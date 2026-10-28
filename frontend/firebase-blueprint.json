@@ -1,0 +1,36 @@
+{
+  "entities": {
+    "students": {
+      "title": "Students",
+      "description": "Registered students database",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "grade": { "type": "string" },
+        "institution": { "type": "string" },
+        "currentModule": { "type": "string" },
+        "status": { "type": "string" },
+        "registeredBy": { "type": "string" },
+        "registeredAt": { "type": "string" }
+      },
+      "required": ["name", "email", "grade"]
+    },
+    "administrators": {
+      "title": "Administrators",
+      "description": "Registered administrators database",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "institution": { "type": "string" },
+        "department": { "type": "string" },
+        "status": { "type": "string" },
+        "registeredBy": { "type": "string" },
+        "registeredAt": { "type": "string" }
+      },
+      "required": ["name", "email", "role"]
+    }
+  }
+}

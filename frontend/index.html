@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enara | The Intelligence Layer for Education</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+      // "Campus" theme: the app's teal/indigo utility classes resolve to the Campus blue scale.
+      (function () {
+        var blue = { 50: '#eef4ff', 100: '#dbe7fd', 200: '#bcd3f7', 300: '#8fb4f0', 400: '#5b8fe6', 500: '#2a6edc', 600: '#0056D2', 700: '#00419e', 800: '#0b3d91', 900: '#0b2a63', 950: '#071530' };
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: { teal: blue, indigo: blue, cyan: blue },
+              fontFamily: { sans: ['"Source Sans 3"', 'system-ui', 'sans-serif'] },
+            },
+          },
+        };
+      })();
+    </script>
+    <style>
+        :root {
+            --primary: #0056D2;
+            --primary-light: #2a6edc;
+            --primary-dark: #00419e;
+            --secondary: #8fb4f0;
+            --accent: #d97706;
+            --background: #f5f7fa;
+            --card: #FFFFFF;
+        }
+        body {
+            font-family: 'Source Sans 3', system-ui, sans-serif;
+            background-color: var(--background);
+            color: #1f1f1f;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        /* Campus uses one sans family; former serif headings become heavy sans. */
+        .font-crimson { font-family: 'Source Sans 3', system-ui, sans-serif; font-weight: 800; letter-spacing: -0.01em; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .teal-gradient, .teal-gradient-hover:hover { background: #0056D2; }
+        .glass-panel { background: #ffffff; }
+        .card-hover { transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+        .card-hover:hover { box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #0056D2; box-shadow: 0 0 0 3px rgba(0, 86, 210, 0.15); }
+        /* Campus shapes: modest radii and flat cards instead of pills and heavy shadows. */
+        .rounded-3xl, [class*="rounded-[2"], [class*="rounded-[3"] { border-radius: 12px !important; }
+        .rounded-2xl { border-radius: 10px; }
+        .shadow-xl, .shadow-2xl, .shadow-lg { box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08) !important; }
+        [class*="shadow-teal-"], [class*="shadow-indigo-"] { --tw-shadow-color: transparent; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+        @keyframes slideIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .animate-slide-in { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.574.0",
+    "recharts": "https://esm.sh/recharts@^3.7.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

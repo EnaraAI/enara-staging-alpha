@@ -1,0 +1,37 @@
+[
+ {
+  "text": "Here: {\"a\": 1} trailing {\"b\": 2}",
+  "ok": {
+   "a": 1
+  }
+ },
+ {
+  "text": "{\"a\": \"}{\"}",
+  "ok": {
+   "a": "}{"
+  }
+ },
+ {
+  "text": "no json",
+  "error": "InvalidModelOutput"
+ },
+ {
+  "text": "  {\"x\": [1, {\"y\": \"z\"}]}  done",
+  "ok": {
+   "x": [
+    1,
+    {
+     "y": "z"
+    }
+   ]
+  }
+ },
+ {
+  "text": "[1, 2]",
+  "error": "InvalidModelOutput"
+ },
+ {
+  "text": "{\"a\": 1",
+  "error": "JSONDecodeError"
+ }
+]

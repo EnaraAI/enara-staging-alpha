@@ -1,0 +1,19 @@
+# Local secrets written by `elevenlabs onboard`
+/.env.local
+
+# Offline grading benchmark data (public datasets, CC BY 4.0): downloaded on demand, never committed.
+/data/benchmarks/grading/
+/data/benchmarks/grading_recall/
+# Benchmark run outputs (may contain dataset text and model output).
+/data/benchmarks/runs/
+/data/benchmarks/budgets/
+__pycache__/
+.pytest_cache/
+
+# Staging deployment repository: never commit installs, builds or local env files.
+node_modules/
+dist/
+.env
+.env.*
+uploads/
+!.env.example

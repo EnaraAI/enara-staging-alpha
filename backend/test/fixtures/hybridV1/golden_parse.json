@@ -1,0 +1,452 @@
+[
+ {
+  "name": "valid",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "يقترن"
+      }
+     ]
+    },
+    {
+     "idea": "x",
+     "status": "MISSING",
+     "evidence": []
+    }
+   ],
+   "score": 3.25
+  },
+  "ok": {
+   "score": 3.25,
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "start": 28,
+       "end": 33
+      }
+     ]
+    },
+    {
+     "idea": "x",
+     "status": "MISSING",
+     "evidence": []
+    }
+   ],
+   "material_errors": []
+  }
+ },
+ {
+  "name": "int_score",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "يقترن"
+      }
+     ]
+    }
+   ],
+   "score": 4
+  },
+  "ok": {
+   "score": 4.0,
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "start": 28,
+       "end": 33
+      }
+     ]
+    }
+   ],
+   "material_errors": []
+  }
+ },
+ {
+  "name": "off_grid",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "يقترن"
+      }
+     ]
+    }
+   ],
+   "score": 3.3
+  },
+  "error": "InvalidModelOutput",
+  "code": "INVALID_MODEL_OUTPUT",
+  "message": "score 3.3 not on the 0.25 grid within [0, 5.0]",
+  "diagnostics": null
+ },
+ {
+  "name": "above_max",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "يقترن"
+      }
+     ]
+    }
+   ],
+   "score": 5.25
+  },
+  "error": "InvalidModelOutput",
+  "code": "INVALID_MODEL_OUTPUT",
+  "message": "score 5.25 not on the 0.25 grid within [0, 5.0]",
+  "diagnostics": null
+ },
+ {
+  "name": "negative",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "يقترن"
+      }
+     ]
+    }
+   ],
+   "score": -0.25
+  },
+  "error": "InvalidModelOutput",
+  "code": "INVALID_MODEL_OUTPUT",
+  "message": "score -0.25 not on the 0.25 grid within [0, 5.0]",
+  "diagnostics": null
+ },
+ {
+  "name": "bool_score",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "يقترن"
+      }
+     ]
+    }
+   ],
+   "score": true
+  },
+  "error": "InvalidModelOutput",
+  "code": "INVALID_MODEL_OUTPUT",
+  "message": "score missing or not a number",
+  "diagnostics": null
+ },
+ {
+  "name": "string_score",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "يقترن"
+      }
+     ]
+    }
+   ],
+   "score": "3"
+  },
+  "error": "InvalidModelOutput",
+  "code": "INVALID_MODEL_OUTPUT",
+  "message": "score missing or not a number",
+  "diagnostics": null
+ },
+ {
+  "name": "no_ideas",
+  "raw": {
+   "score": 3
+  },
+  "error": "InvalidModelOutput",
+  "code": "INVALID_MODEL_OUTPUT",
+  "message": "holistic output is not an object with ideas",
+  "diagnostics": null
+ },
+ {
+  "name": "bad_status",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "x",
+     "status": "YES",
+     "evidence": []
+    }
+   ],
+   "score": 1
+  },
+  "error": "InvalidModelOutput",
+  "code": "INVALID_MODEL_OUTPUT",
+  "message": "idea 0 fails the contract",
+  "diagnostics": null
+ },
+ {
+  "name": "bad_evidence",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "x",
+     "status": "PARTLY",
+     "evidence": [
+      {
+       "text": ""
+      }
+     ]
+    }
+   ],
+   "score": 1
+  },
+  "error": "InvalidModelOutput",
+  "code": "INVALID_MODEL_OUTPUT",
+  "message": "idea 0 evidence fails the contract",
+  "diagnostics": null
+ },
+ {
+  "name": "covered_no_evidence",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "x",
+     "status": "COVERED",
+     "evidence": []
+    }
+   ],
+   "score": 1
+  },
+  "error": "InvalidModelOutput",
+  "code": "INVALID_MODEL_OUTPUT",
+  "message": "idea 0 is COVERED without evidence",
+  "diagnostics": null
+ },
+ {
+  "name": "quote_not_found",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "x",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "غير موجود"
+      }
+     ]
+    }
+   ],
+   "score": 1
+  },
+  "error": "UnverifiableEvidence",
+  "code": "UNVERIFIABLE_EVIDENCE",
+  "message": "idea 0: NOT_FOUND",
+  "diagnostics": [
+   {
+    "idea": 0,
+    "class": "NOT_FOUND",
+    "quote_len": 9,
+    "quote_sha256": "eed69ba9fb73776e"
+   }
+  ]
+ },
+ {
+  "name": "quote_repeated",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "x",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "الفيروس ينسخ نفسه"
+      }
+     ]
+    }
+   ],
+   "score": 1
+  },
+  "error": "UnverifiableEvidence",
+  "code": "UNVERIFIABLE_EVIDENCE",
+  "message": "idea 0: REPEATED_UNRESOLVED",
+  "diagnostics": [
+   {
+    "idea": 0,
+    "class": "REPEATED_UNRESOLVED",
+    "quote_len": 17,
+    "quote_sha256": "69e2c76c5982eb35"
+   }
+  ]
+ },
+ {
+  "name": "quote_context",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "x",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "الفيروس ينسخ نفسه",
+       "context_before": "المكافحة. ",
+       "context_after": null
+      }
+     ]
+    }
+   ],
+   "score": 1
+  },
+  "ok": {
+   "score": 1.0,
+   "ideas": [
+    {
+     "idea": "x",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "start": 82,
+       "end": 99
+      }
+     ]
+    }
+   ],
+   "material_errors": []
+  }
+ },
+ {
+  "name": "diag_then_missing_evidence",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "a",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "zzz"
+      }
+     ]
+    },
+    {
+     "idea": "b",
+     "status": "COVERED",
+     "evidence": []
+    }
+   ],
+   "score": 2
+  },
+  "error": "UnverifiableEvidence",
+  "code": "UNVERIFIABLE_EVIDENCE",
+  "message": "idea 0: NOT_FOUND",
+  "diagnostics": [
+   {
+    "idea": 0,
+    "class": "NOT_FOUND",
+    "quote_len": 3,
+    "quote_sha256": "17f165d5a5ba695f"
+   }
+  ]
+ },
+ {
+  "name": "material_errors_trim",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "يقترن"
+      }
+     ]
+    }
+   ],
+   "score": 2.5,
+   "material_errors": [
+    "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "a",
+    "b",
+    "c",
+    "d",
+    "f"
+   ]
+  },
+  "ok": {
+   "score": 2.5,
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "start": 28,
+       "end": 33
+      }
+     ]
+    }
+   ],
+   "material_errors": [
+    "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "a",
+    "b",
+    "c",
+    "d"
+   ]
+  }
+ },
+ {
+  "name": "max_score_exact",
+  "raw": {
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "text": "يقترن"
+      }
+     ]
+    }
+   ],
+   "score": 5.0
+  },
+  "ok": {
+   "score": 5.0,
+   "ideas": [
+    {
+     "idea": "ينسخ نفسه",
+     "status": "COVERED",
+     "evidence": [
+      {
+       "start": 28,
+       "end": 33
+      }
+     ]
+    }
+   ],
+   "material_errors": []
+  }
+ }
+]

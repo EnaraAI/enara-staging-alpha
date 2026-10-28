@@ -1,0 +1,114 @@
+{
+ "created_utc": "2026-10-26T17:04:51Z",
+ "candidate": "ENARA-HYBRID-experimental@v1",
+ "status": "opt-in shadow adapter implemented; not deployed",
+ "frozen_python_sources": {
+  "anchored_holistic.py": "a1be3f9c6dbabdfc00956ec53c6139709fa827335ffa2b383622127fc6ed55f3",
+  "hybrid_v1.py": "baba3f2994d700966f9215e4e40773f30cafbd86b8dab4a9bf6a5a91ad8607b0",
+  "provider_anthropic.py": "77694af6ebbd3bdd17306c7a6e7b074169c67c318b1bbdf5ba9414297b8ecea9",
+  "gateway.py": "17d824237314da1ffb85b887dd98e407bafc028343b07548d2e45701dab50e9c",
+  "interpretation_guard.py": "df506fcd1e86555beb8a398aceea3510b1d2238765e23e7c1fa6b18c85ade29f",
+  "arasag_test_extract.py": "f00b387c837c52e4e4f3128bf2bb920e68bdd7ba2f85e0e2bd987dab74b58464"
+ },
+ "confirmatory_manifest": {
+  "path": "docs/benchmarks/diagnostics/20261028T080000Z-enara-hybrid-confirmatory-v1/preflight/run_manifest.json",
+  "sha256": "84717eb114bf275026679af665a9bfe325d9e2687b124fa9078584e3bce78e1f",
+  "code_sha256": {
+   "anchored_holistic": "a1be3f9c6dbabdfc00956ec53c6139709fa827335ffa2b383622127fc6ed55f3",
+   "hybrid_v1": "baba3f2994d700966f9215e4e40773f30cafbd86b8dab4a9bf6a5a91ad8607b0",
+   "arasag_test_extract": "f00b387c837c52e4e4f3128bf2bb920e68bdd7ba2f85e0e2bd987dab74b58464",
+   "arasag_extract": "179623d45e1f277dbc3ba44906278f8405c147204afa40146ea18618c835b62c",
+   "interpretation_guard": "df506fcd1e86555beb8a398aceea3510b1d2238765e23e7c1fa6b18c85ade29f",
+   "gateway": "17d824237314da1ffb85b887dd98e407bafc028343b07548d2e45701dab50e9c",
+   "budget": "1ec98209155023d230472ff24a6e8fffa1228c18d46eefb41421526dbd361149",
+   "provider_anthropic": "77694af6ebbd3bdd17306c7a6e7b074169c67c318b1bbdf5ba9414297b8ecea9",
+   "msa_concept": "1cbcfe798954d1ecf7aaa2e56e8fb4710a7754b10241840f1e5a2c4edd7024ae",
+   "hybrid_confirm_run": "28b448a8d12ad3fad0b437f636023beffdc75de2486cf8627bf84cf6ce097f7e",
+   "run_grading_eval": "b16bbfa24be3bcced257cb3a09c6d87a0c55e9b9c3165e725bf7212a6535fcf1",
+   "protocol": "e24dc63429e32950e6eccbdf1fcc6bc51ed5fda97598bd66ffb3cbc24840b984"
+  },
+  "amendments": "docs/benchmarks/diagnostics/20261028T080000Z-enara-hybrid-confirmatory-v1/amendments.json",
+  "amendments_sha256": "c4cf2851c39b1da70a0a40d1068265877cf4d959f2f256829a21ccddd47d9468"
+ },
+ "provenance_checks": {
+  "anchored_holistic_matches_confirmatory": true,
+  "hybrid_v1_matches_confirmatory": true,
+  "provider_matches_confirmatory": true,
+  "run_grading_eval_matches_confirmatory": true,
+  "v6_config_sha256": "ddcda7fe656d9dcc15a9f43001d4d40bb3ebf63f4d516308744f4da43298f1a5",
+  "v6_config_matches": true
+ },
+ "v6": {
+  "version": "ENARA-ANCHORED-HOLISTIC-experimental@v6",
+  "config_sha256": "ddcda7fe656d9dcc15a9f43001d4d40bb3ebf63f4d516308744f4da43298f1a5",
+  "model": "claude-sonnet-5-5",
+  "max_tokens": 8000,
+  "k_anchors": 4,
+  "prompt_format": "adaptive_holistic_v6",
+  "sampling": "provider defaults (no temperature/effort sent)",
+  "sdk_retries": 0,
+  "timeout_s": 240,
+  "repair_attempts": 1,
+  "max_prompt_code_points": 20000
+ },
+ "evalv2": {
+  "policy": "PRODUCTION_POLICY {version: 'eval-v2'} (backend/src/services/gradingProposals.ts, unchanged)",
+  "benchmark_model": "claude-opus-5-5 (backend default ANTHROPIC_TUTOR_MODEL)",
+  "harness": "scripts/benchmarks/run_grading_eval.py --variant baseline",
+  "harness_sha256": "b16bbfa24be3bcced257cb3a09c6d87a0c55e9b9c3165e725bf7212a6535fcf1",
+  "production_sources_sha256": {
+   "gradingProposals.ts": "44a432617c5a59379fdf35bd6278e492c5c1506f19fc9bde4e6435ec009c8814",
+   "autoGrading.ts": "a363ccf5693dd54815e937b1975cfa16f813b3464750199f24f54a4f37eeaf7c",
+   "aiJson.ts": "7f33a3ddbf54f772eb61154374770b6d237a597fde435f09332962b50556ab9b",
+   "aiCalls.ts": "72d58ef2531f6ed0a0e2bf63171fa760f81e31951d082defa24d2c1a4333340f",
+   "featureFlags.ts": "1171244ec0f3e41d572e642cf631f101ffbb43c1c180187ecba6cafd2057112b",
+   "grading.ts": "ecce742c1f8c774b7802dc7716133b742edb010e144c6d8dd23a2d1917d4abc5"
+  }
+ },
+ "hybrid": {
+  "formula": "round(((eval_v2 + v6) / 2) / 0.125) * 0.125 (Python round half-even)",
+  "fallback": "v6 missing -> eval-v2 score labelled HYBRID_FALLBACK_EVALV2; eval-v2 missing -> non-score HYBRID_NO_EVALV2",
+  "anchor_seed_production": "enara-hybrid-v1-anchors",
+  "anchor_seed_confirmatory": "enara-hybrid-confirmatory-v1"
+ },
+ "feature_flags": {
+  "ENARA_HYBRID_V1_ENABLED": "false (default)",
+  "ENARA_HYBRID_V1_MODE": "shadow only",
+  "ENARA_HYBRID_V1_SHADOW_INSTITUTIONS": "required allowlist",
+  "ENARA_HYBRID_V1_MAX_CALLS": "required",
+  "ENARA_HYBRID_V1_MAX_USD": "required"
+ },
+ "interfaces": {
+  "new_collections": [
+   "hybridshadowresults",
+   "hybridanchorsets"
+  ],
+  "official_grade_path": "unchanged (autoGrading.processAttempt)",
+  "api_routes_added": []
+ },
+ "benchmark_source": {
+  "experiment": "enara-hybrid-confirmatory-v1",
+  "report": "docs/benchmarks/diagnostics/20261028T080000Z-enara-hybrid-confirmatory-v1/analysis/report.md",
+  "primary_metrics_sha256": "6f99fb5e921a2c8d4b4ff54231a95b70180ec26025c39c628f90a4efad5ff942"
+ },
+ "new_files_sha256": {
+  "backend/src/services/hybridV1/v6.ts": "340dfc47ed084a4451673e36e290316cfaaf7d55933f4234e39942a75adef88a",
+  "backend/src/services/hybridV1/pyjson.ts": "8d62cc9f894aaf69fe02526ab7a65d77df25bb597beff79f30395975410226ee",
+  "backend/src/services/hybridV1/hybrid.ts": "bc35318703dbdd6e9e2833495089f8c56e02780663ea82303f7f7f2aeee2ebca",
+  "backend/src/services/hybridV1/config.ts": "71595c52f646b49d5e0f7092aff8a4308e25c4570782267d55c52b61d4587324",
+  "backend/src/services/hybridV1/shadow.ts": "50f5d9d6e3254521e2d858148f261073b02443b456f363b3d6ef66e3e41ca613",
+  "backend/src/services/hybridV1/client.ts": "dc04bb57b9dacde12e1f03040efa0a0b45f10d4ab0199a6c97e5ef31476d825d",
+  "backend/src/services/hybridV1/frozenV6Spec.json": "7dac0b136e3b4fb41d5c14e8afe1dfff05d366f433167d9816a36f96370018d4",
+  "backend/src/models/HybridShadowResult.ts": "aca9ba40b0ab970f8d1c492d0e9ae586c6e884da035b2bdb441bbce064bb2f4b",
+  "backend/src/scripts/hybridShadow.ts": "efdc9a2c56d79560427e5a6cecc5ac9bceab89847750b8952255d3e698e84f0c",
+  "backend/test/hybridV1.frozen.test.ts": "9b9cb1eb0106f7a25d2fe94d821df77cf0e688f81f2cf505bef01692865f6c5e",
+  "backend/test/hybridV1.shadow.test.ts": "f8f41e0b725b3cb870b96c302059c36c17f08723b42979e71ab66072e1d4ddef",
+  "scripts/benchmarks/diagnostics/export_hybrid_v1_frozen.py": "d78ec380ac04555a125b9c9c9a8a1de9f0c4b91ef6fc8ed0e8c7e6514278a81e",
+  "backend/test/fixtures/hybridV1/frozen_v6_spec.json": "7dac0b136e3b4fb41d5c14e8afe1dfff05d366f433167d9816a36f96370018d4",
+  "backend/test/fixtures/hybridV1/golden_anchors.json": "37702395f748a3d7cb02c6d7d20b8196499b52e56c15b893fd890200dda2651c",
+  "backend/test/fixtures/hybridV1/golden_combine.json": "a9ad88afb2a3ca3ee6967db406538bf86a89feb27a899f393270cc4fb6c9ae69",
+  "backend/test/fixtures/hybridV1/golden_extract.json": "c12bb3d5b12c1c8e2ce268c0f76c4a022cf4fb77eb80b31e3c4270fc13a14707",
+  "backend/test/fixtures/hybridV1/golden_parse.json": "73fd1685e043859279c822e8a2ba22555357d717c6d8568b4df7f14ad5af7a43",
+  "backend/test/fixtures/hybridV1/golden_prompts.json": "c7530cd59377c25df5cf5ff4e1f9567286cfe41c666325a84aea3d360aca1456"
+ }
+}

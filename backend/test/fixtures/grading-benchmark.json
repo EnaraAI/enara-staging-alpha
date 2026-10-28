@@ -1,0 +1,130 @@
+{
+  "version": "bench-v1",
+  "note": "Reference scores were assigned by the engineering team against each rubric while writing the responses. They are NOT teacher scores. Replace or confirm them with scores from at least two teachers before using the results to decide on automatic release (docs/phase3/PHASE3_GRADING_BENCHMARK.md).",
+  "referenceScoredBy": "engineering (provisional)",
+  "items": [
+    {
+      "id": "en-fractions",
+      "language": "en",
+      "question": {
+        "id": "q", "type": "open-response",
+        "text": "Explain why you need a common denominator before you add 1/3 + 1/6. Use an example.",
+        "modelAnswer": "Fractions can only be added directly when the parts are the same size. Thirds are bigger than sixths, so change 1/3 into 2/6. Then 2/6 + 1/6 = 3/6, which is 1/2.",
+        "objectiveIds": ["obj"],
+        "rubric": { "criteria": [
+          { "id": "reason", "title": "Reasoning", "description": "Explains that parts must be the same size", "maxPoints": 2, "objectiveIds": ["obj"], "levels": [
+            { "id": "r0", "label": "Missing or wrong", "points": 0, "description": "No reason, or an incorrect one" },
+            { "id": "r1", "label": "Partial", "points": 1, "description": "Mentions changing the bottom number without saying why" },
+            { "id": "r2", "label": "Clear", "points": 2, "description": "Says the parts must be the same size (equal-size pieces)" } ] },
+          { "id": "example", "title": "Worked example", "description": "Shows the conversion and the sum", "maxPoints": 2, "objectiveIds": ["obj"], "levels": [
+            { "id": "e0", "label": "None or wrong", "points": 0, "description": "No example, or the arithmetic is wrong" },
+            { "id": "e1", "label": "Partial", "points": 1, "description": "Converts 1/3 to 2/6 but does not finish, or finishes with a slip" },
+            { "id": "e2", "label": "Complete", "points": 2, "description": "1/3 = 2/6 and 2/6 + 1/6 = 3/6 (or 1/2)" } ] } ] }
+      },
+      "responses": [
+        { "id": "en-f-1", "answer": "You can only add fractions when the pieces are the same size. A third is bigger than a sixth, so 1/3 becomes 2/6. Then 2/6 + 1/6 = 3/6 = 1/2.", "reference": { "reason": "r2", "example": "e2" } },
+        { "id": "en-f-2", "answer": "The pieces have to be the same size. 1/3 = 2/6 so the answer is 3/6.", "reference": { "reason": "r2", "example": "e2" } },
+        { "id": "en-f-3", "answer": "Because the bottom numbers need to match. 1/3 is 2/6, then you add.", "reference": { "reason": "r1", "example": "e1" } },
+        { "id": "en-f-4", "answer": "You add the tops and the bottoms: 1/3 + 1/6 = 2/9.", "reference": { "reason": "r0", "example": "e0" } },
+        { "id": "en-f-5", "answer": "So the parts are equal sized and you are counting the same kind of thing. I don't remember how to do the example.", "reference": { "reason": "r2", "example": "e0" } },
+        { "id": "en-f-6", "answer": "You need the same denominator. 1/3 + 1/6 = 2/6 + 1/6 = 3/6.", "reference": { "reason": "r1", "example": "e2" } },
+        { "id": "en-f-7", "answer": "I like fractions. My teacher says they are important.", "reference": { "reason": "r0", "example": "e0" } },
+        { "id": "en-f-8", "answer": "Sixths and thirds are different sized slices of the pizza, so you cut the thirds into sixths first: 1/3 = 2/6. 2/6 + 1/6 = 4/6.", "reference": { "reason": "r2", "example": "e1" } }
+      ]
+    },
+    {
+      "id": "en-ice",
+      "language": "en",
+      "question": {
+        "id": "q", "type": "open-response",
+        "text": "Why does ice float on water? Explain using the idea of density.",
+        "modelAnswer": "When water freezes its molecules form an open structure, so ice takes up more space for the same mass. Its density is lower than liquid water, and objects less dense than water float.",
+        "objectiveIds": ["obj"],
+        "rubric": { "criteria": [
+          { "id": "concept", "title": "Density idea", "description": "Ice is less dense than liquid water and less dense things float", "maxPoints": 2, "objectiveIds": ["obj"], "levels": [
+            { "id": "c0", "label": "Missing or wrong", "points": 0, "description": "No density idea or a misconception (e.g. ice is lighter because it is cold)" },
+            { "id": "c1", "label": "Partial", "points": 1, "description": "Says ice is less dense or lighter for its size, without linking to floating" },
+            { "id": "c2", "label": "Clear", "points": 2, "description": "Lower density than water, and less dense objects float" } ] },
+          { "id": "cause", "title": "Why the density is lower", "description": "Expands when it freezes / molecules spread out", "maxPoints": 2, "objectiveIds": ["obj"], "levels": [
+            { "id": "k0", "label": "Missing", "points": 0, "description": "No cause given" },
+            { "id": "k1", "label": "Partial", "points": 1, "description": "Says ice expands or takes more space, without the mass staying the same" },
+            { "id": "k2", "label": "Clear", "points": 2, "description": "Same mass in a larger volume because molecules form an open structure" } ] } ] }
+      },
+      "responses": [
+        { "id": "en-i-1", "answer": "Ice is less dense than liquid water, and anything less dense than water floats. It is less dense because when water freezes the molecules lock into an open pattern, so the same mass takes up more volume.", "reference": { "concept": "c2", "cause": "k2" } },
+        { "id": "en-i-2", "answer": "Ice floats because it is less dense than water. Water expands when it freezes.", "reference": { "concept": "c2", "cause": "k1" } },
+        { "id": "en-i-3", "answer": "Ice floats because it is cold and cold things are lighter.", "reference": { "concept": "c0", "cause": "k0" } },
+        { "id": "en-i-4", "answer": "Ice has air bubbles in it so it floats.", "reference": { "concept": "c0", "cause": "k0" } },
+        { "id": "en-i-5", "answer": "Ice is lighter for its size than water. That's it.", "reference": { "concept": "c1", "cause": "k0" } },
+        { "id": "en-i-6", "answer": "When water freezes the molecules spread out into a crystal, so the ice has the same mass but bigger volume, which means lower density. Lower density than water means it floats.", "reference": { "concept": "c2", "cause": "k2" } },
+        { "id": "en-i-7", "answer": "Density is mass divided by volume. Ice takes up more space than the water it came from.", "reference": { "concept": "c1", "cause": "k1" } },
+        { "id": "en-i-8", "answer": "Ice floats because it is solid and solids float on liquids.", "reference": { "concept": "c0", "cause": "k0" } }
+      ]
+    },
+    {
+      "id": "ar-fractions",
+      "language": "ar",
+      "question": {
+        "id": "q", "type": "open-response",
+        "text": "اشرح لماذا يجب توحيد المقامات قبل جمع ١/٣ + ١/٦. استخدم مثالاً.",
+        "modelAnswer": "لا يمكن جمع الكسور مباشرة إلا إذا كانت الأجزاء متساوية في الحجم. الثلث أكبر من السدس، لذلك نحول ١/٣ إلى ٢/٦. ثم ٢/٦ + ١/٦ = ٣/٦ أي ١/٢.",
+        "objectiveIds": ["obj"],
+        "rubric": { "criteria": [
+          { "id": "reason", "title": "التعليل", "description": "يوضح أن الأجزاء يجب أن تكون متساوية في الحجم", "maxPoints": 2, "objectiveIds": ["obj"], "levels": [
+            { "id": "r0", "label": "غائب أو خاطئ", "points": 0, "description": "لا تعليل أو تعليل خاطئ" },
+            { "id": "r1", "label": "جزئي", "points": 1, "description": "يذكر توحيد المقام دون سبب" },
+            { "id": "r2", "label": "واضح", "points": 2, "description": "يذكر أن الأجزاء يجب أن تكون متساوية الحجم" } ] },
+          { "id": "example", "title": "المثال", "description": "يبين التحويل والمجموع", "maxPoints": 2, "objectiveIds": ["obj"], "levels": [
+            { "id": "e0", "label": "لا يوجد أو خاطئ", "points": 0, "description": "لا مثال أو حساب خاطئ" },
+            { "id": "e1", "label": "جزئي", "points": 1, "description": "يحول ١/٣ إلى ٢/٦ ولا يكمل، أو يكمل بخطأ" },
+            { "id": "e2", "label": "كامل", "points": 2, "description": "١/٣ = ٢/٦ و ٢/٦ + ١/٦ = ٣/٦" } ] } ] }
+      },
+      "responses": [
+        { "id": "ar-f-1", "answer": "لا نستطيع جمع الكسور إلا إذا كانت القطع بنفس الحجم. الثلث أكبر من السدس، لذلك ١/٣ = ٢/٦، ثم ٢/٦ + ١/٦ = ٣/٦ = ١/٢.", "reference": { "reason": "r2", "example": "e2" } },
+        { "id": "ar-f-2", "answer": "لأن المقامات يجب أن تكون متشابهة. ١/٣ تصبح ٢/٦ ثم نجمع.", "reference": { "reason": "r1", "example": "e1" } },
+        { "id": "ar-f-3", "answer": "نجمع البسط مع البسط والمقام مع المقام: ١/٣ + ١/٦ = ٢/٩.", "reference": { "reason": "r0", "example": "e0" } },
+        { "id": "ar-f-4", "answer": "حتى تكون الأجزاء متساوية في الحجم. ١/٣ = ٢/٦ فيكون الناتج ٣/٦.", "reference": { "reason": "r2", "example": "e2" } },
+        { "id": "ar-f-5", "answer": "أحب الرياضيات كثيراً.", "reference": { "reason": "r0", "example": "e0" } },
+        { "id": "ar-f-6", "answer": "الأسداس والأثلاث قطع بأحجام مختلفة، فنقسم كل ثلث إلى سدسين: ١/٣ = ٢/٦، و ٢/٦ + ١/٦ = ٤/٦.", "reference": { "reason": "r2", "example": "e1" } }
+      ]
+    },
+    {
+      "id": "ar-water",
+      "language": "ar",
+      "question": {
+        "id": "q", "type": "open-response",
+        "text": "صف دورة الماء في الطبيعة واذكر دور الشمس فيها.",
+        "modelAnswer": "تسخن الشمس ماء البحار فيتبخر ويصعد بخار الماء، ثم يبرد في الأعلى فيتكاثف ويكوّن الغيوم، ثم يهطل مطراً أو ثلجاً ويعود إلى البحار والأنهار.",
+        "objectiveIds": ["obj"],
+        "rubric": { "criteria": [
+          { "id": "stages", "title": "المراحل", "description": "التبخر والتكاثف والهطول والعودة", "maxPoints": 2, "objectiveIds": ["obj"], "levels": [
+            { "id": "s0", "label": "ناقص جداً", "points": 0, "description": "مرحلة واحدة أو لا شيء" },
+            { "id": "s1", "label": "جزئي", "points": 1, "description": "مرحلتان أو ثلاث" },
+            { "id": "s2", "label": "كامل", "points": 2, "description": "التبخر والتكاثف والهطول بالترتيب الصحيح" } ] },
+          { "id": "sun", "title": "دور الشمس", "description": "الشمس مصدر الحرارة التي تسبب التبخر", "maxPoints": 2, "objectiveIds": ["obj"], "levels": [
+            { "id": "u0", "label": "غائب", "points": 0, "description": "لا يذكر الشمس أو يذكر دوراً خاطئاً" },
+            { "id": "u2", "label": "صحيح", "points": 2, "description": "الشمس تسخن الماء فيتبخر" } ] } ] }
+      },
+      "responses": [
+        { "id": "ar-w-1", "answer": "تسخن الشمس ماء البحر فيتبخر، ثم يبرد البخار في السماء ويتكاثف فيكون الغيوم، ثم ينزل المطر ويعود إلى البحر.", "reference": { "stages": "s2", "sun": "u2" } },
+        { "id": "ar-w-2", "answer": "الماء يتبخر ثم ينزل مطراً.", "reference": { "stages": "s1", "sun": "u0" } },
+        { "id": "ar-w-3", "answer": "الشمس تجعل الماء يتبخر، ثم يصبح غيوماً.", "reference": { "stages": "s1", "sun": "u2" } },
+        { "id": "ar-w-4", "answer": "المطر يأتي من الغيوم.", "reference": { "stages": "s0", "sun": "u0" } },
+        { "id": "ar-w-5", "answer": "يتبخر الماء من البحار بسبب حرارة الشمس، ويتكاثف في الأعلى، ثم يهطل على شكل مطر أو ثلج.", "reference": { "stages": "s2", "sun": "u2" } },
+        { "id": "ar-w-6", "answer": "القمر يسحب الماء إلى السماء ثم يسقط مطراً.", "reference": { "stages": "s0", "sun": "u0" } }
+      ]
+    }
+  ],
+  "shortAnswers": [
+    { "id": "sa-1", "language": "en", "question": "Write one half as a decimal.", "key": "0.5", "answer": "zero point five", "reference": true },
+    { "id": "sa-2", "language": "en", "question": "Write one half as a decimal.", "key": "0.5", "answer": ".5", "reference": true },
+    { "id": "sa-3", "language": "en", "question": "Write one half as a decimal.", "key": "0.5", "answer": "0.2", "reference": false },
+    { "id": "sa-4", "language": "en", "question": "What gas do plants take in for photosynthesis?", "key": "carbon dioxide", "answer": "CO2", "reference": true },
+    { "id": "sa-5", "language": "en", "question": "What gas do plants take in for photosynthesis?", "key": "carbon dioxide", "answer": "oxygen", "reference": false },
+    { "id": "sa-6", "language": "en", "question": "What is the capital of France?", "key": "Paris", "answer": "paris, france", "reference": true },
+    { "id": "sa-7", "language": "ar", "question": "ما الغاز الذي تمتصه النباتات في عملية البناء الضوئي؟", "key": "ثاني أكسيد الكربون", "answer": "ثاني اكسيد الكربون", "reference": true },
+    { "id": "sa-8", "language": "ar", "question": "ما الغاز الذي تمتصه النباتات في عملية البناء الضوئي؟", "key": "ثاني أكسيد الكربون", "answer": "الأكسجين", "reference": false },
+    { "id": "sa-9", "language": "ar", "question": "اكتب النصف بصورة عشرية.", "key": "0.5", "answer": "٠٫٥", "reference": true },
+    { "id": "sa-10", "language": "ar", "question": "اكتب النصف بصورة عشرية.", "key": "0.5", "answer": "نصف", "reference": false }
+  ]
+}
