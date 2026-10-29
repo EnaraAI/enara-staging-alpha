@@ -4,7 +4,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors, { CorsOptions } from 'cors';
 import helmet from 'helmet';
 import { idleDbController, mountStagingFrontend } from './config/stagingSingleService';
-import { maintenanceToken, stagingMaintenanceRouter } from './routes/stagingMaintenance.routes';
+import { createStagingEnaraAdmin, maintenanceToken, stagingMaintenanceRouter } from './routes/stagingMaintenance.routes';
 import rateLimit from 'express-rate-limit';
 import { createHash } from 'crypto';
 import path from 'path';
@@ -245,6 +245,7 @@ export function createApp() {
         pending: async () => (await import('./migrations/runner')).pendingMigrations((await import('./migrations')).MIGRATIONS),
         migrate: async () => (await import('./migrations/runner')).runMigrations((await import('./migrations')).MIGRATIONS),
         seed: async (inst, opts) => (await import('./scripts/seed4Level1')).seed4Level1(inst, opts) as Promise<Record<string, unknown>>,
+        createEnaraAdmin: createStagingEnaraAdmin,
       }),
     );
   }

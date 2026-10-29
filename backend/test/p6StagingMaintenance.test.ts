@@ -11,6 +11,7 @@ const deps = () => ({
   pending: vi.fn(async () => [{ id: '2026-10-29-p5-usage-indexes', description: 'x' }]),
   migrate: vi.fn(async () => ['2026-10-29-p5-usage-indexes']),
   seed: vi.fn(async () => ({ institution: 'enara-staging-school', setupLinks: {} })),
+  createEnaraAdmin: vi.fn(async () => ({ email: 'enara.admin@x', created: true })),
 });
 const appWith = (d = deps()) => {
   const app = express();
@@ -37,6 +38,7 @@ describe('staging maintenance endpoint', () => {
     }
     expect(d.migrate).not.toHaveBeenCalled();
     expect(d.seed).not.toHaveBeenCalled();
+    expect(d.createEnaraAdmin).not.toHaveBeenCalled();
   });
 
   it('reports status, migrates, and seeds one validated institution', async () => {
@@ -50,6 +52,42 @@ describe('staging maintenance endpoint', () => {
     expect(d.seed).toHaveBeenCalledWith('enara-staging-school', { emitSetupLinks: false });
     await call({ action: 'seed', institution: 'enara-staging-school', emitSetupLinks: true });
     expect(d.seed).toHaveBeenLastCalledWith('enara-staging-school', { emitSetupLinks: true });
+    expect((await call({ action: 'create-enara-admin' })).body).toMatchObject({ action: 'create-enara-admin', created: true });
+    expect(d.createEnaraAdmin).toHaveBeenLastCalledWith({ accessToken: false, setupLink: false });
+    await call({ action: 'create-enara-admin', accessToken: true, setupLink: 'yes' });
+    expect(d.createEnaraAdmin).toHaveBeenLastCalledWith({ accessToken: true, setupLink: false });
     expect((await call({ action: 'drop' })).status).toBe(400);
+  });
+});
+
+describe('staging ENARA admin creation (in-memory database)', () => {
+  it('creates one global enara-admin, reuses it, and never takes over another account', async () => {
+    const { MongoMemoryServer } = await import('mongodb-memory-server');
+    const mongoose = (await import('mongoose')).default;
+    const mongo = await MongoMemoryServer.create();
+    for (const [k, v] of Object.entries({
+      NODE_ENV: 'test', MONGODB_URI: mongo.getUri(), JWT_SECRET: 'test-jwt-secret-32-characters-minimum', INGEST_HMAC_SECRET: 'test-hmac-secret-32-characters-minimum',
+      CORS_ALLOWED_ORIGINS: 'http://localhost:5173', APP_URL: 'https://staging.example.test',
+    })) vi.stubEnv(k, v);
+    (await import('../src/config/env')).resetConfigForTests();
+    await mongoose.connect(mongo.getUri());
+    try {
+      const { createStagingEnaraAdmin, STAGING_ENARA_ADMIN_EMAIL } = await import('../src/routes/stagingMaintenance.routes');
+      const { User } = await import('../src/models/User');
+      const first = await createStagingEnaraAdmin({ accessToken: true, setupLink: true });
+      expect(first).toMatchObject({ email: STAGING_ENARA_ADMIN_EMAIL, created: true });
+      expect(String(first.accessToken)).toMatch(/^ey/);
+      expect(String(first.setupLink)).toMatch(/^https:\/\/staging\.example\.test\/reset-password\?token=/);
+      const u = await User.findOne({ email: STAGING_ENARA_ADMIN_EMAIL }).lean();
+      expect(u).toMatchObject({ role: 'enara-admin', status: 'active' });
+      expect(u!.institutionId).toBeFalsy();
+      expect(await createStagingEnaraAdmin({ accessToken: false, setupLink: false })).toEqual({ email: STAGING_ENARA_ADMIN_EMAIL, created: false });
+      await User.updateOne({ email: STAGING_ENARA_ADMIN_EMAIL }, { $set: { role: 'teacher', institutionId: 'instA' } });
+      await expect(createStagingEnaraAdmin({ accessToken: true, setupLink: false })).rejects.toThrow(/refusing to change existing account/);
+      expect(await User.countDocuments({ email: STAGING_ENARA_ADMIN_EMAIL })).toBe(1);
+    } finally {
+      await mongoose.disconnect();
+      await mongo.stop();
+    }
   });
 });

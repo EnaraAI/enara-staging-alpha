@@ -15,6 +15,9 @@ export interface MaintenanceDeps {
   pending: () => Promise<{ id: string; description: string }[]>;
   migrate: () => Promise<string[]>;
   seed: (institution: string, opts: { emitSetupLinks: boolean }) => Promise<Record<string, unknown>>;
+  // One global ENARA admin for staging set-up. Returns an access token and/or
+  // a single-use setup link only when asked.
+  createEnaraAdmin: (opts: { accessToken: boolean; setupLink: boolean }) => Promise<Record<string, unknown>>;
 }
 
 const sameToken = (given: unknown, expected: string) => {
@@ -53,11 +56,47 @@ export function stagingMaintenanceRouter(token: string, deps: MaintenanceDeps): 
         logger.info('staging_maintenance_seed', { institution, setupLinks: Boolean(req.body?.emitSetupLinks) });
         return res.json({ action, ...out });
       }
-      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'action must be status, migrate or seed' } });
+      if (action === 'create-enara-admin') {
+        const out = await deps.createEnaraAdmin({ accessToken: req.body?.accessToken === true, setupLink: req.body?.setupLink === true });
+        logger.info('staging_maintenance_enara_admin', { accessToken: req.body?.accessToken === true, setupLink: req.body?.setupLink === true });
+        return res.json({ action, ...out });
+      }
+      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'action must be status, migrate, seed or create-enara-admin' } });
     } catch (error) {
       logger.error('staging_maintenance_failed', { action, error: serializeError(error) });
       return res.status(500).json({ error: { code: 'MAINTENANCE_FAILED', message: error instanceof Error ? error.message : 'failed' } });
     }
   });
   return router;
+}
+
+export const STAGING_ENARA_ADMIN_EMAIL = 'enara.admin@enara-staging-school.demo.enara.test';
+
+// Creates (or reuses) the staging ENARA admin. Refuses to touch an existing
+// account with that address unless it already is that ENARA admin.
+export async function createStagingEnaraAdmin(opts: { accessToken: boolean; setupLink: boolean }) {
+  const { randomBytes } = await import('crypto');
+  const bcrypt = (await import('bcryptjs')).default;
+  const { User } = await import('../models/User');
+  const { signAccessToken } = await import('../auth/jwt');
+  const { requestPasswordReset } = await import('../services/accountTokens');
+  const { getConfig } = await import('../config/env');
+  const email = STAGING_ENARA_ADMIN_EMAIL;
+  const existing = await User.findOne({ email }).select('role institutionId').lean();
+  if (existing && (existing.role !== 'enara-admin' || existing.institutionId)) throw new Error(`refusing to change existing account ${email}`);
+  const user = await User.findOneAndUpdate(
+    { email },
+    {
+      $set: { role: 'enara-admin', name: 'ENARA Staging Admin', status: 'active' },
+      $setOnInsert: { email, password: await bcrypt.hash(randomBytes(32).toString('hex'), 10) },
+    },
+    { upsert: true, new: true },
+  );
+  const out: Record<string, unknown> = { email, created: !existing };
+  if (opts.accessToken) out.accessToken = signAccessToken({ id: user!._id.toString(), email, role: 'enara-admin' } as never);
+  if (opts.setupLink) {
+    const token = await requestPasswordReset(email, { sendMail: false });
+    if (token) out.setupLink = `${getConfig().appUrl.replace(/\/$/, '')}/reset-password?token=${encodeURIComponent(token)}`;
+  }
+  return out;
 }
