@@ -594,6 +594,20 @@ describe('ingestion HMAC and IDOR protection', () => {
     expect(wrongSecret.status).toBe(401);
   });
 
+  // Ingestion status lives in Postgres; without it the route answers 503
+  // (F-1, P14.8). These cases model a deployment that has it (service mocked).
+  async function withPostgresConfigured<T>(fn: () => PromiseLike<T>): Promise<T> {
+    const env = await import('../src/config/env');
+    process.env.DATABASE_URL = 'postgres://localhost:5432/enara-test-not-connected';
+    env.resetConfigForTests();
+    try {
+      return await fn();
+    } finally {
+      delete process.env.DATABASE_URL;
+      env.resetConfigForTests();
+    }
+  }
+
   it('prevents another institution from reading ingestion status', async () => {
     serviceMocks.getIngestionJobByEventId.mockResolvedValue({
       event_id: 'evtA',
@@ -603,9 +617,9 @@ describe('ingestion HMAC and IDOR protection', () => {
     });
     const adminA = await bearer({ email: 'ing-admin@example.com', role: 'admin', institutionId: 'instA' });
 
-    const res = await request(app)
+    const res = await withPostgresConfigured(() => request(app)
       .get('/api/ingestion/status/evtA')
-      .set('Authorization', auth(adminA.token));
+      .set('Authorization', auth(adminA.token)));
 
     expect(res.status).toBe(404);
   });
@@ -619,9 +633,9 @@ describe('ingestion HMAC and IDOR protection', () => {
     });
     const adminA = await bearer({ email: 'ing-admin@example.com', role: 'admin', institutionId: 'instA' });
 
-    const res = await request(app)
+    const res = await withPostgresConfigured(() => request(app)
       .get('/api/ingestion/status/evtA')
-      .set('Authorization', auth(adminA.token));
+      .set('Authorization', auth(adminA.token)));
 
     expect(res.status).toBe(200);
     expect(res.body.data.event_id).toBe('evtA');

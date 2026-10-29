@@ -4,9 +4,14 @@ import { logger } from '../utils/logging';
 // Sends through Resend's HTTP API. Returns false (and sends nothing) unless
 // emails are enabled; with a test recipient set, every email goes there instead
 // and says who it was meant for.
+export function isEmailConfigured(): boolean {
+  const { email } = getConfig();
+  return email.enabled && !!email.resendApiKey && !!email.from;
+}
+
 export async function sendEmail(params: { to: string; subject: string; html: string }): Promise<boolean> {
   const { email } = getConfig();
-  if (!email.enabled || !email.resendApiKey || !email.from) return false;
+  if (!isEmailConfigured()) return false;
 
   const to = email.testRecipient || params.to;
   const html = email.testRecipient

@@ -9,11 +9,13 @@ export interface AccessTokenSubject {
   role: UserRole;
   studentId?: string;
   institutionId?: string;
+  tokenVersion?: number;
 }
 
 export interface VerifiedAccessToken {
   subject: string;
   tokenType: 'access';
+  tokenVersion: number;
 }
 
 export function signAccessToken(user: AccessTokenSubject): string {
@@ -25,6 +27,7 @@ export function signAccessToken(user: AccessTokenSubject): string {
     role: user.role,
     studentId: user.studentId,
     institutionId: user.institutionId,
+    tv: user.tokenVersion ?? 0,
   };
   const options: SignOptions = {
     algorithm: 'HS256',
@@ -58,5 +61,10 @@ export function verifyAccessToken(token: string): VerifiedAccessToken {
   if (decoded.role !== undefined && !isUserRole(decoded.role)) {
     throw new AppError('Invalid token payload', 401, 'INVALID_TOKEN');
   }
-  return { subject: decoded.sub, tokenType: 'access' };
+  // Tokens from before S-1 have no tv claim and count as version 0.
+  const tokenVersion = decoded.tv === undefined ? 0 : decoded.tv;
+  if (typeof tokenVersion !== 'number' || !Number.isInteger(tokenVersion) || tokenVersion < 0) {
+    throw new AppError('Invalid token payload', 401, 'INVALID_TOKEN');
+  }
+  return { subject: decoded.sub, tokenType: 'access', tokenVersion };
 }

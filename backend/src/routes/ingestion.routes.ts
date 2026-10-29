@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { authenticateUserOrApiKey, AuthRequest, requireRole } from '../middleware/auth.middleware';
 import { requireIngestionSignature } from '../middleware/ingestionAuth';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
+import { getConfig } from '../config/env';
 import {
   getIngestionJobByEventId,
   pollEngineStatus,
@@ -76,6 +77,8 @@ router.get(
   authenticateUserOrApiKey('ingestion:read'),
   requireRole('teacher', 'admin', 'enara-admin'),
   asyncHandler(async (req: AuthRequest, res: Response) => {
+    // Ingestion status lives in Postgres; without it the feature is unavailable (F-1).
+    if (!getConfig().databaseUrl) throw new AppError('Ingestion status is not available here', 503, 'INGESTION_UNAVAILABLE');
     const eventId = getRequiredId(req.params, 'eventId');
     const job = await getIngestionJobByEventId(eventId);
     if (!job) throw new AppError('Ingestion job not found', 404, 'INGESTION_JOB_NOT_FOUND');

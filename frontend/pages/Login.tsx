@@ -19,7 +19,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { login, logout, SessionUser } from '../services/apiService';
+import { clearSession, login, SessionUser } from '../services/apiService';
 import { uiRoleFor, UiRole } from '../services/roleRouting';
 
 interface LoginProps {
@@ -56,7 +56,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
       // (services/roleRouting.ts). Academic managers get a read-only portal.
       const portal = uiRoleFor(user.role, selectedRole);
       if (!portal) {
-        logout();
+        // Wrong portal: forget this session locally only. A server logout
+        // would also sign the account out on its other devices.
+        clearSession();
         const roleNames: Record<string, string> = {
           student: 'Student', teacher: 'Teacher', academic_manager: 'Academic Manager', admin: 'Administrator', 'enara-admin': 'Enara Administrator',
         };

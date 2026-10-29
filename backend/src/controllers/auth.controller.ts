@@ -31,6 +31,7 @@ function signToken(user: {
   role: UserRole;
   studentId?: string;
   institutionId?: string;
+  tokenVersion?: number;
 }) {
   return signAccessToken({
     id: user._id.toString(),
@@ -38,8 +39,16 @@ function signToken(user: {
     role: user.role,
     studentId: user.studentId,
     institutionId: user.institutionId,
+    tokenVersion: user.tokenVersion,
   });
 }
+
+// Server-side logout (S-1): revokes every token of this account, on every
+// device, by bumping its token version. Idempotent.
+export const logout = asyncHandler(async (req: AuthRequest, res: Response) => {
+  await User.updateOne({ _id: req.user!.id }, { $inc: { tokenVersion: 1 } });
+  res.status(204).end();
+});
 
 async function ensureStudentLink(user: InstanceType<typeof User>) {
   if (user.role !== 'student') return user;

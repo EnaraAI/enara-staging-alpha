@@ -120,7 +120,7 @@ export async function confirmPasswordReset(token: string, password: string): Pro
   const now = new Date();
   const claimed = await PasswordReset.findOneAndUpdate({ tokenHash: hashToken(token), usedAt: null, expiresAt: { $gt: now } }, { $set: { usedAt: now } });
   if (!claimed) throw new AppError('This reset link is invalid, used or expired', 400, 'RESET_TOKEN_INVALID');
-  const updated = await User.updateOne({ _id: claimed.userId, status: 'active' }, { $set: { password: await bcrypt.hash(password, getConfig().bcryptRounds) } });
+  const updated = await User.updateOne({ _id: claimed.userId, status: 'active' }, { $set: { password: await bcrypt.hash(password, getConfig().bcryptRounds) }, $inc: { tokenVersion: 1 } });
   if (!updated.matchedCount) throw new AppError('This reset link is invalid, used or expired', 400, 'RESET_TOKEN_INVALID');
   // Any other open reset links for the account stop working.
   await PasswordReset.updateMany({ userId: claimed.userId, usedAt: null }, { $set: { usedAt: now } });

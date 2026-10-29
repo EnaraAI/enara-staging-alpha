@@ -124,7 +124,10 @@ export async function login(email: string, password: string): Promise<SessionUse
   return data.user;
 }
 
+// Signs out on the server too (S-1): every token of the account stops
+// working, on every device. Best effort; the local session is cleared anyway.
 export function logout() {
+  if (getToken()) void request('POST', '/api/auth/logout').catch(() => undefined);
   clearSession();
 }
 

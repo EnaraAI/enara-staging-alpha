@@ -41,7 +41,8 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
   try {
     const verified = verifyAccessToken(token);
     const user = await User.findById(verified.subject);
-    if (!user || user.status !== 'active') {
+    // A logout or password reset since the token was issued revokes it (S-1).
+    if (!user || user.status !== 'active' || (user.tokenVersion ?? 0) !== verified.tokenVersion) {
       res.status(401).json({
         error: {
           code: 'INVALID_TOKEN',

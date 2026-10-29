@@ -6,7 +6,7 @@ import { TutorSession } from '../models/TutorSession';
 import { User } from '../models/User';
 import { logger } from '../utils/logging';
 import { buildOverview } from './analyticsService';
-import { emailLayout, sendEmail } from './emailService';
+import { emailLayout, isEmailConfigured, sendEmail } from './emailService';
 import { ReminderLog } from '../models/ReminderLog';
 
 // "This week in your school" for teachers and admins: who is stuck, which
@@ -128,6 +128,8 @@ export async function buildWeeklySummary(scope: Record<string, unknown>): Promis
 
 // Monday email to each institution's admins and teachers.
 export async function sendWeeklySummaries() {
+  // Without email nothing can be delivered: don't spend AI calls writing it.
+  if (!isEmailConfigured()) return { sent: 0, skipped: 'email_disabled' as const };
   const staff = await User.find({ role: { $in: ['admin', 'teacher'] }, status: 'active', institutionId: { $ne: null } })
     .select('email name institutionId')
     .lean();

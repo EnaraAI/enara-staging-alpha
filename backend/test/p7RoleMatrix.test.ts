@@ -98,7 +98,9 @@ describe('P7 feature x role sweep', () => {
   });
 
   it('calls every route as every role and keeps the security invariants', async () => {
-    const api = routes.filter((r) => r.path.startsWith('/api/'));
+    // Logout revokes the caller's tokens (S-1), which would sign every sweep
+    // identity out mid-run; it has its own tests (p14_8BlockerFixes).
+    const api = routes.filter((r) => r.path.startsWith('/api/') && r.path !== '/api/auth/logout');
     for (const role of Object.keys(users)) {
       for (const r of api) {
         const res = await call(users[role], r.method, fill(r.path));
@@ -118,10 +120,10 @@ describe('P7 feature x role sweep', () => {
       if (o.role.startsWith('teacher') && ok(o.status) && o.method !== 'GET' && /^\/api\/(ai-controls|learning\/flags|workspace\/(users|invitations)$)/.test(o.path)) v.push(`teacher-admin-write ${o.method} ${o.path}`);
       if (!o.role.startsWith('enara_admin') && ok(o.status) && /^\/api\/ai-controls/.test(o.path)) v.push(`non-enara-ai-controls ${o.role} ${o.method} ${o.path}`);
     }
-    // Known, reviewed findings (QA report): F-1 ingestion status needs Postgres,
-    // which staging does not use, and answers 500 instead of 503; F-2 ending an
-    // avatar session only ever closes the caller's own session (idempotent 204).
-    const KNOWN = [/^5xx \S+ GET \/api\/ingestion\/status\/:eventId 500 /, /^academic-manager-write DELETE \/api\/avatar\/session\/:id$/];
+    // Known, reviewed finding (QA report): F-2 ending an avatar session only
+    // ever closes the caller's own session (idempotent 204). F-1 is fixed
+    // (P14.8): ingestion status without Postgres answers 503 *_UNAVAILABLE.
+    const KNOWN = [/^academic-manager-write DELETE \/api\/avatar\/session\/:id$/];
     expect(v.filter((x) => !KNOWN.some((k) => k.test(x)))).toEqual([]);
   }, 600_000);
 

@@ -212,7 +212,16 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
 export const switchAvatarLanguage = asyncHandler(async (req: AuthRequest, res: Response) => {
   const session = await findOwnSession(req);
   const language = toLanguage((req.body as { target_language?: string }).target_language);
-  const sessionToken = await createAnamSessionToken(language, session.avatarId);
+  // A new Anam session token is new provider time: reserve it before asking
+  // (P0d/P14 caps), and give it back if Anam refuses. Kept whole otherwise.
+  const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: session.avatarId || 'anam-default' }, `avatar:${session.id}:switch:${randomUUID()}`, 48 * 60 * 60 * 1000);
+  let sessionToken: string;
+  try {
+    sessionToken = await createAnamSessionToken(language, session.avatarId);
+  } catch (error) {
+    await releaseAiBudget(ticket);
+    throw error;
+  }
   session.language = language;
   await session.save();
   res.json({ session_token: sessionToken, language });

@@ -14,6 +14,9 @@ export interface IUser extends Document {
   // Explicit permission grants on top of the role's defaults (auth/permissions.ts).
   permissions?: string[];
   origin?: 'live' | 'demo_seed';
+  // Bumped on logout and password reset: every token signed with an older
+  // value is refused (S-1). Missing means 0, so earlier tokens stay valid.
+  tokenVersion?: number;
 }
 
 const userSchema = new Schema<IUser>(
@@ -31,6 +34,7 @@ const userSchema = new Schema<IUser>(
     status: { type: String, enum: ['active', 'disabled'], default: 'active', index: true },
     permissions: { type: [String], default: undefined },
     origin: { type: String, enum: ['live', 'demo_seed'], default: 'live' },
+    tokenVersion: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

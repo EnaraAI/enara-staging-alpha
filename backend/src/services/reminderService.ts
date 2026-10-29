@@ -4,7 +4,7 @@ import { getConfig } from '../config/env';
 import { ReminderLog } from '../models/ReminderLog';
 import { Student } from '../models/Student';
 import { logger } from '../utils/logging';
-import { emailLayout, sendEmail } from './emailService';
+import { emailLayout, isEmailConfigured, sendEmail } from './emailService';
 import { buildLearnerSnapshot, describeSnapshot, LearnerSnapshot } from './learnerSnapshot';
 import { buildNextSteps } from './nextStepsService';
 
@@ -107,6 +107,8 @@ export async function planReminders(scope: Record<string, unknown>): Promise<Rem
 }
 
 export async function sendReminders(scope: Record<string, unknown>) {
+  // Without email nothing can be delivered: don't spend AI calls writing it.
+  if (!isEmailConfigured()) return { planned: 0, sent: 0, skipped: 'email_disabled' as const };
   const plans = await planReminders(scope);
   const appUrl = getConfig().appUrl;
   let sent = 0;
