@@ -31,6 +31,23 @@ export function isStagingMode(source: NodeJS.ProcessEnv): boolean {
   return /^(1|true|yes)$/i.test((source.ENARA_STAGING ?? '').trim());
 }
 
+// ENARA_STAGING set to anything but a boolean ("ture", "on") would read as
+// off and skip the guard. Unset, empty and false are unchanged.
+export function stagingFlagProblem(source: NodeJS.ProcessEnv): string | null {
+  const raw = (source.ENARA_STAGING ?? '').trim();
+  return raw && !/^(1|true|yes|0|false|no)$/i.test(raw) ? 'ENARA_STAGING must be true or false' : null;
+}
+
+// Entry points that exist only for staging (api/index.js -> vercel.ts) call
+// this before anything else: without ENARA_STAGING=true the isolation guard
+// would not run, so they refuse to start. Isolation itself is still proven by
+// stagingProblems(), never by the flag alone.
+export function assertStagingEntry(source: NodeJS.ProcessEnv): void {
+  const problem = stagingFlagProblem(source);
+  if (problem) throw new Error(`Staging entry refused: ${problem}`);
+  if (!isStagingMode(source)) throw new Error('Staging entry refused: this entry point serves only ENARA staging and needs ENARA_STAGING=true');
+}
+
 // The database named in a MongoDB URI path, without logging the URI.
 export function mongoDbName(uri: string): string | null {
   const m = /^mongodb(?:\+srv)?:\/\/[^/]*\/([^?]*)/.exec(uri.trim());
@@ -101,6 +118,13 @@ export function stagingProblems(source: NodeJS.ProcessEnv, dotenvKeys: string[] 
     problems.push('REMINDERS_ENABLED needs REMINDER_TEST_RECIPIENT in staging (every email to one test inbox)');
   }
   if (/^(1|true|yes)$/i.test(val(source, 'DEMO_MODE_ENABLED'))) problems.push('DEMO_MODE_ENABLED must be false in staging');
+
+  // Any paid provider path in staging needs the cumulative test-spend cap
+  // (aiBudget.ts): model keys, voice, avatar, orchestrator, ingestion engine.
+  const paid = ['ANTHROPIC_API_KEY', 'ELEVENLABS_API_KEY', 'ANAM_API_KEY', 'ENARA_API_KEY', 'ENARA_ORCHESTRATOR_URL', 'AI_ENGINE_URL'];
+  if (paid.some((k) => val(source, k)) && !(val(source, 'AI_TEST_SPEND_CAP_USD') && val(source, 'AI_TEST_SPEND_ID'))) {
+    problems.push('AI_TEST_SPEND_CAP_USD and AI_TEST_SPEND_ID must be set when a provider key is set in staging');
+  }
   return problems;
 }
 

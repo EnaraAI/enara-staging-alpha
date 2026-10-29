@@ -1,0 +1,340 @@
+{
+  "phase": "P13.3",
+  "mode": "read-only; source + Vercel metadata + env names/scopes only; no values, dashboards, login, app requests or provider calls",
+  "generatedUtc": "2026-10-29T17:25:00Z",
+  "repository": {
+    "branch": "staging-alpha",
+    "head": "cc8530f171303a035a9a380b076d349f786d2297",
+    "originHead": "cc8530f171303a035a9a380b076d349f786d2297",
+    "trackedChanges": 0,
+    "untrackedPreserved": 7
+  },
+  "deployment": {
+    "alias": "enara-staging-alpha.vercel.app",
+    "id": "dpl_GUdoFwWLBJFK2g4XhYv9ns97WxH4",
+    "target": "production",
+    "state": "Ready",
+    "envNames": 20,
+    "envScopes": {
+      "Production": 20,
+      "Preview": 0,
+      "Development": 0
+    }
+  },
+  "stageA": [
+    {
+      "id": "A3",
+      "check": "guard activation",
+      "kind": "design weakness",
+      "status": "VERIFIED",
+      "source": "backend/src/config/stagingGuard.ts:30-33"
+    },
+    {
+      "id": "A4",
+      "check": "startup order",
+      "kind": "design",
+      "status": "VERIFIED",
+      "source": "backend/src/vercel.ts; backend/src/app.ts:91; backend/src/config/db.ts:7-36"
+    },
+    {
+      "id": "A5",
+      "check": "guard coverage (no host/cluster, no prod-secret compare, no AI_PAUSED)",
+      "kind": "design weakness",
+      "status": "VERIFIED",
+      "source": "backend/src/config/stagingGuard.ts:47-105"
+    },
+    {
+      "id": "A6",
+      "check": "migrations default ON unless exactly 'false'",
+      "kind": "design weakness",
+      "status": "VERIFIED",
+      "source": "backend/src/config/db.ts:29"
+    },
+    {
+      "id": "A7",
+      "check": "R2 all-or-none; 0 set -> local disk",
+      "kind": "design",
+      "status": "VERIFIED",
+      "source": "backend/src/config/env.ts:243-256; backend/src/services/uploadStorage.ts:20-46; backend/src/app.ts:150-170"
+    },
+    {
+      "id": "A8",
+      "check": "all four R2 values non-empty",
+      "kind": "runtime",
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "A9",
+      "check": "email cannot be sent (RESEND_API_KEY, REMINDER_FROM absent)",
+      "kind": "runtime (absence)",
+      "status": "VERIFIED",
+      "source": "backend/src/services/emailService.ts:9; backend/src/config/env.ts:286-291; vercel env names"
+    },
+    {
+      "id": "A10",
+      "check": "cron sweep is secret-gated and includes document-retention deletes; no vercel.json cron",
+      "kind": "design + runtime",
+      "status": "VERIFIED (source/file); external schedulers UNKNOWN",
+      "source": "backend/src/routes/cron.routes.ts; vercel.json"
+    },
+    {
+      "id": "A11",
+      "check": "AI pause layers (env/global/school)",
+      "kind": "design + reported runtime",
+      "status": "REPORTED: env false + global off set 2026-10-29 at owner request; current UNKNOWN",
+      "source": "backend/src/config/env.ts:397; backend/src/services/aiBudget.ts:105-125"
+    },
+    {
+      "id": "A12",
+      "check": "provider path disabled",
+      "kind": "runtime (absence)",
+      "status": "VERIFIED",
+      "source": "vercel env names"
+    },
+    {
+      "id": "A13",
+      "check": "NODE_ENV not production",
+      "kind": "runtime",
+      "status": "INFERRED (strong)",
+      "source": "backend/src/config/env.ts:226-240"
+    },
+    {
+      "id": "A14",
+      "check": "postgres readiness ok without connection",
+      "kind": "design weakness",
+      "status": "VERIFIED",
+      "source": "backend/src/app.ts:176-188"
+    },
+    {
+      "id": "A15",
+      "check": "if staging mode on, REMINDERS_ENABLED is not 'true' (no REMINDER_TEST_RECIPIENT)",
+      "kind": "conditional",
+      "status": "INFERRED (conditional)"
+    }
+  ],
+  "stageB_attestations": [
+    {
+      "id": "1",
+      "item": "ENARA_STAGING enabled",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "1a",
+      "item": "guard demonstrably invoked (local guard script: 0 problems)",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "2",
+      "item": "NODE_ENV as intended (development)",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "3",
+      "item": "database name enara_staging_alpha",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "4a",
+      "item": "Atlas project/cluster distinct from production",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "4b",
+      "item": "least-privilege DB user",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "4c",
+      "item": "network allowlist appropriate",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "5a",
+      "item": "dedicated staging R2 bucket",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "5b",
+      "item": "bucket-limited R2 credentials",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "6a",
+      "item": "JWT_SECRET differs from production",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "6b",
+      "item": "INGEST_HMAC_SECRET differs from production",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "6c",
+      "item": "CRON_SECRET differs from production",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "6d",
+      "item": "previously exposed credentials rotated",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "7",
+      "item": "RUN_MIGRATIONS_ON_START=false",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "8",
+      "item": "SERVE_LOCAL_UPLOADS=false",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "9",
+      "item": "DEMO_MODE_ENABLED=false",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "10",
+      "item": "REGISTRATION_INVITE_ONLY=true",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "11a",
+      "item": "REMINDERS_ENABLED=false",
+      "critical": false,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "11b",
+      "item": "no external scheduler calls /api/cron/daily",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "12a",
+      "item": "AI_PAUSED=true",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null,
+      "expected": "FAILED (reported set to false 2026-10-29)"
+    },
+    {
+      "id": "12b",
+      "item": "global/school pause (separately authorized)",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "12c",
+      "item": "provider path disabled",
+      "critical": true,
+      "status": "VERIFIED",
+      "evidenceType": "Vercel env names",
+      "date": "2026-10-29"
+    },
+    {
+      "id": "13",
+      "item": "TRUST_PROXY is a hop count (1)",
+      "critical": false,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "14",
+      "item": "postgres readiness not treated as proof",
+      "critical": false,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    },
+    {
+      "id": "15",
+      "item": "all four R2 values non-empty",
+      "critical": true,
+      "status": "UNKNOWN",
+      "evidenceType": null,
+      "date": null
+    }
+  ],
+  "decisions": {
+    "authenticatedNonAiSmokeTests": "BLOCKED",
+    "aiDependentTests": "NO-GO",
+    "rule": "any critical attestation UNKNOWN/FAILED -> BLOCKED / NO-GO"
+  },
+  "recommendations": [
+    "fail-closed staging guard / explicit environment identity",
+    "Mongo cluster + R2 account pinning",
+    "migrations opt-in by default",
+    "AI_PAUSED default true; log effective pause booleans",
+    "readiness reports postgres not_configured",
+    "refuse local storage on serverless",
+    "skip destructive cron sweeps in staging unless enabled"
+  ],
+  "notRun": [
+    "reading env values",
+    "Atlas/Cloudflare/Vercel dashboards",
+    "login or any application request",
+    "provider calls",
+    "database/storage inspection"
+  ],
+  "secretsInThisFile": false
+}

@@ -22,11 +22,17 @@ export async function openMongo(): Promise<void> {
   logger.info('mongodb_connected');
 }
 
+// Staging never migrates on start, whatever the spelling of the switch: the
+// guard accepts "FALSE" or " false", which the exact check below would not.
+export function migrateOnStart(env: NodeJS.ProcessEnv, stagingMode: boolean): boolean {
+  return !stagingMode && env.NODE_ENV !== 'test' && env.RUN_MIGRATIONS_ON_START !== 'false';
+}
+
 export async function connectDB(): Promise<void> {
   await openMongo();
 
   // Apply pending migrations on start-up (one instance at a time; the others skip).
-  if (process.env.NODE_ENV !== 'test' && process.env.RUN_MIGRATIONS_ON_START !== 'false') {
+  if (migrateOnStart(process.env, getConfig().stagingMode)) {
     const { MIGRATIONS } = await import('../migrations');
     const { runMigrations } = await import('../migrations/runner');
     await runMigrations(MIGRATIONS).catch((error) =>

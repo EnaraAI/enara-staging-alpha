@@ -112,7 +112,7 @@ export interface IBudgetReservation {
   userId?: string;
   feature: string;
   provider: string;
-  kind: 'standard' | 'grading_allowance' | 'grading_emergency';
+  kind: 'standard' | 'grading_allowance' | 'grading_emergency' | 'test_spend';
   amountMicros: number;
   counters: string[];
   status: ReservationStatus;
@@ -128,7 +128,7 @@ const budgetReservationSchema = new Schema<IBudgetReservation>(
     userId: String,
     feature: { type: String, required: true },
     provider: { type: String, required: true },
-    kind: { type: String, enum: ['standard', 'grading_allowance', 'grading_emergency'], required: true },
+    kind: { type: String, enum: ['standard', 'grading_allowance', 'grading_emergency', 'test_spend'], required: true },
     amountMicros: { type: Number, required: true, min: 0 },
     counters: { type: [String], default: [] },
     status: { type: String, enum: ['reserving', 'reserved', 'settled', 'released', 'expired'], required: true },

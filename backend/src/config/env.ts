@@ -1,4 +1,4 @@
-import { assertStagingIsolation, isStagingMode } from "./stagingGuard";
+import { assertStagingIsolation, isStagingMode, stagingFlagProblem } from "./stagingGuard";
 import dotenv from "dotenv";
 
 // Keys filled in from a .env file (staging refuses to start with any: it must
@@ -74,6 +74,9 @@ export interface AppConfig {
   // sleep. Both are honoured only with ENARA_STAGING=true.
   frontendDir?: string;
   dbIdleDisconnectMs?: number;
+  // Cumulative cap on all AI spend while testing a deployment (P14.2), grading
+  // included. Separate from school budgets; see aiBudget.ts.
+  aiTestSpend?: { id: string; capUsd: number };
   elevenlabs?: {
     apiKey: string;
     voiceIdEn: string;
@@ -206,7 +209,27 @@ function parseTrustProxy(source: NodeJS.ProcessEnv): boolean | number {
   throw new Error("TRUST_PROXY must be true, false, or a hop count");
 }
 
+function parseTestSpend(source: NodeJS.ProcessEnv): AppConfig["aiTestSpend"] {
+  const rawCap = readString(source, "AI_TEST_SPEND_CAP_USD");
+  const id = readString(source, "AI_TEST_SPEND_ID");
+  if (rawCap === undefined) {
+    if (id) throw new Error("AI_TEST_SPEND_ID needs AI_TEST_SPEND_CAP_USD");
+    return undefined;
+  }
+  const capUsd = Number(rawCap);
+  if (!Number.isFinite(capUsd) || capUsd <= 0) {
+    throw new Error("AI_TEST_SPEND_CAP_USD must be a positive number of US dollars");
+  }
+  if (!id || !/^[A-Za-z0-9_-]{1,64}$/.test(id)) {
+    throw new Error("AI_TEST_SPEND_ID (letters, digits, _ or -) is required with AI_TEST_SPEND_CAP_USD");
+  }
+  return { id, capUsd };
+}
+
 export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
+  // A misspelt ENARA_STAGING would silently skip the guard: refuse it.
+  const flagProblem = stagingFlagProblem(source);
+  if (flagProblem) throw new Error(flagProblem);
   // Staging (ENARA_STAGING=true): refuse to start unless isolated; see stagingGuard.ts.
   const staging = isStagingMode(source);
   if (staging) assertStagingIsolation(source, source === process.env ? dotenvKeys : []);
@@ -398,6 +421,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     registrationInviteOnly: readBoolean(source, "REGISTRATION_INVITE_ONLY", staging),
     stagingMode: staging,
     frontendDir: staging ? readString(source, "SERVE_FRONTEND_DIR") || undefined : undefined,
+    aiTestSpend: parseTestSpend(source),
     dbIdleDisconnectMs:
       staging && readString(source, "DB_IDLE_DISCONNECT_MS")
         ? readNumber(source, "DB_IDLE_DISCONNECT_MS", 240_000, { min: 30_000, max: 3_600_000 })

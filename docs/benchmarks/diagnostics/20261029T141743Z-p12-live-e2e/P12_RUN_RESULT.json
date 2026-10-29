@@ -1,0 +1,396 @@
+{
+  "mode": "live",
+  "finishedAt": "2026-10-29T14:11:21.348Z",
+  "steps": [
+    {
+      "n": 0,
+      "name": "Safety gates (isolation, key presence, guard, plan ≤ cap)",
+      "status": "PASS",
+      "kind": "deterministic",
+      "detail": {
+        "database": "mongodb-memory-server (127.0.0.1, throwaway)",
+        "providerHost": "api.anthropic.com",
+        "otherProvidersBlocked": true,
+        "liveEnvTouched": false,
+        "keyPresent": true,
+        "keyPrinted": false,
+        "coreWorstCaseUsd": 0.937
+      }
+    },
+    {
+      "n": 1,
+      "name": "Prepare synthetic source and objectives",
+      "status": "PASS",
+      "kind": "deterministic",
+      "detail": {
+        "httpStatus": 201,
+        "uploadId": "cfj-0a1b4c8e-0f4a-4dd3-8c82-b9b13d22e233",
+        "notesSha256": "83681d5a841ff51b55a7192b052981aca3f3b2937b797ef2cde9336634dc6b29",
+        "objectives": [
+          "p12-obj-roles",
+          "p12-obj-change"
+        ]
+      }
+    },
+    {
+      "n": 2,
+      "name": "Generate English assessment draft (claude-sonnet-5-5)",
+      "status": "PASS",
+      "kind": "REAL PROVIDER",
+      "detail": {
+        "httpStatus": 201,
+        "questions": 5,
+        "model": null
+      }
+    },
+    {
+      "n": 3,
+      "name": "Validate draft (schema, counts, keys, links, duplicates, injection)",
+      "status": "PASS",
+      "kind": "deterministic",
+      "detail": {
+        "englishOnly": true,
+        "countsMatch": true,
+        "objectiveLinked": true,
+        "sourceLinked": 5,
+        "noDuplicates": true,
+        "injectionIgnored": true,
+        "openHasRubric": true,
+        "keyIssues": []
+      }
+    },
+    {
+      "n": 4,
+      "name": "Publish and assign to the synthetic class",
+      "status": "PASS",
+      "kind": "deterministic",
+      "detail": {
+        "publish": 200,
+        "acknowledgedUnsourced": false,
+        "assignment": 201,
+        "assignmentId": "asg-404794fc-4347-49d7-be07-c95aa232679d",
+        "otherSchoolAssign": 404
+      }
+    },
+    {
+      "n": 5,
+      "name": "Synthetic weak submission",
+      "status": "PASS",
+      "kind": "deterministic",
+      "detail": {
+        "attemptId": "att-1793282940182-2h9f",
+        "submit": 200,
+        "studentId": "p12-stu-gap"
+      }
+    },
+    {
+      "n": 6,
+      "name": "Autonomous rubric grading (weak open answer)",
+      "status": "PASS",
+      "kind": "REAL PROVIDER",
+      "detail": {
+        "gradingStatus": "released",
+        "rubricEvaluations": 2,
+        "statuses": [
+          "proposed",
+          "proposed"
+        ],
+        "models": [
+          "claude-opus-5-5"
+        ],
+        "openPoints": 0,
+        "openMax": 4,
+        "weakShare": 0,
+        "totalPercent": 0,
+        "storedScore": 0
+      }
+    },
+    {
+      "n": 7,
+      "name": "Feedback released to the student",
+      "status": "PASS",
+      "kind": "deterministic",
+      "detail": {
+        "resultStatus": 200,
+        "gradingStatus": "released",
+        "feedbackPresent": true,
+        "released": true
+      }
+    },
+    {
+      "n": 8,
+      "name": "Detect learning gaps from stored scores",
+      "status": "PASS",
+      "kind": "deterministic",
+      "detail": {
+        "episodes": [
+          {
+            "objectiveId": "p12-obj-roles",
+            "status": "in_progress"
+          },
+          {
+            "objectiveId": "p12-obj-change",
+            "status": "in_progress"
+          }
+        ],
+        "mastery": [
+          {
+            "objectiveId": "p12-obj-change"
+          },
+          {
+            "objectiveId": "p12-obj-roles"
+          }
+        ],
+        "outcomes": [
+          {
+            "objectiveId": "p12-obj-change",
+            "studentsWithGap": 1,
+            "notYetVerified": 1
+          },
+          {
+            "objectiveId": "p12-obj-roles",
+            "studentsWithGap": 1,
+            "notYetVerified": 1
+          }
+        ]
+      }
+    },
+    {
+      "n": 9,
+      "name": "Targeted tutor reply (claude-opus-5-5)",
+      "status": "PASS",
+      "kind": "REAL PROVIDER",
+      "detail": {
+        "intervention": 201,
+        "start": 200,
+        "message": 200,
+        "teachingMethod": "socratic",
+        "gapTermsMentioned": [
+          "hopper",
+          "grass",
+          "frog",
+          "consumer",
+          "producer",
+          "decomposer"
+        ],
+        "endsWithCheckQuestion": true,
+        "words": 188
+      }
+    },
+    {
+      "n": 10,
+      "name": "Unassisted reassessment (tutor blocked)",
+      "status": "FAIL",
+      "kind": "REAL PROVIDER (short-answer grading) + deterministic MCQ",
+      "detail": {
+        "created": 201,
+        "assigned": 201,
+        "tutorPolicy": "blocked",
+        "attempts": 3,
+        "percents": [
+          85.7,
+          100,
+          100
+        ],
+        "shortAnswerEvaluations": [
+          {
+            "status": "proposed",
+            "points": 1,
+            "model": "claude-opus-5-5"
+          },
+          {
+            "status": "proposed",
+            "points": 1,
+            "model": "claude-opus-5-5"
+          },
+          {
+            "status": "proposed",
+            "points": 1,
+            "model": "claude-opus-5-5"
+          }
+        ],
+        "tutorSessionsTiedToReassessment": 0
+      }
+    },
+    {
+      "n": 11,
+      "name": "Measure change from stored pre/post results",
+      "status": "INFO",
+      "kind": "deterministic",
+      "detail": {
+        "prePercent": 0,
+        "firstPostPercent": 85.7,
+        "items": {
+          "pre": 5,
+          "post": 7
+        },
+        "verdict": "illustrative only: different instruments (AI draft vs teacher-authored), one synthetic student, scripted answers",
+        "episodesAfter": [
+          {
+            "objectiveId": "p12-obj-roles",
+            "status": "in_progress"
+          },
+          {
+            "objectiveId": "p12-obj-change",
+            "status": "in_progress"
+          }
+        ],
+        "masteryAfter": [
+          {
+            "objectiveId": "p12-obj-change"
+          },
+          {
+            "objectiveId": "p12-obj-roles"
+          }
+        ]
+      }
+    },
+    {
+      "n": 6.5,
+      "name": "Strong control: rubric grading of a strong open answer",
+      "status": "PASS",
+      "kind": "REAL PROVIDER",
+      "detail": {
+        "gradingStatus": "released",
+        "rubricEvaluations": 2,
+        "strongShare": 1,
+        "weakShare": 0,
+        "separation": 1,
+        "answerSource": "generated modelAnswer used as the scripted strong answer"
+      }
+    },
+    {
+      "n": 12,
+      "name": "Analytics from stored records (deterministic)",
+      "status": "PASS",
+      "kind": "deterministic",
+      "detail": {
+        "statuses": {
+          "perf": 200,
+          "trend": 200,
+          "gaps": 200,
+          "named": 200
+        },
+        "providerCallsDuringAnalytics": 0,
+        "reportedMeanScore": 66.7,
+        "recomputedMeanOfLatest": 66.7,
+        "reportedSubmissionRate": 75,
+        "perAssignmentStored": {
+          "asg-404794fc-4347-49d7-be07-c95aa232679d": [
+            0,
+            100
+          ],
+          "asg-6c4bec00-cd42-43ea-b2e5-5110673f1959": [
+            100
+          ]
+        },
+        "intents": [
+          "class_performance_summary",
+          "assessment_trend",
+          "learning_gap_summary",
+          "student_report"
+        ]
+      }
+    }
+  ],
+  "reconcile": {
+    "guardAttempts": 9,
+    "guardOk": 9,
+    "usageLedgerRows": 9,
+    "p0dReservations": 9,
+    "guardActualUsd": 0.112112,
+    "usageLedgerCostUsd": 0.112112,
+    "deltaUsd": 0,
+    "guardChargedUsd": 0.112112,
+    "capUsd": 1,
+    "exhausted": false,
+    "stopReason": null,
+    "maxConcurrentAttempts": 1,
+    "ledgerFeatures": [
+      {
+        "feature": "ai_assessment_draft",
+        "model": "claude-sonnet-5-5",
+        "status": "ok",
+        "costUsd": 0.015012,
+        "inputTokens": 931,
+        "outputTokens": 1315
+      },
+      {
+        "feature": "ai_grading",
+        "model": "claude-opus-5-5",
+        "status": "ok",
+        "costUsd": 0.015408,
+        "inputTokens": 1207,
+        "outputTokens": 529
+      },
+      {
+        "feature": "ai_grading",
+        "model": "claude-opus-5-5",
+        "status": "ok",
+        "costUsd": 0.015168,
+        "inputTokens": 1207,
+        "outputTokens": 517
+      },
+      {
+        "feature": "tutor_chat",
+        "model": "claude-opus-5-5",
+        "status": "ok",
+        "costUsd": 0.016316,
+        "inputTokens": 989,
+        "outputTokens": 618
+      },
+      {
+        "feature": "ai_grading",
+        "model": "claude-opus-5-5",
+        "status": "ok",
+        "costUsd": 0.00354,
+        "inputTokens": 285,
+        "outputTokens": 120
+      },
+      {
+        "feature": "ai_grading",
+        "model": "claude-opus-5-5",
+        "status": "ok",
+        "costUsd": 0.00422,
+        "inputTokens": 285,
+        "outputTokens": 154
+      },
+      {
+        "feature": "ai_grading",
+        "model": "claude-opus-5-5",
+        "status": "ok",
+        "costUsd": 0.0039,
+        "inputTokens": 285,
+        "outputTokens": 138
+      },
+      {
+        "feature": "ai_grading",
+        "model": "claude-opus-5-5",
+        "status": "ok",
+        "costUsd": 0.018984,
+        "inputTokens": 1276,
+        "outputTokens": 694
+      },
+      {
+        "feature": "ai_grading",
+        "model": "claude-opus-5-5",
+        "status": "ok",
+        "costUsd": 0.019564,
+        "inputTokens": 1276,
+        "outputTokens": 723
+      }
+    ]
+  },
+  "isolation": {
+    "database": "mongodb-memory-server (127.0.0.1, throwaway)",
+    "providerHost": "api.anthropic.com",
+    "otherProvidersBlocked": true,
+    "liveEnvTouched": false,
+    "keyPresent": true,
+    "keyPrinted": false
+  },
+  "plan": {
+    "coreWorstCaseUsd": 0.937,
+    "optionalWorstCaseUsd": 0.435
+  }
+}

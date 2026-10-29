@@ -1,0 +1,82 @@
+{
+  "phase": "P14.2 minimum safe Vercel test readiness",
+  "date_utc": "2026-10-29T18:04:50Z",
+  "repo": {
+    "name": "EnaraAI/enara-staging-alpha",
+    "branch": "staging-alpha",
+    "head": "cc8530f171303a035a9a380b076d349f786d2297",
+    "origin": "cc8530f171303a035a9a380b076d349f786d2297",
+    "head_matches_expected": true,
+    "untracked_at_start": 10,
+    "untracked_after": 13,
+    "tracked_modified_after": 6,
+    "committed": false,
+    "pushed": false,
+    "deployed": false
+  },
+  "deployment": {
+    "alias": "enara-staging-alpha.vercel.app",
+    "id": "dpl_GUdoFwWLBJFK2g4XhYv9ns97WxH4",
+    "runs_this_change": false
+  },
+  "spend_usd": 0,
+  "provider_calls": 0,
+  "files_changed": [
+    {"path": "backend/src/vercel.ts", "why": "staging entry fails closed; guard runs before DB connect and migrations"},
+    {"path": "backend/src/config/stagingGuard.ts", "why": "stagingFlagProblem, assertStagingEntry; provider key requires test-spend cap in staging"},
+    {"path": "backend/src/config/env.ts", "why": "refuse invalid ENARA_STAGING; parse AI_TEST_SPEND_CAP_USD and AI_TEST_SPEND_ID"},
+    {"path": "backend/src/services/aiBudget.ts", "why": "cumulative test-spend cap for all features incl. grading; school logic unchanged"},
+    {"path": "backend/src/models/OrgBudget.ts", "why": "reservation kind test_spend"},
+    {"path": "backend/staging.env.template", "why": "blank names for the two new settings"},
+    {"path": "backend/test/p14_2StagingEntry.test.ts", "why": "new, 9 tests"},
+    {"path": "backend/test/p14_2GradingTestSpend.test.ts", "why": "new, 15 tests"}
+  ],
+  "tests": {
+    "env": "backend/, env -u ANTHROPIC_API_KEY, all providers mocked",
+    "baseline_focused": {"cmd": "npx vitest run test/p6StagingGuard.test.ts test/p6VercelStaging.test.ts test/p0dBudget.test.ts test/p0dHardening.test.ts", "passed": 35, "skipped": 25, "note": "p0dBudget file-level start-up failure under load; alone 25/25; transient"},
+    "typecheck": {"cmd": "npx tsc --noEmit -p .", "result": "clean"},
+    "new": {"files": 2, "passed": 24, "failed": 0},
+    "focused_after": {"files": 13, "passed": 170, "failed": 0},
+    "full_run_1": {"files": 70, "passed": 972, "failed": 5, "note": "4 p0cReviewFixes caused by first version (settle read config), fixed; 1 p0bGateway load flake, passes in isolation and later full runs"},
+    "full_run_2": {"files": 70, "passed": 977, "failed": 0},
+    "full_run_3": {"files": 70, "passed": 977, "failed": 0},
+    "frontend": "not run (deferred; no frontend change)"
+  },
+  "requirements": [
+    {"id": 1, "req": "grading allowed after ordinary budget exhausted", "status": "PASS", "evidence": "kind grading_allowance; provider called"},
+    {"id": 2, "req": "grading allowed after allowance consumed", "status": "PASS", "evidence": "kind grading_emergency; emergency counter > 0"},
+    {"id": 3, "req": "non-grading denied after exhaustion", "status": "PASS", "evidence": "AI_BUDGET_EXCEEDED; provider not called"},
+    {"id": 4, "req": "exemption limited to ai_grading", "status": "PASS", "evidence": "6 other features refused; GRADING_FEATURES = [ai_grading]"},
+    {"id": 5, "req": "grading usage recorded in usage_ledger", "status": "PASS", "evidence": "row feature ai_grading, ok, estimated, cost > 0; reservation settled"},
+    {"id": 6, "req": "unknown cost explicit, never zero", "status": "PASS", "evidence": "usage_unknown, costInternal null; unknownMicros = full reservation"},
+    {"id": 7, "req": "independent global controls still stop calls", "status": "PASS", "evidence": "test cap stops grading; global pause stops non-grading"},
+    {"id": 8, "req": "cumulative test cap blocks when exhausted", "status": "PASS", "evidence": "across features, schools, cold start; gateway path; unbounded refused"},
+    {"id": 9, "req": "reservation failures fail safely", "status": "PASS", "evidence": "school store failure: non-grading refused, grading recorded; test store failure: all refused"},
+    {"id": 10, "req": "existing regressions covered", "status": "PASS", "evidence": "full suite 977/977"}
+  ],
+  "gates": {
+    "A_db_isolation": "OPERATOR_UNKNOWN",
+    "B_r2_isolation": "OPERATOR_UNKNOWN",
+    "C_secrets": "OPERATOR_UNKNOWN",
+    "D_safe_switches": "CODE_AFTER_DEPLOY_PLUS_OPERATOR",
+    "E_tenant_accounts_cleanup": "OPERATOR",
+    "F_spend_control": "CODE_AFTER_DEPLOY_PLUS_OPERATOR",
+    "G_ai_test_window": "PROCEDURE_DEFINED",
+    "H_provenance": "UNKNOWN"
+  },
+  "verdicts": {
+    "public_checks": "GO",
+    "authenticated_non_ai": "NO-GO",
+    "ai_including_grading": "NO-GO"
+  },
+  "deferred": [
+    "postgres readiness truthfulness",
+    "global AI-pause read endpoint",
+    "pause observability refactor",
+    "migration opt-in for non-staging entries",
+    "cluster/R2 pinning, cron destructive opt-in, serverless local-storage refusal",
+    "frontend type-check fixes",
+    "api/index.js comment; avatar ticket marker",
+    "unrelated refactors and optional hardening"
+  ]
+}

@@ -1,0 +1,232 @@
+{
+  "phase": "P13.1",
+  "mode": "read-only; unauthenticated; no provider calls",
+  "generatedUtc": "2026-10-29T16:25:00Z",
+  "repository": {
+    "root": "enara-staging-alpha (local checkout)",
+    "remote": "github.com/EnaraAI/enara-staging-alpha",
+    "branch": "staging-alpha",
+    "head": "cc8530f171303a035a9a380b076d349f786d2297",
+    "originHead": "cc8530f171303a035a9a380b076d349f786d2297",
+    "trackedChanges": 0,
+    "untrackedBefore": [
+      "backend/src/scripts/p12HardCap.ts",
+      "backend/src/scripts/p12LiveJourney.ts",
+      "backend/test/p12HardCap.test.ts",
+      "docs/benchmarks/diagnostics/20261029T141743Z-p12-live-e2e/",
+      "docs/benchmarks/diagnostics/20261029T153006Z-p13-learning-journey-release-readiness/"
+    ],
+    "outputDirExistedBefore": false
+  },
+  "checks": [
+    {
+      "id": "C1",
+      "kind": "public_http",
+      "request": "GET https://enara-staging-alpha.vercel.app/",
+      "at": "2026-10-29T16:21:01Z",
+      "status": "VERIFIED",
+      "result": {
+        "http": 200,
+        "contentType": "text/html",
+        "title": "Enara | The Intelligence Layer for Education"
+      }
+    },
+    {
+      "id": "C2",
+      "kind": "public_http",
+      "request": "GET /health",
+      "at": "2026-10-29T16:21:02Z",
+      "status": "VERIFIED",
+      "result": {
+        "http": 200,
+        "body": {
+          "status": "ok",
+          "service": "<string>"
+        }
+      }
+    },
+    {
+      "id": "C3",
+      "kind": "public_http",
+      "request": "GET /ready",
+      "at": "2026-10-29T16:21:08Z",
+      "status": "VERIFIED",
+      "result": {
+        "http": 200,
+        "body": {
+          "status": "ready",
+          "checks": {
+            "mongo": "ok",
+            "postgres": "ok"
+          }
+        }
+      },
+      "interpretation": "backend/src/app.ts:176-195: postgres reports ok without a connection when DATABASE_URL is unset and NODE_ENV is not production; no DATABASE_URL name exists in the deployment env, so 'postgres ok' does not prove a PostgreSQL connection. 'mongo ok' proves a live connection to the database named by MONGODB_URI, not that it is a dedicated staging database."
+    },
+    {
+      "id": "C4",
+      "kind": "platform_metadata",
+      "request": "vercel inspect enara-staging-alpha.vercel.app",
+      "at": "2026-10-29T16:21:16Z",
+      "status": "VERIFIED",
+      "result": {
+        "deploymentId": "dpl_GUdoFwWLBJFK2g4XhYv9ns97WxH4",
+        "url": "https://enara-staging-alpha-5slxrtmq9.vercel.app",
+        "target": "production",
+        "state": "Ready",
+        "createdUtc": "2026-10-29T13:48:23Z"
+      }
+    },
+    {
+      "id": "C5",
+      "kind": "platform_metadata",
+      "request": "vercel env ls production|preview|development (names only)",
+      "at": "2026-10-29T16:21:16Z",
+      "status": "VERIFIED",
+      "result": {
+        "productionNames": [
+          "AI_PAUSED",
+          "APP_URL",
+          "CORS_ALLOWED_ORIGINS",
+          "CRON_SECRET",
+          "DEMO_MODE_ENABLED",
+          "ENARA_STAGING",
+          "FRONTEND_URL",
+          "INGEST_HMAC_SECRET",
+          "JWT_SECRET",
+          "MONGODB_URI",
+          "NODE_ENV",
+          "R2_ACCESS_KEY_ID",
+          "R2_ACCOUNT_ID",
+          "R2_BUCKET",
+          "R2_SECRET_ACCESS_KEY",
+          "REGISTRATION_INVITE_ONLY",
+          "REMINDERS_ENABLED",
+          "RUN_MIGRATIONS_ON_START",
+          "SERVE_LOCAL_UPLOADS",
+          "TRUST_PROXY"
+        ],
+        "productionCount": 20,
+        "previewCount": 0,
+        "developmentCount": 0,
+        "absent": [
+          "ANTHROPIC_API_KEY",
+          "ANTHROPIC_TUTOR_MODEL",
+          "ANTHROPIC_INTENT_MODEL",
+          "ANTHROPIC_VISUAL_MODEL",
+          "ANTHROPIC_VOICE_MODEL",
+          "ANTHROPIC_BASE_URL",
+          "ENARA_ORCHESTRATOR_URL",
+          "ENARA_API_KEY",
+          "AI_ENGINE_URL",
+          "DATABASE_URL",
+          "ELEVENLABS_API_KEY",
+          "ANAM_API_KEY"
+        ],
+        "valuesRead": false
+      },
+      "note": "P13 reported 16 names using a narrower text filter; the full name list is 20."
+    },
+    {
+      "id": "C6",
+      "kind": "source_read",
+      "request": "backend/src/services/aiJson.ts:28-30, directTutorModel.ts:121-123, config/env.ts:357",
+      "status": "VERIFIED",
+      "result": "Drafts, grading and tutor need ANTHROPIC_API_KEY; without it isAiConfigured() and isDirectTutorModelConfigured() are false. The only non-Anthropic tutor path is the ENARA orchestrator (tutor.controller.ts, needs a course enaraCourseId and ENARA_ORCHESTRATOR_URL), whose URL name is absent on Vercel."
+    },
+    {
+      "id": "C7",
+      "kind": "source_read",
+      "request": "backend/src/scripts/p12LiveJourney.ts (sha256 6debf8d8\u2026), p12HardCap.ts (sha256 801dd560\u2026)",
+      "status": "VERIFIED",
+      "result": "P12 builds the app in-process (createApp + supertest), uses mongodb-memory-server and refuses any other DB URI, allows outbound HTTP only to api.anthropic.com in live mode (local stub in dry mode); 0 occurrences of 'vercel.app' in either file. Note: the harness was edited after the live run (fixture fix); the run-time version's hash was never recorded."
+    },
+    {
+      "id": "C8",
+      "kind": "artifact_read",
+      "request": "docs/benchmarks/diagnostics/20261029T141743Z-p12-live-e2e/*",
+      "status": "VERIFIED",
+      "result": {
+        "liveMode": "live",
+        "isolation": "mongodb-memory-server (127.0.0.1, throwaway); providerHost api.anthropic.com",
+        "deploymentIdOrVercelUrlInArtifacts": "none found",
+        "runWindowUtc": [
+          "2026-10-29T14:08:45.378Z",
+          "2026-10-29T14:11:21.347Z"
+        ]
+      }
+    },
+    {
+      "id": "C9",
+      "kind": "ledger_reconciliation",
+      "request": "local P12 ledgers only",
+      "status": "VERIFIED",
+      "result": {
+        "recomputed": 0.112112,
+        "capLedger": 0.112112,
+        "csvGuard": 0.112112,
+        "csvUsageLedger": 0.112112,
+        "appLog": 0.112112,
+        "attempts": 9,
+        "appLogCalls": 9,
+        "csvRows": 9,
+        "byModel": {
+          "claude-opus-5-5": 8,
+          "claude-sonnet-5-5": 1
+        },
+        "statuses": [
+          "ok"
+        ],
+        "events": [
+          "start",
+          "finish"
+        ]
+      },
+      "limits": "usage_ledger values and P0d reservation count were exported by the harness from an in-memory DB that no longer exists; no provider invoice access.",
+      "artifactSha256": {
+        "P12_HARD_CAP_SPEND_LEDGER.json": "54b5d54e9418dca795120121f1643665653c73fd8278b765d83b3df3d2c3c402",
+        "P12_CALL_LEDGER.csv": "15d8d96a3f6b62e4ca2003be0642681174ca536ee7203310dcaae950b664e899",
+        "P12_APP_EVENT_LOG.jsonl": "bc6ee354d810ee322f8ea52a526f0183ce23eb8877b2e2e2465e61641c6f7e45",
+        "P12_RUN_RESULT.json": "5117e20092eccec1143b5048b66e7dbd0904086fae7e5102e786d82b51310183"
+      }
+    },
+    {
+      "id": "C10",
+      "kind": "source_read",
+      "request": "backend/src/config/stagingGuard.ts",
+      "status": "VERIFIED",
+      "result": "When ENARA_STAGING=true the app refuses to start unless MONGODB_URI names the staging database, R2 bucket names contain 'staging', and secrets are distinct. This checks names, not hosts; whether it ran depends on the ENARA_STAGING value, which was not read."
+    }
+  ],
+  "notRun": [
+    {
+      "check": "Any authenticated request (login, flags, router state, school pause, chat, tutor, assessments, uploads, cron)",
+      "reason": "P13.1 forbids authenticated requests and endpoints that could mutate data or incur provider cost"
+    },
+    {
+      "check": "Any provider call or P12 re-run",
+      "reason": "paid calls forbidden"
+    },
+    {
+      "check": "Reading any environment variable value (incl. NODE_ENV, ENARA_STAGING, AI_PAUSED, MONGODB_URI)",
+      "reason": "values forbidden; only names reported"
+    },
+    {
+      "check": "Database inspection (staging or otherwise)",
+      "reason": "forbidden"
+    },
+    {
+      "check": "Provider console/invoice",
+      "reason": "no access"
+    },
+    {
+      "check": "Guessed API routes",
+      "reason": "forbidden"
+    }
+  ],
+  "decisions": {
+    "p12IsolatedJourney": "SUPPORTED (with limitations)",
+    "deployedStagingJourney": "NOT VERIFIED; AI-dependent stages BLOCKED on the deployment (no provider key)"
+  },
+  "secretsInThisFile": false
+}

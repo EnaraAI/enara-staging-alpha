@@ -1,0 +1,220 @@
+{
+  "phase": "P14.1",
+  "mode": "gate closure planning; no provider calls, app requests, secret values, external changes, code changes, commits or deploys",
+  "generatedUtc": "2026-10-29T17:50:00Z",
+  "repository": {
+    "branch": "staging-alpha",
+    "head": "cc8530f171303a035a9a380b076d349f786d2297",
+    "originHead": "cc8530f171303a035a9a380b076d349f786d2297",
+    "trackedChanges": 0,
+    "untrackedPreserved": 9
+  },
+  "deployment": {
+    "alias": "enara-staging-alpha.vercel.app",
+    "id": "dpl_GUdoFwWLBJFK2g4XhYv9ns97WxH4",
+    "unchangedSince": "P14 2026-10-29T17:23Z"
+  },
+  "evidenceRefs": [
+    "docs/benchmarks/diagnostics/20261029T171132Z-p13-3-runtime-isolation-attestation/",
+    "docs/benchmarks/diagnostics/20261029T172333Z-p14-vercel-live-ai-e2e/",
+    "backend/src/config/stagingGuard.ts",
+    "backend/src/config/env.ts",
+    "backend/src/config/db.ts",
+    "backend/src/vercel.ts",
+    "backend/src/services/aiBudget.ts",
+    "backend/src/services/uploadStorage.ts",
+    "backend/src/services/documentRetention.ts",
+    "backend/src/routes/cron.routes.ts",
+    "backend/src/routes/aiControls.routes.ts",
+    "backend/src/app.ts",
+    "backend/test/p6StagingGuard.test.ts",
+    "backend/test/p6VercelStaging.test.ts",
+    "backend/test/p0dBudget.test.ts",
+    "backend/test/p0dHardening.test.ts",
+    "vercel.json"
+  ],
+  "keyFindings": [
+    "staging guard is opt-in (ENARA_STAGING); no test covers a staging deployment with the flag off",
+    "grading is never refused for budget (allowance then uncapped emergency overrun)",
+    "grading bypasses AI pause (asserted by p6StagingGuard.test.ts:154)",
+    "global pause has no read endpoint; effective pause not observable without admin/DB",
+    "email cannot send (RESEND_API_KEY, REMINDER_FROM absent)",
+    "no Vercel cron; /api/cron/daily secret-gated, includes bounded document-retention deletes"
+  ],
+  "blockers": [
+    {
+      "id": 1,
+      "blocker": "runtime isolation attestation",
+      "status": "UNKNOWN",
+      "closureType": "operator attestation",
+      "evidenceToClose": "P13.3 items 1,1a,2,3,4a-c,5a-b,6a-d,15 VERIFIED",
+      "currentEvidence": "env names only"
+    },
+    {
+      "id": 2,
+      "blocker": "guard activation / fail-closed",
+      "status": "FAILED (design); runtime UNKNOWN",
+      "closureType": "code change + owner approval + operator attestation",
+      "evidenceToClose": "R-C1 deployed + item 1a on new deployment",
+      "currentEvidence": "stagingGuard.ts:30-33; tests cover flag on/off only"
+    },
+    {
+      "id": 3,
+      "blocker": "Atlas cluster/project + DB isolation",
+      "status": "UNKNOWN",
+      "closureType": "operator attestation (+ optional R-C3)",
+      "evidenceToClose": "items 3,4a,4b,4c VERIFIED",
+      "currentEvidence": "DB name check only (staging mode)"
+    },
+    {
+      "id": 4,
+      "blocker": "R2 bucket + credential isolation",
+      "status": "UNKNOWN",
+      "closureType": "operator attestation",
+      "evidenceToClose": "items 5a,5b,15 VERIFIED",
+      "currentEvidence": "bucket-name rule in staging mode; token scope uncheckable"
+    },
+    {
+      "id": 5,
+      "blocker": "secret separation + rotation",
+      "status": "UNKNOWN",
+      "closureType": "operator attestation (+ external rotation if pending)",
+      "evidenceToClose": "items 6a-6d VERIFIED",
+      "currentEvidence": "guard checks mutual distinctness only; runbook notes pasted credentials"
+    },
+    {
+      "id": 6,
+      "blocker": "safe startup/migration/upload/demo/reminder/cron",
+      "status": "UNKNOWN (runtime); FAILED (design defaults)",
+      "closureType": "operator attestation (+ R-C1)",
+      "evidenceToClose": "items 7,8,9,10,11a,11b,13 VERIFIED",
+      "currentEvidence": "email cannot send VERIFIED; no Vercel cron VERIFIED"
+    },
+    {
+      "id": 7,
+      "blocker": "synthetic tenant/accounts/cleanup",
+      "status": "BLOCKED",
+      "closureType": "owner approval (+ later authorized write)",
+      "evidenceToClose": "owner confirms synthetic-only tenant; approves P14- student + no-access accounts and cleanup plan",
+      "currentEvidence": "teacher/academic_manager/workspace_admin/enara_admin accounts exist (reported); no student/no-access"
+    },
+    {
+      "id": 8,
+      "blocker": "provider-side $5 hard limit",
+      "status": "BLOCKED",
+      "closureType": "external configuration + owner approval",
+      "evidenceToClose": "dedicated staging key in workspace with spend limit <= $5 (yes/no)",
+      "currentEvidence": "no ANTHROPIC_API_KEY name"
+    },
+    {
+      "id": 9,
+      "blocker": "app-side budget enforcement / school limits",
+      "status": "FAILED (as $5 control)",
+      "closureType": "owner approval + authorized admin write (+ optional R-C2)",
+      "evidenceToClose": "caps lowered (daily/monthly <= $5, grading allowance $0) and R-C2 or procedure P-1",
+      "currentEvidence": "caps $6/$15/$3 reported; grading never refused"
+    },
+    {
+      "id": 10,
+      "blocker": "effective AI pause + AI-enable procedure",
+      "status": "FAILED (pause off; grading bypass); current values UNKNOWN",
+      "closureType": "owner approval + external config + operator attestation (+ optional R-C4)",
+      "evidenceToClose": "approved R-O5 procedure; attested pause states",
+      "currentEvidence": "AI_PAUSED=false + global off reported; no global read endpoint"
+    }
+  ],
+  "remediations": {
+    "code": [
+      {
+        "id": "R-C1",
+        "required": true,
+        "summary": "fail-closed staging identity: refuse start on staging project unless ENARA_STAGING=true",
+        "files": [
+          "backend/src/config/env.ts",
+          "backend/src/config/stagingGuard.ts",
+          "backend/test/p6StagingGuard.test.ts"
+        ],
+        "rollback": "revert; Vercel rollback to dpl_GUdo\u2026"
+      },
+      {
+        "id": "R-C2",
+        "required": false,
+        "recommended": true,
+        "summary": "staging: grading obeys pause and caps (no allowance/emergency overrun)",
+        "files": [
+          "backend/src/services/aiBudget.ts",
+          "backend/test/p0dBudget.test.ts",
+          "backend/test/p6StagingGuard.test.ts"
+        ]
+      },
+      {
+        "id": "R-C3",
+        "required": false,
+        "summary": "Mongo host-suffix pin (new non-secret env var)"
+      },
+      {
+        "id": "R-C4",
+        "required": false,
+        "summary": "log effective pause booleans; admin GET for global pause"
+      },
+      {
+        "id": "R-C5",
+        "required": false,
+        "summary": "readiness reports postgres not_configured"
+      }
+    ],
+    "operator": [
+      {
+        "id": "R-O1",
+        "summary": "complete P13.3 checklist (yes/no)"
+      },
+      {
+        "id": "R-O2",
+        "summary": "rotate Atlas password + R2 token if pending; update Vercel; redeploy"
+      },
+      {
+        "id": "R-O3",
+        "summary": "dedicated Anthropic staging workspace/key with hard limit <= $5"
+      },
+      {
+        "id": "R-O4",
+        "summary": "lower school P0d caps (<= $5; grading allowance $0)"
+      },
+      {
+        "id": "R-O5",
+        "summary": "approved AI-enable/disable procedure for T3 window only"
+      },
+      {
+        "id": "R-O6",
+        "summary": "confirm no external scheduler"
+      },
+      {
+        "id": "R-O7",
+        "summary": "approve tenant, P14- accounts, cleanup plan"
+      }
+    ]
+  },
+  "testPhases": {
+    "T0_public": "GO",
+    "T1_authenticated_read_only": "NO-GO",
+    "T2_synthetic_writes": "NO-GO",
+    "T3_ai_provider_calls": "NO-GO",
+    "T4_full_journey": "NO-GO"
+  },
+  "unresolvedBlockers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "smallestNextAction": "authorize R-C1 (code+tests+commit+deploy) and have the operator complete R-O1 against the resulting deployment id",
+  "spendLedgerProduced": false,
+  "providerCalls": 0,
+  "secretsInThisFile": false
+}

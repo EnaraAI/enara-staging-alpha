@@ -1,0 +1,93 @@
+{
+  "phase": "P14.3 staging guard hardening and Vercel test readiness",
+  "date_utc": "2026-10-29T18:27:33Z",
+  "repo": {
+    "remote": "https://github.com/EnaraAI/enara-staging-alpha",
+    "branch": "staging-alpha",
+    "head": "cc8530f171303a035a9a380b076d349f786d2297",
+    "origin_head": "cc8530f171303a035a9a380b076d349f786d2297",
+    "matches_expected_baseline": true,
+    "tracked_modified_at_start": 6,
+    "tracked_modified_at_start_origin": "all P14.2",
+    "unrelated_tracked_changes": 0,
+    "untracked_at_start": 13,
+    "tracked_modified_at_end": 7,
+    "untracked_at_end": 16,
+    "committed": false,
+    "pushed": false,
+    "deployed": false
+  },
+  "spend_usd": 0,
+  "provider_calls": 0,
+  "secrets_read": false,
+  "deployed_requests": 0,
+  "verdicts": {
+    "local_code_readiness": "READY",
+    "authenticated_non_ai_vercel_tests": "NOT_READY",
+    "synthetic_write_tests": "NOT_READY",
+    "live_ai_tests": "NOT_READY"
+  },
+  "findings": [
+    {"id": "R1", "topic": "guard runs before DB connect and migrations", "classification": "VERIFIED_EXISTING", "evidence": "vercel.ts order; no import-time connects; p14_2StagingEntry, p14_3StagingStartup source-order test"},
+    {"id": "D1", "topic": "RUN_MIGRATIONS_ON_START=FALSE passed the guard but still migrated", "classification": "FIXED_AND_TESTED", "file": "backend/src/config/db.ts", "test": "p14_3StagingStartup migrations on start"},
+    {"id": "R3", "topic": "staging flag parsing", "classification": "VERIFIED_EXISTING", "evidence": "stagingFlagProblem; p14_2StagingEntry"},
+    {"id": "D2", "topic": "paid paths other than Anthropic/ElevenLabs could run in staging without the cap", "classification": "FIXED_AND_TESTED", "file": "backend/src/config/stagingGuard.ts", "test": "p14_3StagingStartup paid provider paths"},
+    {"id": "R5", "topic": "cap covers all served provider paths incl. grading", "classification": "VERIFIED_EXISTING", "evidence": "all call sites via reserveAttempt; candidateV2Live only in offline scripts"},
+    {"id": "D3", "topic": "reused attempt key returned reserved without reserving; could release first attempt", "classification": "FIXED_AND_TESTED", "file": "backend/src/services/aiBudget.ts", "test": "p14_3TestSpendEnforcement replays"},
+    {"id": "R7", "topic": "concurrent oversubscription", "classification": "VERIFIED_EXISTING", "evidence": "atomic conditional $inc; 24 concurrent -> 5 admitted"},
+    {"id": "R8", "topic": "failures, retries, unknown cost conservative", "classification": "VERIFIED_EXISTING", "evidence": "maxRetries 0; per-attempt reservations; usage_unknown keeps full reservation; tests added"},
+    {"id": "R9a", "topic": "alternate entry point on Vercel", "classification": "VERIFIED_EXISTING", "evidence": "single function, single require; p14_3StagingStartup"},
+    {"id": "R9b", "topic": "Docker/Railway entry (src/index.ts) keeps opt-in flag", "classification": "DEFERRED_BY_OWNER", "note": "not a P14 target; needs its own staging entry before use"},
+    {"id": "R10a", "topic": "grading cannot bypass the test cap", "classification": "VERIFIED_EXISTING", "evidence": "p14_2GradingTestSpend 7/8b; p14_3TestSpendEnforcement pause cases"},
+    {"id": "R10b", "topic": "pauses stop non-grading only (P0d design, preserved)", "classification": "OPERATOR_ACTION_REQUIRED", "note": "emergency stop for grading = remove/revoke key; test cap stops all"},
+    {"id": "R11", "topic": "grading exemption intact, ai_grading only", "classification": "VERIFIED_EXISTING"},
+    {"id": "R12", "topic": "no unlimited-budget display", "classification": "VERIFIED_EXISTING", "evidence": "only an Enterprise upsell banner mentions unlimited; test counter not listed in school views"},
+    {"id": "R13", "topic": "ledger known/usage_unknown semantics", "classification": "VERIFIED_EXISTING"}
+  ],
+  "files_modified": [
+    {"path": "backend/src/vercel.ts", "phase": "P14.2", "reason": "staging entry fails closed before createApp and DB connect"},
+    {"path": "backend/src/config/stagingGuard.ts", "phase": "P14.2+P14.3", "reason": "flag validation, entry assertion; every paid path needs cap+id (D2)"},
+    {"path": "backend/src/config/env.ts", "phase": "P14.2", "reason": "invalid ENARA_STAGING refused; cap settings parsed"},
+    {"path": "backend/src/config/db.ts", "phase": "P14.3", "reason": "D1: staging never migrates on start"},
+    {"path": "backend/src/services/aiBudget.ts", "phase": "P14.2+P14.3", "reason": "test-spend cap; duplicate key refused (D3)"},
+    {"path": "backend/src/models/OrgBudget.ts", "phase": "P14.2", "reason": "reservation kind test_spend"},
+    {"path": "backend/staging.env.template", "phase": "P14.2", "reason": "blank names for cap settings"},
+    {"path": "backend/test/p14_2GradingTestSpend.test.ts", "phase": "P14.2+P14.3", "reason": "replay assertion made stricter (D3)"},
+    {"path": "backend/test/p14_2StagingEntry.test.ts", "phase": "P14.2+P14.3", "reason": "cold-import timeout 30s"},
+    {"path": "backend/test/p14_3StagingStartup.test.ts", "phase": "P14.3", "reason": "new, 13 tests"},
+    {"path": "backend/test/p14_3TestSpendEnforcement.test.ts", "phase": "P14.3", "reason": "new, 8 tests"}
+  ],
+  "tests": {
+    "env": "backend/, env -u ANTHROPIC_API_KEY, providers mocked, no network",
+    "runs": [
+      {"cmd": "npx tsc --noEmit -p .", "result": "clean"},
+      {"cmd": "npx vitest run test/p14_3StagingStartup.test.ts test/p14_3TestSpendEnforcement.test.ts test/p14_2GradingTestSpend.test.ts test/p14_2StagingEntry.test.ts", "attempt": 1, "passed": 42, "failed": 3, "causes": ["P14.2 replay assertion contradicted D3 (made stricter)", "own control test set ENARA_STAGING to the string 'undefined' (fixed)", "5s default timeout on cold app import (raised to 30s)"]},
+      {"cmd": "same", "attempt": 2, "files": 4, "passed": 45, "failed": 0},
+      {"cmd": "npx vitest run <18 focused files: p6StagingGuard p6VercelStaging p6SingleService p0dBudget p0dHardening p0bGateway p0cMetering p0cReviewFixes usageLedger avatar gradingEvalAdapter gradingPolicy phase3.autograding p12HardCap p14_2GradingTestSpend p14_2StagingEntry p14_3StagingStartup p14_3TestSpendEnforcement>", "files": 18, "passed": 235, "failed": 0},
+      {"cmd": "npx vitest run", "run": 1, "files": 72, "passed": 998, "failed": 0},
+      {"cmd": "npx vitest run", "run": 2, "files": 72, "passed": 998, "failed": 0}
+    ],
+    "baseline_failures": "none in this phase",
+    "frontend": "not run (no frontend change; deferred by owner)"
+  },
+  "runtime_gates": {
+    "1_identity_and_deployment": "DEPLOYMENT_VERIFICATION_REQUIRED",
+    "2_safe_switches": "DEPLOYMENT_VERIFICATION_REQUIRED + OPERATOR_ACTION_REQUIRED",
+    "3_r2": "DEPLOYMENT_VERIFICATION_REQUIRED + OPERATOR_ACTION_REQUIRED",
+    "4_accounts_and_data": "OPERATOR_ACTION_REQUIRED",
+    "5_provider_and_cost": "OPERATOR_ACTION_REQUIRED + DEPLOYMENT_VERIFICATION_REQUIRED",
+    "6_test_window": "OPERATOR_ACTION_REQUIRED"
+  },
+  "deferred_by_owner": [
+    "PostgreSQL readiness redesign",
+    "global AI-pause read endpoint",
+    "pause observability refactor",
+    "frontend fixes and type-check cleanup",
+    "unrelated refactors and optional hardening",
+    "Docker/Railway staging entry",
+    "avatar ticket marker for direct test-spend settlement",
+    "api/index.js stale comment"
+  ],
+  "stop_conditions_hit": [],
+  "next_requires_authorization": ["review", "commit", "push", "deploy", "operator gates 1-6", "provider calls (<= $5)"]
+}

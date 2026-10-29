@@ -1,0 +1,19 @@
+{
+  "ranAt": "2026-10-29T14:08Z (during the live run, same working tree)",
+  "headCommit": "cc8530f",
+  "backend": { "command": "cd backend && npx vitest run", "files": 68, "tests": 953, "passed": 953, "reconciliation": "947 (after F-10) + 6 new in test/p12HardCap.test.ts" },
+  "focusedP12": { "command": "npx vitest run test/p12HardCap.test.ts", "tests": 6, "passed": 6, "covers": ["worst-case reservation before the call and settlement from reported usage", "refusal before the network when the reservation would cross the cap; STOP persists; later attempts refused", "other hosts and unplanned (model, max_tokens) pairs blocked", "concurrent attempts serialized (max 1 in flight)", "HTTP errors charged at full reservation; missing usage stops the run", "byte-bound fallback when token counting fails"] },
+  "journeyDryRun": { "command": "npx tsx src/scripts/p12LiveJourney.ts --out <dir>", "provider": "local stub (127.0.0.1)", "result": "12 PASS; strong control FAIL by design (stub awards the lowest rubric level); ledgers reconcile 9/9/9, delta $0", "files": "dry-run/" },
+  "typecheck": { "backend": "pass", "frontend": "pass" },
+  "frontendBuild": "pass (npm run build)",
+  "gitDiffCheck": "clean",
+  "whitespaceScanUntracked": "clean (all new text files)",
+  "trackedFilesModified": 0,
+  "newFiles": ["backend/src/scripts/p12HardCap.ts", "backend/src/scripts/p12LiveJourney.ts", "backend/test/p12HardCap.test.ts", "this diagnostics folder"],
+  "fileSha256": {
+    "backend/src/scripts/p12HardCap.ts": "801dd560891779068e349e76d973e9dacbaa4ddafcc6ffe5f174afd1b97c8209",
+    "backend/src/scripts/p12LiveJourney.ts": "6debf8d81ccb19072970c61a817947954ccaf9f036a6cfd146f67f0dfcfd5db4",
+    "backend/test/p12HardCap.test.ts": "65dceb72a5b6f12695b7439a1d10e9bb4f2a2929ed98921dacbbe898e87ea9d3"
+  },
+  "harnessChangeAfterLiveRun": "p12LiveJourney.ts: one fixture line fixed after the live run (synthetic Batch record lacked the required academicYear, so the named-student profile showed 'class not recorded'). Verified with a free dry run; the live run was not repeated."
+}

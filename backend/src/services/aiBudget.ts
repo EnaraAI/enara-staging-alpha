@@ -30,6 +30,11 @@ import { logger, serializeError } from '../utils/logging';
 //  - Grading always proceeds. If its policy cannot be read it runs as a
 //    recorded emergency exposure (critical alert); if even that cannot be
 //    written, a critical log carries the exposure.
+//  - Test-spend cap (P14.2, AI_TEST_SPEND_CAP_USD): one cumulative counter for
+//    every attempt in a deployment test window, grading included, reserved
+//    before the school policy. Independent of school caps, the grading
+//    exemption and pauses; it fails closed (unbounded calls, store failures)
+//    for every feature. Unknown cost keeps the whole reservation, as above.
 
 export const GRADING_FEATURES = new Set(['ai_grading']);
 // Operations with no catalogue price or reported usage (P0c).
@@ -40,17 +45,18 @@ const CONFIG_CACHE_MS = 15_000;
 const MICROS = 1_000_000;
 
 export class AiBudgetError extends AppError {
-  constructor(code: 'AI_BUDGET_EXCEEDED' | 'AI_PAUSED' | 'AI_BUDGET_POLICY_MISSING' | 'AI_BUDGET_UNAVAILABLE') {
+  constructor(code: 'AI_BUDGET_EXCEEDED' | 'AI_PAUSED' | 'AI_BUDGET_POLICY_MISSING' | 'AI_BUDGET_UNAVAILABLE' | 'AI_TEST_SPEND_CAP') {
     const messages = {
       AI_BUDGET_EXCEEDED: ["This school's AI allowance for now has been reached. Please try again later.", 429],
       AI_PAUSED: ['AI features are paused right now.', 503],
       AI_BUDGET_POLICY_MISSING: ['This AI feature is not enabled for this school yet.', 403],
       AI_BUDGET_UNAVAILABLE: ['AI features are temporarily unavailable. Please try again shortly.', 503],
+      AI_TEST_SPEND_CAP: ['The AI testing limit for this environment has been reached.', 429],
     } as const;
     super(messages[code][0], messages[code][1], code);
   }
 }
-export const BUDGET_ERROR_CODES = new Set(['AI_BUDGET_EXCEEDED', 'AI_PAUSED', 'AI_BUDGET_POLICY_MISSING', 'AI_BUDGET_UNAVAILABLE']);
+export const BUDGET_ERROR_CODES = new Set(['AI_BUDGET_EXCEEDED', 'AI_PAUSED', 'AI_BUDGET_POLICY_MISSING', 'AI_BUDGET_UNAVAILABLE', 'AI_TEST_SPEND_CAP']);
 
 interface BudgetConfig {
   enforcementEnabled: boolean;
@@ -170,7 +176,7 @@ const toMicros = (usd: number) => Math.ceil(usd * MICROS);
 interface CounterSpec {
   id: string;
   capMicros: number;
-  window: 'day' | 'month' | 'user_day' | 'grading' | 'grading_emergency';
+  window: 'day' | 'month' | 'user_day' | 'grading' | 'grading_emergency' | 'test_spend';
   expiresAt: Date;
 }
 
@@ -226,6 +232,8 @@ export interface BudgetTicket {
   key: string;
   state: 'unmetered' | 'reserved';
   kind?: IBudgetReservation['kind'];
+  // A test-spend reservation (key + ':test_spend') is held for this attempt.
+  testSpend?: boolean;
 }
 
 export interface ReserveInput {
@@ -264,9 +272,76 @@ async function recordGradingEmergency(input: ReserveInput, inst: string, bound: 
   }
 }
 
-// Checks pauses and reserves budget for one provider attempt. Throws an
-// AiBudgetError (before any provider call) when the attempt may not run.
+// Not a school: test-spend counters and reservations carry this tenant id, so
+// school budget views never list them.
+export const TEST_SPEND_TENANT = '__test_spend__';
+const testSpendKey = (key: string) => `${key}:test_spend`;
+
+// Reserves the attempt's bound on the deployment's cumulative test-spend
+// counter. Returns the reservation key, or undefined when no cap is set.
+async function reserveTestSpend(input: ReserveInput): Promise<string | undefined> {
+  const cap = getConfig().aiTestSpend;
+  if (!cap) return undefined;
+  const key = testSpendKey(input.key);
+  let bound = typeof input.upperBoundUsd === 'number' && Number.isFinite(input.upperBoundUsd) ? input.upperBoundUsd : undefined;
+  try {
+    if (bound === undefined && input.institutionId) {
+      const school = await schoolConfig(input.institutionId);
+      bound = school.value?.maxReservationUsdPerCall[`${input.provider}:${input.feature}`];
+    }
+    const amount = bound === undefined ? 0 : toMicros(bound);
+    // A call without a positive bound cannot be held under the cap.
+    if (amount <= 0) {
+      logger.warn('ai_test_spend_unbounded_refused', { feature: input.feature, provider: input.provider });
+      throw new AiBudgetError('AI_TEST_SPEND_CAP');
+    }
+    if (!connected()) throw new Error('database not connected');
+    const now = input.now ?? new Date();
+    const counter: CounterSpec = { id: `test_spend:${cap.id}`, capMicros: toMicros(cap.capUsd), window: 'test_spend', expiresAt: new Date(now.getTime() + 400 * 86400_000) };
+    try {
+      await BudgetReservation.create({
+        _id: key, institutionId: TEST_SPEND_TENANT, userId: input.userId, feature: input.feature, provider: input.provider,
+        kind: 'test_spend', amountMicros: amount, counters: [], status: 'reserving', createdAt: now,
+        expiresAt: new Date(now.getTime() + (input.ttlMs ?? DEFAULT_RESERVATION_TTL_MS)),
+      });
+    } catch (error) {
+      if ((error as { code?: number }).code !== 11000) throw error;
+      // Attempt keys are unique. A reused one is refused rather than run
+      // unreserved (its first reservation may be settled), and the first
+      // attempt's reservation is never released by this caller.
+      logger.warn('ai_test_spend_duplicate_key_refused', { feature: input.feature });
+      throw new AiBudgetError('AI_TEST_SPEND_CAP');
+    }
+    if (!(await reserveOn(TEST_SPEND_TENANT, counter, amount))) {
+      await BudgetReservation.updateOne({ _id: key }, { $set: { status: 'released', amountMicros: 0 } });
+      logger.warn('ai_test_spend_cap_refused', { feature: input.feature });
+      throw new AiBudgetError('AI_TEST_SPEND_CAP');
+    }
+    await BudgetReservation.updateOne({ _id: key }, { $set: { status: 'reserved', counters: [counter.id] } });
+    await checkAlerts(TEST_SPEND_TENANT, [counter]);
+    return key;
+  } catch (error) {
+    if (error instanceof AiBudgetError) throw error;
+    storeAlert('ai_test_spend_unavailable', { what: 'test_spend', error: serializeError(error) });
+    throw new AiBudgetError('AI_BUDGET_UNAVAILABLE');
+  }
+}
+
+// Checks the test-spend cap, pauses and the school budget for one provider
+// attempt. Throws an AiBudgetError (before any provider call) when the
+// attempt may not run.
 export async function reserveAiBudget(input: ReserveInput): Promise<BudgetTicket> {
+  const test = await reserveTestSpend(input);
+  try {
+    const ticket = await reserveSchoolBudget(input);
+    return test ? { ...ticket, state: 'reserved', testSpend: true } : ticket;
+  } catch (error) {
+    if (test) await releaseOne(test);
+    throw error;
+  }
+}
+
+async function reserveSchoolBudget(input: ReserveInput): Promise<BudgetTicket> {
   const grading = GRADING_FEATURES.has(input.feature);
   const none: BudgetTicket = { key: input.key, state: 'unmetered' };
   const inst = input.institutionId;
@@ -366,9 +441,14 @@ export async function reserveAiBudget(input: ReserveInput): Promise<BudgetTicket
 // (null) keeps the whole reservation as unknown exposure. Idempotent.
 export async function settleAiBudget(ticket: BudgetTicket, actualUsd: number | null): Promise<void> {
   if (ticket.state !== 'reserved') return;
+  await settleOne(ticket.key, actualUsd);
+  if (ticket.testSpend) await settleOne(testSpendKey(ticket.key), actualUsd);
+}
+
+async function settleOne(key: string, actualUsd: number | null): Promise<void> {
   try {
     const actual = actualUsd === null ? null : toMicros(actualUsd);
-    const r = await BudgetReservation.findOneAndUpdate({ _id: ticket.key, status: 'reserved' }, { $set: { status: 'settled', actualMicros: actual, settledAt: new Date() } }, { new: false }).lean();
+    const r = await BudgetReservation.findOneAndUpdate({ _id: key, status: 'reserved' }, { $set: { status: 'settled', actualMicros: actual, settledAt: new Date() } }, { new: false }).lean();
     if (!r) return;
     for (const id of r.counters) {
       if (actual === null) await BudgetCounter.updateOne({ _id: id }, { $inc: { unknownMicros: r.amountMicros } });
@@ -378,19 +458,24 @@ export async function settleAiBudget(ticket: BudgetTicket, actualUsd: number | n
     if (actual !== null && actual > r.amountMicros) logger.warn('ai_budget_reservation_exceeded', { institutionId: r.institutionId, feature: r.feature });
   } catch (error) {
     // The reservation stays held; the stale sweep keeps it as unknown exposure.
-    logger.error('ai_budget_settle_failed', { key: ticket.key, error: serializeError(error) });
+    logger.error('ai_budget_settle_failed', { key, error: serializeError(error) });
   }
 }
 
 // The provider was not called: give the reservation back. Idempotent.
 export async function releaseAiBudget(ticket: BudgetTicket): Promise<void> {
   if (ticket.state !== 'reserved') return;
+  await releaseOne(ticket.key);
+  if (ticket.testSpend) await releaseOne(testSpendKey(ticket.key));
+}
+
+async function releaseOne(key: string): Promise<void> {
   try {
-    const r = await BudgetReservation.findOneAndUpdate({ _id: ticket.key, status: 'reserved' }, { $set: { status: 'released', settledAt: new Date() } }, { new: false }).lean();
+    const r = await BudgetReservation.findOneAndUpdate({ _id: key, status: 'reserved' }, { $set: { status: 'released', settledAt: new Date() } }, { new: false }).lean();
     if (!r) return;
     for (const id of r.counters) await BudgetCounter.updateOne({ _id: id }, { $inc: { committedMicros: -r.amountMicros } });
   } catch (error) {
-    logger.error('ai_budget_release_failed', { key: ticket.key, error: serializeError(error) });
+    logger.error('ai_budget_release_failed', { key, error: serializeError(error) });
   }
 }
 

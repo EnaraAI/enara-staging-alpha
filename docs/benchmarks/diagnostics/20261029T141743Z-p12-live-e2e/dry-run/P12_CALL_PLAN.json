@@ -1,0 +1,62 @@
+{
+  "capUsd": 1,
+  "concurrency": 1,
+  "timeoutsMs": {
+    "askForJson": 55000,
+    "tutor": 25000
+  },
+  "retryCeilings": "askForJson: 2 validation attempts; meteredMessage: 1 transport retry; SDK maxRetries 0",
+  "plan": [
+    {
+      "step": "assessment draft",
+      "label": "assessment_draft",
+      "model": "claude-sonnet-5-5",
+      "maxTokens": 8000,
+      "estInputTokens": 3000,
+      "attempts": 2,
+      "why": "askForJson: 1 call + 1 validation retry",
+      "worstCaseUsd": 0.175
+    },
+    {
+      "step": "rubric grading (weak answer)",
+      "label": "rubric_grading",
+      "model": "claude-opus-5-5",
+      "maxTokens": 3000,
+      "estInputTokens": 2500,
+      "attempts": 6,
+      "why": "2 consistency runs + 1 tie-break, each with 1 validation retry",
+      "worstCaseUsd": 0.435
+    },
+    {
+      "step": "tutor reply",
+      "label": "tutor_chat",
+      "model": "claude-opus-5-5",
+      "maxTokens": 4000,
+      "estInputTokens": 3500,
+      "attempts": 2,
+      "why": "meteredMessage maxAttempts 2 (transport retry)",
+      "worstCaseUsd": 0.195
+    },
+    {
+      "step": "reassessment short-answer grading (≤3 attempts)",
+      "label": "short_answer_grading",
+      "model": "claude-opus-5-5",
+      "maxTokens": 800,
+      "estInputTokens": 1200,
+      "attempts": 6,
+      "why": "1 run + 1 validation retry per reassessment attempt",
+      "worstCaseUsd": 0.132
+    }
+  ],
+  "coreWorstCaseUsd": 0.937,
+  "optional": {
+    "step": "rubric grading (strong control, optional)",
+    "label": "rubric_grading",
+    "model": "claude-opus-5-5",
+    "maxTokens": 3000,
+    "estInputTokens": 2500,
+    "attempts": 6,
+    "why": "runs only if the remaining cap covers this whole worst case",
+    "worstCaseUsd": 0.435
+  }
+}

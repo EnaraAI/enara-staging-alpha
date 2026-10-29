@@ -1,0 +1,240 @@
+{
+  "phase": "P13.2",
+  "mode": "read-only; metadata and source only; no values; no app requests; no provider calls",
+  "generatedUtc": "2026-10-29T16:40:00Z",
+  "repository": {
+    "branch": "staging-alpha",
+    "head": "cc8530f171303a035a9a380b076d349f786d2297",
+    "originHead": "cc8530f171303a035a9a380b076d349f786d2297",
+    "expectedHeadMatches": true,
+    "trackedChanges": 0,
+    "untrackedPreserved": 6,
+    "outputDirPreexisted": false
+  },
+  "checks": [
+    {
+      "id": "A1",
+      "what": "repository state",
+      "status": "DIRECT",
+      "result": "HEAD as expected; no tracked changes"
+    },
+    {
+      "id": "B1",
+      "what": "vercel teams ls / project ls",
+      "status": "DIRECT",
+      "result": {
+        "scopes": 1,
+        "projects": [
+          "enara-staging-alpha"
+        ]
+      }
+    },
+    {
+      "id": "B2",
+      "what": "vercel alias ls / inspect",
+      "status": "DIRECT",
+      "result": {
+        "alias": "enara-staging-alpha.vercel.app",
+        "deployment": "dpl_GUdoFwWLBJFK2g4XhYv9ns97WxH4",
+        "target": "production",
+        "state": "Ready",
+        "createdUtc": "2026-10-29T13:48:23Z",
+        "projectJsonMatches": true
+      }
+    },
+    {
+      "id": "B3",
+      "what": "vercel env ls (names + scopes)",
+      "status": "DIRECT",
+      "result": {
+        "count": 20,
+        "scopes": {
+          "Production": 20,
+          "Preview": 0,
+          "Development": 0
+        },
+        "valuesRead": false
+      }
+    },
+    {
+      "id": "C1",
+      "what": "guard trigger",
+      "status": "DIRECT",
+      "result": "conditional on ENARA_STAGING in {1,true,yes}",
+      "path": "backend/src/config/stagingGuard.ts:30-33"
+    },
+    {
+      "id": "C2",
+      "what": "guard timing vs DB/migrations",
+      "status": "DIRECT",
+      "result": "module-load (createApp\u2192getConfig) before DB connect; post-connect DB-name recheck; migrations after",
+      "path": "backend/src/vercel.ts; backend/src/app.ts:91; backend/src/config/db.ts:7-36"
+    },
+    {
+      "id": "C3",
+      "what": "guard coverage",
+      "status": "DIRECT",
+      "result": "names/settings only; no Mongo host/cluster, no production-secret comparison, no AI_PAUSED",
+      "path": "backend/src/config/stagingGuard.ts:47-105"
+    },
+    {
+      "id": "C4",
+      "what": "fail-open defaults",
+      "status": "DIRECT",
+      "result": {
+        "migrationsOnStart": "ON unless exactly 'false'",
+        "serveLocalUploads": "default !isProduction",
+        "aiPaused": "default = stagingMode",
+        "registrationInviteOnly": "default = stagingMode",
+        "demoMode": "default false",
+        "reminders": "only if 'true'"
+      },
+      "path": "backend/src/config/db.ts:29; backend/src/config/env.ts:289,311-320,348-352,397-398"
+    },
+    {
+      "id": "C5",
+      "what": "NODE_ENV not production",
+      "status": "INFERENCE",
+      "result": "production mode would throw without DATABASE_URL/ENARA_API_KEY/ENARA_ORCHESTRATOR_URL/AI_ENGINE_URL; names absent and app serves",
+      "path": "backend/src/config/env.ts:226-240"
+    },
+    {
+      "id": "D1",
+      "what": "repo config/docs",
+      "status": "REPORTED",
+      "result": "runbook intends ENARA_STAGING=true, NODE_ENV=development, db enara_staging_alpha on dedicated Atlas cluster, bucket enara-staging-alpha-uploads, safe switches, AI_PAUSED=true; credentials pasted in chat must be rotated",
+      "path": "docs/benchmarks/diagnostics/20261029T070000Z-vercel-staging/VERCEL_STAGING_RUNBOOK.md"
+    },
+    {
+      "id": "D2",
+      "what": "known deviation",
+      "status": "REPORTED (own action record)",
+      "result": "AI_PAUSED set false + global pause off on 2026-10-29 at owner request",
+      "path": "scratchpad ENARA_REPORT_2026-10-29.md \u00a76"
+    }
+  ],
+  "matrix": [
+    {
+      "n": 1,
+      "item": "Alias maps to intended project/deployment",
+      "label": "VERIFIED SAFE",
+      "evidence": "B1,B2",
+      "reason": "only project in scope; production alias per runbook"
+    },
+    {
+      "n": 2,
+      "item": "Staging-appropriate environment scope",
+      "label": "VERIFIED SAFE",
+      "evidence": "B3",
+      "reason": "production scope of a dedicated staging project; values UNKNOWN"
+    },
+    {
+      "n": 3,
+      "item": "ENARA_STAGING guard guaranteed to execute",
+      "label": "VERIFIED UNSAFE",
+      "evidence": "C1",
+      "reason": "opt-in; silently skipped if not truthy; runtime value UNKNOWN"
+    },
+    {
+      "n": 4,
+      "item": "Mongo database dedicated to staging",
+      "label": "BLOCKED",
+      "evidence": "C3",
+      "reason": "needs DB name from URI path"
+    },
+    {
+      "n": 5,
+      "item": "Mongo host/cluster isolated from production",
+      "label": "BLOCKED",
+      "evidence": "C3,D1",
+      "reason": "never checked by code; runbook claim only"
+    },
+    {
+      "n": 6,
+      "item": "R2 bucket dedicated to staging",
+      "label": "BLOCKED",
+      "evidence": "C3,D1",
+      "reason": "conditional name-only check"
+    },
+    {
+      "n": 7,
+      "item": "JWT/HMAC/cron secrets distinct from production",
+      "label": "BLOCKED",
+      "evidence": "C3",
+      "reason": "guard checks mutual distinctness only"
+    },
+    {
+      "n": 8,
+      "item": "Startup migrations disabled or safe",
+      "label": "UNKNOWN",
+      "evidence": "C4",
+      "reason": "default ON unless exactly 'false'"
+    },
+    {
+      "n": 9,
+      "item": "Local-upload serving disabled/isolated",
+      "label": "UNKNOWN",
+      "evidence": "C4,C5",
+      "reason": "default ON when not production"
+    },
+    {
+      "n": 10,
+      "item": "Demo mode and invite-only safe",
+      "label": "UNKNOWN",
+      "evidence": "C4",
+      "reason": "invite-only default depends on staging mode"
+    },
+    {
+      "n": 11,
+      "item": "Reminder/cron cannot act on production data",
+      "label": "UNKNOWN",
+      "evidence": "C4; vercel.json",
+      "reason": "no Vercel cron; depends on DB identity"
+    },
+    {
+      "n": 12,
+      "item": "AI safely paused; no deployed provider path",
+      "label": "VERIFIED UNSAFE",
+      "evidence": "B3,D2",
+      "reason": "pause off; no provider path configured (safe now, unsafe once a key is added)"
+    },
+    {
+      "n": 13,
+      "item": "PostgreSQL readiness truthful",
+      "label": "VERIFIED UNSAFE",
+      "evidence": "backend/src/app.ts:176-188",
+      "reason": "reports ok without a connection"
+    },
+    {
+      "n": 14,
+      "item": "No production data can be mutated by staging requests",
+      "label": "UNKNOWN",
+      "evidence": "items 3-7",
+      "reason": "isolation unproven"
+    }
+  ],
+  "decisions": {
+    "authenticatedNonAiSmokeTests": "BLOCKED",
+    "aiDependentTests": "NO-GO"
+  },
+  "operatorDerivedFactsNeeded": [
+    "ENARA_STAGING boolean",
+    "NODE_ENV value",
+    "DB name in MONGODB_URI path",
+    "Atlas project/cluster name differs from production",
+    "R2_BUCKET name and token scope",
+    "per-secret yes/no: differs from production (local fingerprint compare)",
+    "values of RUN_MIGRATIONS_ON_START, SERVE_LOCAL_UPLOADS, DEMO_MODE_ENABLED, REGISTRATION_INVITE_ONLY, REMINDERS_ENABLED, TRUST_PROXY",
+    "rotation of credentials pasted in chat; Atlas network allowlist state",
+    "whether any external scheduler calls /api/cron/daily"
+  ],
+  "notRun": [
+    "reading any env value",
+    "database/storage inspection",
+    "any application request",
+    "provider calls",
+    "Vercel runtime logs",
+    "other dashboards (Atlas, Cloudflare, other Vercel scopes)"
+  ],
+  "secretsInThisFile": false
+}
