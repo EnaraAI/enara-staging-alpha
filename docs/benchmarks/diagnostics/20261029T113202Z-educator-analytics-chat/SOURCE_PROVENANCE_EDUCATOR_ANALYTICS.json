@@ -1,0 +1,174 @@
+{
+ "created_utc": "2026-10-29T11:35:22Z",
+ "kind": "post-educator-analytics-chat working-tree source provenance",
+ "branch": "staging-alpha",
+ "commit_sha": null,
+ "note": "Snapshot of an uncommitted working tree (no commit SHA). It does not replace the V1 freeze manifest, which stays the historical baseline. Files under production_sources changed in P0a-educator-analytics-chat work (or are local edits) and no longer match the baseline; the hybridV1 and candidateV2Live artifacts are frozen and unchanged.",
+ "baseline_manifest": {
+  "path": "docs/benchmarks/diagnostics/20261028T090000Z-hybrid-v1-production-readiness/V1_FREEZE_MANIFEST.json",
+  "sha256": "5db3622cf66ba05648c2e8a206aba975683affd618d8af6bcef94d40bad742b8"
+ },
+ "production_sources": {
+  "backend/src/services/gradingProposals.ts": {
+   "baseline_sha256": "44a432617c5a59379fdf35bd6278e492c5c1506f19fc9bde4e6435ec009c8814",
+   "current_sha256": "14efd710f3b5a33af55a1dc592a781d0e408995fe027abac1f3300406a9dcf00",
+   "changed_since_baseline": true
+  },
+  "backend/src/services/autoGrading.ts": {
+   "baseline_sha256": "a363ccf5693dd54815e937b1975cfa16f813b3464750199f24f54a4f37eeaf7c",
+   "current_sha256": "a363ccf5693dd54815e937b1975cfa16f813b3464750199f24f54a4f37eeaf7c",
+   "changed_since_baseline": false
+  },
+  "backend/src/services/aiJson.ts": {
+   "baseline_sha256": "7f33a3ddbf54f772eb61154374770b6d237a597fde435f09332962b50556ab9b",
+   "current_sha256": "9426fe6df6255bedf2934c10c3e810a21e28f8bf2922f6fea427b8f9eee13d58",
+   "changed_since_baseline": true
+  },
+  "backend/src/services/aiCalls.ts": {
+   "baseline_sha256": "72d58ef2531f6ed0a0e2bf63171fa760f81e31951d082defa24d2c1a4333340f",
+   "current_sha256": "c7241f4383af2722a0fd92dad9382640efbad465d0ac8ae832c5fb4d58165152",
+   "changed_since_baseline": true
+  },
+  "backend/src/services/featureFlags.ts": {
+   "baseline_sha256": "1171244ec0f3e41d572e642cf631f101ffbb43c1c180187ecba6cafd2057112b",
+   "current_sha256": "a51fc44d299424465bf151db3dedd83f0a79aa0fe09ebc40664ea3c0d171c942",
+   "changed_since_baseline": true
+  },
+  "backend/src/services/grading.ts": {
+   "baseline_sha256": "ecce742c1f8c774b7802dc7716133b742edb010e144c6d8dd23a2d1917d4abc5",
+   "current_sha256": "ecce742c1f8c774b7802dc7716133b742edb010e144c6d8dd23a2d1917d4abc5",
+   "changed_since_baseline": false
+  },
+  "scripts/benchmarks/run_grading_eval.py": {
+   "baseline_sha256": "b16bbfa24be3bcced257cb3a09c6d87a0c55e9b9c3165e725bf7212a6535fcf1",
+   "current_sha256": "5e2fa22b3530ab05cfd5e91a13b960f49c30eb363e100a602d81d857c8b0fc16",
+   "changed_since_baseline": true
+  }
+ },
+ "frozen_artifacts": {
+  "hybridV1": {
+   "backend/src/services/hybridV1/v6.ts": {
+    "baseline_sha256": "340dfc47ed084a4451673e36e290316cfaaf7d55933f4234e39942a75adef88a",
+    "current_sha256": "340dfc47ed084a4451673e36e290316cfaaf7d55933f4234e39942a75adef88a",
+    "unchanged": true
+   },
+   "backend/src/services/hybridV1/pyjson.ts": {
+    "baseline_sha256": "8d62cc9f894aaf69fe02526ab7a65d77df25bb597beff79f30395975410226ee",
+    "current_sha256": "8d62cc9f894aaf69fe02526ab7a65d77df25bb597beff79f30395975410226ee",
+    "unchanged": true
+   },
+   "backend/src/services/hybridV1/hybrid.ts": {
+    "baseline_sha256": "bc35318703dbdd6e9e2833495089f8c56e02780663ea82303f7f7f2aeee2ebca",
+    "current_sha256": "bc35318703dbdd6e9e2833495089f8c56e02780663ea82303f7f7f2aeee2ebca",
+    "unchanged": true
+   },
+   "backend/src/services/hybridV1/config.ts": {
+    "baseline_sha256": "71595c52f646b49d5e0f7092aff8a4308e25c4570782267d55c52b61d4587324",
+    "current_sha256": "71595c52f646b49d5e0f7092aff8a4308e25c4570782267d55c52b61d4587324",
+    "unchanged": true
+   },
+   "backend/src/services/hybridV1/shadow.ts": {
+    "baseline_sha256": "50f5d9d6e3254521e2d858148f261073b02443b456f363b3d6ef66e3e41ca613",
+    "current_sha256": "50f5d9d6e3254521e2d858148f261073b02443b456f363b3d6ef66e3e41ca613",
+    "unchanged": true
+   },
+   "backend/src/services/hybridV1/client.ts": {
+    "baseline_sha256": "dc04bb57b9dacde12e1f03040efa0a0b45f10d4ab0199a6c97e5ef31476d825d",
+    "current_sha256": "dc04bb57b9dacde12e1f03040efa0a0b45f10d4ab0199a6c97e5ef31476d825d",
+    "unchanged": true
+   },
+   "backend/src/services/hybridV1/frozenV6Spec.json": {
+    "baseline_sha256": "7dac0b136e3b4fb41d5c14e8afe1dfff05d366f433167d9816a36f96370018d4",
+    "current_sha256": "7dac0b136e3b4fb41d5c14e8afe1dfff05d366f433167d9816a36f96370018d4",
+    "unchanged": true
+   }
+  },
+  "candidateV2Live": {
+   "backend/src/services/candidateV2Live/promptProvider.ts": {
+    "recorded_sha256": "88d63ab00747643ffb6b8b3104cac97ca19deb1fcf4eecd52568eaf885bc3148",
+    "current_sha256": "88d63ab00747643ffb6b8b3104cac97ca19deb1fcf4eecd52568eaf885bc3148",
+    "unchanged": true
+   },
+   "backend/src/services/candidateV2Live/liveProvider.ts": {
+    "recorded_sha256": null,
+    "current_sha256": "242709fe755b57cb980272eece4ad819bd9cdec3b643dc9ade240b6173959861",
+    "unchanged": null
+   }
+  }
+ },
+ "p0_metering_sources": {
+  "backend/src/services/priceCatalog.ts": "8a766fba12a341e7cc0add33610b5f2ee81cb49ee7022588b6c3c0b354c838ed",
+  "backend/src/services/priceCatalogDrift.ts": "7828bb32b58831938c54fcc2a4176f2ada20cbf60e1c159413c249e6a6d54a77",
+  "backend/src/models/PriceCatalog.ts": "0d8db9bac26317a4b2bec498ae088dba54d94c04117e4415202b3dd7b798a7cc",
+  "backend/src/models/UsageLedger.ts": "05069a61d526b403f38d302777aba347c86c227e0edbf9384672aaf3eb613661",
+  "backend/src/services/usageLedger.ts": "d2a80fb7900b9d14598f921edc0bc75b6642e1371599f446ef69b9bbcc55e091",
+  "backend/src/services/aiGateway.ts": "0c9a009194db233259aa688f47df9df8d1b2336432a7969847fce2cbd80418a5",
+  "backend/src/services/avatarUsage.ts": "e27efedb00d456f91cd707aa5f840925642fe48e28c340d762ba4ab5c36f2006",
+  "backend/src/models/AvatarSession.ts": "70612e7e13665ec38233896c81d493808120886a4baf559f044af7461582cea6",
+  "backend/src/migrations/index.ts": "960c9cbb219afb9c2241d6bd266549084bcf42fe8656dae0a1ec772d8adc3420",
+  "backend/src/models/OrgBudget.ts": "0cae374b220a2cbd165ca85931b15ee21294e9ef54df63e4786c728e9e66b44f",
+  "backend/src/services/aiBudget.ts": "89b51c7646e1b35d432d9e7d0b2019cb146a025ee6ff24e60cfda0bc3c057eab",
+  "backend/src/services/aiRateLimit.ts": "34a1fb0c9ff12ae9cb875a48bd795b43423914359e40112a879f04df603741b4",
+  "backend/src/middleware/aiRateLimits.ts": "904380a448e2b6cdedcaefd277c4cd46c37143c542a390962e2a9f5f5775efe5",
+  "backend/src/routes/aiControls.routes.ts": "53ef25b87e00a933a962634763c32a26ef9db554e817efc61155a9d69873b0c2",
+  "backend/src/auth/permissions.ts": "e6ac09ae7eefbd9e54d18f642cb9faaa8ff27da49484e07509c9017e933586f4",
+  "backend/src/auth/roles.ts": "cc30f7ba1fd210e2e5d108a769a914f55c1da5bca19c1641e0fbde415d682c0c",
+  "backend/src/models/AccountToken.ts": "d506cfeb1b06768e13bb05e8842465fb3265fcacbe0cf5dde491b1b4f6d91c7f",
+  "backend/src/services/accountTokens.ts": "c1e169f2ef913a6c9c808182762317869d368f8fb1794ead83547938d32f0243",
+  "backend/src/routes/workspace.routes.ts": "8481713a87971a900462ddd1d4dbe1f4a0ec0c8a0af01928e00d1cbd3388b22c",
+  "backend/src/routes/curriculum.routes.ts": "ef9c4f91dc0a99e7d2787500184ace413330f20e871537fe9edbc50cb688030b",
+  "backend/src/controllers/curriculum.controller.ts": "1cfbb2119d9b74e51b9dbf4e42825aa7fa3a26d137bdb8779e10a84e2af47782",
+  "backend/src/scripts/seed4Level1.ts": "c42d72fd12c4c1da52ddd6048eb23b4a2798dce36dacc8bcdfc9e5165d21ee6e",
+  "backend/src/services/originScope.ts": "8c89508acd1a0f8a4950c9e94cd01c97ffc225172ca1d8a1006257edd3060977",
+  "backend/src/controllers/teaching.controller.ts": "128227bd9df2261350d3447f6ff7be44d927487acf0ed17963781a8b0fc5193d",
+  "backend/src/controllers/learningInsights.controller.ts": "1a45e8e5d52887f10286745b3a1793c2dbaffad2e49ac68ec4ba786b9f921f39",
+  "backend/src/controllers/learningPedagogy.controller.ts": "886445e19a21dc29932a6a662b625146bf3fd303e0e96836b9d892536c5c69f5",
+  "frontend/services/roleRouting.ts": "869cba419fe05bb335b1dbd23960c3b060f4c804eb96173522baadb8ad458c4d",
+  "frontend/components/OriginSelector.tsx": "a71fceec931dd9ada01dc282e7906ff5b1e8f9c4e4a544ed30cfc7c52fb28aa7",
+  "frontend/pages/teaching/TeachingDashboard.tsx": "ac6bee704f4afb4113d162ad242acc95451da4f9a57692873c347d788d09b472",
+  "frontend/pages/ClassInsights.tsx": "43cb03ce9a15d86c54db4f4e8dc046b1a7e3526ed13e9000e51cf9f58ab799b2",
+  "backend/src/utils/docxText.ts": "ad259fe3936e1dceb8515b1b9b7a8f5b9f28e3673b2add722450d40741e6fe1c",
+  "backend/src/services/malwareScan.ts": "f7d78f956085a80278751c800b936c7bd547c2bbf66ebd2221d5d8030f243e83",
+  "backend/src/services/documentSafety.ts": "5418f5ea9adb959ea3f6c2616b54861bc5ae4b1eaec31bffbbb65587a3d297d4",
+  "backend/src/services/documents.ts": "d916a417b5cea25f8491a741e14d41cb1fbe8e460563caf352d60e831a55b0f3",
+  "backend/src/services/documentRetention.ts": "e7563fd2bbd3bf63057904be8dfe582a6a39f1723b35efb64028b2ef4ac89265",
+  "backend/src/services/curriculumExtraction.ts": "6b8523b6eca5bdb5c995fba56df2b966e84c5a6e2e7691ab1cd0802fef7e95ce",
+  "backend/src/services/curriculumRetrieval.ts": "168e1ac5125cfe13e05559ccc85701043059a550e756f16d4fe029b5b41f95f3",
+  "backend/src/routes/documents.routes.ts": "e270366a5d99962309c8222938a5e32f60c9f57b4dc5178dfb4fa54a5f453ca3",
+  "backend/src/models/CurriculumChunk.ts": "e4c246cdb92c9ce752e08398758c6d4b3f83b251794bd65f4807f0d87c03b829",
+  "frontend/pages/workspace/Documents.tsx": "af953c948b42a23a5fea1c3d249170b0ee1afcd2bd1b5e2b5f4399c9808c73d4",
+  "backend/src/services/educatorChat.ts": "3d961be3a005430851dcd89db7074dd3c4500aa7df04a0875b67610e124d02a9",
+  "backend/src/models/EducatorConversation.ts": "7bef9a1042322263d8e0c9522ae6f711c681868522e80b7da7ea6c1757c30031",
+  "backend/src/routes/educatorChat.routes.ts": "86c676c3a98522719e1b91f41052740fb99e146e22c2fb1bd614f40b7b8797d7",
+  "backend/src/services/featureFlags.ts": "a51fc44d299424465bf151db3dedd83f0a79aa0fe09ebc40664ea3c0d171c942",
+  "backend/src/app.ts": "504ec84926cf5c617be804015ee7f3cb1e1b14b58fc5aeaa2fc05dae8a347a5f",
+  "frontend/pages/workspace/AIChat.tsx": "baae92fc58b08b4ff1d0131d136fd77fe7da5edd021bebb19a2c846b5cd09a89",
+  "backend/src/services/speakingExam.ts": "843a2c53334ef8a1a562204a8e1fff5baa97f8a3ae3c8077e102bd3668f7b673",
+  "backend/src/controllers/speakingExam.controller.ts": "fefc93353af847cd939295d8b31fa51d57ba8eb549a3c692543f8d47360b7714",
+  "backend/src/routes/speaking.routes.ts": "3b7e04eddb2226ce7bd9f4a97f9fcb2dd057f7fdfe10c7014bae1d8561129599",
+  "backend/src/services/sourceSelection.ts": "15c7f729670d24bbd26b33485c1e816bfdac05dbf3cfa2c7e94151b51e71a859",
+  "backend/src/controllers/outcomes.controller.ts": "18eaefec41aca1baee250d3dd8ea768afb8c3d1c1dd1d15d23cc28e4636d884c",
+  "backend/src/services/educatorAi.ts": "6e1fa285e8c48ed4930bbe447970676d94e7f7ab4a6afe111719a20483ae6c0c",
+  "backend/src/services/conversationExam.ts": "4fece8e4ec82d3aaa9de267c3f52a064b4768c6c2980cdbed499a961e593ed50",
+  "backend/src/controllers/assignments.controller.ts": "a189d98ff5511882ffce8623a93256b6abd583fe19443385c90d6ff5f7e303ca",
+  "backend/src/controllers/meAssignments.controller.ts": "238775ca06acc99fcf00f84512748509b90c08364580e7238ccd55a893e41f4e",
+  "backend/src/models/Assignment.ts": "880410305ffd997e33c00fac985691d435a50e979b1669e2e33a54d3682870e9",
+  "backend/src/models/AssessmentAttempt.ts": "79e4001f91de2765a01e0c8b4d341deb070f4fb1b0664a23f74a921ba0393b74",
+  "backend/src/config/env.ts": "3677cf1c7826f6a86deae6f3b84ea1ea9f7aae6fd165d45e78137dbf16f194db",
+  "frontend/components/SpeakingExam.tsx": "4e2a412bb32476776064bbe01ee36aecf7c817fc9f2d06b37633bf5c4a7d17b0",
+  "frontend/components/SourcePicker.tsx": "08cc45dc1b5f23023dcb6436d3c8cbcaa1044d07872131813e00552f9d033884",
+  "frontend/pages/teaching/SpeakingExamSettings.tsx": "7ba0eb6c07790d476854eab1aa620bc982c9b1386eafac0f51778fc655db3bd2",
+  "frontend/pages/workspace/Outcomes.tsx": "58a6a849ff005062d2046252d6051a5cc23221ec0ae1c27e648737ac19adec9b",
+  "backend/src/models/CommercialPlan.ts": "43105ee7435d641613b1514251ffb16a09502fab02f960ee645a304e12c28ccb",
+  "backend/src/services/usageReport.ts": "cb529e15615a72853ac14373b29c582880b5d1b824ba825c656f2dec3dec66e6",
+  "backend/src/routes/usage.routes.ts": "b8ee4fe9541fbe1294d1d8b6d5d6c60b229cb42fabe1d90d04c435dba287a15f",
+  "frontend/components/UsageChip.tsx": "83308c65b3cc7d80614c42a993dcfa9f96d967b92fdd21101939469bbf44a27a",
+  "frontend/pages/workspace/Usage.tsx": "1da79d60da304d8f28c8d1e3d5a81c26f5af66e50d23670b78d67f4ab68b2790",
+  "frontend/pages/workspace/SavingsCenter.tsx": "33cff834d2655ff42d0f4ef746610bddb911fb20478c5604c063cca634de2513",
+  "frontend/pages/Login.tsx": "0477d07aa586f31a20bdbf5e0f2463e651f56df7ebac44119bcb6984ec7012d6",
+  "frontend/services/avatarService.ts": "f52b3a383dbf78ea00326f970d44193337f670f129e9d567852c0eac437cfb22",
+  "frontend/tsconfig.json": "a333af1b88c6e50ff4b43af1b36c6d72d1db5f692d4048fd98af6d8a7a96b23b",
+  "backend/src/config/stagingGuard.ts": "8c90344fac2e751e56d253660948dc722d24a8297831de0550cba7ea7dd76cda",
+  "backend/src/config/db.ts": "ddec4d0c9709ce877a0c211f58ec715d362c1d7d8fe09c62df58f8f9c80e4ec2"
+ }
+}

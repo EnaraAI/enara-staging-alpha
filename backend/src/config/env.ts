@@ -39,6 +39,8 @@ export interface AppConfig {
   /** Claude is the tutor backup when the orchestrator is unavailable. */
   anthropicApiKey?: string;
   anthropicTutorModel: string;
+  // P9 analytics question routing (intent only): a small, priced model.
+  anthropicIntentModel: string;
   anthropicVisualModel: string;
   anthropicVoiceModel: string;
   anthropicTutorEffort: 'low' | 'medium' | 'high';
@@ -354,6 +356,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     enaraDefaultCourseId: readString(source, "ENARA_DEFAULT_COURSE_ID") || readString(source, "DEFAULT_COURSE_ID"),
     anthropicApiKey: readString(source, "ANTHROPIC_API_KEY"),
     anthropicTutorModel: readString(source, "ANTHROPIC_TUTOR_MODEL") || "claude-opus-5-5",
+    anthropicIntentModel: readString(source, "ANTHROPIC_INTENT_MODEL") || "claude-haiku-5-5",
     anthropicVisualModel: readString(source, "ANTHROPIC_VISUAL_MODEL") || "claude-haiku-5-5",
     // Spoken avatar replies need a fast first word more than depth.
     anthropicVoiceModel: readString(source, "ANTHROPIC_VOICE_MODEL") || "claude-haiku-5-5",

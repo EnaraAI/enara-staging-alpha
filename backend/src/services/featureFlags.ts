@@ -35,7 +35,12 @@ export const TEACHING_MASTER_FLAG = 'teaching_workflow_enabled';
 export const DOCUMENT_FLAGS = ['documents_workspace_enabled'] as const;
 // P3 grounded educator chat: its own master flag, default off. It never
 // turns document processing on; it only answers from eligible documents.
-export const EDUCATOR_CHAT_FLAGS = ['educator_chat_enabled'] as const;
+// educator_analytics_enabled: class analytics and charts in that chat (own
+// flag, default off; also needs educator_chat_enabled to reach the route).
+// educator_analytics_ai_router_enabled (P9): a metered model may interpret
+// analytics questions the fixed patterns miss (intent only, never data);
+// default off, and only acts when educator_analytics_enabled is on too.
+export const EDUCATOR_CHAT_FLAGS = ['educator_chat_enabled', 'educator_analytics_enabled', 'educator_analytics_ai_router_enabled'] as const;
 
 // P4, each its own master flag, default off: the connected workflow
 // (source-linked generation, outcomes), teacher-controlled English speaking

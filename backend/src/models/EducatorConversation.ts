@@ -19,10 +19,14 @@ export interface IEducatorChatCitation {
 export interface IEducatorChatMessage {
   role: 'user' | 'assistant';
   text: string;
-  // assistant only: answered (cited), no_sources, unsupported, refused
-  status?: 'answered' | 'no_sources' | 'unsupported' | 'refused';
+  // assistant only: answered (cited), no_sources, unsupported, refused;
+  // needs_clarification for class-analytics questions that need a class.
+  status?: 'answered' | 'no_sources' | 'unsupported' | 'refused' | 'needs_clarification';
   citations?: IEducatorChatCitation[];
   uploadIds?: string[];
+  // Class analytics report (analytics-v1): computed figures, table and chart
+  // payload, all from records the user may read. No passage text or prompts.
+  analytics?: Record<string, unknown>;
   at: Date;
 }
 
@@ -45,9 +49,10 @@ const messageSchema = new Schema<IEducatorChatMessage>(
   {
     role: { type: String, enum: ['user', 'assistant'], required: true },
     text: { type: String, required: true },
-    status: { type: String, enum: ['answered', 'no_sources', 'unsupported', 'refused'] },
+    status: { type: String, enum: ['answered', 'no_sources', 'unsupported', 'refused', 'needs_clarification'] },
     citations: { type: [citationSchema], default: undefined },
     uploadIds: { type: [String], default: undefined },
+    analytics: { type: Schema.Types.Mixed, default: undefined },
     at: { type: Date, required: true },
   },
   { _id: false },

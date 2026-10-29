@@ -18,7 +18,7 @@ export const MAX_GROUPS = 200;
 const DAY = 86_400_000;
 
 export const FEATURE_LABELS: Record<string, string> = {
-  educator_chat: 'AI Chat', ai_assessment_draft: 'Assessment drafts', ai_question_regenerate: 'Question regeneration', ai_lesson_plan: 'Lesson plans',
+  educator_chat: 'AI Chat', educator_analytics_intent: 'AI Chat (question routing)', ai_assessment_draft: 'Assessment drafts', ai_question_regenerate: 'Question regeneration', ai_lesson_plan: 'Lesson plans',
   ai_lesson_plan_section: 'Lesson plan sections', ai_grading: 'Grading', chat: 'AI Tutor', voice: 'AI Tutor (voice)', visualize: 'AI Tutor visuals', staff_assistant: 'Staff assistant', assessment: 'Assessments', avatar_visual: 'Avatar visuals', curriculum_ingestion: 'Curriculum ingestion', speaking_exam_stt: 'Speaking exam (speech to text)',
   speaking_exam_tts: 'Speaking exam (examiner voice)', conversation_exam: 'Exam examiner', stt: 'Avatar speech to text', tts: 'Avatar voice', avatar_session: 'Avatar session',
 };

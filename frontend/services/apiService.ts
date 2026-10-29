@@ -938,17 +938,19 @@ export interface ChatCitation { n: number; uploadId?: string; chunkId: string; f
 export interface ChatDocument { uploadId: string; fileName: string; curriculumId: string; curriculumName: string | null; state: DocumentState; eligible: boolean; malwareScan?: WorkspaceDocument['malwareScan'] }
 export interface ChatAnswer {
   conversationId: string;
-  status: 'answered' | 'no_sources' | 'unsupported' | 'refused';
+  status: 'answered' | 'no_sources' | 'unsupported' | 'refused' | 'needs_clarification';
   answer: string;
+  // Class analytics report (no documents selected; educator_analytics_enabled).
+  analytics?: import('../components/AnalyticsReport').AnalyticsReportData;
   citations: ChatCitation[];
   usedUploadIds: string[];
   ineligible: { uploadId: string; fileName: string; state: string }[];
 }
-export const fetchChatDocuments = () => request<{ documents: ChatDocument[]; maxQuestionChars: number }>('GET', '/api/educator-chat/documents');
-export const askEducatorChat = (params: { question: string; uploadIds: string[]; conversationId?: string }) => request<ChatAnswer>('POST', '/api/educator-chat/ask', params);
+export const fetchChatDocuments = () => request<{ documents: ChatDocument[]; maxQuestionChars: number; analyticsEnabled?: boolean }>('GET', '/api/educator-chat/documents');
+export const askEducatorChat = (params: { question: string; uploadIds: string[]; conversationId?: string; studentId?: string }) => request<ChatAnswer>('POST', '/api/educator-chat/ask', params);
 export const fetchChatConversations = () => request<{ conversations: { id: string; title: string; updatedAt: string }[] }>('GET', '/api/educator-chat/conversations');
 export const fetchChatConversation = (id: string) =>
-  request<{ conversation: { id: string; title: string; messages: { role: 'user' | 'assistant'; text: string; status?: ChatAnswer['status']; citations?: ChatCitation[]; at: string }[] } }>('GET', `/api/educator-chat/conversations/${encodeURIComponent(id)}`);
+  request<{ conversation: { id: string; title: string; messages: { role: 'user' | 'assistant'; text: string; status?: ChatAnswer['status']; citations?: ChatCitation[]; analytics?: ChatAnswer['analytics']; at: string }[] } }>('GET', `/api/educator-chat/conversations/${encodeURIComponent(id)}`);
 export const deleteChatConversation = (id: string) => request('DELETE', `/api/educator-chat/conversations/${encodeURIComponent(id)}`);
 
 // P5 usage (customer-facing; never ENARA's internal provider cost).

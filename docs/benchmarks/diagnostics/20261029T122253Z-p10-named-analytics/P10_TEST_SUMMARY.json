@@ -1,0 +1,72 @@
+{
+ "phase": "P10 named-student analytics",
+ "paid_calls": 0,
+ "remote_connections": 0,
+ "tests": {
+  "focused_x2": "136/136 (p10NamedStudents 24 + p9AnalyticsRouter 46 + educatorAnalytics 66)",
+  "related": "245/245 (8 files)",
+  "full_backend": "944/944 (67 files)"
+ },
+ "checks": {
+  "tsc_backend": 0,
+  "tsc_frontend": 0,
+  "frontend_build": 0,
+  "git_diff_check": 0
+ },
+ "count_reconciliation": {
+  "previous": 920,
+  "added": 24,
+  "new_files": 1,
+  "total": 944
+ },
+ "dataset": {
+  "file": "P10_INTENT_BENCHMARK_DATASET.json",
+  "sha256": "255eb91518bf3ffb5639a6e037a76684bc9438b54fd15b293895c824528db977",
+  "items": 120
+ },
+ "dry_run": {
+  "mode": "dry-stub",
+  "questions": 120,
+  "notEvaluated": 0,
+  "attempts": 77,
+  "ledgerRows": 77,
+  "attemptsEqualLedgerRows": true,
+  "overallAccuracy": 100,
+  "scopeViolations": 0,
+  "piiLeaks": 0,
+  "writes": 0,
+  "fastPath": {
+   "handled": 26,
+   "accuracy": 100,
+   "modelCalls": 0
+  },
+  "modelPath": {
+   "handled": 94,
+   "accuracy": 100,
+   "interpretedReports": 54
+  }
+ },
+ "live_preflight": {
+  "model": "claude-haiku-5-5",
+  "worst_case_usd_per_attempt": 0.00067375,
+  "max_attempts": 240,
+  "worst_case_usd_total": 0.1617,
+  "cap_usd": 0.25,
+  "authorized": false
+ },
+ "source_sha256": {
+  "backend/src/services/educatorAnalytics.ts": "a3d0bebc411cfaf42f73458dccbfb40a4f8ee5c4d8409968a2c5b84a680708e3",
+  "backend/src/services/educatorAnalyticsRouter.ts": "5bd22f7033a98b17fb79b9c6fdb9ab6862addc6abdb2a1b9266a3f50f068b8cf",
+  "backend/src/services/studentDirectory.ts": "fb6366be7e7bfd50a651243c41cd68696ed38e09ed66a7afb3c51ac5988fede2",
+  "backend/src/services/educatorChat.ts": "a92bbfed90308fdad3f93d98d9b3622f78288c805b02841a44d37519ff2c1de1",
+  "backend/src/services/chartPayload.ts": "9dbd8d2edae189bde1b4b6162ba340782cdb084e0fe209d63c0662c1cae2c16b",
+  "backend/src/scripts/benchmarkIntentRouter.ts": "99dcb1ca814b7de80e91627b8f07f62af093e605fba73a88086526f754209794",
+  "backend/test/p10NamedStudents.test.ts": "2b20c1702e9b4343e1169e117b30bc5226c57fc5f4a4aad0ccc864730e02af4b",
+  "backend/test/p9AnalyticsRouter.test.ts": "86eab0bf9d7bcf6190f2dcb4db58236ecab656dab2a7c27cfbd8609d83e42ef7",
+  "backend/test/educatorAnalytics.test.ts": "8a3a5302e985263a2ca745485181aa0b377b227ace2e36eb989600e4aa55245d",
+  "frontend/components/AnalyticsReport.tsx": "f275c64873d397e357f901ad362d491a39f7f0a7edbbf865751e03e250946220",
+  "frontend/pages/workspace/AIChat.tsx": "27a9de699b11a9e2627f89a9f5e5016ae11e83944ccc234af599336b13b7d121",
+  "frontend/services/apiService.ts": "378b2e8fbfbcac70a15c810a3d1453664ea1eecf4049aadef83659880ce7dced",
+  "backend/src/routes/educatorChat.routes.ts": "8a874502a3e266637e9a19a106a5a4ad3c4c920e2b612d9310708dc857bde1de"
+ }
+}

@@ -1,0 +1,18 @@
+{
+  "feature": "educator-analytics-chat (analytics-v1, chart-v1)",
+  "date_utc": "2026-10-29",
+  "paid_ai_calls": 0,
+  "remote_connections": 0,
+  "commands": [
+    {"cmd": "cd backend && npx vitest run test/educatorAnalytics.test.ts", "runs": 2, "exit": 0, "files": 1, "tests": 66, "passed": 66},
+    {"cmd": "cd backend && npx vitest run test/educatorAnalytics.test.ts test/p3EducatorChat.test.ts test/p8SmallScopeRetrieval.test.ts test/p7RoleMatrix.test.ts test/p2Documents.test.ts", "exit": 0, "files": 5, "tests": 164, "passed": 164},
+    {"cmd": "cd backend && npx vitest run", "exit": 0, "files": 65, "tests": 874, "passed": 874},
+    {"cmd": "cd backend && npx tsc --noEmit -p .", "exit": 0},
+    {"cmd": "cd frontend && npx tsc --noEmit -p .", "exit": 0},
+    {"cmd": "cd frontend && npm run build", "exit": 0},
+    {"cmd": "git diff --check", "exit": 0},
+    {"cmd": "playwright screenshots of the real AnalyticsReport component (9 views)", "exit": 0, "page_errors": 0, "horizontal_scroll": false}
+  ],
+  "count_reconciliation": {"previous_total": 808, "added_tests": 66, "added_files": 1, "new_total": 874},
+  "fixtures": "synthetic only (no real student data)"
+}

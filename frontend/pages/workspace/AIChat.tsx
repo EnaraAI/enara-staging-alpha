@@ -12,12 +12,15 @@ import {
   fetchChatDocuments,
 } from '../../services/apiService';
 import { UsageChip } from '../../components/UsageChip';
+import { AnalyticsReport } from '../../components/AnalyticsReport';
 import { requestIdOf } from '../../services/apiService';
 
 // AI Chat (P3): ask questions answered only from approved documents. Shows the
 // server's citations; never shows an answer without them, and explains when
-// no approved document is available (no bypass offered).
-type Turn = { role: 'user' | 'assistant'; text: string; status?: ChatAnswer['status']; citations?: ChatCitation[]; requestId?: string | null };
+// no approved document is available (no bypass offered). With class analytics
+// on for the school, a question sent with no document selected is answered
+// from the teacher's own class records instead (report, table and chart).
+type Turn = { role: 'user' | 'assistant'; text: string; status?: ChatAnswer['status']; citations?: ChatCitation[]; analytics?: ChatAnswer['analytics']; requestId?: string | null };
 type Failure = { kind: 'budget' | 'paused' | 'rate' | 'provider' | 'timeout' | 'other'; message: string };
 
 const STATE_LABEL: Record<string, string> = {
@@ -66,11 +69,12 @@ export const AIChat: React.FC = () => {
   const [conversations, setConversations] = useState<{ id: string; title: string }[]>([]);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<Failure | null>(null);
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
 
   const loadConversations = () => fetchChatConversations().then((r) => setConversations(r.conversations)).catch(() => setConversations([]));
   useEffect(() => {
     fetchChatDocuments()
-      .then((r) => setDocs(r.documents))
+      .then((r) => { setDocs(r.documents); setAnalyticsEnabled(Boolean(r.analyticsEnabled)); })
       .catch((err: ApiError) => {
         if (err.code === 'FEATURE_DISABLED') setDisabled(true);
         setDocs([]);
@@ -79,17 +83,18 @@ export const AIChat: React.FC = () => {
   }, []);
 
   const eligible = (docs ?? []).filter((d) => d.eligible);
-  const send = async () => {
-    if (!question.trim() || !selected.length) return;
+  // studentId: a student picked from the candidates of an ambiguous name (P10).
+  const send = async (repeat?: { question: string; studentId: string }) => {
+    if (!repeat && (!question.trim() || (!selected.length && !analyticsEnabled))) return;
     setBusy(true);
     setFailure(null);
-    const q = question.trim();
+    const q = repeat ? repeat.question : question.trim();
     setTurns((t) => [...t, { role: 'user', text: q }]);
-    setQuestion('');
+    if (!repeat) setQuestion('');
     try {
-      const r = await askEducatorChat({ question: q, uploadIds: selected, conversationId });
+      const r = await askEducatorChat({ question: q, uploadIds: repeat ? [] : selected, conversationId, ...(repeat ? { studentId: repeat.studentId } : {}) });
       setConversationId(r.conversationId);
-      setTurns((t) => [...t, { role: 'assistant', text: r.answer, status: r.status, citations: r.citations, requestId: requestIdOf(r) }]);
+      setTurns((t) => [...t, { role: 'assistant', text: r.answer, status: r.status, citations: r.citations, analytics: r.analytics, requestId: requestIdOf(r) }]);
       loadConversations();
     } catch (err) {
       setFailure(failureOf(err));
@@ -100,7 +105,7 @@ export const AIChat: React.FC = () => {
   const open = (id: string) =>
     fetchChatConversation(id).then((r) => {
       setConversationId(id);
-      setTurns(r.conversation.messages.map((m) => ({ role: m.role, text: m.text, status: m.status, citations: m.citations })));
+      setTurns(r.conversation.messages.map((m) => ({ role: m.role, text: m.text, status: m.status, citations: m.citations, analytics: m.analytics })));
     }).catch((err) => setFailure(failureOf(err)));
 
   if (disabled) return <p className="max-w-4xl mx-auto p-8 text-slate-700">AI Chat isn't enabled for your school.</p>;
@@ -146,13 +151,14 @@ export const AIChat: React.FC = () => {
           <p className="text-xs font-bold uppercase tracking-wide text-teal-700">AI Studio</p>
           <h1 className="text-2xl font-bold text-slate-900">AI Chat</h1>
           <p className="text-sm text-slate-600">Answers come only from the documents you choose, with their sources. If they don't cover a question, it says so.</p>
+          {analyticsEnabled && <p className="text-sm text-slate-600">With no document selected, ask about your classes (for example "class performance summary for the last month" or "ارسم تطور درجات الفصل خلال آخر 3 تقييمات"). Reports use only classes you may see.</p>}
           <div className="mt-1"><UsageChip features={['educator_chat']} /></div>
         </div>
         <div className="space-y-3" aria-live="polite">
           {!turns.length && <p className="text-sm text-slate-500 flex items-center gap-2"><MessageSquare className="w-4 h-4" /> Choose documents and ask a question.</p>}
           {turns.map((t, i) => (
-            <div key={i} className={`rounded-xl p-3 text-sm ${t.role === 'user' ? 'bg-slate-900 text-white ml-12' : t.status === 'answered' ? 'bg-white border border-slate-200 mr-12' : 'bg-amber-50 border border-amber-200 text-amber-900 mr-12'}`}>
-              <p className="whitespace-pre-wrap">{t.text}</p>
+            <div key={i} className={`rounded-xl p-3 text-sm ${t.role === 'user' ? 'bg-slate-900 text-white ml-12' : t.status === 'answered' || t.analytics?.status === 'answered' ? 'bg-white border border-slate-200 mr-12' : 'bg-amber-50 border border-amber-200 text-amber-900 mr-12'}`}>
+              {t.analytics ? <AnalyticsReport report={t.analytics} onPickStudent={(studentId) => { const asked = [...turns.slice(0, i)].reverse().find((x) => x.role === 'user'); if (asked) send({ question: asked.text, studentId }); }} /> : <p className="whitespace-pre-wrap">{t.text}</p>}
               {t.citations && t.citations.length > 0 && (
                 <ol className="mt-2 border-t border-slate-100 pt-2 text-xs text-slate-600 space-y-0.5">
                   {t.citations.map((c) => <li key={c.n}>[{c.n}] {cite(c)}</li>)}
@@ -169,8 +175,8 @@ export const AIChat: React.FC = () => {
           )}
         </div>
         <div className="flex gap-2">
-          <textarea aria-label="Question" value={question} maxLength={2000} onChange={(e) => setQuestion(e.target.value)} rows={2} placeholder={eligible.length ? 'Ask about the selected documents…' : 'No approved document available yet'} disabled={!eligible.length} className="flex-1 rounded-lg border border-slate-300 p-2 text-sm" />
-          <button onClick={send} disabled={busy || !question.trim() || !selected.length} className="px-4 rounded-lg bg-slate-900 text-white disabled:bg-slate-200 disabled:text-slate-500" aria-label="Send"><Send className="w-4 h-4" /></button>
+          <textarea aria-label="Question" value={question} maxLength={2000} onChange={(e) => setQuestion(e.target.value)} rows={2} placeholder={selected.length ? 'Ask about the selected documents…' : analyticsEnabled ? 'Ask about your classes, or select documents…' : eligible.length ? 'Ask about the selected documents…' : 'No approved document available yet'} disabled={!eligible.length && !analyticsEnabled} className="flex-1 rounded-lg border border-slate-300 p-2 text-sm" />
+          <button onClick={() => send()} disabled={busy || !question.trim() || (!selected.length && !analyticsEnabled)} className="px-4 rounded-lg bg-slate-900 text-white disabled:bg-slate-200 disabled:text-slate-500" aria-label="Send"><Send className="w-4 h-4" /></button>
         </div>
       </main>
     </div>

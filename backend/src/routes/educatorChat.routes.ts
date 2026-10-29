@@ -3,7 +3,7 @@ import { authMiddleware, AuthRequest } from '../middleware/auth.middleware';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { requirePermission } from '../auth/permissions';
 import { requireInstitutionId } from '../auth/authorization';
-import { requireFeature } from '../services/featureFlags';
+import { isFeatureEnabled, requireFeature } from '../services/featureFlags';
 import { EducatorConversation } from '../models/EducatorConversation';
 import { askEducatorChat, documentsForChat, MAX_QUESTION_CHARS } from '../services/educatorChat';
 import { ensurePlainObject, rejectMongoOperators } from '../utils/validation';
@@ -21,7 +21,8 @@ const own = (req: AuthRequest) => ({ institutionId: requireInstitutionId(req), u
 router.get('/documents', asyncHandler(async (req: AuthRequest, res: Response) => {
   requireInstitutionId(req);
   const docs = await documentsForChat(req);
-  res.json({ documents: docs.map(({ institutionId: _i, ...d }) => d), maxQuestionChars: MAX_QUESTION_CHARS });
+  const analyticsEnabled = (req.user!.role === 'teacher' || req.user!.role === 'admin') && (await isFeatureEnabled(req.user!.institutionId, 'educator_analytics_enabled'));
+  res.json({ documents: docs.map(({ institutionId: _i, ...d }) => d), maxQuestionChars: MAX_QUESTION_CHARS, analyticsEnabled });
 }));
 
 router.get('/conversations', asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -46,7 +47,7 @@ router.post('/ask', asyncHandler(async (req: AuthRequest, res: Response) => {
   const body = ensurePlainObject(req.body);
   rejectMongoOperators(body);
   const conversationId = typeof body.conversationId === 'string' ? body.conversationId : undefined;
-  res.json(await askEducatorChat(req, { conversationId, uploadIds: body.uploadIds, question: body.question }));
+  res.json(await askEducatorChat(req, { conversationId, uploadIds: body.uploadIds, question: body.question, classId: body.classId, studentId: body.studentId }));
 }));
 
 export default router;

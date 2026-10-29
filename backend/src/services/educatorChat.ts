@@ -10,10 +10,14 @@ import { CurriculumFileJob } from '../models/CurriculumChunk';
 import { EDUCATOR_CHAT_RETENTION_DAYS, EducatorConversation, type IEducatorChatCitation } from '../models/EducatorConversation';
 import { meteredMessage } from './aiGateway';
 import { BUDGET_ERROR_CODES } from './aiBudget';
-import { citationsIn, retrieveCurriculumSources, type RetrievedSource } from './curriculumRetrieval';
+import { CITATION_MARKER, citationNumber, citationsIn, retrieveCurriculumSources, smallScopePassages, type RetrievedSource } from './curriculumRetrieval';
 import { isClearedForProcessing, isDocumentSafetyRequired } from './documentSafety';
 import { documentState, malwareScanOf } from './documents';
 import { textTokenBound } from './priceCatalog';
+import { logger } from '../utils/logging';
+import { asksForPrivateStudentDetails, runAnalytics, type AnalyticsResult } from './educatorAnalytics';
+import { routeWithModel } from './educatorAnalyticsRouter';
+import { isFeatureEnabled } from './featureFlags';
 
 // Grounded educator chat (P3). Answers only from passages of documents the
 // educator may use, selected by upload id. Never from general knowledge:
@@ -21,7 +25,11 @@ import { textTokenBound } from './priceCatalog';
 // model call. In a school with the documents safety gate, only attested
 // documents that are scanned clean, or not scanned by school policy
 // ('deferred', no scanner configured), are eligible; only their bounded
-// extracted passages are sent. Citations come from the server's
+// extracted passages are sent. F-3b: when keyword retrieval finds nothing
+// but the selected eligible documents hold at most SMALL_SCOPE_PASSAGES
+// passages in total, all of them go to the answer call, whose NOT_IN_SOURCES
+// rule and server-side citation check decide; larger selections keep the
+// no_sources reply. Citations come from the server's
 // retrieved sources, never from the model's text. Passage text is untrusted
 // data. Every model call goes through the AI gateway (budget, pause, rate
 // limit, metering).
@@ -29,6 +37,8 @@ import { textTokenBound } from './priceCatalog';
 export const MAX_QUESTION_CHARS = 2000;
 export const MAX_UPLOADS_PER_QUESTION = 10;
 const MAX_SOURCES = 6;
+// F-3b small-scope fallback (see above); at most MAX_SOURCES.
+export const SMALL_SCOPE_PASSAGES = 3;
 const HISTORY_TURNS = 6;
 const HISTORY_CHARS = 4000;
 const MAX_OUTPUT_TOKENS = 1500;
@@ -53,8 +63,10 @@ export function asksForStudentData(question: string): boolean {
 
 export interface EducatorChatAnswer {
   conversationId: string;
-  status: 'answered' | 'no_sources' | 'unsupported' | 'refused';
+  status: 'answered' | 'no_sources' | 'unsupported' | 'refused' | 'needs_clarification';
   answer: string;
+  // Class analytics (no documents selected, educator_analytics_enabled).
+  analytics?: AnalyticsResult;
   citations: IEducatorChatCitation[];
   usedUploadIds: string[];
   ineligible: { uploadId: string; fileName: string; state: string }[];
@@ -121,6 +133,22 @@ function systemPrompt(sources: RetrievedSource[]) {
   );
 }
 
+// Stores an analytics turn like any other chat turn (same retention), with
+// the computed report; no documents, citations or model output involved.
+async function saveAnalytics(
+  conversation: Awaited<ReturnType<typeof loadOrCreateConversation>>,
+  question: string,
+  r: { status: EducatorChatAnswer['status']; answer: string; analytics?: AnalyticsResult },
+): Promise<EducatorChatAnswer> {
+  const at = new Date();
+  conversation.messages.push({ role: 'user', text: question, at });
+  conversation.messages.push({ role: 'assistant', text: r.answer, status: r.status, ...(r.analytics ? { analytics: r.analytics as unknown as Record<string, unknown> } : {}), at });
+  if (conversation.messages.length > 100) conversation.messages.splice(0, conversation.messages.length - 100);
+  conversation.expiresAt = new Date(at.getTime() + EDUCATOR_CHAT_RETENTION_DAYS * 86_400_000);
+  await conversation.save();
+  return { conversationId: conversation.id, status: r.status, answer: r.answer, citations: [], usedUploadIds: [], ineligible: [], ...(r.analytics ? { analytics: r.analytics } : {}) };
+}
+
 async function loadOrCreateConversation(req: AuthRequest, conversationId: string | undefined, question: string) {
   const user = req.user!;
   const institutionId = user.institutionId;
@@ -140,11 +168,27 @@ async function loadOrCreateConversation(req: AuthRequest, conversationId: string
   });
 }
 
-export async function askEducatorChat(req: AuthRequest, params: { conversationId?: string; uploadIds: unknown; question: unknown }): Promise<EducatorChatAnswer> {
+export async function askEducatorChat(req: AuthRequest, params: { conversationId?: string; uploadIds: unknown; question: unknown; classId?: unknown; studentId?: unknown }): Promise<EducatorChatAnswer> {
   const question = typeof params.question === 'string' ? params.question.trim() : '';
   if (!question) throw new AppError('Ask a question', 400, 'VALIDATION_ERROR');
   if (question.length > MAX_QUESTION_CHARS) throw new AppError(`Questions are limited to ${MAX_QUESTION_CHARS} characters`, 400, 'VALIDATION_ERROR');
   const uploadIds = Array.isArray(params.uploadIds) ? [...new Set(params.uploadIds.filter((x): x is string => typeof x === 'string' && x.length <= 80))] : [];
+  // Class analytics: only with no document selected and the school's flag on.
+  // Selecting documents always keeps the document-grounded path below.
+  if (!uploadIds.length && (await isFeatureEnabled(req.user!.institutionId, 'educator_analytics_enabled'))) {
+    if (params.classId !== undefined && (typeof params.classId !== 'string' || params.classId.length > 80)) throw new AppError('Invalid class', 400, 'VALIDATION_ERROR');
+    if (params.studentId !== undefined && (typeof params.studentId !== 'string' || params.studentId.length > 80)) throw new AppError('Invalid student', 400, 'VALIDATION_ERROR');
+    if (asksForPrivateStudentDetails(question)) {
+      const conversation = await loadOrCreateConversation(req, params.conversationId, question);
+      return saveAnalytics(conversation, question, { status: 'refused', answer: STUDENT_DATA_REFUSAL });
+    }
+    // P9: questions the fixed patterns miss may go to the metered intent router
+    // (its own flag, default off); the deterministic path never needs it.
+    const route = (await isFeatureEnabled(req.user!.institutionId, 'educator_analytics_ai_router_enabled')) ? routeWithModel : undefined;
+    const analytics = await runAnalytics(req, question, params.classId as string | undefined, new Date(), route, params.studentId as string | undefined);
+    const conversation = await loadOrCreateConversation(req, params.conversationId, question);
+    return saveAnalytics(conversation, question, { status: analytics.status, answer: analytics.summary, analytics });
+  }
   if (!uploadIds.length || uploadIds.length > MAX_UPLOADS_PER_QUESTION) {
     throw new AppError(`Choose 1 to ${MAX_UPLOADS_PER_QUESTION} documents`, 400, 'VALIDATION_ERROR');
   }
@@ -181,6 +225,25 @@ export async function askEducatorChat(req: AuthRequest, params: { conversationId
     found.push(...(await retrieveCurriculumSources({ institutionId, curriculumId, query: question, uploadIds: ids, k: MAX_SOURCES })));
   }
   const eligibleIds = new Set(eligible.map((d) => d.uploadId));
+  // F-3b: keyword retrieval found nothing. A small selection (at most
+  // SMALL_SCOPE_PASSAGES passages across all chosen documents) goes to the
+  // answer call whole; the model must reply NOT_IN_SOURCES when it does not
+  // support an answer, and only citations of these passages are kept.
+  if (!found.length) {
+    const small: RetrievedSource[] = [];
+    let total = 0;
+    for (const [curriculumId, { institutionId, ids }] of byCurriculum) {
+      const part = await smallScopePassages({ institutionId, curriculumId, uploadIds: ids, max: SMALL_SCOPE_PASSAGES - total });
+      if (!part) { small.length = 0; break; } // too many passages: no fallback
+      total += part.length;
+      small.push(...part);
+    }
+    if (small.length) {
+      found.push(...small);
+      // Telemetry: counts and ids only, never passage text or the question.
+      logger.info('educator_chat_small_scope_fallback', { institutionId: req.user!.institutionId, conversationId: conversation.id, passages: small.length, documents: new Set(small.map((x) => x.uploadId)).size });
+    }
+  }
   const sources = found
     .filter((s) => s.uploadId && eligibleIds.has(s.uploadId))
     .sort((a, b) => b.score - a.score)
@@ -230,6 +293,6 @@ export async function askEducatorChat(req: AuthRequest, params: { conversationId
   if (!text || /NOT_IN_SOURCES/.test(text) || !citations.length) return finish('unsupported', UNSUPPORTED_ANSWER);
   // Only citation markers the server validated remain in the text.
   const valid = new Set(citations.map((c) => c.n));
-  const answer = text.replace(/\[(\d{1,2})\]/g, (m, n) => (valid.has(Number(n)) ? m : ''));
+  const answer = text.replace(CITATION_MARKER, (m, n) => (valid.has(citationNumber(n)) ? m : ''));
   return finish('answered', answer, citations, [...new Set(citations.map((c) => c.uploadId).filter(Boolean) as string[])]);
 }

@@ -44,6 +44,10 @@ export async function askForJson<T>(params: {
   institutionId?: string;
   refs?: { attemptId?: string; assessmentId?: string; sessionId?: string };
   validate: (value: unknown) => T;
+  // Optional: a specific (priced) model instead of the tutor model, and fewer
+  // validation attempts (default 2) for callers that must fail fast.
+  model?: string;
+  validationAttempts?: number;
 }): Promise<{ value: T; model: string }> {
   const config = getConfig();
   if (!config.anthropicApiKey) throw new AppError('AI is not configured', 503, 'AI_UNAVAILABLE');
@@ -51,12 +55,12 @@ export async function askForJson<T>(params: {
   // metered), except under a spending guard, where each HTTP request has to
   // pass through reserve() first.
   client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 55_000, maxRetries: 0 });
-  const model = config.anthropicTutorModel;
+  const model = params.model ?? config.anthropicTutorModel;
   let lastError = '';
   // One operation: the validation retry and transport retries are separate,
   // numbered attempts under it.
   const op = startOperation();
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (let attempt = 0; attempt < Math.min(2, Math.max(1, params.validationAttempts ?? 2)); attempt++) {
     const ticket = guard?.reserve({ model, maxTokens: params.maxTokens, promptBytes: Buffer.byteLength(params.system) + Buffer.byteLength(params.user) });
     let response;
     try {

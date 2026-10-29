@@ -150,9 +150,15 @@ describe('grounded answers', () => {
     }
   });
 
-  it('no matching passage: no_sources and no model call', async () => {
-    const { photo } = await cleanDocs();
-    const r = await ask(T, { uploadIds: [photo], question: 'Explain the French revolution timeline' });
+  // F-3b: a selection of 1-3 passages now goes to the model (see the F-3b
+  // tests below); the no-call reply holds for 4 or more passages.
+  it('no matching passage in a selection of 4+ passages: no_sources and no model call', async () => {
+    const { photo, other } = await cleanDocs();
+    scan.setMalwareScannerForTests(clean);
+    const a = (await up(T, Buffer.from('Volcano lesson. Magma rises through vents.'), 'volcano.txt')).body.document.uploadId;
+    const b = (await up(T, Buffer.from('Weather lesson. Clouds form when vapour cools.'), 'weather.txt')).body.document.uploadId;
+    scan.setMalwareScannerForTests(null);
+    const r = await ask(T, { uploadIds: [photo, other, a, b], question: 'Explain the French revolution timeline' });
     expect(r.body).toMatchObject({ status: 'no_sources', citations: [] });
     expect(ai.create).not.toHaveBeenCalled();
   });
@@ -318,5 +324,182 @@ describe('legacy school (document gate off)', () => {
     const r = await ask(LT, { uploadIds: [p], question: 'What do plants make with sunlight in photosynthesis?' });
     expect(r.body.status).toBe('answered');
     expect((await ask(T, { uploadIds: [p], question: 'What do plants make with sunlight in photosynthesis?' })).status).toBe(404);
+  });
+});
+
+// F-3b: small selections (1-3 passages) go to the answer call whole when
+// keyword retrieval finds nothing; NOT_IN_SOURCES and server citation checks
+// decide. Every assertion is on what the mocked model actually received.
+describe('F-3b small-scope fallback', () => {
+  const sent = () => {
+    const system: string = ai.create.mock.calls.at(-1)![0].system;
+    return [...system.matchAll(/<passage n="(\d+)" file="([^"]+)"[^>]*>([^<]*)<\/passage>/g)].map((m) => ({ n: Number(m[1]), file: m[2], text: m[3] }));
+  };
+  const one = async (body: Buffer, name: string, w = T, cur = 'curA') => {
+    scan.setMalwareScannerForTests(clean);
+    const id = (await up(w, body, name, cur)).body.document.uploadId as string;
+    scan.setMalwareScannerForTests(null);
+    return id;
+  };
+  const AR = Buffer.from('درس البناء الضوئي. تستخدم النباتات ضوء الشمس والماء وثاني أكسيد الكربون لصنع الجلوكوز والأكسجين في البلاستيدات الخضراء.');
+  const AR_OFF = Buffer.from('درس الكسور. الكسر يسمي أجزاء متساوية من الكل.');
+
+  it('EN: a direct question with no keyword match is answered from the one selected passage', async () => {
+    const photo = await one(PHOTO, 'photosynthesis.txt');
+    const q = 'Which organelle hosts this process?';
+    expect(await retrieval.retrieveCurriculumSources({ institutionId: 'instA', curriculumId: 'curA', query: q, uploadIds: [photo] })).toEqual([]);
+    ai.create.mockResolvedValue(reply('It takes place in the chloroplasts [1].'));
+    const r = await ask(T, { uploadIds: [photo], question: q });
+    expect(r.body).toMatchObject({ status: 'answered', usedUploadIds: [photo] });
+    expect(r.body.citations).toEqual([expect.objectContaining({ n: 1, uploadId: photo, fileName: 'photosynthesis.txt' })]);
+    expect(sent()).toEqual([expect.objectContaining({ n: 1, file: 'photosynthesis.txt' })]);
+    expect(sent()[0].text).toContain('chloroplasts');
+    expect(await M.UsageLedger.countDocuments({ feature: 'educator_chat', institutionId: 'instA' })).toBe(1);
+  });
+
+  it('the fallback is logged with counts only; keyword hits never use it', async () => {
+    const { logger } = await import('../src/utils/logging');
+    const spy = vi.spyOn(logger, 'info');
+    try {
+      const photo = await one(PHOTO, 'photosynthesis.txt');
+      ai.create.mockResolvedValue(reply('Chloroplasts [1].'));
+      await ask(T, { uploadIds: [photo], question: 'Which organelle hosts this process?' });
+      const events = spy.mock.calls.filter(([m]) => m === 'educator_chat_small_scope_fallback');
+      expect(events).toHaveLength(1);
+      expect(events[0][1]).toMatchObject({ institutionId: 'instA', passages: 1, documents: 1 });
+      expect(JSON.stringify(events[0])).not.toMatch(/chloroplast|organelle|Photosynthesis/i);
+      spy.mockClear();
+      await ask(T, { uploadIds: [photo], question: 'What do plants make with sunlight in photosynthesis?' });
+      expect(spy.mock.calls.filter(([m]) => m === 'educator_chat_small_scope_fallback')).toHaveLength(0);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('EN: an instruction-style request reaches the model with the selected passage', async () => {
+    const photo = await one(PHOTO, 'photosynthesis.txt');
+    ai.create.mockResolvedValue(reply('Plants use sunlight to make glucose and oxygen [1].'));
+    const r = await ask(T, { uploadIds: [photo], question: 'Summarise this for my grade 5 class in two sentences' });
+    expect(r.body.status).toBe('answered');
+    expect(sent().map((x) => x.file)).toEqual(['photosynthesis.txt']);
+  });
+
+  it('AR: a direct question and an instruction-style request both reach the model with the selected passage', async () => {
+    const ar = await one(AR, 'photo-ar.txt');
+    for (const q of ['أين تحدث هذه العملية؟', 'لخص هذا الدرس لطلاب الصف الخامس']) {
+      ai.create.mockResolvedValueOnce(reply('تحدث في البلاستيدات الخضراء [1].'));
+      const r = await ask(T, { uploadIds: [ar], question: q });
+      expect(r.body).toMatchObject({ status: 'answered', citations: [expect.objectContaining({ uploadId: ar })] });
+      expect(sent().map((x) => x.file)).toEqual(['photo-ar.txt']);
+    }
+  });
+
+  it('2-3 selected passages: exactly those are sent, never an unselected or other-school document', async () => {
+    const photo = await one(PHOTO, 'photosynthesis.txt');
+    const other = await one(OTHER, 'fractions.txt');
+    const ar = await one(AR_OFF, 'fractions-ar.txt');
+    await one(Buffer.from('Volcano lesson. Magma rises through vents.'), 'unselected.txt');
+    await one(Buffer.from('School B lesson. Private notes of school B.'), 'school-b.txt', TB, 'curB');
+    ai.create.mockResolvedValue(reply('NOT_IN_SOURCES'));
+    for (const ids of [[photo, other], [photo, other, ar]]) {
+      await ask(T, { uploadIds: ids, question: 'Which organelle hosts this process?' });
+      const files = sent().map((x) => x.file).sort();
+      expect(files).toEqual((ids.length === 2 ? ['fractions.txt', 'photosynthesis.txt'] : ['fractions-ar.txt', 'fractions.txt', 'photosynthesis.txt']));
+      expect(sent().map((x) => x.n)).toEqual(ids.map((_, i) => i + 1));
+    }
+    const all = JSON.stringify(ai.create.mock.calls);
+    expect(all).not.toContain('unselected.txt');
+    expect(all).not.toContain('school B');
+  });
+
+  it('unsupported EN, AR and incidental-word questions are refused with no citation', async () => {
+    const photo = await one(PHOTO, 'photosynthesis.txt');
+    const ar = await one(AR, 'photo-ar.txt');
+    for (const [ids, q, model] of [
+      [[photo], 'Who won the football world cup in 1998?', 'NOT_IN_SOURCES'],
+      [[ar], 'من فاز بكأس العالم؟', 'NOT_IN_SOURCES'],
+      [[photo], 'How much water does an electric car use?', 'Electric cars use no water.'],
+      [[photo], 'Is carbon dioxide heavier than oxygen?', 'Yes, carbon dioxide is heavier. NOT_IN_SOURCES [1]'],
+    ] as [string[], string, string][]) {
+      ai.create.mockResolvedValueOnce(reply(model));
+      const r = await ask(T, { uploadIds: ids, question: q });
+      expect(r.body, q).toMatchObject({ status: 'unsupported', citations: [], usedUploadIds: [] });
+      expect(r.body.answer).not.toMatch(/heavier|no water/);
+    }
+  });
+
+  it('forged citations to passages that were not supplied are rejected', async () => {
+    const photo = await one(PHOTO, 'photosynthesis.txt');
+    for (const text of ['Chloroplasts [2].', 'Chloroplasts [0].', 'Chloroplasts [99].', 'See secret.pdf [7].']) {
+      ai.create.mockResolvedValueOnce(reply(text));
+      const r = await ask(T, { uploadIds: [photo], question: 'Which organelle hosts this process?' });
+      expect(r.body, text).toMatchObject({ status: 'unsupported', citations: [] });
+    }
+    // A valid marker next to a forged one: only the supplied passage survives.
+    ai.create.mockResolvedValueOnce(reply('Chloroplasts [1] and also [3].'));
+    const r = await ask(T, { uploadIds: [photo], question: 'Which organelle hosts this process?' });
+    expect(r.body.citations.map((c: { n: number }) => c.n)).toEqual([1]);
+    expect(r.body.answer).not.toContain('[3]');
+  });
+
+  it('F-9: Arabic-Indic citation digits count as citations; forged ones are still stripped', async () => {
+    const s1 = [{ n: 1, chunkId: 'c1', text: 't', fileName: 'f.txt', fileUrl: '/f', lessonId: 'L1', score: 1 }] as never;
+    for (const t of ['[1]', '[١]', '[۱]']) expect(retrieval.citationsIn(`يمتص الكلوروفيل الضوء ${t}.`, s1).map((c) => c.n), t).toEqual([1]);
+    expect(retrieval.citationsIn('[٢] [۹] [٩٩]', s1)).toEqual([]);
+    const ar = await one(AR, 'photo-ar.txt');
+    ai.create.mockResolvedValueOnce(reply('تحدث في البلاستيدات الخضراء [١]. وانظر أيضا [٧].'));
+    const r = await ask(T, { uploadIds: [ar], question: 'أين تحدث هذه العملية؟' });
+    expect(r.body).toMatchObject({ status: 'answered', citations: [expect.objectContaining({ n: 1, uploadId: ar })] });
+    expect(r.body.answer).toContain('[١]');
+    expect(r.body.answer).not.toContain('[٧]');
+    // Only forged Arabic-digit markers: still refused.
+    ai.create.mockResolvedValueOnce(reply('تحدث في البلاستيدات الخضراء [٣].'));
+    expect((await ask(T, { uploadIds: [ar], question: 'أين تحدث هذه العملية؟' })).body).toMatchObject({ status: 'unsupported', citations: [] });
+  });
+
+  it('school B cannot get a school A document sent; no model call', async () => {
+    const photo = await one(PHOTO, 'photosynthesis.txt');
+    const r = await ask(TB, { uploadIds: [photo], question: 'Which organelle hosts this process?' });
+    expect(r.status).toBe(404);
+    expect(ai.create).not.toHaveBeenCalled();
+  });
+
+  it('safety gate: an ineligible selected document is never sent; alone it gets no model call', async () => {
+    const photo = await one(PHOTO, 'photosynthesis.txt');
+    scan.setMalwareScannerForTests({ name: 'fake-test-scanner', scan: async () => ({ verdict: 'error' as const }) });
+    const bad = (await up(T, Buffer.from('Scan failed lesson. Hidden text that must not be sent.'), 'failed.txt')).body.document.uploadId;
+    scan.setMalwareScannerForTests(null);
+    ai.create.mockResolvedValue(reply('Chloroplasts [1].'));
+    const r = await ask(T, { uploadIds: [photo, bad], question: 'Which organelle hosts this process?' });
+    expect(r.body.status).toBe('answered');
+    expect(sent().map((x) => x.file)).toEqual(['photosynthesis.txt']);
+    expect(JSON.stringify(ai.create.mock.calls)).not.toContain('Hidden text');
+    ai.create.mockClear();
+    const alone = await ask(T, { uploadIds: [bad], question: 'Which organelle hosts this process?' });
+    expect(alone.body.status).toBe('no_sources');
+    expect(ai.create).not.toHaveBeenCalled();
+    // A clean document whose scan state changes is dropped before the fallback too.
+    await M.CurriculumFileJob.updateOne({ id: photo }, { scanStatus: 'unavailable' });
+    expect((await ask(T, { uploadIds: [photo], question: 'Which organelle hosts this process?' })).body.status).toBe('no_sources');
+    expect(ai.create).not.toHaveBeenCalled();
+  });
+
+  it('budget: the fallback call is reserved and refused by the P0d policy before any provider call', async () => {
+    const photo = await one(PHOTO, 'photosynthesis.txt');
+    await allow('instA', { dailyCapUsd: 0.000001 });
+    const r = await ask(T, { uploadIds: [photo], question: 'Which organelle hosts this process?' });
+    expect(r.status).toBe(429);
+    expect(r.body.code ?? r.body.error?.code).toBe('AI_BUDGET_EXCEEDED');
+    expect(ai.create).not.toHaveBeenCalled();
+  });
+
+  it('other workflows keep keyword-only retrieval (tutor and generation share retrieveCurriculumSources)', async () => {
+    const photo = await one(PHOTO, 'photosynthesis.txt');
+    const q = 'Which organelle hosts this process?';
+    expect(await retrieval.retrieveCurriculumSources({ institutionId: 'instA', curriculumId: 'curA', query: q })).toEqual([]);
+    const { gatherSources } = await import('../src/services/educatorAi');
+    expect((await gatherSources({ institutionId: 'instA', curriculumId: 'curA', query: q, objectiveIds: [], uploadIds: [photo] })).sources).toEqual([]);
+    const src = (f: string) => fs.readFileSync(path.join(__dirname, '../src', f), 'utf8');
+    for (const f of ['controllers/tutor.controller.ts', 'controllers/tutorExtras.controller.ts', 'services/educatorAi.ts', 'services/directTutorModel.ts']) expect(src(f), f).not.toContain('smallScopePassages');
   });
 });
