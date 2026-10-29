@@ -22,7 +22,10 @@ import { normaliseArabic } from './textSearch';
 // a guessed report).
 
 export const ROUTER_FEATURE = 'educator_analytics_intent';
-export const ROUTER_LIMITS = { maxRequestChars: 500, maxOutputTokens: 300, maxNames: 5000 } as const;
+// maxOutputTokens covers the model's reasoning as well as the ~80-token JSON:
+// at 300, Haiku replies were cut off (stop_reason max_tokens) and rejected in
+// 25 of 77 live attempts (P10 live benchmark).
+export const ROUTER_LIMITS = { maxRequestChars: 500, maxOutputTokens: 1024, maxNames: 5000 } as const;
 const REASONS = ['ambiguous_intent', 'multiple_reports', 'missing_class', 'unclear_period', 'unsupported_request'] as const;
 const KEYS = ['intent', 'metric', 'timeRange', 'lastN', 'classReference', 'chart', 'language', 'clarificationNeeded', 'clarificationReason'] as const;
 // P10, optional (absent = null): a placeholder the request contains, and ranking order.

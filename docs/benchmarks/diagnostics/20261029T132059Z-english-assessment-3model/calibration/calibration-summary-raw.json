@@ -1,0 +1,107 @@
+{
+  "mode": "live",
+  "startedAt": "2026-10-29T13:00:04.999Z",
+  "finishedAt": "2026-10-29T13:00:55.778Z",
+  "datasetSha256": "bbb26ca9d176ff3babaab3833e4c3e1236a60e21cb9f6cd5c89d8e0b0484bf4f",
+  "models": [
+    "claude-haiku-5-5",
+    "claude-sonnet-5-5",
+    "claude-opus-5-5"
+  ],
+  "reps": 1,
+  "cases": 24,
+  "runsPlanned": 6,
+  "cap": 4,
+  "ledger": {
+    "version": 1,
+    "name": "p7-english-assessment-live",
+    "cap_usd": 4,
+    "authorized_by": "owner chat 2026-10-29: 'you're authorized to excute all the 3 pending tasks'",
+    "created_at": "2026-10-29T12:57:47.657Z",
+    "spent_usd": 0.094454,
+    "reservations": {
+      "8b068605-3593-4839-8864-800426894866": {
+        "amount": 0.169552,
+        "at": "2026-10-29T12:58:01.034Z",
+        "run": "en-assess-live"
+      }
+    },
+    "calls": 8,
+    "calls_without_cost": 0,
+    "refused": 0,
+    "stop_reason": null
+  },
+  "gatewayLedgerRows": 6,
+  "p0dPolicy": {
+    "monthly": 15,
+    "daily": 6,
+    "perUser": 6,
+    "gradingAllowance": 3
+  },
+  "summary": [
+    {
+      "model": "claude-haiku-5-5",
+      "planned": 2,
+      "ran": 2,
+      "passed": 1,
+      "passRate": 0.5,
+      "wilsonLower95": 0.0945,
+      "criticalFailures": 1,
+      "shouldRate": 1,
+      "medianLatencyMs": 7905.5,
+      "p90LatencyMs": 8531,
+      "costUsd": 0.001733,
+      "costPerPassingRunUsd": 0.001733,
+      "providerAttempts": 2,
+      "validatorFailures": 0,
+      "mustFailures": {
+        "M3_mcq_answer_key": 1
+      },
+      "shouldFailures": {},
+      "acceptable": false
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "planned": 2,
+      "ran": 2,
+      "passed": 1,
+      "passRate": 0.5,
+      "wilsonLower95": 0.0945,
+      "criticalFailures": 1,
+      "shouldRate": 1,
+      "medianLatencyMs": 7526,
+      "p90LatencyMs": 7708,
+      "costUsd": 0.026134,
+      "costPerPassingRunUsd": 0.026134,
+      "providerAttempts": 2,
+      "validatorFailures": 0,
+      "mustFailures": {
+        "M3_mcq_answer_key": 1
+      },
+      "shouldFailures": {},
+      "acceptable": false
+    },
+    {
+      "model": "claude-opus-5-5",
+      "planned": 2,
+      "ran": 2,
+      "passed": 0,
+      "passRate": 0,
+      "wilsonLower95": 0,
+      "criticalFailures": 1,
+      "shouldRate": 1,
+      "medianLatencyMs": 9916.5,
+      "p90LatencyMs": 10517,
+      "costUsd": 0.053408,
+      "costPerPassingRunUsd": null,
+      "providerAttempts": 2,
+      "validatorFailures": 0,
+      "mustFailures": {
+        "M3_mcq_answer_key": 2
+      },
+      "shouldFailures": {},
+      "acceptable": false
+    }
+  ],
+  "recommendation": null
+}

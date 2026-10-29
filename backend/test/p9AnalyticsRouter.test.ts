@@ -152,7 +152,7 @@ describe('what the model receives (data minimisation and redaction)', () => {
     const call = JSON.stringify(sent()[0]);
     for (const leak of ['Amal', 'Badr', 'Carim', 'Dana', 'Fadi', 'Ghada', 'Hiba', 'Grade 6 Math', 'Other Teacher Class', 'School B', 'instA', '"A1"', 'Quiz 1', '72', '100', users.T.id, 'test-key']) expect(call, leak).not.toContain(leak);
     expect(sent()[0].model).toBe('claude-haiku-5-5');
-    expect(sent()[0].max_tokens).toBe(300);
+    expect(sent()[0].max_tokens).toBe(1024);
   });
 
   it('student names (English and Arabic, with prefixes), emails, phones and ids are removed before the call', async () => {
