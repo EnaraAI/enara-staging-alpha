@@ -911,6 +911,7 @@ export interface WorkspaceDocument {
   origin: 'live' | 'demo_seed';
   canChange: boolean;
   fileUrl: string | null;
+  downloadWarning?: string | null;
 }
 export const fetchDocuments = (origin: OriginView = 'live') =>
   request<{ origin: OriginView; attestationStatement: string; notScannedNotice?: string; documents: WorkspaceDocument[] }>('GET', withOrigin('/api/documents', origin));

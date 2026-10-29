@@ -69,3 +69,14 @@
 | `docs/benchmarks/diagnostics/20261029T070000Z-vercel-staging/VERCEL_STAGING_RUNBOOK.md` (new) | steps, limits (4.5 MB request body), R2 CORS, rollback | — |
 
 Hobby terms: non-commercial use only. The owner accepted this for staging.
+
+## 6. Storage and unscanned-document update (owner decisions 2026-10-29)
+
+| File | Change | Verified by |
+|---|---|---|
+| `backend/src/config/stagingGuard.ts` | R2 is **mandatory in all staging** (any host): all four `R2_*` must be set and the bucket name must contain `staging`; `SERVE_LOCAL_UPLOADS=true` is refused. The `UPLOAD_DIR` fallback is gone in staging | `p6StagingGuard`, `p6VercelStaging` |
+| `backend/src/routes/documents.routes.ts` | `deferred` (not scanned by policy) documents now get a signed `fileUrl` and a `downloadWarning`. `pending`, `unavailable`, `failed` and `infected` still get none. Raw-file-to-AI filtering (`filterClearedFileUrls`, clean only) is unchanged | `p2Documents` (new test for blocked states) |
+| `frontend/pages/workspace/Documents.tsx`, `frontend/services/apiService.ts` | Download link. Unscanned files show "Download (not scanned)" and ask for confirmation | frontend `tsc` and build |
+| tests, template, README, Vercel runbook | updated to the two decisions | full suite 747/747 |
+
+Remaining non-R2 path: `/api/upload` (orchestrator ingestion) writes to AWS S3. In staging `AWS_S3_BUCKET` is left unset, so it returns 503 and stores nothing (fails closed).

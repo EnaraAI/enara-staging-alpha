@@ -32,10 +32,10 @@ describe('Vercel staging storage rule', () => {
     expect(stagingProblems(base())).toEqual([]);
   });
 
-  it('refuses a local upload directory on Vercel: files are stored only in R2', () => {
+  it('refuses a local upload directory or local serving on Vercel: files are stored only in R2', () => {
     const noR2 = { R2_ACCOUNT_ID: undefined, R2_BUCKET: undefined, R2_ACCESS_KEY_ID: undefined, R2_SECRET_ACCESS_KEY: undefined };
-    expect(stagingProblems(base({ ...noR2, UPLOAD_DIR: '/tmp/enara-staging/uploads' })).join(' ')).toMatch(/on Vercel, set R2_ACCOUNT_ID/);
-    expect(stagingProblems(base({ SERVE_LOCAL_UPLOADS: 'true' })).join(' ')).toMatch(/SERVE_LOCAL_UPLOADS must be false on Vercel/);
+    expect(stagingProblems(base({ ...noR2, UPLOAD_DIR: '/tmp/enara-staging/uploads' })).join(' ')).toMatch(/staging stores files only in R2/);
+    expect(stagingProblems(base({ SERVE_LOCAL_UPLOADS: 'true' })).join(' ')).toMatch(/SERVE_LOCAL_UPLOADS must be false in staging/);
     expect(stagingProblems(base({ R2_BUCKET: 'enara-sandbox-uploads' })).join(' ')).toMatch(/R2_BUCKET must be a staging bucket/);
   });
 
@@ -44,9 +44,9 @@ describe('Vercel staging storage rule', () => {
     expect(stagingProblems(base({ TRUST_PROXY: '1' }))).toEqual([]);
   });
 
-  it('keeps the local-directory option off Vercel (Docker and Railway unchanged)', () => {
+  it('R2 is mandatory off Vercel too (Railway, Docker): no local-directory fallback in staging', () => {
     const noR2 = { R2_ACCOUNT_ID: undefined, R2_BUCKET: undefined, R2_ACCESS_KEY_ID: undefined, R2_SECRET_ACCESS_KEY: undefined };
-    expect(stagingProblems(base({ ...noR2, VERCEL: undefined, UPLOAD_DIR: '/srv/enara-staging/uploads' }))).toEqual([]);
+    expect(stagingProblems(base({ ...noR2, VERCEL: undefined, UPLOAD_DIR: '/srv/enara-staging/uploads' })).join(' ')).toMatch(/staging stores files only in R2/);
   });
 
   it('a Vercel domain of the existing sandbox is still refused as the staging origin', () => {

@@ -20,7 +20,7 @@ const base = (over: Record<string, string | undefined> = {}): NodeJS.ProcessEnv 
   INGEST_HMAC_SECRET: SECRET_HMAC,
   CRON_SECRET: SECRET_CRON,
   RUN_MIGRATIONS_ON_START: 'false',
-  UPLOAD_DIR: '/srv/enara-staging/uploads',
+  R2_ACCOUNT_ID: 'a', R2_BUCKET: 'enara-staging-alpha-uploads', R2_ACCESS_KEY_ID: 'k', R2_SECRET_ACCESS_KEY: 's',
   CORS_ALLOWED_ORIGINS: 'https://staging.example.test',
   FRONTEND_URL: 'https://staging.example.test',
   ...over,
@@ -30,7 +30,7 @@ const load = async (env: NodeJS.ProcessEnv) => (await import('../src/config/env'
 describe('staging guard rules', () => {
   it('accepts an isolated staging configuration', () => {
     expect(stagingProblems(base())).toEqual([]);
-    expect(stagingProblems(base({ UPLOAD_DIR: undefined, R2_ACCOUNT_ID: 'a', R2_BUCKET: 'enara-staging-alpha-uploads', R2_ACCESS_KEY_ID: 'k', R2_SECRET_ACCESS_KEY: 's' }))).toEqual([]);
+    expect(stagingProblems(base({ SERVE_LOCAL_UPLOADS: 'false' }))).toEqual([]);
     expect(mongoDbName(base().MONGODB_URI!)).toBe(STAGING_DB_NAME);
     expect(mongoDbName(`mongodb+srv://u:p@c.example/${STAGING_DB_NAME}`)).toBe(STAGING_DB_NAME);
   });
@@ -41,13 +41,14 @@ describe('staging guard rules', () => {
     }
   });
 
-  it('rejects missing, partial or non-staging storage', () => {
-    expect(stagingProblems(base({ UPLOAD_DIR: undefined })).join(' ')).toMatch(/set a staging upload store/);
-    expect(stagingProblems(base({ UPLOAD_DIR: 'uploads' })).join(' ')).toMatch(/absolute staging-only path/);
-    expect(stagingProblems(base({ UPLOAD_DIR: '/srv/enara/uploads' })).join(' ')).toMatch(/absolute staging-only path/);
-    expect(stagingProblems(base({ R2_ACCOUNT_ID: 'a', R2_BUCKET: 'enara-uploads', R2_ACCESS_KEY_ID: 'k', R2_SECRET_ACCESS_KEY: 's' })).join(' ')).toMatch(/R2_BUCKET must be a staging bucket/);
-    expect(stagingProblems(base({ R2_BUCKET: 'enara-staging' })).join(' ')).toMatch(/must be set together/);
-    expect(stagingProblems(base({ AWS_S3_BUCKET: 'enara-prod' })).join(' ')).toMatch(/AWS_S3_BUCKET must be unset or a staging bucket/);
+  it('requires R2 for every staging file: missing, partial, local-directory or non-staging storage is refused', () => {
+    const noR2 = { R2_ACCOUNT_ID: undefined, R2_BUCKET: undefined, R2_ACCESS_KEY_ID: undefined, R2_SECRET_ACCESS_KEY: undefined };
+    expect(stagingProblems(base(noR2)).join(' ')).toMatch(/must all be set \(staging stores files only in R2\)/);
+    expect(stagingProblems(base({ ...noR2, UPLOAD_DIR: '/srv/enara-staging/uploads' })).join(' ')).toMatch(/must all be set/);
+    expect(stagingProblems(base({ R2_SECRET_ACCESS_KEY: undefined })).join(' ')).toMatch(/must all be set/);
+    expect(stagingProblems(base({ R2_BUCKET: 'enara-uploads' })).join(' ')).toMatch(/R2_BUCKET must be a staging bucket/);
+    expect(stagingProblems(base({ R2_BUCKET: 'enara-sandbox-uploads' })).join(' ')).toMatch(/R2_BUCKET must be a staging bucket/);
+    expect(stagingProblems(base({ SERVE_LOCAL_UPLOADS: 'true' })).join(' ')).toMatch(/SERVE_LOCAL_UPLOADS must be false in staging/);
   });
 
   it('requires distinct staging secrets, deliberate migrations, invite-only, and a test email inbox', () => {
@@ -158,7 +159,7 @@ describe('runtime database check and grading', () => {
     try {
       const { resetConfigForTests, getConfig, setDotenvKeysForTests } = await import('../src/config/env');
       // This checkout has a local backend/.env; the guard would rightly refuse it.
-      for (const k of ['AWS_S3_BUCKET', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'R2_ACCOUNT_ID', 'R2_BUCKET', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY']) delete process.env[k];
+      for (const k of ['AWS_S3_BUCKET', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']) delete process.env[k];
       setDotenvKeysForTests([]);
       resetConfigForTests();
       expect(getConfig().aiPaused).toBe(true);

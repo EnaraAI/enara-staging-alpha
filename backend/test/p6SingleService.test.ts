@@ -20,7 +20,7 @@ const base = (over: Record<string, string | undefined> = {}): NodeJS.ProcessEnv 
   INGEST_HMAC_SECRET: 'hmac-staging-secret-bbbbbbbbbbbbbbbbbbbbbbbbbbb',
   CRON_SECRET: 'cron-staging-secret-ccccccccccccccccccccccccccc',
   RUN_MIGRATIONS_ON_START: 'false',
-  UPLOAD_DIR: '/srv/enara-staging/uploads',
+  R2_ACCOUNT_ID: 'a', R2_BUCKET: 'enara-staging-alpha-uploads', R2_ACCESS_KEY_ID: 'k', R2_SECRET_ACCESS_KEY: 's',
   CORS_ALLOWED_ORIGINS: 'https://staging.example.test',
   FRONTEND_URL: 'https://staging.example.test',
   SERVE_FRONTEND_DIR: '/app/public',

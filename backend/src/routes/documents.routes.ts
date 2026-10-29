@@ -37,9 +37,13 @@ async function findDocument(req: AuthRequest, mode: 'read' | 'write') {
   return { job, curriculum };
 }
 
+export const DEFERRED_DOWNLOAD_WARNING =
+  'This file has not been scanned for malware. Open it only if you trust its source.';
+
 function toDocument(job: ICurriculumFileJob, curriculum: { id: string; name: string; chapters?: { id: string; title?: string }[] } | undefined, canChange: boolean) {
-  // Unscanned ('deferred') files are not offered for download: only text is used.
-  const viewable = job.scanStatus === 'clean' || job.scanStatus === 'not_required';
+  // Owner decision (2026-10-29): unscanned ('deferred') files may be downloaded,
+  // labelled as not malware-scanned. Pending, failed and infected files never are.
+  const viewable = job.scanStatus === 'clean' || job.scanStatus === 'not_required' || job.scanStatus === 'deferred';
   return {
     uploadId: job.id,
     fileName: job.fileName ?? path.basename(job.fileUrl).replace(/^[0-9a-f-]{36}-/i, ''),
@@ -61,8 +65,9 @@ function toDocument(job: ICurriculumFileJob, curriculum: { id: string; name: str
     rightsAttested: Boolean(job.rightsAttestation?.attestedAt),
     origin: job.origin ?? 'live',
     canChange,
-    // Download only for files that are cleared or were never gated (signed by the API).
+    // Download for cleared, never-gated and unscanned-by-policy files (signed by the API).
     fileUrl: viewable ? job.fileUrl : null,
+    downloadWarning: viewable && job.scanStatus === 'deferred' ? DEFERRED_DOWNLOAD_WARNING : null,
   };
 }
 

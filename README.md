@@ -4,7 +4,8 @@ This private repository is the **isolated deployment source for the ENARA Integr
 
 - **Source:** a clean snapshot of the approved release commit `544c6ec7e8139961a8629fa9abb7a01ef8a67160` (branch `staging-alpha` of `EnaraAI/enara-sandbox`), plus reviewed staging-only changes. This repository does not include the original history. See `STAGING_REPOSITORY_MANIFEST.md`.
 - **Deployment:** chosen host is **Vercel Hobby** (one new project linked only to this repository; production branch `staging-alpha`; `main` never deploys). Runbook: `docs/benchmarks/diagnostics/20261029T070000Z-vercel-staging/VERCEL_STAGING_RUNBOOK.md`. There are no GitHub Actions workflows. Deploy only after owner approval. The Railway configs are kept as an unused alternative.
-- **Storage:** all files are stored in the R2 bucket `enara-staging-alpha-uploads`. On Vercel the backend refuses to start without R2.
+- **Storage:** all files are stored in the R2 bucket `enara-staging-alpha-uploads`. In staging the backend refuses to start without R2, on any host.
+- **Unscanned documents (owner decision, 2026-10-29):** files kept as `not_scanned_by_policy` can be downloaded by staff who can see them. The link carries a not-scanned warning and the page asks for confirmation. Pending, failed and infected files are never downloadable. Raw files are never sent to AI.
 - **Secrets:** none are stored here. Every credential is set by hand on the Railway service. `backend/staging.env.template` lists the variable names; every secret in it is blank.
 
 ## Targets (configuration names; nothing is created by this repository)
@@ -24,7 +25,7 @@ This private repository is the **isolated deployment source for the ENARA Integr
   - the database is exactly `enara_staging_alpha` (checked again after connecting);
   - no `.env` file is loaded;
   - three distinct secrets of 32+ characters are set;
-  - storage is staging-only;
+  - all four `R2_*` are set for a bucket named with `staging` (files are stored only in R2; no local-disk fallback);
   - `RUN_MIGRATIONS_ON_START=false`;
   - CORS is an explicit list that includes `FRONTEND_URL`, with no wildcards and no existing production or sandbox domains.
 - **Backend defaults in staging:** AI paused, invite-only registration, demo mode off.

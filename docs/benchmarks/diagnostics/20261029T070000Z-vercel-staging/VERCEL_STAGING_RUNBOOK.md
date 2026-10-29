@@ -11,7 +11,8 @@ One new Vercel project, `enara-staging-alpha`, linked only to `EnaraAI/enara-sta
 | everything else | static SPA from `frontend/dist`, built with `VITE_API_URL=/api` (same origin) |
 | `/api/*`, `/uploads/*`, `/ready`, `/health` | one Node function, `api/index.js` → `backend/dist/vercel.js` (Express), region `iad1`, 60 s, 1024 MB |
 
-- **Storage:** R2 only. On Vercel (`VERCEL` is set), the staging guard **refuses to start** without all four `R2_*` variables, or with `SERVE_LOCAL_UPLOADS=true`. Nothing is written to the function's filesystem.
+- **Storage:** R2 only. In staging (any host), the guard **refuses to start** without all four `R2_*` variables, or with `SERVE_LOCAL_UPLOADS=true`. Nothing is written to the function's filesystem.
+- **Unscanned documents:** downloadable with a not-scanned warning (owner decision). Pending, failed and infected files are not downloadable. Raw files are never sent to AI.
 - **Database:** MongoDB Atlas Free, `enara_staging_alpha`. One connection is reused per warm function instance; nothing stays running between requests.
 - **No cron. No rewrites to any other host.** `git.deploymentEnabled` lets only `staging-alpha` deploy; `main` never does.
 - **Railway files** (`railway.staging*.toml`, `Dockerfile.staging*`) stay in the repository, unused by Vercel.

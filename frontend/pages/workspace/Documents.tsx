@@ -137,6 +137,18 @@ export const Documents: React.FC = () => {
                       {d.state === 'ready' && d.chunkCount != null && <p className="text-xs text-slate-500 mt-1">{d.chunkCount} passages{d.pages ? ` from ${d.pages} page(s)/section(s)` : ''}</p>}
                     </td>
                     <td className="p-3 whitespace-nowrap space-x-2">
+                      {d.fileUrl && (
+                        <a
+                          href={d.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={d.downloadWarning ?? undefined}
+                          onClick={(e) => { if (d.downloadWarning && !window.confirm(`${d.downloadWarning}\n\nDownload anyway?`)) e.preventDefault(); }}
+                          className={d.downloadWarning ? 'text-amber-800 font-semibold' : 'text-indigo-700 font-semibold'}
+                        >
+                          {d.downloadWarning ? 'Download (not scanned)' : 'Download'}
+                        </a>
+                      )}
                       {d.state === 'ready' && (
                         <button onClick={() => fetchDocumentSources(d.uploadId).then((r) => setSources({ doc: d, items: r.sources })).catch((err) => toast.error('Could not load sources', (err as Error).message))} className="text-indigo-700 font-semibold">Sources</button>
                       )}

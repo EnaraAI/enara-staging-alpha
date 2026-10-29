@@ -186,10 +186,12 @@ describe('rights attestation and the scan gate', () => {
     expect(await M.CurriculumFileJob.countDocuments()).toBe(0);
   });
 
-  it('without a configured scanner an attested file is not scanned by policy: text extracted locally, never called clean, no download, raw file never sent to AI', async () => {
+  it('without a configured scanner an attested file is not scanned by policy: text extracted locally, never called clean, downloadable with a not-scanned warning (owner decision), raw file never sent to AI', async () => {
     const r = await upTxt(T);
     expect(r.status).toBe(201);
-    expect(r.body.document).toMatchObject({ state: 'ready', scanStatus: 'deferred', malwareScan: 'not_scanned_by_policy', rightsAttested: true, fileUrl: null });
+    expect(r.body.document).toMatchObject({ state: 'ready', scanStatus: 'deferred', malwareScan: 'not_scanned_by_policy', rightsAttested: true });
+    expect(r.body.document.fileUrl).toMatch(/^\/uploads\/.+\?exp=\d+&sig=/);
+    expect(r.body.document.downloadWarning).toMatch(/has not been scanned for malware/);
     expect(JSON.stringify(r.body.document)).not.toMatch(/"clean"|scanned clean/);
     const job = await M.CurriculumFileJob.findOne({ id: r.body.document.uploadId }).lean();
     expect(job).toMatchObject({ status: 'done', scanStatus: 'deferred' });
@@ -201,7 +203,19 @@ describe('rights attestation and the scan gate', () => {
     expect(await safety.filterClearedFileUrls('instA', [job!.fileUrl])).toEqual([]);
     const list = await get(T, '/api/documents');
     expect(list.body.notScannedNotice).toMatch(/has not been scanned for malware/);
-    expect(list.body.documents[0]).toMatchObject({ malwareScan: 'not_scanned_by_policy', fileUrl: null });
+    expect(list.body.documents[0]).toMatchObject({ malwareScan: 'not_scanned_by_policy' });
+    expect(list.body.documents[0].fileUrl).toMatch(/^\/uploads\/.+\?exp=\d+&sig=/);
+    expect(list.body.documents[0].downloadWarning).toMatch(/has not been scanned for malware/);
+  });
+
+  it('pending, failed and infected files are never offered for download', async () => {
+    const r = await upTxt(T);
+    const base = (await M.CurriculumFileJob.findOne({ id: r.body.document.uploadId }).lean())!;
+    for (const scanStatus of ['pending', 'unavailable', 'failed', 'infected']) {
+      await M.CurriculumFileJob.updateOne({ id: base.id }, { $set: { scanStatus } });
+      const doc = (await get(T, '/api/documents')).body.documents.find((d: { uploadId: string }) => d.uploadId === base.id);
+      expect(doc, scanStatus).toMatchObject({ fileUrl: null, downloadWarning: null });
+    }
   });
 
   it('pending, failed and infected files are never extracted; an infected file is deleted', async () => {
