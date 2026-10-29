@@ -4,6 +4,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors, { CorsOptions } from 'cors';
 import helmet from 'helmet';
 import { idleDbController, mountStagingFrontend } from './config/stagingSingleService';
+import { maintenanceToken, stagingMaintenanceRouter } from './routes/stagingMaintenance.routes';
 import rateLimit from 'express-rate-limit';
 import { createHash } from 'crypto';
 import path from 'path';
@@ -234,6 +235,19 @@ export function createApp() {
   app.use('/api/speaking', speakingRoutes);
   app.use('/api/usage', usageRoutes);
   app.use('/api/analytics', analyticsRoutes);
+
+  // TEMPORARY (staging set-up only): see routes/stagingMaintenance.routes.ts.
+  const maintenance = config.stagingMode ? maintenanceToken() : undefined;
+  if (maintenance) {
+    app.use(
+      '/api/staging-maintenance',
+      stagingMaintenanceRouter(maintenance, {
+        pending: async () => (await import('./migrations/runner')).pendingMigrations((await import('./migrations')).MIGRATIONS),
+        migrate: async () => (await import('./migrations/runner')).runMigrations((await import('./migrations')).MIGRATIONS),
+        seed: async (inst, opts) => (await import('./scripts/seed4Level1')).seed4Level1(inst, opts) as Promise<Record<string, unknown>>,
+      }),
+    );
+  }
 
   app.use((_req, _res, next) => {
     next(new AppError('Route not found', 404, 'NOT_FOUND'));
