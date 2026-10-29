@@ -216,6 +216,73 @@ describe('P4.1 source-linked generation', () => {
   });
 });
 
+// F-3b for question drafts: a brief or objective worded differently from a
+// small chosen document used to retrieve nothing, so the model drafted with no
+// passages. Now 1-3 passages of the chosen documents go to the model whole.
+describe('F-3b small-scope fallback for question drafts', () => {
+  const NO_MATCH = { brief: 'Which organelle hosts this process?', objectiveIds: [] as string[] };
+  const prompt = () => JSON.parse(ai.calls.at(-1).messages[0].content).coursePassages as string;
+  const doc = async (body: Buffer, name: string) => {
+    scan.setMalwareScannerForTests(clean);
+    const id = (await upload(T, body, name)).body.document.uploadId as string;
+    scan.setMalwareScannerForTests(null);
+    return id;
+  };
+
+  it('a non-matching brief on one small document: the passage reaches the model and cited questions are supported', async () => {
+    const id = await cleanDoc(); // also uploads fractions.txt, not chosen
+    const retrieval = await import('../src/services/curriculumRetrieval');
+    expect(await retrieval.retrieveCurriculumSources({ institutionId: 'instA', curriculumId: 'cur', query: NO_MATCH.brief, uploadIds: [id] })).toEqual([]);
+    const { logger } = await import('../src/utils/logging');
+    const spy = vi.spyOn(logger, 'info');
+    try {
+      ai.handler = () => draftReply;
+      const r = await generate(T, { uploadIds: [id], ...NO_MATCH });
+      expect(r.status).toBe(201);
+      expect(prompt()).toContain('chloroplasts');
+      expect(prompt()).not.toContain('Fractions');
+      expect(r.body.sources).toEqual([expect.objectContaining({ n: 1, uploadId: id })]);
+      expect(r.body.assessment.questions.map((q: any) => q.sourceStatus)).toEqual(['supported', 'no_supporting_source']);
+      const events = spy.mock.calls.filter(([m]) => m === 'assessment_draft_small_scope_fallback');
+      expect(events).toHaveLength(1);
+      expect(events[0][1]).toMatchObject({ institutionId: 'instA', documents: 1, passages: 1 });
+      expect(JSON.stringify(events[0])).not.toMatch(/organelle|chloroplast/i);
+      spy.mockClear();
+      // A keyword hit never uses the fallback.
+      await generate(T, { uploadIds: [id] });
+      expect(spy.mock.calls.filter(([m]) => m === 'assessment_draft_small_scope_fallback')).toHaveLength(0);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('more than 3 passages across the chosen documents: no fallback, the model gets no passages', async () => {
+    const ids = [];
+    for (const n of [1, 2, 3, 4]) ids.push(await doc(Buffer.from(`Lesson ${n}. Topic number ${n} has its own notes.`), `n${n}.txt`));
+    ai.handler = () => JSON.stringify({ questions: [mcq('Q?', [])] });
+    const r = await generate(T, { uploadIds: ids, ...NO_MATCH, counts: { 'multiple-choice': 1 } });
+    expect(r.status).toBe(201);
+    expect(prompt()).toBe('(no course passages were found)');
+    expect(r.body.sources).toEqual([]);
+  });
+
+  it('no chosen documents, lesson plans and the other school: the fallback never applies', async () => {
+    const id = await cleanDoc();
+    ai.handler = () => JSON.stringify({ questions: [mcq('Q?', [])] });
+    // Whole-curriculum drafts (no uploadIds) keep keyword-only retrieval.
+    await generate(T, { ...NO_MATCH, counts: { 'multiple-choice': 1 } });
+    expect(prompt()).toBe('(no course passages were found)');
+    // Lesson plans keep keyword-only retrieval.
+    ai.handler = () => JSON.stringify({ title: 'Plan', sections: [{ kind: 'sequence', title: 'Open', content: 'Start', durationMinutes: 5, sourceRefs: [] }] });
+    await T.post('/api/lesson-plans/generate', { curriculumId: 'cur', lessonId: 'L1', goals: NO_MATCH.brief, uploadIds: [id] });
+    expect(JSON.stringify(ai.calls.at(-1))).not.toContain('chloroplasts');
+    // School B cannot get a school A document sent: refused before any call.
+    const calls = ai.calls.length;
+    expect([403, 404]).toContain((await TB.post('/api/assessments/generate', { curriculumId: 'curB', ...NO_MATCH, counts: { 'multiple-choice': 1 }, uploadIds: [id] })).status);
+    expect(ai.calls.length).toBe(calls);
+  });
+});
+
 describe('P4.3 outcomes and timeline: roles, scope, origin', () => {
   beforeEach(async () => {
     await M.TimeToUnderstand.create([

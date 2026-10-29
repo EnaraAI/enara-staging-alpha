@@ -1,7 +1,9 @@
 import { randomUUID } from 'crypto';
 import { LearningObjective } from '../models/LearningObjective';
 import { askForJson } from './aiJson';
-import { retrieveCurriculumSources, type RetrievedSource } from './curriculumRetrieval';
+import { retrieveCurriculumSources, smallScopePassages, type RetrievedSource } from './curriculumRetrieval';
+import { SMALL_SCOPE_PASSAGES } from './educatorChat';
+import { logger } from '../utils/logging';
 import { STRATEGIES } from './strategyRegistry';
 
 // Educator AI (author-v1, lessonplan-v1): drafts for a teacher to edit.
@@ -15,7 +17,11 @@ const uid = (p: string) => `${p}${randomUUID().slice(0, 8)}`;
 
 // uploadIds (P4.1) narrows retrieval to documents already checked by
 // resolveGenerationSources; it never widens the curriculum scope.
-export async function gatherSources(params: { institutionId?: string; curriculumId?: string; query: string; lessonId?: string; objectiveIds: string[]; uploadIds?: string[] }) {
+// smallScopeFallback (F-3b for question drafts): when keyword retrieval finds
+// nothing but the chosen documents hold at most SMALL_SCOPE_PASSAGES passages
+// in total, all of them are given to the model; larger selections keep the
+// "no passages" behaviour. Only chosen documents, never the whole curriculum.
+export async function gatherSources(params: { institutionId?: string; curriculumId?: string; query: string; lessonId?: string; objectiveIds: string[]; uploadIds?: string[]; smallScopeFallback?: boolean }) {
   const objectives = params.objectiveIds.length
     ? await LearningObjective.find({ id: { $in: params.objectiveIds }, institutionId: params.institutionId, curriculumId: params.curriculumId, status: 'approved' })
         .select('id code title description')
@@ -26,6 +32,13 @@ export async function gatherSources(params: { institutionId?: string; curriculum
   for (const q of queries.slice(0, 5)) {
     for (const s of await retrieveCurriculumSources({ institutionId: params.institutionId, curriculumId: params.curriculumId, query: q, lessonId: params.lessonId, k: 3, ...(params.uploadIds ? { uploadIds: params.uploadIds } : {}) })) {
       if (!seen.has(s.chunkId)) seen.set(s.chunkId, s);
+    }
+  }
+  if (!seen.size && params.smallScopeFallback && params.uploadIds?.length && params.institutionId && params.curriculumId) {
+    const small = await smallScopePassages({ institutionId: params.institutionId, curriculumId: params.curriculumId, uploadIds: params.uploadIds, max: SMALL_SCOPE_PASSAGES });
+    if (small?.length) {
+      for (const s of small) seen.set(s.chunkId, s);
+      logger.info('assessment_draft_small_scope_fallback', { institutionId: params.institutionId, documents: params.uploadIds.length, passages: small.length });
     }
   }
   const sources = [...seen.values()].slice(0, 6).map((s, i) => ({ ...s, n: i + 1 }));
@@ -138,7 +151,7 @@ export async function generateAssessmentDraft(params: {
   allowOpen: boolean;
   uploadIds?: string[];
 }) {
-  const { objectives, sources } = await gatherSources({ ...params, query: params.brief });
+  const { objectives, sources } = await gatherSources({ ...params, query: params.brief, smallScopeFallback: true });
   const total = Object.values(params.counts).reduce((a, b) => a + b, 0);
   const ctx = { objectiveIds: new Set(objectives.map((o) => o.id)), sources, allowOpen: params.allowOpen };
   const { value, model } = await askForJson({

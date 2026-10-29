@@ -493,13 +493,15 @@ describe('F-3b small-scope fallback', () => {
     expect(ai.create).not.toHaveBeenCalled();
   });
 
-  it('other workflows keep keyword-only retrieval (tutor and generation share retrieveCurriculumSources)', async () => {
+  // Question drafts got the same fallback later (gatherSources smallScopeFallback,
+  // tested in p4Workflow.test.ts); tutor and lesson plans still do not.
+  it('tutor and lesson plans keep keyword-only retrieval', async () => {
     const photo = await one(PHOTO, 'photosynthesis.txt');
     const q = 'Which organelle hosts this process?';
     expect(await retrieval.retrieveCurriculumSources({ institutionId: 'instA', curriculumId: 'curA', query: q })).toEqual([]);
     const { gatherSources } = await import('../src/services/educatorAi');
     expect((await gatherSources({ institutionId: 'instA', curriculumId: 'curA', query: q, objectiveIds: [], uploadIds: [photo] })).sources).toEqual([]);
     const src = (f: string) => fs.readFileSync(path.join(__dirname, '../src', f), 'utf8');
-    for (const f of ['controllers/tutor.controller.ts', 'controllers/tutorExtras.controller.ts', 'services/educatorAi.ts', 'services/directTutorModel.ts']) expect(src(f), f).not.toContain('smallScopePassages');
+    for (const f of ['controllers/tutor.controller.ts', 'controllers/tutorExtras.controller.ts', 'services/directTutorModel.ts']) expect(src(f), f).not.toContain('smallScopePassages');
   });
 });
