@@ -3,7 +3,8 @@
 This private repository is the **isolated deployment source for the ENARA Integrated Alpha staging environment** on Railway. It is not the development repository, and it is never deployed to production.
 
 - **Source:** a clean snapshot of the approved release commit `544c6ec7e8139961a8629fa9abb7a01ef8a67160` (branch `staging-alpha` of `EnaraAI/enara-sandbox`), plus reviewed staging-only changes. This repository does not include the original history. See `STAGING_REPOSITORY_MANIFEST.md`.
-- **Deployment:** manual only. There are no GitHub Actions workflows that deploy anywhere. Link Railway with auto-deploy **off**, and deploy only after owner approval.
+- **Deployment:** chosen host is **Vercel Hobby** (one new project linked only to this repository; production branch `staging-alpha`; `main` never deploys). Runbook: `docs/benchmarks/diagnostics/20261029T070000Z-vercel-staging/VERCEL_STAGING_RUNBOOK.md`. There are no GitHub Actions workflows. Deploy only after owner approval. The Railway configs are kept as an unused alternative.
+- **Storage:** all files are stored in the R2 bucket `enara-staging-alpha-uploads`. On Vercel the backend refuses to start without R2.
 - **Secrets:** none are stored here. Every credential is set by hand on the Railway service. `backend/staging.env.template` lists the variable names; every secret in it is blank.
 
 ## Targets (configuration names; nothing is created by this repository)
@@ -12,6 +13,7 @@ This private repository is the **isolated deployment source for the ENARA Integr
 |---|---|
 | Railway project | `enara-staging-alpha` |
 | Services (two-service topology) | `enara-staging-backend` (root `backend`, config `/backend/railway.staging.toml`) and `enara-staging-frontend` (root `frontend`, config `/frontend/railway.staging.toml`, `Dockerfile.staging`) |
+| **Vercel (chosen)** | root `/`, `vercel.json`: static SPA plus one function `api/index.js` for `/api`, `/uploads`, `/ready`, `/health` |
 | Optional single-service topology (USD 0 plan) | root `/`, config `/railway.staging-single.toml`, `Dockerfile.staging-single` |
 | Database | `enara_staging_alpha` (user restricted to this database) |
 | Upload bucket | `enara-staging-alpha-uploads` (R2 token restricted to this bucket) |

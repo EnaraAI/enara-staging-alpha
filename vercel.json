@@ -1,0 +1,27 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd frontend && npm ci && cd ../backend && npm ci",
+  "buildCommand": "cd frontend && VITE_API_URL=/api npx vite build && cd ../backend && npm run build",
+  "outputDirectory": "frontend/dist",
+  "regions": ["iad1"],
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 60,
+      "memory": 1024,
+      "includeFiles": "backend/dist/**"
+    }
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": false,
+      "staging-alpha": true
+    }
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api" },
+    { "source": "/uploads/:path*", "destination": "/api" },
+    { "source": "/ready", "destination": "/api" },
+    { "source": "/health", "destination": "/api" },
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+  ]
+}

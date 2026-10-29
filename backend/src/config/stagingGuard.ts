@@ -58,6 +58,9 @@ export function stagingProblems(source: NodeJS.ProcessEnv, dotenvKeys: string[] 
   const r2 = ['R2_ACCOUNT_ID', 'R2_BUCKET', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY'].filter((k) => val(source, k)).length;
   if (r2 === 4) {
     if (!STAGING_MARK.test(val(source, 'R2_BUCKET'))) problems.push('R2_BUCKET must be a staging bucket (its name must contain "staging")');
+  } else if (r2 === 0 && val(source, 'VERCEL')) {
+    // Vercel functions have no persistent disk: every file must live in R2.
+    problems.push('on Vercel, set R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY (uploads are stored only in R2)');
   } else if (r2 === 0) {
     const dir = val(source, 'UPLOAD_DIR');
     if (!dir) problems.push('set a staging upload store: R2_* for a staging bucket, or UPLOAD_DIR');
@@ -65,6 +68,10 @@ export function stagingProblems(source: NodeJS.ProcessEnv, dotenvKeys: string[] 
   } else {
     problems.push('R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY must be set together');
   }
+  // Behind one edge proxy (Railway, Vercel): trust exactly one hop. `true`
+  // trusts any client-supplied X-Forwarded-For and defeats IP rate limits.
+  if (/^(true|yes)$/i.test(val(source, 'TRUST_PROXY'))) problems.push('TRUST_PROXY must be a hop count (use 1 behind Railway or Vercel), not true');
+  if (val(source, 'VERCEL') && /^(1|true|yes)$/i.test(val(source, 'SERVE_LOCAL_UPLOADS'))) problems.push('SERVE_LOCAL_UPLOADS must be false on Vercel (uploads are stored only in R2)');
   if (val(source, 'AWS_S3_BUCKET') && !STAGING_MARK.test(val(source, 'AWS_S3_BUCKET'))) problems.push('AWS_S3_BUCKET must be unset or a staging bucket (containing "staging")');
 
   // Staging-only secrets: present, long, and not reused between purposes.

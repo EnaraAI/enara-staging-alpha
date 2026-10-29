@@ -57,3 +57,15 @@
 | modified `scripts/benchmarks/run_grading_eval.py`, modified `tests/benchmarks/test_additional_datasets.py`, new `scripts/benchmarks/diagnostics/math_benchmark/run_enara.py` | 3 | research changes; the app doesn't need them. The committed version of `run_grading_eval.py` is kept (§2) |
 | `+~`, `backend/+~` | 2 | empty files, referenced by nothing |
 | ignored files (`.env`, `.env.local`, `node_modules`, `dist`, `data/`, `.vercel/`, `backend/demo-server.local.ts`, caches) | — | never included |
+
+## 5. Vercel update (second commit, owner decision 2026-10-29)
+
+| File | Change | Verified by |
+|---|---|---|
+| `vercel.json`, `api/index.js`, `package.json` (new, root) | one Vercel project: SPA built with `VITE_API_URL=/api`, backend as one function (`iad1`, 60 s). No crons, no external rewrites; only `staging-alpha` deploys | `p6VercelStaging`, local build, handler run |
+| `backend/src/config/stagingGuard.ts` | on Vercel, refuses to start without all four `R2_*` or with `SERVE_LOCAL_UPLOADS=true` (all files in R2). In staging, refuses `TRUST_PROXY=true` (requires a hop count), because `true` lets clients spoof their IP and bypass rate limits | `p6VercelStaging` (9 tests), `p6StagingGuard` |
+| `backend/staging.env.template` | `TRUST_PROXY=1` | — |
+| `backend/test/p6VercelStaging.test.ts` (new) | the tests above | full suite 746/746 |
+| `docs/benchmarks/diagnostics/20261029T070000Z-vercel-staging/VERCEL_STAGING_RUNBOOK.md` (new) | steps, limits (4.5 MB request body), R2 CORS, rollback | — |
+
+Hobby terms: non-commercial use only. The owner accepted this for staging.
