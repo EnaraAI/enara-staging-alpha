@@ -1,7 +1,7 @@
 import express from 'express';
 import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
-import { maintenanceToken, stagingMaintenanceRouter } from '../src/routes/stagingMaintenance.routes';
+import { maintenanceToken, r2Shape, stagingMaintenanceRouter } from '../src/routes/stagingMaintenance.routes';
 
 // Temporary staging set-up endpoint: hidden without a long token, answers a
 // wrong token exactly like a missing route, and only runs the three actions.
@@ -12,6 +12,7 @@ const deps = () => ({
   migrate: vi.fn(async () => ['2026-10-29-p5-usage-indexes']),
   seed: vi.fn(async () => ({ institution: 'enara-staging-school', setupLinks: {} })),
   createEnaraAdmin: vi.fn(async () => ({ email: 'enara.admin@x', created: true })),
+  r2Diagnose: vi.fn(async () => ({ headBucket: 'ok' })),
 });
 const appWith = (d = deps()) => {
   const app = express();
@@ -57,6 +58,19 @@ describe('staging maintenance endpoint', () => {
     await call({ action: 'create-enara-admin', accessToken: true, setupLink: 'yes' });
     expect(d.createEnaraAdmin).toHaveBeenLastCalledWith({ accessToken: true, setupLink: false });
     expect((await call({ action: 'drop' })).status).toBe(400);
+  });
+});
+
+describe('R2 shape report', () => {
+  it('describes formats and lengths only, never a value', () => {
+    const acct = 'ab'.repeat(16);
+    const secret = 'Zz9'.repeat(15);
+    const r = r2Shape({ R2_ACCOUNT_ID: ` https://${acct}.r2.cloudflarestorage.com `, R2_ACCESS_KEY_ID: 'k'.repeat(32), R2_SECRET_ACCESS_KEY: secret, R2_BUCKET: 'enara-staging-alpha-uploads' });
+    expect(r.R2_ACCOUNT_ID).toMatchObject({ set: true, hasWhitespace: true, looksLikeUrl: true, hex32: false });
+    expect(r2Shape({ R2_ACCOUNT_ID: acct }).R2_ACCOUNT_ID).toMatchObject({ hex32: true, looksLikeUrl: false, hasWhitespace: false });
+    const text = JSON.stringify(r);
+    expect(text).not.toContain(acct);
+    expect(text).not.toContain(secret);
   });
 });
 

@@ -18,6 +18,8 @@ export interface MaintenanceDeps {
   // One global ENARA admin for staging set-up. Returns an access token and/or
   // a single-use setup link only when asked.
   createEnaraAdmin: (opts: { accessToken: boolean; setupLink: boolean }) => Promise<Record<string, unknown>>;
+  // Shape of the R2 settings and one HeadBucket result; never any value.
+  r2Diagnose: () => Promise<Record<string, unknown>>;
 }
 
 const sameToken = (given: unknown, expected: string) => {
@@ -61,7 +63,8 @@ export function stagingMaintenanceRouter(token: string, deps: MaintenanceDeps): 
         logger.info('staging_maintenance_enara_admin', { accessToken: req.body?.accessToken === true, setupLink: req.body?.setupLink === true });
         return res.json({ action, ...out });
       }
-      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'action must be status, migrate, seed or create-enara-admin' } });
+      if (action === 'r2-diagnose') return res.json({ action, ...(await deps.r2Diagnose()) });
+      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'action must be status, migrate, seed, create-enara-admin or r2-diagnose' } });
     } catch (error) {
       logger.error('staging_maintenance_failed', { action, error: serializeError(error) });
       return res.status(500).json({ error: { code: 'MAINTENANCE_FAILED', message: error instanceof Error ? error.message : 'failed' } });
@@ -97,6 +100,47 @@ export async function createStagingEnaraAdmin(opts: { accessToken: boolean; setu
   if (opts.setupLink) {
     const token = await requestPasswordReset(email, { sendMail: false });
     if (token) out.setupLink = `${getConfig().appUrl.replace(/\/$/, '')}/reset-password?token=${encodeURIComponent(token)}`;
+  }
+  return out;
+}
+
+// Describes the R2 settings without revealing them: lengths and formats only,
+// plus the outcome of one HeadBucket call against the configured bucket.
+export function r2Shape(source: NodeJS.ProcessEnv = process.env) {
+  const shape = (raw: string | undefined) => {
+    const v = raw ?? '';
+    return {
+      set: v.length > 0,
+      length: v.length,
+      trimmedLength: v.trim().length,
+      hasWhitespace: /\s/.test(v),
+      hasQuotes: /["']/.test(v),
+      looksLikeUrl: /^https?:|\.r2\.cloudflarestorage\.com|\//i.test(v),
+      hex32: /^[0-9a-f]{32}$/.test(v.trim()),
+      hexOnlyLowercase: /^[0-9a-f]+$/.test(v.trim()),
+    };
+  };
+  return {
+    R2_ACCOUNT_ID: shape(source.R2_ACCOUNT_ID),
+    R2_ACCESS_KEY_ID: shape(source.R2_ACCESS_KEY_ID),
+    R2_SECRET_ACCESS_KEY: { set: Boolean(source.R2_SECRET_ACCESS_KEY), length: (source.R2_SECRET_ACCESS_KEY ?? '').length, hasWhitespace: /\s/.test(source.R2_SECRET_ACCESS_KEY ?? '') },
+    R2_BUCKET: source.R2_BUCKET ?? null,
+  };
+}
+
+export async function diagnoseR2() {
+  const out: Record<string, unknown> = { shape: r2Shape() };
+  try {
+    const { S3Client, HeadBucketCommand } = await import('@aws-sdk/client-s3');
+    const { getConfig } = await import('../config/env');
+    const r2 = getConfig().r2;
+    if (!r2) return { ...out, headBucket: 'R2 not configured' };
+    const client = new S3Client({ region: 'auto', endpoint: `https://${r2.accountId}.r2.cloudflarestorage.com`, credentials: { accessKeyId: r2.accessKeyId, secretAccessKey: r2.secretAccessKey } });
+    await client.send(new HeadBucketCommand({ Bucket: r2.bucket }));
+    out.headBucket = 'ok';
+  } catch (error) {
+    const e = error as { name?: string; code?: string; $metadata?: { httpStatusCode?: number } };
+    out.headBucket = { name: e.name ?? null, code: e.code ?? null, httpStatus: e.$metadata?.httpStatusCode ?? null };
   }
   return out;
 }
