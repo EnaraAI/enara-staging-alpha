@@ -106,14 +106,50 @@ const errorSchema: OpenAPIV3.SchemaObject = {
   },
 };
 
-export function buildOpenApiSpec(serverUrl?: string): OpenAPIV3.Document {
+export type ServerRoute = { method: string; path: string };
+
+// Routes the server really has but the hand-written spec below doesn't
+// describe yet: listed so the docs never hide an endpoint, and marked as
+// undocumented rather than given invented request or response shapes.
+const PUBLIC_ROUTES = new Set(['/api/auth/login', '/api/auth/register', '/api/auth/demo-login', '/api/auth/refresh', '/api/auth/password-reset', '/health', '/ready']);
+function addServerRoutes(doc: OpenAPIV3.Document, routes: ServerRoute[]): OpenAPIV3.Document {
+  const tagNames = new Set((doc.tags ?? []).map((t) => t.name));
+  for (const r of routes) {
+    const method = r.method.toLowerCase() as OpenAPIV3.HttpMethods;
+    if (!['get', 'post', 'put', 'patch', 'delete'].includes(method)) continue;
+    const path = r.path.replace(/:([A-Za-z0-9_]+)/g, '{$1}');
+    const item = (doc.paths[path] ??= {}) as OpenAPIV3.PathItemObject;
+    if (item[method]) continue;
+    const seg = path.split('/')[2] || 'other';
+    const tag = seg.split('-').map((w) => (w === 'ai' ? 'AI' : w.charAt(0).toUpperCase() + w.slice(1))).join(' ');
+    if (!tagNames.has(tag)) { tagNames.add(tag); (doc.tags ??= []).push({ name: tag, description: `Routes under /api/${seg}` }); }
+    const params = [...path.matchAll(/\{([^}]+)\}/g)].map((m) => ({ name: m[1], in: 'path' as const, required: true, schema: { type: 'string' as const } }));
+    item[method] = {
+      tags: [tag],
+      summary: 'Not documented yet',
+      description: 'Listed from the server\'s routes. Request and response details are not documented yet; the server checks the role, the school and any feature switches on every call.',
+      ...(PUBLIC_ROUTES.has(r.path) ? {} : { security: [{ bearerAuth: [] }] }),
+      ...(params.length ? { parameters: params } : {}),
+      ...(['post', 'put', 'patch'].includes(method) ? { requestBody: { required: false, content: { 'application/json': { schema: { type: 'object' } } } } } : {}),
+      responses: { '200': { description: 'Success' }, '401': { description: 'Not signed in' }, '403': { description: 'Not allowed for this role or school' }, '404': { description: 'Not found, or switched off for this school' } },
+    };
+  }
+  doc.tags?.sort((a, b) => a.name.localeCompare(b.name));
+  return doc;
+}
+
+export function buildOpenApiSpec(serverUrl?: string, routes: ServerRoute[] = []): OpenAPIV3.Document {
+  return addServerRoutes(buildDocumentedSpec(serverUrl), routes);
+}
+
+function buildDocumentedSpec(serverUrl?: string): OpenAPIV3.Document {
   return {
     openapi: '3.0.3',
     info: {
-      title: 'Enara AI API',
-      version: '1.2.0',
+      title: 'ENARA API',
+      version: '1.3.0',
       description:
-        'Curriculum Center (admin) + Student Me APIs including AI Tutor sessions.',
+        'Every route of the ENARA backend. Routes with full details come first in each group; the rest are listed from the server and marked "not documented yet". To try a call: POST /api/auth/login with your email and password, copy the token, press Authorize and paste it.',
     },
     servers: [{ url: serverUrl || '/', description: 'API server' }],
     tags: [

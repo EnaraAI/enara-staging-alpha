@@ -930,6 +930,10 @@ export const fetchMyAssignmentResult = (id: string, attemptId: string) => reques
 export const appealMyResult = (id: string, attemptId: string, message: string, questionId?: string) =>
   request<any>('POST', `/api/me/assignments/${enc(id)}/attempts/${enc(attemptId)}/appeals`, { message, questionId });
 export const fetchTeachingClasses = () => request<{ classes: { id: string; courseName: string; curriculumId: string | null; curriculumName: string | null }[] }>('GET', '/api/assignments/classes');
+// Which AI tools the caller's school has on (yes/no only), so pages can hide
+// a button rather than fail after it is pressed.
+export type TeachingFeatures = { aiAssessmentDrafts: boolean; aiLessonPlans: boolean; documents: boolean };
+export const fetchTeachingFeatures = () => request<TeachingFeatures>('GET', '/api/teaching/features');
 export const fetchTeachingOverview = (origin: OriginView = 'live') => request<any>('GET', withOrigin('/api/teaching/overview', origin));
 export const fetchClassRoster = (classId: string, origin: OriginView = 'live') => request<any>('GET', withOrigin(`/api/teaching/classes/${enc(classId)}/roster`, origin));
 export const fetchClassObjectives = (classId: string) => request<{ objectives: { id: string; code: string; title: string }[] }>('GET', `/api/teaching/classes/${enc(classId)}/objectives`);

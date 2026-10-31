@@ -242,6 +242,10 @@ const App: React.FC = () => {
     if (state.role !== 'student') return setAssignmentsEnabled(false);
     fetchMyAssignments().then(() => setAssignmentsEnabled(true)).catch(() => setAssignmentsEnabled(false));
   }, [state.role]);
+  // "Assessments" tab: with class assignments on, a student's quizzes live
+  // under "Assignments"; this older list is shown only when it has something,
+  // so students don't see two similar tabs, one of them empty.
+  const showAssessmentsTab = !assignmentsEnabled || assessments.length > 0;
   // "Study plan" tab: only when the school has study plans on.
   const [studyPlanEnabled, setStudyPlanEnabled] = useState(false);
   useEffect(() => {
@@ -320,7 +324,7 @@ const App: React.FC = () => {
             {/* Sub Navigation */}
             <div className="bg-white border-b border-gray-200 px-4 sm:px-8 py-2 overflow-x-auto whitespace-nowrap no-scrollbar shrink-0">
               <div className="flex gap-4 sm:gap-8">
-                {[['dashboard', 'Home'], ['courses', 'My learning'], ...(progressEnabled ? [['progress', 'My progress']] : []), ...(assignmentsEnabled ? [['assignments-student', 'Assignments']] : []), ...(studyPlanEnabled ? [['study-plan', 'Study plan']] : []), ['assessments', 'Assessments'], ['results', 'Results']].map(([tab, label]) => (
+                {[['dashboard', 'Home'], ['courses', 'My learning'], ...(progressEnabled ? [['progress', 'My progress']] : []), ...(assignmentsEnabled ? [['assignments-student', 'Assignments']] : []), ...(studyPlanEnabled ? [['study-plan', 'Study plan']] : []), ...(showAssessmentsTab ? [['assessments', 'Assessments']] : []), ['results', 'Results']].map(([tab, label]) => (
                   <button
                     key={tab}
                     onClick={() => navigate(tab)}
@@ -516,7 +520,6 @@ const App: React.FC = () => {
           {state.page === 'grading' && <GradingReview />}
           {state.page === 'teaching' && <TeachingDashboard />}
           {state.page === 'lesson-planner' && <LessonPlanner />}
-          {state.page === 'outcomes' && <div className="p-20 text-center text-slate-400">Learning Outcomes & Success Metrics</div>}
           {state.page === 'operations' && <div className="p-20 text-center text-slate-400">Operational Efficiency & Resource Management</div>}
           {state.page === 'integrations' && <Integrations />}
           {state.page === 'live-avatars' && <AdminAvatarControlCenter />}

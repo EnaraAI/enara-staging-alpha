@@ -1,26 +1,12 @@
-
-import React, { useState } from 'react';
-import { 
-  GraduationCap, 
-  Building2, 
-  Cpu, 
-  BookOpen,
-  ArrowRight, 
-  Eye, 
-  EyeOff, 
-  Lock, 
-  Mail, 
-  Sparkles,
-  ChevronRight,
-  ShieldCheck,
-  Globe,
-  Zap,
-  AlertTriangle,
-  ShieldAlert
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowRight, AtSign, CircleAlert, Eye, EyeOff, Info, KeyRound, Lock } from 'lucide-react';
 import { clearSession, login, SessionUser } from '../services/apiService';
-import { uiRoleFor, UiRole } from '../services/roleRouting';
+import { uiRoleFor, UiRole, LoginChoice } from '../services/roleRouting';
+import './Login.css';
+
+// Sign-in "Floating Classroom" (redesign concept B). The sign-in flow is the
+// same as before: the backend checks the email and password, and
+// roleRouting decides which portal the account may open from the chosen card.
 
 interface LoginProps {
   onLogin: (role: UiRole, user: SessionUser) => void;
@@ -28,370 +14,212 @@ interface LoginProps {
   isSharedAssessment?: boolean;
 }
 
+type Lang = 'en' | 'ar';
+
+const PORTALS: LoginChoice[] = ['student', 'admin', 'enara-admin'];
+
+const TEXT = {
+  en: {
+    heroA: 'Learning that ', heroB: 'moves', heroC: ' with you.',
+    heroP: 'Lessons, practice and assessment in one place, with an AI tutor that adapts to every step.',
+    welcome: 'Welcome back', sub: 'Sign in to continue learning.',
+    shared: 'Sign in to open what was shared with you.',
+    portal: 'Portal', portals: { student: 'Student', admin: 'School staff', 'enara-admin': 'ENARA team' } as Record<LoginChoice, string>,
+    email: 'Email', emailPh: 'name@school.edu', badEmail: 'Enter an email like name@school.edu.',
+    password: 'Password', passwordPh: 'Your password', noPassword: 'Enter your password.',
+    forgot: 'Forgot password?', forgotInfo: "Your school manages ENARA accounts. Ask your school's administrator to reset your password.",
+    show: 'Show password', hide: 'Hide password',
+    submit: 'Continue', loading: 'Signing in…',
+    managed: 'Your school manages your account.',
+    wrong: "That email and password don't match. Check them and try again.",
+    unreachable: 'Could not reach the server. Please try again.',
+    wrongPortal: (chosen: string, right: string) => `This account can't sign in as ${chosen}. Choose "${right}" instead.`,
+    progressLabel: 'Adding fractions', progressNote: 'Practising with your tutor',
+    lang: 'Language',
+  },
+  ar: {
+    heroA: 'تعلّم ', heroB: 'بيتحرك', heroC: ' معاك.',
+    heroP: 'الدروس والتدريب والتقييم في مكان واحد، مع مدرّس ذكي بيتكيّف مع كل خطوة.',
+    welcome: 'أهلاً بيك تاني', sub: 'سجّل دخولك عشان تكمّل تعلّمك.',
+    shared: 'سجّل دخولك عشان تفتح اللي اتشارك معاك.',
+    portal: 'البوابة', portals: { student: 'طالب', admin: 'فريق المدرسة', 'enara-admin': 'فريق إنارة' } as Record<LoginChoice, string>,
+    email: 'الإيميل', emailPh: 'name@school.edu', badEmail: 'اكتب إيميل زي name@school.edu.',
+    password: 'كلمة السر', passwordPh: 'كلمة السر بتاعتك', noPassword: 'اكتب كلمة السر.',
+    forgot: 'نسيت كلمة السر؟', forgotInfo: 'مدرستك هي اللي بتدير حسابات إنارة. اطلب من مسؤول المدرسة يغيّر لك كلمة السر.',
+    show: 'إظهار كلمة السر', hide: 'إخفاء كلمة السر',
+    submit: 'متابعة', loading: 'جاري تسجيل الدخول…',
+    managed: 'مدرستك هي اللي بتدير حسابك.',
+    wrong: 'الإيميل وكلمة السر مش متطابقين. راجعهم وجرّب تاني.',
+    unreachable: 'مش قادرين نوصل للسيرفر. جرّب تاني.',
+    wrongPortal: (chosen: string, right: string) => `الحساب ده مينفعش يدخل كـ«${chosen}». اختار «${right}».`,
+    progressLabel: 'جمع الكسور', progressNote: 'بتتدرّب مع المدرّس',
+    lang: 'اللغة',
+  },
+};
+
+// The card an account should use, from its backend role (see roleRouting).
+const PORTAL_FOR_ROLE: Record<string, LoginChoice> = {
+  student: 'student', teacher: 'admin', academic_manager: 'admin', admin: 'admin', 'enara-admin': 'enara-admin',
+};
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedAssessment }) => {
-  const [selectedRole, setSelectedRole] = useState<'student' | 'admin' | 'enara-admin' | null>(() => {
-    if (isSharedCourse || isSharedAssessment) return 'student';
-    return null;
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [lang, setLang] = useState<Lang>('en');
+  const [portal, setPortal] = useState<LoginChoice>('student');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [fieldError, setFieldError] = useState<{ field: 'email' | 'password'; text: string } | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const t = TEXT[lang];
+  const rtl = lang === 'ar';
 
-  const handleSelectRole = (role: 'student' | 'admin' | 'enara-admin') => {
-    setSelectedRole(role);
-    setAuthError(null);
-  };
+  // Pointer tilt of the 3D scene; skipped when the user prefers reduced motion.
+  useEffect(() => {
+    const root = rootRef.current, stage = stageRef.current;
+    if (!root || !stage) return;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const move = (e: PointerEvent) => {
+      if (reduced?.matches || e.pointerType === 'touch') return;
+      const r = root.getBoundingClientRect();
+      stage.style.setProperty('--px', (((e.clientX - r.left) / r.width - 0.5) * 2).toFixed(3));
+      stage.style.setProperty('--py', (((e.clientY - r.top) / r.height - 0.5) * 2).toFixed(3));
+    };
+    const leave = () => { stage.style.setProperty('--px', '0'); stage.style.setProperty('--py', '0'); };
+    root.addEventListener('pointermove', move);
+    root.addEventListener('pointerleave', leave);
+    return () => { root.removeEventListener('pointermove', move); root.removeEventListener('pointerleave', leave); };
+  }, []);
+
+  const choosePortal = (p: LoginChoice) => { setPortal(p); setAuthError(null); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRole) return;
-    setAuthError(null);
+    setAuthError(null); setInfo(null); setFieldError(null);
+    if (!EMAIL_RE.test(email.trim())) { setFieldError({ field: 'email', text: t.badEmail }); return; }
+    if (!password) { setFieldError({ field: 'password', text: t.noPassword }); return; }
     setIsLoading(true);
-
     try {
-      const user = await login(email, password);
-      // The account's role on the backend decides what the user can open
-      // (services/roleRouting.ts). Academic managers get a read-only portal.
-      const portal = uiRoleFor(user.role, selectedRole);
-      if (!portal) {
+      const user = await login(email.trim(), password);
+      const ui = uiRoleFor(user.role, portal);
+      if (!ui) {
         // Wrong portal: forget this session locally only. A server logout
         // would also sign the account out on its other devices.
         clearSession();
-        const roleNames: Record<string, string> = {
-          student: 'Student', teacher: 'Teacher', academic_manager: 'Academic Manager', admin: 'Administrator', 'enara-admin': 'Enara Administrator',
-        };
-        setAuthError(`This account can't sign in as ${roleNames[selectedRole]}. Choose "${roleNames[user.role] || user.role}" instead.`);
+        const right = PORTAL_FOR_ROLE[user.role];
+        setAuthError(t.wrongPortal(t.portals[portal], right ? t.portals[right] : user.role));
         return;
       }
-      onLogin(portal, user);
+      onLogin(ui, user);
     } catch (err: any) {
-      setAuthError(err.status === 401 ? "Incorrect email or password." : (err.message || "Could not reach the server. Please try again."));
+      setAuthError(err?.status === 401 ? t.wrong : (lang === 'en' && err?.message) || t.unreachable);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const roles = [
-    {
-      id: 'student' as const,
-      title: 'Student',
-      description: 'Continue your learning journey, track progress, and access personalized support.',
-      icon: GraduationCap,
-      color: 'bg-blue-50 text-blue-600',
-      accent: 'teal'
-    },
-    {
-      id: 'admin' as const,
-      title: 'Administrator',
-      description: 'Manage students, programs, performance, and daily operations.',
-      icon: Building2,
-      color: 'bg-indigo-50 text-indigo-600',
-      accent: 'teal'
-    },
-    {
-      id: 'enara-admin' as const,
-      title: 'Enara Administrator',
-      description: 'Access platform oversight, system controls, and network-wide intelligence.',
-      icon: Cpu,
-      color: 'bg-indigo-50 text-indigo-600',
-      accent: 'indigo'
-    }
-  ];
+  const portalIndex = PORTALS.indexOf(portal);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden font-sans">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-teal-200/20 blur-[120px] rounded-full"></div>
-        <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-blue-200/20 blur-[120px] rounded-full"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#0056D2 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+    <div className="enara-signin" ref={rootRef}>
+      <div className="si-aura" aria-hidden="true"><i /><i /><i /></div>
+      <div className="si-dots" aria-hidden="true" />
+
+      <div className="si-scene">
+        <div className="si-stage" ref={stageRef} aria-hidden="true">
+          <svg className="si-path" viewBox="0 0 600 560" preserveAspectRatio="none">
+            <path d="M70 60 C 220 40, 260 200, 380 140 S 520 260, 470 380 S 260 520, 140 470" fill="none" stroke="var(--brand-300)" strokeWidth="2" />
+          </svg>
+          <div className="si-obj si-sigma">∑</div>
+          <div className="si-obj si-tiles">
+            <div><span style={{ width: 120, background: 'var(--brand)' }}>½</span></div>
+            <div><span style={{ width: 58, background: 'var(--brand-400)' }}>¼</span><span style={{ width: 58, background: 'var(--brand-400)' }}>¼</span></div>
+            <div>{[0, 1, 2].map((i) => <span key={i} style={{ width: 38, background: 'var(--amber)' }}>⅓</span>)}</div>
+          </div>
+          <div className="si-obj si-book">
+            <div className="pg l"><i className="b" /><i /><i /><i style={{ width: '60%' }} /></div>
+            <div className="pg r"><i /><i className="b" /><i /><i style={{ width: '40%' }} /></div>
+          </div>
+          <div className="si-obj si-atom"><span className="orbit" /><span className="orbit" /><span className="orbit" /><span className="e" /><span className="core" /></div>
+          <div className="si-obj si-ar">ع</div>
+          <div className="si-obj si-progress" dir={rtl ? 'rtl' : 'ltr'}>
+            <small>{t.progressLabel}</small>
+            <div className="bar"><i /></div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>{t.progressNote}</div>
+          </div>
+        </div>
+        <div className="si-copy" dir={rtl ? 'rtl' : 'ltr'} lang={lang}>
+          <h1>{t.heroA}<span>{t.heroB}</span>{t.heroC}</h1>
+          <p>{t.heroP}</p>
+        </div>
       </div>
 
-      <div className="w-full max-w-5xl z-10 py-8 sm:py-12">
-        {/* Header Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-8 sm:mb-12"
-        >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-sm mb-4 sm:mb-6">
-            <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-teal-600 flex items-center justify-center">
-              <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
-            </div>
-            <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-500">Intelligence You Can Learn From</span>
-          </div>
-          
-          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:xl bg-teal-600 flex items-center justify-center shadow-lg shadow-teal-600/20">
-              <span className="text-white font-bold text-lg sm:text-xl">E</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">Enara</h1>
-          </div>
-          
-          <p className="text-slate-500 max-w-md mx-auto text-base sm:text-lg px-4">
-            Welcome to the intelligence layer. Please select your operational role to continue.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Role Selection Grid */}
-          <div className={`lg:col-span-7 space-y-3 sm:space-y-4 transition-all duration-500 ${selectedRole ? 'lg:opacity-40 lg:blur-[2px] pointer-events-none lg:scale-95' : ''}`}>
-            {roles.map((role, idx) => (
-              <motion.button
-                key={role.id}
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                onClick={() => handleSelectRole(role.id)}
-                className={`w-full group relative flex items-center gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 hover:border-teal-200 transition-all duration-300 text-left ${selectedRole === role.id ? 'ring-2 ring-teal-500 border-transparent' : ''}`}
-              >
-                <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl ${role.color} flex items-center justify-center shrink-0 transition-transform duration-500 group-hover:scale-110`}>
-                  <role.icon className="w-6 h-6 sm:w-8 sm:h-8" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-0.5 sm:mb-1 flex items-center gap-2">
-                    {role.title}
-                    <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-300 group-hover:text-teal-500 transition-colors" />
-                  </h3>
-                  <p className="text-slate-500 text-xs sm:text-sm leading-relaxed max-w-sm">
-                    {role.description}
-                  </p>
-                </div>
-                <div className="hidden sm:flex w-10 h-10 rounded-full bg-slate-50 items-center justify-center text-slate-300 group-hover:bg-teal-50 group-hover:text-teal-600 transition-all">
-                  <ArrowRight size={20} />
-                </div>
-              </motion.button>
-            ))}
-          </div>
-
-          {/* Login Form Area */}
-          <div className="lg:col-span-5 relative">
-            <AnimatePresence mode="wait">
-              {!selectedRole ? (
-                <motion.div
-                  key="placeholder"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="hidden lg:flex flex-col items-center justify-center p-12 rounded-[2.5rem] border-2 border-dashed border-slate-200 bg-slate-50/50 h-full min-h-[400px] text-center"
-                >
-                  <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-300 mb-4">
-                    <ShieldCheck size={32} />
-                  </div>
-                  <h4 className="text-slate-400 font-medium">Secure Access Portal</h4>
-                  <p className="text-slate-400 text-sm mt-2">Select a role on the left to initialize the authentication sequence.</p>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="form"
-                  initial={{ opacity: 0, x: 30, scale: 0.95 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: 30, scale: 0.95 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  className="bg-white p-8 sm:p-10 rounded-[2.5rem] shadow-2xl shadow-teal-900/5 border border-slate-100 relative overflow-hidden"
-                >
-                  {/* Form Header */}
-                  <div className="flex items-center justify-between mb-8">
-                    <div>
-                      <button 
-                        onClick={() => setSelectedRole(null)}
-                        className="text-xs font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1 mb-2 group"
-                      >
-                        <ChevronRight size={14} className="rotate-180 group-hover:-translate-x-0.5 transition-transform" />
-                        Back to roles
-                      </button>
-                      <h2 className="text-2xl font-bold text-slate-900">
-                        {roles.find(r => r.id === selectedRole)?.title} Login
-                      </h2>
-                    </div>
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${roles.find(r => r.id === selectedRole)?.color}`}>
-                      {React.createElement(roles.find(r => r.id === selectedRole)?.icon || GraduationCap, { size: 24 })}
-                    </div>
-                  </div>
-
-                  {/* Quick RBAC Credential Auto-Fill Buttons */}
-                  <div className="mb-6 p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                        <ShieldCheck size={12} className="text-teal-600" />
-                        Quick Test Accounts (RBAC)
-                      </span>
-                      <span className="text-[9px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">
-                        Auto-Filled
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleSelectRole('student')}
-                        className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all text-left border ${
-                          selectedRole === 'student'
-                            ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
-                            : 'bg-white text-slate-700 border-slate-200 hover:border-teal-300 hover:bg-teal-50/50'
-                        }`}
-                      >
-                        <div className="font-bold flex items-center gap-1">🎓 Student</div>
-                        <div className={`text-[10px] truncate ${selectedRole === 'student' ? 'text-teal-100' : 'text-slate-400'}`}>
-                          student@enara.edu
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleSelectRole('admin')}
-                        className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all text-left border ${
-                          selectedRole === 'admin'
-                            ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
-                            : 'bg-white text-slate-700 border-slate-200 hover:border-teal-300 hover:bg-teal-50/50'
-                        }`}
-                      >
-                        <div className="font-bold flex items-center gap-1">🏛️ Admin</div>
-                        <div className={`text-[10px] truncate ${selectedRole === 'admin' ? 'text-teal-100' : 'text-slate-400'}`}>
-                          user@enara.edu
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-
-                  <form onSubmit={handleSubmit} className="space-y-5">
-                    {authError && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3 text-red-700"
-                      >
-                        <ShieldAlert size={20} className="text-red-600 shrink-0 mt-0.5" />
-                        <div className="flex-1">
-                          <h5 className="font-bold text-xs uppercase tracking-wider text-red-800">Access Prohibited</h5>
-                          <p className="text-xs mt-1 text-red-700 leading-relaxed font-medium">{authError}</p>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-                      <div className="relative group">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
-                        <input 
-                          type="email" 
-                          required 
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="name@institution.edu"
-                          className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:bg-white focus:border-teal-500 transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between ml-1">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Password</label>
-                        <button type="button" className="text-xs font-bold text-teal-600 hover:text-teal-700">Forgot?</button>
-                      </div>
-                      <div className="relative group">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
-                        <input 
-                          type={showPassword ? 'text' : 'password'} 
-                          required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:bg-white focus:border-teal-500 transition-all"
-                        />
-                        <button 
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                        >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 py-2">
-                      <label className="flex items-center gap-2 cursor-pointer group">
-                        <div className="relative flex items-center justify-center">
-                          <input type="checkbox" className="peer sr-only" />
-                          <div className="w-5 h-5 border-2 border-slate-200 rounded-lg bg-white peer-checked:bg-teal-600 peer-checked:border-teal-600 transition-all"></div>
-                          <ShieldCheck size={12} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
-                        </div>
-                        <span className="text-sm text-slate-500 group-hover:text-slate-900 transition-colors">Remember this device</span>
-                      </label>
-                    </div>
-
-                    <button 
-                      disabled={isLoading}
-                      className={`w-full py-4 bg-teal-600 text-white rounded-2xl font-bold shadow-lg shadow-teal-600/20 hover:bg-teal-700 hover:shadow-teal-600/30 transition-all flex items-center justify-center gap-2 relative overflow-hidden ${isLoading ? 'opacity-80 cursor-not-allowed' : 'active:scale-[0.98]'}`}
-                    >
-                      {isLoading ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          <span>Authenticating...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Sign In to Enara</span>
-                          <ArrowRight size={18} />
-                        </>
-                      )}
-                    </button>
-
-                    <div className="pt-4 flex items-center gap-4">
-                      <div className="flex-1 h-px bg-slate-100"></div>
-                      <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Institutional SSO</span>
-                      <div className="flex-1 h-px bg-slate-100"></div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <button type="button" className="flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
-                        <Globe size={16} /> Google
-                      </button>
-                      <button type="button" className="flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
-                        <Zap size={16} /> Microsoft
-                      </button>
-                    </div>
-                  </form>
-
-                  {/* Subtle Background Detail */}
-                  <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-teal-50 rounded-full blur-3xl opacity-50"></div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+      <form className="si-card" onSubmit={handleSubmit} noValidate dir={rtl ? 'rtl' : 'ltr'} lang={lang}>
+        <div className="si-top">
+          <div className="si-brand"><span className="si-logo">E</span><b>ENARA</b></div>
+          <div className="si-lang" role="group" aria-label={t.lang}>
+            <button type="button" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>EN</button>
+            <button type="button" aria-pressed={lang === 'ar'} onClick={() => setLang('ar')} lang="ar">ع</button>
           </div>
         </div>
 
-        {/* Footer Info */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 1 }}
-          className="mt-16 flex flex-col sm:flex-row items-center justify-between gap-6 px-4"
-        >
-          <div className="flex items-center gap-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-            <span>© 2026 Enara Intelligence</span>
-            <span className="hidden sm:inline">•</span>
-            <button className="hover:text-teal-600 transition-colors">Privacy Protocol</button>
-            <span className="hidden sm:inline">•</span>
-            <button className="hover:text-teal-600 transition-colors">Terms of Service</button>
+        <div className="si-head">
+          <h2>{t.welcome}</h2>
+          <p>{isSharedCourse || isSharedAssessment ? t.shared : t.sub}</p>
+        </div>
+
+        <div className="si-seg" role="group" aria-label={t.portal} style={{ ['--i' as any]: portalIndex }}>
+          <span className="thumb" />
+          {PORTALS.map((p) => (
+            <button key={p} type="button" aria-pressed={portal === p} onClick={() => choosePortal(p)}>{t.portals[p]}</button>
+          ))}
+        </div>
+
+        {authError && (
+          <div className="si-alert err" role="alert"><CircleAlert size={18} /><span>{authError}</span></div>
+        )}
+        {info && (
+          <div className="si-alert info" role="status"><Info size={18} /><span>{info}</span></div>
+        )}
+
+        <div className="si-field">
+          <label htmlFor="si-email">{t.email}</label>
+          <div className={`si-input${fieldError?.field === 'email' ? ' err' : ''}`}>
+            <AtSign size={18} />
+            <input id="si-email" type="email" dir="ltr" autoComplete="username" placeholder={t.emailPh} value={email}
+              aria-invalid={fieldError?.field === 'email'} aria-describedby={fieldError?.field === 'email' ? 'si-email-err' : undefined}
+              onChange={(e) => { setEmail(e.target.value); if (fieldError?.field === 'email') setFieldError(null); }} />
           </div>
-          
-          <div className="flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-slate-200 overflow-hidden">
-                  <img src={`https://picsum.photos/seed/user${i}/32/32`} alt="User" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                </div>
-              ))}
-            </div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              Trusted by <span className="text-teal-600">500+</span> Institutions
-            </p>
+          {fieldError?.field === 'email' && <p className="si-hint err" id="si-email-err"><CircleAlert size={14} />{fieldError.text}</p>}
+        </div>
+
+        <div className="si-field">
+          <label htmlFor="si-pass">
+            {t.password}
+            <button type="button" className="si-link" onClick={() => { setAuthError(null); setInfo(t.forgotInfo); }}>{t.forgot}</button>
+          </label>
+          <div className={`si-input${fieldError?.field === 'password' ? ' err' : ''}`}>
+            <KeyRound size={18} />
+            <input id="si-pass" type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder={t.passwordPh} value={password}
+              aria-invalid={fieldError?.field === 'password'} aria-describedby={fieldError?.field === 'password' ? 'si-pass-err' : undefined}
+              onChange={(e) => { setPassword(e.target.value); if (fieldError?.field === 'password') setFieldError(null); }} />
+            <button type="button" aria-label={showPassword ? t.hide : t.show} onClick={() => setShowPassword((s) => !s)}>
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
-        </motion.div>
-      </div>
+          {fieldError?.field === 'password' && <p className="si-hint err" id="si-pass-err"><CircleAlert size={14} />{fieldError.text}</p>}
+        </div>
+
+        <button type="submit" className="si-submit" disabled={isLoading}>
+          {isLoading ? <><span className="si-spin" />{t.loading}</> : <>{t.submit}<ArrowRight size={18} /></>}
+        </button>
+        <p className="si-hint"><Lock size={14} />{t.managed}</p>
+      </form>
     </div>
   );
 };

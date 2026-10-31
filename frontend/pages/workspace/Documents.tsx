@@ -36,6 +36,8 @@ export const Documents: React.FC = () => {
   const [origin, setOrigin] = useState<OriginView>('live');
   const [data, setData] = useState<{ attestationStatement: string; notScannedNotice?: string; documents: WorkspaceDocument[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Switched off for the school: show only the notice, not an upload form that cannot work.
+  const [switchedOff, setSwitchedOff] = useState(false);
   const [curricula, setCurricula] = useState<{ id: string; name: string; chapters: { id: string; title: string }[] }[]>([]);
   const [form, setForm] = useState<{ curriculumId: string; lessonId: string; file: File | null; attested: boolean }>({ curriculumId: '', lessonId: '', file: null, attested: false });
   const [busy, setBusy] = useState(false);
@@ -44,10 +46,11 @@ export const Documents: React.FC = () => {
   const load = () => {
     setError(null);
     fetchDocuments(origin)
-      .then(setData)
+      .then((d) => { setSwitchedOff(false); setData(d); })
       .catch((err: ApiError) => {
         setData({ attestationStatement: '', documents: [] });
-        setError(err.code === 'FEATURE_DISABLED' ? 'Documents are not enabled for your school.' : err.message || 'Could not load documents.');
+        if (err.code === 'FEATURE_DISABLED') { setSwitchedOff(true); return; }
+        setError(err.message || 'Could not load documents.');
       });
   };
   useEffect(load, [origin]);
@@ -82,6 +85,9 @@ export const Documents: React.FC = () => {
         <OriginSelector value={origin} onChange={setOrigin} />
       </div>
 
+      {switchedOff ? (
+        <p role="status" className="text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-4">Documents are switched off for your school. Your school administrator can ask ENARA to turn them on.</p>
+      ) : (<>
       <section className="bg-white border border-slate-200 rounded-xl p-4 space-y-3" aria-label="Upload a document">
         <h2 className="text-sm font-semibold text-slate-800">Upload</h2>
         <div className="grid md:grid-cols-3 gap-3">
@@ -166,6 +172,7 @@ export const Documents: React.FC = () => {
           </table>
         </div>
       )}
+      </>)}
 
       {sources && (
         <section className="bg-white border border-slate-200 rounded-xl p-4" aria-label="Sources">

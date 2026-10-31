@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Loader2, Plus, Trash2, ArrowUp, ArrowDown, Sparkles, X } from 'lucide-react';
 import {
   ApiError,
+  fetchTeachingFeatures,
   archiveAssessmentById,
   createAssessment,
   duplicateAssessmentById,
@@ -144,6 +145,10 @@ export const AssessmentBuilder: React.FC = () => {
   const [disabled, setDisabled] = useState(false);
   const [classes, setClasses] = useState<any[]>([]);
   const [aiOpen, setAiOpen] = useState(false);
+  // AI drafts switched off for the school: hide the AI buttons and say why,
+  // instead of failing after they are pressed. Unknown (check failed): show them.
+  const [aiOn, setAiOn] = useState(true);
+  useEffect(() => { fetchTeachingFeatures().then((f) => setAiOn(f.aiAssessmentDrafts)).catch(() => setAiOn(true)); }, []);
   const [dirty, setDirty] = useState(false);
   const [filter, setFilter] = useState('');
   const [doc, setDoc] = useState<any>(null);
@@ -254,9 +259,9 @@ export const AssessmentBuilder: React.FC = () => {
       {aiOpen && <AiDraftForm classes={classes} onClose={() => setAiOpen(false)} onDone={(id) => { setAiOpen(false); load(); open(id); }} />}
       <aside className="space-y-3">
         <div className="flex items-center justify-between">
-          <div><h1 className="text-xl font-bold text-slate-900">Assessments</h1><UsageChip features={['ai_assessment_draft', 'ai_question_regenerate']} label="AI drafts" /></div>
+          <div><h1 className="text-xl font-bold text-slate-900">Assessments</h1>{aiOn ? <UsageChip features={['ai_assessment_draft', 'ai_question_regenerate']} label="AI drafts" /> : <p className="text-xs text-slate-500 mt-1">AI drafts are switched off for your school.</p>}</div>
           <div className="flex gap-1">
-            <button onClick={() => setAiOpen(true)} className="inline-flex items-center gap-1 text-sm font-semibold text-violet-800 border border-violet-300 rounded-lg px-2 py-1.5"><Sparkles className="w-4 h-4" /> AI</button>
+            {aiOn && <button onClick={() => setAiOpen(true)} className="inline-flex items-center gap-1 text-sm font-semibold text-violet-800 border border-violet-300 rounded-lg px-2 py-1.5"><Sparkles className="w-4 h-4" /> AI</button>}
             <button onClick={newDraft} className="inline-flex items-center gap-1 text-sm font-semibold text-white bg-slate-900 rounded-lg px-3 py-1.5"><Plus className="w-4 h-4" /> New</button>
           </div>
         </div>
@@ -327,7 +332,7 @@ export const AssessmentBuilder: React.FC = () => {
                       <select aria-label="Question type" className="border border-slate-300 rounded px-2 py-1 text-sm" value={q.type} onChange={(e) => setQ(i, { ...blankQuestion(e.target.value), id: q.id, text: q.text })}>
                         {TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                       </select>
-                      {doc.id && <button aria-label="Regenerate with AI" title="Regenerate with AI" onClick={() => regenerate(i)} className="p-1 text-violet-700"><Sparkles className="w-4 h-4" /></button>}
+                      {doc.id && aiOn && <button aria-label="Regenerate with AI" title="Regenerate with AI" onClick={() => regenerate(i)} className="p-1 text-violet-700"><Sparkles className="w-4 h-4" /></button>}
                       <button aria-label="Move up" disabled={i === 0} onClick={() => move(i, -1)} className="p-1 disabled:opacity-30"><ArrowUp className="w-4 h-4" /></button>
                       <button aria-label="Move down" disabled={i === doc.questions.length - 1} onClick={() => move(i, 1)} className="p-1 disabled:opacity-30"><ArrowDown className="w-4 h-4" /></button>
                       <button aria-label="Remove question" onClick={() => setDoc({ ...doc, questions: doc.questions.filter((_: Q, j: number) => j !== i) })} className="p-1 text-slate-500 hover:text-rose-700"><Trash2 className="w-4 h-4" /></button>

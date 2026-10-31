@@ -19,7 +19,7 @@ import { StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import { classStudentIds, loadClassForStaff, resolveStudentForRead } from '../services/learningAccess';
 import { originFilter, parseOriginView, studentsInView, type OriginView } from '../services/originScope';
 import { assignmentStatus, studentStatus } from '../services/assignments';
-import { getFeatureFlags } from '../services/featureFlags';
+import { getFeatureFlags, isFeatureEnabled } from '../services/featureFlags';
 import { getEnrolledInstances } from '../services/studentCourseService';
 import { ensurePlainObject, getOptionalId, getOptionalString, getRequiredId, getRequiredString, rejectMongoOperators } from '../utils/validation';
 
@@ -467,4 +467,21 @@ export const getOpsMetrics = asyncHandler(async (req: AuthRequest, res: Response
     notifications: notifications ? notifications.map((x: { _id: { kind: string; sent: boolean }; n: number }) => ({ kind: x._id.kind, sent: x._id.sent, count: x.n })) : null,
     submissions: { onTime: submissions.find((s: { _id: boolean }) => !s._id)?.n ?? 0, late: submissions.find((s: { _id: boolean }) => s._id === true)?.n ?? 0 },
   });
+});
+
+// GET /api/teaching/features — which AI tools the caller's own school has on,
+// so pages hide a button instead of failing after it is pressed. The same
+// checks the AI endpoints make; yes/no answers only, never other schools'.
+export const getTeachingFeatures = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const user = req.user!;
+  // Enara admins have no school of their own: hide nothing, the server decides.
+  if (user.role === 'enara-admin') { res.json({ aiAssessmentDrafts: true, aiLessonPlans: true, documents: true }); return; }
+  const institutionId = user.institutionId;
+  if (!institutionId) { res.json({ aiAssessmentDrafts: false, aiLessonPlans: false, documents: false }); return; }
+  const [aiAssessmentDrafts, aiLessonPlans, documents] = await Promise.all([
+    isFeatureEnabled(institutionId, 'ai_assessment_authoring_enabled'),
+    isFeatureEnabled(institutionId, 'ai_lesson_planning_enabled'),
+    isFeatureEnabled(institutionId, 'documents_workspace_enabled'),
+  ]);
+  res.json({ aiAssessmentDrafts, aiLessonPlans, documents });
 });
