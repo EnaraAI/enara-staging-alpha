@@ -107,9 +107,17 @@ export async function buildObjectiveContext(params: {
     const newEvidenceSince = Boolean(previous && recentEvidence.some((e) => e.occurredAt > previous.at));
     const improvedSince = (d: (typeof decisions)[number], now: number | null) =>
       typeof d.masteryAtDecision === 'number' && typeof now === 'number' ? now > d.masteryAtDecision + IMPROVEMENT_MARGIN : undefined;
+    // A plan counts as "tried without improvement" only if assessed evidence
+    // arrived after it (before the next plan, or until now) and the estimate did
+    // not rise. With no evidence in between, its effect is unknown, not "none":
+    // consecutive plans in different sessions must not trigger a switch (live
+    // check P21, Socratic -> Mastery without new evidence).
+    const evidenceBetween = (from: Date, to: Date | undefined) => recentEvidence.some((e) => e.occurredAt > from && (!to || e.occurredAt <= to));
     const tried = new Set<string>();
     for (let i = 0; i < decisions.length; i++) {
-      const later = i === 0 ? (newEvidenceSince ? estimate : null) : decisions[i - 1].masteryAtDecision ?? null;
+      const nextAt = i === 0 ? undefined : decisions[i - 1].at;
+      if (!evidenceBetween(decisions[i].at, nextAt)) continue;
+      const later = i === 0 ? estimate : decisions[i - 1].masteryAtDecision ?? null;
       if (improvedSince(decisions[i], later) === false) tried.add(decisions[i].strategyId);
     }
     const retentionLapsed = Boolean(

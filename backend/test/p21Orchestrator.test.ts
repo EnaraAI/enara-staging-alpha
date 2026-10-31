@@ -244,6 +244,20 @@ describe('orchestrator wiring (real MongoDB, synthetic records)', () => {
     expect(await M.PedagogicalDecision.countDocuments({ tutorSessionId: 'tut-s' })).toBe(2);
   });
 
+  it('plans in consecutive sessions with no assessed evidence in between never trigger a switch (live-check regression)', async () => {
+    // Live check: a proficient history student got Socratic, then (new session, no new
+    // evidence) Mastery Learning, because the earlier Socratic plan was wrongly counted
+    // as "tried without improvement".
+    await M.PedagogicalDecision.deleteMany({});
+    await mongoose.connection.collection('curriculums').updateOne({ id: 'cur' }, { $set: { id: 'cur', name: 'History: Industrial Revolution' } }, { upsert: true });
+    const turn = (session: string) => ctx.buildTeachingContext({ institutionId: S, studentId: 'stu-1', sessionObjectiveId: 'o-m1', tutorSessionId: session, channel: 'chat' });
+    const plans = [];
+    for (const session of ['sess-A', 'sess-B', 'sess-B', 'sess-C']) plans.push((await turn(session))!.teaching);
+    expect(plans.map((p) => p.primary)).toEqual(['socratic_questioning', 'socratic_questioning', 'socratic_questioning', 'socratic_questioning']);
+    expect(plans.flatMap((p) => p.reasonCodes ?? [])).not.toContain('STRATEGY_CHANGED');
+    await mongoose.connection.collection('curriculums').deleteOne({ id: 'cur' });
+  });
+
   it('decisions written by ped-v1 (no new fields) still load and count as "effect unknown"', async () => {
     await M.PedagogicalDecision.create({ id: 'pd-legacy', institutionId: S, studentId: 'stu-1', objectiveId: 'o-single', targetObjectiveId: 'o-single', strategyId: 'socratic_questioning', strategyVersion: 1, reasonCodes: ['NO_EVIDENCE'], supportingEvidenceIds: [], misconceptionIds: [], requiresReassessment: true, decisionVersion: 'ped-v1', at: new Date(Date.now() - 86_400_000) });
     const c = (await ctx.buildTeachingContext({ institutionId: S, studentId: 'stu-1', lessonId: 'L1', tutorSessionId: 'tut-l', channel: 'chat' }))!;
