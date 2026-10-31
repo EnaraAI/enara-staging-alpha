@@ -12,3 +12,19 @@ export function retryDelayMs(method: string, status: number, retryAfter: string 
   if (!retryAfter || !Number.isFinite(seconds) || seconds < 0) return null;
   return Math.min(MAX_WAIT_MS, seconds * 1000 + Math.floor(random() * JITTER_MS));
 }
+
+// Live-call transcription (ElevenLabs realtime): sessions are time-limited, so
+// a closed one is reopened while the call lasts. Each reopen fetches a new token
+// (a paid, budget-reserved call), so a session that keeps closing right after it
+// opens (quota used up, network refusing it) must not loop: the wait doubles
+// with each quick close, and after MAX_QUICK_CLOSES in a row it stops.
+// Quota and authentication errors stop it at once (no reconnect at all).
+export const QUICK_CLOSE_MS = 10_000;
+export const MAX_QUICK_CLOSES = 3;
+const RECONNECT_BASE_MS = 500;
+const RECONNECT_MAX_MS = 8_000;
+
+export function transcriptionReconnectDelayMs(quickCloses: number, fatal: boolean): number | null {
+  if (fatal || quickCloses >= MAX_QUICK_CLOSES) return null;
+  return Math.min(RECONNECT_MAX_MS, RECONNECT_BASE_MS * 2 ** quickCloses);
+}
