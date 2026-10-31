@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { EnaraMark } from '../brand/EnaraLogo';
 import { X, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { createClient, AnamEvent } from '@anam-ai/js-sdk';
 import { Assessment } from '../../types';
@@ -814,7 +815,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
                   <img src={myTutor.current.imageUrl} alt="" className="w-28 h-28 rounded-full object-cover border border-teal-400/40" />
                 ) : (
                   <div className="w-28 h-28 rounded-full bg-teal-600/20 border border-teal-400/40 grid place-items-center">
-                    <span className="text-4xl font-extrabold text-teal-300">E</span>
+                    <EnaraMark className="w-12 h-12 text-teal-300" />
                   </div>
                 )}
                 <p className="text-white font-bold">{myTutor?.current?.name || 'Enara tutor'} · voice</p>

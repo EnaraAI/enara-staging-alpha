@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { EnaraLogo } from './brand/EnaraLogo';
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -103,10 +104,7 @@ export const Header: React.FC<{
         )}
 
         <div className="flex items-center gap-2 ml-0.5 sm:ml-0">
-          <div className="w-8 h-8 rounded-md bg-teal-600 flex items-center justify-center" aria-hidden="true">
-            <span className="text-lg font-extrabold text-white">E</span>
-          </div>
-          <span className="text-xl font-extrabold text-slate-900 tracking-tight">Enara</span>
+          <EnaraLogo className="h-9 w-auto text-slate-900 shrink-0" />
           {role !== 'student' && (
             <span className="hidden sm:inline text-sm font-semibold text-slate-500 border-l border-slate-200 pl-2 ml-1">
               {isEnaraAdmin ? 'Executive' : getSessionUser()?.role === 'teacher' ? 'Teaching' : 'School admin'}
@@ -253,11 +251,7 @@ export const AdminSidebar: React.FC<{
       `}>
         <div className="lg:hidden px-6 mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-md bg-teal-600 flex items-center justify-center text-white font-extrabold" aria-hidden="true">E</div>
-            <div className="flex flex-col">
-              <span className="text-xl font-extrabold text-slate-900 leading-none">Enara</span>
-              
-            </div>
+            <EnaraLogo className="h-9 w-auto text-slate-900" />
           </div>
           <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600">
             <X size={20} />

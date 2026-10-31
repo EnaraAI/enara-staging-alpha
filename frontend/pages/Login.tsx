@@ -3,6 +3,7 @@ import { ArrowRight, AtSign, CircleAlert, Eye, EyeOff, Info, KeyRound, Lock } fr
 import { clearSession, login, SessionUser } from '../services/apiService';
 import { uiRoleFor, UiRole, LoginChoice } from '../services/roleRouting';
 import './Login.css';
+import { EnaraLogo } from '../components/brand/EnaraLogo';
 
 // Sign-in "Floating Classroom" (redesign concept B). The sign-in flow is the
 // same as before: the backend checks the email and password, and
@@ -161,7 +162,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
 
       <form className="si-card" onSubmit={handleSubmit} noValidate dir={rtl ? 'rtl' : 'ltr'} lang={lang}>
         <div className="si-top">
-          <div className="si-brand"><span className="si-logo">E</span><b>ENARA</b></div>
+          <div className="si-brand"><EnaraLogo className="si-logo" /></div>
           <div className="si-lang" role="group" aria-label={t.lang}>
             <button type="button" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>EN</button>
             <button type="button" aria-pressed={lang === 'ar'} onClick={() => setLang('ar')} lang="ar">ع</button>
