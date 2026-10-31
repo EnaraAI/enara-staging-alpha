@@ -23,6 +23,13 @@ const ACTIONS: Record<string, string> = {
   revisit_lesson: 'Revisit a lesson', prerequisite_practice: 'Prerequisite practice', targeted_exercise: 'Targeted exercise',
   check_in: 'Check-in', tutor_support: 'AI tutor support', spaced_review: 'Spaced review', reassessment: 'Reassessment', teacher_assigned: 'Practice',
 };
+const RESULT: Record<string, string> = {
+  insufficient_evidence: 'Not enough new assessment evidence yet to see a change.',
+  observed_change: 'Change observed in later assessments, but the before and after are not fully comparable.',
+  associated_with_intervention: 'Change in later assessments while this approach was used (an association, not proof it caused it).',
+};
+const CHANNEL: Record<string, string> = { chat: 'chat', stream: 'chat', voice: 'live calls' };
+const when = (d?: string) => (d ? new Date(d).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true }) : '');
 const SUB: Record<string, string> = {
   not_started: 'Not started', in_progress: 'In progress', submitted: 'Submitted', grading: 'Grading', grading_delayed: 'Grader stopped', awaiting_review: 'Awaiting review', graded: 'Final', released: 'Released', missing: 'Missing',
 };
@@ -99,6 +106,31 @@ function Profile({ studentId, classId, origin, onClose }: { studentId: string; c
           )}
         </Section>
       </div>
+      <Section title="Teaching approach" kind="Tutor plan">
+        {!p.teaching?.enabled ? <p className="text-slate-500">Adaptive teaching isn't on for your school.</p> : !p.teaching.items.length ? <p className="text-slate-500">The tutor hasn't chosen an approach yet. It does once the student works on an objective with the tutor.</p> : (
+          <ul className="space-y-3">
+            {p.teaching.items.map((t: any) => (
+              <li key={t.objectiveId} className="border-t border-slate-100 pt-3 first:border-0 first:pt-0">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="font-medium">{t.code ? `${t.code} ` : ''}{t.title ?? 'Objective'}</span>
+                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${t.source === 'teacher' ? 'bg-amber-50 text-amber-800' : 'bg-indigo-50 text-indigo-800'}`}>{t.source === 'teacher' ? 'Set by a teacher' : 'Chosen automatically'}</span>
+                </div>
+                <p className="mt-1 text-slate-900">
+                  <span className="font-semibold">{t.method.name}</span>
+                  {t.supporting.length > 0 && <> with {t.supporting.map((x: any) => x.name).join(' and ')}</>}
+                  {t.reinforcement && <span className="text-slate-600">, then {t.reinforcement.name}</span>}
+                </p>
+                {t.why && <p className="text-slate-600">Why: {t.why}{t.previousMethod ? ` Switched from ${t.previousMethod.name}.` : ''}</p>}
+                <p className="mt-1 text-xs text-slate-500">
+                  Used in {t.uses} tutor {t.uses === 1 ? 'turn' : 'turns'}{t.channels.length ? ` (${[...new Set(t.channels.map((c: string) => CHANNEL[c] ?? c))].join(', ')})` : ''} · last {when(t.lastUsedAt)}
+                </p>
+                {t.result && <p className="mt-1 text-xs text-slate-600">{RESULT[t.result.label] ?? t.result.label}{typeof t.result.observedChange === 'number' && t.result.label !== 'insufficient_evidence' ? ` Change: ${t.result.observedChange >= 0 ? '+' : ''}${Math.round(t.result.observedChange * 100)} points.` : ''}</p>}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-3 text-xs text-slate-500">The tutor picks the approach from this student's assessment evidence. To set one yourself, assign a method from Class Insights.</p>
+      </Section>
       <Section title="Follow-ups and interventions" kind="Actions">
         {!p.interventions.length ? <p className="text-slate-500">None yet.</p> : (
           <ul className="space-y-2">

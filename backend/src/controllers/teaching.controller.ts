@@ -10,6 +10,9 @@ import { CourseInstance } from '../models/CourseInstance';
 import { EDUCATOR_ACTIONS, LearningIntervention } from '../models/LearningIntervention';
 import { LearningEvent } from '../models/LearningEvent';
 import { LearningObjective } from '../models/LearningObjective';
+import { PedagogicalDecision } from '../models/PedagogicalDecision';
+import { TeachingEpisode } from '../models/TeachingEpisode';
+import { STRATEGY_BY_ID } from '../services/strategyRegistry';
 import { Student } from '../models/Student';
 import { StudentMisconception } from '../models/StudentMisconception';
 import { StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
@@ -194,6 +197,46 @@ export const getLearnerProfile = asyncHandler(async (req: AuthRequest, res: Resp
     const { buildPathway } = await import('../services/pathways');
     recommendations = (await buildPathway(student)).recommendations;
   }
+  // Teaching approach (P21): the latest tutor plan per objective, how often it
+  // was used and, when computed, what the assessment evidence did after it.
+  // Observational only; never costs.
+  let teaching: { objectiveId: string; [k: string]: unknown }[] | null = null;
+  if (flags?.adaptive_pedagogy_enabled) {
+    const latest = await PedagogicalDecision.aggregate([
+      { $match: { studentId: student.id } },
+      { $sort: { at: -1 } },
+      { $group: { _id: '$objectiveId', d: { $first: '$$ROOT' }, uses: { $sum: 1 }, channels: { $addToSet: '$channel' } } },
+      { $sort: { 'd.at': -1 } },
+      { $limit: 20 },
+    ]);
+    const episodes = latest.length
+      ? await TeachingEpisode.find({ studentId: student.id, objectiveId: { $in: latest.map((l: { _id: string }) => l._id) } })
+          .sort({ startAt: -1 })
+          .select('objectiveId primary label observedChange evidenceQuality startAt')
+          .lean()
+      : [];
+    const name = (id?: string) => (id ? STRATEGY_BY_ID.get(id)?.name ?? id.replace(/_/g, ' ') : undefined);
+    teaching = latest.map((l: { _id: string; uses: number; channels: (string | null)[]; d: Record<string, any> }) => {
+      const d = l.d;
+      const ep = episodes.find((e) => e.objectiveId === l._id && e.primary === d.strategyId);
+      objectiveIds.add(l._id);
+      return {
+        objectiveId: l._id,
+        method: { id: d.strategyId, name: name(d.strategyId) },
+        supporting: (d.supportingStrategyIds ?? []).map((id: string) => ({ id, name: name(id) })),
+        reinforcement: d.reinforcementStrategyId ? { id: d.reinforcementStrategyId, name: name(d.reinforcementStrategyId) } : null,
+        why: d.gap ?? null,
+        reasonCodes: d.reasonCodes ?? [],
+        source: d.interventionId || (d.reasonCodes ?? []).includes('TEACHER_ASSIGNED') ? 'teacher' : 'automatic',
+        previousMethod: d.previousStrategyId && d.previousStrategyId !== d.strategyId ? { id: d.previousStrategyId, name: name(d.previousStrategyId) } : null,
+        confidence: d.confidence ?? null,
+        lastUsedAt: d.at,
+        uses: l.uses,
+        channels: l.channels.filter(Boolean),
+        result: ep ? { label: ep.label, observedChange: ep.observedChange ?? null, evidenceQuality: ep.evidenceQuality, since: ep.startAt } : null,
+      };
+    });
+  }
   const codes = new Map((await LearningObjective.find({ id: { $in: [...objectiveIds] } }).select('id code title').lean()).map((o) => [o.id, o]));
   const label = (id?: string) => (id ? { objectiveId: id, code: codes.get(id)?.code, title: codes.get(id)?.title } : null);
 
@@ -221,6 +264,7 @@ export const getLearnerProfile = asyncHandler(async (req: AuthRequest, res: Resp
     estimates: estimates === null ? { enabled: false } : { enabled: true, items: (estimates as { objectiveId: string }[]).map((e) => ({ ...e, ...label(e.objectiveId) })) },
     misconceptions: misconceptions === null ? { enabled: false } : { enabled: true, items: (misconceptions as { objectiveId: string }[]).map((m) => ({ ...m, ...label(m.objectiveId) })) },
     recommendations: recommendations === null ? { enabled: false } : { enabled: true, items: recommendations },
+    teaching: teaching === null ? { enabled: false } : { enabled: true, items: teaching.map((t) => ({ ...t, ...label(t.objectiveId) })) },
     interventions: interventions.map((i) => ({
       id: i.id,
       action: i.interventionType,
