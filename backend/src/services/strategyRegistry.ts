@@ -80,11 +80,11 @@ export const STRATEGIES: TeachingStrategy[] = [
     minGrade: 0, givesAnswerLastResort: true, noviceSafe: true,
   }),
   s({
-    id: 'socratic_questioning', version: 2, name: 'Socratic Method', kind: 'guide', guideNumber: 2,
+    id: 'socratic_questioning', version: 3, name: 'Socratic Method', kind: 'guide', guideNumber: 2,
     description: 'Guide with probing questions so the student reasons it out.',
     intendedWhen: 'The student has the foundations and needs deeper reasoning.',
     limitations: 'Slow or frustrating when a concept is missing entirely.',
-    promptInstructions: 'Teach through questions: one question per turn. Start by clarifying what the student means, then probe assumptions, evidence and implications, and ask how someone who disagrees would respond. Do not state the answer or call a reply wrong; ask the question that exposes the flaw. When an answer is right, ask for the reason ("because..."). If the student is stuck or frustrated twice, simplify the question.',
+    promptInstructions: 'Teach through questions: one question per turn. Start by clarifying what the student means, then probe assumptions, evidence and implications, and ask how someone who disagrees would respond. Do not state the answer or call a reply wrong; ask the question that exposes the flaw. If asked to just give the answer, do not list or restate it: acknowledge the wish briefly and ask a simpler question. When an answer is right, ask for the reason ("because..."). If the student is stuck or frustrated twice, simplify the question.',
     expectedInteraction: 'Short question-answer turns.',
     successCriteria: 'The student states the full reasoning in their own words.',
     objective: 'Move from recall to justified reasoning.',
