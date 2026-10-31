@@ -331,7 +331,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   if (kind === 'opening') {
     const claimed = await AvatarSession.updateOne(
       { id: session.id, openingUsed: { $ne: true } },
-      { $set: { openingUsed: true, freeNudgesLeft: 2 } },
+      { $set: { openingUsed: true, freeNudgesLeft: 1 } },
     );
     if (!claimed.modifiedCount) throw new AppError('The call has already started', 409, 'AVATAR_TURN_REJECTED');
     messages = [];
@@ -391,10 +391,12 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
           { language: spokenLanguage ?? session.language, ...(pinned ? { pinnedLanguage: pinned } : {}) },
         )
       : Promise.resolve(),
-    // Teaching plan (ped-v2) for spoken turns: same orchestrator as chat, in a
-    // compact form; recorded with channel 'voice'. Null when adaptive pedagogy is
-    // off or no objective applies (the call then teaches as before).
-    session.studentId && kind === 'turn'
+    // Teaching plan (ped-v2) for every spoken line, the tutor's own opening and
+    // nudges included: same orchestrator as chat, in a compact form, with channel
+    // 'voice'. A nudge continues the turn it follows, so it uses the plan without
+    // logging another decision. Null when adaptive pedagogy is off or no
+    // objective applies (the call then teaches as before).
+    session.studentId
       ? buildTeachingContext({
           institutionId: session.institutionId,
           studentId: session.studentId,
@@ -402,6 +404,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
           tutorSessionId: session.id,
           channel: 'voice',
           compact: true,
+          record: kind !== 'nudge',
         })
       : Promise.resolve(null),
   ]);
@@ -445,9 +448,13 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     !curriculum && session.subject ? `Subject: ${session.subject}` : '',
     languageLine,
     kind === 'opening'
-      ? `(The call has just started and the student hasn't spoken yet. Open it yourself: greet ${learner?.firstName || 'the student'} by name in one short sentence, then make one specific offer that fits where they stand - pick up the current or next lesson, practise a weak topic from their recent quiz, or do their review questions due today - and end with a question. Under 40 words. Don't list everything you know.)`
+      ? plan
+        ? `(The call has just started and the student hasn't spoken yet. Open it yourself: greet ${learner?.firstName || 'the student'} by name in one short sentence, then begin the way your teaching plan says - a plan that explains or models first starts with a short explanation of the first step; a plan that questions starts with one question. Under 40 words. Don't list everything you know.)`
+        : `(The call has just started and the student hasn't spoken yet. Open it yourself: greet ${learner?.firstName || 'the student'} by name in one short sentence, then make one specific offer that fits where they stand - pick up the current or next lesson, practise a weak topic from their recent quiz, or do their review questions due today - and end with a question. Under 40 words. Don't list everything you know.)`
       : kind === 'nudge'
-        ? "(The student has been quiet for a while after your last question. Help them get unstuck: give one short hint or a simpler version of the question, or offer two answers to choose from. One or two sentences, warm, and don't repeat the question word for word.)"
+        ? plan
+          ? "(The student has been quiet for a while after your last question. Help them get unstuck the way your teaching plan says: if the plan explains or models, show the next step yourself with a short example instead of asking again; if it questions, give one hint or a simpler question. One or two sentences, warm, and don't repeat the question word for word.)"
+          : "(The student has been quiet for a while after your last question. Help them get unstuck: give one short hint or a simpler version of the question, or offer two answers to choose from. One or two sentences, warm, and don't repeat the question word for word.)"
         : last!.content,
   ]
     .filter(Boolean)
@@ -522,7 +529,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     );
   }
   // An answered student turn allows up to two hints if they then go quiet.
-  if (spoken && kind === 'turn') await AvatarSession.updateOne({ id: session.id }, { $set: { freeNudgesLeft: 2 } });
+  if (spoken && kind === 'turn') await AvatarSession.updateOne({ id: session.id }, { $set: { freeNudgesLeft: 1 } });
 
   // With browser transcription the language is already known for every turn.
   const target = last && !heardLanguage ? detectLanguageSwitch(last.content, session.language) : null;

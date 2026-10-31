@@ -301,6 +301,9 @@ export async function buildTeachingContext(params: {
   tutorSessionId?: string;
   channel: Channel;
   compact?: boolean;
+  // false: use the plan without logging a new decision (e.g. a voice nudge,
+  // which continues the turn it follows). Defaults to true.
+  record?: boolean;
 }): Promise<ObjectiveContext | null> {
   try {
     if (!(await isFeatureEnabled(params.institutionId, 'adaptive_pedagogy_enabled'))) return null;
@@ -313,7 +316,7 @@ export async function buildTeachingContext(params: {
       objectiveId: resolved.objectiveId,
       interventionId: params.interventionId,
       tutorSessionId: params.tutorSessionId,
-      record: true,
+      record: params.record ?? true,
       channel: params.channel,
       objectiveResolution: resolved.resolution,
       compact: params.compact,

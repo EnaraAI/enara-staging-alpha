@@ -348,12 +348,13 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       if (reply) voiceHistoryRef.current = [...messages, { role: 'assistant' as const, content: reply }].slice(-12);
       await voice.finishTurn();
       // Ended on a question: if the student stays quiet, help them along.
-      if (current() && /[?؟]\s*$/.test(reply) && nudgesRef.current < 2) {
+      // One nudge per student turn, after a longer pause: thinking time first.
+      if (current() && /[?؟]\s*$/.test(reply) && nudgesRef.current < 1) {
         silenceTimerRef.current = setTimeout(() => {
           if (!current()) return;
           nudgesRef.current += 1;
           void answerSpokenTurnRef.current(null, undefined, 'nudge');
-        }, 12_000);
+        }, 22_000);
       }
     } catch (e) {
       console.error('[AVATAR] Spoken answer failed', e);
