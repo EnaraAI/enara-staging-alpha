@@ -325,5 +325,24 @@ Causal estimates need a comparison design. A proposal for owner, ethics and prod
   - Problem-Based (mastered, applied, grade ≥ 7);
   - Concept Mapping (unit consolidation).
 
-  Grade-gated methods are only chosen when the grade is known. Tests: orchestrator 32/32, including a safety grid of 5,120 combinations. Full regression: 379 tests in 38 files.
-- **(5) Commit and deploy** and **(1) the live check** are reported separately.
+  Grade-gated methods are only chosen when the grade is known. Tests: orchestrator 33/33, including a safety grid of 5,120 combinations and the switching regression test below. Full regression: 380 tests in 38 files.
+- **(5) Commit and deploy.** Three local commits on `claude/codebase-review-kbxqan` (`37e8fe8`, `15583ae`, `3bf73e2`), not pushed. Deployed to staging with the Vercel CLI, smoke-tested (`/health`, `/ready`, student dashboard and courses, strategy list `ped-v2` / `reg-v2` / Socratic v3, the app page: all 200) and promoted as `dpl_AcKtqm8NUQvRcyFPmQJqXPvMoBWN`.
+- **(1) Live check of method adherence.** Real tutor (no mocks), synthetic tenant `P21C_` with 7 students in Mathematics, History and Biology at different mastery levels; 2 turns each; cap 20 calls.
+
+  | Student | Expected main method | Chosen | Followed the method |
+  |---|---|---|---|
+  | Beginning, maths | Formative Feedback | Formative Feedback | 2/2 |
+  | Emerging, maths | Direct Instruction | Direct Instruction | 2/2 |
+  | Developing, maths | Scaffolding | Scaffolding | 2/2 |
+  | Proficient, maths | Mastery Learning | Mastery Learning | 2/2 |
+  | Proficient, history, grade 8 | Socratic Questioning | Socratic Questioning | 1/2 (turn 2 restated the answer) |
+  | Mastered, history, grade 10 | Case-Based | Case-Based | 2/2 |
+  | Mastered, biology, grade 9 | Problem-Based | Problem-Based | 2/2 |
+
+  All 14 replies carried a decision ID with `ped-v2` / `reg-v2`. Two problems were found and fixed:
+  1. **Socratic gave in when asked for the answer.** Socratic v3 now acknowledges the wish and asks a simpler question instead of restating the content.
+  2. **A wrong switch between turns.** The evidence-based switching rule judged the previous plan "not improved" when no new assessment evidence had arrived since it began, so turn 2 of the re-check moved to Mastery Learning. A plan is now judged only when assessed evidence arrived after it (`3bf73e2`, with a regression test that fails on the old code).
+
+  **Final re-check** (after both fixes, same student, new session): both turns used Socratic Questioning v3 with Elaborative Interrogation. Turn 2 ("Just tell me the answer") acknowledged the request and asked a smaller question without listing the causes.
+
+  **Cost:** 18 tutor calls in total. The first run cost about $0.20 (12 calls logged at $0.17); the final re-check logged 2 calls at $0.017.
