@@ -124,10 +124,46 @@ export async function releaseAttempt(attempt: AttemptDoc, by: string) {
 export async function recordAttemptEvidence(attempt: AttemptDoc, questions: IQuestion[], subject?: string) {
   const byId = new Map(questions.map((q) => [q.id, q]));
   const at = attempt.submittedAt || new Date();
+  // Rubric criteria scored separately (open responses graded by the automatic
+  // grader or a teacher) give evidence for their own objectives at their own
+  // score (P21); before, every objective on the question got the whole question's
+  // score. Objectives also tagged on the question itself stay question-level.
+  const criterionEvents = attempt.answers.flatMap((a) => {
+    const q = byId.get(a.questionId);
+    if (!q?.rubric?.criteria?.length || !a.criterionScores?.length || a.method === 'rule') return [];
+    const questionLevel = new Set(q.objectiveIds || []);
+    return q.rubric.criteria.flatMap((c) => {
+      const objectiveIds = (c.objectiveIds || []).filter((o) => !questionLevel.has(o));
+      const scored = a.criterionScores!.find((cs) => cs.criterionId === c.id);
+      const max = Math.max(0, ...(c.levels || []).map((l) => l.points || 0));
+      if (!objectiveIds.length || !scored || !max) return [];
+      const fraction = Math.min(1, Math.max(0, (scored.points || 0) / max));
+      return [{
+        objectiveIds,
+        idempotencyKey: `attempt:${attempt.id}:q:${a.questionId}:c:${c.id}`,
+        studentId: attempt.studentId,
+        institutionId: attempt.institutionId,
+        type: 'question_answered' as const,
+        source: 'assessment' as const,
+        verified: true,
+        gradedBy: a.method === 'ai' ? ('ai' as const) : ('teacher' as const),
+        subject: subject || attempt.subject,
+        topic: a.topic || undefined,
+        refs: { assessmentId: attempt.assessmentId, attemptId: attempt.id, questionId: a.questionId, assignmentId: attempt.assignmentId, criterionId: c.id },
+        outcome: { correct: fraction >= 1, score: Math.round(fraction * 1000) / 1000 },
+        at,
+      }];
+    });
+  });
+  const criterionScored = (q: IQuestion | undefined, a: (typeof attempt.answers)[number]) =>
+    Boolean(q?.rubric?.criteria?.length && a.criterionScores?.length && a.method !== 'rule');
   await recordLearningEvents([
+    ...criterionEvents,
     ...attempt.answers.map((a) => {
       const q = byId.get(a.questionId);
-      const objectiveIds = [...new Set([...(q?.objectiveIds || []), ...(q?.rubric?.criteria || []).flatMap((c) => c.objectiveIds || [])])];
+      const objectiveIds = criterionScored(q, a)
+        ? [...new Set(q?.objectiveIds || [])]
+        : [...new Set([...(q?.objectiveIds || []), ...(q?.rubric?.criteria || []).flatMap((c) => c.objectiveIds || [])])];
       const byRule = a.method === 'rule';
       const byAi = a.method === 'ai';
       const fraction = a.maxPoints ? (a.points || 0) / a.maxPoints : 0;

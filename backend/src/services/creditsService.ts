@@ -160,22 +160,17 @@ export async function settleUsage(
 }
 
 export async function releaseUsage(reservation: UsageReservation) {
-  await StudentCredit.updateOne(
-    { studentId: reservation.studentId },
-    { $inc: { usage: -reservation.reservedCredits } }
-  );
-  await StudentCredit.updateOne(
-    { studentId: reservation.studentId, usage: { $lt: 0 } },
-    { $set: { usage: 0 } }
-  );
-  await StudentCredit.updateOne(
+  // One atomic update (P20; was three round trips): give the credits back,
+  // never below zero, and lift a throttle once usage is under the limit again.
+  const usage = { $max: [0, { $subtract: ['$usage', reservation.reservedCredits] }] };
+  await StudentCredit.updateOne({ studentId: reservation.studentId }, [
     {
-      studentId: reservation.studentId,
-      status: 'throttled',
-      $expr: { $lt: ['$usage', '$limit'] },
+      $set: {
+        usage,
+        status: { $cond: [{ $and: [{ $eq: ['$status', 'throttled'] }, { $lt: [usage, '$limit'] }] }, 'active', '$status'] },
+      },
     },
-    { $set: { status: 'active' } }
-  );
+  ]);
   await UsageEvent.updateOne({ id: reservation.eventId }, { $set: { status: 'released' } });
 }
 

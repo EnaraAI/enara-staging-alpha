@@ -48,7 +48,7 @@ import { Outcomes } from './pages/workspace/Outcomes';
 import { Usage } from './pages/workspace/Usage';
 import { SavingsCenter } from './pages/workspace/SavingsCenter';
 import { getSessionUser as sessionUser } from './services/apiService';
-import { ACADEMIC_MANAGER_PAGES, academicManagerPage, restoreUiRole, UiRole } from './services/roleRouting';
+import { ACADEMIC_MANAGER_PAGES, academicManagerPage, restoreUiRole, staffLandingPage, staffPageAllowed, UiRole } from './services/roleRouting';
 import { Assessment, Student } from './types';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -86,7 +86,7 @@ const App: React.FC = () => {
     const role = restoreUiRole(session?.role, savedRole);
     return {
       role,
-      page: role === 'student' && courseId ? 'courses' : 'dashboard',
+      page: role === 'student' && courseId ? 'courses' : role === 'admin' ? staffLandingPage(session?.role) : 'dashboard',
       activeAssessment: null,
       selectedStudent: null,
       sharedCourseId: courseId,
@@ -110,7 +110,8 @@ const App: React.FC = () => {
     loadAssessments()
       .then(list => { if (!cancelled) setAssessments(list); })
       .catch(err => console.warn('Could not load assessments:', err));
-    if (state.role !== 'student') {
+    // The school-wide student list is for school admins (teachers see their classes' rosters).
+    if (state.role !== 'student' && staffPageAllowed(getSessionUser()?.role, 'students')) {
       fetchStudents()
         .then(list => { if (!cancelled) setStudents(list); })
         .catch(err => console.warn('Could not load students:', err));
@@ -141,7 +142,7 @@ const App: React.FC = () => {
 
   const handleLogin = (role: UiRole, user: SessionUser) => {
     try { localStorage.setItem(UI_ROLE_KEY, role); } catch { /* storage unavailable */ }
-    let page = role === 'student' && state.sharedCourseId ? 'courses' : 'dashboard';
+    let page = role === 'student' && state.sharedCourseId ? 'courses' : role === 'admin' ? staffLandingPage(user.role) : 'dashboard';
     let activeAssessment = null;
 
     // If student and has a shared assessment, go directly to it
@@ -173,15 +174,17 @@ const App: React.FC = () => {
     setState(prev => ({ ...prev, page: 'courses', activeAssessment: null, selectedStudent: null, sharedCourseId: courseId }));
   };
 
-  const navigate = (page: string) => {
+  const navigate = (target: string) => {
+    // Teachers in the staff portal never open school-admin pages.
+    const backendRole = getSessionUser()?.role;
     setState(prev => ({ 
       ...prev, 
-      page, 
+      page: prev.role === 'admin' && !staffPageAllowed(backendRole, target) ? staffLandingPage(backendRole) : target, 
       activeAssessment: null, 
       selectedStudent: null, 
       // Only clear shared IDs if we're navigating to a different main area
-      sharedCourseId: page === 'courses' ? prev.sharedCourseId : null,
-      sharedAssessmentId: page === 'taking-assessment' ? prev.sharedAssessmentId : null
+      sharedCourseId: target === 'courses' ? prev.sharedCourseId : null,
+      sharedAssessmentId: target === 'taking-assessment' ? prev.sharedAssessmentId : null
     }));
   };
 

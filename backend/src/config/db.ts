@@ -5,10 +5,20 @@ import { logger, serializeError } from '../utils/logging';
 // Opens the Mongo connection. Also used to reconnect after an idle
 // disconnect (staging), so the staging database check runs every time.
 export async function openMongo(): Promise<void> {
-  const { mongoUri } = getConfig();
+  const { mongoUri, mongo } = getConfig();
 
+  // P20: a simultaneous start of 100 students opened many instances at once, each
+  // growing the driver's default pool (100) towards Atlas, which then refused TLS
+  // handshakes. Keep each instance's pool small, open connections two at a time,
+  // and give every wait (server selection, a free pooled connection, mongoose's
+  // own buffering) the same short limit so a refused cluster fails fast.
+  mongoose.set('bufferTimeoutMS', mongo.serverSelectionTimeoutMs);
   await mongoose.connect(mongoUri, {
-    serverSelectionTimeoutMS: 10_000,
+    maxPoolSize: mongo.maxPoolSize,
+    minPoolSize: 0,
+    maxConnecting: 2,
+    serverSelectionTimeoutMS: mongo.serverSelectionTimeoutMs,
+    waitQueueTimeoutMS: mongo.serverSelectionTimeoutMs,
   });
   // Staging: the connected database must be the staging one (checked again
   // after connecting, before anything is served).

@@ -4,8 +4,11 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors, { CorsOptions } from 'cors';
 import helmet from 'helmet';
 import { idleDbController, mountStagingFrontend } from './config/stagingSingleService';
+import { dbAvailabilityGate } from './config/dbAvailability';
+import { requestDeadline } from './middleware/requestDeadline';
 import rateLimit from 'express-rate-limit';
 import { createHash } from 'crypto';
+import { verifyAccessToken } from './auth/jwt';
 import path from 'path';
 import { getConfig } from './config/env';
 import { setupSwagger } from './config/swagger';
@@ -58,7 +61,19 @@ function corsOptions(): CorsOptions {
   };
 }
 
-function makeLimiter(name: string, windowMs: number, max: number, message: string, perUser = false, skip?: (req: Request) => boolean) {
+// The verified user behind a request, or undefined: a forged or expired token
+// never gets its own rate-limit bucket (it falls back to the IP address).
+function verifiedUserKey(req: Request): string | undefined {
+  const h = req.headers.authorization;
+  if (!h || !h.startsWith('Bearer ')) return undefined;
+  try {
+    return `uid:${verifyAccessToken(h.slice(7)).subject}`;
+  } catch {
+    return undefined;
+  }
+}
+
+function makeLimiter(name: string, windowMs: number, max: number, message: string, perUser: boolean | 'verified' = false, skip?: (req: Request) => boolean) {
   return rateLimit({
     windowMs,
     max,
@@ -67,7 +82,9 @@ function makeLimiter(name: string, windowMs: number, max: number, message: strin
     // Don't take the API down if the counter store fails.
     passOnStoreError: true,
     // Per signed-in user where a school's students share one IP address.
-    ...(perUser
+    ...(perUser === 'verified'
+      ? { keyGenerator: (req: Request) => verifiedUserKey(req) ?? req.ip ?? 'unknown' }
+      : perUser
       ? {
           keyGenerator: (req: Request) =>
             req.headers.authorization
@@ -96,6 +113,8 @@ export function createApp() {
   app.set('trust proxy', config.trustProxy);
 
   app.use(requestContext);
+  app.use(dbAvailabilityGate);
+  app.use(requestDeadline(config.requestDeadlineMs));
   if (config.dbIdleDisconnectMs) {
     app.use(idleDbController(config.dbIdleDisconnectMs).middleware);
   }
@@ -134,7 +153,12 @@ export function createApp() {
   app.use('/api/avatar/speak', makeLimiter('speak', 60 * 1000, 120, 'Too many speech requests', true));
   // /api/learning is limited per verified user instead (learning.routes.ts):
   // a class doing diagnostics shares the school's IP address.
-  app.use('/api', makeLimiter('api', 60 * 1000, 300, 'Too many API requests', false, (req) => req.path.startsWith('/learning/') && req.path !== '/learning/objectives/extract'));
+  // P19-1: 300/min per verified user (a class behind one school IP no longer
+  // shares one budget); unauthenticated or invalid-token traffic stays per IP.
+  // A coarse per-IP ceiling still bounds everything coming from one address.
+  const learningOwnLimiter = (req: Request) => req.path.startsWith('/learning/') && req.path !== '/learning/objectives/extract';
+  app.use('/api', makeLimiter('api', 60 * 1000, 300, 'Too many API requests', 'verified', learningOwnLimiter));
+  app.use('/api', makeLimiter('api-ip', 60 * 1000, 3000, 'Too many API requests from this network', false, learningOwnLimiter));
 
   app.use(express.json({ limit: config.requestBodyLimit, verify: captureRawBody }));
   app.use(express.urlencoded({ extended: false, limit: config.formBodyLimit, verify: captureRawBody }));

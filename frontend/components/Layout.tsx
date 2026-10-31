@@ -35,6 +35,7 @@ import {
   Grid3x3
 } from 'lucide-react';
 import { getSessionUser } from '../services/apiService';
+import { staffPageAllowed } from '../services/roleRouting';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -108,7 +109,7 @@ export const Header: React.FC<{
           <span className="text-xl font-extrabold text-slate-900 tracking-tight">Enara</span>
           {role !== 'student' && (
             <span className="hidden sm:inline text-sm font-semibold text-slate-500 border-l border-slate-200 pl-2 ml-1">
-              {isEnaraAdmin ? 'Executive' : 'School admin'}
+              {isEnaraAdmin ? 'Executive' : getSessionUser()?.role === 'teacher' ? 'Teaching' : 'School admin'}
             </span>
           )}
         </div>
@@ -142,7 +143,7 @@ export const Header: React.FC<{
           >
             <div className="flex flex-col items-end hidden md:flex">
               <span className="text-xs sm:text-sm font-semibold text-slate-800">{userName}</span>
-              <span className="text-[10px] sm:text-xs text-slate-500 capitalize">{role}</span>
+              <span className="text-[10px] sm:text-xs text-slate-500 capitalize">{({ teacher: 'teacher', academic_manager: 'academic manager' } as Record<string, string>)[getSessionUser()?.role ?? ''] ?? role}</span>
             </div>
             <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${isEnaraAdmin ? 'bg-slate-900' : 'bg-teal-600'} flex items-center justify-center text-white text-[10px] sm:text-xs font-bold`}>
               {userName.split(' ').map(n => n[0]).join('')}
@@ -223,7 +224,10 @@ export const AdminSidebar: React.FC<{
   ];
 
   const isWorkspaceAdmin = getSessionUser()?.role === 'admin';
-  const menuItems = isEnaraAdmin ? enaraMenuItems : adminMenuItems.filter((m) => !(m as { workspaceAdminOnly?: boolean }).workspaceAdminOnly || isWorkspaceAdmin);
+  const backendRole = getSessionUser()?.role;
+  const menuItems = isEnaraAdmin
+    ? enaraMenuItems
+    : adminMenuItems.filter((m) => (!(m as { workspaceAdminOnly?: boolean }).workspaceAdminOnly || isWorkspaceAdmin) && staffPageAllowed(backendRole, m.id));
 
   const handleNavigate = (id: string) => {
     onNavigate(id);

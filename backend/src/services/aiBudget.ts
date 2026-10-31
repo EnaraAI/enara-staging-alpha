@@ -450,10 +450,9 @@ async function settleOne(key: string, actualUsd: number | null): Promise<void> {
     const actual = actualUsd === null ? null : toMicros(actualUsd);
     const r = await BudgetReservation.findOneAndUpdate({ _id: key, status: 'reserved' }, { $set: { status: 'settled', actualMicros: actual, settledAt: new Date() } }, { new: false }).lean();
     if (!r) return;
-    for (const id of r.counters) {
-      if (actual === null) await BudgetCounter.updateOne({ _id: id }, { $inc: { unknownMicros: r.amountMicros } });
-      else await BudgetCounter.updateOne({ _id: id }, { $inc: { committedMicros: actual - r.amountMicros, settledMicros: actual } });
-    }
+    // One round trip for all counters (P20): the increments are independent.
+    const inc = actual === null ? { unknownMicros: r.amountMicros } : { committedMicros: actual - r.amountMicros, settledMicros: actual };
+    if (r.counters.length) await BudgetCounter.bulkWrite(r.counters.map((id: string) => ({ updateOne: { filter: { _id: id }, update: { $inc: inc } } })), { ordered: false });
     if (actual === null) logger.info('ai_budget_unknown_cost_retained', { institutionId: r.institutionId, feature: r.feature, provider: r.provider });
     if (actual !== null && actual > r.amountMicros) logger.warn('ai_budget_reservation_exceeded', { institutionId: r.institutionId, feature: r.feature });
   } catch (error) {
@@ -473,7 +472,7 @@ async function releaseOne(key: string): Promise<void> {
   try {
     const r = await BudgetReservation.findOneAndUpdate({ _id: key, status: 'reserved' }, { $set: { status: 'released', settledAt: new Date() } }, { new: false }).lean();
     if (!r) return;
-    for (const id of r.counters) await BudgetCounter.updateOne({ _id: id }, { $inc: { committedMicros: -r.amountMicros } });
+    if (r.counters.length) await BudgetCounter.bulkWrite(r.counters.map((id: string) => ({ updateOne: { filter: { _id: id }, update: { $inc: { committedMicros: -r.amountMicros } } } })), { ordered: false });
   } catch (error) {
     logger.error('ai_budget_release_failed', { key, error: serializeError(error) });
   }

@@ -22,6 +22,8 @@ const METHOD_GUIDANCE: Record<TeachingMethod, string> = {
     "Find where the student's reasoning went wrong, explain the mistake, then show the correct approach step by step.",
 };
 
+const PLAN_GUIDANCE = 'Teach with the teaching method given in the learning focus below.';
+
 let client: Anthropic | undefined;
 function getClient(apiKey: string): Anthropic {
   // One client per warm instance. Fit within the 60 s serverless limit: one
@@ -122,7 +124,7 @@ export function isDirectTutorModelConfigured(): boolean {
   return Boolean(getConfig().anthropicApiKey);
 }
 
-interface TutorRequestParams {
+export interface TutorRequestParams {
   query: string;
   history: ChatHistoryItem[];
   teachingMethod: TeachingMethod;
@@ -136,6 +138,9 @@ interface TutorRequestParams {
   // Learning-intelligence context for one objective: target, evidence summary
   // and the teaching strategy to use (services/learningContext.ts).
   pedagogy?: string;
+  // A teaching plan (ped-v2) is in `pedagogy`: its method replaces the legacy
+  // per-session teaching-method line, so the two never contradict each other.
+  planActive?: boolean;
   // Retrieved course passages (services/curriculumRetrieval.ts). When given,
   // they replace sending whole lesson files.
   sourcesPrompt?: string;
@@ -154,7 +159,7 @@ export const PROACTIVE_TEACHING =
 // the server strips it and draws the visual.
 export const SHOW_VISUAL_MARKER = '[SHOW]';
 
-async function buildTutorRequest(params: TutorRequestParams) {
+export async function buildTutorRequest(params: TutorRequestParams) {
   const config = getConfig();
   // History must start with a user turn. A conversation the tutor opened itself
   // keeps that opening, after a stand-in for the start of the call.
@@ -189,7 +194,7 @@ async function buildTutorRequest(params: TutorRequestParams) {
       text:
         "You are Enara's AI tutor for school students. Reply in the student's language (English or Arabic), " +
         style +
-        METHOD_GUIDANCE[params.teachingMethod] +
+        (params.planActive ? PLAN_GUIDANCE : METHOD_GUIDANCE[params.teachingMethod]) +
         ' ' +
         PROACTIVE_TEACHING,
     },
@@ -295,13 +300,18 @@ export async function queryDirectTutorModel(
 
 // Streams the reply text as it is generated. Yields nothing if the model is
 // unconfigured or fails before any text; a refusal ends the stream early.
-export async function* streamDirectTutorModel(params: TutorRequestParams): AsyncGenerator<string> {
+// How a stream ended, for callers that need it: refused, failed (possibly after
+// some text was sent), and the model and context count of a complete reply.
+export interface StreamStatus { refused?: boolean; failed?: boolean; model?: string; contextFound?: number }
+
+export async function* streamDirectTutorModel(params: TutorRequestParams, status: StreamStatus = {}): AsyncGenerator<string> {
   const config = getConfig();
   if (!config.anthropicApiKey) return;
 
   const feature = params.mode === 'voice' ? 'tutor_voice' : 'tutor_chat';
   try {
-    const { body, bound } = await buildTutorRequest(params);
+    const { body, bound, materialsCount } = await buildTutorRequest(params);
+    status.contextFound = (params.curriculum ? 1 : 0) + materialsCount;
     const client = getClient(config.anthropicApiKey);
     // The gateway logs ai_calls and meters each attempt; a consumer that stops
     // reading early aborts the stream.
@@ -311,7 +321,9 @@ export async function* streamDirectTutorModel(params: TutorRequestParams): Async
         yield event.delta.text;
       }
     }
+    status.model = out.final?.model;
     if (out.final?.stop_reason === 'refusal') {
+      status.refused = true;
       logger.warn('direct_tutor_model_refused', { category: out.final.stop_details?.category ?? null });
     }
   } catch (error) {
@@ -319,6 +331,7 @@ export async function* streamDirectTutorModel(params: TutorRequestParams): Async
     // So are budget refusals and pauses: the caller reports them.
     const code = (error as { code?: string }).code;
     if (code === 'USAGE_METERING_FAILED' || BUDGET_ERROR_CODES.has(code ?? '')) throw error;
+    status.failed = true;
     logModelError(error);
   }
 }

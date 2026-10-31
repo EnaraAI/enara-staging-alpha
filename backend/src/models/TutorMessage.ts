@@ -1,6 +1,20 @@
 import { Schema, model, Document } from 'mongoose';
 import type { ChatRole, TeachingMethod } from './TutorSession';
 
+export interface TeachingMeta {
+  decisionId?: string;
+  objectiveId?: string;
+  objectiveResolution: string;
+  primary: string;
+  supporting?: string[];
+  reinforcement?: string;
+  modifiers?: string[];
+  reasonCodes?: string[];
+  primaryVersion?: number;
+  decisionVersion: string;
+  registryVersion: string;
+}
+
 // One chat message, stored on its own so long conversations don't grow the
 // session document without bound. Sessions created before this collection
 // existed may still hold older messages embedded in TutorSession.messages;
@@ -21,6 +35,8 @@ export interface ITutorMessageDoc extends Document {
     version?: string;
     teachingMethod?: TeachingMethod;
     citations?: { n: number; fileName: string; page: number | null; lessonId: string; chunkId: string }[];
+    // The teaching plan this reply followed (P21); absent on older messages.
+    teaching?: TeachingMeta;
   };
 }
 
@@ -41,6 +57,23 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
       version: String,
       teachingMethod: String,
       citations: { type: [{ n: Number, fileName: String, page: Number, lessonId: String, chunkId: String, _id: false }], default: undefined },
+      teaching: {
+        type: {
+          decisionId: String,
+          objectiveId: String,
+          objectiveResolution: String,
+          primary: String,
+          supporting: { type: [String], default: undefined },
+          reinforcement: String,
+          modifiers: { type: [String], default: undefined },
+          reasonCodes: { type: [String], default: undefined },
+          primaryVersion: Number,
+          decisionVersion: String,
+          registryVersion: String,
+          _id: false,
+        },
+        default: undefined,
+      },
     },
   },
   { collection: 'tutor_messages', versionKey: false },

@@ -74,6 +74,11 @@ export interface AppConfig {
   // sleep. Both are honoured only with ENARA_STAGING=true.
   frontendDir?: string;
   dbIdleDisconnectMs?: number;
+  // MongoDB client limits per process (P20). Every serverless instance opens its
+  // own pool, so the pool must stay small, and a refused cluster must fail fast.
+  mongo: { maxPoolSize: number; serverSelectionTimeoutMs: number };
+  // GET /api requests answer 503 + Retry-After after this long (P20).
+  requestDeadlineMs: number;
   // Cumulative cap on all AI spend while testing a deployment (P14.2), grading
   // included. Separate from school budgets; see aiBudget.ts.
   aiTestSpend?: { id: string; capUsd: number };
@@ -426,6 +431,11 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       staging && readString(source, "DB_IDLE_DISCONNECT_MS")
         ? readNumber(source, "DB_IDLE_DISCONNECT_MS", 240_000, { min: 30_000, max: 3_600_000 })
         : undefined,
+    mongo: {
+      maxPoolSize: readNumber(source, "MONGO_MAX_POOL_SIZE", 10, { min: 1, max: 100 }),
+      serverSelectionTimeoutMs: readNumber(source, "MONGO_SERVER_SELECTION_TIMEOUT_MS", 10_000, { min: 1_000, max: 30_000 }),
+    },
+    requestDeadlineMs: readNumber(source, "REQUEST_DEADLINE_MS", 25_000, { min: 1_000, max: 55_000 }),
   };
 }
 

@@ -158,6 +158,8 @@ export async function recordAttempt(rec: AttemptRecord): Promise<boolean> {
 // Before a provider attempt: per-school rate limit (non-grading), pauses and
 // the budget reservation. Throws before the provider is called if refused.
 export async function reserveAttempt(meta: GatewayMeta, operationKey: string, ttlMs?: number): Promise<BudgetTicket> {
+  const shared = getCallContext().request;
+  if (shared) shared.aiStarted = true;
   const who = owner(meta);
   const provider = meta.provider ?? 'anthropic';
   await checkInstitutionAiRate(who.institutionId, meta.feature);

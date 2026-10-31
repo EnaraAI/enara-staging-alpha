@@ -9,6 +9,7 @@ import { estimateMastery } from './masteryModel';
 import { detectMisconceptions } from './misconceptionRules';
 import { updateTimeToUnderstand } from './timeToUnderstand';
 import { updateRetention } from './retention';
+import { recomputeStudentEpisodesSafely } from './teachingImpact';
 
 const MAX_ATTEMPTS = 5;
 
@@ -180,6 +181,8 @@ export async function processPendingEvidence(params: { studentId?: string; insti
       logger.warn('misconception_detection_failed', { studentId, error: serializeError(error) }),
     ),
   );
+  // Teaching episodes (P21) read the new evidence: derived, never throws.
+  await inBatches([...byStudent.keys()], STUDENT_CONCURRENCY, (studentId) => recomputeStudentEpisodesSafely(studentId));
   return { processed, failed, masteryUpdated: touched.size };
 }
 

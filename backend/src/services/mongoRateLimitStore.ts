@@ -1,6 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import type { IncrementResponse, Options, Store } from 'express-rate-limit';
 import { logger, serializeError } from '../utils/logging';
+import { dbUnavailable, isDbDownError, isDbUnavailableError, markDbUnavailable } from '../config/dbAvailability';
 
 // Rate-limit counters shared by every serverless instance. One document per
 // limiter and client; MongoDB deletes it once the window has passed.
@@ -34,11 +35,17 @@ export class MongoRateLimitStore implements Store {
 
   async increment(key: string): Promise<IncrementResponse> {
     const now = Date.now();
-    if (mongoose.connection.readyState !== 1) return this.incrementLocally(key, now);
+    // While the database is known to be unreachable, count locally rather than
+    // wait on it again before the request is even routed (P20).
+    if (mongoose.connection.readyState !== 1 || dbUnavailable()) return this.incrementLocally(key, now);
     const resetAt = new Date(now + this.windowMs);
     try {
       return await this.incrementShared(key, now, resetAt);
     } catch (error) {
+      if (isDbUnavailableError(error)) {
+        if (isDbDownError(error)) markDbUnavailable();
+        return this.incrementLocally(key, now);
+      }
       // Callers decide whether to allow (passOnStoreError); never silently.
       logger.error('rate_limit_store_failed', { limiter: this.prefix, error: serializeError(error) });
       throw error;

@@ -1,3 +1,4 @@
+import { ASSESSMENT_KINDS, type AssessmentKind } from './Assessment';
 import { Schema, model, Document } from 'mongoose';
 
 // An assessment version given to a class (or some of its students) with its
@@ -60,6 +61,8 @@ export interface IAssignment extends Document {
   answerReveal: 'after-submit' | 'after-close' | 'never';
   // Tutor help while the assignment is open.
   tutorPolicy: 'allowed' | 'hints_only' | 'blocked';
+  // Overrides the assessment's kind for this assignment (e.g. a quiz reused as a unit test). P21.
+  assessmentKind?: AssessmentKind;
   // 'conversation': an AI examiner asks the questions in a conversation; the
   // student's replies are the answers, graded like written ones.
   // 'english_conversation' (P4): a teacher-controlled spoken English exam;
@@ -96,6 +99,7 @@ const assignmentSchema = new Schema<IAssignment>(
     releasePolicy: { type: String, enum: ['auto', 'manual'], default: 'auto' },
     answerReveal: { type: String, enum: ['after-submit', 'after-close', 'never'], default: 'after-close' },
     tutorPolicy: { type: String, enum: ['allowed', 'hints_only', 'blocked'], default: 'hints_only' },
+    assessmentKind: { type: String, enum: ASSESSMENT_KINDS },
     format: { type: String, enum: ['written', 'conversation', 'english_conversation'], default: 'written' },
     speaking: { type: Schema.Types.Mixed, default: undefined },
     extensions: { type: [{ studentId: String, dueAt: Date, by: String, at: Date, reason: String, _id: false }], default: [] },

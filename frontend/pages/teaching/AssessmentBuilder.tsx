@@ -36,7 +36,7 @@ const TYPES = [
 
 type Level = { id: string; label: string; points: number; description?: string };
 type Criterion = { id: string; title: string; description?: string; levels: Level[] };
-type Q = { id: string; type: string; text: string; options?: string[]; correctAnswer?: string; explanation?: string; modelAnswer?: string; points?: number; rubric?: { criteria: Criterion[] }; source?: string; objectiveIds?: string[]; sources?: { chunkId: string; uploadId?: string; fileName: string; page?: number | null; section?: string }[]; sourceStatus?: 'supported' | 'no_supporting_source' };
+type Q = { id: string; type: string; text: string; options?: string[]; correctAnswer?: string; explanation?: string; modelAnswer?: string; points?: number; rubric?: { criteria: Criterion[] }; source?: string; objectiveIds?: string[]; sources?: { chunkId: string; uploadId?: string; fileName: string; page?: number | null; section?: string }[]; sourceStatus?: 'supported' | 'no_supporting_source'; difficulty?: number; cognitiveLevel?: number };
 
 function AiDraftForm({ classes, onDone, onClose }: { classes: any[]; onDone: (assessmentId: string) => void; onClose: () => void }) {
   const withCurriculum = classes.filter((c) => c.curriculumId);
@@ -106,6 +106,11 @@ const blankQuestion = (type = 'multiple-choice'): Q =>
         ? { id: uid('q'), type, text: '', correctAnswer: '', points: 1 }
         : { id: uid('q'), type, text: '', options: ['', ''], correctAnswer: '', points: 1 };
 
+// Optional exam metadata (P21): used to compare like with like when measuring
+// learning. Left unset, it stays unset (never guessed).
+const KINDS: [string, string][] = [['', 'Not specified'], ['diagnostic', 'Diagnostic'], ['formative', 'Formative check'], ['quiz', 'Quiz'], ['unit_test', 'Unit test'], ['midterm', 'Midterm exam'], ['final', 'Final exam'], ['teacher_exam', 'Teacher exam'], ['retention_check', 'Retention check'], ['practice', 'Practice']];
+const LEVELS: [number, string][] = [[1, 'Remember'], [2, 'Understand'], [3, 'Apply'], [4, 'Analyse'], [5, 'Evaluate'], [6, 'Create']];
+
 const LIFECYCLE: Record<string, string> = { draft: 'Draft', published: 'Published', archived: 'Archived' };
 
 function RubricEditor({ value, onChange }: { value: Criterion[]; onChange: (c: Criterion[]) => void }) {
@@ -170,7 +175,7 @@ export const AssessmentBuilder: React.FC = () => {
   };
   const newDraft = () => { setDoc({ title: '', subject: '', curriculumId: curricula[0]?.[0] ?? '', instructions: '', questions: [blankQuestion()], lifecycle: 'draft' }); setVersions([]); setProblems(null); };
 
-  const payload = () => ({ title: doc.title, subject: doc.subject || 'General', curriculumId: doc.curriculumId || undefined, instructions: doc.instructions || undefined, questions: doc.questions.map((q: Q) => ({ ...q, points: q.type === 'open-response' ? undefined : Number(q.points ?? 1) })) });
+  const payload = () => ({ title: doc.title, subject: doc.subject || 'General', curriculumId: doc.curriculumId || undefined, instructions: doc.instructions || undefined, assessmentKind: doc.assessmentKind || (doc.id ? null : undefined), questions: doc.questions.map((q: Q) => ({ ...q, points: q.type === 'open-response' ? undefined : Number(q.points ?? 1) })) });
 
   const save = async () => {
     setBusy(true);
@@ -305,6 +310,11 @@ export const AssessmentBuilder: React.FC = () => {
                   {curricula.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
                 </select>
               </label>
+              <label className="text-sm text-slate-700">Assessment type
+                <select disabled={!editable} className="mt-1 w-full border border-slate-300 rounded px-2 py-1.5" value={doc.assessmentKind ?? ''} onChange={(e) => setDoc({ ...doc, assessmentKind: e.target.value || undefined })}>
+                  {KINDS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                </select>
+              </label>
               <label className="text-sm text-slate-700 sm:col-span-2">Instructions<textarea disabled={!editable} dir="auto" className="mt-1 w-full border border-slate-300 rounded px-2 py-1.5" value={doc.instructions ?? ''} onChange={(e) => setDoc({ ...doc, instructions: e.target.value })} /></label>
             </div>
 
@@ -355,6 +365,20 @@ export const AssessmentBuilder: React.FC = () => {
                 ) : (
                   <label className="text-sm text-slate-700 inline-flex items-center gap-2">Points<input disabled={!editable} type="number" min={0} max={100} className="w-20 border border-slate-300 rounded px-2 py-1" value={q.points ?? 1} onChange={(e) => setQ(i, { ...q, points: Number(e.target.value) })} /></label>
                 )}
+                <div className="flex flex-wrap gap-3">
+                  <label className="text-sm text-slate-700 inline-flex items-center gap-2">Thinking level
+                    <select disabled={!editable} aria-label="Thinking level" className="border border-slate-300 rounded px-2 py-1 text-sm" value={q.cognitiveLevel ?? ''} onChange={(e) => setQ(i, { ...q, cognitiveLevel: e.target.value ? Number(e.target.value) : undefined })}>
+                      <option value="">Not set</option>
+                      {LEVELS.map(([v, l]) => <option key={v} value={v}>{v} · {l}</option>)}
+                    </select>
+                  </label>
+                  <label className="text-sm text-slate-700 inline-flex items-center gap-2">Difficulty
+                    <select disabled={!editable} aria-label="Question difficulty" className="border border-slate-300 rounded px-2 py-1 text-sm" value={q.difficulty ?? ''} onChange={(e) => setQ(i, { ...q, difficulty: e.target.value ? Number(e.target.value) : undefined })}>
+                      <option value="">Not set</option>
+                      {[1, 2, 3, 4, 5].map((v) => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </label>
+                </div>
                 {q.type !== 'open-response' && <input disabled={!editable} aria-label="Explanation" dir="auto" className="w-full border border-slate-300 rounded px-2 py-1 text-sm" value={q.explanation ?? ''} placeholder="Explanation shown with the answer key" onChange={(e) => setQ(i, { ...q, explanation: e.target.value })} />}
               </div>
             ))}

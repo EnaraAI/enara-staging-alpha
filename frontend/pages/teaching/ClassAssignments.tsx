@@ -46,7 +46,7 @@ function CreateAssignment({ classes, onDone, onClose }: { classes: any[]; onDone
   const [f, setF] = useState<any>({
     classId: classes[0]?.id ?? '', assessmentId: '', title: '', instructions: '',
     opensAt: toLocalInput(now), dueAt: toLocalInput(new Date(now.getTime() + 7 * 86400000)), closesAt: '',
-    latePolicy: 'not_accepted', maxAttempts: 1, timeLimitMinutes: '', answerReveal: 'after-close', tutorPolicy: 'hints_only', format: 'written', draft: false,
+    latePolicy: 'not_accepted', maxAttempts: 1, timeLimitMinutes: '', answerReveal: 'after-close', tutorPolicy: 'hints_only', format: 'written', draft: false, assessmentKind: '',
   });
   const [busy, setBusy] = useState(false);
   const [speaking, setSpeaking] = useState(DEFAULT_SPEAKING);
@@ -65,6 +65,7 @@ function CreateAssignment({ classes, onDone, onClose }: { classes: any[]; onDone
         timeZone: localTz, latePolicy: f.latePolicy, maxAttempts: Number(f.maxAttempts),
         timeLimitMinutes: f.timeLimitMinutes ? Number(f.timeLimitMinutes) : undefined,
         answerReveal: f.answerReveal, tutorPolicy: f.tutorPolicy, format: f.format, draft: f.draft,
+        ...(f.assessmentKind ? { assessmentKind: f.assessmentKind } : {}),
         ...(f.format === 'english_conversation' ? { speaking: speakingPayload(speaking) } : {}),
       });
       toast.success(f.draft ? 'Saved as draft' : 'Assigned', f.draft ? 'Publish it when ready.' : 'Students will see it from the opening time.');
@@ -99,6 +100,7 @@ function CreateAssignment({ classes, onDone, onClose }: { classes: any[]; onDone
       <label className="block text-sm">How students answer<select className={field} value={f.format} onChange={(e) => set('format', e.target.value)}><option value="written">Written answers</option><option value="conversation">Conversation with an AI examiner (open and short answers only)</option><option value="english_conversation">English speaking exam (voice)</option></select></label>
       {f.format === 'english_conversation' && <SpeakingSettingsFields value={speaking} onChange={setSpeaking} classId={f.classId} />}
       {f.format === 'english_conversation' && <SpeakingPreview assessmentId={f.assessmentId} speaking={speaking} />}
+      <label className="block text-sm">Counts as<select className={field} value={f.assessmentKind} onChange={(e) => set('assessmentKind', e.target.value)}><option value="">Same as the assessment</option><option value="diagnostic">Diagnostic</option><option value="formative">Formative check</option><option value="quiz">Quiz</option><option value="unit_test">Unit test</option><option value="midterm">Midterm exam</option><option value="final">Final exam</option><option value="teacher_exam">Teacher exam</option><option value="retention_check">Retention check</option><option value="practice">Practice</option></select></label>
       <label className="block text-sm">AI tutor while open<select className={field} value={f.tutorPolicy} onChange={(e) => set('tutorPolicy', e.target.value)}><option value="hints_only">Hints only</option><option value="allowed">Allowed</option><option value="blocked">Not available</option></select></label>
       <label className="text-sm inline-flex items-center gap-2"><input type="checkbox" checked={f.draft} onChange={(e) => set('draft', e.target.checked)} /> Save as draft (not visible to students)</label>
       <div className="flex justify-end gap-2"><button onClick={onClose} className="px-3 py-2 text-sm rounded-lg border border-slate-300">Cancel</button><button disabled={busy || !f.assessmentId} onClick={save} className="px-3 py-2 text-sm rounded-lg bg-indigo-700 text-white font-semibold disabled:opacity-50">{f.draft ? 'Save draft' : 'Assign'}</button></div>

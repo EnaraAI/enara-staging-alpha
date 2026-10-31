@@ -1,0 +1,225 @@
+{
+ "phase": "P20",
+ "date": "2026-10-30",
+ "status": "FAIL",
+ "deployment": "dpl_BgztikQS7KaowoixcuBGo21J6T3G",
+ "environment": "staging",
+ "run": {
+  "releasedUtc": "2026-10-30T20:34:35Z",
+  "releasedCairo": "10:34:35 PM",
+  "endUtc": "2026-10-30T20:38:20Z",
+  "reruns": 0,
+  "workers": 100,
+  "startSpreadMs": 19.76,
+  "within100ms": 100,
+  "loadGenerator": {
+   "cpuS": 43.8,
+   "maxRssMB": 35.7,
+   "netRxMB": 3.64,
+   "netTxMB": 3.74,
+   "cpus": 4
+  },
+  "warmup": "GET /health (does not open the database)"
+ },
+ "journeys": {
+  "completed": 0,
+  "failedAtStep1to2": 100,
+  "reachedTutorOrGrading": 0,
+  "unsafeReleases": 0,
+  "misassociations": 0,
+  "crossUserAccess": 0
+ },
+ "requestsAtStart": {
+  "byEndpoint": {
+   "1 workspace": {
+    "200": 3,
+    "500": 1,
+    "504": 96
+   },
+   "2 courses": {
+    "200": 15,
+    "504": 80,
+    "500": 5
+   },
+   "2 assignments": {
+    "500": 2,
+    "504": 59,
+    "200": 39
+   },
+   "2 next-steps": {
+    "504": 12,
+    "200": 88
+   }
+  },
+  "total": {
+   "200": 145,
+   "500": 8,
+   "504": 247
+  },
+  "sentAfter150s": {
+   "200": 82,
+   "504": 3
+  },
+  "lastFailureSec": 222.8,
+  "postRunDashboard": {
+   "status": 200,
+   "ms": 1165
+  }
+ },
+ "rootCause": {
+  "label": "APP-RECORDED evidence, DERIVED mechanism",
+  "logSignatures": {
+   "Task timed out after 60 seconds": 121,
+   "MongoServerSelectionError": 49,
+   "MongoNetworkError": 29,
+   "ReplicaSetNoPrimary": 23,
+   "tlsv1 alert internal error (SSL alert 80) from Atlas": "40+"
+  },
+  "mechanism": "burst of database requests grows each instance pool towards the driver default maxPoolSize 100 (not set); Atlas refuses TLS handshakes; requests wait on the database until the 60 s function limit; self-recovers after ~3.5 min. Staging idle disconnect is not set on Vercel (not a factor).",
+  "unavailable": [
+   "Atlas tier and connection limit",
+   "Atlas metrics",
+   "Vercel instance count"
+  ]
+ },
+ "ai": {
+  "tutorCalls": 0,
+  "gradingCalls": 0,
+  "nextStepsNoteCallsLogged": 53,
+  "nextStepsNoteLoggedCostUsd": 0.004474,
+  "schoolDayCounterDeltaUsd": 0.00799,
+  "testSpendDerivedUsd": 0.583,
+  "testCapUsd": 30
+ },
+ "postRunIntegrity": {
+  "assignmentStatus": {
+   "200": 100
+  },
+  "attemptsPerStudent": {
+   "0": 100
+  },
+  "p20TutorSessions": {
+   "(200, 0)": 100
+  }
+ },
+ "preflightBlocked": {
+  "phase": "P20",
+  "date": "2026-10-30",
+  "status": "BLOCKED",
+  "paidCallsMade": 0,
+  "deployment": "dpl_756oCbJoG7VTv7PZTuxh3xrXtiBq",
+  "target": "staging (enara-staging-alpha.vercel.app)",
+  "budget": {
+   "testCapUsd": 10,
+   "testSpendUsedUsdDerived": 4.3647,
+   "testSpendNote": "derived from the school month counter delta since the spend id was set; the test-spend counter itself is not readable (UNVERIFIED); P19.2 (running) adds ~0.3-0.7",
+   "schoolDailyCapUsd": 6,
+   "schoolDayCommittedUsdAtCheck": 5.176839,
+   "schoolMonthCommittedUsdAtCheck": 5.207783,
+   "providerLimit": "operator-attested >= $15 (UNVERIFIED)",
+   "perCallReservationUsd": {
+    "tutor": "0.106-0.167",
+    "gradingEvaluation": "~0.061 (maxTokens 3000: ~0.09)"
+   },
+   "p20EstimateUsd": {
+    "expected": 4.3,
+    "realisticWorst": 6.0,
+    "hardWorstAllProductRetries": 25.8
+   },
+   "peakReservationForTrueSimultaneousUsd": {
+    "tutor100": "11-17",
+    "grading200evals": "~12-18"
+   }
+  },
+  "harnessValidationZeroCost": {
+   "coldConnections": {
+    "workers": 100,
+    "scheduledStartUtc": "2026-10-30T18:08:00",
+    "startSpreadMs": 48.371,
+    "within100ms": 100,
+    "offsetMs": {
+     "min": 0.002,
+     "p50": 24.7925,
+     "max": 48.373
+    },
+    "statuses": {
+     "200": 100
+    },
+    "latencyMs": {
+     "p50": 7607.5,
+     "p95": 8708,
+     "p99": 8762,
+     "max": 8872
+    },
+    "loadGenerator": {
+     "cpuUserS": 8.743,
+     "cpuSysS": 0.362,
+     "maxRssMB": 106.8,
+     "netRxKB": 1860,
+     "netTxKB": 1425,
+     "cpus": 4
+    }
+   },
+   "warmConnections": {
+    "workers": 100,
+    "scheduledStartUtc": "2026-10-30T18:09:12",
+    "startSpreadMs": 15.817,
+    "within100ms": 100,
+    "statuses": {
+     "200": 100
+    },
+    "latencyMs": {
+     "p50": 161.5,
+     "p95": 2148,
+     "p99": 2236,
+     "max": 2242
+    },
+    "loadGeneratorCpuS": 21.53,
+    "maxRssMB": 31.7
+   },
+   "serverReceiptEvidence": "Vercel log search returned only 50/100 (cold) and 5/100 (warm) /health entries: cold arrivals spread ~2.0 s; warm subset within 40 ms"
+  },
+  "blockers": [
+   "B1 school daily AI budget ($6) has ~$0.82 headroom today; even after the UTC day rollover it admits only ~35-55 simultaneous tutor reservations",
+   "B2 test-spend cap ($10, ~$5 left) cannot hold ~$11-18 of simultaneous reservations; raising it needs the guard maximum changed in code and a deploy",
+   "B3 provider budget only operator-attested; P20 requires verification",
+   "B4 test-spend counter not independently readable (direct DB read refused by policy)",
+   "B5 per-IP API limit 300/min: a single-IP simultaneous start sends ~500 requests in seconds; ~40% would be refused by design (P19-1)"
+  ]
+ },
+ "recommendations": [
+  "bound maxPoolSize per instance",
+  "fail fast with 503 + Retry-After",
+  "check Atlas tier/connection limit or add a pooler",
+  "staging idle disconnect: not active on Vercel, no change needed",
+  "re-run P20 once after fixes (warm and cold variants), with approval"
+ ],
+ "fixesImplementedLocally": {
+  "deployed": false,
+  "committed": false,
+  "files": [
+   "backend/src/config/db.ts",
+   "backend/src/config/env.ts",
+   "backend/src/config/dbAvailability.ts",
+   "backend/src/serverlessHandler.ts",
+   "backend/src/vercel.ts",
+   "backend/src/middleware/errorHandler.ts",
+   "backend/src/app.ts",
+   "backend/src/services/mongoRateLimitStore.ts",
+   "frontend/services/retryPolicy.ts",
+   "frontend/services/apiService.ts"
+  ],
+  "tests": {
+   "backend/test/p20DbAvailability.test.ts": "4/4",
+   "frontend/services/retryPolicy.test.ts": "5/5",
+   "backendRegression": "30 files, 276 tests pass (9 AI-mocking files not run)",
+   "tsc": "clean (backend, frontend)",
+   "builds": "pass"
+  },
+  "outageMeasured": {
+   "firstRequestMs": 1510,
+   "next20RequestsMs": 51,
+   "note": "test selection timeout 1.5 s; production 10 s"
+  }
+ }
+}

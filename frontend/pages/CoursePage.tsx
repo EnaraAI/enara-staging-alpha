@@ -1,6 +1,6 @@
 import {
   createTutorSession,
-  sendTutorMessage,
+  streamTutorMessage,
   fetchMyCourses,
   fetchMyCourse,
   completeMyLesson,
@@ -332,7 +332,14 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
     setInputText('');
     setIsTyping(true);
 
-    let response: string;
+    // The reply appears as the tutor writes it (streamed), in one message bubble.
+    const replyId = (Date.now() + 1).toString();
+    const showReply = (text: string) => {
+      setIsTyping(false);
+      setChatMessages(prev => prev.some(m => m.id === replyId)
+        ? prev.map(m => (m.id === replyId ? { ...m, text } : m))
+        : [...prev, { id: replyId, role: 'ai', text, timestamp: new Date() }]);
+    };
     try {
       let sessionId = tutorSessionId;
       if (!sessionId) {
@@ -340,21 +347,18 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
         sessionId = session.id as string;
         setTutorSessionId(sessionId);
       }
-      const result: any = await sendTutorMessage(sessionId, textToSend, {
+      const result: any = await streamTutorMessage(sessionId, textToSend, {
         courseId: selectedCourse?.id,
         lessonId: selectedLesson?.id,
         subject: selectedCourse?.subject,
         lessonTitle: selectedLesson?.title,
-      });
-      response = result.assistantMessage?.text || 'No response received.';
+      }, showReply);
+      showReply(result.assistantMessage?.text || 'No response received.');
     } catch (err) {
       const message = errorMessage(err, 'The tutor is unavailable right now.');
       toast.error('AI Tutor error', message);
-      response = `Sorry, I couldn't reach the tutor: ${message}`;
+      showReply(`Sorry, I couldn't reach the tutor: ${message}`);
     }
-
-    setIsTyping(false);
-    setChatMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'ai', text: response, timestamp: new Date() }]);
   };
 
   const handleReadAloud = async (message: ChatMessage) => {

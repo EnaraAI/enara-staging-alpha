@@ -1,17 +1,21 @@
 import { assignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { isFeatureEnabled, isShadowMode } from '../services/featureFlags';
 import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSource } from '../services/curriculumRetrieval';
-import { buildObjectiveContext } from '../services/learningContext';
+import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
 import {
   curriculumFromCourse,
   isDirectTutorModelConfigured,
   queryDirectTutorModel,
+  streamDirectTutorModel,
   type TutorCurriculum,
+  type StreamStatus,
+  type TutorRequestParams,
 } from '../services/directTutorModel';
+import { logger, serializeError } from '../utils/logging';
 import { getConfig } from '../config/env';
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
-import { asyncHandler, AppError } from '../middleware/errorHandler';
+import { asyncHandler, AppError, creditReservationError } from '../middleware/errorHandler';
 import { toPlainObject } from '../utils/serialize';
 import { TutorSession, TeachingMethod } from '../models/TutorSession';
 import { generateMessageId, generateTutorSessionId } from '../utils/idGenerator';
@@ -138,38 +142,46 @@ export const clearTutorSessions = asyncHandler(async (req: AuthRequest, res: Res
   res.json({ message: 'Tutor sessions cleared', deleted: result.deletedCount });
 });
 
-export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Response) => {
+type TurnContext = {
+  courseId?: string;
+  lessonId?: string;
+  subject?: string;
+  lessonTitle?: string;
+  curriculumSummary?: string;
+};
+
+// One tutor turn, prepared up to the provider call. Shared by the JSON and the
+// streaming endpoints, so both apply the same session, policy and credit checks.
+interface TutorTurn {
+  studentId: string;
+  session: InstanceType<typeof TutorSession>;
+  text: string;
+  method: TeachingMethod;
+  userMessage: { id: string; role: 'user'; text: string; timestamp: Date };
+  earlierCount: number;
+  lessonTitle?: string;
+  reservation?: UsageReservation;
+  sources: RetrievedSource[];
+  // Set when the orchestrator should be asked first.
+  orchestrator?: Parameters<typeof queryOrchestratorChat>[0];
+  // The teaching plan (ped-v2) and the metadata stored on the reply.
+  plan?: ObjectiveContext | null;
+  // Builds the direct-model request (retrieval, objective focus, learner snapshot).
+  directParams?: () => Promise<TutorRequestParams>;
+}
+
+async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
   const studentId = req.user!.studentId!;
   const session = await TutorSession.findOne({ id: req.params.id, studentId });
   if (!session) throw new AppError('Tutor session not found', 404);
 
-  const {
-    text,
-    teachingMethod,
-    context,
-  } = req.body as {
-    text?: string;
-    teachingMethod?: TeachingMethod;
-    context?: {
-      courseId?: string;
-      lessonId?: string;
-      subject?: string;
-      lessonTitle?: string;
-      curriculumSummary?: string;
-    };
-  };
-
+  const { text, teachingMethod, context } = req.body as { text?: string; teachingMethod?: TeachingMethod; context?: TurnContext };
   if (!text?.trim()) throw new AppError('Message text is required');
 
   const method: TeachingMethod = teachingMethod || session.teachingMethod || 'socratic';
   if (teachingMethod) session.teachingMethod = teachingMethod;
 
-  const userMessage = {
-    id: generateMessageId(),
-    role: 'user' as const,
-    text: text.trim(),
-    timestamp: new Date(),
-  };
+  const userMessage = { id: generateMessageId(), role: 'user' as const, text: text.trim(), timestamp: new Date() };
   const earlier = await loadTutorMessages(session);
 
   const courseId = context?.courseId || session.courseId;
@@ -236,72 +248,72 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
     throw new AppError(`The AI tutor is off while you work on "${tutorPolicy.title}"`, 403, 'TUTOR_BLOCKED');
   }
   const extraRules = [session.handoff?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean) as string[];
-  let reservation: UsageReservation | undefined;
-  let sources: RetrievedSource[] = [];
-  let aiResult: TutorReply | null = null;
-  if (enaraCourseId || isDirectTutorModelConfigured()) {
-    try {
-      reservation = await reserveUsage({
-        userId: req.user!.id,
-        studentId,
-        feature: 'chat',
-        sessionId: session.id,
-      });
-    } catch (err) {
-      throw new AppError((err as Error).message, 402, 'CREDIT_LIMIT_EXCEEDED');
-    }
+  const turn: TutorTurn = { studentId, session, text: text.trim(), method, userMessage, earlierCount: earlier.length, lessonTitle, sources: [] };
+  if (!(enaraCourseId || isDirectTutorModelConfigured())) return turn;
 
-    if (enaraCourseId && !extraRules.length) {
-      aiResult = await queryOrchestratorChat({
-        course_id: enaraCourseId,
-        query: enrichedQuery,
-        section_ids: enaraSectionId ? [enaraSectionId] : undefined,
-        chat_history: history,
-        teaching_method: method,
-      });
-    }
-    // Orchestrator down or unconfigured: answer with the direct model instead.
-    if (!aiResult) {
-      // Course passages for this question (school-scoped), with citations.
-      sources = (await isFeatureEnabled(session.institutionId, 'learning_intelligence_enabled')) && !(await isShadowMode(session.institutionId))
-        ? await retrieveCurriculumSources({
-            institutionId: session.institutionId,
-            curriculumId: session.curriculumId,
-            query: text.trim(),
-            lessonId: session.lessonId,
-            objectiveId: session.objectiveId,
-          }).catch(() => [])
-        : [];
-      const focus = session.objectiveId
-        ? await buildObjectiveContext({
-            institutionId: session.institutionId,
-            studentId,
-            objectiveId: session.objectiveId,
-            interventionId: session.interventionId,
-            tutorSessionId: session.id,
-            record: true,
-          })
-        : null;
-      aiResult = await queryDirectTutorModel({
-        query: enrichedQuery,
-        history,
-        teachingMethod: method,
-        curriculum,
-        pedagogy: [focus?.prompt, ...extraRules].filter(Boolean).join('\n\n') || undefined,
-        sourcesPrompt: sources.length ? sourcesPrompt(sources) : undefined,
-        learner: await getLearnerSnapshot(studentId).then((l) => (l ? describeSnapshot(l) : undefined)),
-      });
-    }
+  try {
+    turn.reservation = await reserveUsage({ userId: req.user!.id, studentId, feature: 'chat', sessionId: session.id });
+  } catch (err) {
+    throw creditReservationError(err);
   }
+  // Teaching plan for this turn (adaptive pedagogy on; objective from the session
+  // or its lesson). A plan is a rule set like a handoff: the turn then goes to the
+  // direct model, where it is applied (the external orchestrator cannot take it).
+  turn.plan = await buildTeachingContext({
+    institutionId: session.institutionId,
+    studentId,
+    sessionObjectiveId: session.objectiveId,
+    lessonId: session.lessonId,
+    interventionId: session.interventionId,
+    tutorSessionId: session.id,
+    channel: req.path.endsWith('/stream') ? 'stream' : 'chat',
+  });
+  if (enaraCourseId && !extraRules.length && !turn.plan) {
+    turn.orchestrator = {
+      course_id: enaraCourseId,
+      query: enrichedQuery,
+      section_ids: enaraSectionId ? [enaraSectionId] : undefined,
+      chat_history: history,
+      teaching_method: method,
+    };
+  }
+  turn.directParams = async () => {
+    // Course passages for this question (school-scoped), with citations.
+    turn.sources = (await isFeatureEnabled(session.institutionId, 'learning_intelligence_enabled')) && !(await isShadowMode(session.institutionId))
+      ? await retrieveCurriculumSources({
+          institutionId: session.institutionId,
+          curriculumId: session.curriculumId,
+          query: turn.text,
+          lessonId: session.lessonId,
+          objectiveId: session.objectiveId,
+        }).catch(() => [])
+      : [];
+    return {
+      query: enrichedQuery,
+      history,
+      teachingMethod: method,
+      curriculum,
+      pedagogy: [turn.plan?.prompt, ...extraRules].filter(Boolean).join('\n\n') || undefined,
+      planActive: Boolean(turn.plan),
+      sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
+      learner: await getLearnerSnapshot(studentId).then((l) => (l ? describeSnapshot(l) : undefined)),
+    };
+  };
+  return turn;
+}
 
+// Settles or releases the credits and saves both messages. A null reply (no
+// model answer) gives the credits back and saves the local fallback reply.
+async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
+  let aiResult = reply;
   if (!aiResult) {
-    if (reservation) await releaseUsage(reservation);
-    aiResult = buildFallbackTutorReply(text.trim(), method, lessonTitle);
-  } else if (reservation) {
-    await settleUsage(reservation, { model: aiResult.version });
-    reservation = undefined;
+    if (turn.reservation) await releaseUsage(turn.reservation);
+    aiResult = buildFallbackTutorReply(turn.text, turn.method, turn.lessonTitle);
+  } else if (turn.reservation) {
+    await settleUsage(turn.reservation, { model: aiResult.version });
   }
-
+  turn.reservation = undefined;
+  const citations = citationsIn(aiResult.answer, turn.sources);
   const assistantMessage = {
     id: generateMessageId(),
     role: 'ai' as const,
@@ -311,30 +323,97 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
       intent: aiResult.intent,
       contextFound: aiResult.context_found,
       version: aiResult.version,
-      teachingMethod: method,
-      ...(citationsIn(aiResult.answer, sources).length ? { citations: citationsIn(aiResult.answer, sources) } : {}),
+      teachingMethod: turn.method,
+      ...(citations.length ? { citations } : {}),
+      // Recorded only when the plan was actually used for this reply (a model reply).
+      ...(turn.plan && reply ? { teaching: turn.plan.teaching } : {}),
     },
   };
-
-  await appendTutorMessages(session, [userMessage, assistantMessage], { source: 'tutor_chat' });
-  session.messageCount = earlier.length + 2;
+  const { session } = turn;
+  await appendTutorMessages(session, [turn.userMessage, assistantMessage], { source: 'tutor_chat' });
+  session.messageCount = turn.earlierCount + 2;
   session.lastMessageAt = new Date();
-
   if (!session.title || session.title === 'AI Tutor chat' || session.title === 'New chat') {
-    session.title = text.trim().slice(0, 60);
+    session.title = turn.text.slice(0, 60);
   }
-
   await session.save();
+  return { aiResult, assistantMessage };
+}
 
+const replyMeta = (aiResult: TutorReply, method: TeachingMethod) => ({
+  intent: aiResult.intent,
+  contextFound: aiResult.context_found,
+  version: aiResult.version,
+  teachingMethod: method,
+});
+
+export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const turn = await prepareTutorTurn(req);
+  let reply: TutorReply | null = null;
+  if (turn.orchestrator) reply = await queryOrchestratorChat(turn.orchestrator);
+  // Orchestrator down or unconfigured: answer with the direct model instead.
+  if (!reply && turn.directParams) reply = await queryDirectTutorModel(await turn.directParams());
+  const { aiResult, assistantMessage } = await finishTutorTurn(turn, reply);
   res.json({
-    userMessage,
+    userMessage: turn.userMessage,
     assistantMessage,
-    session: await toSessionResponse(session),
-    meta: {
-      intent: aiResult.intent,
-      contextFound: aiResult.context_found,
-      version: aiResult.version,
-      teachingMethod: method,
-    },
+    session: await toSessionResponse(turn.session),
+    meta: replyMeta(aiResult, turn.method),
   });
+});
+
+// P20: the same turn, streamed as the model writes it (server-sent events), so
+// the student sees the first words seconds after the model starts instead of
+// waiting for the whole reply. Errors before the stream starts are ordinary
+// HTTP errors; after it starts they are an `error` event. Events:
+//   user {message} · token {delta} · replace {text} (the model failed or refused
+//   mid-reply: show this instead) · done {assistantMessage, meta, session} · error {code, message}
+export const streamTutorMessage = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const turn = await prepareTutorTurn(req);
+  let open = true;
+  res.on('close', () => { open = false; });
+  res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders?.();
+  const send = (event: Record<string, unknown>) => { if (open) res.write(`data: ${JSON.stringify(event)}\n\n`); };
+  send({ type: 'user', message: turn.userMessage });
+  // Keep the connection visibly alive while the turn is prepared.
+  const heartbeat = setInterval(() => { if (open) res.write(': waiting\n\n'); }, 5_000);
+  try {
+    let reply: TutorReply | null = null;
+    if (turn.orchestrator) {
+      reply = await queryOrchestratorChat(turn.orchestrator);
+      if (reply) send({ type: 'token', delta: reply.answer });
+    }
+    if (!reply && turn.directParams) {
+      const params = await turn.directParams();
+      const status: StreamStatus = {};
+      let answer = '';
+      for await (const delta of streamDirectTutorModel(params, status)) {
+        if (!open) break; // the student left: stop generating (metered as cancelled)
+        answer += delta;
+        send({ type: 'token', delta });
+      }
+      if (!open) {
+        if (turn.reservation) await releaseUsage(turn.reservation);
+        return;
+      }
+      // A refusal or a failure mid-reply makes the streamed text unusable: the
+      // fallback replaces it below, as the JSON endpoint would answer.
+      const ok = answer.trim() && !status.refused && !status.failed;
+      reply = ok ? { answer: answer.trim(), intent: 'direct_model', context_found: status.contextFound ?? 0, version: `anthropic:${status.model ?? 'unknown'}` } : null;
+    }
+    const { aiResult, assistantMessage } = await finishTutorTurn(turn, reply);
+    if (!reply) send({ type: 'replace', text: aiResult.answer });
+    send({ type: 'done', messageId: assistantMessage.id, assistantMessage, meta: replyMeta(aiResult, turn.method), session: await toSessionResponse(turn.session) });
+  } catch (error) {
+    if (turn.reservation) await releaseUsage(turn.reservation).catch(() => undefined);
+    const code = (error as { code?: string }).code || 'TUTOR_STREAM_FAILED';
+    logger.error('tutor_stream_failed', { requestId: req.requestId, code, error: serializeError(error) });
+    send({ type: 'error', code, message: error instanceof AppError ? error.message : 'The tutor could not finish this reply. Please try again.' });
+  } finally {
+    clearInterval(heartbeat);
+    if (open) res.end();
+  }
 });

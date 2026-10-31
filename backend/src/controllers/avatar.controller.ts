@@ -6,13 +6,14 @@ import { randomUUID } from 'crypto';
 import { Response } from 'express';
 import { getConfig } from '../config/env';
 import { AuthRequest } from '../middleware/auth.middleware';
-import { asyncHandler, AppError } from '../middleware/errorHandler';
+import { asyncHandler, AppError, creditReservationError } from '../middleware/errorHandler';
 import { AvatarSession, IAvatarSession } from '../models/AvatarSession';
 import { finalizeAvatarUsage, sweepAvatarUsage } from '../services/avatarUsage';
 import { reserveAttempt } from '../services/aiGateway';
 import { releaseAiBudget } from '../services/aiBudget';
 import { releaseUsage, reserveUsage, settleUsage } from '../services/creditsService';
 import { describeSnapshot, getLearnerSnapshot } from '../services/learnerSnapshot';
+import { buildTeachingContext } from '../services/learningContext';
 import { resolveTutorFace } from '../services/tutorFaceService';
 import {
   curriculumFromCourse,
@@ -374,13 +375,13 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   if (tutorPolicy.policy === 'blocked') throw new AppError('The AI tutor is off while an assignment is open', 403, 'TUTOR_BLOCKED');
 
   // Independent setup runs in parallel: every millisecond here is silence on the call.
-  const [curriculum, learner, reservation] = await Promise.all([
+  const [curriculum, learner, reservation, , plan] = await Promise.all([
     loadSessionCurriculum(session),
     session.studentId ? getLearnerSnapshot(session.studentId) : Promise.resolve(undefined),
     session.studentId && kind === 'turn'
       ? reserveUsage({ userId: req.user!.id, studentId: session.studentId, feature: 'voice', sessionId: session.id }).catch(
           (err) => {
-            throw new AppError((err as Error).message, 402, 'CREDIT_LIMIT_EXCEEDED');
+            throw creditReservationError(err);
           },
         )
       : Promise.resolve(undefined),
@@ -390,6 +391,19 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
           { language: spokenLanguage ?? session.language, ...(pinned ? { pinnedLanguage: pinned } : {}) },
         )
       : Promise.resolve(),
+    // Teaching plan (ped-v2) for spoken turns: same orchestrator as chat, in a
+    // compact form; recorded with channel 'voice'. Null when adaptive pedagogy is
+    // off or no objective applies (the call then teaches as before).
+    session.studentId && kind === 'turn'
+      ? buildTeachingContext({
+          institutionId: session.institutionId,
+          studentId: session.studentId,
+          lessonId: session.lessonId,
+          tutorSessionId: session.id,
+          channel: 'voice',
+          compact: true,
+        })
+      : Promise.resolve(null),
   ]);
   if (spokenLanguage) session.language = spokenLanguage;
 
@@ -457,7 +471,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       curriculum,
       mode: 'voice',
       learner: learner ? describeSnapshot(learner) : undefined,
-      pedagogy: policyRule(tutorPolicy.policy),
+      pedagogy: [plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined,
+      planActive: Boolean(plan),
     })) {
       if (headDone) {
         emit(chunk);

@@ -9,7 +9,7 @@ export function requestContext(req: Request, res: Response, next: NextFunction):
     (Array.isArray(incoming) ? incoming[0] : incoming)?.slice(0, 128) || randomUUID();
   req.requestId = requestId;
   res.setHeader('X-Request-Id', requestId);
-  runWithCallContext({ requestId }, next);
+  runWithCallContext({ requestId, memo: new Map(), request: { aiStarted: false } }, next);
 }
 
 export function requestLogger(req: Request, res: Response, next: NextFunction): void {

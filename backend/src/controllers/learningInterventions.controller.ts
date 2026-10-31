@@ -62,6 +62,9 @@ export const createIntervention = asyncHandler(async (req: AuthRequest, res: Res
   if (!(TYPES as readonly unknown[]).includes(interventionType)) throw new AppError('interventionType is invalid', 400, 'VALIDATION_ERROR');
   const strategyId = isStudent ? undefined : getOptionalString(body, 'strategyId', { max: 60 });
   if (strategyId && !STRATEGY_BY_ID.has(strategyId)) throw new AppError('Unknown strategyId', 400, 'VALIDATION_ERROR');
+  // A teacher-assigned strategy leads the session, so it must be able to be primary
+  // (not a scheduler or modifier such as spaced_repetition or adaptive_pathways).
+  if (strategyId && !STRATEGY_BY_ID.get(strategyId)!.roles?.includes('primary')) throw new AppError('This strategy cannot lead a session', 400, 'VALIDATION_ERROR');
 
   const evidence = await LearningEvidence.find({ studentId: student.id, objectiveId, result: 'incorrect', invalidatedAt: { $exists: false } })
     .sort({ occurredAt: -1 })

@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { requireInstitutionId } from '../auth/authorization';
-import { Assessment } from '../models/Assessment';
+import { ASSESSMENT_KINDS, Assessment } from '../models/Assessment';
 import { AssessmentAttempt } from '../models/AssessmentAttempt';
 import { Assignment, type IAssignment } from '../models/Assignment';
 import { CourseInstance } from '../models/CourseInstance';
@@ -135,6 +135,8 @@ export const createAssignment = asyncHandler(async (req: AuthRequest, res: Respo
     releasePolicy: oneOf(body.releasePolicy, RELEASE, 'releasePolicy') ?? 'auto',
     answerReveal: oneOf(body.answerReveal, REVEAL, 'answerReveal') ?? 'after-close',
     tutorPolicy: oneOf(body.tutorPolicy, TUTOR, 'tutorPolicy') ?? 'hints_only',
+    // Optional (P21): overrides the assessment's kind for this assignment.
+    assessmentKind: oneOf(body.assessmentKind, ASSESSMENT_KINDS, 'assessmentKind'),
     format: oneOf(body.format, FORMAT, 'format') ?? 'written',
     speaking: undefined as ReturnType<typeof parseSpeakingSettings> | undefined,
     extensions: [],
@@ -243,6 +245,7 @@ export const updateAssignment = asyncHandler(async (req: AuthRequest, res: Respo
   if (body.releasePolicy !== undefined) a.releasePolicy = oneOf(body.releasePolicy, RELEASE, 'releasePolicy')!;
   if (body.answerReveal !== undefined) a.answerReveal = oneOf(body.answerReveal, REVEAL, 'answerReveal')!;
   if (body.tutorPolicy !== undefined) a.tutorPolicy = oneOf(body.tutorPolicy, TUTOR, 'tutorPolicy')!;
+  if (body.assessmentKind !== undefined) a.assessmentKind = body.assessmentKind === null ? undefined : oneOf(body.assessmentKind, ASSESSMENT_KINDS, 'assessmentKind');
   if (body.speaking !== undefined || (body.format === 'english_conversation' && a.format !== 'english_conversation')) {
     // Speaking settings are frozen once the exam is published or started.
     if (a.state !== 'draft' || (await AssessmentAttempt.exists({ assignmentId: a.id }))) throw new AppError('Published exam settings are frozen; create a new assignment to change them', 409, 'SPEAKING_SETTINGS_FROZEN');

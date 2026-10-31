@@ -34,9 +34,9 @@ import {
   deleteTutorSession,
   clearTutorSessions,
   sendTutorMessage,
+  streamTutorMessage,
 } from '../controllers/tutor.controller';
 import {
-  streamTutorMessage,
   tutorVisualize,
   tutorTts,
 } from '../controllers/tutorExtras.controller';

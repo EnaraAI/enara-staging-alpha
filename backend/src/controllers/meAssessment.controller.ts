@@ -5,7 +5,7 @@ import { Response } from 'express';
 import { queueQuizMistakes } from '../services/reviewService';
 import { forgetLearnerSnapshot } from '../services/learnerSnapshot';
 import { AuthRequest } from '../middleware/auth.middleware';
-import { asyncHandler, AppError } from '../middleware/errorHandler';
+import { asyncHandler, AppError, creditReservationError } from '../middleware/errorHandler';
 import { toPlainObject } from '../utils/serialize';
 import { Assessment, AssessmentVersion, type IQuestion } from '../models/Assessment';
 import { studentFacingContent } from '../services/assessmentVersions';
@@ -282,7 +282,7 @@ export const submitAssessmentAttempt = asyncHandler(async (req: AuthRequest, res
   } catch (err) {
     // Not graded if it couldn't be paid for: the student can submit again later.
     await reopen();
-    throw new AppError((err as Error).message, 402, 'CREDIT_LIMIT_EXCEEDED');
+    throw creditReservationError(err);
   }
   const reveal = canRevealAnswers(assessment, used);
 

@@ -4,14 +4,19 @@ import { LessonProgress } from '../models/LessonProgress';
 import { Student } from '../models/Student';
 import { AppError } from '../middleware/errorHandler';
 import { STUDENT_VISIBLE_COURSE_FILTER } from './courseVisibility';
+import { requestMemo } from '../utils/callContext';
 
 export async function getStudentOrThrow(studentId: string) {
-  const student = await Student.findOne({ id: studentId });
+  const student = await requestMemo(`student:${studentId}`, () => Student.findOne({ id: studentId }).exec());
   if (!student) throw new AppError('Student profile not found', 404);
   return student;
 }
 
-export async function getEnrolledInstances(studentId: string) {
+export function getEnrolledInstances(studentId: string) {
+  return requestMemo(`enrolled:${studentId}`, () => readEnrolledInstances(studentId));
+}
+
+async function readEnrolledInstances(studentId: string) {
   const student = await getStudentOrThrow(studentId);
   const filter: Record<string, unknown>[] = [{ studentIds: studentId }];
   if (student.batchId) {
@@ -24,7 +29,8 @@ export async function getEnrolledInstances(studentId: string) {
     $or: filter,
   })
     .sort({ createdAt: -1 })
-    .limit(100);
+    .limit(100)
+    .exec();
 }
 
 export async function getVisibleCurriculumIdsForStudent(studentId: string): Promise<string[]> {

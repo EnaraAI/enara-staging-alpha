@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { trackAiCall } from './aiCalls';
+import { textTokenBound } from './priceCatalog';
 import { getConfig } from '../config/env';
 import { logger } from '../utils/logging';
 import { describeSnapshot, LearnerSnapshot } from './learnerSnapshot';
@@ -63,20 +63,17 @@ export async function nextStepsNote(s: LearnerSnapshot, steps: NextStep[]): Prom
 
   client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 8_000, maxRetries: 0 });
   try {
-    const response = await trackAiCall('next_steps_note', config.anthropicVoiceModel, () => client!.messages.create({
-      model: config.anthropicVoiceModel,
-      max_tokens: 300,
-      output_config: { effort: 'low' },
-      messages: [
-        {
-          role: 'user',
-          content:
-            `${describeSnapshot(s)}\n\nSuggested next steps:\n${steps.map((x) => `- ${x.title}: ${x.detail}`).join('\n')}\n\n` +
-            `Write ONE short, warm sentence (max 25 words) to ${s.firstName}, a school student, on their home page, ` +
-            'pointing them to the first step and why it helps. Specific, not generic praise; no emoji, no quotes.',
-        },
-      ],
-    }));
+    const content =
+      `${describeSnapshot(s)}\n\nSuggested next steps:\n${steps.map((x) => `- ${x.title}: ${x.detail}`).join('\n')}\n\n` +
+      `Write ONE short, warm sentence (max 25 words) to ${s.firstName}, a school student, on their home page, ` +
+      'pointing them to the first step and why it helps. Specific, not generic praise; no emoji, no quotes.';
+    // Bounded like the tutor and grader (P18-1): without a bound a spending
+    // guard refuses the call before the provider.
+    const { meteredMessage } = await import('./aiGateway');
+    const response = await meteredMessage(
+      { feature: 'next_steps_note', modelName: config.anthropicVoiceModel, bound: { inputTokens: textTokenBound(content), outputTokens: 300 } },
+      () => client!.messages.create({ model: config.anthropicVoiceModel, max_tokens: 300, output_config: { effort: 'low' }, messages: [{ role: 'user', content }] }),
+    );
     const note = response.content.map((b) => (b.type === 'text' ? b.text : '')).join('').trim();
     const result = note && response.stop_reason !== 'refusal' ? note : fallbackNote(s, steps);
     if (noteCache.size > 1000) noteCache.clear();

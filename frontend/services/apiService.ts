@@ -1,5 +1,7 @@
 import type { ApiKeyValidationResponse } from '../types';
 import { OriginView, withOrigin } from './roleRouting';
+import { retryDelayMs } from './retryPolicy';
+import { createSseParser } from './sse';
 
 // Single client for the Enara backend (backend/ in this repo).
 //
@@ -81,11 +83,17 @@ async function request<T = any>(method: string, path: string, body?: unknown, is
   if (token) headers.Authorization = `Bearer ${token}`;
   if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
 
-  const res = await fetch(toUrl(path), {
-    method,
-    headers,
-    body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
-  });
+  let res: Response;
+  for (let attempt = 0; ; attempt++) {
+    res = await fetch(toUrl(path), {
+      method,
+      headers,
+      body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
+    });
+    const wait = retryDelayMs(method, res.status, res.headers.get('Retry-After'), attempt);
+    if (wait === null) break;
+    await new Promise((resolve) => setTimeout(resolve, wait));
+  }
 
   const text = await res.text();
   let data: any = null;
@@ -166,6 +174,9 @@ export const deleteCurriculum = (id: string) => request('DELETE', `/api/curricul
 export const deployCurriculum = (id: string) => request('PATCH', `/api/curriculums/${encodeURIComponent(id)}/deploy`, {});
 export const assignBatchToCurriculum = (id: string, batchId: string) =>
   request('POST', `/api/curriculums/${encodeURIComponent(id)}/assign-batch`, { batchId });
+// Teachers publish their own curriculum to a class they teach (P1 route).
+export const publishCurriculumToClass = (id: string, classId: string) =>
+  request<{ classId: string; curriculumId: string }>('POST', `/api/curriculums/${encodeURIComponent(id)}/publish-to-class`, { classId });
 export const unassignBatchFromCurriculum = (id: string, batchId: string) =>
   request('DELETE', `/api/curriculums/${encodeURIComponent(id)}/batches/${encodeURIComponent(batchId)}`);
 export function uploadChapterFile(curriculumId: string, chapterId: string, file: File) {
@@ -627,6 +638,47 @@ export const sendTutorMessage = (sessionId: string, text: string, context?: any)
   request('POST', `/api/me/tutor/sessions/${encodeURIComponent(sessionId)}/messages`, { text, context });
 export const deleteTutorSession = (id: string) => request('DELETE', `/api/me/tutor/sessions/${encodeURIComponent(id)}`);
 
+// The tutor reply streamed as it is written (P20). onText gets the reply so far
+// on every update; resolves with the saved assistant message. Errors before
+// the stream starts are ApiErrors like any request; never re-sent.
+export async function streamTutorMessage(sessionId: string, text: string, context: any, onText: (soFar: string) => void): Promise<any> {
+  const token = getToken();
+  const res = await fetch(toUrl(`/api/me/tutor/sessions/${encodeURIComponent(sessionId)}/messages/stream`), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: JSON.stringify({ text, context }),
+  });
+  if (!res.ok || !res.body) {
+    let data: any = null;
+    try { data = await res.json(); } catch { /* not JSON */ }
+    if (res.status === 401 && token) {
+      clearSession();
+      window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
+    }
+    throw new ApiError(data?.error?.message || data?.message || `Request failed (${res.status})`, res.status, data?.error?.code);
+  }
+  let soFar = '';
+  let done: any = null;
+  let failure: { code?: string; message?: string } | null = null;
+  const feed = createSseParser((e) => {
+    if (e.type === 'token') { soFar += e.delta ?? ''; onText(soFar); }
+    else if (e.type === 'replace') { soFar = e.text ?? ''; onText(soFar); }
+    else if (e.type === 'done') done = e;
+    else if (e.type === 'error') failure = e;
+  });
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  for (;;) {
+    const { value, done: end } = await reader.read();
+    if (end) break;
+    feed(decoder.decode(value, { stream: true }));
+  }
+  feed(decoder.decode());
+  if (failure) throw new ApiError((failure as { message?: string }).message || 'The tutor could not finish this reply.', 503, (failure as { code?: string }).code);
+  if (!done) throw new ApiError('The connection to the tutor was interrupted.', 503, 'TUTOR_STREAM_INTERRUPTED');
+  return done;
+}
+
 // Staff data assistant: answers from the caller's own school data, server-side.
 export const askDataAssistant = (message: string, history: { role: 'user' | 'assistant'; content: string }[] = []) =>
   request<{ answer: string; aiGenerated: true }>('POST', '/api/analytics/assistant', { message, history });
@@ -863,6 +915,16 @@ export const fetchOutcomes = (params: { classId?: string; origin?: OriginView; f
   const q = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== undefined && v !== '').map(([k, v]) => [k, String(v)]));
   return request<any>('GET', `/api/learning/analytics/outcomes${q.toString() ? `?${q}` : ''}`);
 };
+// P21 teaching effectiveness (descriptive, never a ranking or a causal claim; no costs).
+export const fetchTeachingEffectiveness = (params: { classId?: string; origin?: OriginView; dimension?: string; composition?: boolean } = {}) => {
+  const q = new URLSearchParams();
+  if (params.classId) q.set('classId', params.classId);
+  if (params.origin) q.set('origin', params.origin);
+  if (params.dimension) q.set('dimension', params.dimension);
+  if (params.composition) q.set('composition', '1');
+  return request<any>('GET', `/api/learning/analytics/teaching-effectiveness${q.toString() ? `?${q}` : ''}`);
+};
+export const fetchStudentTeachingImpact = (studentId = 'me') => request<any>('GET', `/api/learning/students/${enc(studentId)}/teaching-impact`);
 export const fetchStudentTimeline = (studentId: string) => request<{ studentId: string; events: { at: string; type: string; ref: string; detail?: any }[] }>('GET', `/api/learning/students/${enc(studentId)}/timeline`);
 export const fetchMyAssignmentResult = (id: string, attemptId: string) => request<any>('GET', `/api/me/assignments/${enc(id)}/attempts/${enc(attemptId)}/result`);
 export const appealMyResult = (id: string, attemptId: string, message: string, questionId?: string) =>

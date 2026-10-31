@@ -102,7 +102,9 @@ export async function evaluateShort(attempt: AttemptDoc, q: IQuestion, answer: s
 
 const words = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter(Boolean);
 
-// leak-v2 (opt-in, offline benchmark so far). Never flags more than v1:
+// leak-v2 (opt-in, offline benchmark so far). Compared with v1:
+// - both ignore punctuation (v1 since P19.2 F-2); v2 also skips runs the
+//   student wrote and needs a short model answer to appear whole;
 // - a model answer of 8-15 words leaks only if it appears whole (v1: any 8
 //   consecutive words), longer ones by any 8-word run as in v1, shorter ones
 //   never (as in v1);
@@ -129,9 +131,15 @@ function leaks(text: string, q: IQuestion, mode: 'v1' | 'v2' = 'v1', studentAnsw
     if (leaksModelAnswerV2(text, String(q.modelAnswer ?? ''), studentAnswer)) return 'model answer';
     return keyLeak(t, q);
   }
-  const model = String(q.modelAnswer ?? '').toLowerCase().replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+  // Compare words with case and punctuation ignored, so a comma or full stop
+  // inside a copied run cannot hide it (P19.2 F-2: "more energy, so more of them").
+  // A run the student wrote themselves reveals nothing hidden (P19.2 C4-07).
+  const model = words(String(q.modelAnswer ?? ''));
+  const released = ` ${words(text).join(' ')} `;
+  const own = ` ${words(studentAnswer).join(' ')} `;
   for (let i = 0; i + 8 <= model.length; i++) {
-    if (t.includes(` ${model.slice(i, i + 8).join(' ')} `)) return 'model answer';
+    const run = ` ${model.slice(i, i + 8).join(' ')} `;
+    if (released.includes(run) && !own.includes(run)) return 'model answer';
   }
   return keyLeak(t, q);
 }
@@ -307,9 +315,10 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
           maxPoints: t.maxPoints,
           score: t.percent,
           gradingStatus: 'released',
-          finalizedAt: now,
+          // The run's start time is \`now\`; finalization and release happen here (P18-4).
+          finalizedAt: new Date(),
           finalizedBy: GRADER,
-          releasedAt: now,
+          releasedAt: new Date(),
           intelligenceStatus: 'pending',
         },
         $unset: { gradingLeaseUntil: 1, nextGradingAt: 1, gradingError: 1, exceptionReason: 1 },
