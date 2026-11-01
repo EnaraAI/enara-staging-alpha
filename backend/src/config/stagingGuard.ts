@@ -8,8 +8,9 @@ const MIN_SECRET_LENGTH = 32;
 const STAGING_MARK = /staging/i;
 // Owner-approved maximum for a staging AI test window (P14: $5; $10 for the
 // P19 100-workflow run; $30 for the P20 simultaneous-start run, approved by
-// the owner on 2026-10-30). A higher cap needs a new approval and a code change.
-export const STAGING_MAX_TEST_SPEND_USD = 30;
+// the owner on 2026-10-30; $50, approved by the owner on 2026-11-01). A higher
+// cap needs a new approval and a code change.
+export const STAGING_MAX_TEST_SPEND_USD = 50;
 // Hosts of existing deployments recorded in this repository (production and
 // the shared sandbox). Staging must never allow them as browser origins.
 export const KNOWN_NON_STAGING_HOSTS = [
