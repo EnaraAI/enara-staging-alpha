@@ -1,0 +1,86 @@
+{
+  "deployment": "https://enara-staging-alpha-chs8xxxp3.vercel.app",
+  "at": "2026-11-01T11:59:31.282Z",
+  "results": [
+    {
+      "name": "login admin",
+      "ok": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "login teacher",
+      "ok": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "login student",
+      "ok": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "login academic_manager",
+      "ok": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "login enara-admin",
+      "ok": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "login other-school teacher (P21C)",
+      "ok": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "academic manager refused by AI assistant",
+      "ok": true,
+      "detail": "status 403 ASSISTANT_NOT_PERMITTED"
+    },
+    {
+      "name": "ENARA admin refused by AI assistant",
+      "ok": true,
+      "detail": "status 403 ASSISTANT_NOT_PERMITTED"
+    },
+    {
+      "name": "school admin can list People",
+      "ok": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "teacher refused People",
+      "ok": true,
+      "detail": "status 403"
+    },
+    {
+      "name": "student courses load",
+      "ok": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "cross-school curriculum read refused",
+      "ok": true,
+      "detail": "status 404"
+    },
+    {
+      "name": "AI draft request refused (feature off, or Arabic refused)",
+      "ok": true,
+      "detail": "status 404 FEATURE_DISABLED"
+    },
+    {
+      "name": "4Level1 teacher: no download link for unscanned originals",
+      "ok": true,
+      "detail": "status 200; documents 0; unscanned with link 0"
+    },
+    {
+      "name": "P21C teacher: no download link for unscanned originals",
+      "ok": true,
+      "detail": "status 404; documents 0; unscanned with link 0"
+    },
+    {
+      "name": "unsigned upload link refused",
+      "ok": true,
+      "detail": "status 403"
+    }
+  ]
+}
