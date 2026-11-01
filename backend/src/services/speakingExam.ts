@@ -109,7 +109,8 @@ export async function avatarExamAvailable(institutionId: string): Promise<{ avai
 // Owner decision 2026-11-01 (OD-1): speaking-exam speech-to-text is not
 // capped per reply. Optional ceilings still apply when set. Its cost stays
 // 'unpriced' (never $0), and every call is still reserved under the school
-// budget and the environment-wide test-spend cap.
+// budget. Speaking exams are exempt from the environment-wide test-spend cap
+// (owner decision 2026-11-01, see aiBudget SPEAKING_EXAM_FEATURES).
 export function voiceConfigured() {
   return Boolean(getConfig().elevenlabs);
 }

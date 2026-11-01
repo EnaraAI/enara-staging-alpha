@@ -57,6 +57,16 @@ describe('live avatar and the test-spend cap', () => {
   it('a live-avatar call without a per-call bound is not refused by the cap', async () => {
     await expect(B.reserveAiBudget({ key: 'nb', feature: 'avatar_session', provider: 'anam', institutionId: 'instA', userId: 'u1' })).resolves.toBeTruthy();
   });
+  it('speaking exams are not held under the cap', async () => {
+    await reserve('f1', 'tutor_chat', 'anthropic', 0.95);
+    const before = await env$();
+    for (const [i, [feature, provider]] of ([['speaking_exam_stt', 'elevenlabs'], ['speaking_exam_tts', 'elevenlabs'], ['conversation_exam', 'anthropic']] as const).entries()) {
+      const t = await reserve(`se${i}`, feature, provider, 0.5);
+      expect(t.testSpend).toBeFalsy();
+    }
+    await expect(B.reserveAiBudget({ key: 'se-nb', feature: 'speaking_exam_stt', provider: 'elevenlabs', institutionId: 'instA', userId: 'u1' })).resolves.toBeTruthy();
+    expect(await env$()).toBe(before);
+  });
   it('grading and other features stay under the cap', async () => {
     await expect(reserve('g1', 'ai_grading', 'anthropic', 1.5)).rejects.toMatchObject({ code: 'AI_TEST_SPEND_CAP' });
     await expect(reserve('l1', 'ai_lesson_plan', 'anthropic', 1.5)).rejects.toMatchObject({ code: 'AI_TEST_SPEND_CAP' });

@@ -44,6 +44,11 @@ export const GRADING_FEATURES = new Set(['ai_grading']);
 // on-screen visuals and ElevenLabs listening/speaking. School budgets, pauses
 // and rate limits still apply; usage is still recorded.
 export const LIVE_AVATAR_FEATURES = new Set(['avatar_session', 'avatar_visual', 'tutor_voice', 'stt', 'tts']);
+// Speaking exams are not held under the cap either (owner decision
+// 2026-11-01): reply transcription, the examiner's voice and its questions.
+// Grading of the answers is ordinary grading and stays under the cap.
+export const SPEAKING_EXAM_FEATURES = new Set(['speaking_exam_stt', 'speaking_exam_tts', 'conversation_exam']);
+const TEST_SPEND_EXEMPT = new Set([...LIVE_AVATAR_FEATURES, ...SPEAKING_EXAM_FEATURES]);
 // Operations with no catalogue price or reported usage (P0c).
 export const UNKNOWN_PRICED_TOOLS = ['anam:avatar_session', 'elevenlabs:stt', 'elevenlabs:speaking_exam_stt', 'orchestrator:tutor_chat', 'ingestion_engine:curriculum_ingestion'];
 export const ALERT_THRESHOLDS = [50, 80, 100] as const;
@@ -314,8 +319,8 @@ async function ensureEnvironmentCounter(): Promise<void> {
 async function reserveTestSpend(input: ReserveInput): Promise<string | undefined> {
   const cap = getConfig().aiTestSpend;
   if (!cap) return undefined;
-  if (LIVE_AVATAR_FEATURES.has(input.feature)) {
-    logger.info('ai_test_spend_exempt_live_avatar', { feature: input.feature, provider: input.provider });
+  if (TEST_SPEND_EXEMPT.has(input.feature)) {
+    logger.info(LIVE_AVATAR_FEATURES.has(input.feature) ? 'ai_test_spend_exempt_live_avatar' : 'ai_test_spend_exempt_speaking_exam', { feature: input.feature, provider: input.provider });
     return undefined;
   }
   const key = testSpendKey(input.key);
