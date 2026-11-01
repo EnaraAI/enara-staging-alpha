@@ -11,6 +11,7 @@ import { CourseInstance } from '../models/CourseInstance';
 import { hasPermission } from '../auth/permissions';
 import { isDocumentSafetyRequired } from '../services/documentSafety';
 import { readAttestation, registerDocument } from '../services/documents';
+import { claimDirectUpload, discardDirectUpload, issueDirectUpload } from '../services/directUpload';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { getConfig } from '../config/env';
@@ -315,6 +316,43 @@ export const uploadChapterFile = asyncHandler(async (req: AuthRequest, res: Resp
   curriculum.lastUpdated = formatDate();
   await curriculum.save();
 
+  void queueCurriculumProcessing(curriculum);
+  res.json({ upload: fileUrl, curriculum: toCurriculumResponse(curriculum) });
+});
+
+// Lesson files (PDF, Word, PowerPoint, text) uploaded straight to storage, so
+// files over the platform's 4.5 MB request limit work. Step 1: a signed URL.
+export const requestChapterFileUpload = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const curriculum = await Curriculum.findOne(await curriculumScope(req, { id: req.params.id }, 'write'));
+  if (!curriculum) throw new AppError('Curriculum not found', 404);
+  if (!curriculum.chapters.some((ch) => ch.id === req.params.chapterId)) throw new AppError('Chapter not found', 404);
+  const { fileName, size } = (req.body ?? {}) as { fileName?: string; size?: number };
+  res.json(await issueDirectUpload(curriculum.institutionId, fileName, size));
+});
+
+// Step 2: the same checks and attachment as a normal lesson upload.
+export const completeChapterFileUpload = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const curriculum = await Curriculum.findOne(await curriculumScope(req, { id: req.params.id }, 'write'));
+  if (!curriculum) throw new AppError('Curriculum not found', 404);
+  const chapter = curriculum.chapters.find((ch) => ch.id === req.params.chapterId);
+  if (!chapter) throw new AppError('Chapter not found', 404);
+  const body = (req.body ?? {}) as Record<string, unknown>;
+  const { storedName, file } = await claimDirectUpload(curriculum.institutionId, body.storedName, body.fileName);
+  try {
+    if (await isDocumentSafetyRequired(curriculum.institutionId)) {
+      const job = await registerDocument({ curriculum, chapterId: String(req.params.chapterId), file, uploadedBy: req.user!.id, attested: readAttestation(body.rightsAttested), storedName });
+      res.json({ upload: job.fileUrl, uploadId: job.id, curriculum: toCurriculumResponse(curriculum) });
+      return;
+    }
+    validateUploadFile(file);
+  } catch (error) {
+    await discardDirectUpload(storedName);
+    throw error;
+  }
+  const fileUrl = `/uploads/${storedName}`;
+  chapter.uploads.push(fileUrl);
+  curriculum.lastUpdated = formatDate();
+  await curriculum.save();
   void queueCurriculumProcessing(curriculum);
   res.json({ upload: fileUrl, curriculum: toCurriculumResponse(curriculum) });
 });

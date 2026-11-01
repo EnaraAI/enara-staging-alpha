@@ -191,10 +191,39 @@ export const publishCurriculumToClass = (id: string, classId: string) =>
   request<{ classId: string; curriculumId: string }>('POST', `/api/curriculums/${encodeURIComponent(id)}/publish-to-class`, { classId });
 export const unassignBatchFromCurriculum = (id: string, batchId: string) =>
   request('DELETE', `/api/curriculums/${encodeURIComponent(id)}/batches/${encodeURIComponent(batchId)}`);
+// Files go straight to storage with a signed URL: the hosting platform refuses
+// API request bodies over 4.5 MB. Without remote storage (local development)
+// the server answers 503 and the file is sent through the API as before.
+function putToStorage(url: string, contentType: string, file: File) {
+  return new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', url);
+    xhr.setRequestHeader('Content-Type', contentType);
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new ApiError(`Upload failed (${xhr.status})`, xhr.status)));
+    xhr.onerror = () => reject(new ApiError('Upload failed (network error)', 0));
+    xhr.send(file);
+  });
+}
+
+async function directUpload<T>(start: string, startBody: Record<string, unknown>, complete: string, completeBody: Record<string, unknown>, file: File, fallback: () => Promise<T>): Promise<T> {
+  let target: { uploadUrl: string; storedName: string; contentType: string };
+  try {
+    target = await request('POST', start, { ...startBody, fileName: file.name, size: file.size });
+  } catch (error) {
+    if (error instanceof ApiError && error.code === 'UPLOAD_STORAGE_UNAVAILABLE') return fallback();
+    throw error;
+  }
+  await putToStorage(target.uploadUrl, target.contentType, file);
+  return request<T>('POST', complete, { ...completeBody, storedName: target.storedName, fileName: file.name });
+}
+
 export function uploadChapterFile(curriculumId: string, chapterId: string, file: File) {
-  const form = new FormData();
-  form.append('file', file);
-  return request('POST', `/api/curriculums/${encodeURIComponent(curriculumId)}/chapters/${encodeURIComponent(chapterId)}/uploads`, form, true);
+  const base = `/api/curriculums/${encodeURIComponent(curriculumId)}/chapters/${encodeURIComponent(chapterId)}`;
+  return directUpload<any>(`${base}/file-uploads`, {}, `${base}/file-uploads/complete`, {}, file, () => {
+    const form = new FormData();
+    form.append('file', file);
+    return request('POST', `${base}/uploads`, form, true);
+  });
 }
 
 // Lesson videos: compressed in the browser, then PUT straight to R2 with a signed
@@ -1002,6 +1031,10 @@ export const NOT_SCANNED_NOTICE =
   'This document has not been scanned for malware. ENARA validates file type and size, but this is not a malware scan. Eligible extracted text may be sent to the configured AI provider. Upload only educational files you are authorized to use; avoid confidential or personal student data.';
 export const NOT_SCANNED_LABEL = 'Not scanned — AI processing enabled by institution policy';
 export function uploadDocument(params: { file: File; curriculumId: string; lessonId: string; rightsAttested: boolean }) {
+  const ids = { curriculumId: params.curriculumId, lessonId: params.lessonId };
+  return directUpload<{ document: WorkspaceDocument }>('/api/documents/direct-upload', ids, '/api/documents/direct-upload/complete', { ...ids, rightsAttested: params.rightsAttested }, params.file, () => uploadDocumentThroughApi(params));
+}
+function uploadDocumentThroughApi(params: { file: File; curriculumId: string; lessonId: string; rightsAttested: boolean }) {
   const form = new FormData();
   form.append('curriculumId', params.curriculumId);
   form.append('lessonId', params.lessonId);

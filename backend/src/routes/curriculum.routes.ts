@@ -11,6 +11,8 @@ import {
   unassignBatchFromCurriculum,
   uploadChapterFile,
   requestChapterVideoUpload,
+  requestChapterFileUpload,
+  completeChapterFileUpload,
   completeChapterVideoUpload,
   removeChapterUpload,
   getBatchesForAssignment,
@@ -51,6 +53,8 @@ router.post(
   uploadChapterFile
 );
 router.delete('/:id/chapters/:chapterId/uploads', removeChapterUpload);
+router.post('/:id/chapters/:chapterId/file-uploads', requestChapterFileUpload);
+router.post('/:id/chapters/:chapterId/file-uploads/complete', completeChapterFileUpload);
 router.post('/:id/chapters/:chapterId/video-uploads', requestChapterVideoUpload);
 router.post('/:id/chapters/:chapterId/video-uploads/complete', completeChapterVideoUpload);
 

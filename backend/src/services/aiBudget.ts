@@ -38,6 +38,17 @@ import { logger, serializeError } from '../utils/logging';
 //    for every feature. Unknown cost keeps the whole reservation, as above.
 
 export const GRADING_FEATURES = new Set(['ai_grading']);
+// Live avatar calls are not held under the staging test-spend cap (owner
+// decision 2026-11-01: "no cap running for the live avatar"). This covers
+// everything a call uses: the Anam session, the tutor's spoken replies, the
+// on-screen visuals and ElevenLabs listening/speaking. School budgets, pauses
+// and rate limits still apply; usage is still recorded.
+export const LIVE_AVATAR_FEATURES = new Set(['avatar_session', 'avatar_visual', 'tutor_voice', 'stt', 'tts']);
+// Speaking exams are not held under the cap either (owner decision
+// 2026-11-01): reply transcription, the examiner's voice and its questions.
+// Grading of the answers is ordinary grading and stays under the cap.
+export const SPEAKING_EXAM_FEATURES = new Set(['speaking_exam_stt', 'speaking_exam_tts', 'conversation_exam']);
+const TEST_SPEND_EXEMPT = new Set([...LIVE_AVATAR_FEATURES, ...SPEAKING_EXAM_FEATURES]);
 // Operations with no catalogue price or reported usage (P0c).
 export const UNKNOWN_PRICED_TOOLS = ['anam:avatar_session', 'elevenlabs:stt', 'elevenlabs:speaking_exam_stt', 'orchestrator:tutor_chat', 'ingestion_engine:curriculum_ingestion'];
 export const ALERT_THRESHOLDS = [50, 80, 100] as const;
@@ -308,6 +319,10 @@ async function ensureEnvironmentCounter(): Promise<void> {
 async function reserveTestSpend(input: ReserveInput): Promise<string | undefined> {
   const cap = getConfig().aiTestSpend;
   if (!cap) return undefined;
+  if (TEST_SPEND_EXEMPT.has(input.feature)) {
+    logger.info(LIVE_AVATAR_FEATURES.has(input.feature) ? 'ai_test_spend_exempt_live_avatar' : 'ai_test_spend_exempt_speaking_exam', { feature: input.feature, provider: input.provider });
+    return undefined;
+  }
   const key = testSpendKey(input.key);
   let bound = typeof input.upperBoundUsd === 'number' && Number.isFinite(input.upperBoundUsd) ? input.upperBoundUsd : undefined;
   try {
