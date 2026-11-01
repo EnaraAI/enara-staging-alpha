@@ -14,6 +14,7 @@ import { ATTESTATION_STATEMENT, NOT_SCANNED_NOTICE, isClearedForProcessing, isDo
 import { originFilter, parseOriginView } from '../services/originScope';
 import { MAX_UPLOAD_BYTES } from '../utils/uploadSecurity';
 import { ensurePlainObject, rejectMongoOperators } from '../utils/validation';
+import { claimDirectUpload, discardDirectUpload, issueDirectUpload } from '../services/directUpload';
 
 // Documents workspace (P2): teachers' teaching materials. content:author
 // (teachers, school admins); never academic managers or students. Teachers
@@ -94,6 +95,43 @@ router.get('/', asyncHandler(async (req: AuthRequest, res: Response) => {
     notScannedNotice: NOT_SCANNED_NOTICE,
     documents: jobs.map((j) => toDocument(j as never, byId.get(j.curriculumId) as never, manager || byId.get(j.curriculumId)?.createdBy === req.user!.id)),
   });
+}));
+
+// Direct upload, step 1: a short-lived signed URL the browser PUTs the file to.
+// Used for files of any size; it avoids the hosting platform's 4.5 MB body limit.
+router.post('/direct-upload', asyncHandler(async (req: AuthRequest, res: Response) => {
+  const body = ensurePlainObject(req.body ?? {});
+  rejectMongoOperators(body);
+  const curriculum = await Curriculum.findOne(await curriculumScope(req, { id: typeof body.curriculumId === 'string' ? body.curriculumId : '' }, 'write'));
+  if (!curriculum) throw new AppError('Curriculum not found', 404, 'NOT_FOUND');
+  if (!curriculum.chapters.some((ch) => ch.id === body.lessonId)) throw new AppError('Lesson not found', 404, 'NOT_FOUND');
+  if (!DOCUMENT_EXTENSIONS.includes(path.extname(String(body.fileName ?? '')).toLowerCase())) {
+    throw new AppError(`Upload a ${DOCUMENT_EXTENSIONS.join(', ')} file`, 415, 'UPLOAD_TYPE_NOT_ALLOWED');
+  }
+  res.json(await issueDirectUpload(curriculum.institutionId, body.fileName, body.size));
+}));
+
+// Direct upload, step 2: the same checks and registration as a normal upload.
+router.post('/direct-upload/complete', asyncHandler(async (req: AuthRequest, res: Response) => {
+  const body = ensurePlainObject(req.body ?? {});
+  rejectMongoOperators(body);
+  if (!readAttestation(body.rightsAttested)) throw new AppError('Confirm you have the right to upload this file for processing', 400, 'RIGHTS_ATTESTATION_REQUIRED');
+  const curriculum = await Curriculum.findOne(await curriculumScope(req, { id: typeof body.curriculumId === 'string' ? body.curriculumId : '' }, 'write'));
+  if (!curriculum) throw new AppError('Curriculum not found', 404, 'NOT_FOUND');
+  const { storedName, file } = await claimDirectUpload(curriculum.institutionId, body.storedName, body.fileName);
+  let job;
+  try {
+    if (!DOCUMENT_EXTENSIONS.includes(path.extname(file.originalname).toLowerCase())) {
+      throw new AppError(`Upload a ${DOCUMENT_EXTENSIONS.join(', ')} file`, 415, 'UPLOAD_TYPE_NOT_ALLOWED');
+    }
+    job = await registerDocument({ curriculum, chapterId: typeof body.lessonId === 'string' ? body.lessonId : '', file, uploadedBy: req.user!.id, attested: true, storedName });
+  } catch (error) {
+    await discardDirectUpload(storedName);
+    throw error;
+  }
+  if (isClearedForProcessing(job, await isDocumentSafetyRequired(curriculum.institutionId))) await processDocuments(curriculum.id);
+  const fresh = await CurriculumFileJob.findOne({ id: job.id }).lean();
+  res.status(201).json({ document: toDocument(fresh as never, curriculum.toObject() as never, true) });
 }));
 
 router.post('/', upload.single('file'), asyncHandler(async (req: AuthRequest, res: Response) => {

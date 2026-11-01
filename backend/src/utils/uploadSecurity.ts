@@ -156,3 +156,10 @@ export function buildStorageKey(prefix: string, safeFileName: string): string {
 export function isAllowedUploadExtension(fileName: string): boolean {
   return Object.prototype.hasOwnProperty.call(ALLOWED_TYPES, path.extname(fileName).toLowerCase());
 }
+
+// Content type a browser must send when it PUTs a document straight to storage
+// (direct uploads). Documents only: audio and video have their own routes.
+export function directUploadContentType(fileName: string): string | null {
+  const type = ALLOWED_TYPES[path.extname(sanitizeFileName(fileName)).toLowerCase()];
+  return type && type.kind === 'document' ? type.mimeTypes[0] : null;
+}

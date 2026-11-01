@@ -30,6 +30,8 @@ export async function registerDocument(params: {
   uploadedBy: string;
   attested: boolean;
   origin?: 'live' | 'demo_seed';
+  // Set when the browser already put the file in storage (direct upload).
+  storedName?: string;
 }): Promise<ICurriculumFileJob> {
   const { curriculum } = params;
   const chapter = curriculum.chapters.find((ch) => ch.id === params.chapterId);
@@ -39,8 +41,8 @@ export async function registerDocument(params: {
     throw new AppError('Confirm you have the right to upload this file for processing', 400, 'RIGHTS_ATTESTATION_REQUIRED');
   }
   const info = validateUploadFile(params.file);
-  const storedName = storedUploadName(curriculum.institutionId, info.safeFileName);
-  await saveUpload(storedName, params.file.buffer, info.contentType);
+  const storedName = params.storedName ?? storedUploadName(curriculum.institutionId, info.safeFileName);
+  if (!params.storedName) await saveUpload(storedName, params.file.buffer, info.contentType);
   const fileUrl = `/uploads/${storedName}`;
   const now = new Date();
   const job = await CurriculumFileJob.create({
