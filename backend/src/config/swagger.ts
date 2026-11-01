@@ -54,14 +54,12 @@ function getServerUrl(req: Request): string {
 }
 
 // The docs are behind a password (HTTP Basic: any user name, the password in
-// API_DOCS_PASSWORD). Without that setting they are closed on production
-// servers and open only for local development and tests.
+// API_DOCS_PASSWORD). Without that setting they are closed everywhere (404),
+// whatever NODE_ENV says: staging runs with NODE_ENV=development, so an
+// environment-based exception would publish the full API map.
 function docsGate(req: Request, res: Response, next: NextFunction) {
   const password = process.env.API_DOCS_PASSWORD;
-  if (!password) {
-    if (process.env.NODE_ENV === 'production') { res.status(404).json({ message: 'Not found' }); return; }
-    return next();
-  }
+  if (!password) { res.status(404).json({ message: 'Not found' }); return; }
   const header = req.headers.authorization ?? '';
   const given = header.startsWith('Basic ') ? Buffer.from(header.slice(6), 'base64').toString('utf8') : '';
   const supplied = given.includes(':') ? given.slice(given.indexOf(':') + 1) : '';

@@ -124,6 +124,12 @@ export const getAiUsage = asyncHandler(async (req: AuthRequest, res: Response) =
 
 // POST /api/analytics/assistant { message, history? } — staff data assistant.
 export const askAssistant = asyncHandler(async (req: AuthRequest, res: Response) => {
+  // Model-backed analytics are for teachers and school admins only in this
+  // release (P22, owner decision): never academic managers or ENARA admins,
+  // whatever permissions they hold. Their read-only insight pages are unchanged.
+  if (req.user?.role !== 'teacher' && req.user?.role !== 'admin') {
+    throw new AppError('The AI data assistant is available to teachers and school admins only', 403, 'ASSISTANT_NOT_PERMITTED');
+  }
   const message = typeof req.body?.message === 'string' ? req.body.message.trim().slice(0, 2000) : '';
   if (!message) throw new AppError('message is required', 400, 'VALIDATION_ERROR');
   const rawHistory: unknown[] = Array.isArray(req.body?.history) ? req.body.history.slice(-6) : [];

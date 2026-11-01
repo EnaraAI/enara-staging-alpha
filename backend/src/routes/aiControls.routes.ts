@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { recordAudit } from '../services/auditTrail';
 import { authMiddleware, AuthRequest, requireRole } from '../middleware/auth.middleware';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { Institution } from '../models/Institution';
@@ -86,6 +87,7 @@ router.put('/budgets/:institutionId', asyncHandler(async (req: AuthRequest, res:
   );
   forgetAiBudgetCache(institutionId);
   logger.info('ai_budget_config_changed', { institutionId, version, by: req.user!.id, fields: Object.keys(changes) });
+  await recordAudit('ai_budget_changed', req.user, { institutionId, type: 'org_budget', id: institutionId }, { version, changes });
   res.json({ budget });
 }));
 
@@ -103,6 +105,7 @@ router.put('/budgets/:institutionId/pause', asyncHandler(async (req: AuthRequest
   );
   forgetAiBudgetCache(institutionId);
   logger.warn('ai_paused_changed', { scope: 'institution', institutionId, paused, by: req.user!.id });
+  await recordAudit('ai_pause_changed', req.user, { institutionId, type: 'org_budget', id: institutionId }, { paused });
   res.json({ institutionId, aiPaused: paused });
 }));
 
@@ -118,6 +121,7 @@ router.put('/pause', asyncHandler(async (req: AuthRequest, res: Response) => {
   );
   forgetAiBudgetCache();
   logger.warn('ai_paused_changed', { scope: 'global', paused, by: req.user!.id });
+  await recordAudit('ai_pause_changed', req.user, { type: 'ai_control', id: 'global' }, { paused });
   res.json({ aiPaused: paused });
 }));
 
@@ -171,6 +175,7 @@ router.put('/commercial/:institutionId', asyncHandler(async (req: AuthRequest, r
     { upsert: true, new: true, lean: true },
   );
   logger.info('commercial_plan_changed', { institutionId, version, by: req.user!.id });
+  await recordAudit('commercial_plan_changed', req.user, { institutionId, type: 'commercial_plan', id: institutionId }, { version });
   res.json({ plan: saved });
 }));
 

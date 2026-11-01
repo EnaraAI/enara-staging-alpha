@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { recordAudit } from '../services/auditTrail';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { isGlobalAdmin, requireInstitutionId } from '../auth/authorization';
@@ -32,6 +33,7 @@ export const setFlags = asyncHandler(async (req: AuthRequest, res: Response) => 
   if (!updated.matchedCount) throw new AppError('Institution not found', 404, 'INSTITUTION_NOT_FOUND');
   forgetFeatureFlags(institutionId);
   logger.info('feature_flags_changed', { institutionId, changedBy: req.user!.id, flags });
+  await recordAudit('feature_flags_changed', req.user, { institutionId, type: 'institution', id: institutionId }, { flags });
   res.json({ institutionId, flags: await getFeatureFlags(institutionId) });
 });
 
@@ -69,6 +71,7 @@ export const setLearningSettings = asyncHandler(async (req: AuthRequest, res: Re
   if (Object.keys(set).length) await Institution.updateOne({ id: institutionId }, { $set: set });
   forgetFeatureFlags(institutionId);
   logger.info('learning_settings_changed', { institutionId, changedBy: req.user!.id, set });
+  await recordAudit('learning_settings_changed', req.user, { institutionId, type: 'institution', id: institutionId }, { set });
   const school = await Institution.findOne({ id: institutionId }).select('learningSettings').lean();
   res.json({ institutionId, settings: { diagnosticMaxQuestions: 12, diagnosticMaxMinutes: 30, pathwayMode: 'teacher_controlled', shadowMode: false, adultLearners: false, ...(school?.learningSettings || {}) } });
 });

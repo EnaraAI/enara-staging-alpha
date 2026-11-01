@@ -235,11 +235,12 @@ export const setOverallFeedback = asyncHandler(async (req: AuthRequest, res: Res
 
 // POST /api/grading/attempts/:id/finalize — for work a teacher graded by
 // hand (an exception, or a school that grades open answers by hand).
-// Results are released straight away, like automatic grades.
+// Results are released straight away, like automatic grades, unless the
+// assignment releases results manually (then: release endpoints below).
 export const finalizeSubmission = asyncHandler(async (req: AuthRequest, res: Response) => {
   const { attempt, assignment, questions, version } = await loadAttemptForStaff(req, String(req.params.id));
   let done = await finalizeAttempt(attempt, req.user!.id, questions, version.subject);
-  if (done.gradingStatus === 'finalized') {
+  if (done.gradingStatus === 'finalized' && assignment.releasePolicy !== 'manual') {
     done = await releaseAttempt(done, req.user!.id);
     await notifyResultsReleased(assignment, done.studentId, done.id).catch(() => undefined);
   }

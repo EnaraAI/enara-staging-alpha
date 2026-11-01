@@ -106,6 +106,10 @@ export async function avatarExamAvailable(institutionId: string): Promise<{ avai
   return { available: false, reason: 'Avatar speaking exams are not available yet.' };
 }
 
+// Owner decision 2026-11-01 (OD-1): speaking-exam speech-to-text is not
+// capped per reply. Optional ceilings still apply when set. Its cost stays
+// 'unpriced' (never $0), and every call is still reserved under the school
+// budget and the environment-wide test-spend cap.
 export function voiceConfigured() {
   return Boolean(getConfig().elevenlabs);
 }
@@ -233,13 +237,18 @@ function eleven() {
 // otherwise usage is recorded as unknown, never as free.
 export async function transcribeReply(audio: Buffer, mime: string, refs: { attemptId: string; assessmentId: string; sessionId: string }) {
   const { client: el, config } = eleven();
+  const limits = getConfig().unpricedLimits;
   const res = await meteredCall(
-    { feature: 'speaking_exam_stt', provider: 'elevenlabs', modelName: config.examSttModel, refs },
+    { feature: 'speaking_exam_stt', provider: 'elevenlabs', modelName: config.examSttModel, refs, ...(limits.speakingExamSttUsdPerReply ? { boundUsd: limits.speakingExamSttUsdPerReply } : {}) },
     () => el.speechToText.convert({ file: new Blob([audio], { type: mime }), modelId: config.examSttModel, languageCode: 'en', tagAudioEvents: false }),
     { units: (r) => audioSecondsOf(r) },
   );
   const text = String((res as { text?: unknown }).text ?? '').replace(/\s+/g, ' ').trim();
-  return { text, audioSeconds: audioSecondsOf(res)?.audioSeconds };
+  const seconds = audioSecondsOf(res)?.audioSeconds;
+  if (seconds !== undefined && limits.speakingExamMaxReplySeconds && seconds > limits.speakingExamMaxReplySeconds) {
+    throw new AppError(`Replies may be at most ${limits.speakingExamMaxReplySeconds} seconds long`, 413, 'REPLY_TOO_LONG');
+  }
+  return { text, audioSeconds: seconds };
 }
 
 function audioSecondsOf(r: unknown) {

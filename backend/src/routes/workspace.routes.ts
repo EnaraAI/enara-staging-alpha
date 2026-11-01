@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { recordAudit } from '../services/auditTrail';
 import { authMiddleware, AuthRequest } from '../middleware/auth.middleware';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { requirePermission, GRANTABLE_PERMISSIONS, isPermission, permissionsFor } from '../auth/permissions';
@@ -9,6 +10,7 @@ import { User } from '../models/User';
 import { acceptInvitation, createInvitation, INVITABLE_ROLES } from '../services/accountTokens';
 import { ensurePlainObject, getOptionalString, normalizeEmail, rejectMongoOperators, validatePassword } from '../utils/validation';
 import { getConfig } from '../config/env';
+import { logger } from '../utils/logging';
 
 // Workspace administration within one school (4Level1 plan, P1): users,
 // their permission grants, and invitations. workspace:users is held by school
@@ -79,9 +81,33 @@ router.put('/users/:id/permissions', asyncHandler(async (req: AuthRequest, res: 
   const target = await User.findOne({ _id: /^[a-f0-9]{24}$/.test(String(req.params.id)) ? req.params.id : null, institutionId });
   if (!target) throw new AppError('User not found', 404, 'NOT_FOUND');
   if (target.role === 'student' || target.role === 'enara-admin') throw new AppError('This user cannot hold staff permissions', 400, 'PERMISSION_NOT_GRANTABLE');
+  const before = target.permissions ?? [];
   target.permissions = [...new Set(grants as string[])];
   await target.save();
+  await recordAudit('user_permissions_changed', req.user, { institutionId, type: 'user', id: target._id.toString() }, { from: before, to: target.permissions });
   res.json({ id: target._id.toString(), grants: target.permissions, permissions: [...permissionsFor(target)] });
+}));
+
+// Disables or re-enables an account in the school (P22). A disabled account
+// cannot sign in, and its open sessions stop working at once (the token
+// version moves on). A school admin manages teachers, academic managers and
+// students; another school admin only ENARA. Nobody disables themselves.
+router.put('/users/:id/status', asyncHandler(async (req: AuthRequest, res: Response) => {
+  const institutionId = await workspaceOf(req);
+  const body = ensurePlainObject(req.body);
+  rejectMongoOperators(body);
+  const status = body.status;
+  if (status !== 'active' && status !== 'disabled') throw new AppError('status must be active or disabled', 400, 'VALIDATION_ERROR');
+  const target = await User.findOne({ _id: /^[a-f0-9]{24}$/.test(String(req.params.id)) ? req.params.id : null, institutionId });
+  if (!target || target.role === 'enara-admin') throw new AppError('User not found', 404, 'NOT_FOUND');
+  if (target._id.toString() === req.user!.id) throw new AppError('You cannot change your own account status', 400, 'SELF_STATUS_CHANGE');
+  if (target.role === 'admin' && !isGlobalAdmin(req)) throw new AppError('Only ENARA can disable a school administrator', 403, 'FORBIDDEN');
+  if (target.status !== status) {
+    await User.updateOne({ _id: target._id }, status === 'disabled' ? { $set: { status }, $inc: { tokenVersion: 1 } } : { $set: { status } });
+    logger.info('user_status_changed', { userId: target._id.toString(), institutionId, status, changedBy: req.user!.id });
+    await recordAudit('user_status_changed', req.user, { institutionId, type: 'user', id: target._id.toString() }, { from: target.status, to: status });
+  }
+  res.json({ id: target._id.toString(), status });
 }));
 
 router.get('/invitations', asyncHandler(async (req: AuthRequest, res: Response) => {

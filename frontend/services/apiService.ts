@@ -1055,3 +1055,16 @@ export const updateCurrentTool = (id: string, data: any) => request<{ item: any 
 export const removeCurrentTool = (id: string) => request<void>('DELETE', `/api/usage/current-tools/${enc(id)}`);
 export const fetchSavings = () => request<any>('GET', '/api/usage/savings');
 export const simulateUsage = (data: { students?: number; staff?: number; quantities: Record<string, number> }) => request<any>('POST', '/api/usage/simulate', data);
+
+// Accounts (P22): invitation links, password reset, and the school's people.
+export const acceptInvitation = (token: string, password: string, name?: string) =>
+  request<{ user: { email: string; role: string; name?: string } }>('POST', '/api/workspace/invitations/accept', { token, password, ...(name ? { name } : {}) });
+export const requestPasswordReset = (email: string) => request<unknown>('POST', '/api/auth/password-reset/request', { email });
+export const confirmPasswordReset = (token: string, password: string) => request<{ ok: boolean }>('POST', '/api/auth/password-reset/confirm', { token, password });
+export interface WorkspaceUser { id: string; email: string; name?: string; role: string; status: 'active' | 'disabled'; origin?: string }
+export interface WorkspaceInvitation { id: string; email: string; role: string; status: string; expiresAt: string; createdAt: string; expired?: boolean }
+export const fetchWorkspaceUsers = () => request<{ users: WorkspaceUser[] }>('GET', '/api/workspace/users');
+export const setWorkspaceUserStatus = (id: string, status: 'active' | 'disabled') => request<{ id: string; status: string }>('PUT', `/api/workspace/users/${encodeURIComponent(id)}/status`, { status });
+export const fetchWorkspaceInvitations = () => request<{ invitations: WorkspaceInvitation[] }>('GET', '/api/workspace/invitations');
+export const createWorkspaceInvitation = (email: string, role: string) => request<{ inviteLink: string; invitation: WorkspaceInvitation }>('POST', '/api/workspace/invitations', { email, role });
+export const revokeWorkspaceInvitation = (id: string) => request<void>('DELETE', `/api/workspace/invitations/${encodeURIComponent(id)}`);

@@ -2,7 +2,7 @@ import { AvatarSession, type IAvatarSession } from '../models/AvatarSession';
 import { runWithCallContext } from '../utils/callContext';
 import { logger, serializeError } from '../utils/logging';
 import { recordAttempt } from './aiGateway';
-import { settleAiBudget } from './aiBudget';
+import { settleReservationsUnder } from './aiBudget';
 
 // Anam avatar time (4Level1 plan, P0c). One immutable usage_ledger row per
 // call, keyed `avatar:<session id>`, appended once the end is known. The
@@ -74,8 +74,9 @@ export async function finalizeAvatarUsage(sessionId: string, now = new Date()): 
     }),
   );
   if (!stored) return false;
-  // The call's budget reservation (if any) is kept whole: Anam has no price.
-  await settleAiBudget({ key: `avatar:${s.id}`, state: 'reserved' }, null);
+  // The call's budget reservations (start, language switches and their
+  // test-spend copies) are kept whole: Anam has no price.
+  await settleReservationsUnder(`avatar:${s.id}`, null);
   const finalizedAt = new Date();
   await AvatarSession.updateOne(
     { id: sessionId, usageFinalizedAt: null },

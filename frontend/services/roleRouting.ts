@@ -35,7 +35,7 @@ export function restoreUiRole(backendRole: string | undefined, saved: string | n
 // on their Teaching Dashboard instead of the school dashboard.
 export const SCHOOL_ADMIN_PAGES = [
   'dashboard', 'live-avatars', 'course-intelligence', 'institution-analytics', 'students',
-  'credits', 'engagement', 'school-insights', 'learning-events', 'usage', 'savings',
+  'credits', 'engagement', 'school-insights', 'learning-events', 'usage', 'savings', 'people',
 ] as const;
 
 export function staffPageAllowed(backendRole: string | undefined, page: string): boolean {

@@ -547,6 +547,9 @@ export const generateAssessmentDraftHandler = asyncHandler(async (req: AuthReque
   const { resolveGenerationSources } = await import('../services/sourceSelection');
   const uploadIds = await resolveGenerationSources(req, curriculum, body.uploadIds);
   const { generateAssessmentDraft } = await import('../services/educatorAi');
+  // Arabic AI assessment drafting is out of scope for this release (P7
+  // revised scope; finding F-8). Teachers can still write Arabic assessments.
+  if (body.language === 'ar') throw new AppError(ARABIC_DRAFTS_OFF, 400, 'LANGUAGE_NOT_SUPPORTED');
   const draft = await generateAssessmentDraft({
     uploadIds,
     institutionId: curriculum.institutionId,
@@ -578,6 +581,8 @@ export const generateAssessmentDraftHandler = asyncHandler(async (req: AuthReque
   res.status(201).json({ assessment: toPlainObject(assessment), sources: draft.sources, note: 'AI draft: check every question, answer and rubric before publishing.' });
 });
 
+const ARABIC_DRAFTS_OFF = 'AI drafting is available in English only for now. Write Arabic questions by hand.';
+
 // POST /api/assessments/:id/questions/:questionId/regenerate { instruction?, question? }
 // Returns a replacement for one question; nothing is saved, so the
 // teacher's other edits stay as they are.
@@ -586,6 +591,7 @@ export const regenerateQuestionHandler = asyncHandler(async (req: AuthRequest, r
   rejectMongoOperators(body);
   const assessment = await loadAssessment(req, String(req.params.id));
   await requireAuthoringAi(req, assessment.institutionId);
+  if (assessment.language === 'ar') throw new AppError(ARABIC_DRAFTS_OFF, 400, 'LANGUAGE_NOT_SUPPORTED');
   const current = (body.question && typeof body.question === 'object' ? body.question : assessment.questions.find((q) => q.id === req.params.questionId)) as { type?: string; text?: string; objectiveIds?: string[] } | undefined;
   if (!current?.type) throw new AppError('Question not found', 404);
   const { regenerateQuestion } = await import('../services/educatorAi');

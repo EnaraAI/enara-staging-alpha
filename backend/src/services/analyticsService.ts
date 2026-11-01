@@ -1,4 +1,6 @@
 import { Assessment } from '../models/Assessment';
+import { Assignment } from '../models/Assignment';
+import { SCORE_WINDOW_DAYS, scoresInWindow } from './scoreMetrics';
 import { AssessmentAttempt } from '../models/AssessmentAttempt';
 import { CourseInstance } from '../models/CourseInstance';
 import { Curriculum } from '../models/Curriculum';
@@ -60,6 +62,9 @@ interface LeanAttempt {
   studentId: string;
   score?: number;
   submittedAt?: Date;
+  status?: string;
+  gradingStatus?: string;
+  assignmentId?: string;
   answers: Array<{ topic?: string; isCorrect: boolean }>;
 }
 
@@ -189,7 +194,7 @@ async function loadScope(scope: Scope, now: Date, studentFilter: Scope = {}, ori
       .select('id courseId courseName batchId curriculumId institutionId studentIds visibility isDemo')
       .lean() as Promise<LeanCourse[]>,
     AssessmentAttempt.find({ ...scope, ...of, studentId: { $in: studentIds }, status: 'submitted' })
-      .select('id assessmentId assessmentTitle subject studentId score submittedAt answers.topic answers.isCorrect')
+      .select('id assessmentId assignmentId assessmentTitle subject studentId score status gradingStatus submittedAt answers.topic answers.isCorrect')
       .sort({ submittedAt: 1 })
       .lean() as Promise<LeanAttempt[]>,
     LessonProgress.find({ ...scope, studentId: { $in: studentIds }, status: 'completed' })
@@ -230,7 +235,15 @@ async function loadScope(scope: Scope, now: Date, studentFilter: Scope = {}, ori
     }
   }
 
-  return { since, students, courses, attempts, lessons, sessions, usage, assessments, chaptersByCurriculum, questions };
+  // Scores follow the shared definition (services/scoreMetrics.ts): latest
+  // final grade per student and piece of work, in the score window, never a
+  // zero for missing work. Submission and activity counts use every
+  // submitted attempt.
+  const assignmentIds = [...new Set(attempts.map((a) => a.assignmentId).filter(Boolean))] as string[];
+  const assignmentDue = new Map((assignmentIds.length ? await Assignment.find({ id: { $in: assignmentIds } }).select('id dueAt state').lean() : []).map((a) => [a.id, { dueAt: a.dueAt, state: a.state }]));
+  const scoreWindow = { from: new Date(now.getTime() - SCORE_WINDOW_DAYS * DAY_MS), to: now };
+  const scoredAttempts = scoresInWindow(attempts, scoreWindow, (id) => assignmentDue.get(id)).sort((a, b) => +new Date(a.submittedAt ?? 0) - +new Date(b.submittedAt ?? 0));
+  return { since, students, courses, attempts, scoredAttempts, scoreWindow, lessons, sessions, usage, assessments, chaptersByCurriculum, questions };
 }
 
 type ScopeData = Awaited<ReturnType<typeof loadScope>>;
@@ -277,12 +290,11 @@ function computeStudentMetrics(data: ScopeData, now: Date): StudentMetrics[] {
   };
 
   const scores = new Map<string, number[]>();
-  for (const a of data.attempts) {
-    if (typeof a.score === 'number') {
-      if (!scores.has(a.studentId)) scores.set(a.studentId, []);
-      scores.get(a.studentId)!.push(a.score);
-    }
-    touch(a.studentId, a.submittedAt);
+  // Activity: every submission. Scores: the shared definition only.
+  for (const a of data.attempts) touch(a.studentId, a.submittedAt);
+  for (const a of data.scoredAttempts) {
+    if (!scores.has(a.studentId)) scores.set(a.studentId, []);
+    scores.get(a.studentId)!.push(a.score as number);
   }
   const lessonsDone = new Map<string, number>();
   for (const l of data.lessons) {
@@ -506,6 +518,9 @@ export async function buildOverview(scope: Scope, now = new Date(), origin: Orig
       scoreBands: SCORE_BANDS,
       inactiveAfterDays: INACTIVE_AFTER_DAYS,
       atRisk: `average score under ${LOW_SCORE}%, no activity for ${INACTIVE_AFTER_DAYS} days, or 2+ overdue assessments`,
+      score: `latest final grade per student and piece of work (finalized or released; drafts, in-progress and awaiting-review attempts excluded), assignment work due in the last ${SCORE_WINDOW_DAYS} days (self-paced work submitted in that window); missing work is never counted as zero`,
+      scoreWindow: { from: data.scoreWindow.from.toISOString(), to: data.scoreWindow.to.toISOString() },
+      scoredWork: data.scoredAttempts.length,
     },
     totals: {
       students: students.length,
@@ -525,7 +540,7 @@ export async function buildOverview(scope: Scope, now = new Date(), origin: Orig
     weekly: weekly.map((w) => ({ ...w, activeStudents: w.activeStudents.size })),
     performance,
     risk,
-    subjects: subjectScores(data.attempts),
+    subjects: subjectScores(data.scoredAttempts),
     topics: topicAccuracy(data.attempts),
     courses,
     batches,
@@ -552,7 +567,7 @@ export async function buildCourseAnalytics(scope: Scope, courseKey: string, now 
       (!a.curriculumId && course.batchId && a.batchId === course.batchId)
   );
   const assessmentIds = new Set(courseAssessments.map((a) => a.id));
-  const attempts = data.attempts.filter((a) => assessmentIds.has(a.assessmentId) && ids.has(a.studentId));
+  const attempts = data.scoredAttempts.filter((a) => assessmentIds.has(a.assessmentId) && ids.has(a.studentId));
 
   const sessions = data.sessions.filter((s) => s.courseId === course.courseId && ids.has(s.studentId));
   const recentSessions = sessions.filter((s) => (s.lastMessageAt ? new Date(s.lastMessageAt) : sessionCreatedAt(s)) >= data.since);
@@ -774,13 +789,13 @@ export async function buildStudentAnalytics(scope: Scope, studentId: string, now
     generatedAt: now.toISOString(),
     windowDays: ACTIVITY_WINDOW_DAYS,
     summary: metrics,
-    scoreHistory: data.attempts.slice(-20).map((a) => ({
+    scoreHistory: data.scoredAttempts.slice(-20).map((a) => ({
       date: a.submittedAt ? new Date(a.submittedAt).toISOString() : null,
       title: a.assessmentTitle,
       subject: a.subject,
       score: typeof a.score === 'number' ? a.score : null,
     })),
-    subjects: subjectScores(data.attempts),
+    subjects: subjectScores(data.scoredAttempts),
     topics: topicAccuracy(data.attempts),
     tutorUsage: [...usageByCourse.entries()]
       .map(([label, questions]) => ({ label, questions }))

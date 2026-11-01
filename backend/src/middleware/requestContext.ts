@@ -20,7 +20,7 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     logger.info('http_request', {
       requestId: req.requestId,
       method: req.method,
-      path: req.originalUrl,
+      path: logPath(req.originalUrl),
       status: res.statusCode,
       durationMs: Math.round(durationMs),
       userId: req.user?.id,
@@ -33,4 +33,9 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
 
 export function captureRawBody(req: Request, _res: Response, buf: Buffer): void {
   req.rawBody = Buffer.from(buf);
+}
+
+// File links carry a signature that works for hours: never log it.
+export function logPath(url: string): string {
+  return url.startsWith('/uploads/') ? url.split('?')[0] : url;
 }

@@ -138,22 +138,16 @@ export const Documents: React.FC = () => {
                     <td className="p-3">
                       <span className={`text-xs font-semibold px-2 py-1 rounded-full ${s.tone}`}>{s.label}</span>
                       {(d.detail || s.help) && <p className="text-xs text-slate-500 mt-1 max-w-xs">{d.detail || s.help}</p>}
-                      {d.malwareScan === 'not_scanned_by_policy' && <p className="text-xs text-amber-800 mt-1 max-w-xs" title={NOT_SCANNED_NOTICE}>{NOT_SCANNED_LABEL}. Extracted text may be sent to the AI provider.</p>}
+                      {d.malwareScan === 'not_scanned_by_policy' && <p className="text-xs text-amber-800 mt-1 max-w-xs" title={NOT_SCANNED_NOTICE}>{NOT_SCANNED_LABEL}. The original cannot be downloaded; its extracted text may be sent to the AI provider.</p>}
                       {d.malwareScan === 'clean' && <p className="text-xs text-slate-500 mt-1">Malware scan: no threat found</p>}
                       {d.state === 'ready' && d.chunkCount != null && <p className="text-xs text-slate-500 mt-1">{d.chunkCount} passages{d.pages ? ` from ${d.pages} page(s)/section(s)` : ''}</p>}
                     </td>
                     <td className="p-3 whitespace-nowrap space-x-2">
-                      {d.fileUrl && (
-                        <a
-                          href={d.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title={d.downloadWarning ?? undefined}
-                          onClick={(e) => { if (d.downloadWarning && !window.confirm(`${d.downloadWarning}\n\nDownload anyway?`)) e.preventDefault(); }}
-                          className={d.downloadWarning ? 'text-amber-800 font-semibold' : 'text-indigo-700 font-semibold'}
-                        >
-                          {d.downloadWarning ? 'Download (not scanned)' : 'Download'}
-                        </a>
+                      {d.fileUrl ? (
+                        <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-700 font-semibold">Download</a>
+                      ) : (
+                        // Owner decision 2026-11-01: originals that were not scanned clean are never downloadable.
+                        <span className="text-xs text-slate-500" title={d.downloadWarning ?? undefined}>Original not downloadable (not scanned)</span>
                       )}
                       {d.state === 'ready' && (
                         <button onClick={() => fetchDocumentSources(d.uploadId).then((r) => setSources({ doc: d, items: r.sources })).catch((err) => toast.error('Could not load sources', (err as Error).message))} className="text-indigo-700 font-semibold">Sources</button>

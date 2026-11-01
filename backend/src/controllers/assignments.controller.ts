@@ -1,3 +1,4 @@
+import { recordAudit } from '../services/auditTrail';
 import { randomUUID } from 'crypto';
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -153,6 +154,7 @@ export const createAssignment = asyncHandler(async (req: AuthRequest, res: Respo
   const created = await Assignment.create(doc);
   logger.info('assignment_created', { assignmentId: created.id, classId: cls.id, assessmentId: assessment.id, version: created.assessmentVersion, by: req.user!.id });
   if (!draft) await notifyAssignmentPublished(created).catch(() => undefined);
+  await recordAudit('assignment_created', req.user, { institutionId: created.institutionId, type: 'assignment', id: created.id }, { releasePolicy: created.releasePolicy });
   res.status(201).json(view(created));
 });
 
@@ -242,7 +244,11 @@ export const updateAssignment = asyncHandler(async (req: AuthRequest, res: Respo
   if (body.timeZone !== undefined) a.timeZone = validTimeZone(getRequiredString(body, 'timeZone', { max: 60 }));
   if (body.maxAttempts !== undefined) a.maxAttempts = Math.floor(getOptionalNumber(body, 'maxAttempts', { min: 1, max: 10 }) ?? a.maxAttempts);
   if (body.timeLimitMinutes !== undefined) a.timeLimitMinutes = getOptionalNumber(body, 'timeLimitMinutes', { min: 1, max: 600 });
-  if (body.releasePolicy !== undefined) a.releasePolicy = oneOf(body.releasePolicy, RELEASE, 'releasePolicy')!;
+  if (body.releasePolicy !== undefined) {
+    const next = oneOf(body.releasePolicy, RELEASE, 'releasePolicy')!;
+    if (next !== a.releasePolicy) await recordAudit('assignment_release_policy_changed', req.user, { institutionId: a.institutionId, type: 'assignment', id: a.id }, { from: a.releasePolicy, to: next });
+    a.releasePolicy = next;
+  }
   if (body.answerReveal !== undefined) a.answerReveal = oneOf(body.answerReveal, REVEAL, 'answerReveal')!;
   if (body.tutorPolicy !== undefined) a.tutorPolicy = oneOf(body.tutorPolicy, TUTOR, 'tutorPolicy')!;
   if (body.assessmentKind !== undefined) a.assessmentKind = body.assessmentKind === null ? undefined : oneOf(body.assessmentKind, ASSESSMENT_KINDS, 'assessmentKind');

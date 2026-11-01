@@ -201,7 +201,9 @@ describe('assignments and submissions', () => {
     const draftOnly = await teacher.post('/api/assessments', { title: 'D', subject: 'M', curriculumId: 'cur', lifecycle: 'draft', questions: [mc('q1')] });
     expect((await teacher.post('/api/assignments', { assessmentId: draftOnly.body.id, classId: 'cls', dueAt: new Date(Date.now() + H).toISOString() })).body.error.code).toBe('ASSESSMENT_NOT_PUBLISHED');
     expect((await teacher.post('/api/assignments', { assessmentId, classId: 'cls', studentIds: ['out'], dueAt: new Date(Date.now() + H).toISOString() })).status).toBe(400);
-    const id = await assign(assessmentId, { releasePolicy: 'manual' });
+    // P22: 'manual' now holds results for the teacher (tested in p22TeacherTestingFixes);
+    // this answer-key release test uses the default 'auto' policy.
+    const id = await assign(assessmentId, { releasePolicy: 'auto' });
 
     // A later edit of the assessment doesn't change the assigned version.
     await teacher.patch(`/api/assessments/${assessmentId}`, { questions: [mc('q1', 'wrong'), mc('q2'), mc('q3')] });

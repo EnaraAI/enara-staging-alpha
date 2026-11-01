@@ -95,6 +95,11 @@ const usageLedgerSchema = new Schema<IUsageLedger>(
   },
   { collection: 'usage_ledger', timestamps: { createdAt: true, updatedAt: false } },
 );
+// Retention (owner decision 2026-11-01, OD-5): rows are removed by MongoDB one
+// month after they were written. Budget counters, which enforce caps, are
+// separate and are not affected.
+export const USAGE_LEDGER_RETENTION_DAYS = 30;
+usageLedgerSchema.index({ createdAt: 1 }, { expireAfterSeconds: USAGE_LEDGER_RETENTION_DAYS * 86400, name: 'retention_30d' });
 usageLedgerSchema.index({ institutionId: 1, createdAt: -1 });
 usageLedgerSchema.index({ feature: 1, createdAt: -1 });
 usageLedgerSchema.index({ institutionId: 1, origin: 1, createdAt: -1 });

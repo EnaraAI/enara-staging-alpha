@@ -81,7 +81,8 @@ function AiDraftForm({ classes, onDone, onClose }: { classes: any[]; onDone: (as
             <SourcePicker curriculumId={cls?.curriculumId} value={f.uploadIds} onChange={(ids) => setF({ ...f, uploadIds: ids })} />
             <label className="block text-sm">What should it cover?<textarea dir="auto" className={field} value={f.brief} onChange={(e) => setF({ ...f, brief: e.target.value })} placeholder="e.g. adding fractions with unlike denominators, word problems" /></label>
             <div className="grid grid-cols-2 gap-2">
-              <label className="block text-sm">Language<select className={field} value={f.language} onChange={(e) => setF({ ...f, language: e.target.value })}><option value="en">English</option><option value="ar">العربية</option></select></label>
+              {/* AI drafts are English only for now (P7 scope); Arabic assessments are written by hand. */}
+              <p className="block text-sm text-slate-600">Language: English. AI drafting in Arabic is not available yet; write Arabic questions by hand.</p>
               <label className="block text-sm">Difficulty<select className={field} value={f.difficulty} onChange={(e) => setF({ ...f, difficulty: e.target.value })}><option>Easy</option><option>Medium</option><option>Hard</option></select></label>
             </div>
             <div className="grid grid-cols-4 gap-2">

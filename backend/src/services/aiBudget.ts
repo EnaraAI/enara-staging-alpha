@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { getConfig } from '../config/env';
 import { AppError } from '../middleware/errorHandler';
+import { recordAlert } from './auditTrail';
 import { AiControl, BudgetCounter, BudgetReservation, OrgBudget, type IBudgetReservation } from '../models/OrgBudget';
 import { logger, serializeError } from '../utils/logging';
 
@@ -38,7 +39,7 @@ import { logger, serializeError } from '../utils/logging';
 
 export const GRADING_FEATURES = new Set(['ai_grading']);
 // Operations with no catalogue price or reported usage (P0c).
-export const UNKNOWN_PRICED_TOOLS = ['anam:avatar_session', 'elevenlabs:stt', 'orchestrator:tutor_chat', 'ingestion_engine:curriculum_ingestion'];
+export const UNKNOWN_PRICED_TOOLS = ['anam:avatar_session', 'elevenlabs:stt', 'elevenlabs:speaking_exam_stt', 'orchestrator:tutor_chat', 'ingestion_engine:curriculum_ingestion'];
 export const ALERT_THRESHOLDS = [50, 80, 100] as const;
 const DEFAULT_RESERVATION_TTL_MS = 30 * 60 * 1000;
 const CONFIG_CACHE_MS = 15_000;
@@ -102,6 +103,7 @@ function storeAlert(event: string, meta: Record<string, unknown>) {
   if (Date.now() - (lastAlert.get(key) ?? 0) < 60_000) return;
   lastAlert.set(key, Date.now());
   logger.error(event, { severity: 'critical', ...meta });
+  void recordAlert(event, 'critical', { scope: String(meta.what ?? meta.institutionId ?? '') }, typeof meta.institutionId === 'string' ? meta.institutionId : undefined);
 }
 
 interface PolicyRead<T> {
@@ -223,6 +225,7 @@ async function checkAlerts(inst: string, counters: CounterSpec[]) {
       if (res.modifiedCount === 1) {
         // Internal admin alert: no amounts, prompts or user content.
         (t === 100 ? logger.error : logger.warn)('ai_budget_alert', { institutionId: inst, window: c.window, threshold: t });
+        void recordAlert(t === 100 ? 'ai_budget_cap_reached' : 'ai_budget_threshold', t === 100 ? 'critical' : 'warning', { scope: c.id, window: c.window, threshold: t }, inst === TEST_SPEND_TENANT ? undefined : inst);
       }
     }
   }
@@ -277,6 +280,29 @@ async function recordGradingEmergency(input: ReserveInput, inst: string, bound: 
 export const TEST_SPEND_TENANT = '__test_spend__';
 const testSpendKey = (key: string) => `${key}:test_spend`;
 
+// The environment-wide test-spend counter (P22). AI_TEST_SPEND_ID names a
+// test window for reporting, but the cap is enforced on this one counter,
+// which a new ID never resets: spend is cumulative for the whole staging
+// environment. It is created once, seeded with everything already committed
+// under earlier spend IDs. Only scripts/resetTestSpendWindow.ts, run by an
+// operator with recorded owner approval and reconciliation evidence, may
+// start a new environment window.
+export const TEST_SPEND_ENVIRONMENT_COUNTER = 'test_spend:__environment__';
+
+async function ensureEnvironmentCounter(): Promise<void> {
+  if (await BudgetCounter.exists({ _id: TEST_SPEND_ENVIRONMENT_COUNTER })) return;
+  const earlier = await BudgetCounter.find({ _id: { $regex: '^test_spend:', $ne: TEST_SPEND_ENVIRONMENT_COUNTER }, institutionId: TEST_SPEND_TENANT })
+    .select('committedMicros settledMicros unknownMicros').lean();
+  const sum = (f: 'committedMicros' | 'settledMicros' | 'unknownMicros') => earlier.reduce((n, c) => n + Math.max(0, Number(c[f] ?? 0)), 0);
+  await BudgetCounter.updateOne(
+    { _id: TEST_SPEND_ENVIRONMENT_COUNTER },
+    { $setOnInsert: { institutionId: TEST_SPEND_TENANT, committedMicros: sum('committedMicros'), settledMicros: sum('settledMicros'), unknownMicros: sum('unknownMicros'), alerts: [], expiresAt: new Date(Date.now() + 10 * 365 * 86400_000) } },
+    { upsert: true },
+  ).catch((error) => {
+    if ((error as { code?: number }).code !== 11000) throw error;
+  });
+}
+
 // Reserves the attempt's bound on the deployment's cumulative test-spend
 // counter. Returns the reservation key, or undefined when no cap is set.
 async function reserveTestSpend(input: ReserveInput): Promise<string | undefined> {
@@ -298,6 +324,8 @@ async function reserveTestSpend(input: ReserveInput): Promise<string | undefined
     if (!connected()) throw new Error('database not connected');
     const now = input.now ?? new Date();
     const counter: CounterSpec = { id: `test_spend:${cap.id}`, capMicros: toMicros(cap.capUsd), window: 'test_spend', expiresAt: new Date(now.getTime() + 400 * 86400_000) };
+    const environment: CounterSpec = { id: TEST_SPEND_ENVIRONMENT_COUNTER, capMicros: toMicros(cap.capUsd), window: 'test_spend', expiresAt: new Date(now.getTime() + 10 * 365 * 86400_000) };
+    await ensureEnvironmentCounter();
     try {
       await BudgetReservation.create({
         _id: key, institutionId: TEST_SPEND_TENANT, userId: input.userId, feature: input.feature, provider: input.provider,
@@ -312,13 +340,19 @@ async function reserveTestSpend(input: ReserveInput): Promise<string | undefined
       logger.warn('ai_test_spend_duplicate_key_refused', { feature: input.feature });
       throw new AiBudgetError('AI_TEST_SPEND_CAP');
     }
-    if (!(await reserveOn(TEST_SPEND_TENANT, counter, amount))) {
+    // Environment-wide first (the cap a new spend ID cannot reset), then the
+    // window's own counter (reporting); a refusal on either gives back both.
+    const onEnvironment = await reserveOn(TEST_SPEND_TENANT, environment, amount);
+    const onWindow = onEnvironment && (await reserveOn(TEST_SPEND_TENANT, counter, amount));
+    if (!onWindow) {
+      if (onEnvironment) await BudgetCounter.updateOne({ _id: environment.id }, { $inc: { committedMicros: -amount } });
       await BudgetReservation.updateOne({ _id: key }, { $set: { status: 'released', amountMicros: 0 } });
       logger.warn('ai_test_spend_cap_refused', { feature: input.feature });
+      void recordAlert('ai_test_spend_cap_reached', 'critical', { scope: 'environment', feature: input.feature });
       throw new AiBudgetError('AI_TEST_SPEND_CAP');
     }
-    await BudgetReservation.updateOne({ _id: key }, { $set: { status: 'reserved', counters: [counter.id] } });
-    await checkAlerts(TEST_SPEND_TENANT, [counter]);
+    await BudgetReservation.updateOne({ _id: key }, { $set: { status: 'reserved', counters: [environment.id, counter.id] } });
+    await checkAlerts(TEST_SPEND_TENANT, [environment, counter]);
     return key;
   } catch (error) {
     if (error instanceof AiBudgetError) throw error;
@@ -421,6 +455,7 @@ async function reserveSchoolBudget(input: ReserveInput): Promise<BudgetTicket> {
         await addUncapped(inst, id, amount, new Date(now.getTime() + 400 * 86400_000));
         held = [{ id, capMicros: 0, window: 'grading_emergency', expiresAt: now }];
         logger.error('ai_budget_grading_emergency', { institutionId: inst, feature: input.feature, severity: 'critical' });
+        void recordAlert('ai_budget_grading_emergency', 'critical', { scope: 'school_caps_exhausted', feature: input.feature }, inst);
       }
     }
     await BudgetReservation.updateOne({ _id: input.key }, { $set: { status: 'reserved', kind, counters: held.map((c) => c.id) } });
@@ -453,12 +488,25 @@ async function settleOne(key: string, actualUsd: number | null): Promise<void> {
     // One round trip for all counters (P20): the increments are independent.
     const inc = actual === null ? { unknownMicros: r.amountMicros } : { committedMicros: actual - r.amountMicros, settledMicros: actual };
     if (r.counters.length) await BudgetCounter.bulkWrite(r.counters.map((id: string) => ({ updateOne: { filter: { _id: id }, update: { $inc: inc } } })), { ordered: false });
-    if (actual === null) logger.info('ai_budget_unknown_cost_retained', { institutionId: r.institutionId, feature: r.feature, provider: r.provider });
+    if (actual === null) {
+      logger.info('ai_budget_unknown_cost_retained', { institutionId: r.institutionId, feature: r.feature, provider: r.provider });
+      void recordAlert('ai_unknown_cost_reserved', 'warning', { scope: `${r.provider}:${r.feature}`, provider: r.provider, feature: r.feature }, r.institutionId === TEST_SPEND_TENANT ? undefined : r.institutionId);
+    }
     if (actual !== null && actual > r.amountMicros) logger.warn('ai_budget_reservation_exceeded', { institutionId: r.institutionId, feature: r.feature });
   } catch (error) {
     // The reservation stays held; the stale sweep keeps it as unknown exposure.
     logger.error('ai_budget_settle_failed', { key, error: serializeError(error) });
   }
+}
+
+// Settles every reservation still held under one call, e.g. an avatar
+// session's start, its language switches and their test-spend copies
+// (keys `<base>`, `<base>:...`). Idempotent.
+export async function settleReservationsUnder(base: string, actualUsd: number | null): Promise<number> {
+  const escaped = base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const held = await BudgetReservation.find({ _id: { $regex: `^${escaped}(:|$)` }, status: 'reserved' }).select('_id').lean();
+  for (const r of held) await settleOne(String(r._id), actualUsd);
+  return held.length;
 }
 
 // The provider was not called: give the reservation back. Idempotent.

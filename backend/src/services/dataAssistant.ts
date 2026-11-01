@@ -16,6 +16,45 @@ export interface AssistantTurn {
   content: string;
 }
 
+// Privacy (P22, owner decision 2026-11-01): no student-level record leaves
+// the backend for this assistant. The model gets school-level aggregates only
+// (totals, courses, subjects, weakest topics), never a roster, name, ID,
+// score, risk flag or answer. Names typed in a question are replaced with
+// "[student]" before the call. Per-student reports (with real names, for
+// authorised staff) come from the deterministic Educator Chat analytics,
+// which never call a model.
+const escapeRe = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+export function nameRedactor(names: string[]) {
+  const words = new Set<string>();
+  for (const n of names) {
+    const full = (n || '').trim();
+    if (full) words.add(full);
+    for (const w of full.split(/\s+/)) if ([...w].length >= 3) words.add(w);
+  }
+  // Longest first, so a full name is replaced before its parts.
+  const rules = [...words].sort((a, b) => b.length - a.length).map((w) => new RegExp(`(?<![\\p{L}\\p{N}])${escapeRe(w)}(?![\\p{L}\\p{N}])`, 'giu'));
+  return (text: string) => rules.reduce((t, re) => t.replace(re, '[student]'), text).replace(/(\[student\]\s*)+/g, '[student] ');
+}
+
+// What the model may see: school-level aggregates only (see header).
+export function assistantData(overview: Awaited<ReturnType<typeof buildOverview>>) {
+  return {
+    generatedAt: overview.generatedAt,
+    definitions: overview.definitions,
+    totals: overview.totals,
+    courses: (overview as { courses?: unknown[] }).courses,
+    subjects: overview.subjects,
+    weakestTopics: overview.topics.slice(0, 15),
+    // Counts only: never a per-student row (see header).
+    studentCounts: {
+      total: overview.students.length,
+      byStatus: overview.students.reduce<Record<string, number>>((acc, s) => { const k = String(s.status ?? 'unknown'); acc[k] = (acc[k] ?? 0) + 1; return acc; }, {}),
+      withRiskFlags: overview.students.filter((s) => Array.isArray(s.riskFlags) && s.riskFlags.length > 0).length,
+    },
+  };
+}
+
 export async function answerDataQuestion(scope: Record<string, unknown>, message: string, history: AssistantTurn[]) {
   const config = getConfig();
   if (!config.anthropicApiKey) throw new AppError('The assistant is not configured', 503, 'AI_UNAVAILABLE');
@@ -23,31 +62,18 @@ export async function answerDataQuestion(scope: Record<string, unknown>, message
   client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 25_000, maxRetries: 0 });
 
   const overview = await buildOverview(scope);
-  const data = {
-    generatedAt: overview.generatedAt,
-    definitions: overview.definitions,
-    totals: overview.totals,
-    courses: (overview as { courses?: unknown[] }).courses,
-    subjects: overview.subjects,
-    weakestTopics: overview.topics.slice(0, 15),
-    students: overview.students.slice(0, 300).map((s) => ({
-      name: s.name,
-      status: s.status,
-      avgScore: s.avgScore,
-      lessonCompletionRate: s.lessonCompletionRate,
-      overdueAssessments: s.overdueAssessments,
-      lastActiveAt: s.lastActiveAt,
-      riskFlags: s.riskFlags,
-    })),
-  };
+  const redact = nameRedactor(overview.students.map((s) => String(s.name ?? '')));
+  const data = assistantData(overview);
 
   const institutionId = typeof scope.institutionId === 'string' ? scope.institutionId : undefined;
   const system =
     "You are Enara's data assistant for school staff. Answer only from the school data provided, which " +
     'is computed from real activity. If the data does not answer the question, say so plainly; never ' +
-    'invent students, numbers or deadlines. Be concise and use Markdown lists or tables where they help.\n\n' +
+    'invent students, numbers or deadlines. Be concise and use Markdown lists or tables where they help. ' +
+    'The data has no individual students. If asked about a particular student, say that individual reports are in ' +
+    'Educator Chat (class analytics) and give school-level context only.\n\n' +
     `<school_data>${JSON.stringify(data)}</school_data>`;
-  const messages = [...history.slice(-6), { role: 'user' as const, content: message }];
+  const messages = [...history.slice(-6), { role: 'user' as const, content: message }].map((m) => ({ ...m, content: redact(m.content) }));
   const response = await meteredMessage(
     {
       feature: 'staff_assistant', modelName: config.anthropicTutorModel, institutionId, maxAttempts: 2,

@@ -1,3 +1,4 @@
+import { latestCountedPerWork, type ScorableAttempt } from './scoreMetrics';
 import type { AuthRequest } from '../middleware/auth.middleware';
 import { AppError } from '../middleware/errorHandler';
 import { Assignment } from '../models/Assignment';
@@ -266,9 +267,8 @@ async function loadPairs(institutionId: string, classes: ScopedClass[], from: Da
     for (const s of members) {
       const mine = by.get(`${a.id}|${s}`) ?? [];
       // Score: the most recent finalized or released attempt (duplicates collapse to one).
-      const graded = mine
-        .filter((t) => t.status === 'submitted' && (t.gradingStatus === 'finalized' || t.gradingStatus === 'released') && typeof t.score === 'number' && Number.isFinite(t.score))
-        .sort((x, y) => +new Date(y.submittedAt ?? 0) - +new Date(x.submittedAt ?? 0) || String(y.id).localeCompare(String(x.id)))[0];
+      // Shared definition (services/scoreMetrics.ts).
+      const graded = latestCountedPerWork(mine as never as ScorableAttempt[])[0] as (typeof mine)[number] | undefined;
       pairs.push({ assignmentId: a.id, classId: a.classId, studentId: s, status: studentStatus(a as never, s, mine as never, to).status, score: graded ? (graded.score as number) : null, dueAt: a.dueAt });
     }
   }
@@ -516,7 +516,9 @@ export async function runAnalytics(
     if (!(await isFeatureEnabled(req.user!.institutionId, 'mastery_tracking_enabled'))) {
       return audit({ ...base('unsupported', language === 'ar' ? 'تتبع الإتقان غير مفعّل لمدرستك، لذا لا توجد بيانات نواتج تعلم.' : 'Mastery tracking is not enabled for your school, so there is no learning-outcome data.'), intent: plan.intent });
     }
-    const rows = await StudentObjectiveMastery.find({ studentId: { $in: [...students] }, masteryStatus: { $ne: 'not_assessed' } }).select('studentId objectiveId masteryStatus').lean();
+    // Every institution-owned collection is filtered by the caller's school
+    // (P22): mastery rows of a same-ID student elsewhere never count.
+    const rows = await StudentObjectiveMastery.find({ institutionId: req.user!.institutionId, studentId: { $in: [...students] }, masteryStatus: { $ne: 'not_assessed' } }).select('studentId objectiveId masteryStatus').lean();
     const objectives = new Map((await LearningObjective.find({ id: { $in: [...new Set(rows.map((r) => r.objectiveId))] }, institutionId: req.user!.institutionId }).select('id code title').lean()).map((o) => [o.id, o]));
     const per = new Map<string, { assessed: number; weak: number }>();
     for (const r of rows) {

@@ -123,7 +123,10 @@ describe('P7 feature x role sweep', () => {
     // Known, reviewed finding (QA report): F-2 ending an avatar session only
     // ever closes the caller's own session (idempotent 204). F-1 is fixed
     // (P14.8): ingestion status without Postgres answers 503 *_UNAVAILABLE.
-    const KNOWN = [/^academic-manager-write DELETE \/api\/avatar\/session\/:id$/];
+    // Marking one's own product tour as finished (b9a49c0) is a self-only
+    // preference write on the caller's own user record, like logout: allowed
+    // for read-only roles. Its own tests are in productTour.test.ts.
+    const KNOWN = [/^academic-manager-write DELETE \/api\/avatar\/session\/:id$/, /^academic-manager-write POST \/api\/auth\/tour\/complete$/];
     expect(v.filter((x) => !KNOWN.some((k) => k.test(x)))).toEqual([]);
   }, 600_000);
 

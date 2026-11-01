@@ -1,3 +1,4 @@
+import { storedUploadName } from './uploadAccess';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import { AppError } from '../middleware/errorHandler';
@@ -38,7 +39,7 @@ export async function registerDocument(params: {
     throw new AppError('Confirm you have the right to upload this file for processing', 400, 'RIGHTS_ATTESTATION_REQUIRED');
   }
   const info = validateUploadFile(params.file);
-  const storedName = `${randomUUID()}-${info.safeFileName}`;
+  const storedName = storedUploadName(curriculum.institutionId, info.safeFileName);
   await saveUpload(storedName, params.file.buffer, info.contentType);
   const fileUrl = `/uploads/${storedName}`;
   const now = new Date();

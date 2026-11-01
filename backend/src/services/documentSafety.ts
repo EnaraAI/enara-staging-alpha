@@ -123,3 +123,5 @@ export async function filterClearedFileUrls(institutionId: string | undefined, u
   );
   return urls.filter((u) => ok.has(u.split('?')[0]));
 }
+
+// Download eligibility of originals lives in services/uploadAccess.ts (P22).

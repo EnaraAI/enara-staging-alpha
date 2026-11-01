@@ -1,32 +1,40 @@
 import { createHmac, timingSafeEqual } from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import { getConfig } from '../config/env';
+import { logger, serializeError } from './logging';
 
 // Uploaded files are served at /uploads/<name> only with a valid, expiring
-// signature. The API adds signatures to every /uploads/ path it returns, so
-// only users who could read the curriculum or course get working links.
+// signature bound to the file's owning school (P22). The API signs /uploads/
+// paths in its JSON responses only when
+//   - the caller is signed in,
+//   - the file belongs to the caller's school (ENARA admins: any school), and
+//   - the original may be downloaded at all (scanned clean, or lesson media).
+// Everything else stays a plain, unusable path. Links are bearer credentials:
+// they live about 15 minutes and are never logged (see requestContext.logPath).
 // Stored data always keeps the plain /uploads/<name> path.
 
-const LINK_TTL_SECONDS = 6 * 60 * 60;
+export const LINK_TTL_SECONDS = 15 * 60;
 const PLAIN_UPLOAD_PATH = /^\/uploads\/[^?#\s/]+$/;
 const SIGNED_UPLOAD_PATH = /^(\/uploads\/[^?#\s/]+)\?exp=\d+&sig=[a-f0-9]+$/;
 
-function signature(name: string, exp: number): string {
-  return createHmac('sha256', `${getConfig().jwtSecret}:uploads`).update(`${name}:${exp}`).digest('hex');
+function signature(name: string, exp: number, owner: string): string {
+  return createHmac('sha256', `${getConfig().jwtSecret}:uploads`).update(`${name}:${exp}:${owner}`).digest('hex');
 }
 
-export function signUploadPath(uploadPath: string, now = Date.now()): string {
+// Signs one path for its owning school. Expiry is rounded up to the minute
+// (repeated responses within a minute give the same URL) and never exceeds
+// LINK_TTL_SECONDS.
+export function signUploadPath(uploadPath: string, owner: string, now = Date.now()): string {
   const name = uploadPath.slice('/uploads/'.length);
-  // Round the expiry so repeated responses within a window give the same URL (browser caching).
-  const exp = Math.ceil(now / 1000 / 3600) * 3600 + LINK_TTL_SECONDS;
-  return `${uploadPath}?exp=${exp}&sig=${signature(name, exp)}`;
+  const exp = Math.floor(now / 1000 / 60) * 60 + LINK_TTL_SECONDS;
+  return `${uploadPath}?exp=${exp}&sig=${signature(name, exp, owner)}`;
 }
 
-export function isValidUploadSignature(name: string, exp: unknown, sig: unknown, now = Date.now()): boolean {
-  if (typeof exp !== 'string' || typeof sig !== 'string' || !/^\d+$/.test(exp)) return false;
+export function isValidUploadSignature(name: string, exp: unknown, sig: unknown, owner: string | null, now = Date.now()): boolean {
+  if (!owner || typeof exp !== 'string' || typeof sig !== 'string' || !/^\d+$/.test(exp)) return false;
   const expiry = Number(exp);
-  if (expiry * 1000 < now) return false;
-  const expected = Buffer.from(signature(name, expiry), 'hex');
+  if (expiry * 1000 < now || expiry * 1000 > now + (LINK_TTL_SECONDS + 60) * 1000) return false;
+  const expected = Buffer.from(signature(name, expiry, owner), 'hex');
   const given = Buffer.from(sig, 'hex');
   return expected.length === given.length && timingSafeEqual(expected, given);
 }
@@ -48,20 +56,48 @@ function mapStrings(value: unknown, fn: (s: string) => string, depth = 0): unkno
   return value;
 }
 
-export function signUploadPaths<T>(value: T): T {
-  return mapStrings(value, (s) => (PLAIN_UPLOAD_PATH.test(s) ? signUploadPath(s) : s)) as T;
+function collectUploadPaths(value: unknown, into: Set<string>, depth = 0): Set<string> {
+  mapStrings(value, (s) => { if (PLAIN_UPLOAD_PATH.test(s)) into.add(s); return s; }, depth);
+  return into;
 }
 
 export function unsignUploadPaths<T>(value: T): T {
   return mapStrings(value, unsignUploadPath) as T;
 }
 
-// Signs /uploads/ paths in JSON responses and strips signatures from JSON
-// request bodies, so a client that sends a curriculum back doesn't store them.
+// Signs the paths of one response body for one caller (see header comment).
+export async function signUploadPathsFor<T>(value: T, caller: { institutionId?: string; role?: string } | undefined): Promise<T> {
+  const paths = [...collectUploadPaths(value, new Set())];
+  if (!paths.length || !caller) return value;
+  const { resolveUploads, schoolSlug } = await import('../services/uploadAccess');
+  const info = await resolveUploads(paths);
+  const global = caller.role === 'enara-admin';
+  const mine = caller.institutionId ? schoolSlug(caller.institutionId) : null;
+  return mapStrings(value, (s) => {
+    if (!PLAIN_UPLOAD_PATH.test(s)) return s;
+    const i = info.get(s);
+    if (!i?.owner || !i.eligibility.downloadable || (!global && i.owner !== mine)) return s;
+    return signUploadPath(s, i.owner);
+  }) as T;
+}
+
+// Strips signatures from JSON request bodies (a client sending a curriculum
+// back doesn't store them) and signs eligible /uploads/ paths in responses.
 export function uploadLinkSigning(req: Request, res: Response, next: NextFunction): void {
   if (req.body && typeof req.body === 'object') req.body = unsignUploadPaths(req.body);
   const json = res.json.bind(res);
-  res.json = (body?: unknown) =>
-    json(body === undefined ? body : signUploadPaths(JSON.parse(JSON.stringify(body))));
+  res.json = ((body?: unknown) => {
+    if (body === undefined) return json(body);
+    const plain = JSON.parse(JSON.stringify(body));
+    const caller = (req as Request & { user?: { institutionId?: string; role?: string } }).user;
+    signUploadPathsFor(plain, caller)
+      .then((signed) => json(signed))
+      .catch((error) => {
+        // Never fail the response for this; paths stay plain (no download).
+        logger.error('upload_link_signing_failed', { error: serializeError(error) });
+        json(plain);
+      });
+    return res;
+  }) as Response['json'];
   next();
 }

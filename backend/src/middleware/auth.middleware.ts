@@ -54,6 +54,16 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
       return;
     }
 
+    // A suspended school's users are stopped on every request, not only at
+    // sign-in (P22). ENARA admins are not bound to one school.
+    if (user.role !== 'enara-admin' && user.institutionId && (await isInstitutionSuspended(user.institutionId))) {
+      res.status(403).json({
+        error: { code: 'INSTITUTION_SUSPENDED', message: "Your school's ENARA access is suspended. Contact your school administrator.", requestId: req.requestId },
+        message: "Your school's ENARA access is suspended.",
+      });
+      return;
+    }
+
     req.user = {
       id: user._id.toString(),
       email: user.email,
@@ -198,4 +208,22 @@ export function requireTeacher(req: AuthRequest, res: Response, next: NextFuncti
     return;
   }
   next();
+}
+
+// Institution status, cached briefly per server instance (one lookup per
+// school per 15 s, not per request). forgetInstitutionStatus clears it after
+// a change on this instance; other instances see it within 15 s.
+const STATUS_CACHE_MS = 15_000;
+const statusCache = new Map<string, { suspended: boolean; at: number }>();
+export async function isInstitutionSuspended(institutionId: string): Promise<boolean> {
+  const hit = statusCache.get(institutionId);
+  if (hit && Date.now() - hit.at < STATUS_CACHE_MS) return hit.suspended;
+  const school = await Institution.findOne({ id: institutionId }).select('status').lean();
+  const suspended = school?.status === 'suspended';
+  statusCache.set(institutionId, { suspended, at: Date.now() });
+  return suspended;
+}
+export function forgetInstitutionStatus(institutionId?: string): void {
+  if (institutionId) statusCache.delete(institutionId);
+  else statusCache.clear();
 }

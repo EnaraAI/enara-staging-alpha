@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, AtSign, CircleAlert, Eye, EyeOff, Info, KeyRound, Lock } from 'lucide-react';
-import { clearSession, login, SessionUser } from '../services/apiService';
+import { clearSession, login, requestPasswordReset, SessionUser } from '../services/apiService';
 import { uiRoleFor, UiRole, LoginChoice } from '../services/roleRouting';
 import './Login.css';
 import { EnaraLogo } from '../components/brand/EnaraLogo';
@@ -29,6 +29,8 @@ const TEXT = {
     email: 'Email', emailPh: 'name@school.edu', badEmail: 'Enter an email like name@school.edu.',
     password: 'Password', passwordPh: 'Your password', noPassword: 'Enter your password.',
     forgot: 'Forgot password?', forgotInfo: "Your school manages ENARA accounts. Ask your school's administrator to reset your password.",
+    forgotSent: "If an account exists for that email, we have sent a link to reset the password. It works once, for 30 minutes. No email? Ask your school's administrator.",
+    forgotNeedEmail: 'Enter your email above first, then choose Forgot password.',
     show: 'Show password', hide: 'Hide password',
     submit: 'Continue', loading: 'Signing in…',
     managed: 'Your school manages your account.',
@@ -47,6 +49,8 @@ const TEXT = {
     email: 'الإيميل', emailPh: 'name@school.edu', badEmail: 'اكتب إيميل زي name@school.edu.',
     password: 'كلمة السر', passwordPh: 'كلمة السر بتاعتك', noPassword: 'اكتب كلمة السر.',
     forgot: 'نسيت كلمة السر؟', forgotInfo: 'مدرستك هي اللي بتدير حسابات إنارة. اطلب من مسؤول المدرسة يغيّر لك كلمة السر.',
+    forgotSent: 'لو فيه حساب بالإيميل ده، بعتنا لك رابط تغيّر بيه كلمة السر. الرابط يشتغل مرة واحدة لمدة ٣٠ دقيقة. ما وصلكش؟ كلّم مسؤول المدرسة.',
+    forgotNeedEmail: 'اكتب إيميلك الأول، وبعدين دوس على نسيت كلمة السر.',
     show: 'إظهار كلمة السر', hide: 'إخفاء كلمة السر',
     submit: 'متابعة', loading: 'جاري تسجيل الدخول…',
     managed: 'مدرستك هي اللي بتدير حسابك.',
@@ -202,7 +206,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
         <div className="si-field">
           <label htmlFor="si-pass">
             {t.password}
-            <button type="button" className="si-link" onClick={() => { setAuthError(null); setInfo(t.forgotInfo); }}>{t.forgot}</button>
+            <button type="button" className="si-link" onClick={() => {
+              setAuthError(null);
+              if (!EMAIL_RE.test(email.trim())) { setInfo(t.forgotNeedEmail); return; }
+              // Always the same answer, whether or not the account exists.
+              requestPasswordReset(email.trim()).catch(() => undefined).finally(() => setInfo(t.forgotSent));
+            }}>{t.forgot}</button>
           </label>
           <div className={`si-input${fieldError?.field === 'password' ? ' err' : ''}`}>
             <KeyRound size={18} />

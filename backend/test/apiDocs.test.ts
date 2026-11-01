@@ -36,10 +36,17 @@ describe('API docs password', () => {
       expect((await getDocs(url)).status).toBe(200);
     }
   });
-  it('is closed on a production server with no password set', async () => {
+  it('is closed with no password set, in production and elsewhere', async () => {
     delete process.env.API_DOCS_PASSWORD;
     process.env.NODE_ENV = 'production';
     try { expect((await request(app).get('/api/docs/ui')).status).toBe(404); } finally { process.env.NODE_ENV = 'test'; process.env.API_DOCS_PASSWORD = PASS; }
+    // Closed without a password outside production too (staging runs as development).
+    delete process.env.API_DOCS_PASSWORD;
+    process.env.NODE_ENV = 'development';
+    try {
+      expect((await request(app).get('/api/docs/ui')).status).toBe(404);
+      expect((await request(app).get('/api/docs.json')).status).toBe(404);
+    } finally { process.env.NODE_ENV = 'test'; process.env.API_DOCS_PASSWORD = PASS; }
   });
 });
 

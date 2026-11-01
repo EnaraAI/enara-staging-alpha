@@ -3,8 +3,18 @@ type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 const SENSITIVE_KEY_PATTERN =
   /(authorization|password|token|secret|api[-_]?key|cookie|set-cookie|signature|credential)/i;
 
+// Signed links are bearer credentials (P22): any signature, expiry-bound
+// token or presigned-URL credential in a logged string is replaced, wherever
+// the string appears (paths, URLs, error messages).
+const SIGNED_QUERY_PATTERN = /([?&](?:sig|exp|token|X-Amz-Signature|X-Amz-Credential|X-Amz-Security-Token)=)[^&\s"'#]*/gi;
+
+export function redactSignedLinks(text: string): string {
+  return text.replace(SIGNED_QUERY_PATTERN, '$1[REDACTED]');
+}
+
 function redact(value: unknown, depth = 0): unknown {
   if (depth > 4) return '[REDACTED_DEPTH]';
+  if (typeof value === 'string') return redactSignedLinks(value);
   if (Array.isArray(value)) return value.map((item) => redact(item, depth + 1));
   if (!value || typeof value !== 'object') return value;
 
@@ -19,7 +29,7 @@ function write(level: LogLevel, message: string, meta: Record<string, unknown> =
   const safeMeta = redact(meta) as Record<string, unknown>;
   const event = {
     level,
-    message,
+    message: redactSignedLinks(message),
     timestamp: new Date().toISOString(),
     ...safeMeta,
   };

@@ -37,13 +37,17 @@ async function findDocument(req: AuthRequest, mode: 'read' | 'write') {
   return { job, curriculum };
 }
 
-export const DEFERRED_DOWNLOAD_WARNING =
-  'This file has not been scanned for malware. Open it only if you trust its source.';
+export { ORIGINAL_NOT_AVAILABLE } from '../services/downloadNotice';
+import { ORIGINAL_NOT_AVAILABLE } from '../services/downloadNotice';
+import { eligibilityOf } from '../services/uploadAccess';
+import { recordAudit } from '../services/auditTrail';
 
 function toDocument(job: ICurriculumFileJob, curriculum: { id: string; name: string; chapters?: { id: string; title?: string }[] } | undefined, canChange: boolean) {
-  // Owner decision (2026-10-29): unscanned ('deferred') files may be downloaded,
-  // labelled as not malware-scanned. Pending, failed and infected files never are.
-  const viewable = job.scanStatus === 'clean' || job.scanStatus === 'not_required' || job.scanStatus === 'deferred';
+  // Owner decision (2026-11-01, supersedes 2026-10-29): only an original that
+  // was scanned clean may be downloaded, by any role. Unscanned (not scanned,
+  // pending, deferred), failed, infected or removed originals never are; the
+  // extracted-text view ("Sources") stays available to staff.
+  const eligibility = eligibilityOf(job, job.fileUrl);
   return {
     uploadId: job.id,
     fileName: job.fileName ?? path.basename(job.fileUrl).replace(/^[0-9a-f-]{36}-/i, ''),
@@ -65,9 +69,11 @@ function toDocument(job: ICurriculumFileJob, curriculum: { id: string; name: str
     rightsAttested: Boolean(job.rightsAttestation?.attestedAt),
     origin: job.origin ?? 'live',
     canChange,
-    // Download for cleared, never-gated and unscanned-by-policy files (signed by the API).
-    fileUrl: viewable ? job.fileUrl : null,
-    downloadWarning: viewable && job.scanStatus === 'deferred' ? DEFERRED_DOWNLOAD_WARNING : null,
+    // The API signs this only for the owning school (see utils/uploadSigning).
+    fileUrl: eligibility.downloadable ? job.fileUrl : null,
+    originalDownload: eligibility.downloadable ? 'available' : 'unavailable',
+    originalUnavailableReason: eligibility.downloadable ? null : eligibility.reason,
+    downloadWarning: eligibility.downloadable ? null : ORIGINAL_NOT_AVAILABLE,
   };
 }
 
@@ -142,12 +148,14 @@ router.post('/:uploadId/retry', asyncHandler(async (req: AuthRequest, res: Respo
   const after = await CurriculumFileJob.findOne({ id: job.id }).lean();
   if (after && after.status === 'pending' && isClearedForProcessing(after, await isDocumentSafetyRequired(after.institutionId))) await processDocuments(after.curriculumId);
   const final = await CurriculumFileJob.findOne({ id: job.id }).lean();
+  await recordAudit('document_retried', req.user, { institutionId: job.institutionId, type: 'document', id: job.id }, { scanStatus: final?.scanStatus, status: final?.status });
   res.json({ document: toDocument(final as never, undefined, true) });
 }));
 
 router.delete('/:uploadId', asyncHandler(async (req: AuthRequest, res: Response) => {
   const { job } = await findDocument(req, 'write');
   await deleteDocument(job, 'user');
+  await recordAudit('document_deleted', req.user, { institutionId: job.institutionId, type: 'document', id: job.id });
   res.status(204).end();
 }));
 

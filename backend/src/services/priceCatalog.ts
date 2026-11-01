@@ -86,6 +86,7 @@ export interface UsageUnits {
   cacheReadTokens?: number;
   cacheWriteTokens?: number;
   characters?: number;
+  audioSeconds?: number;
 }
 
 export interface PricedUsage {
@@ -104,6 +105,12 @@ export function priceUsage(provider: PriceProvider, model: string, units: UsageU
     provider === 'elevenlabs'
       ? [['tts_character', units.characters]]
       : [['input_token', units.inputTokens], ['output_token', units.outputTokens], ['cache_read_token', units.cacheReadTokens], ['cache_write_token', units.cacheWriteTokens]];
+  // ElevenLabs is priced by text-to-speech characters only. Usage measured in
+  // other units (speech-to-text audio seconds) has no catalogue price: it is
+  // 'unpriced', so its budget reservation is kept whole, never refunded as free.
+  if (provider === 'elevenlabs' && !units.characters && Object.values(units).some((v) => typeof v === 'number' && v > 0)) {
+    return { ...base, costUsd: null, status: 'unpriced' };
+  }
   for (const [unit, amount] of parts) {
     if (!amount) continue;
     const price = unitPriceUsd(provider, model, unit, version);

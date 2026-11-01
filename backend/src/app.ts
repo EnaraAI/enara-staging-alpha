@@ -14,6 +14,7 @@ import { getConfig } from './config/env';
 import { setupSwagger } from './config/swagger';
 import { errorHandler, AppError } from './middleware/errorHandler';
 import { isValidUploadSignature, uploadLinkSigning } from './utils/uploadSigning';
+import { resolveUpload } from './services/uploadAccess';
 import { MongoRateLimitStore } from './services/mongoRateLimitStore';
 import { captureRawBody, requestContext, requestLogger } from './middleware/requestContext';
 import authRoutes from './routes/auth.routes';
@@ -164,17 +165,30 @@ export function createApp() {
   app.use(express.urlencoded({ extended: false, limit: config.formBodyLimit, verify: captureRawBody }));
   app.use(uploadLinkSigning);
 
-  // Files need a signed, expiring link from an API response (see uploadSigning).
-  const requireUploadSignature = (req: Request, res: Response, next: NextFunction) => {
-    const name = path.basename(String(req.params.name ?? req.path));
-    if (!isValidUploadSignature(name, req.query.exp, req.query.sig)) {
-      return res.status(403).json({ error: { code: 'UPLOAD_LINK_INVALID', message: 'This file link is invalid or has expired.' } });
+  // Files need a signed, expiring link from an API response, bound to the
+  // file's owning school (see uploadSigning), and the original must be
+  // downloadable: scanned clean, or lesson media. Unscanned, pending,
+  // deferred, failed, infected or removed files are never served (P22,
+  // owner decision 2026-11-01), whatever link is presented.
+  const requireDownloadableUpload = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const name = path.basename(String(req.params.name ?? req.path));
+      const info = await resolveUpload(`/uploads/${name}`);
+      if (!isValidUploadSignature(name, req.query.exp, req.query.sig, info.owner)) {
+        return res.status(403).json({ error: { code: 'UPLOAD_LINK_INVALID', message: 'This file link is invalid or has expired.' } });
+      }
+      if (!info.eligibility.downloadable) {
+        return res.status(404).json({ error: { code: 'FILE_NOT_AVAILABLE', message: 'The original of this file is not available for download.' } });
+      }
+      res.setHeader('Cache-Control', 'private, no-store');
+      return next();
+    } catch (error) {
+      return next(error);
     }
-    return next();
   };
 
   if (isRemoteUploadStorage()) {
-    app.get('/uploads/:name', requireUploadSignature, async (req: Request, res: Response, next: NextFunction) => {
+    app.get('/uploads/:name', requireDownloadableUpload, async (req: Request, res: Response, next: NextFunction) => {
       try {
         const name = String(req.params.name);
         // Videos are too large to pass through the function; send the viewer to R2.
@@ -183,41 +197,57 @@ export function createApp() {
         if (!file) return res.status(404).json({ error: 'Not found' });
         res.setHeader('Content-Type', file.contentType || 'application/octet-stream');
         res.setHeader('X-Content-Type-Options', 'nosniff');
-        res.setHeader('Cache-Control', 'private, max-age=3600');
+        res.setHeader('Cache-Control', 'private, max-age=900');
         return res.send(file.body);
       } catch (error) {
         return next(error);
       }
     });
   } else if (config.serveLocalUploads) {
-    app.use('/uploads', requireUploadSignature, express.static(path.resolve(config.uploadDir)));
+    app.use('/uploads', requireDownloadableUpload, express.static(path.resolve(config.uploadDir)));
   }
 
   app.get('/health', (_req: Request, res: Response) => {
     res.json({ status: 'ok', service: 'enara-ai-be' });
   });
 
+  // Readiness (P22): required dependencies for this runtime, and which
+  // optional services are configured. Configuration presence only for R2 and
+  // providers (no network call, no credential or URL in the response).
   app.get('/ready', async (_req: Request, res: Response) => {
     const mongoReady = mongoose.connection.readyState === 1;
-    let postgresReady = false;
+    let postgres: 'ok' | 'unavailable' | 'not_configured' = 'not_configured';
     if (config.databaseUrl) {
       try {
         await getPostgresPool().query('SELECT 1');
-        postgresReady = true;
+        postgres = 'ok';
       } catch {
-        postgresReady = false;
+        postgres = 'unavailable';
       }
-    } else {
-      postgresReady = !config.isProduction;
     }
-
-    const ready = mongoReady && postgresReady;
+    const staging = process.env.ENARA_STAGING === 'true';
+    // Production needs Postgres (ingestion status); staging and serverless
+    // runtimes need R2 for files (no persistent local disk) and, when any AI
+    // key is set in staging, the test-spend cap.
+    const required: Record<string, boolean> = {
+      mongo: mongoReady,
+      ...(config.isProduction ? { postgres: postgres === 'ok' } : {}),
+      ...(staging || process.env.VERCEL ? { r2Configured: Boolean(config.r2) } : {}),
+      ...(staging && config.anthropicApiKey ? { aiTestSpendCap: Boolean(config.aiTestSpend) } : {}),
+    };
+    const ready = Object.values(required).every(Boolean);
     res.status(ready ? 200 : 503).json({
       status: ready ? 'ready' : 'not_ready',
       checks: {
         mongo: mongoReady ? 'ok' : 'unavailable',
-        postgres: postgresReady ? 'ok' : 'unavailable',
+        postgres,
+        r2: config.r2 ? 'configured' : 'not_configured',
+        anthropic: config.anthropicApiKey ? 'configured' : 'not_configured',
+        elevenlabs: config.elevenlabs ? 'configured' : 'not_configured',
+        anam: config.anam ? 'configured' : 'not_configured',
+        aiTestSpendCap: config.aiTestSpend ? 'set' : 'not_set',
       },
+      required: Object.keys(required),
     });
   });
 

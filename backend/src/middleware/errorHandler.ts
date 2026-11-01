@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger, serializeError } from '../utils/logging';
+import { logPath } from './requestContext';
+import { recordAlert } from '../services/auditTrail';
 import { isDbDownError, isDbUnavailableError, markDbUnavailable, sendDbUnavailable } from '../config/dbAvailability';
 
 export class AppError extends Error {
@@ -61,13 +63,13 @@ export function errorHandler(
 ): void {
   // Already answered (e.g. the GET deadline sent its 503): nothing left to send.
   if (res.headersSent) {
-    logger.warn('error_after_response', { requestId: req.requestId, path: req.originalUrl, error: serializeError(err) });
+    logger.warn('error_after_response', { requestId: req.requestId, path: logPath(req.originalUrl), error: serializeError(err) });
     return;
   }
   if (isDbUnavailableError(err)) {
     // The database is unreachable or this instance's pool is full: a retryable 503, not a 500 (P20).
     if (isDbDownError(err)) markDbUnavailable();
-    logger.error('request_db_unavailable', { requestId: req.requestId, method: req.method, path: req.originalUrl, error: serializeError(err) });
+    logger.error('request_db_unavailable', { requestId: req.requestId, method: req.method, path: logPath(req.originalUrl), error: serializeError(err) });
     sendDbUnavailable(res, req.requestId);
     return;
   }
@@ -76,10 +78,11 @@ export function errorHandler(
   const message = safeMessage(err, statusCode);
 
   if (statusCode >= 500) {
+    void recordAlert('http_5xx', 'warning', { scope: `${req.method} ${req.route?.path ?? logPath(req.originalUrl).split('?')[0]}`, statusCode, code });
     logger.error('request_error', {
       requestId: req.requestId,
       method: req.method,
-      path: req.originalUrl,
+      path: logPath(req.originalUrl),
       statusCode,
       error: serializeError(err),
     });

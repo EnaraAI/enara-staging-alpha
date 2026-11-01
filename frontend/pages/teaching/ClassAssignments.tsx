@@ -46,7 +46,7 @@ function CreateAssignment({ classes, onDone, onClose }: { classes: any[]; onDone
   const [f, setF] = useState<any>({
     classId: classes[0]?.id ?? '', assessmentId: '', title: '', instructions: '',
     opensAt: toLocalInput(now), dueAt: toLocalInput(new Date(now.getTime() + 7 * 86400000)), closesAt: '',
-    latePolicy: 'not_accepted', maxAttempts: 1, timeLimitMinutes: '', answerReveal: 'after-close', tutorPolicy: 'hints_only', format: 'written', draft: false, assessmentKind: '',
+    latePolicy: 'not_accepted', maxAttempts: 1, timeLimitMinutes: '', answerReveal: 'after-close', tutorPolicy: 'hints_only', format: 'written', draft: false, assessmentKind: '', releasePolicy: 'auto',
   });
   const [busy, setBusy] = useState(false);
   const [speaking, setSpeaking] = useState(DEFAULT_SPEAKING);
@@ -64,7 +64,7 @@ function CreateAssignment({ classes, onDone, onClose }: { classes: any[]; onDone
         closesAt: f.latePolicy === 'accept_late' && f.closesAt ? new Date(f.closesAt).toISOString() : undefined,
         timeZone: localTz, latePolicy: f.latePolicy, maxAttempts: Number(f.maxAttempts),
         timeLimitMinutes: f.timeLimitMinutes ? Number(f.timeLimitMinutes) : undefined,
-        answerReveal: f.answerReveal, tutorPolicy: f.tutorPolicy, format: f.format, draft: f.draft,
+        answerReveal: f.answerReveal, tutorPolicy: f.tutorPolicy, format: f.format, draft: f.draft, releasePolicy: f.releasePolicy,
         ...(f.assessmentKind ? { assessmentKind: f.assessmentKind } : {}),
         ...(f.format === 'english_conversation' ? { speaking: speakingPayload(speaking) } : {}),
       });
@@ -95,7 +95,8 @@ function CreateAssignment({ classes, onDone, onClose }: { classes: any[]; onDone
         <label className="block text-sm">Attempts<input type="number" min={1} max={10} className={field} value={f.maxAttempts} onChange={(e) => set('maxAttempts', e.target.value)} /></label>
         <label className="block text-sm">Time limit (minutes)<input type="number" min={1} max={600} className={field} value={f.timeLimitMinutes} placeholder="None" onChange={(e) => set('timeLimitMinutes', e.target.value)} /></label>
       </div>
-      <p className="text-sm text-slate-600">Results: Enara grades each submission and releases it to the student once it passes its checks. You can correct any grade afterwards.</p>
+      <label className="block text-sm">Results<select className={field} value={f.releasePolicy} onChange={(e) => set('releasePolicy', e.target.value)}><option value="auto">Released to each student once Enara has graded and checked it</option><option value="manual">Held until I release them</option></select></label>
+      <p className="text-sm text-slate-600">{f.releasePolicy === 'manual' ? 'Enara grades and checks each submission; students see their result only after you release it. You can correct any grade first.' : 'Enara grades each submission and releases it to the student once it passes its checks. You can correct any grade afterwards.'}</p>
       <label className="block text-sm">Correct answers shown<select className={field} value={f.answerReveal} onChange={(e) => set('answerReveal', e.target.value)}><option value="after-close">After the assignment closes</option><option value="after-submit">After the last attempt</option><option value="never">Never</option></select></label>
       <label className="block text-sm">How students answer<select className={field} value={f.format} onChange={(e) => set('format', e.target.value)}><option value="written">Written answers</option><option value="conversation">Conversation with an AI examiner (open and short answers only)</option><option value="english_conversation">English speaking exam (voice)</option></select></label>
       {f.format === 'english_conversation' && <SpeakingSettingsFields value={speaking} onChange={setSpeaking} classId={f.classId} />}
@@ -176,7 +177,7 @@ export const ClassAssignments: React.FC = () => {
               <div className="flex flex-wrap justify-between gap-2">
                 <div>
                   <h2 className="text-lg font-bold text-slate-900">{detail.assignment.title}</h2>
-                  <p className="text-sm text-slate-600">{A_STATUS[detail.assignment.status]} · version {detail.assignment.assessmentVersion} · due {new Date(detail.assignment.dueAt).toLocaleString()} ({detail.assignment.timeZone}) · results released automatically</p>
+                  <p className="text-sm text-slate-600">{A_STATUS[detail.assignment.status]} · version {detail.assignment.assessmentVersion} · due {new Date(detail.assignment.dueAt).toLocaleString()} ({detail.assignment.timeZone}) · {detail.assignment.releasePolicy === 'manual' ? 'results held until you release them' : 'results released automatically'}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {detail.assignment.state === 'draft' && <button onClick={() => act(() => assignmentAction(detail.assignment.id, 'publish'), 'Published')} className="px-3 py-1.5 rounded-lg bg-indigo-700 text-white text-sm">Publish</button>}

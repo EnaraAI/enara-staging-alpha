@@ -1,6 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Login } from './pages/Login';
+import { AccountLink, accountLinkFromLocation } from './pages/AccountLink';
+import { People } from './pages/workspace/People';
 import { StudentDashboard } from './pages/StudentDashboard';
 import { CoursePage } from './pages/CoursePage';
 import { AdminDashboard } from './pages/AdminDashboard';
@@ -261,6 +263,10 @@ const App: React.FC = () => {
     setTimeout(() => setTutorMessage(null), 100);
   };
 
+  // Invitation and password-reset links open their own page (P22).
+  const accountLink = accountLinkFromLocation();
+  if (accountLink) return <AccountLink kind={accountLink.kind} token={accountLink.token} />;
+
   if (!state.role) {
     return (
       <Login 
@@ -458,14 +464,8 @@ const App: React.FC = () => {
             {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
             {state.page === 'settings' && <div className="p-20 text-center text-slate-400">Platform Global Settings</div>}
           </main>
-          <AIAssistant 
-            students={students} 
-            assessments={assessments} 
-            role="enara-admin"
-            isOpen={isTutorOpen}
-            onToggle={setIsTutorOpen}
-            externalMessage={tutorMessage}
-          />
+          {/* P22: the AI data assistant is for school admins only (server-enforced);
+              ENARA admins use the read-only insight pages. */}
         </div>
       </div>
     );
@@ -515,6 +515,7 @@ const App: React.FC = () => {
           {state.page === 'outcomes' && <Outcomes />}
           {/* P5: Workspace Admin only; the server enforces workspace:billing too. */}
           {state.page === 'usage' && sessionUser()?.role === 'admin' && <Usage />}
+          {state.page === 'people' && (sessionUser()?.role === 'admin' || sessionUser()?.role === 'enara-admin') && <People />}
           {state.page === 'savings' && sessionUser()?.role === 'admin' && <SavingsCenter />}
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments />}
@@ -538,15 +539,18 @@ const App: React.FC = () => {
             />
           )}
         </main>
-        <AIAssistant 
-          students={students} 
-          assessments={assessments} 
-          role="admin"
-          isOpen={isTutorOpen}
-          onToggle={setIsTutorOpen}
-          externalMessage={tutorMessage}
-          onNavigate={navigate}
-        />
+        {/* P22: model-backed analytics for school admins only (server-enforced). */}
+        {sessionUser()?.role === 'admin' && (
+          <AIAssistant
+            students={students}
+            assessments={assessments}
+            role="admin"
+            isOpen={isTutorOpen}
+            onToggle={setIsTutorOpen}
+            externalMessage={tutorMessage}
+            onNavigate={navigate}
+          />
+        )}
       </div>
     </div>
   );

@@ -44,9 +44,13 @@ type Language = 'english' | 'arabic';
 type TurnKind = 'turn' | 'opening' | 'nudge';
 
 function requireAnam() {
-  const anam = getConfig().anam;
+  const { anam, unpricedLimits } = getConfig();
   if (!anam) throw new AppError('The live tutor is not configured', 503, 'AVATAR_UNAVAILABLE');
-  return anam;
+  // Owner decision 2026-11-01 (OD-1): live calls are not capped per session.
+  // Optional ANAM_SESSION_RESERVE_USD / ANAM_MAX_SESSION_SECONDS still apply
+  // when set; otherwise the school's per-call ceiling (if any) and the
+  // environment-wide test-spend cap bound the reservation.
+  return { ...anam, reserveUsd: unpricedLimits.anamSessionReserveUsd, maxSeconds: unpricedLimits.anamMaxSessionSeconds };
 }
 
 // With ElevenLabs configured, Anam is only the face: it lip-syncs to audio the
@@ -82,6 +86,18 @@ async function createAnamSessionToken(language: Language, avatarId?: string): Pr
 async function findOwnSession(req: AuthRequest): Promise<IAvatarSession> {
   const session = await AvatarSession.findOne({ id: req.params.id, userId: req.user!.id, endedAt: null });
   if (!session) throw new AppError('Avatar session not found', 404);
+  // Hard stop (P22): past the approved maximum length the call is ended on
+  // the server and metered; the browser must start a new, newly reserved one.
+  // (New calls cannot start without the limit: see requireAnam.)
+  // Read without failing the heartbeat when the full config is not loadable
+  // (unit callers); a running server always has it.
+  let maxSeconds: number | undefined;
+  try { maxSeconds = getConfig().unpricedLimits.anamMaxSessionSeconds; } catch { maxSeconds = undefined; }
+  if (maxSeconds && Date.now() - session.createdAt.getTime() > maxSeconds * 1000) {
+    await AvatarSession.updateOne({ id: session.id, endedAt: null }, { $set: { endedAt: new Date() } });
+    void finalizeAvatarUsage(session.id).catch(() => undefined);
+    throw new AppError('This live call reached its maximum length. Start a new call to continue.', 410, 'AVATAR_SESSION_LIMIT');
+  }
   // Heartbeat for usage metering: the latest request seen for this call.
   await AvatarSession.updateOne({ id: session.id }, { $set: { lastActivityAt: new Date() } });
   return session;
@@ -155,7 +171,7 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
   // needs a configured reservation ceiling; it is kept until the call is
   // metered (unknown cost is never released as free).
   const sessionId = `av-${randomUUID()}`;
-  const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: face?.avatarId || 'anam-default' }, `avatar:${sessionId}`, 48 * 60 * 60 * 1000);
+  const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: face?.avatarId || 'anam-default', ...(requireAnam().reserveUsd ? { boundUsd: requireAnam().reserveUsd } : {}) }, `avatar:${sessionId}`, 48 * 60 * 60 * 1000);
   let sessionToken: string;
   try {
     sessionToken = await createAnamSessionToken(language, face?.avatarId);
@@ -215,7 +231,7 @@ export const switchAvatarLanguage = asyncHandler(async (req: AuthRequest, res: R
   const language = toLanguage((req.body as { target_language?: string }).target_language);
   // A new Anam session token is new provider time: reserve it before asking
   // (P0d/P14 caps), and give it back if Anam refuses. Kept whole otherwise.
-  const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: session.avatarId || 'anam-default' }, `avatar:${session.id}:switch:${randomUUID()}`, 48 * 60 * 60 * 1000);
+  const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: session.avatarId || 'anam-default', ...(requireAnam().reserveUsd ? { boundUsd: requireAnam().reserveUsd } : {}) }, `avatar:${session.id}:switch:${randomUUID()}`, 48 * 60 * 60 * 1000);
   let sessionToken: string;
   try {
     sessionToken = await createAnamSessionToken(language, session.avatarId);
