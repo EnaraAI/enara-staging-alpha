@@ -40,7 +40,7 @@ export const getLearningSettings = asyncHandler(async (req: AuthRequest, res: Re
   const institutionId =
     isGlobalAdmin(req) && typeof req.query.institutionId === 'string' ? req.query.institutionId : requireInstitutionId(req);
   const school = await Institution.findOne({ id: institutionId }).select('learningSettings').lean();
-  res.json({ institutionId, settings: { diagnosticMaxQuestions: 12, diagnosticMaxMinutes: 30, pathwayMode: 'teacher_controlled', shadowMode: false, ...(school?.learningSettings || {}) } });
+  res.json({ institutionId, settings: { diagnosticMaxQuestions: 12, diagnosticMaxMinutes: 30, pathwayMode: 'teacher_controlled', shadowMode: false, adultLearners: false, ...(school?.learningSettings || {}) } });
 });
 
 export const setLearningSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -56,6 +56,10 @@ export const setLearningSettings = asyncHandler(async (req: AuthRequest, res: Re
     if (!modes.includes(body.pathwayMode as string)) throw new AppError('pathwayMode must be strict_sequence, teacher_controlled or adaptive', 400, 'VALIDATION_ERROR');
     (set as Record<string, unknown>)['learningSettings.pathwayMode'] = body.pathwayMode;
   }
+  if (body.adultLearners !== undefined) {
+    if (typeof body.adultLearners !== 'boolean') throw new AppError('adultLearners must be true or false', 400, 'VALIDATION_ERROR');
+    (set as Record<string, unknown>)['learningSettings.adultLearners'] = body.adultLearners;
+  }
   if (body.shadowMode !== undefined) {
     // A rollout decision, so Enara admins only.
     if (!isGlobalAdmin(req)) throw new AppError('Only Enara administrators can change shadow mode', 403, 'FORBIDDEN');
@@ -66,5 +70,5 @@ export const setLearningSettings = asyncHandler(async (req: AuthRequest, res: Re
   forgetFeatureFlags(institutionId);
   logger.info('learning_settings_changed', { institutionId, changedBy: req.user!.id, set });
   const school = await Institution.findOne({ id: institutionId }).select('learningSettings').lean();
-  res.json({ institutionId, settings: { diagnosticMaxQuestions: 12, diagnosticMaxMinutes: 30, pathwayMode: 'teacher_controlled', shadowMode: false, ...(school?.learningSettings || {}) } });
+  res.json({ institutionId, settings: { diagnosticMaxQuestions: 12, diagnosticMaxMinutes: 30, pathwayMode: 'teacher_controlled', shadowMode: false, adultLearners: false, ...(school?.learningSettings || {}) } });
 });

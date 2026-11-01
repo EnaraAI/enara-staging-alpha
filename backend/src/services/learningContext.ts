@@ -11,9 +11,13 @@ import { StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import type { TeachingMeta } from '../models/TutorMessage';
 import { logger, serializeError } from '../utils/logging';
 import { applicationGapFrom, examContextFor } from './assessmentEvidenceContext';
-import { isFeatureEnabled, isShadowMode } from './featureFlags';
+import { isAdultSchool, isFeatureEnabled, isShadowMode } from './featureFlags';
 import { PEDAGOGY_PLAN_VERSION, selectTeachingPlan, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { REGISTRY_VERSION, STRATEGY_BY_ID } from './strategyRegistry';
+
+// The level used for adult learners: above every method's minimum grade, and
+// past the age where game-style motivation is chosen.
+export const ADULT_GRADE_LEVEL = 18;
 
 const MET = new Set(['proficient', 'mastered']);
 const INDEPENDENT = new Set(['independent_assessment', 'diagnostic', 'retention_review', 'teacher_verified']);
@@ -133,6 +137,8 @@ export async function buildObjectiveContext(params: {
       recentEvidence.map((e) => exam.get(e.id)?.subject).find(Boolean) ??
       (objective.curriculumId ? (await Curriculum.findOne({ id: objective.curriculumId }).select('name').lean())?.name : undefined);
     const gradeMatch = /(\d{1,2})/.exec(student?.grade ?? '');
+    // Adult education schools: every student is taught as an adult.
+    const adult = await isAdultSchool(params.institutionId);
     const input: PlanInput = {
       objectiveId: objective.id,
       masteryStatus: mine?.masteryStatus ?? 'not_assessed',
@@ -147,7 +153,7 @@ export async function buildObjectiveContext(params: {
       previous: previous ? { primary: previous.strategyId, newEvidenceSince, improved: newEvidenceSince ? improvedSince(previous, estimate) : undefined } : undefined,
       triedWithoutImprovement: [...tried],
       teacherStrategyId,
-      gradeLevel: gradeMatch ? Number(gradeMatch[1]) : undefined,
+      gradeLevel: adult ? ADULT_GRADE_LEVEL : gradeMatch ? Number(gradeMatch[1]) : undefined,
       disengaged: lastActivity ? Date.now() - new Date(lastActivity.at).getTime() > DISENGAGED_DAYS * 86_400_000 : false,
       subject,
       relatedSecureObjectives: relatedObjectives.length

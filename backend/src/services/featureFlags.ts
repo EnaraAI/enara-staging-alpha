@@ -54,7 +54,7 @@ const masterOf = (flag: LearningFlag) =>
   [...DOCUMENT_FLAGS, ...EDUCATOR_CHAT_FLAGS, ...P4_FLAGS].includes(flag as never) ? flag : (TEACHING_FLAGS as readonly string[]).includes(flag) ? TEACHING_MASTER_FLAG : MASTER_FLAG;
 
 const CACHE_MS = 30_000;
-const cache = new Map<string, { at: number; flags: Record<string, boolean>; shadow: boolean }>();
+const cache = new Map<string, { at: number; flags: Record<string, boolean>; shadow: boolean; adult: boolean }>();
 
 export function forgetFeatureFlags(institutionId?: string) {
   if (institutionId) cache.delete(institutionId);
@@ -64,12 +64,13 @@ export function forgetFeatureFlags(institutionId?: string) {
 export async function loadSchool(institutionId: string) {
   const cached = cache.get(institutionId);
   if (cached && Date.now() - cached.at < CACHE_MS) return cached;
-  const institution = await Institution.findOne({ id: institutionId }).select('features learningSettings.shadowMode').lean();
+  const institution = await Institution.findOne({ id: institutionId }).select('features learningSettings.shadowMode learningSettings.adultLearners').lean();
   const stored = (institution?.features ?? {}) as Record<string, boolean> | Map<string, boolean>;
   const entry = {
     at: Date.now(),
     flags: stored instanceof Map ? Object.fromEntries(stored) : { ...stored },
     shadow: institution?.learningSettings?.shadowMode === true,
+    adult: institution?.learningSettings?.adultLearners === true,
   };
   cache.set(institutionId, entry);
   return entry;
@@ -109,6 +110,12 @@ export function requireFeature(flag: LearningFlag) {
 
 // Shadow mode (rollout stage C): everything is computed, but only staff see
 // it. Students get the same answer as if the feature were off.
+// Adult education school (learningSettings.adultLearners).
+export async function isAdultSchool(institutionId: string | undefined): Promise<boolean> {
+  if (!institutionId) return false;
+  return (await loadSchool(institutionId)).adult;
+}
+
 export async function isShadowMode(institutionId: string | undefined): Promise<boolean> {
   if (!institutionId) return false;
   return (await loadSchool(institutionId)).shadow;
