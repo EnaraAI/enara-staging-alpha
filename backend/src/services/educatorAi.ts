@@ -1,3 +1,4 @@
+import { getConfig } from '../config/env';
 import { randomUUID } from 'crypto';
 import { LearningObjective } from '../models/LearningObjective';
 import { askForJson } from './aiJson';
@@ -156,6 +157,7 @@ export async function generateAssessmentDraft(params: {
   const ctx = { objectiveIds: new Set(objectives.map((o) => o.id)), sources, allowOpen: params.allowOpen };
   const { value, model } = await askForJson({
     feature: 'ai_assessment_draft',
+    model: getConfig().anthropicDraftModel,
     institutionId: params.institutionId,
     maxTokens: 8000,
     system: `${AUTHOR_RULES} Reply with JSON only: {"title":"...","questions":[${QUESTION_SHAPE}]}`,
@@ -197,6 +199,7 @@ export async function regenerateQuestion(params: {
   const ctx = { objectiveIds: new Set(objectives.map((o) => o.id)), sources, allowOpen: params.allowOpen };
   const { value } = await askForJson({
     feature: 'ai_question_regenerate',
+    model: getConfig().anthropicDraftModel,
     institutionId: params.institutionId,
     maxTokens: 2500,
     system: `${AUTHOR_RULES} Write ONE replacement for the given question (same type unless the teacher asks otherwise). Reply with JSON only: {"question":${QUESTION_SHAPE}}`,

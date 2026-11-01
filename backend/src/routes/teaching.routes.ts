@@ -8,6 +8,7 @@ import {
   getRoster,
   getOpsMetrics,
   getClassObjectives,
+  getTeachingFeatures,
   listEducatorInterventions,
   updateEducatorIntervention,
 } from '../controllers/teaching.controller';
@@ -18,6 +19,7 @@ import { getStudentStudyPlanForStaff } from '../controllers/meStudyPlan.controll
 const router = Router();
 router.use(authMiddleware, requireRole('teacher', 'admin', 'enara-admin'), requireFeature('teaching_workflow_enabled'));
 
+router.get('/features', getTeachingFeatures);
 router.get('/overview', getOverview);
 router.get('/ops', getOpsMetrics);
 router.get('/classes/:classId/roster', getRoster);

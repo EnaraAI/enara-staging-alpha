@@ -1,0 +1,195 @@
+{
+ "phase": "P19",
+ "date": "2026-10-30",
+ "kind": "LOCAL (mocked provider) unless stated",
+ "deploymentUnchanged": "dpl_4Bj8UuVfA4PcTxjq5ZtZdcMs74K1",
+ "suites": {
+  "backendFull": {
+   "files": 78,
+   "tests": 1069,
+   "passed": 1069
+  },
+  "p19TenantIsolation": {
+   "tests": 11,
+   "passed": 11
+  },
+  "p19Resilience": {
+   "tests": 27,
+   "passed": 27
+  },
+  "uiJourney": {
+   "checks": 43,
+   "passed": 43
+  },
+  "uiTenantIsolation": {
+   "checks": 15,
+   "passed": 15
+  }
+ },
+ "metrics": {
+  "level3": {
+   "requests": 12,
+   "tutorFailed": 0,
+   "tutorP50": 319,
+   "tutorP95": 321,
+   "tutorMax": 321,
+   "releaseP50": 285,
+   "releaseP95": 289,
+   "releaseMax": 289,
+   "providerCalls": 9,
+   "ledgerRows": 9,
+   "duplicates": 0
+  },
+  "level5": {
+   "requests": 20,
+   "tutorFailed": 0,
+   "tutorP50": 347,
+   "tutorP95": 353,
+   "tutorMax": 353,
+   "releaseP50": 321,
+   "releaseP95": 333,
+   "releaseMax": 333,
+   "providerCalls": 15,
+   "ledgerRows": 15,
+   "duplicates": 0
+  },
+  "level10": {
+   "requests": 40,
+   "tutorFailed": 0,
+   "tutorP50": 476,
+   "tutorP95": 483,
+   "tutorMax": 483,
+   "releaseP50": 404,
+   "releaseP95": 440,
+   "releaseMax": 440,
+   "providerCalls": 30,
+   "ledgerRows": 30,
+   "duplicates": 0
+  },
+  "level20": {
+   "requests": 80,
+   "tutorFailed": 0,
+   "tutorP50": 577,
+   "tutorP95": 583,
+   "tutorMax": 584,
+   "releaseP50": 669,
+   "releaseP95": 687,
+   "releaseMax": 752,
+   "providerCalls": 60,
+   "ledgerRows": 60,
+   "duplicates": 0
+  },
+  "dbOps /api/me/achievements": 6,
+  "dash /api/me/dashboard": {
+   "p50": 180,
+   "p95": 192,
+   "max": 192
+  },
+  "dash /api/me/achievements": {
+   "p50": 90,
+   "p95": 94,
+   "max": 94
+  },
+  "dash /api/me/courses": {
+   "p50": 125,
+   "p95": 130,
+   "max": 131
+  },
+  "dash /api/me/assignments": {
+   "p50": 125,
+   "p95": 129,
+   "max": 129
+  },
+  "oneIpClass": {
+   "students": 30,
+   "requests": 600,
+   "rateLimited": 240,
+   "limit": "300 per minute per IP (app.ts:137, perUser=false)"
+  },
+  "oneIpLogins": {
+   "attempts": 25,
+   "ok": 20,
+   "rateLimited": 5,
+   "limit": "20 per 15 minutes per IP (app.ts:112)"
+  },
+  "failure timeout": {
+   "failedRunProviderAttempts": 4,
+   "ledgerRowsForFailedRun": 4,
+   "statuses": [
+    "error/usage_unknown"
+   ],
+   "retriedWithinRun": true
+  },
+  "failure 429": {
+   "failedRunProviderAttempts": 4,
+   "ledgerRowsForFailedRun": 4,
+   "statuses": [
+    "error/usage_unknown"
+   ],
+   "retriedWithinRun": true
+  },
+  "failure 400": {
+   "failedRunProviderAttempts": 2,
+   "ledgerRowsForFailedRun": 2,
+   "statuses": [
+    "error/usage_unknown"
+   ],
+   "retriedWithinRun": false
+  },
+  "failure network": {
+   "failedRunProviderAttempts": 4,
+   "ledgerRowsForFailedRun": 4,
+   "statuses": [
+    "error/usage_unknown"
+   ],
+   "retriedWithinRun": true
+  },
+  "failure 529": {
+   "failedRunProviderAttempts": 4,
+   "ledgerRowsForFailedRun": 4,
+   "statuses": [
+    "error/usage_unknown"
+   ],
+   "retriedWithinRun": true
+  },
+  "failure invalid-json": {
+   "failedRunProviderAttempts": 4,
+   "ledgerRowsForFailedRun": 4,
+   "statuses": [
+    "ok/estimated"
+   ],
+   "retriedWithinRun": false
+  },
+  "failure truncated": {
+   "failedRunProviderAttempts": 4,
+   "ledgerRowsForFailedRun": 4,
+   "statuses": [
+    "ok/estimated"
+   ],
+   "retriedWithinRun": false
+  },
+  "duplicateDelivery": {
+   "outcomes": [
+    "skipped",
+    "skipped"
+   ],
+   "providerCalls": 2
+  },
+  "budgetRace": {
+   "concurrent": 20,
+   "admitted": 4,
+   "refused": 16,
+   "capMicros": 427995,
+   "reservationMicros": 95110,
+   "committedMicros": 5600,
+   "settledMicros": 5600
+  }
+ },
+ "liveBaseline": {
+  "schoolMonthCounterMicros": 698084,
+  "usageReportOperations": 54,
+  "usageUnknown": 0,
+  "testSpendCounter": "UNVERIFIED (direct DB read refused by permission policy)",
+  "providerConsole": "UNVERIFIED"
+ }
+}

@@ -80,7 +80,12 @@ export async function deleteUpload(name: string): Promise<void> {
 // response bodies are capped at ~4.5 MB: the browser PUTs straight to R2 with a
 // short-lived signed URL, and viewers are redirected to a signed GET URL.
 
-const SIGNED_URL_SECONDS = 60 * 60;
+// Presigned R2 URLs are bearer credentials (P22). Uploads: 15 minutes to
+// start the PUT. Video playback: 60 minutes, because the browser keeps
+// fetching byte ranges of the same URL while a lesson video plays; the
+// download gate and owner check run before every such link is issued.
+const UPLOAD_URL_SECONDS = 15 * 60;
+const PLAYBACK_URL_SECONDS = 60 * 60;
 
 function requireR2() {
   const r2 = getR2();
@@ -93,7 +98,7 @@ export async function createDirectUploadUrl(name: string, contentType: string): 
   return getSignedUrl(
     r2.client,
     new PutObjectCommand({ Bucket: r2.bucket, Key: `uploads/${path.basename(name)}`, ContentType: contentType }),
-    { expiresIn: SIGNED_URL_SECONDS },
+    { expiresIn: UPLOAD_URL_SECONDS },
   );
 }
 
@@ -102,7 +107,7 @@ export async function createDownloadUrl(name: string): Promise<string> {
   return getSignedUrl(
     r2.client,
     new GetObjectCommand({ Bucket: r2.bucket, Key: `uploads/${path.basename(name)}` }),
-    { expiresIn: SIGNED_URL_SECONDS },
+    { expiresIn: PLAYBACK_URL_SECONDS },
   );
 }
 

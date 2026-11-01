@@ -47,6 +47,8 @@ import {
 
 // Enara Learning Intelligence Engine (Phase 2). Everything except the flag
 // endpoints needs the school's learning_intelligence_enabled flag.
+import { getStudentTeachingImpact, getTeachingEffectiveness } from '../controllers/teachingEffectiveness.controller';
+
 const router = Router();
 
 router.use(authMiddleware);
@@ -68,6 +70,9 @@ router.use(blockStudentsInShadowMode);
 
 // P4.3 outcomes and audit timeline (connected_workflow_enabled; roles checked inside).
 router.get('/analytics/outcomes', getOutcomes);
+// P21 teaching effectiveness (roles, scope and feature flags checked inside).
+router.get('/analytics/teaching-effectiveness', getTeachingEffectiveness);
+router.get('/students/:studentId/teaching-impact', getStudentTeachingImpact);
 router.get('/students/:studentId/timeline', getStudentTimeline);
 
 router.get('/flags', requireRole('admin', 'enara-admin'), getFlags);

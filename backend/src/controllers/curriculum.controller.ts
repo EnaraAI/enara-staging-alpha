@@ -1,5 +1,6 @@
 import { queueCurriculumProcessing } from '../services/curriculumExtraction';
 import { unsignUploadPath } from '../utils/uploadSigning';
+import { ownerFromName, ownUploadsOnly, resolveUpload, schoolSlug, storedUploadName } from '../services/uploadAccess';
 import { Response } from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -143,6 +144,9 @@ export const createCurriculum = asyncHandler(async (req: AuthRequest, res: Respo
       })
     : [];
 
+  // Only this school's own files may be attached (P22: no foreign /uploads/ paths).
+  for (const ch of normalizedChapters) ch.uploads = await ownUploadsOnly(institutionId, ch.uploads);
+
   const curriculum = await Curriculum.create({
     id,
     institutionId,
@@ -182,6 +186,18 @@ export const updateCurriculum = asyncHandler(async (req: AuthRequest, res: Respo
     'chapters',
   ] as const;
 
+  // Upload paths a client sends back are kept only if they were already in
+  // this curriculum or belong to this school (P22: another school's file can
+  // never be attached, signed or deleted through a curriculum).
+  if (Array.isArray(body.chapters)) {
+    const listed = new Set(curriculum.chapters.flatMap((c) => c.uploads || []));
+    for (const raw of body.chapters as unknown[]) {
+      if (raw && typeof raw === 'object' && Array.isArray((raw as { uploads?: unknown }).uploads)) {
+        const ch = raw as { uploads: unknown[] };
+        ch.uploads = await ownUploadsOnly(curriculum.institutionId, ch.uploads.filter((u): u is string => typeof u === 'string'), listed);
+      }
+    }
+  }
   for (const key of allowed) {
     if (body[key] !== undefined) {
       (curriculum as unknown as Record<string, unknown>)[key] = body[key];
@@ -291,7 +307,7 @@ export const uploadChapterFile = asyncHandler(async (req: AuthRequest, res: Resp
   }
   const uploadInfo = validateUploadFile(file);
 
-  const storedName = `${randomUUID()}-${uploadInfo.safeFileName}`;
+  const storedName = storedUploadName(curriculum.institutionId, uploadInfo.safeFileName);
   await saveUpload(storedName, file.buffer, file.mimetype);
 
   const fileUrl = `/uploads/${storedName}`;
@@ -323,7 +339,7 @@ export const requestChapterVideoUpload = asyncHandler(async (req: AuthRequest, r
     throw new AppError('Video must be 1 GB or smaller', 413, 'UPLOAD_SIZE_NOT_ALLOWED');
   }
 
-  const storedName = `${randomUUID()}-${safeFileName}`;
+  const storedName = storedUploadName(curriculum.institutionId, safeFileName);
   const uploadUrl = await createDirectUploadUrl(storedName, contentType);
   res.json({ uploadUrl, storedName, contentType });
 });
@@ -335,6 +351,8 @@ export const completeChapterVideoUpload = asyncHandler(async (req: AuthRequest, 
   if (!chapter) throw new AppError('Chapter not found', 404);
 
   const storedName = path.basename(String((req.body as { storedName?: string }).storedName || ''));
+  // The name must be one this school was given (P22): never another school's object.
+  if (ownerFromName(storedName) !== schoolSlug(curriculum.institutionId)) throw new AppError('Unknown video upload', 400, 'VALIDATION_ERROR');
   const extension = path.extname(storedName).toLowerCase();
   if (!VIDEO_TYPES[extension]) throw new AppError('Unknown video upload', 400, 'VALIDATION_ERROR');
 
@@ -365,9 +383,14 @@ export const removeChapterUpload = asyncHandler(async (req: AuthRequest, res: Re
   if (!uploadPath || !uploadPath.startsWith('/uploads/')) {
     throw new AppError('uploadPath query parameter is required', 400, 'VALIDATION_ERROR');
   }
+  const listed = chapter.uploads.includes(uploadPath);
   chapter.uploads = chapter.uploads.filter((u) => u !== uploadPath);
 
-  await deleteUpload(path.basename(uploadPath));
+  // Delete the stored object only if it was in this lesson and belongs to
+  // this school (P22); never a file named by another school's path.
+  if (listed && (await resolveUpload(uploadPath)).owner === schoolSlug(curriculum.institutionId)) {
+    await deleteUpload(path.basename(uploadPath));
+  }
 
   curriculum.lastUpdated = formatDate();
   await curriculum.save();

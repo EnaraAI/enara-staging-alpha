@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { OriginSelector } from '../components/OriginSelector';
+import { TeachingEffectivenessPanel } from '../components/TeachingEffectivenessPanel';
 import { OriginView } from '../services/roleRouting';
 import { createPortal } from 'react-dom';
 import { Loader2, X } from 'lucide-react';
@@ -280,6 +281,7 @@ export const ClassInsights: React.FC = () => {
         </>
       )}
 
+      {classId && <TeachingEffectivenessPanel classId={classId} origin={origin} />}
       {assigning &&
         createPortal(
           <div className="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="assign-title">

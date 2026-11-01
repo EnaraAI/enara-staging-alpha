@@ -4,14 +4,20 @@ import { LessonProgress } from '../models/LessonProgress';
 import { Student } from '../models/Student';
 import { AppError } from '../middleware/errorHandler';
 import { STUDENT_VISIBLE_COURSE_FILTER } from './courseVisibility';
+import { requestMemo } from '../utils/callContext';
+import { resolveUploads } from './uploadAccess';
 
 export async function getStudentOrThrow(studentId: string) {
-  const student = await Student.findOne({ id: studentId });
+  const student = await requestMemo(`student:${studentId}`, () => Student.findOne({ id: studentId }).exec());
   if (!student) throw new AppError('Student profile not found', 404);
   return student;
 }
 
-export async function getEnrolledInstances(studentId: string) {
+export function getEnrolledInstances(studentId: string) {
+  return requestMemo(`enrolled:${studentId}`, () => readEnrolledInstances(studentId));
+}
+
+async function readEnrolledInstances(studentId: string) {
   const student = await getStudentOrThrow(studentId);
   const filter: Record<string, unknown>[] = [{ studentIds: studentId }];
   if (student.batchId) {
@@ -24,7 +30,8 @@ export async function getEnrolledInstances(studentId: string) {
     $or: filter,
   })
     .sort({ createdAt: -1 })
-    .limit(100);
+    .limit(100)
+    .exec();
 }
 
 export async function getVisibleCurriculumIdsForStudent(studentId: string): Promise<string[]> {
@@ -62,7 +69,13 @@ export async function buildCourseTree(studentId: string, courseId: string) {
     progress.filter((p) => p.status === 'completed').map((p) => p.lessonId)
   );
 
-  const chapters = curriculum?.chapters || [];
+  // Course materials list only originals a learner may download: scanned
+  // clean, or lesson media (P22, owner decision 2026-11-01). Unscanned,
+  // pending, failed or removed documents are left out entirely.
+  const allUploads = (curriculum?.chapters || []).flatMap((c) => c.uploads || []);
+  const info = await resolveUploads(allUploads);
+  const offered = new Set(allUploads.filter((u) => !u.startsWith('/uploads/') || info.get(u)?.eligibility.downloadable));
+  const chapters = (curriculum?.chapters || []).map((c) => ({ ...(typeof (c as any).toObject === 'function' ? (c as any).toObject() : c), uploads: (c.uploads || []).filter((u: string) => offered.has(u)) }));
   const lessons = chapters.map((chapter, idx) => {
     const isCompleted = completedIds.has(chapter.id);
     const prevCompleted = idx === 0 || completedIds.has(chapters[idx - 1].id);

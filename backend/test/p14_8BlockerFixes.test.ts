@@ -207,9 +207,9 @@ describe('staging test-spend cap ceiling', () => {
     R2_ACCOUNT_ID: 'a', R2_BUCKET: 'enara-staging-alpha-uploads', R2_ACCESS_KEY_ID: 'k', R2_SECRET_ACCESS_KEY: 's', SERVE_LOCAL_UPLOADS: 'false',
     CORS_ALLOWED_ORIGINS: 'https://staging.example.test', FRONTEND_URL: 'https://staging.example.test', ANTHROPIC_API_KEY: 'x', AI_TEST_SPEND_ID: 'p14', ...over,
   });
-  it('accepts a cap up to the approved $5 and refuses anything above it', () => {
-    expect(STAGING_MAX_TEST_SPEND_USD).toBe(5);
-    for (const v of ['4.50', '5', '0.01']) expect(stagingProblems(base({ AI_TEST_SPEND_CAP_USD: v })), v).toEqual([]);
-    for (const v of ['5.01', '50', '0', '-1', 'five']) expect(stagingProblems(base({ AI_TEST_SPEND_CAP_USD: v })).join(' '), v).toMatch(/at most 5/);
+  it('accepts a cap up to the approved $30 and refuses anything above it', () => {
+    expect(STAGING_MAX_TEST_SPEND_USD).toBe(50);
+    for (const v of ['4.50', '5', '10', '30', '50', '0.01']) expect(stagingProblems(base({ AI_TEST_SPEND_CAP_USD: v })), v).toEqual([]);
+    for (const v of ['50.01', '75', '0', '-1', 'five']) expect(stagingProblems(base({ AI_TEST_SPEND_CAP_USD: v })).join(' '), v).toMatch(/at most 50/);
   });
 });

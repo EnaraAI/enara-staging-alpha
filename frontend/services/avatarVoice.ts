@@ -1,3 +1,4 @@
+import { QUICK_CLOSE_MS, transcriptionReconnectDelayMs } from './retryPolicy';
 import { CommitStrategy, RealtimeEvents, Scribe, type RealtimeConnection } from '@elevenlabs/client';
 import { avatarFetch } from './apiService';
 
@@ -47,6 +48,10 @@ export class AvatarVoice {
   private connection: RealtimeConnection | null = null;
   private rotating = false;
   private stopped = false;
+  // Reconnect guard (see transcriptionReconnectDelayMs): quick closes in a row,
+  // and whether the provider refused us for good (quota, authentication).
+  private quickCloses = 0;
+  private fatal = false;
   private playback: Promise<void> = Promise.resolve();
   // Bumped on interrupt: queued and playing audio from older turns is dropped.
   private generation = 0;
@@ -109,8 +114,15 @@ export class AvatarVoice {
       // sentence gets a fresh one.
       void this.rotate();
     });
-    connection.on(RealtimeEvents.AUTH_ERROR, () => this.callbacks.onError('Voice transcription was refused.'));
-    connection.on(RealtimeEvents.QUOTA_EXCEEDED, () => this.callbacks.onError('The voice quota has run out.'));
+    connection.on(RealtimeEvents.AUTH_ERROR, () => {
+      this.fatal = true;
+      this.callbacks.onError('Voice transcription was refused.');
+    });
+    connection.on(RealtimeEvents.QUOTA_EXCEEDED, () => {
+      this.fatal = true;
+      this.callbacks.onError('The voice quota has run out.');
+    });
+    const openedAt = performance.now();
     // Resolve once the session is live (or after 3 s), so a rotation only
     // closes the previous session when this one is already listening.
     const started = new Promise<void>((resolve) => {
@@ -120,13 +132,19 @@ export class AvatarVoice {
     connection.on(RealtimeEvents.CLOSE, () => {
       if (this.connection !== connection) return;
       this.connection = null;
-      // Tokens and sessions are time-limited: reconnect while the call is open.
-      if (!this.stopped) {
-        setTimeout(
-          () => void this.startListening().catch(() => this.callbacks.onError('Voice transcription stopped.')),
-          500,
-        );
+      // Tokens and sessions are time-limited: reconnect while the call is open,
+      // but never in a tight loop (each reconnect buys a new token).
+      if (this.stopped) return;
+      this.quickCloses = performance.now() - openedAt < QUICK_CLOSE_MS ? this.quickCloses + 1 : 0;
+      const delay = transcriptionReconnectDelayMs(this.quickCloses, this.fatal);
+      if (delay === null) {
+        if (!this.fatal) this.callbacks.onError('Voice transcription keeps dropping. Please try again later.');
+        return;
       }
+      setTimeout(
+        () => void this.startListening().catch(() => this.callbacks.onError('Voice transcription stopped.')),
+        delay,
+      );
     });
     await started;
   }

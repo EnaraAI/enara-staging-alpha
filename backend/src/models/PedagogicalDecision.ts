@@ -19,6 +19,24 @@ export interface IPedagogicalDecision extends Document {
   interventionId?: string;
   tutorSessionId?: string;
   at: Date;
+  // ped-v2 / registry v2 (P21), all optional: older decisions stay valid.
+  supportingStrategyIds?: string[];
+  reinforcementStrategyId?: string;
+  modifierIds?: string[];
+  registryVersion?: string;
+  gap?: string;
+  expectedOutcome?: string;
+  switchWhen?: string;
+  confidence?: string;
+  limitations?: string[];
+  // How the objective was chosen: session | lesson | lesson_multiple.
+  objectiveResolution?: string;
+  // chat | stream | voice
+  channel?: string;
+  // The student's mastery estimate when the plan was chosen (to see later
+  // whether evidence moved after it).
+  masteryAtDecision?: number | null;
+  masteryStatusAtDecision?: string;
 }
 
 const schema = new Schema<IPedagogicalDecision>(
@@ -39,6 +57,19 @@ const schema = new Schema<IPedagogicalDecision>(
     interventionId: String,
     tutorSessionId: String,
     at: { type: Date, required: true },
+    supportingStrategyIds: { type: [String], default: undefined },
+    reinforcementStrategyId: String,
+    modifierIds: { type: [String], default: undefined },
+    registryVersion: String,
+    gap: String,
+    expectedOutcome: String,
+    switchWhen: String,
+    confidence: String,
+    limitations: { type: [String], default: undefined },
+    objectiveResolution: String,
+    channel: String,
+    masteryAtDecision: Number,
+    masteryStatusAtDecision: String,
   },
   { collection: 'pedagogical_decisions', versionKey: false },
 );

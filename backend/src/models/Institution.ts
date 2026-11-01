@@ -21,6 +21,10 @@ export interface IInstitution extends Document {
     pathwayMode?: 'strict_sequence' | 'teacher_controlled' | 'adaptive';
     // Rollout stage C: results visible to staff only.
     shadowMode?: boolean;
+    // Adult education school: every student is taught as an adult (all
+    // teaching methods open, no game-style motivation), whatever the
+    // grade on their profile.
+    adultLearners?: boolean;
   };
 }
 
@@ -41,6 +45,7 @@ const institutionSchema = new Schema<IInstitution>(
       diagnosticMaxMinutes: { type: Number, min: 5, max: 120 },
       pathwayMode: { type: String, enum: ['strict_sequence', 'teacher_controlled', 'adaptive'] },
       shadowMode: Boolean,
+      adultLearners: Boolean,
     },
   },
   { timestamps: true }

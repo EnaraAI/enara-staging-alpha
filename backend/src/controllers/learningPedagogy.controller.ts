@@ -5,14 +5,14 @@ import { isGlobalAdmin, requireInstitutionId } from '../auth/authorization';
 import { CourseInstance } from '../models/CourseInstance';
 import { Student } from '../models/Student';
 import { TimeToUnderstand } from '../models/TimeToUnderstand';
-import { STRATEGIES } from '../services/strategyRegistry';
-import { PEDAGOGY_DECISION_VERSION } from '../services/pedagogyPolicy';
+import { REGISTRY_VERSION, STRATEGIES } from '../services/strategyRegistry';
+import { PEDAGOGY_PLAN_VERSION } from '../services/pedagogyPolicy';
 import { TTU_VERSION } from '../services/timeToUnderstand';
 import { parseOriginView, studentClauseForView, studentsInView } from '../services/originScope';
 
 // GET /api/learning/strategies — the strategy registry (staff).
 export const listStrategies = asyncHandler(async (_req: AuthRequest, res: Response) => {
-  res.json({ decisionVersion: PEDAGOGY_DECISION_VERSION, strategies: STRATEGIES });
+  res.json({ decisionVersion: PEDAGOGY_PLAN_VERSION, registryVersion: REGISTRY_VERSION, strategies: STRATEGIES });
 });
 
 const quantile = (sorted: number[], q: number) => {

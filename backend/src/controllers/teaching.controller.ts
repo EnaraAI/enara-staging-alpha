@@ -10,13 +10,16 @@ import { CourseInstance } from '../models/CourseInstance';
 import { EDUCATOR_ACTIONS, LearningIntervention } from '../models/LearningIntervention';
 import { LearningEvent } from '../models/LearningEvent';
 import { LearningObjective } from '../models/LearningObjective';
+import { PedagogicalDecision } from '../models/PedagogicalDecision';
+import { TeachingEpisode } from '../models/TeachingEpisode';
+import { STRATEGY_BY_ID } from '../services/strategyRegistry';
 import { Student } from '../models/Student';
 import { StudentMisconception } from '../models/StudentMisconception';
 import { StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import { classStudentIds, loadClassForStaff, resolveStudentForRead } from '../services/learningAccess';
 import { originFilter, parseOriginView, studentsInView, type OriginView } from '../services/originScope';
 import { assignmentStatus, studentStatus } from '../services/assignments';
-import { getFeatureFlags } from '../services/featureFlags';
+import { getFeatureFlags, isFeatureEnabled } from '../services/featureFlags';
 import { getEnrolledInstances } from '../services/studentCourseService';
 import { ensurePlainObject, getOptionalId, getOptionalString, getRequiredId, getRequiredString, rejectMongoOperators } from '../utils/validation';
 
@@ -194,6 +197,46 @@ export const getLearnerProfile = asyncHandler(async (req: AuthRequest, res: Resp
     const { buildPathway } = await import('../services/pathways');
     recommendations = (await buildPathway(student)).recommendations;
   }
+  // Teaching approach (P21): the latest tutor plan per objective, how often it
+  // was used and, when computed, what the assessment evidence did after it.
+  // Observational only; never costs.
+  let teaching: { objectiveId: string; [k: string]: unknown }[] | null = null;
+  if (flags?.adaptive_pedagogy_enabled) {
+    const latest = await PedagogicalDecision.aggregate([
+      { $match: { studentId: student.id } },
+      { $sort: { at: -1 } },
+      { $group: { _id: '$objectiveId', d: { $first: '$$ROOT' }, uses: { $sum: 1 }, channels: { $addToSet: '$channel' } } },
+      { $sort: { 'd.at': -1 } },
+      { $limit: 20 },
+    ]);
+    const episodes = latest.length
+      ? await TeachingEpisode.find({ studentId: student.id, objectiveId: { $in: latest.map((l: { _id: string }) => l._id) } })
+          .sort({ startAt: -1 })
+          .select('objectiveId primary label observedChange evidenceQuality startAt')
+          .lean()
+      : [];
+    const name = (id?: string) => (id ? STRATEGY_BY_ID.get(id)?.name ?? id.replace(/_/g, ' ') : undefined);
+    teaching = latest.map((l: { _id: string; uses: number; channels: (string | null)[]; d: Record<string, any> }) => {
+      const d = l.d;
+      const ep = episodes.find((e) => e.objectiveId === l._id && e.primary === d.strategyId);
+      objectiveIds.add(l._id);
+      return {
+        objectiveId: l._id,
+        method: { id: d.strategyId, name: name(d.strategyId) },
+        supporting: (d.supportingStrategyIds ?? []).map((id: string) => ({ id, name: name(id) })),
+        reinforcement: d.reinforcementStrategyId ? { id: d.reinforcementStrategyId, name: name(d.reinforcementStrategyId) } : null,
+        why: d.gap ?? null,
+        reasonCodes: d.reasonCodes ?? [],
+        source: d.interventionId || (d.reasonCodes ?? []).includes('TEACHER_ASSIGNED') ? 'teacher' : 'automatic',
+        previousMethod: d.previousStrategyId && d.previousStrategyId !== d.strategyId ? { id: d.previousStrategyId, name: name(d.previousStrategyId) } : null,
+        confidence: d.confidence ?? null,
+        lastUsedAt: d.at,
+        uses: l.uses,
+        channels: l.channels.filter(Boolean),
+        result: ep ? { label: ep.label, observedChange: ep.observedChange ?? null, evidenceQuality: ep.evidenceQuality, since: ep.startAt } : null,
+      };
+    });
+  }
   const codes = new Map((await LearningObjective.find({ id: { $in: [...objectiveIds] } }).select('id code title').lean()).map((o) => [o.id, o]));
   const label = (id?: string) => (id ? { objectiveId: id, code: codes.get(id)?.code, title: codes.get(id)?.title } : null);
 
@@ -221,6 +264,7 @@ export const getLearnerProfile = asyncHandler(async (req: AuthRequest, res: Resp
     estimates: estimates === null ? { enabled: false } : { enabled: true, items: (estimates as { objectiveId: string }[]).map((e) => ({ ...e, ...label(e.objectiveId) })) },
     misconceptions: misconceptions === null ? { enabled: false } : { enabled: true, items: (misconceptions as { objectiveId: string }[]).map((m) => ({ ...m, ...label(m.objectiveId) })) },
     recommendations: recommendations === null ? { enabled: false } : { enabled: true, items: recommendations },
+    teaching: teaching === null ? { enabled: false } : { enabled: true, items: teaching.map((t) => ({ ...t, ...label(t.objectiveId) })) },
     interventions: interventions.map((i) => ({
       id: i.id,
       action: i.interventionType,
@@ -423,4 +467,21 @@ export const getOpsMetrics = asyncHandler(async (req: AuthRequest, res: Response
     notifications: notifications ? notifications.map((x: { _id: { kind: string; sent: boolean }; n: number }) => ({ kind: x._id.kind, sent: x._id.sent, count: x.n })) : null,
     submissions: { onTime: submissions.find((s: { _id: boolean }) => !s._id)?.n ?? 0, late: submissions.find((s: { _id: boolean }) => s._id === true)?.n ?? 0 },
   });
+});
+
+// GET /api/teaching/features — which AI tools the caller's own school has on,
+// so pages hide a button instead of failing after it is pressed. The same
+// checks the AI endpoints make; yes/no answers only, never other schools'.
+export const getTeachingFeatures = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const user = req.user!;
+  // Enara admins have no school of their own: hide nothing, the server decides.
+  if (user.role === 'enara-admin') { res.json({ aiAssessmentDrafts: true, aiLessonPlans: true, documents: true }); return; }
+  const institutionId = user.institutionId;
+  if (!institutionId) { res.json({ aiAssessmentDrafts: false, aiLessonPlans: false, documents: false }); return; }
+  const [aiAssessmentDrafts, aiLessonPlans, documents] = await Promise.all([
+    isFeatureEnabled(institutionId, 'ai_assessment_authoring_enabled'),
+    isFeatureEnabled(institutionId, 'ai_lesson_planning_enabled'),
+    isFeatureEnabled(institutionId, 'documents_workspace_enabled'),
+  ]);
+  res.json({ aiAssessmentDrafts, aiLessonPlans, documents });
 });

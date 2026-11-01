@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { recordAudit } from '../services/auditTrail';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { isGlobalAdmin, requireInstitutionId } from '../auth/authorization';
@@ -32,6 +33,7 @@ export const setFlags = asyncHandler(async (req: AuthRequest, res: Response) => 
   if (!updated.matchedCount) throw new AppError('Institution not found', 404, 'INSTITUTION_NOT_FOUND');
   forgetFeatureFlags(institutionId);
   logger.info('feature_flags_changed', { institutionId, changedBy: req.user!.id, flags });
+  await recordAudit('feature_flags_changed', req.user, { institutionId, type: 'institution', id: institutionId }, { flags });
   res.json({ institutionId, flags: await getFeatureFlags(institutionId) });
 });
 
@@ -40,7 +42,7 @@ export const getLearningSettings = asyncHandler(async (req: AuthRequest, res: Re
   const institutionId =
     isGlobalAdmin(req) && typeof req.query.institutionId === 'string' ? req.query.institutionId : requireInstitutionId(req);
   const school = await Institution.findOne({ id: institutionId }).select('learningSettings').lean();
-  res.json({ institutionId, settings: { diagnosticMaxQuestions: 12, diagnosticMaxMinutes: 30, pathwayMode: 'teacher_controlled', shadowMode: false, ...(school?.learningSettings || {}) } });
+  res.json({ institutionId, settings: { diagnosticMaxQuestions: 12, diagnosticMaxMinutes: 30, pathwayMode: 'teacher_controlled', shadowMode: false, adultLearners: false, ...(school?.learningSettings || {}) } });
 });
 
 export const setLearningSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -56,6 +58,10 @@ export const setLearningSettings = asyncHandler(async (req: AuthRequest, res: Re
     if (!modes.includes(body.pathwayMode as string)) throw new AppError('pathwayMode must be strict_sequence, teacher_controlled or adaptive', 400, 'VALIDATION_ERROR');
     (set as Record<string, unknown>)['learningSettings.pathwayMode'] = body.pathwayMode;
   }
+  if (body.adultLearners !== undefined) {
+    if (typeof body.adultLearners !== 'boolean') throw new AppError('adultLearners must be true or false', 400, 'VALIDATION_ERROR');
+    (set as Record<string, unknown>)['learningSettings.adultLearners'] = body.adultLearners;
+  }
   if (body.shadowMode !== undefined) {
     // A rollout decision, so Enara admins only.
     if (!isGlobalAdmin(req)) throw new AppError('Only Enara administrators can change shadow mode', 403, 'FORBIDDEN');
@@ -65,6 +71,7 @@ export const setLearningSettings = asyncHandler(async (req: AuthRequest, res: Re
   if (Object.keys(set).length) await Institution.updateOne({ id: institutionId }, { $set: set });
   forgetFeatureFlags(institutionId);
   logger.info('learning_settings_changed', { institutionId, changedBy: req.user!.id, set });
+  await recordAudit('learning_settings_changed', req.user, { institutionId, type: 'institution', id: institutionId }, { set });
   const school = await Institution.findOne({ id: institutionId }).select('learningSettings').lean();
-  res.json({ institutionId, settings: { diagnosticMaxQuestions: 12, diagnosticMaxMinutes: 30, pathwayMode: 'teacher_controlled', shadowMode: false, ...(school?.learningSettings || {}) } });
+  res.json({ institutionId, settings: { diagnosticMaxQuestions: 12, diagnosticMaxMinutes: 30, pathwayMode: 'teacher_controlled', shadowMode: false, adultLearners: false, ...(school?.learningSettings || {}) } });
 });

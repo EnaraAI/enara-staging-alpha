@@ -251,7 +251,7 @@ describe('live avatar', () => {
     const again = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: id, kind: 'opening' });
     expect(again.status).toBe(409);
 
-    // A nudge drops any trailing "student" message and is limited to two per turn.
+    // A nudge drops any trailing "student" message and is limited to one per turn.
     const nudge = await request(app)
       .post('/api/avatar/query-stream')
       .set('Authorization', auth)
@@ -265,9 +265,8 @@ describe('live avatar', () => {
       });
     expect(nudge.status).toBe(200);
     expect(mocks.stream.mock.calls[1][0].history).toEqual([{ role: 'assistant', content: 'What is 2 + 3?' }]);
-    await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: id, kind: 'nudge' });
-    const third = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: id, kind: 'nudge' });
-    expect(third.status).toBe(409);
+    const second = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: id, kind: 'nudge' });
+    expect(second.status).toBe(409);
   });
 
   it('validates session input and caps calls per day for staff', async () => {

@@ -1,6 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Login } from './pages/Login';
+import { AccountLink, accountLinkFromLocation } from './pages/AccountLink';
+import { People } from './pages/workspace/People';
 import { StudentDashboard } from './pages/StudentDashboard';
 import { CoursePage } from './pages/CoursePage';
 import { AdminDashboard } from './pages/AdminDashboard';
@@ -48,7 +50,7 @@ import { Outcomes } from './pages/workspace/Outcomes';
 import { Usage } from './pages/workspace/Usage';
 import { SavingsCenter } from './pages/workspace/SavingsCenter';
 import { getSessionUser as sessionUser } from './services/apiService';
-import { ACADEMIC_MANAGER_PAGES, academicManagerPage, restoreUiRole, UiRole } from './services/roleRouting';
+import { ACADEMIC_MANAGER_PAGES, academicManagerPage, restoreUiRole, staffLandingPage, staffPageAllowed, UiRole } from './services/roleRouting';
 import { Assessment, Student } from './types';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -86,7 +88,7 @@ const App: React.FC = () => {
     const role = restoreUiRole(session?.role, savedRole);
     return {
       role,
-      page: role === 'student' && courseId ? 'courses' : 'dashboard',
+      page: role === 'student' && courseId ? 'courses' : role === 'admin' ? staffLandingPage(session?.role) : 'dashboard',
       activeAssessment: null,
       selectedStudent: null,
       sharedCourseId: courseId,
@@ -110,7 +112,8 @@ const App: React.FC = () => {
     loadAssessments()
       .then(list => { if (!cancelled) setAssessments(list); })
       .catch(err => console.warn('Could not load assessments:', err));
-    if (state.role !== 'student') {
+    // The school-wide student list is for school admins (teachers see their classes' rosters).
+    if (state.role !== 'student' && staffPageAllowed(getSessionUser()?.role, 'students')) {
       fetchStudents()
         .then(list => { if (!cancelled) setStudents(list); })
         .catch(err => console.warn('Could not load students:', err));
@@ -141,7 +144,7 @@ const App: React.FC = () => {
 
   const handleLogin = (role: UiRole, user: SessionUser) => {
     try { localStorage.setItem(UI_ROLE_KEY, role); } catch { /* storage unavailable */ }
-    let page = role === 'student' && state.sharedCourseId ? 'courses' : 'dashboard';
+    let page = role === 'student' && state.sharedCourseId ? 'courses' : role === 'admin' ? staffLandingPage(user.role) : 'dashboard';
     let activeAssessment = null;
 
     // If student and has a shared assessment, go directly to it
@@ -173,15 +176,17 @@ const App: React.FC = () => {
     setState(prev => ({ ...prev, page: 'courses', activeAssessment: null, selectedStudent: null, sharedCourseId: courseId }));
   };
 
-  const navigate = (page: string) => {
+  const navigate = (target: string) => {
+    // Teachers in the staff portal never open school-admin pages.
+    const backendRole = getSessionUser()?.role;
     setState(prev => ({ 
       ...prev, 
-      page, 
+      page: prev.role === 'admin' && !staffPageAllowed(backendRole, target) ? staffLandingPage(backendRole) : target, 
       activeAssessment: null, 
       selectedStudent: null, 
       // Only clear shared IDs if we're navigating to a different main area
-      sharedCourseId: page === 'courses' ? prev.sharedCourseId : null,
-      sharedAssessmentId: page === 'taking-assessment' ? prev.sharedAssessmentId : null
+      sharedCourseId: target === 'courses' ? prev.sharedCourseId : null,
+      sharedAssessmentId: target === 'taking-assessment' ? prev.sharedAssessmentId : null
     }));
   };
 
@@ -239,6 +244,10 @@ const App: React.FC = () => {
     if (state.role !== 'student') return setAssignmentsEnabled(false);
     fetchMyAssignments().then(() => setAssignmentsEnabled(true)).catch(() => setAssignmentsEnabled(false));
   }, [state.role]);
+  // "Assessments" tab: with class assignments on, a student's quizzes live
+  // under "Assignments"; this older list is shown only when it has something,
+  // so students don't see two similar tabs, one of them empty.
+  const showAssessmentsTab = !assignmentsEnabled || assessments.length > 0;
   // "Study plan" tab: only when the school has study plans on.
   const [studyPlanEnabled, setStudyPlanEnabled] = useState(false);
   useEffect(() => {
@@ -253,6 +262,10 @@ const App: React.FC = () => {
     // Clear message after passing it to prevent repeated triggers on state updates
     setTimeout(() => setTutorMessage(null), 100);
   };
+
+  // Invitation and password-reset links open their own page (P22).
+  const accountLink = accountLinkFromLocation();
+  if (accountLink) return <AccountLink kind={accountLink.kind} token={accountLink.token} />;
 
   if (!state.role) {
     return (
@@ -317,9 +330,10 @@ const App: React.FC = () => {
             {/* Sub Navigation */}
             <div className="bg-white border-b border-gray-200 px-4 sm:px-8 py-2 overflow-x-auto whitespace-nowrap no-scrollbar shrink-0">
               <div className="flex gap-4 sm:gap-8">
-                {[['dashboard', 'Home'], ['courses', 'My learning'], ...(progressEnabled ? [['progress', 'My progress']] : []), ...(assignmentsEnabled ? [['assignments-student', 'Assignments']] : []), ...(studyPlanEnabled ? [['study-plan', 'Study plan']] : []), ['assessments', 'Assessments'], ['results', 'Results']].map(([tab, label]) => (
+                {[['dashboard', 'Home'], ['courses', 'My learning'], ...(progressEnabled ? [['progress', 'My progress']] : []), ...(assignmentsEnabled ? [['assignments-student', 'Assignments']] : []), ...(studyPlanEnabled ? [['study-plan', 'Study plan']] : []), ...(showAssessmentsTab ? [['assessments', 'Assessments']] : []), ['results', 'Results']].map(([tab, label]) => (
                   <button
                     key={tab}
+                    data-tour={tab}
                     onClick={() => navigate(tab)}
                     className={`py-3 px-1 text-[15px] font-semibold transition-colors border-b-2 ${
                       state.page === tab 
@@ -450,14 +464,8 @@ const App: React.FC = () => {
             {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
             {state.page === 'settings' && <div className="p-20 text-center text-slate-400">Platform Global Settings</div>}
           </main>
-          <AIAssistant 
-            students={students} 
-            assessments={assessments} 
-            role="enara-admin"
-            isOpen={isTutorOpen}
-            onToggle={setIsTutorOpen}
-            externalMessage={tutorMessage}
-          />
+          {/* P22: the AI data assistant is for school admins only (server-enforced);
+              ENARA admins use the read-only insight pages. */}
         </div>
       </div>
     );
@@ -507,13 +515,13 @@ const App: React.FC = () => {
           {state.page === 'outcomes' && <Outcomes />}
           {/* P5: Workspace Admin only; the server enforces workspace:billing too. */}
           {state.page === 'usage' && sessionUser()?.role === 'admin' && <Usage />}
+          {state.page === 'people' && (sessionUser()?.role === 'admin' || sessionUser()?.role === 'enara-admin') && <People />}
           {state.page === 'savings' && sessionUser()?.role === 'admin' && <SavingsCenter />}
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments />}
           {state.page === 'grading' && <GradingReview />}
           {state.page === 'teaching' && <TeachingDashboard />}
           {state.page === 'lesson-planner' && <LessonPlanner />}
-          {state.page === 'outcomes' && <div className="p-20 text-center text-slate-400">Learning Outcomes & Success Metrics</div>}
           {state.page === 'operations' && <div className="p-20 text-center text-slate-400">Operational Efficiency & Resource Management</div>}
           {state.page === 'integrations' && <Integrations />}
           {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
@@ -531,15 +539,18 @@ const App: React.FC = () => {
             />
           )}
         </main>
-        <AIAssistant 
-          students={students} 
-          assessments={assessments} 
-          role="admin"
-          isOpen={isTutorOpen}
-          onToggle={setIsTutorOpen}
-          externalMessage={tutorMessage}
-          onNavigate={navigate}
-        />
+        {/* P22: model-backed analytics for school admins only (server-enforced). */}
+        {sessionUser()?.role === 'admin' && (
+          <AIAssistant
+            students={students}
+            assessments={assessments}
+            role="admin"
+            isOpen={isTutorOpen}
+            onToggle={setIsTutorOpen}
+            externalMessage={tutorMessage}
+            onNavigate={navigate}
+          />
+        )}
       </div>
     </div>
   );

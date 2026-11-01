@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger, serializeError } from '../utils/logging';
+import { logPath } from './requestContext';
+import { recordAlert } from '../services/auditTrail';
+import { isDbDownError, isDbUnavailableError, markDbUnavailable, sendDbUnavailable } from '../config/dbAvailability';
 
 export class AppError extends Error {
   statusCode: number;
@@ -10,6 +13,14 @@ export class AppError extends Error {
     this.statusCode = statusCode;
     this.code = code;
   }
+}
+
+// A failed credit reservation is a credit problem only if the database answered.
+// P20 run 3: a database error during the reservation was reported to students as
+// "credit limit exceeded" (402); it is now the retryable 503 it really is.
+export function creditReservationError(err: unknown): Error {
+  if (isDbUnavailableError(err)) return err as Error;
+  return new AppError((err as Error).message, 402, 'CREDIT_LIMIT_EXCEEDED');
 }
 
 function statusCodeFromError(err: Error): number {
@@ -50,15 +61,28 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
+  // Already answered (e.g. the GET deadline sent its 503): nothing left to send.
+  if (res.headersSent) {
+    logger.warn('error_after_response', { requestId: req.requestId, path: logPath(req.originalUrl), error: serializeError(err) });
+    return;
+  }
+  if (isDbUnavailableError(err)) {
+    // The database is unreachable or this instance's pool is full: a retryable 503, not a 500 (P20).
+    if (isDbDownError(err)) markDbUnavailable();
+    logger.error('request_db_unavailable', { requestId: req.requestId, method: req.method, path: logPath(req.originalUrl), error: serializeError(err) });
+    sendDbUnavailable(res, req.requestId);
+    return;
+  }
   const statusCode = statusCodeFromError(err);
   const code = codeFromError(err);
   const message = safeMessage(err, statusCode);
 
   if (statusCode >= 500) {
+    void recordAlert('http_5xx', 'warning', { scope: `${req.method} ${req.route?.path ?? logPath(req.originalUrl).split('?')[0]}`, statusCode, code });
     logger.error('request_error', {
       requestId: req.requestId,
       method: req.method,
-      path: req.originalUrl,
+      path: logPath(req.originalUrl),
       statusCode,
       error: serializeError(err),
     });

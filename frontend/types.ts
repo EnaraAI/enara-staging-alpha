@@ -241,6 +241,8 @@ export interface Assessment {
   status: 'upcoming' | 'active' | 'completed' | 'pending' | 'in-progress';
   dueDate: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
+  // What kind of assessment (P21): used to compare like with like when measuring learning. Optional.
+  assessmentKind?: string;
   curriculumId?: string;
   batchId?: string;
   studentId?: string; // For individual assignments

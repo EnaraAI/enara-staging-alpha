@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { EnaraMark } from '../brand/EnaraLogo';
 import { X, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { createClient, AnamEvent } from '@anam-ai/js-sdk';
 import { Assessment } from '../../types';
@@ -348,12 +349,13 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       if (reply) voiceHistoryRef.current = [...messages, { role: 'assistant' as const, content: reply }].slice(-12);
       await voice.finishTurn();
       // Ended on a question: if the student stays quiet, help them along.
-      if (current() && /[?؟]\s*$/.test(reply) && nudgesRef.current < 2) {
+      // One nudge per student turn, after a longer pause: thinking time first.
+      if (current() && /[?؟]\s*$/.test(reply) && nudgesRef.current < 1) {
         silenceTimerRef.current = setTimeout(() => {
           if (!current()) return;
           nudgesRef.current += 1;
           void answerSpokenTurnRef.current(null, undefined, 'nudge');
-        }, 12_000);
+        }, 22_000);
       }
     } catch (e) {
       console.error('[AVATAR] Spoken answer failed', e);
@@ -813,7 +815,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
                   <img src={myTutor.current.imageUrl} alt="" className="w-28 h-28 rounded-full object-cover border border-teal-400/40" />
                 ) : (
                   <div className="w-28 h-28 rounded-full bg-teal-600/20 border border-teal-400/40 grid place-items-center">
-                    <span className="text-4xl font-extrabold text-teal-300">E</span>
+                    <EnaraMark className="w-12 h-12 text-teal-300" />
                   </div>
                 )}
                 <p className="text-white font-bold">{myTutor?.current?.name || 'Enara tutor'} · voice</p>

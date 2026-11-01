@@ -39,6 +39,9 @@ export interface GatewayMeta {
   // server-side fallback may answer with another model. Without it, the
   // school's configured reservation ceiling for the tool applies.
   bound?: { inputTokens?: number; outputTokens?: number; characters?: number; anyModel?: boolean };
+  // An owner-approved USD ceiling for one attempt of a service the price
+  // catalogue cannot price (speaking-exam STT, Anam sessions; P22).
+  boundUsd?: number;
 }
 
 export interface GatewayOperation {
@@ -158,11 +161,15 @@ export async function recordAttempt(rec: AttemptRecord): Promise<boolean> {
 // Before a provider attempt: per-school rate limit (non-grading), pauses and
 // the budget reservation. Throws before the provider is called if refused.
 export async function reserveAttempt(meta: GatewayMeta, operationKey: string, ttlMs?: number): Promise<BudgetTicket> {
+  const shared = getCallContext().request;
+  if (shared) shared.aiStarted = true;
   const who = owner(meta);
   const provider = meta.provider ?? 'anthropic';
   await checkInstitutionAiRate(who.institutionId, meta.feature);
   const bound =
-    meta.bound && (provider === 'anthropic' || provider === 'elevenlabs') ? upperBoundUsd(provider, meta.modelName, meta.bound) : null;
+    typeof meta.boundUsd === 'number' && meta.boundUsd > 0
+      ? meta.boundUsd
+      : meta.bound && (provider === 'anthropic' || provider === 'elevenlabs') ? upperBoundUsd(provider, meta.modelName, meta.bound) : null;
   return reserveAiBudget({ key: operationKey, feature: meta.feature, provider, institutionId: who.institutionId, userId: who.userId, upperBoundUsd: bound, ttlMs });
 }
 

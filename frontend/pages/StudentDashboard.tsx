@@ -7,6 +7,7 @@ import {
   fetchMyCourses,
   fetchMyResults,
   fetchMyAchievements,
+  fetchMyAssignments,
 } from '../services/apiService';
 import { toast } from '../services/toastService';
 import { NextStepsCard } from '../components/proactive/NextStepsCard';
@@ -24,6 +25,8 @@ interface DashboardActivity { title: string; type: 'quiz' | 'lesson'; score?: nu
 interface UpcomingAssessment {
   id: string; title: string; subject?: string; status: string; dueDate?: string; duration?: number;
   questions?: unknown[]; questionsCount?: number;
+  // 'assignment': a class assignment (Phase 3), opened on the Assignments page.
+  kind?: 'assessment' | 'assignment';
 }
 interface DashboardData {
   student: Partial<Student> & { name: string };
@@ -75,6 +78,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onStartAsses
   const [courses, setCourses] = useState<CourseSummary[]>([]);
   const [results, setResults] = useState<ResultItem[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [openAssignments, setOpenAssignments] = useState<UpcomingAssessment[]>([]);
   const [resumeTree, setResumeTree] = useState<(Course & { progressPct?: number }) | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -88,12 +92,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onStartAsses
     setIsLoading(true);
     setLoadError(null);
     try {
-      const [data, courseList, resultList, achievementList] = await Promise.all([
+      const [data, courseList, resultList, achievementList, assignmentList] = await Promise.all([
         fetchMyDashboard() as Promise<DashboardData>,
         (fetchMyCourses() as Promise<CourseSummary[]>).catch(() => null),
         (fetchMyResults() as Promise<ResultItem[]>).catch(() => [] as ResultItem[]),
         (fetchMyAchievements() as Promise<Achievement[]>).catch(() => [] as Achievement[]),
+        fetchMyAssignments().catch(() => ({ assignments: [] as any[] })),
       ]);
+      // Class assignments the student can still submit and has not finished.
+      setOpenAssignments(
+        (assignmentList?.assignments || [])
+          .filter((a: any) => a.canSubmit && (a.status === 'not_started' || a.status === 'in_progress'))
+          .map((a: any) => ({ id: `assignment:${a.id}`, title: a.title, status: a.status === 'in_progress' ? 'in-progress' : 'active', dueDate: a.dueAt, kind: 'assignment' as const })),
+      );
       setDashboard(data);
       setCourses(
         Array.isArray(courseList)
@@ -144,12 +155,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onStartAsses
     const byId = new Map<string, UpcomingAssessment>();
     for (const a of dashboard?.upcomingAssessments || []) byId.set(a.id, a);
     for (const a of assessments || []) byId.set(a.id, { ...byId.get(a.id), ...a });
+    for (const a of openAssignments) byId.set(a.id, a);
     const rank = (s: string) => (s === 'active' || s === 'in-progress' ? 0 : s === 'upcoming' || s === 'pending' ? 1 : 2);
     return [...byId.values()]
       .filter(a => rank(a.status) < 2)
       .sort((a, b) => rank(a.status) - rank(b.status) || new Date(a.dueDate || 0).getTime() - new Date(b.dueDate || 0).getTime())
       .slice(0, 3);
-  }, [dashboard, assessments]);
+  }, [dashboard, assessments, openAssignments]);
 
   // Your week: submitted assessments (all results) + tutor sessions (from recent activity) per day, last 7 days.
   const week = useMemo(() => {
@@ -262,10 +274,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onStartAsses
                   <>
                     {due && <span className="text-sm text-zinc-600 inline-flex items-center gap-1"><Clock size={13} aria-hidden="true" /> Due {due}</span>}
                     <button
-                      onClick={() => onStartAssessment(a.id)}
+                      onClick={() => (a.kind === 'assignment' ? onNavigate('assignments-student') : onStartAssessment(a.id))}
                       className="self-start mt-1.5 inline-flex items-center gap-1 font-bold text-teal-700 hover:text-teal-800 hover:underline"
                     >
-                      Start assessment <ArrowRight size={14} aria-hidden="true" />
+                      {a.kind === 'assignment' ? 'Open assignment' : 'Start assessment'} <ArrowRight size={14} aria-hidden="true" />
                     </button>
                   </>
                 ) : (

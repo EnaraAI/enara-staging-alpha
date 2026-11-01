@@ -52,6 +52,8 @@ import {
   fetchStudents,
 } from '../services/apiService';
 import { toast } from '../services/toastService';
+import { getSessionUser, fetchTeachingClasses, publishCurriculumToClass } from '../services/apiService';
+import { staffPageAllowed } from '../services/roleRouting';
 
 type CourseVisibility = 'student' | 'internal' | 'archived';
 // The backend adds `visibility` to course instances; types.ts predates it.
@@ -87,14 +89,44 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  // Batches, class instances and the student list are school-admin data;
+  // teachers work with their own curricula and publish them to their classes.
+  const schoolAdmin = staffPageAllowed(getSessionUser()?.role, 'students');
+  const [publishTarget, setPublishTarget] = useState<Curriculum | null>(null);
+  const [myClasses, setMyClasses] = useState<{ id: string; courseName: string; curriculumId: string | null }[]>([]);
+  const [publishing, setPublishing] = useState(false);
+
+  const openPublish = async (curr: Curriculum) => {
+    setPublishTarget(curr);
+    try {
+      setMyClasses((await fetchTeachingClasses()).classes);
+    } catch (err) {
+      toast.error('Could not load your classes', errorMessage(err));
+    }
+  };
+  const publishTo = async (classId: string) => {
+    if (!publishTarget) return;
+    setPublishing(true);
+    try {
+      await publishCurriculumToClass(publishTarget.id, classId);
+      setMyClasses((prev) => prev.map((c) => (c.id === classId ? { ...c, curriculumId: publishTarget.id } : c)));
+      toast.success('Published to your class', 'Students in the class can now open it.');
+    } catch (err) {
+      toast.error('Could not publish', errorMessage(err));
+    } finally {
+      setPublishing(false);
+    }
+  };
+
   const loadAll = async () => {
     setIsLoading(true);
     setLoadError(null);
+    const none = Promise.resolve([] as never[]);
     const [c, b, i, s] = await Promise.allSettled([
       fetchCurriculums(),
-      fetchBatches(),
-      fetchCourseInstances(),
-      fetchStudents(),
+      schoolAdmin ? fetchBatches() : none,
+      schoolAdmin ? fetchCourseInstances() : none,
+      schoolAdmin ? fetchStudents() : none,
     ]);
     if (c.status === 'fulfilled') setCurriculums(c.value as Curriculum[]);
     if (b.status === 'fulfilled') setBatches(b.value as Batch[]);
@@ -654,7 +686,7 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
             <ChevronLeft size={24} />
           </button>
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-teal-700">School admin</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-teal-700">{schoolAdmin ? 'School admin' : 'Teaching'}</p>
             <h1 className="text-3xl font-extrabold text-slate-900 mt-1">Curriculum Center</h1>
             <p className="text-slate-600 mt-1">Manage educational frameworks and batch assignments.</p>
           </div>
@@ -699,6 +731,7 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
           Curriculums
           {activeTab === 'curriculums' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-teal-600 rounded-full" />}
         </button>
+        {schoolAdmin && (<>
         <button 
           onClick={() => setActiveTab('batches')}
           className={`pb-4 text-sm font-bold transition-all relative whitespace-nowrap ${
@@ -717,6 +750,7 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
           Course Instances
           {activeTab === 'instances' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-teal-600 rounded-full" />}
         </button>
+        </>)}
       </div>
 
       {activeTab === 'curriculums' ? (
@@ -841,7 +875,16 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
 
                 <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between gap-3">
                   <div className="flex gap-2">
-                    <button 
+                    {!schoolAdmin && (
+                      <button
+                        onClick={() => openPublish(curr)}
+                        className="px-3 h-[44px] bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-all text-sm font-semibold"
+                        title="Publish to my class"
+                      >
+                        Publish to class
+                      </button>
+                    )}
+                    {schoolAdmin && <button 
                       onClick={() => {
                         setSelectedCurriculum(curr);
                         setShowAssignModal(true);
@@ -850,7 +893,7 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
                       title="Assign to Batch"
                     >
                       <LinkIcon size={18} />
-                    </button>
+                    </button>}
                     {curr.status === 'deployed' && (
                       <button 
                         onClick={() => {
@@ -863,7 +906,7 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
                         <Globe size={18} />
                       </button>
                     )}
-                    {curr.status !== 'deployed' && (
+                    {schoolAdmin && curr.status !== 'deployed' && (
                       <button
                         onClick={() => handleDeploy(curr.id)}
                         disabled={!curr.chapters?.length}
@@ -880,13 +923,13 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
                     >
                       <Edit2 size={18} />
                     </button>
-                    <button
+                    {schoolAdmin && <button
                       onClick={() => handleDeleteCurriculum(curr)}
                       className="p-3 bg-slate-50 text-slate-500 rounded-md hover:bg-red-50 hover:text-red-600 transition-all border border-slate-100"
                       title="Delete Curriculum"
                     >
                       <Trash2 size={18} />
-                    </button>
+                    </button>}
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-bold text-slate-500">Last Updated</p>
@@ -1150,6 +1193,34 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
             })}
           </div>
         </>
+      )}
+
+      {/* Publish to class (teachers) */}
+      {publishTarget && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40" role="dialog" aria-label="Publish to class">
+          <div className="bg-white rounded-xl w-full max-w-md shadow-xl p-6">
+            <h2 className="text-xl font-bold text-slate-900">Publish to your class</h2>
+            <p className="text-sm text-slate-500 mt-1">{publishTarget.name}</p>
+            <div className="mt-4 space-y-2">
+              {myClasses.length === 0 && <p className="text-sm text-slate-600">You do not teach any class yet.</p>}
+              {myClasses.map((c) => (
+                <div key={c.id} className="flex items-center justify-between border border-slate-200 rounded-md p-3">
+                  <span className="text-sm font-semibold text-slate-800">{c.courseName}</span>
+                  {c.curriculumId === publishTarget.id ? (
+                    <span className="text-xs font-bold text-emerald-700">Published</span>
+                  ) : (
+                    <button disabled={publishing} onClick={() => publishTo(c.id)} className="px-3 py-1.5 rounded-md bg-teal-600 text-white text-sm font-semibold disabled:opacity-50">
+                      Publish
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 text-right">
+              <button onClick={() => setPublishTarget(null)} className="px-4 py-2 rounded-md border border-slate-300 text-sm font-semibold">Close</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Assign Modal */}

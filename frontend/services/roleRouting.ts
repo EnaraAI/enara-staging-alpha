@@ -29,6 +29,23 @@ export function restoreUiRole(backendRole: string | undefined, saved: string | n
   return allowed.includes(saved as UiRole) ? (saved as UiRole) : null;
 }
 
+// Staff-portal pages only school (workspace) admins can use: every data call
+// on them needs admin rights, so a teacher got only "Access denied" (P15 UI
+// sweep). Teachers share the staff portal but never see these pages, and land
+// on their Teaching Dashboard instead of the school dashboard.
+export const SCHOOL_ADMIN_PAGES = [
+  'dashboard', 'live-avatars', 'course-intelligence', 'institution-analytics', 'students',
+  'credits', 'engagement', 'school-insights', 'learning-events', 'usage', 'savings', 'people',
+] as const;
+
+export function staffPageAllowed(backendRole: string | undefined, page: string): boolean {
+  return backendRole !== 'teacher' || !(SCHOOL_ADMIN_PAGES as readonly string[]).includes(page);
+}
+
+export function staffLandingPage(backendRole: string | undefined): string {
+  return backendRole === 'teacher' ? 'teaching' : 'dashboard';
+}
+
 // The pages of the academic manager portal: school-wide, read-only analytics
 // (GET /api/analytics/*). Nothing that edits content, teaches, grades,
 // administers users or budgets, or shows internal AI cost.

@@ -49,6 +49,8 @@ export interface ILearningEvent extends Document {
     messageId?: string;
     diagnosticId?: string;
     assignmentId?: string;
+    // A rubric criterion of the question (P21): evidence for that criterion's own objectives.
+    criterionId?: string;
   };
   outcome?: {
     correct?: boolean;
@@ -106,6 +108,7 @@ const learningEventSchema = new Schema<ILearningEvent>(
       messageId: String,
       diagnosticId: String,
       assignmentId: String,
+      criterionId: String,
     },
     outcome: {
       correct: Boolean,

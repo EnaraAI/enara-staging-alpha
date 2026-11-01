@@ -5,7 +5,9 @@ import { Schema, model, Document } from 'mongoose';
 // answer and the server-validated citations (file, page/section, ids); not
 // prompts, retrieved passage text, costs or provider details. Deleted 180
 // days after the last message, like other AI records.
-export const EDUCATOR_CHAT_RETENTION_DAYS = 180;
+// Owner decision 2026-11-01 (OD-5): one month (was 180 days). Applies to
+// conversations saved from now on; existing rows keep their expiry.
+export const EDUCATOR_CHAT_RETENTION_DAYS = 30;
 
 export interface IEducatorChatCitation {
   n: number;

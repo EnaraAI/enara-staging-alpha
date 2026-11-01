@@ -11,6 +11,7 @@ import {
   regenerateLessonPlanSection,
   saveLessonPlanVersion,
   updateLessonPlan,
+  fetchTeachingFeatures,
 } from '../../services/apiService';
 import { toast } from '../../services/toastService';
 import { SourcePicker } from '../../components/SourcePicker';
@@ -30,6 +31,10 @@ export const LessonPlanner: React.FC = () => {
   const [plans, setPlans] = useState<any[] | null>(null);
   const [classes, setClasses] = useState<any[]>([]);
   const [disabled, setDisabled] = useState(false);
+  // AI lesson planning switched off for the school: hide the AI tools and say
+  // why, instead of failing after "Draft a plan" is pressed. Unknown: show them.
+  const [aiOn, setAiOn] = useState(true);
+  useEffect(() => { fetchTeachingFeatures().then((f) => setAiOn(f.aiLessonPlans)).catch(() => setAiOn(true)); }, []);
   const [plan, setPlan] = useState<any>(null);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -95,7 +100,10 @@ export const LessonPlanner: React.FC = () => {
     <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
       <aside className="space-y-4">
         <h1 className="text-xl font-bold text-slate-900">Lesson planner</h1>
-        <UsageChip features={['ai_lesson_plan', 'ai_lesson_plan_section']} label="AI drafts" />
+        {aiOn && <UsageChip features={['ai_lesson_plan', 'ai_lesson_plan_section']} label="AI drafts" />}
+        {!aiOn ? (
+          <p role="status" className="text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-4">AI lesson planning is switched off for your school. Your school administrator can ask ENARA to turn it on. Plans you already have are listed below.</p>
+        ) : (
         <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
           <h2 className="text-sm font-semibold text-slate-800">New AI draft</h2>
           {!classes.length ? <p className="text-sm text-slate-500">None of your classes has a curriculum yet.</p> : (
@@ -119,6 +127,7 @@ export const LessonPlanner: React.FC = () => {
             </>
           )}
         </div>
+        )}
         <div>
           <h2 className="text-sm font-semibold text-slate-800 mb-1">Your plans</h2>
           {!plans.length ? <p className="text-sm text-slate-500">None yet.</p> : (
@@ -147,7 +156,7 @@ export const LessonPlanner: React.FC = () => {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{KINDS[s.kind] ?? s.kind}{s.origin === 'ai' && <span className="ml-2 normal-case text-violet-700 bg-violet-50 rounded px-1.5 py-0.5">AI draft</span>}</span>
                   <div className="flex items-center gap-1">
-                    <button aria-label="Rewrite with AI" title="Rewrite with AI" onClick={() => regenerate(i)} className="p-1 text-violet-700"><Sparkles className="w-4 h-4" /></button>
+                    {aiOn && <button aria-label="Rewrite with AI" title="Rewrite with AI" onClick={() => regenerate(i)} className="p-1 text-violet-700"><Sparkles className="w-4 h-4" /></button>}
                     <button aria-label="Move up" disabled={i === 0} onClick={() => move(i, -1)} className="p-1 disabled:opacity-30"><ArrowUp className="w-4 h-4" /></button>
                     <button aria-label="Move down" disabled={i === plan.sections.length - 1} onClick={() => move(i, 1)} className="p-1 disabled:opacity-30"><ArrowDown className="w-4 h-4" /></button>
                     <button aria-label="Remove section" onClick={() => { setPlan({ ...plan, sections: plan.sections.filter((_: any, j: number) => j !== i) }); setDirty(true); }} className="p-1 text-slate-500 hover:text-rose-700"><Trash2 className="w-4 h-4" /></button>

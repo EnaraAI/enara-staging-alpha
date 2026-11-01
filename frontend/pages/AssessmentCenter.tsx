@@ -33,8 +33,10 @@ import {
   deleteAssessment,
   fetchAssessmentAttempts,
   AssessmentAttemptsReport,
+  getSessionUser,
 } from '../services/apiService';
 import { toast } from '../services/toastService';
+import { staffPageAllowed } from '../services/roleRouting';
 
 const errorMessage = (err: unknown) => (err instanceof Error && err.message ? err.message : 'Unexpected error');
 const todayPlus = (days: number) => new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -70,6 +72,7 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({ assessments,
   // AI Generation Form State
   const [topic, setTopic] = useState('');
   const [difficulty, setDifficulty] = useState<'Easy' | 'Medium' | 'Hard'>('Medium');
+  const [assessmentKind, setAssessmentKind] = useState('');
   const [numQuestions, setNumQuestions] = useState(5);
   const [objectives, setObjectives] = useState('');
   const [selectedCurriculumId, setSelectedCurriculumId] = useState('');
@@ -132,7 +135,14 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({ assessments,
 
   useEffect(() => {
     let cancelled = false;
-    Promise.allSettled([fetchCurriculums(), fetchBatches(), fetchStudents()]).then(([c, b, s]) => {
+    // Batches and the student roster are school-admin data (403 for teachers);
+    // a teacher's pickers work from curriculums alone.
+    const schoolAdmin = staffPageAllowed(getSessionUser()?.role, 'students');
+    Promise.allSettled([
+      fetchCurriculums(),
+      schoolAdmin ? fetchBatches() : Promise.resolve([]),
+      schoolAdmin ? fetchStudents() : Promise.resolve([]),
+    ]).then(([c, b, s]) => {
       if (cancelled) return;
       if (c.status === 'fulfilled') setCurriculums(c.value as Curriculum[]);
       if (b.status === 'fulfilled') setBatches(b.value as Batch[]);
@@ -213,6 +223,7 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({ assessments,
     setTopic(asm.title);
     if (/^\d{4}-\d{2}-\d{2}/.test(asm.dueDate || '')) setDueDate(asm.dueDate.slice(0, 10));
     setDifficulty(asm.difficulty);
+    setAssessmentKind(asm.assessmentKind || '');
     setInstructions(asm.instructions || '');
     setSelectedCurriculumId(asm.curriculumId || '');
     setSelectedBatchId(asm.batchId || '');
@@ -228,6 +239,7 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({ assessments,
       const updated = (await updateAssessment(editingAssessment.id, {
         title: topic,
         difficulty,
+        assessmentKind: assessmentKind || null,
         instructions,
         dueDate,
         curriculumId: selectedCurriculumId,
@@ -245,6 +257,7 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({ assessments,
     setIsModalOpen(false);
     setEditingAssessment(null);
     setTopic('');
+    setAssessmentKind('');
     setInstructions('');
     setSelectedCurriculumId('');
     setSelectedBatchId('');
@@ -279,6 +292,7 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({ assessments,
         status: 'upcoming',
         dueDate,
         difficulty,
+        ...(assessmentKind ? { assessmentKind } : {}),
         curriculumId: selectedCurriculumId,
         batchId: selectedBatchId,
         instructions: instructions || result.suggestedInstructions,
@@ -408,6 +422,7 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({ assessments,
       status: 'upcoming',
       dueDate,
       difficulty,
+      ...(assessmentKind ? { assessmentKind } : {}),
       curriculumId: selectedCurriculumId,
       batchId: selectedBatchId,
       instructions,
@@ -500,7 +515,7 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({ assessments,
             <ChevronLeft size={24} />
           </button>
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-teal-700">School admin</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-teal-700">{staffPageAllowed(getSessionUser()?.role, 'students') ? 'School admin' : 'Teaching'}</p>
             <h1 className="text-3xl font-extrabold text-slate-900 mt-1">Assessment Center</h1>
             <p className="text-slate-600 mt-1">Manage institutional evaluations. Generated questions are generic templates until AI generation ships: review every question before publishing.</p>
           </div>
@@ -981,6 +996,26 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({ assessments,
                         <option value="Easy">Easy</option>
                         <option value="Medium">Medium</option>
                         <option value="Hard">Hard</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="assessment-kind" className="block text-sm font-semibold text-slate-700 mb-1.5">Assessment type</label>
+                      <select
+                        id="assessment-kind"
+                        value={assessmentKind}
+                        onChange={(e) => setAssessmentKind(e.target.value)}
+                        className="w-full px-4 h-11 rounded-md border border-slate-300 focus:border-teal-500 outline-none transition-all bg-white text-sm"
+                      >
+                        <option value="">Not specified</option>
+                        <option value="diagnostic">Diagnostic</option>
+                        <option value="formative">Formative check</option>
+                        <option value="quiz">Quiz</option>
+                        <option value="unit_test">Unit test</option>
+                        <option value="midterm">Midterm exam</option>
+                        <option value="final">Final exam</option>
+                        <option value="teacher_exam">Teacher exam</option>
+                        <option value="retention_check">Retention check</option>
+                        <option value="practice">Practice</option>
                       </select>
                     </div>
                     <div className="space-y-2">

@@ -6,13 +6,14 @@ import { randomUUID } from 'crypto';
 import { Response } from 'express';
 import { getConfig } from '../config/env';
 import { AuthRequest } from '../middleware/auth.middleware';
-import { asyncHandler, AppError } from '../middleware/errorHandler';
+import { asyncHandler, AppError, creditReservationError } from '../middleware/errorHandler';
 import { AvatarSession, IAvatarSession } from '../models/AvatarSession';
 import { finalizeAvatarUsage, sweepAvatarUsage } from '../services/avatarUsage';
 import { reserveAttempt } from '../services/aiGateway';
 import { releaseAiBudget } from '../services/aiBudget';
 import { releaseUsage, reserveUsage, settleUsage } from '../services/creditsService';
 import { describeSnapshot, getLearnerSnapshot } from '../services/learnerSnapshot';
+import { buildTeachingContext } from '../services/learningContext';
 import { resolveTutorFace } from '../services/tutorFaceService';
 import {
   curriculumFromCourse,
@@ -43,9 +44,13 @@ type Language = 'english' | 'arabic';
 type TurnKind = 'turn' | 'opening' | 'nudge';
 
 function requireAnam() {
-  const anam = getConfig().anam;
+  const { anam, unpricedLimits } = getConfig();
   if (!anam) throw new AppError('The live tutor is not configured', 503, 'AVATAR_UNAVAILABLE');
-  return anam;
+  // Owner decision 2026-11-01 (OD-1): live calls are not capped per session.
+  // Optional ANAM_SESSION_RESERVE_USD / ANAM_MAX_SESSION_SECONDS still apply
+  // when set; otherwise the school's per-call ceiling (if any) and the
+  // environment-wide test-spend cap bound the reservation.
+  return { ...anam, reserveUsd: unpricedLimits.anamSessionReserveUsd, maxSeconds: unpricedLimits.anamMaxSessionSeconds };
 }
 
 // With ElevenLabs configured, Anam is only the face: it lip-syncs to audio the
@@ -81,6 +86,18 @@ async function createAnamSessionToken(language: Language, avatarId?: string): Pr
 async function findOwnSession(req: AuthRequest): Promise<IAvatarSession> {
   const session = await AvatarSession.findOne({ id: req.params.id, userId: req.user!.id, endedAt: null });
   if (!session) throw new AppError('Avatar session not found', 404);
+  // Hard stop (P22): past the approved maximum length the call is ended on
+  // the server and metered; the browser must start a new, newly reserved one.
+  // (New calls cannot start without the limit: see requireAnam.)
+  // Read without failing the heartbeat when the full config is not loadable
+  // (unit callers); a running server always has it.
+  let maxSeconds: number | undefined;
+  try { maxSeconds = getConfig().unpricedLimits.anamMaxSessionSeconds; } catch { maxSeconds = undefined; }
+  if (maxSeconds && Date.now() - session.createdAt.getTime() > maxSeconds * 1000) {
+    await AvatarSession.updateOne({ id: session.id, endedAt: null }, { $set: { endedAt: new Date() } });
+    void finalizeAvatarUsage(session.id).catch(() => undefined);
+    throw new AppError('This live call reached its maximum length. Start a new call to continue.', 410, 'AVATAR_SESSION_LIMIT');
+  }
   // Heartbeat for usage metering: the latest request seen for this call.
   await AvatarSession.updateOne({ id: session.id }, { $set: { lastActivityAt: new Date() } });
   return session;
@@ -154,7 +171,7 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
   // needs a configured reservation ceiling; it is kept until the call is
   // metered (unknown cost is never released as free).
   const sessionId = `av-${randomUUID()}`;
-  const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: face?.avatarId || 'anam-default' }, `avatar:${sessionId}`, 48 * 60 * 60 * 1000);
+  const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: face?.avatarId || 'anam-default', ...(requireAnam().reserveUsd ? { boundUsd: requireAnam().reserveUsd } : {}) }, `avatar:${sessionId}`, 48 * 60 * 60 * 1000);
   let sessionToken: string;
   try {
     sessionToken = await createAnamSessionToken(language, face?.avatarId);
@@ -214,7 +231,7 @@ export const switchAvatarLanguage = asyncHandler(async (req: AuthRequest, res: R
   const language = toLanguage((req.body as { target_language?: string }).target_language);
   // A new Anam session token is new provider time: reserve it before asking
   // (P0d/P14 caps), and give it back if Anam refuses. Kept whole otherwise.
-  const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: session.avatarId || 'anam-default' }, `avatar:${session.id}:switch:${randomUUID()}`, 48 * 60 * 60 * 1000);
+  const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: session.avatarId || 'anam-default', ...(requireAnam().reserveUsd ? { boundUsd: requireAnam().reserveUsd } : {}) }, `avatar:${session.id}:switch:${randomUUID()}`, 48 * 60 * 60 * 1000);
   let sessionToken: string;
   try {
     sessionToken = await createAnamSessionToken(language, session.avatarId);
@@ -330,7 +347,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   if (kind === 'opening') {
     const claimed = await AvatarSession.updateOne(
       { id: session.id, openingUsed: { $ne: true } },
-      { $set: { openingUsed: true, freeNudgesLeft: 2 } },
+      { $set: { openingUsed: true, freeNudgesLeft: 1 } },
     );
     if (!claimed.modifiedCount) throw new AppError('The call has already started', 409, 'AVATAR_TURN_REJECTED');
     messages = [];
@@ -374,13 +391,13 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   if (tutorPolicy.policy === 'blocked') throw new AppError('The AI tutor is off while an assignment is open', 403, 'TUTOR_BLOCKED');
 
   // Independent setup runs in parallel: every millisecond here is silence on the call.
-  const [curriculum, learner, reservation] = await Promise.all([
+  const [curriculum, learner, reservation, , plan] = await Promise.all([
     loadSessionCurriculum(session),
     session.studentId ? getLearnerSnapshot(session.studentId) : Promise.resolve(undefined),
     session.studentId && kind === 'turn'
       ? reserveUsage({ userId: req.user!.id, studentId: session.studentId, feature: 'voice', sessionId: session.id }).catch(
           (err) => {
-            throw new AppError((err as Error).message, 402, 'CREDIT_LIMIT_EXCEEDED');
+            throw creditReservationError(err);
           },
         )
       : Promise.resolve(undefined),
@@ -390,6 +407,22 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
           { language: spokenLanguage ?? session.language, ...(pinned ? { pinnedLanguage: pinned } : {}) },
         )
       : Promise.resolve(),
+    // Teaching plan (ped-v2) for every spoken line, the tutor's own opening and
+    // nudges included: same orchestrator as chat, in a compact form, with channel
+    // 'voice'. A nudge continues the turn it follows, so it uses the plan without
+    // logging another decision. Null when adaptive pedagogy is off or no
+    // objective applies (the call then teaches as before).
+    session.studentId
+      ? buildTeachingContext({
+          institutionId: session.institutionId,
+          studentId: session.studentId,
+          lessonId: session.lessonId,
+          tutorSessionId: session.id,
+          channel: 'voice',
+          compact: true,
+          record: kind !== 'nudge',
+        })
+      : Promise.resolve(null),
   ]);
   if (spokenLanguage) session.language = spokenLanguage;
 
@@ -431,9 +464,13 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     !curriculum && session.subject ? `Subject: ${session.subject}` : '',
     languageLine,
     kind === 'opening'
-      ? `(The call has just started and the student hasn't spoken yet. Open it yourself: greet ${learner?.firstName || 'the student'} by name in one short sentence, then make one specific offer that fits where they stand - pick up the current or next lesson, practise a weak topic from their recent quiz, or do their review questions due today - and end with a question. Under 40 words. Don't list everything you know.)`
+      ? plan
+        ? `(The call has just started and the student hasn't spoken yet. Open it yourself: greet ${learner?.firstName || 'the student'} by name in one short sentence, then begin the way your teaching plan says - a plan that explains or models first starts with a short explanation of the first step; a plan that questions starts with one question. Under 40 words. Don't list everything you know.)`
+        : `(The call has just started and the student hasn't spoken yet. Open it yourself: greet ${learner?.firstName || 'the student'} by name in one short sentence, then make one specific offer that fits where they stand - pick up the current or next lesson, practise a weak topic from their recent quiz, or do their review questions due today - and end with a question. Under 40 words. Don't list everything you know.)`
       : kind === 'nudge'
-        ? "(The student has been quiet for a while after your last question. Help them get unstuck: give one short hint or a simpler version of the question, or offer two answers to choose from. One or two sentences, warm, and don't repeat the question word for word.)"
+        ? plan
+          ? "(The student has been quiet for a while after your last question. Help them get unstuck the way your teaching plan says: if the plan explains or models, show the next step yourself with a short example instead of asking again; if it questions, give one hint or a simpler question. One or two sentences, warm, and don't repeat the question word for word.)"
+          : "(The student has been quiet for a while after your last question. Help them get unstuck: give one short hint or a simpler version of the question, or offer two answers to choose from. One or two sentences, warm, and don't repeat the question word for word.)"
         : last!.content,
   ]
     .filter(Boolean)
@@ -457,7 +494,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       curriculum,
       mode: 'voice',
       learner: learner ? describeSnapshot(learner) : undefined,
-      pedagogy: policyRule(tutorPolicy.policy),
+      pedagogy: [plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined,
+      planActive: Boolean(plan),
     })) {
       if (headDone) {
         emit(chunk);
@@ -507,7 +545,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     );
   }
   // An answered student turn allows up to two hints if they then go quiet.
-  if (spoken && kind === 'turn') await AvatarSession.updateOne({ id: session.id }, { $set: { freeNudgesLeft: 2 } });
+  if (spoken && kind === 'turn') await AvatarSession.updateOne({ id: session.id }, { $set: { freeNudgesLeft: 1 } });
 
   // With browser transcription the language is already known for every turn.
   const target = last && !heardLanguage ? detectLanguageSwitch(last.content, session.language) : null;

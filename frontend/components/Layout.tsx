@@ -1,6 +1,9 @@
 
 import React, { useState } from 'react';
+import { EnaraLogo } from './brand/EnaraLogo';
+import { ProductTour, startTour } from './ProductTour';
 import { 
+  Compass,
   LayoutDashboard, 
   BookOpen, 
   ClipboardCheck, 
@@ -35,6 +38,7 @@ import {
   Grid3x3
 } from 'lucide-react';
 import { getSessionUser } from '../services/apiService';
+import { staffPageAllowed } from '../services/roleRouting';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -102,19 +106,26 @@ export const Header: React.FC<{
         )}
 
         <div className="flex items-center gap-2 ml-0.5 sm:ml-0">
-          <div className="w-8 h-8 rounded-md bg-teal-600 flex items-center justify-center" aria-hidden="true">
-            <span className="text-lg font-extrabold text-white">E</span>
-          </div>
-          <span className="text-xl font-extrabold text-slate-900 tracking-tight">Enara</span>
+          <EnaraLogo className="h-9 w-auto text-slate-900 shrink-0" />
           {role !== 'student' && (
             <span className="hidden sm:inline text-sm font-semibold text-slate-500 border-l border-slate-200 pl-2 ml-1">
-              {isEnaraAdmin ? 'Executive' : 'School admin'}
+              {isEnaraAdmin ? 'Executive' : getSessionUser()?.role === 'teacher' ? 'Teaching' : 'School admin'}
             </span>
           )}
         </div>
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-6">
+        <button
+          onClick={startTour}
+          data-tour="tour-button"
+          title="Take a tour of the platform"
+          className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg transition-all text-xs sm:text-sm font-medium border border-slate-200"
+        >
+          <Compass size={14} />
+          <span className="hidden md:inline">Tour</span>
+        </button>
+        <ProductTour />
         <button 
           onClick={handleShareApp}
           className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg transition-all text-xs sm:text-sm font-medium border border-slate-200"
@@ -142,7 +153,7 @@ export const Header: React.FC<{
           >
             <div className="flex flex-col items-end hidden md:flex">
               <span className="text-xs sm:text-sm font-semibold text-slate-800">{userName}</span>
-              <span className="text-[10px] sm:text-xs text-slate-500 capitalize">{role}</span>
+              <span className="text-[10px] sm:text-xs text-slate-500 capitalize">{({ teacher: 'teacher', academic_manager: 'academic manager' } as Record<string, string>)[getSessionUser()?.role ?? ''] ?? role}</span>
             </div>
             <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${isEnaraAdmin ? 'bg-slate-900' : 'bg-teal-600'} flex items-center justify-center text-white text-[10px] sm:text-xs font-bold`}>
               {userName.split(' ').map(n => n[0]).join('')}
@@ -198,6 +209,7 @@ export const AdminSidebar: React.FC<{
     { id: 'ai-chat', label: 'AI Chat', icon: MessageSquare },
     { id: 'outcomes', label: 'Outcomes', icon: Milestone },
     // P5: Workspace Admin only (workspace:billing); hidden for teachers.
+    { id: 'people', label: 'People', icon: Users, workspaceAdminOnly: true },
     { id: 'usage', label: 'Usage', icon: Gauge, workspaceAdminOnly: true },
     { id: 'savings', label: 'AI Savings Center', icon: PiggyBank, workspaceAdminOnly: true },
     { id: 'learning-events', label: 'Learning Events', icon: ListChecks },
@@ -223,7 +235,10 @@ export const AdminSidebar: React.FC<{
   ];
 
   const isWorkspaceAdmin = getSessionUser()?.role === 'admin';
-  const menuItems = isEnaraAdmin ? enaraMenuItems : adminMenuItems.filter((m) => !(m as { workspaceAdminOnly?: boolean }).workspaceAdminOnly || isWorkspaceAdmin);
+  const backendRole = getSessionUser()?.role;
+  const menuItems = isEnaraAdmin
+    ? enaraMenuItems
+    : adminMenuItems.filter((m) => (!(m as { workspaceAdminOnly?: boolean }).workspaceAdminOnly || isWorkspaceAdmin) && staffPageAllowed(backendRole, m.id));
 
   const handleNavigate = (id: string) => {
     onNavigate(id);
@@ -249,11 +264,7 @@ export const AdminSidebar: React.FC<{
       `}>
         <div className="lg:hidden px-6 mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-md bg-teal-600 flex items-center justify-center text-white font-extrabold" aria-hidden="true">E</div>
-            <div className="flex flex-col">
-              <span className="text-xl font-extrabold text-slate-900 leading-none">Enara</span>
-              
-            </div>
+            <EnaraLogo className="h-9 w-auto text-slate-900" />
           </div>
           <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600">
             <X size={20} />
@@ -271,6 +282,7 @@ export const AdminSidebar: React.FC<{
     return (
       <button
         key={item.id}
+        data-tour={item.id}
         onClick={() => handleNavigate(item.id)}
         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-[15px] transition-colors ${
           isActive 

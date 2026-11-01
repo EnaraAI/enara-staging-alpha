@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react';
 import { OriginSelector } from '../../components/OriginSelector';
 import { ApiError, fetchClassRoster, fetchOutcomes, fetchStudentTimeline, fetchTeachingClasses } from '../../services/apiService';
 import type { OriginView } from '../../services/roleRouting';
+import { TeachingEffectivenessPanel } from '../../components/TeachingEffectivenessPanel';
 
 // P4 outcomes: what was observed for the students in your scope. "Gap
 // closed" only when an independent, unassisted reassessment verified it;
@@ -113,6 +114,7 @@ export const Outcomes: React.FC<{ allowClassFilter?: boolean; showTimeline?: boo
             )}
             <p className="text-xs text-slate-500 mt-2">{data.note}</p>
           </section>
+          <TeachingEffectivenessPanel classId={classId || undefined} origin={origin} />
           {showTimeline && classId && students.length > 0 && (
             <section className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
               <h2 className="font-semibold text-slate-900">Student timeline</h2>

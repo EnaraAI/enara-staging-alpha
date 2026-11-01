@@ -1,3 +1,4 @@
+import { recordAlert } from './auditTrail';
 import { AssessmentAttempt, type IAttemptAnswer } from '../models/AssessmentAttempt';
 import type { IQuestion } from '../models/Assessment';
 import { Assignment, type IAssignment } from '../models/Assignment';
@@ -16,7 +17,9 @@ import { logger } from '../utils/logging';
 // graded, validated, finalized and released without a teacher in the way:
 //
 //   grading_queued → grading_in_progress → [AI evaluation → validation]
-//                  → finalized + released (one conditional write)
+//                  → finalized + released (one conditional write); when the
+//                    assignment's releasePolicy is 'manual', finalized only:
+//                    the teacher releases the results (P22)
 //                  → Phase 2 update (intelligenceStatus, retried on its own)
 //
 // A run claims the attempt with a lease, so two workers never grade it at
@@ -102,7 +105,9 @@ export async function evaluateShort(attempt: AttemptDoc, q: IQuestion, answer: s
 
 const words = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter(Boolean);
 
-// leak-v2 (opt-in, offline benchmark so far). Never flags more than v1:
+// leak-v2 (opt-in, offline benchmark so far). Compared with v1:
+// - both ignore punctuation (v1 since P19.2 F-2); v2 also skips runs the
+//   student wrote and needs a short model answer to appear whole;
 // - a model answer of 8-15 words leaks only if it appears whole (v1: any 8
 //   consecutive words), longer ones by any 8-word run as in v1, shorter ones
 //   never (as in v1);
@@ -129,9 +134,15 @@ function leaks(text: string, q: IQuestion, mode: 'v1' | 'v2' = 'v1', studentAnsw
     if (leaksModelAnswerV2(text, String(q.modelAnswer ?? ''), studentAnswer)) return 'model answer';
     return keyLeak(t, q);
   }
-  const model = String(q.modelAnswer ?? '').toLowerCase().replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+  // Compare words with case and punctuation ignored, so a comma or full stop
+  // inside a copied run cannot hide it (P19.2 F-2: "more energy, so more of them").
+  // A run the student wrote themselves reveals nothing hidden (P19.2 C4-07).
+  const model = words(String(q.modelAnswer ?? ''));
+  const released = ` ${words(text).join(' ')} `;
+  const own = ` ${words(studentAnswer).join(' ')} `;
   for (let i = 0; i + 8 <= model.length; i++) {
-    if (t.includes(` ${model.slice(i, i + 8).join(' ')} `)) return 'model answer';
+    const run = ` ${model.slice(i, i + 8).join(' ')} `;
+    if (released.includes(run) && !own.includes(run)) return 'model answer';
   }
   return keyLeak(t, q);
 }
@@ -228,11 +239,12 @@ async function recordFailure(attempt: AttemptDoc, error: unknown, now: Date) {
     { ...update, $push: { history: { at: now, by: GRADER, action: final ? 'grading_exception' : 'grading_failed', reason: `${e.reason}: ${e.message}`.slice(0, 500) } } },
   );
   logger.warn(final ? 'grading_exception' : 'grading_failed', { attemptId: attempt.id, reason: e.reason, runs });
+  if (final) void recordAlert('grading_exception', 'warning', { scope: e.reason, attemptId: attempt.id, reason: e.reason }, attempt.institutionId);
   return final ? 'exception' : 'failed';
 }
 
 // One grading run. Safe to call any number of times, from anywhere.
-export async function processAttempt(attemptId: string, now = new Date()): Promise<'released' | 'failed' | 'exception' | 'skipped'> {
+export async function processAttempt(attemptId: string, now = new Date()): Promise<'released' | 'finalized' | 'failed' | 'exception' | 'skipped'> {
   const attempt = await claim(attemptId, now);
   if (!attempt) return 'skipped';
   try {
@@ -295,9 +307,12 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
 
     // Result validation.
     const t = validateGrading({ attempt, assignment, version, questions, answers, evaluations });
-    history.push({ at: now, by: GRADER, action: 'validated' }, { at: now, by: GRADER, action: 'finalized', to: { totalPoints: t.totalPoints, maxPoints: t.maxPoints } }, { at: now, by: GRADER, action: 'released' });
+    // Manual release (assignment setting): finalize only; a teacher releases.
+    const hold = assignment.releasePolicy === 'manual';
+    history.push({ at: now, by: GRADER, action: 'validated' }, { at: now, by: GRADER, action: 'finalized', to: { totalPoints: t.totalPoints, maxPoints: t.maxPoints } });
+    if (!hold) history.push({ at: now, by: GRADER, action: 'released' });
 
-    // Finalize and release together; only if this run still owns the attempt.
+    // Finalize (and release) together; only if this run still owns the attempt.
     const done = await AssessmentAttempt.findOneAndUpdate(
       { id: attempt.id, gradingStatus: 'grading_in_progress', gradingRuns: attempt.gradingRuns },
       {
@@ -306,10 +321,11 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
           totalPoints: t.totalPoints,
           maxPoints: t.maxPoints,
           score: t.percent,
-          gradingStatus: 'released',
-          finalizedAt: now,
+          gradingStatus: hold ? 'finalized' : 'released',
+          // The run's start time is \`now\`; finalization and release happen here (P18-4).
+          finalizedAt: new Date(),
           finalizedBy: GRADER,
-          releasedAt: now,
+          ...(hold ? {} : { releasedAt: new Date() }),
           intelligenceStatus: 'pending',
         },
         $unset: { gradingLeaseUntil: 1, nextGradingAt: 1, gradingError: 1, exceptionReason: 1 },
@@ -318,11 +334,11 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
       { new: true },
     );
     if (!done) return 'skipped';
-    logger.info('grading_released', { attemptId: done.id, score: done.score, aiAnswers: todo.length, version: AUTO_GRADING_VERSION });
-    // Downstream steps: each can fail without affecting the released grade.
-    await notifyResultsReleased(assignment, done.studentId, done.id).catch((error) => logger.warn('results_notification_failed', { attemptId: done.id, error: String(error) }));
+    logger.info(hold ? 'grading_finalized_held' : 'grading_released', { attemptId: done.id, score: done.score, aiAnswers: todo.length, version: AUTO_GRADING_VERSION });
+    // Downstream steps: each can fail without affecting the grade.
+    if (!hold) await notifyResultsReleased(assignment, done.studentId, done.id).catch((error) => logger.warn('results_notification_failed', { attemptId: done.id, error: String(error) }));
     await updateLearningIntelligence(done.id, questions, version.subject);
-    return 'released';
+    return hold ? 'finalized' : 'released';
   } catch (error) {
     return recordFailure(attempt, error, now);
   }

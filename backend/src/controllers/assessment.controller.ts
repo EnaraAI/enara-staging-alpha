@@ -4,7 +4,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { toPlainObject } from '../utils/serialize';
-import { Assessment, AssessmentVersion } from '../models/Assessment';
+import { ASSESSMENT_KINDS, Assessment, AssessmentVersion } from '../models/Assessment';
 import { Assignment } from '../models/Assignment';
 import { teacherCurriculumIds } from '../services/learningAccess';
 import { getVersion, publishAssessment, publishProblems, questionPoints } from '../services/assessmentVersions';
@@ -152,6 +152,7 @@ function normalizeQuestions(raw: unknown) {
         rubric: parseRubric(q.rubric, `questions[${index}]`),
         objectiveIds: q.objectiveIds === undefined ? undefined : [...new Set(getOptionalStringArray(q, 'objectiveIds', { maxItems: 10, maxLength: 128 }) || [])],
         difficulty: getOptionalNumber(q, 'difficulty', { min: 1, max: 5 }),
+        cognitiveLevel: getOptionalNumber(q, 'cognitiveLevel', { min: 1, max: 6 }),
         source: q.source === 'ai' ? ('ai' as const) : ('manual' as const),
         sources: parseSourceRefs(q.sources),
         // Kept until the teacher corrects or accepts the question (P4.1).
@@ -185,6 +186,7 @@ function normalizeQuestions(raw: unknown) {
       modelAnswer: getOptionalString(q, 'modelAnswer', { max: 4000 }),
       objectiveIds: q.objectiveIds === undefined ? undefined : [...new Set(getOptionalStringArray(q, 'objectiveIds', { maxItems: 10, maxLength: 128 }) || [])],
       difficulty: getOptionalNumber(q, 'difficulty', { min: 1, max: 5 }),
+      cognitiveLevel: getOptionalNumber(q, 'cognitiveLevel', { min: 1, max: 6 }),
       distractors: parseDistractors(q, Array.isArray(optionsRaw) ? (optionsRaw as string[]) : []),
       points: getOptionalNumber(q, 'points', { min: 0, max: 100 }),
       source: q.source === 'ai' ? ('ai' as const) : ('manual' as const),
@@ -318,6 +320,7 @@ export const createAssessment = asyncHandler(async (req: AuthRequest, res: Respo
   const status = requireEnum(body.status, ASSESSMENT_STATUSES, 'status', 'upcoming');
   const dueDate = getOptionalString(body, 'dueDate', { max: 80 }) || '';
   const difficulty = requireEnum(body.difficulty, DIFFICULTIES, 'difficulty', 'Medium');
+  const assessmentKind = body.assessmentKind === undefined || body.assessmentKind === null ? undefined : requireEnum(body.assessmentKind, ASSESSMENT_KINDS, 'assessmentKind');
   const curriculumId = getOptionalId(body, 'curriculumId');
   const batchId = getOptionalId(body, 'batchId');
   const studentId = getOptionalId(body, 'studentId');
@@ -351,6 +354,7 @@ export const createAssessment = asyncHandler(async (req: AuthRequest, res: Respo
     status,
     dueDate,
     difficulty,
+    ...(assessmentKind ? { assessmentKind } : {}),
     curriculumId,
     batchId,
     studentId,
@@ -401,6 +405,7 @@ export const updateAssessment = asyncHandler(async (req: AuthRequest, res: Respo
   if (body.status !== undefined) assessment.status = requireEnum(body.status, ASSESSMENT_STATUSES, 'status');
   if (body.dueDate !== undefined) assessment.dueDate = getOptionalString(body, 'dueDate', { max: 80 }) || '';
   if (body.difficulty !== undefined) assessment.difficulty = requireEnum(body.difficulty, DIFFICULTIES, 'difficulty');
+  if (body.assessmentKind !== undefined) assessment.assessmentKind = body.assessmentKind === null ? undefined : requireEnum(body.assessmentKind, ASSESSMENT_KINDS, 'assessmentKind');
   if (body.maxAttempts !== undefined) assessment.maxAttempts = Math.floor(getOptionalNumber(body, 'maxAttempts', { min: 1, max: 10 }) ?? assessment.maxAttempts);
   if (body.answerReveal !== undefined) assessment.answerReveal = requireEnum(body.answerReveal, ANSWER_REVEAL, 'answerReveal');
   if (body.curriculumId !== undefined) assessment.curriculumId = getOptionalId(body, 'curriculumId');
@@ -542,6 +547,9 @@ export const generateAssessmentDraftHandler = asyncHandler(async (req: AuthReque
   const { resolveGenerationSources } = await import('../services/sourceSelection');
   const uploadIds = await resolveGenerationSources(req, curriculum, body.uploadIds);
   const { generateAssessmentDraft } = await import('../services/educatorAi');
+  // Arabic AI assessment drafting is out of scope for this release (P7
+  // revised scope; finding F-8). Teachers can still write Arabic assessments.
+  if (body.language === 'ar') throw new AppError(ARABIC_DRAFTS_OFF, 400, 'LANGUAGE_NOT_SUPPORTED');
   const draft = await generateAssessmentDraft({
     uploadIds,
     institutionId: curriculum.institutionId,
@@ -573,6 +581,8 @@ export const generateAssessmentDraftHandler = asyncHandler(async (req: AuthReque
   res.status(201).json({ assessment: toPlainObject(assessment), sources: draft.sources, note: 'AI draft: check every question, answer and rubric before publishing.' });
 });
 
+const ARABIC_DRAFTS_OFF = 'AI drafting is available in English only for now. Write Arabic questions by hand.';
+
 // POST /api/assessments/:id/questions/:questionId/regenerate { instruction?, question? }
 // Returns a replacement for one question; nothing is saved, so the
 // teacher's other edits stay as they are.
@@ -581,6 +591,7 @@ export const regenerateQuestionHandler = asyncHandler(async (req: AuthRequest, r
   rejectMongoOperators(body);
   const assessment = await loadAssessment(req, String(req.params.id));
   await requireAuthoringAi(req, assessment.institutionId);
+  if (assessment.language === 'ar') throw new AppError(ARABIC_DRAFTS_OFF, 400, 'LANGUAGE_NOT_SUPPORTED');
   const current = (body.question && typeof body.question === 'object' ? body.question : assessment.questions.find((q) => q.id === req.params.questionId)) as { type?: string; text?: string; objectiveIds?: string[] } | undefined;
   if (!current?.type) throw new AppError('Question not found', 404);
   const { regenerateQuestion } = await import('../services/educatorAi');

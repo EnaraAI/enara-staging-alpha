@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom';
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Circle, Loader2, MessageCircle, X } from 'lucide-react';
 import { Diagnostic } from './Diagnostic';
+import { MyTeachingProgress } from '../components/MyTeachingProgress';
 import {
   completeIntervention,
   createIntervention,
@@ -200,6 +201,7 @@ export const KnowledgeMap: React.FC<{ studentId?: string; onAskTutor?: (prompt: 
           the more questions you answer, the more reliable it gets.
         </p>
       </div>
+      <MyTeachingProgress studentId={studentId} />
 
       {studentId === 'me' && objectives.some((o: any) => o.courseId) && (
         <div className="flex flex-wrap gap-2">

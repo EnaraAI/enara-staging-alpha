@@ -41,6 +41,10 @@ export interface AppConfig {
   anthropicTutorModel: string;
   // P9 analytics question routing (intent only): a small, priced model.
   anthropicIntentModel: string;
+  // AI assessment drafts and question regeneration (owner decision 2026-11-01:
+  // Sonnet 5.5, from the 144-run English benchmark). Grading and the tutor keep
+  // ANTHROPIC_TUTOR_MODEL.
+  anthropicDraftModel: string;
   anthropicVisualModel: string;
   anthropicVoiceModel: string;
   anthropicTutorEffort: 'low' | 'medium' | 'high';
@@ -74,6 +78,11 @@ export interface AppConfig {
   // sleep. Both are honoured only with ENARA_STAGING=true.
   frontendDir?: string;
   dbIdleDisconnectMs?: number;
+  // MongoDB client limits per process (P20). Every serverless instance opens its
+  // own pool, so the pool must stay small, and a refused cluster must fail fast.
+  mongo: { maxPoolSize: number; serverSelectionTimeoutMs: number };
+  // GET /api requests answer 503 + Retry-After after this long (P20).
+  requestDeadlineMs: number;
   // Cumulative cap on all AI spend while testing a deployment (P14.2), grading
   // included. Separate from school budgets; see aiBudget.ts.
   aiTestSpend?: { id: string; capUsd: number };
@@ -88,6 +97,14 @@ export interface AppConfig {
     examSttModel: string;
   };
   anam?: { apiKey: string; avatarId: string; voiceIdEn: string; voiceIdAr: string };
+  // Owner-approved cost ceilings for services without a catalogue price
+  // (P22). Unset = the service refuses to start (fail closed).
+  unpricedLimits: {
+    speakingExamSttUsdPerReply?: number;
+    speakingExamMaxReplySeconds?: number;
+    anamSessionReserveUsd?: number;
+    anamMaxSessionSeconds?: number;
+  };
   r2?: { accountId: string; bucket: string; accessKeyId: string; secretAccessKey: string };
 }
 
@@ -113,6 +130,14 @@ function readBoolean(
   if (/^(true|1|yes)$/i.test(value)) return true;
   if (/^(false|0|no)$/i.test(value)) return false;
   throw new Error(`${key} must be a boolean`);
+}
+
+function readOptionalPositive(source: NodeJS.ProcessEnv, key: string, max: number): number | undefined {
+  const raw = readString(source, key);
+  if (raw === undefined) return undefined;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value <= 0 || value > max) throw new Error(`${key} must be a number above 0 and at most ${max}`);
+  return value;
 }
 
 function readNumber(
@@ -380,6 +405,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     anthropicApiKey: readString(source, "ANTHROPIC_API_KEY"),
     anthropicTutorModel: readString(source, "ANTHROPIC_TUTOR_MODEL") || "claude-opus-5-5",
     anthropicIntentModel: readString(source, "ANTHROPIC_INTENT_MODEL") || "claude-haiku-5-5",
+    anthropicDraftModel: readString(source, "ANTHROPIC_DRAFT_MODEL") || "claude-sonnet-5-5",
     anthropicVisualModel: readString(source, "ANTHROPIC_VISUAL_MODEL") || "claude-haiku-5-5",
     // Spoken avatar replies need a fast first word more than depth.
     anthropicVoiceModel: readString(source, "ANTHROPIC_VOICE_MODEL") || "claude-haiku-5-5",
@@ -412,6 +438,12 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     awsSecretAccessKey,
     r2,
     anam,
+    unpricedLimits: {
+      speakingExamSttUsdPerReply: readOptionalPositive(source, "SPEAKING_EXAM_STT_MAX_USD_PER_REPLY", 5),
+      speakingExamMaxReplySeconds: readOptionalPositive(source, "SPEAKING_EXAM_MAX_REPLY_SECONDS", 600),
+      anamSessionReserveUsd: readOptionalPositive(source, "ANAM_SESSION_RESERVE_USD", 50),
+      anamMaxSessionSeconds: readOptionalPositive(source, "ANAM_MAX_SESSION_SECONDS", 3600),
+    },
     elevenlabs,
     email,
     appUrl: readString(source, "APP_URL") || "https://enara-sandbox-frontend.vercel.app",
@@ -426,6 +458,11 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       staging && readString(source, "DB_IDLE_DISCONNECT_MS")
         ? readNumber(source, "DB_IDLE_DISCONNECT_MS", 240_000, { min: 30_000, max: 3_600_000 })
         : undefined,
+    mongo: {
+      maxPoolSize: readNumber(source, "MONGO_MAX_POOL_SIZE", 10, { min: 1, max: 100 }),
+      serverSelectionTimeoutMs: readNumber(source, "MONGO_SERVER_SELECTION_TIMEOUT_MS", 10_000, { min: 1_000, max: 30_000 }),
+    },
+    requestDeadlineMs: readNumber(source, "REQUEST_DEADLINE_MS", 25_000, { min: 1_000, max: 55_000 }),
   };
 }
 

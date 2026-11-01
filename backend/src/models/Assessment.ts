@@ -10,6 +10,11 @@ export interface IRubricCriterion {
   objectiveIds?: string[];
 }
 
+// What kind of assessment this is (P21), for comparing like with like when
+// measuring learning. Optional: records without it are 'unspecified', never guessed.
+export const ASSESSMENT_KINDS = ['diagnostic', 'formative', 'quiz', 'unit_test', 'midterm', 'final', 'teacher_exam', 'standardized', 'retention_check', 'practice'] as const;
+export type AssessmentKind = (typeof ASSESSMENT_KINDS)[number];
+
 export type QuestionType = 'multiple-choice' | 'true-false' | 'short-answer' | 'open-response';
 
 export interface IQuestion {
@@ -34,6 +39,9 @@ export interface IQuestion {
   // Learning objectives this question gives evidence for, and its difficulty (1-5).
   objectiveIds?: string[];
   difficulty?: number;
+  // Revised Bloom level the question targets (1 remember ... 6 create), when the
+  // author set it (P21). Not inferred.
+  cognitiveLevel?: number;
   // Wrong options that signal a known misconception (never sent to students).
   distractors?: { option: string; category: string; description: string }[];
 }
@@ -48,6 +56,7 @@ export interface IAssessment extends Document {
   status: 'upcoming' | 'active' | 'completed' | 'pending' | 'in-progress';
   dueDate: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
+  assessmentKind?: AssessmentKind;
   curriculumId?: string;
   batchId?: string;
   studentId?: string;
@@ -108,6 +117,7 @@ const questionSchema = new Schema<IQuestion>(
     sourceStatus: { type: String, enum: ['supported', 'no_supporting_source'] },
     objectiveIds: { type: [String], default: undefined },
     difficulty: { type: Number, min: 1, max: 5 },
+    cognitiveLevel: { type: Number, min: 1, max: 6 },
     distractors: { type: [{ option: String, category: String, description: String, _id: false }], default: undefined },
   },
   { _id: false }
@@ -132,6 +142,7 @@ const assessmentSchema = new Schema<IAssessment>(
       enum: ['Easy', 'Medium', 'Hard'],
       default: 'Medium',
     },
+    assessmentKind: { type: String, enum: ASSESSMENT_KINDS },
     curriculumId: String,
     batchId: { type: String, index: true },
     studentId: { type: String, index: true },
