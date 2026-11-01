@@ -327,6 +327,7 @@ const App: React.FC = () => {
                 {[['dashboard', 'Home'], ['courses', 'My learning'], ...(progressEnabled ? [['progress', 'My progress']] : []), ...(assignmentsEnabled ? [['assignments-student', 'Assignments']] : []), ...(studyPlanEnabled ? [['study-plan', 'Study plan']] : []), ...(showAssessmentsTab ? [['assessments', 'Assessments']] : []), ['results', 'Results']].map(([tab, label]) => (
                   <button
                     key={tab}
+                    data-tour={tab}
                     onClick={() => navigate(tab)}
                     className={`py-3 px-1 text-[15px] font-semibold transition-colors border-b-2 ${
                       state.page === tab 

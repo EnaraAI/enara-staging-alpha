@@ -22,6 +22,8 @@ export interface SessionUser {
   name?: string;
   studentId?: string;
   institutionId?: string;
+  // New accounts get the product tour once, until they finish or skip it.
+  tourPending?: boolean;
 }
 
 export class ApiError extends Error {
@@ -130,6 +132,16 @@ export async function login(email: string, password: string): Promise<SessionUse
   });
   saveSession(data.token, data.user);
   return data.user;
+}
+
+// The product tour was finished or skipped: remembered on the account (so it
+// doesn't come back on another device) and in the stored session.
+export async function completeTour(): Promise<void> {
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    if (raw) localStorage.setItem(USER_KEY, JSON.stringify({ ...JSON.parse(raw), tourPending: false }));
+  } catch { /* storage unavailable: the server copy still counts */ }
+  await request('POST', '/api/auth/tour/complete').catch(() => undefined);
 }
 
 // Signs out on the server too (S-1): every token of the account stops

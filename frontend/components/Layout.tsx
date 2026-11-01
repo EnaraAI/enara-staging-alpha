@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
 import { EnaraLogo } from './brand/EnaraLogo';
+import { ProductTour, startTour } from './ProductTour';
 import { 
+  Compass,
   LayoutDashboard, 
   BookOpen, 
   ClipboardCheck, 
@@ -114,6 +116,16 @@ export const Header: React.FC<{
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-6">
+        <button
+          onClick={startTour}
+          data-tour="tour-button"
+          title="Take a tour of the platform"
+          className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg transition-all text-xs sm:text-sm font-medium border border-slate-200"
+        >
+          <Compass size={14} />
+          <span className="hidden md:inline">Tour</span>
+        </button>
+        <ProductTour />
         <button 
           onClick={handleShareApp}
           className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg transition-all text-xs sm:text-sm font-medium border border-slate-200"
@@ -269,6 +281,7 @@ export const AdminSidebar: React.FC<{
     return (
       <button
         key={item.id}
+        data-tour={item.id}
         onClick={() => handleNavigate(item.id)}
         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-[15px] transition-colors ${
           isActive 

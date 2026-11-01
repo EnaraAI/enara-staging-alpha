@@ -17,6 +17,9 @@ export interface IUser extends Document {
   // Bumped on logout and password reset: every token signed with an older
   // value is refused (S-1). Missing means 0, so earlier tokens stay valid.
   tokenVersion?: number;
+  // When the account finished or skipped the product tour (new accounts only).
+  tourCompletedAt?: Date;
+  createdAt?: Date;
 }
 
 const userSchema = new Schema<IUser>(
@@ -35,6 +38,7 @@ const userSchema = new Schema<IUser>(
     permissions: { type: [String], default: undefined },
     origin: { type: String, enum: ['live', 'demo_seed'], default: 'live' },
     tokenVersion: { type: Number, default: 0 },
+    tourCompletedAt: { type: Date },
   },
   { timestamps: true }
 );

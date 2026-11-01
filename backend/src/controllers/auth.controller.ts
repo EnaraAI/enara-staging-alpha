@@ -78,6 +78,19 @@ async function ensureStudentLink(user: InstanceType<typeof User>) {
   return user;
 }
 
+// Product tour: shown once to accounts created from the tour's release on,
+// until they finish or skip it. Older accounts are not interrupted.
+export const TOUR_FOR_ACCOUNTS_CREATED_SINCE = new Date('2026-10-31T23:30:00Z'); // release of the tour (1 Nov 2026, 1:30 AM Cairo)
+export function tourPending(user: { tourCompletedAt?: Date | null; createdAt?: Date | null }): boolean {
+  return !user.tourCompletedAt && !!user.createdAt && new Date(user.createdAt) >= TOUR_FOR_ACCOUNTS_CREATED_SINCE;
+}
+
+// POST /api/auth/tour/complete: the signed-in account finished or skipped the tour.
+export const completeTour = asyncHandler(async (req: AuthRequest, res: Response) => {
+  await User.updateOne({ _id: req.user!.id, tourCompletedAt: { $exists: false } }, { $set: { tourCompletedAt: new Date() } });
+  res.json({ ok: true });
+});
+
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const body = ensurePlainObject(req.body);
   rejectMongoOperators(body);
@@ -110,6 +123,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       name: user.name,
       studentId: user.studentId,
       institutionId: user.institutionId,
+      tourPending: tourPending(user),
     },
   });
 });
@@ -171,6 +185,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       name: user.name,
       studentId: user.studentId,
       institutionId: user.institutionId,
+      tourPending: tourPending(user),
     },
   });
 });
@@ -224,6 +239,7 @@ export const demoLogin = asyncHandler(async (req: Request, res: Response) => {
       name: user.name,
       studentId: user.studentId,
       institutionId: user.institutionId,
+      tourPending: tourPending(user),
     },
   });
 });
