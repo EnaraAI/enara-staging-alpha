@@ -8,6 +8,7 @@ import {
   reportLessonViewed,
   getTutorSession,
   deleteTutorSession,
+  fetchTutorVisual,
 } from '../services/apiService';
 import { toast } from '../services/toastService';
 import React, { useState, useRef, useEffect } from 'react';
@@ -21,6 +22,7 @@ import {
   ChevronLeft,
   Menu,
   X,
+  Maximize2,
   Bot,
   Volume2,
   Send,
@@ -39,7 +41,7 @@ import {
   Download,
 } from 'lucide-react';
 import { Course, Lesson, Module, ChatMessage } from '../types';
-import { getTutorResponse, generateSpeech, generateImage } from '../services/geminiService';
+import { generateSpeech } from '../services/geminiService';
 import { LiveAvatarModal } from '../components/enara/LiveAvatarModal';
 import { UsageChip } from '../components/UsageChip';
 
@@ -97,6 +99,8 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isTutorMinimized, setIsTutorMinimized] = useState(true);
   const [isLiveAvatarOpen, setIsLiveAvatarOpen] = useState(false);
+  // A tutor diagram shown full size (the chat panel is narrow).
+  const [largeVisual, setLargeVisual] = useState<string | null>(null);
   const [tutorView, setTutorView] = useState<'chat' | 'history'>('chat');
   
   // AI Tutor State
@@ -165,43 +169,30 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
     setChatMessages(prev => [...prev, userMsg]);
     setIsTyping(true);
 
-    const lessonContext = selectedLesson 
-      ? `Subject: ${selectedCourse?.subject}, Module: ${selectedModule?.title}, Lesson: ${selectedLesson.title}.`
-      : `Subject: ${selectedCourse?.subject}.`;
-
-    const prompt = `Based on the lesson "${selectedLesson?.title || selectedCourse?.title}", generate a prompt for an educational illustration that helps visualize the core concept. The prompt should be descriptive and educational. Return ONLY the JSON object with the "prompt" field.`;
-    
-    const response = await getTutorResponse([], prompt, lessonContext).catch(() => '');
-    let imagePrompt = response;
+    // Drawn by the same diagram generator as the live call (no image service needed).
+    const plain = (selectedLesson?.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 3000);
     try {
-      // Try to parse if it's JSON
-      const parsed = JSON.parse(response);
-      imagePrompt = parsed.prompt || response;
-    } catch (e) {
-      // Fallback to raw text
-    }
-
-    const imageUrl = await generateImage(imagePrompt, "16:9");
-    
-    setIsTyping(false);
-    
-    if (imageUrl) {
-      setChatMessages(prev => [...prev, { 
-        id: (Date.now() + 1).toString(), 
-        role: 'ai', 
-        text: "Here's a visualization of the concept. I hope this helps you understand it better!", 
+      const { html } = await fetchTutorVisual({
+        lessonTitle: selectedLesson?.title || selectedCourse?.title,
+        lessonText: plain || undefined,
+        courseId: selectedCourse?.id,
+      });
+      setChatMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'ai',
+        text: "Here's a visual of the lesson's main idea. Ask me about any part of it!",
         timestamp: new Date(),
-        imageUrl,
-        imagePrompt
+        visualHtml: html,
       }]);
-    } else {
-      setChatMessages(prev => [...prev, { 
-        id: (Date.now() + 1).toString(), 
-        role: 'ai', 
-        text: "Pictures aren't available in text chat yet. Ask the live tutor to draw it: it can show diagrams during a call.", 
-        timestamp: new Date() 
+    } catch (err) {
+      setChatMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'ai',
+        text: err instanceof Error && err.message ? err.message : "I couldn't make the visual right now. Please try again in a moment.",
+        timestamp: new Date(),
       }]);
-      await handleSendMessage("Explain the concept in detail.");
+    } finally {
+      setIsTyping(false);
     }
   };
 
@@ -655,6 +646,18 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
                   }`}
                 >
                   {msg.role === 'user' ? msg.text : <MessageContent text={msg.text} />}
+                  {msg.visualHtml && (
+                    <div className="mt-3 rounded-md overflow-hidden border border-[#e5e7eb] bg-white">
+                      <iframe srcDoc={msg.visualHtml} sandbox="" title="Lesson visual" className="w-full h-[420px] border-0" />
+                      <button
+                        type="button"
+                        onClick={() => setLargeVisual(msg.visualHtml!)}
+                        className="w-full flex items-center justify-center gap-1.5 py-1.5 border-t border-[#e5e7eb] text-xs font-semibold text-teal-700 hover:bg-teal-50"
+                      >
+                        <Maximize2 size={13} aria-hidden="true" /> Open larger
+                      </button>
+                    </div>
+                  )}
                   {msg.imageUrl && (
                     <div className="mt-3 rounded-md overflow-hidden border border-[#e5e7eb] bg-white">
                       <img
@@ -1071,6 +1074,33 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
           {tutorPanel}
         </aside>
       </div>
+
+      {largeVisual && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Lesson visual"
+          className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/60"
+          onClick={() => setLargeVisual(null)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setLargeVisual(null); }}
+        >
+          <div className="relative w-full max-w-4xl h-[88vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e7eb] shrink-0">
+              <p className="text-sm font-semibold text-slate-800">Lesson visual</p>
+              <button
+                type="button"
+                autoFocus
+                onClick={() => setLargeVisual(null)}
+                aria-label="Close visual"
+                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <iframe srcDoc={largeVisual} sandbox="" title="Lesson visual (large)" className="flex-1 w-full border-0" />
+          </div>
+        </div>
+      )}
 
       {/* Live AI Avatar Streaming Modal */}
       <LiveAvatarModal

@@ -70,5 +70,7 @@ describe('live avatar and the test-spend cap', () => {
   it('grading and other features stay under the cap', async () => {
     await expect(reserve('g1', 'ai_grading', 'anthropic', 1.5)).rejects.toMatchObject({ code: 'AI_TEST_SPEND_CAP' });
     await expect(reserve('l1', 'ai_lesson_plan', 'anthropic', 1.5)).rejects.toMatchObject({ code: 'AI_TEST_SPEND_CAP' });
+    // Text-tutor visuals are not part of the live call: they stay under the cap.
+    await expect(reserve('tv1', 'tutor_visual', 'anthropic', 1.5)).rejects.toMatchObject({ code: 'AI_TEST_SPEND_CAP' });
   });
 });

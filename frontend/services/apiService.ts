@@ -217,6 +217,9 @@ async function directUpload<T>(start: string, startBody: Record<string, unknown>
   return request<T>('POST', complete, { ...completeBody, storedName: target.storedName, fileName: file.name });
 }
 
+export const fetchTutorVisual = (params: { lessonTitle?: string; lessonText?: string; courseId?: string; prompt?: string }) =>
+  request<{ html: string }>('POST', '/api/me/tutor/visualize', params);
+
 export function uploadChapterFile(curriculumId: string, chapterId: string, file: File) {
   const base = `/api/curriculums/${encodeURIComponent(curriculumId)}/chapters/${encodeURIComponent(chapterId)}`;
   return directUpload<any>(`${base}/file-uploads`, {}, `${base}/file-uploads/complete`, {}, file, () => {
