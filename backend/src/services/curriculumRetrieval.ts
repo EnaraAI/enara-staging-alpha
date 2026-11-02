@@ -1,6 +1,6 @@
 import { CurriculumChunk } from '../models/CurriculumChunk';
 import { LearningObjective } from '../models/LearningObjective';
-import { searchTerms } from './textSearch';
+import { searchTerms, TERMS_VERSION } from './textSearch';
 import { clearedUploadIds, isDocumentSafetyRequired } from './documentSafety';
 
 // Keyword retrieval over extracted curriculum passages (retrieval-v1, BM25).
@@ -28,6 +28,14 @@ const FRAMING_WORDS = new Set([
   'summarise', 'summarize', 'summary', 'simply', 'simple', 'brief', 'briefly', 'describe', 'overview', 'student', 'learner', 'pupil', 'kid', 'children', 'grade',
   'اشرح', 'لخص', 'وضح', 'بسط', 'ببساطه', 'بسيط', 'مبسط', 'طلاب', 'لطلاب', 'للطلاب', 'طالب', 'تلاميذ', 'لتلاميذ', 'للتلاميذ',
 ]);
+// References to the source itself ("according to the book", "in this
+// chapter", "حسب الكتاب"): the passage rarely names itself, so these words would
+// make a fitting passage look like it misses part of the question. Ignored in
+// small scopes only; compared after fold() ("according" -> "accord").
+const SOURCE_WORDS = new Set([
+  'accord', 'book', 'textbook', 'coursebook', 'workbook', 'chapter', 'page', 'lesson', 'document', 'pdf', 'material', 'curriculum', 'passage',
+  'حسب', 'وفقا', 'كتاب', 'الكتاب', 'للكتاب', 'بالكتاب', 'درس', 'الدرس', 'الفصل', 'المنهج', 'صفحه', 'الصفحه',
+]);
 // "grade 5", "10th grade", "الصف الخامس": the grade word and the word after
 // (or a number before) it are audience, not topic.
 const GRADE_WORDS = new Set(['grade', 'الصف', 'صف', 'للصف', 'لصف']);
@@ -39,7 +47,7 @@ function contentTerms(terms: string[]) {
     if (i + 1 < terms.length && (/^\d/.test(terms[i + 1]) || t !== 'grade')) drop.add(i + 1);
     if (i > 0 && /^\d/.test(terms[i - 1])) drop.add(i - 1);
   });
-  return [...new Set(terms.filter((t, i) => !drop.has(i) && !QUESTION_WORDS.has(t)).map(fold).filter((t) => !FRAMING_WORDS.has(t)))];
+  return [...new Set(terms.filter((t, i) => !drop.has(i) && !QUESTION_WORDS.has(t)).map(fold).filter((t) => !FRAMING_WORDS.has(t) && !SOURCE_WORDS.has(t)))];
 }
 // A question with one topic word ("explain water to my students") matches any
 // passage that mentions the word once in passing. In small scopes such a word
@@ -88,6 +96,7 @@ export async function retrieveCurriculumSources(params: {
   if (!qTerms.length) return [];
   const scope = await passageScope(params);
   if (!scope) return [];
+  await refreshStaleTerms(scope);
   const [N, candidates, dfs] = await Promise.all([
     CurriculumChunk.countDocuments(scope),
     CurriculumChunk.find({ ...scope, terms: { $in: qTerms } })
@@ -151,6 +160,22 @@ export async function retrieveCurriculumSources(params: {
     lessonId: x.c.lessonId,
     score: Math.round(x.score * 100) / 100,
   }));
+}
+
+// Passages stored before the current TERMS_VERSION get their terms rebuilt
+// from their text, once, the first time their scope is searched. Deterministic
+// and idempotent; text and everything else stay as stored.
+const REFRESH_BATCH = 2000;
+async function refreshStaleTerms(scope: Record<string, unknown>) {
+  const stale = await CurriculumChunk.find({ ...scope, termsVersion: { $ne: TERMS_VERSION } }).select('id text').limit(REFRESH_BATCH).lean();
+  if (!stale.length) return;
+  await CurriculumChunk.bulkWrite(
+    stale.map((c) => {
+      const terms = searchTerms(c.text);
+      return { updateOne: { filter: { id: c.id }, update: { $set: { terms: [...new Set(terms)], termCount: terms.length, termsVersion: TERMS_VERSION } } } };
+    }),
+    { ordered: false },
+  );
 }
 
 // The passage filter every retrieval uses: one school and curriculum,
