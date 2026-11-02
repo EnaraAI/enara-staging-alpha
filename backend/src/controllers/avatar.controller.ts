@@ -323,6 +323,14 @@ export const getAvatarArtifact = asyncHandler(async (req: AuthRequest, res: Resp
   res.json({ html: session.artifactHtml || null });
 });
 
+// A student turn worth a picture: a question or request of four words or more,
+// not a greeting or a one-word answer.
+export function wantsAutoVisual(text: string): boolean {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length < 4) return false;
+  return !/^(hi|hello|hey|thanks|thank you|ok|okay|yes|no|bye|goodbye|اهلا|أهلا|مرحبا|شكرا|ماشي|تمام|اه|لا)(?=$|[\s,.!?،؟])/i.test(text.trim());
+}
+
 export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Response) => {
   const body = req.body as {
     session_id?: string;
@@ -434,7 +442,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   const startVisual = async (question: string) => {
     if (visualStarted) return;
     visualStarted = true;
-    await AvatarSession.updateOne({ id: session.id }, { $unset: { artifactHtml: 1 } });
+    await AvatarSession.updateOne({ id: session.id }, { $unset: { artifactHtml: 1 }, $inc: { visualsShown: 1 } });
     // The recent conversation says what "this" refers to (e.g. the equation asked about).
     const recent = messages
       .slice(-4)
@@ -448,13 +456,17 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     );
   };
   const visualRequested = Boolean(last && isVisualRequest(last.content));
-  if (visualRequested) await startVisual(last!.content);
+  // Every call gets a visual: the first real question (not a greeting) draws one
+  // even if nobody asked. Not while an assignment limits the tutor to hints.
+  const autoVisual =
+    !visualRequested && kind === 'turn' && !session.visualsShown && tutorPolicy.policy !== 'hints_only' && wantsAutoVisual(last!.content);
+  if (visualRequested || autoVisual) await startVisual(last!.content);
 
   res.setHeader('Content-Type', 'application/x-ndjson; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
-  if (visualRequested) res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
+  if (visualRequested || autoVisual) res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
 
   const languageLine = spokenLanguage
     ? `(Reply only in ${spokenLanguage === 'arabic' ? 'Egyptian Arabic' : 'English'}, whatever language earlier turns used.)`
@@ -463,6 +475,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     !curriculum && lessonTitle ? `Current lesson: ${lessonTitle}` : '',
     !curriculum && session.subject ? `Subject: ${session.subject}` : '',
     languageLine,
+    autoVisual ? '(A visual about this is being drawn on the screen next to you right now: mention it in a few words and refer to it.)' : '',
     kind === 'opening'
       ? plan
         ? `(The call has just started and the student hasn't spoken yet. Open it yourself: greet ${learner?.firstName || 'the student'} by name in one short sentence, then begin the way your teaching plan says - a plan that explains or models first starts with a short explanation of the first step; a plan that questions starts with one question. Under 40 words. Don't list everything you know.)`

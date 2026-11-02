@@ -2,7 +2,7 @@ import { QUICK_CLOSE_MS, transcriptionReconnectDelayMs } from './retryPolicy';
 import { CommitStrategy, RealtimeEvents, Scribe, type RealtimeConnection } from '@elevenlabs/client';
 import { avatarFetch } from './apiService';
 
-import { isEcho, languageOfText, toVoiceLanguage, voiceWords as words, type VoiceLanguage } from './voiceText';
+import { isEcho, isRepeatUtterance, languageOfText, REPEAT_WINDOW_MS, toVoiceLanguage, voiceWords as words, type VoiceLanguage } from './voiceText';
 
 export { SentenceSplitter } from './sentenceSplitter';
 export { languageOfText, type VoiceLanguage } from './voiceText';
@@ -60,6 +60,8 @@ export class AvatarVoice {
   // plays audio a second or two after we send it, and the room carries it.
   private recentSpoken: string[] = [];
   private echoUntil = 0;
+  // Sentences already passed on, so the same words reported twice are answered once.
+  private recentHeard: { text: string; at: number }[] = [];
 
   constructor(
     private readonly sessionId: string,
@@ -94,6 +96,8 @@ export class AvatarVoice {
     this.connection = connection;
 
     connection.on(RealtimeEvents.PARTIAL_TRANSCRIPT, (msg) => {
+      // Live text only from the current session (an old one may still be closing).
+      if (connection !== this.connection) return;
       const text = msg.text?.trim();
       if (text && !this.isOwnEcho(text)) this.callbacks.onHearing?.(text);
     });
@@ -102,9 +106,14 @@ export class AvatarVoice {
       if (!text) return;
       // The mic hears the avatar too; never answer its own words.
       if (this.isOwnEcho(text)) return;
+      // The old and the new session overlap for a moment: one answer per sentence.
+      const now = performance.now();
+      if (isRepeatUtterance(text, this.recentHeard, now)) return;
+      this.recentHeard = [...this.recentHeard.filter((r) => now - r.at <= REPEAT_WINDOW_MS), { text, at: now }];
       if (this.isSpeaking) {
-        // Real speech over the avatar interrupts it; a stray word doesn't.
-        if (words(text).length < 2) return;
+        // Real speech over the avatar interrupts it; a stray word or two
+        // (often the avatar's own voice, partly heard) doesn't.
+        if (words(text).length < 3) return;
         this.interrupt();
         this.callbacks.onInterrupt?.();
       }

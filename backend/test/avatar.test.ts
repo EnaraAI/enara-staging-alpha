@@ -178,6 +178,36 @@ describe('live avatar', () => {
     });
   });
 
+  it('draws one visual by itself on the first real question of a call, and tells the tutor', async () => {
+    const auth = await token('auto-visual');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ lesson_title: 'Greetings' });
+    const ask = (content: string) =>
+      request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: start.body.session_id, messages: [{ role: 'user', content }] });
+
+    // A greeting is not worth a picture.
+    const hi = await ask('Hello there');
+    expect(hi.text).not.toContain('"visual"');
+    expect(mocks.visual).not.toHaveBeenCalled();
+
+    const first = await ask('What do we say in the morning and evening?');
+    expect(JSON.parse(first.text.split('\n')[0])).toEqual({ visual: 'drawing' });
+    expect(mocks.visual).toHaveBeenCalledTimes(1);
+    expect(mocks.visual).toHaveBeenCalledWith(expect.objectContaining({ question: 'What do we say in the morning and evening?', requested: true }));
+    expect(mocks.stream.mock.calls.at(-1)[0].query).toContain('A visual about this is being drawn on the screen');
+
+    // Only the first one is automatic; later ones are asked for or chosen by the tutor.
+    const second = await ask('And what do we say at night before bed?');
+    expect(second.text).not.toContain('"visual"');
+    expect(mocks.visual).toHaveBeenCalledTimes(1);
+  });
+
+  it('knows which turns are worth an automatic visual', async () => {
+    const { wantsAutoVisual } = await import('../src/controllers/avatar.controller');
+    expect(wantsAutoVisual('What is the job of a pilot?')).toBe(true);
+    expect(wantsAutoVisual('ازاي أقول صباح الخير بالانجليزي؟')).toBe(true);
+    for (const t of ['Hi', 'thank you so much teacher', 'ok', 'Yes I am a student', 'شكرا يا مس جدا']) expect(wantsAutoVisual(t)).toBe(false);
+  });
+
   it('keeps equations readable inside Arabic visuals', async () => {
     const { isolateEquations } = await vi.importActual<typeof import('../src/services/avatarVisuals')>(
       '../src/services/avatarVisuals',
