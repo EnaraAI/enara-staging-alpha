@@ -303,13 +303,32 @@ describe('live avatar', () => {
     const auth = await token('staff-cap');
     const bad = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ lesson_title: { $gt: '' } });
     expect(bad.status).toBe(400);
-    for (let i = 0; i < 5; i += 1) {
-      const ok = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
-      expect(ok.status).toBe(200);
-    }
+    const { AvatarSession } = await import('../src/models/AvatarSession');
+    const { User } = await import('../src/models/User');
+    const userId = String((await User.findOne({ email: 'staff-cap@enara.ai' }).lean())!._id);
+    const past = (n: number, connected: boolean) =>
+      AvatarSession.insertMany(
+        Array.from({ length: n }, (_, i) => ({ id: `av-past-${connected}-${i}-${userId}`, userId, ...(connected ? { lastHeartbeatAt: new Date() } : {}) })),
+      );
+    // Calls whose video never connected don't use up the day...
+    await past(6, false);
+    expect((await request(app).post('/api/avatar/session').set('Authorization', auth).send({})).status).toBe(200);
+    // ...connected ones do: 5 per day for staff.
+    await past(5, true);
     const capped = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
     expect(capped.status).toBe(429);
     expect(capped.body.error.code).toBe('AVATAR_DAILY_LIMIT');
+  });
+
+  it('bounds failed call starts too (three times the daily limit)', async () => {
+    const auth = await token('start-cap');
+    const { AvatarSession } = await import('../src/models/AvatarSession');
+    const { User } = await import('../src/models/User');
+    const userId = String((await User.findOne({ email: 'start-cap@enara.ai' }).lean())!._id);
+    await AvatarSession.insertMany(Array.from({ length: 14 }, (_, i) => ({ id: `av-fail-${i}-${userId}`, userId })));
+    expect((await request(app).post('/api/avatar/session').set('Authorization', auth).send({})).status).toBe(200);
+    const capped = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    expect(capped.status).toBe(429);
   });
 
   it('caps spoken characters per call', async () => {

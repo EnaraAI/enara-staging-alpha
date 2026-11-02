@@ -130,6 +130,8 @@ async function loadSessionCurriculum(session: IAvatarSession): Promise<TutorCurr
 // Calls a user may start per day. Staff only preview the tutor and aren't
 // charged credits, so they get fewer.
 const DAILY_SESSIONS = { student: 30, staff: 5 };
+// Starts allowed per day, connected or not, as a multiple of the limit above.
+const DAILY_START_FACTOR = 3;
 // ElevenLabs characters per call (roughly 20 minutes of speech).
 const MAX_SPOKEN_CHARS_PER_SESSION = 20_000;
 
@@ -153,11 +155,17 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
     preferred_language: optionalText(raw.preferred_language, 20),
   };
   const isStudent = req.user!.role === 'student';
-  const today = await AvatarSession.countDocuments({
-    userId: req.user!.id,
-    createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
-  });
-  if (today >= (isStudent ? DAILY_SESSIONS.student : DAILY_SESSIONS.staff)) {
+  // The daily limit counts calls that actually got going (the video connected,
+  // or the tutor opened the call): attempts that failed to start must not use
+  // up a student's day (seen live: retries locked an account out). A wider
+  // cap on every start keeps failed attempts bounded too.
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const limit = isStudent ? DAILY_SESSIONS.student : DAILY_SESSIONS.staff;
+  const [connected, started] = await Promise.all([
+    AvatarSession.countDocuments({ userId: req.user!.id, createdAt: { $gte: since }, $or: [{ lastHeartbeatAt: { $ne: null } }, { openingUsed: true }] }),
+    AvatarSession.countDocuments({ userId: req.user!.id, createdAt: { $gte: since } }),
+  ]);
+  if (connected >= limit || started >= limit * DAILY_START_FACTOR) {
     throw new AppError('Daily live tutor limit reached. Try again tomorrow.', 429, 'AVATAR_DAILY_LIMIT');
   }
   // No language asked for: open in the one the student ended their last call in.
