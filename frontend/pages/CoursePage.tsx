@@ -22,6 +22,7 @@ import {
   ChevronLeft,
   Menu,
   X,
+  Maximize2,
   Bot,
   Volume2,
   Send,
@@ -98,6 +99,8 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isTutorMinimized, setIsTutorMinimized] = useState(true);
   const [isLiveAvatarOpen, setIsLiveAvatarOpen] = useState(false);
+  // A tutor diagram shown full size (the chat panel is narrow).
+  const [largeVisual, setLargeVisual] = useState<string | null>(null);
   const [tutorView, setTutorView] = useState<'chat' | 'history'>('chat');
   
   // AI Tutor State
@@ -646,6 +649,13 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
                   {msg.visualHtml && (
                     <div className="mt-3 rounded-md overflow-hidden border border-[#e5e7eb] bg-white">
                       <iframe srcDoc={msg.visualHtml} sandbox="" title="Lesson visual" className="w-full h-[420px] border-0" />
+                      <button
+                        type="button"
+                        onClick={() => setLargeVisual(msg.visualHtml!)}
+                        className="w-full flex items-center justify-center gap-1.5 py-1.5 border-t border-[#e5e7eb] text-xs font-semibold text-teal-700 hover:bg-teal-50"
+                      >
+                        <Maximize2 size={13} aria-hidden="true" /> Open larger
+                      </button>
                     </div>
                   )}
                   {msg.imageUrl && (
@@ -1064,6 +1074,33 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
           {tutorPanel}
         </aside>
       </div>
+
+      {largeVisual && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Lesson visual"
+          className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/60"
+          onClick={() => setLargeVisual(null)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setLargeVisual(null); }}
+        >
+          <div className="relative w-full max-w-4xl h-[88vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e7eb] shrink-0">
+              <p className="text-sm font-semibold text-slate-800">Lesson visual</p>
+              <button
+                type="button"
+                autoFocus
+                onClick={() => setLargeVisual(null)}
+                aria-label="Close visual"
+                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <iframe srcDoc={largeVisual} sandbox="" title="Lesson visual (large)" className="flex-1 w-full border-0" />
+          </div>
+        </div>
+      )}
 
       {/* Live AI Avatar Streaming Modal */}
       <LiveAvatarModal
