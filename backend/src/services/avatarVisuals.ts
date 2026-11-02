@@ -82,8 +82,11 @@ export async function generateVisualAid(params: {
   context?: string;
   // The student asked for it: always draw something.
   requested?: boolean;
+  // Live calls use 'avatar_visual' (exempt from the staging cap); the text
+  // tutor uses 'tutor_visual', which stays under it.
+  feature?: 'avatar_visual' | 'tutor_visual';
 }): Promise<string | null> {
-  const { question, answer, context, requested } = params;
+  const { question, answer, context, requested, feature = 'avatar_visual' } = params;
   const config = getConfig();
   if (!config.anthropicApiKey) return null;
   client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 40_000, maxRetries: 0 });
@@ -91,7 +94,7 @@ export async function generateVisualAid(params: {
   try {
     // Bound: the variable parts plus 4,000 tokens for the fixed instructions.
     const bound = { inputTokens: textTokenBound(question, answer, context, LAYOUT_RULES) + 4000, outputTokens: 12_000 };
-    const response = await meteredMessage({ feature: 'avatar_visual', modelName: config.anthropicVisualModel, bound }, () => client!.messages.create({
+    const response = await meteredMessage({ feature, modelName: config.anthropicVisualModel, bound }, () => client!.messages.create({
       model: config.anthropicVisualModel,
       max_tokens: 12_000,
       output_config: { effort: 'low' },

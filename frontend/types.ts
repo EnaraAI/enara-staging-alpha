@@ -188,6 +188,8 @@ export interface ChatMessage {
   timestamp: Date;
   imageUrl?: string;
   imagePrompt?: string;
+  // Sanitised HTML/SVG diagram, shown in a sandboxed iframe.
+  visualHtml?: string;
 }
 
 export interface ChatSession {
