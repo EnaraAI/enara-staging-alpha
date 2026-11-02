@@ -331,6 +331,9 @@ export const getAvatarArtifact = asyncHandler(async (req: AuthRequest, res: Resp
   res.json({ html: session.artifactHtml || null });
 });
 
+// The tutor announcing a visual in its own words ("I'm putting a table on the screen").
+export const SAYS_ON_SCREEN = /\b(on (the|your) screen|on the panel|putting (up )?(a|an|the|some) \w+( \w+)? (up|on)|let me (draw|show you)|i'?ll (draw|show you))\b|على الشاشة|هرسم|هرسملك|هوريك/i;
+
 // A student turn worth a picture: a question or request of four words or more,
 // not a greeting or a one-word answer.
 export function wantsAutoVisual(text: string): boolean {
@@ -539,6 +542,13 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     if (!headDone) emit(head);
   } catch (error) {
     logger.warn('avatar_stream_failed', { error: serializeError(error) });
+  }
+
+  // The tutor said it is putting something on the screen without the marker:
+  // draw it, so its words and the panel agree.
+  if (spoken && !visualStarted && tutorPolicy.policy !== 'hints_only' && SAYS_ON_SCREEN.test(spoken)) {
+    await startVisual(spoken.trim());
+    res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
   }
 
   if (!spoken) {

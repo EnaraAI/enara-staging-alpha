@@ -201,6 +201,25 @@ describe('live avatar', () => {
     expect(mocks.visual).toHaveBeenCalledTimes(1);
   });
 
+  it('draws what the tutor says it is putting on the screen, even without the marker', async () => {
+    mocks.stream.mockImplementation(async function* () {
+      yield "Hello! I'm putting a short dialogue on the screen ";
+      yield 'so you can see how people greet each other.';
+    });
+    const auth = await token('says-screen');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    const res = await request(app)
+      .post('/api/avatar/query-stream')
+      .set('Authorization', auth)
+      .send({ session_id: start.body.session_id, messages: [{ role: 'user', content: 'Hello' }] });
+    const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
+    expect(lines.at(-1)).toEqual({ visual: 'drawing' });
+    expect(mocks.visual).toHaveBeenCalledWith(expect.objectContaining({ question: expect.stringContaining('short dialogue on the screen') }));
+    const { SAYS_ON_SCREEN } = await import('../src/controllers/avatar.controller');
+    expect(SAYS_ON_SCREEN.test('A pilot flies airplanes. What do you want to be?')).toBe(false);
+    expect(SAYS_ON_SCREEN.test("Let me show you a table of greetings.")).toBe(true);
+  });
+
   it('knows which turns are worth an automatic visual', async () => {
     const { wantsAutoVisual } = await import('../src/controllers/avatar.controller');
     expect(wantsAutoVisual('What is the job of a pilot?')).toBe(true);
