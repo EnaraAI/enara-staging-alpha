@@ -4,7 +4,7 @@ import { CurriculumChunk, CurriculumFileJob } from '../models/CurriculumChunk';
 import { Curriculum, type ICurriculum } from '../models/Curriculum';
 import { LearningObjective } from '../models/LearningObjective';
 import { logger, serializeError } from '../utils/logging';
-import { searchTerms } from './textSearch';
+import { searchTerms, TERMS_VERSION } from './textSearch';
 import { readUpload } from './uploadStorage';
 import { docxSections } from '../utils/docxText';
 import { isClearedForProcessing, isDocumentSafetyRequired } from './documentSafety';
@@ -162,6 +162,7 @@ async function processJob(jobId: string) {
           text: c.text,
           terms: [...new Set(terms)],
           termCount: terms.length,
+          termsVersion: TERMS_VERSION,
           objectiveIds: objectives.map((o) => o.id),
           contentHash,
           extractionVersion: EXTRACTION_VERSION,

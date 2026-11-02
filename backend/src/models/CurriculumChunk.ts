@@ -21,6 +21,8 @@ export interface ICurriculumChunk extends Document {
   // Normalised search terms (unique), for keyword retrieval.
   terms: string[];
   termCount: number;
+  // textSearch TERMS_VERSION the terms were made with (absent: version 1).
+  termsVersion?: number;
   objectiveIds: string[];
   contentHash: string;
   extractionVersion: string;
@@ -42,6 +44,7 @@ const chunkSchema = new Schema<ICurriculumChunk>(
     text: { type: String, required: true },
     terms: { type: [String], default: [] },
     termCount: { type: Number, default: 0 },
+    termsVersion: Number,
     objectiveIds: { type: [String], default: [] },
     contentHash: { type: String, required: true },
     extractionVersion: { type: String, required: true },

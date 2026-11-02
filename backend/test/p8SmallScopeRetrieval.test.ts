@@ -197,3 +197,40 @@ describe('source references in the question (E2E D-1)', () => {
     expect(await ask('greet', 'According to the book, what?')).toEqual([]);
   });
 });
+
+describe('clock times (E2E D-1, terms v2)', () => {
+  const BOOK = [
+    '=== Page 4 - Greet people === A. CONVERSATION MODEL. 1 Good morning. (8:00 A.M.)  2 Good afternoon. (2:00 P.M.)  3 Good evening. (6:00 P.M.)',
+    'Responses: Fine. / I\'m fine. / Not bad. / Great. Remember: Hello. Good morning. Good afternoon. Good evening. === Page 5 - Say good-bye === A: Good-bye, Charlotte.',
+    'Lesson 1: Introduce people. Vocabulary: a flight attendant, a writer, a manager, a scientist, a photographer, a pilot, an actor.',
+    'Grammar: the verb be. She is not a scientist. She is a student. I am an actor. He is not a manager.',
+    'Classroom objects: a board, a table, a chair, a book, a desk, a pen, a pencil, a notebook.',
+    'ABOUT YOU. Write your own responses with real information. "Good morning! I\'m Kate Portman." "What\'s your occupation?"',
+  ];
+  beforeAll(async () => {
+    for (const [i, t] of BOOK.entries()) await passage('book', i + 1, t, 'up-book');
+    // A passage stored before terms v2: legacy terms, no termsVersion.
+    await CurriculumChunk.updateOne({ id: 'book-c1' }, { $set: { terms: ['page', 'greet', 'people', 'conversation', 'model', 'good', 'morning', '00', 'afternoon', 'evening'], termCount: 12 }, $unset: { termsVersion: 1 } });
+  });
+
+  it('turns clock times into one term each', () => {
+    expect(searchTerms('What do you say at 8:00 A.M. and at 6:00 P.M.?')).toEqual(['say', 't0800', 't1800']);
+    expect(searchTerms('at 8 am, 12 p.m., 12:30 a.m. and 14:05')).toEqual(['t0800', 't1200', 't0030', 't1405']);
+    expect(searchTerms('I am a student')).toEqual(['am', 'student']);
+    expect(searchTerms('It costs 3.50, ratio 25:00')).toEqual(['costs', '50', 'ratio', '25', '00']);
+  });
+
+  it('finds the passage that states the times, in a document of more than 3 passages, after refreshing legacy terms', async () => {
+    for (const q of ['According to the book, what do you say at 8:00 A.M. and at 6:00 P.M.?', 'What do you say at 8:00 A.M. and at 6:00 P.M.?', 'What do we say at 8 am and at 6 pm?']) {
+      expect([q, (await ask('book', q, ['up-book']))[0]?.chunkId]).toEqual([q, 'book-c1']);
+    }
+    const refreshed = await CurriculumChunk.findOne({ id: 'book-c1' }).lean();
+    expect(refreshed?.termsVersion).toBe(2);
+    expect(refreshed?.terms).toEqual(expect.arrayContaining(['t0800', 't1400', 't1800']));
+    expect(refreshed?.terms).not.toContain('00');
+  });
+
+  it('a time alone does not pull in unrelated passages', async () => {
+    expect(await ask('book', 'What happens at 9:00 P.M.?', ['up-book'])).toEqual([]);
+  });
+});

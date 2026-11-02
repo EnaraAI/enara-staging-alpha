@@ -1,6 +1,6 @@
 import { CurriculumChunk } from '../models/CurriculumChunk';
 import { LearningObjective } from '../models/LearningObjective';
-import { searchTerms } from './textSearch';
+import { searchTerms, TERMS_VERSION } from './textSearch';
 import { clearedUploadIds, isDocumentSafetyRequired } from './documentSafety';
 
 // Keyword retrieval over extracted curriculum passages (retrieval-v1, BM25).
@@ -96,6 +96,7 @@ export async function retrieveCurriculumSources(params: {
   if (!qTerms.length) return [];
   const scope = await passageScope(params);
   if (!scope) return [];
+  await refreshStaleTerms(scope);
   const [N, candidates, dfs] = await Promise.all([
     CurriculumChunk.countDocuments(scope),
     CurriculumChunk.find({ ...scope, terms: { $in: qTerms } })
@@ -159,6 +160,22 @@ export async function retrieveCurriculumSources(params: {
     lessonId: x.c.lessonId,
     score: Math.round(x.score * 100) / 100,
   }));
+}
+
+// Passages stored before the current TERMS_VERSION get their terms rebuilt
+// from their text, once, the first time their scope is searched. Deterministic
+// and idempotent; text and everything else stay as stored.
+const REFRESH_BATCH = 2000;
+async function refreshStaleTerms(scope: Record<string, unknown>) {
+  const stale = await CurriculumChunk.find({ ...scope, termsVersion: { $ne: TERMS_VERSION } }).select('id text').limit(REFRESH_BATCH).lean();
+  if (!stale.length) return;
+  await CurriculumChunk.bulkWrite(
+    stale.map((c) => {
+      const terms = searchTerms(c.text);
+      return { updateOne: { filter: { id: c.id }, update: { $set: { terms: [...new Set(terms)], termCount: terms.length, termsVersion: TERMS_VERSION } } } };
+    }),
+    { ordered: false },
+  );
 }
 
 // The passage filter every retrieval uses: one school and curriculum,
