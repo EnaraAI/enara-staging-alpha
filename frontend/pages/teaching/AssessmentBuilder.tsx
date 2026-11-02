@@ -22,6 +22,7 @@ import {
 import { toast } from '../../services/toastService';
 import { SourcePicker } from '../../components/SourcePicker';
 import { UsageChip } from '../../components/UsageChip';
+import { cefrCriteria, type CefrSkill } from './cefrRubric';
 
 // Assessment builder (Phase 3): drafts, questions with points and rubrics,
 // validation, publishing versions. Students only see published versions.
@@ -117,6 +118,13 @@ const LIFECYCLE: Record<string, string> = { draft: 'Draft', published: 'Publishe
 
 function RubricEditor({ value, onChange }: { value: Criterion[]; onChange: (c: Criterion[]) => void }) {
   const set = (i: number, c: Criterion) => onChange(value.map((x, j) => (j === i ? c : x)));
+  // Replaces the rubric with the CEFR criteria. Asks first unless the rubric is
+  // empty or still the untouched starter criterion.
+  const applyCefr = (skill: CefrSkill) => {
+    const starter = value.length === 1 && value[0].title === 'Reasoning' && value[0].levels.every((l) => !l.description);
+    if (value.length && !starter && !window.confirm(`Replace this question's rubric with the English CEFR ${skill} rubric?`)) return;
+    onChange(cefrCriteria(skill));
+  };
   return (
     <div className="space-y-3">
       {value.map((c, i) => (
@@ -136,7 +144,12 @@ function RubricEditor({ value, onChange }: { value: Criterion[]; onChange: (c: C
           <button onClick={() => set(i, { ...c, levels: [...c.levels, { id: uid('l'), label: '', points: 0 }] })} className="text-xs text-indigo-700 font-semibold">+ level</button>
         </div>
       ))}
-      <button onClick={() => onChange([...value, { id: uid('c'), title: '', levels: [{ id: uid('l'), label: 'Missing', points: 0 }, { id: uid('l'), label: 'Complete', points: 2 }] }])} className="text-xs text-indigo-700 font-semibold">+ criterion</button>
+      <div className="flex flex-wrap items-center gap-3">
+        <button onClick={() => onChange([...value, { id: uid('c'), title: '', levels: [{ id: uid('l'), label: 'Missing', points: 0 }, { id: uid('l'), label: 'Complete', points: 2 }] }])} className="text-xs text-indigo-700 font-semibold">+ criterion</button>
+        <span className="text-xs text-slate-500">English CEFR rubric (Below A1 to C2):</span>
+        <button onClick={() => applyCefr('speaking')} className="text-xs text-indigo-700 font-semibold">Speaking</button>
+        <button onClick={() => applyCefr('writing')} className="text-xs text-indigo-700 font-semibold">Writing</button>
+      </div>
     </div>
   );
 }

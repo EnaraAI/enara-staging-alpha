@@ -52,6 +52,8 @@ beforeAll(async () => {
   await passage('repeat', 1, 'Rolling objects slow down because of friction. Rough surfaces create more friction than smooth ones.');
   await passage('same-sentence', 1, 'Rolling objects slow down because friction and more friction act on them.');
   await passage('ar-heading', 1, PHOTO_AR, 'up-ar-heading-1', 'القسم 2: الكلوروفيل');
+  await passage('greet', 1, 'Greetings. At 8:00 A.M. you say good morning to your teacher. At 6:00 P.M. you say good evening to your family.');
+  await passage('greet-ar', 1, 'التحيات. في الصباح نقول صباح الخير للمعلم، وفي المساء نقول مساء الخير للأسرة.');
   await passage('few', 1, DISTRACTORS[0]);
   await passage('few', 2, PHOTO);
   await passage('few', 3, DISTRACTORS[1]);
@@ -179,4 +181,19 @@ describe('F-5 temporary maintenance endpoint is gone', () => {
     expect(fs.existsSync(path.join(src, 'routes/stagingMaintenance.routes.ts'))).toBe(false);
     expect(fs.readFileSync(path.join(src, 'app.ts'), 'utf8')).not.toMatch(/staging-maintenance|stagingMaintenance|STAGING_MAINTENANCE_TOKEN/);
   }, 30_000);
+});
+
+describe('source references in the question (E2E D-1)', () => {
+  it('answers "according to the book" questions from the passage that covers the rest', async () => {
+    const q = 'According to the book, what do you say at 8:00 A.M. and at 6:00 P.M.?';
+    expect((await ask('greet', q, ['up-greet-1'])).map((s) => s.chunkId)).toEqual(['greet-c1']);
+    expect((await ask('greet', 'What does this lesson say about 8:00 A.M. in the textbook?')).map((s) => s.chunkId)).toEqual(['greet-c1']);
+    expect((await ask('greet-ar', 'حسب الكتاب، ماذا نقول في الصباح؟')).map((s) => s.chunkId)).toEqual(['greet-ar-c1']);
+  });
+
+  it('still refuses unrelated questions phrased the same way', async () => {
+    expect(await ask('greet', 'According to the book, who won the football world cup in 1998?')).toEqual([]);
+    expect(await ask('one', 'According to the book, what is the capital city of France?')).toEqual([]);
+    expect(await ask('greet', 'According to the book, what?')).toEqual([]);
+  });
 });

@@ -28,6 +28,14 @@ const FRAMING_WORDS = new Set([
   'summarise', 'summarize', 'summary', 'simply', 'simple', 'brief', 'briefly', 'describe', 'overview', 'student', 'learner', 'pupil', 'kid', 'children', 'grade',
   'اشرح', 'لخص', 'وضح', 'بسط', 'ببساطه', 'بسيط', 'مبسط', 'طلاب', 'لطلاب', 'للطلاب', 'طالب', 'تلاميذ', 'لتلاميذ', 'للتلاميذ',
 ]);
+// References to the source itself ("according to the book", "in this
+// chapter", "حسب الكتاب"): the passage rarely names itself, so these words would
+// make a fitting passage look like it misses part of the question. Ignored in
+// small scopes only; compared after fold() ("according" -> "accord").
+const SOURCE_WORDS = new Set([
+  'accord', 'book', 'textbook', 'coursebook', 'workbook', 'chapter', 'page', 'lesson', 'document', 'pdf', 'material', 'curriculum', 'passage',
+  'حسب', 'وفقا', 'كتاب', 'الكتاب', 'للكتاب', 'بالكتاب', 'درس', 'الدرس', 'الفصل', 'المنهج', 'صفحه', 'الصفحه',
+]);
 // "grade 5", "10th grade", "الصف الخامس": the grade word and the word after
 // (or a number before) it are audience, not topic.
 const GRADE_WORDS = new Set(['grade', 'الصف', 'صف', 'للصف', 'لصف']);
@@ -39,7 +47,7 @@ function contentTerms(terms: string[]) {
     if (i + 1 < terms.length && (/^\d/.test(terms[i + 1]) || t !== 'grade')) drop.add(i + 1);
     if (i > 0 && /^\d/.test(terms[i - 1])) drop.add(i - 1);
   });
-  return [...new Set(terms.filter((t, i) => !drop.has(i) && !QUESTION_WORDS.has(t)).map(fold).filter((t) => !FRAMING_WORDS.has(t)))];
+  return [...new Set(terms.filter((t, i) => !drop.has(i) && !QUESTION_WORDS.has(t)).map(fold).filter((t) => !FRAMING_WORDS.has(t) && !SOURCE_WORDS.has(t)))];
 }
 // A question with one topic word ("explain water to my students") matches any
 // passage that mentions the word once in passing. In small scopes such a word
