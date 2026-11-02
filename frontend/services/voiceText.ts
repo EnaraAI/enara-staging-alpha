@@ -45,3 +45,19 @@ export function isEcho(heard: string, spoken: string): boolean {
   if (heardWords.length <= 3) return longest === heardWords.length && heardWords.length >= 2;
   return longest >= 4 || longest / heardWords.length >= 0.6;
 }
+
+// True when a transcript repeats a sentence already handled a moment ago. While
+// the transcription session is being replaced after each sentence, the old and
+// the new session both hear the student, and both report the same words
+// (seen live: every sentence answered twice). Same words, or one transcript
+// containing the other, within the window counts as the same sentence.
+export const REPEAT_WINDOW_MS = 5000;
+export function isRepeatUtterance(text: string, recent: { text: string; at: number }[], now: number): boolean {
+  const heard = voiceWords(text).join(' ');
+  if (!heard) return true;
+  return recent.some((r) => {
+    if (now - r.at > REPEAT_WINDOW_MS) return false;
+    const before = voiceWords(r.text).join(' ');
+    return before === heard || (before.length >= 6 && heard.length >= 6 && (before.includes(heard) || heard.includes(before)));
+  });
+}

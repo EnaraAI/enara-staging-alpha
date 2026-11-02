@@ -178,6 +178,55 @@ describe('live avatar', () => {
     });
   });
 
+  it('draws one visual by itself on the first real question of a call, and tells the tutor', async () => {
+    const auth = await token('auto-visual');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ lesson_title: 'Greetings' });
+    const ask = (content: string) =>
+      request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: start.body.session_id, messages: [{ role: 'user', content }] });
+
+    // A greeting is not worth a picture.
+    const hi = await ask('Hello there');
+    expect(hi.text).not.toContain('"visual"');
+    expect(mocks.visual).not.toHaveBeenCalled();
+
+    const first = await ask('What do we say in the morning and evening?');
+    expect(JSON.parse(first.text.split('\n')[0])).toEqual({ visual: 'drawing' });
+    expect(mocks.visual).toHaveBeenCalledTimes(1);
+    expect(mocks.visual).toHaveBeenCalledWith(expect.objectContaining({ question: 'What do we say in the morning and evening?', requested: true }));
+    expect(mocks.stream.mock.calls.at(-1)[0].query).toContain('A visual about this is being drawn on the screen');
+
+    // Only the first one is automatic; later ones are asked for or chosen by the tutor.
+    const second = await ask('And what do we say at night before bed?');
+    expect(second.text).not.toContain('"visual"');
+    expect(mocks.visual).toHaveBeenCalledTimes(1);
+  });
+
+  it('draws what the tutor says it is putting on the screen, even without the marker', async () => {
+    mocks.stream.mockImplementation(async function* () {
+      yield "Hello! I'm putting a short dialogue on the screen ";
+      yield 'so you can see how people greet each other.';
+    });
+    const auth = await token('says-screen');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    const res = await request(app)
+      .post('/api/avatar/query-stream')
+      .set('Authorization', auth)
+      .send({ session_id: start.body.session_id, messages: [{ role: 'user', content: 'Hello' }] });
+    const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
+    expect(lines.at(-1)).toEqual({ visual: 'drawing' });
+    expect(mocks.visual).toHaveBeenCalledWith(expect.objectContaining({ question: expect.stringContaining('short dialogue on the screen') }));
+    const { SAYS_ON_SCREEN } = await import('../src/controllers/avatar.controller');
+    expect(SAYS_ON_SCREEN.test('A pilot flies airplanes. What do you want to be?')).toBe(false);
+    expect(SAYS_ON_SCREEN.test("Let me show you a table of greetings.")).toBe(true);
+  });
+
+  it('knows which turns are worth an automatic visual', async () => {
+    const { wantsAutoVisual } = await import('../src/controllers/avatar.controller');
+    expect(wantsAutoVisual('What is the job of a pilot?')).toBe(true);
+    expect(wantsAutoVisual('ازاي أقول صباح الخير بالانجليزي؟')).toBe(true);
+    for (const t of ['Hi', 'thank you so much teacher', 'ok', 'Yes I am a student', 'شكرا يا مس جدا']) expect(wantsAutoVisual(t)).toBe(false);
+  });
+
   it('keeps equations readable inside Arabic visuals', async () => {
     const { isolateEquations } = await vi.importActual<typeof import('../src/services/avatarVisuals')>(
       '../src/services/avatarVisuals',
@@ -273,13 +322,32 @@ describe('live avatar', () => {
     const auth = await token('staff-cap');
     const bad = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ lesson_title: { $gt: '' } });
     expect(bad.status).toBe(400);
-    for (let i = 0; i < 5; i += 1) {
-      const ok = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
-      expect(ok.status).toBe(200);
-    }
+    const { AvatarSession } = await import('../src/models/AvatarSession');
+    const { User } = await import('../src/models/User');
+    const userId = String((await User.findOne({ email: 'staff-cap@enara.ai' }).lean())!._id);
+    const past = (n: number, connected: boolean) =>
+      AvatarSession.insertMany(
+        Array.from({ length: n }, (_, i) => ({ id: `av-past-${connected}-${i}-${userId}`, userId, ...(connected ? { lastHeartbeatAt: new Date() } : {}) })),
+      );
+    // Calls whose video never connected don't use up the day...
+    await past(6, false);
+    expect((await request(app).post('/api/avatar/session').set('Authorization', auth).send({})).status).toBe(200);
+    // ...connected ones do: 5 per day for staff.
+    await past(5, true);
     const capped = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
     expect(capped.status).toBe(429);
     expect(capped.body.error.code).toBe('AVATAR_DAILY_LIMIT');
+  });
+
+  it('bounds failed call starts too (three times the daily limit)', async () => {
+    const auth = await token('start-cap');
+    const { AvatarSession } = await import('../src/models/AvatarSession');
+    const { User } = await import('../src/models/User');
+    const userId = String((await User.findOne({ email: 'start-cap@enara.ai' }).lean())!._id);
+    await AvatarSession.insertMany(Array.from({ length: 14 }, (_, i) => ({ id: `av-fail-${i}-${userId}`, userId })));
+    expect((await request(app).post('/api/avatar/session').set('Authorization', auth).send({})).status).toBe(200);
+    const capped = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    expect(capped.status).toBe(429);
   });
 
   it('caps spoken characters per call', async () => {

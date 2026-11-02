@@ -72,6 +72,10 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const closingRef = useRef(false);
   const fallbackStartedRef = useRef(false);
+  const startVoiceOnlyRef = useRef<() => Promise<void>>(async () => {});
+  // "Try again" waits a few seconds between attempts (the server limits call starts).
+  const [retryWaitUntil, setRetryWaitUntil] = useState(0);
+  const [, setRetryTick] = useState(0);
   const answeringRef = useRef(false);
   const lastUserMessageRef = useRef<string>('');
   const anamLanguageRef = useRef<'english' | 'arabic'>('english');
@@ -198,6 +202,11 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       setLoading(false);
     } catch (e) {
       console.error('[AVATAR] Tavus fallback failed', e);
+      // No backup video: the call can still go on by voice.
+      if (speechModeRef.current === 'elevenlabs' && sessionIdRef.current && !closingRef.current) {
+        await startVoiceOnlyRef.current();
+        return;
+      }
       setError('The AI tutor is temporarily unavailable. Please try again.');
       setLoading(false);
     }
@@ -413,6 +422,10 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     startVoice(sink, () => sink.stopPlayback());
   }, [startVoice, stopAnam]);
 
+  useEffect(() => {
+    startVoiceOnlyRef.current = startVoiceOnly;
+  }, [startVoiceOnly]);
+
   const startAnam = useCallback(async (sessionToken: string) => {
     anamReadyRef.current = false;
     const elevenlabs = speechModeRef.current === 'elevenlabs';
@@ -553,6 +566,14 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     setProvider(null);
     setStatus(reconnect ? 'Reconnecting…' : 'Starting session…');
 
+    // A fresh start ("Try again") first closes whatever call is still open, so
+    // half-started calls don't pile up and block the next one.
+    if (!reconnect && sessionIdRef.current) {
+      stopPolling();
+      await stopAnam();
+      await endServerSession();
+    }
+
     try {
       const res = await avatarFetch('/session', {
         method: 'POST',
@@ -583,7 +604,10 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
           await startAnam(data.session_token);
         } catch (e) {
           console.error('[AVATAR] Anam startup failed', e);
-          await switchToTavus('anam_client_start_failed');
+          // The video didn't start: carry on as a voice-only tutor when the
+          // voice is ours (ElevenLabs) instead of a backup video service.
+          if (speechModeRef.current === 'elevenlabs') await startVoiceOnly();
+          else await switchToTavus('anam_client_start_failed');
         }
         return;
       }
@@ -602,7 +626,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       setError('Could not start the AI tutor. Please try again.');
       setLoading(false);
     }
-  }, [courseId, lessonId, lessonTitle, startAnam, startPolling, subject, switchToTavus]);
+  }, [courseId, endServerSession, lessonId, lessonTitle, startAnam, startPolling, startVoiceOnly, stopAnam, stopPolling, subject, switchToTavus]);
 
   useEffect(() => {
     restartRef.current = async () => {
@@ -796,8 +820,14 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               <AlertCircle size={32} className="text-rose-400" />
               <p className="text-sm text-slate-400">{error}</p>
               <button
-                onClick={() => void start(languageChoice && languageChoice !== 'auto' ? languageChoice : undefined)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white text-sm font-bold rounded-xl transition-all"
+                disabled={loading || Date.now() < retryWaitUntil}
+                onClick={() => {
+                  const until = Date.now() + 5000;
+                  setRetryWaitUntil(until);
+                  setTimeout(() => setRetryTick((n) => n + 1), 5000);
+                  void start(languageChoice && languageChoice !== 'auto' ? languageChoice : undefined);
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all"
               >
                 <RefreshCw size={14} /> Try Again
               </button>

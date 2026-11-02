@@ -186,7 +186,7 @@ export async function buildTutorRequest(params: TutorRequestParams) {
         'Next to you is a visual panel: when the student asks for a picture, diagram, drawing, table or chart, ' +
         'one is drawn there for them automatically while you talk, so never say you cannot show or draw things. ' +
         'Say something like "I\'m putting a diagram on the screen" and talk them through it. ' +
-        `If a picture, diagram, table or worked steps on screen would clearly help and the student did not ask, start your reply with ${SHOW_VISUAL_MARKER} (it is hidden from them) and mention you are putting it on the screen. Don't do it for small talk or every turn. `
+        `Use the panel often: whenever you explain, model or practise something that has a shape on paper (a short dialogue, a word list, a table, a timeline, steps, a diagram, an example sentence to copy) or the topic changes, start your reply with ${SHOW_VISUAL_MARKER} (it is hidden from them) and say you are putting it on the screen. Skip it only for greetings, small talk and quick yes/no answers. `
       : 'keep replies concise and age-appropriate, and use Markdown for steps and formulas. ';
   const system: Anthropic.Beta.BetaTextBlockParam[] = [
     {
