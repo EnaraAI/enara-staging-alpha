@@ -29,6 +29,7 @@ import meRoutes from './routes/me.routes';
 import assessmentRoutes from './routes/assessment.routes';
 import ingestionRoutes from './routes/ingestion.routes';
 import integrationsRoutes from './routes/integrations.routes';
+import securityRoutes from './routes/security.routes';
 import analyticsRoutes from './routes/analytics.routes';
 import uploadRoutes from './routes/upload.routes';
 import teacherAttendanceRoutes from './routes/teacherAttendance.routes';
@@ -281,6 +282,7 @@ export function createApp() {
   app.use('/api/teacher/attendance', teacherAttendanceRoutes);
   app.use('/api/credits', creditsRoutes);
   app.use('/api/integrations', integrationsRoutes);
+  app.use('/api/security', securityRoutes);
   app.use('/api/ai-controls', aiControlsRoutes);
   app.use('/api/workspace', workspaceRoutes);
   app.use('/api/documents', documentsRoutes);

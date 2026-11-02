@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { recordSignIn } from '../services/signInHistory';
 import { Request, Response } from 'express';
 import { User, UserRole } from '../models/User';
 import { Student } from '../models/Student';
@@ -94,26 +95,37 @@ export const completeTour = asyncHandler(async (req: AuthRequest, res: Response)
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const body = ensurePlainObject(req.body);
   rejectMongoOperators(body);
-  const email = normalizeEmail(body.email);
+  let email: string | undefined;
+  try {
+    email = normalizeEmail(body.email);
+  } catch (error) {
+    await recordSignIn(req, 'invalid_request');
+    throw error;
+  }
   const password = typeof body.password === 'string' ? body.password : undefined;
 
   if (!email || !password) {
+    await recordSignIn(req, 'invalid_request', { email: email || undefined });
     throw new AppError('Email and password are required');
   }
 
   let user = await User.findOne({ email }).select('+password');
 
+  // The reply never says which check failed; the sign-in history does.
   if (!user || user.status !== 'active') {
+    await recordSignIn(req, user ? 'account_disabled' : 'unknown_account', { email, ...(user ? { userId: user._id.toString(), role: user.role, institutionId: user.institutionId } : {}) });
     throw new AppError('Invalid credentials', 401);
   }
 
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) {
+    await recordSignIn(req, 'wrong_password', { email, userId: user._id.toString(), role: user.role, institutionId: user.institutionId });
     throw new AppError('Invalid credentials', 401);
   }
 
   user = await ensureStudentLink(user);
   const token = signToken(user);
+  await recordSignIn(req, 'success', { email, userId: user._id.toString(), role: user.role, institutionId: user.institutionId });
 
   res.json({
     token,
