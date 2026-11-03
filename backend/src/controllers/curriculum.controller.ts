@@ -255,6 +255,10 @@ export const assignBatchToCurriculum = asyncHandler(async (req: AuthRequest, res
   if (!batch) throw new AppError('Batch not found', 404);
   assertSameInstitution(req, batch);
 
+  // A group follows one curriculum: drop it from the previous one's list.
+  if (batch.curriculumId && batch.curriculumId !== curriculum.id) {
+    await Curriculum.updateOne(scopedFilter(req, { id: batch.curriculumId }), { $pull: { assignedBatches: batch.name } });
+  }
   batch.curriculumId = curriculum.id;
   await batch.save();
 
@@ -472,7 +476,35 @@ export const publishCurriculumToClass = asyncHandler(async (req: AuthRequest, re
     ...(manager ? {} : { instructorIds: req.user!.id }),
   });
   if (!course) throw new AppError('Class not found', 404, 'CLASS_NOT_FOUND');
+  // Publishing makes it what the class's students see, so the Curriculum page
+  // must say so too (seen 2 Nov: the class switched to a draft while the page
+  // still showed the old curriculum as the published one for that group).
+  if (curriculum.status !== 'deployed') {
+    if (!curriculum.name || !curriculum.summary || !curriculum.chapters.length) {
+      throw new AppError('Add a name, a summary and at least one lesson before publishing', 400, 'CURRICULUM_INCOMPLETE');
+    }
+    curriculum.status = 'deployed';
+    curriculum.deploymentLink = buildDeploymentLink(curriculum.id);
+  }
+  const previousId = course.curriculumId;
   course.curriculumId = curriculum.id;
   await course.save();
-  res.json({ classId: course.id, curriculumId: curriculum.id });
+  const batch = course.batchId ? await Batch.findOne({ id: course.batchId, institutionId: curriculum.institutionId }) : null;
+  if (batch) {
+    if (!curriculum.assignedBatches.includes(batch.name)) curriculum.assignedBatches.push(batch.name);
+    // The group leaves the old curriculum only when none of its classes still use it.
+    const stillOld = previousId && previousId !== curriculum.id
+      ? await CourseInstance.countDocuments({ institutionId: curriculum.institutionId, batchId: batch.id, curriculumId: previousId })
+      : 0;
+    if (!stillOld) {
+      if (previousId && previousId !== curriculum.id) {
+        await Curriculum.updateOne({ id: previousId, institutionId: curriculum.institutionId }, { $pull: { assignedBatches: batch.name } });
+      }
+      batch.curriculumId = curriculum.id;
+      await batch.save();
+    }
+  }
+  curriculum.lastUpdated = formatDate();
+  await curriculum.save();
+  res.json({ classId: course.id, curriculumId: curriculum.id, curriculum: toCurriculumResponse(curriculum) });
 });

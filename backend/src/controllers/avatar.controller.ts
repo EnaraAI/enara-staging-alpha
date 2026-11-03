@@ -130,6 +130,8 @@ async function loadSessionCurriculum(session: IAvatarSession): Promise<TutorCurr
 // Calls a user may start per day. Staff only preview the tutor and aren't
 // charged credits, so they get fewer.
 const DAILY_SESSIONS = { student: 30, staff: 5 };
+// A tutor-chosen visual at most every this many student turns (asked-for ones always draw).
+const VISUAL_GAP_TURNS = 3;
 // Starts allowed per day, connected or not, as a multiple of the limit above.
 const DAILY_START_FACTOR = 3;
 // ElevenLabs characters per call (roughly 20 minutes of speech).
@@ -449,11 +451,22 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     curriculum?.chapters.find((c) => c.id === curriculum.currentLessonId)?.title || session.lessonTitle;
   // A visual on screen, either asked for or chosen by the tutor: start drawing
   // right away, alongside the spoken answer.
+  // Student turns are counted so the tutor puts up a new visual only every few
+  // turns (seen live: one on every answer); asked-for visuals always draw.
+  const turnNo = kind === 'turn'
+    ? ((await AvatarSession.findOneAndUpdate({ id: session.id }, { $inc: { turnCount: 1 } }, { new: true }).select('turnCount').lean())?.turnCount ?? 1)
+    : (session.turnCount ?? 0);
+  const tutorMayShow = turnNo - (session.lastVisualTurn ?? -VISUAL_GAP_TURNS) >= VISUAL_GAP_TURNS;
   let visualStarted = false;
   const startVisual = async (question: string) => {
     if (visualStarted) return;
     visualStarted = true;
-    await AvatarSession.updateOne({ id: session.id }, { $unset: { artifactHtml: 1 }, $inc: { visualsShown: 1 } });
+    const started = await AvatarSession.findOneAndUpdate(
+      { id: session.id },
+      { $unset: { artifactHtml: 1 }, $inc: { visualsShown: 1, visualSeq: 1 }, $set: { lastVisualTurn: turnNo } },
+      { new: true },
+    ).select('visualSeq').lean();
+    const seq = started?.visualSeq ?? 0;
     // The recent conversation says what "this" refers to (e.g. the equation asked about).
     const recent = messages
       .slice(-4)
@@ -462,7 +475,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     const context = [lessonTitle ? `Lesson: ${lessonTitle}` : '', recent].filter(Boolean).join('\n');
     waitUntil(
       generateVisualAid({ question, context, requested: true })
-        .then((html) => (html ? AvatarSession.updateOne({ id: session.id }, { artifactHtml: html }) : undefined))
+        .then((html) => (html ? AvatarSession.updateOne({ id: session.id, visualSeq: seq }, { artifactHtml: html }) : undefined))
         .catch((error) => logger.warn('avatar_visual_save_failed', { error: serializeError(error) })),
     );
   };
@@ -487,6 +500,9 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     !curriculum && session.subject ? `Subject: ${session.subject}` : '',
     languageLine,
     autoVisual ? '(A visual about this is being drawn on the screen next to you right now: mention it in a few words and refer to it.)' : '',
+    kind === 'turn' && !visualRequested && !autoVisual && !tutorMayShow
+      ? "(A visual you put up a moment ago is still on the screen: don't put up a new one this turn and don't say you are; refer to the one showing if it helps.)"
+      : '',
     kind === 'opening'
       ? plan
         ? `(The call has just started and the student hasn't spoken yet. Open it yourself: greet ${learner?.firstName || 'the student'} by name in one short sentence, then begin the way your teaching plan says - a plan that explains or models first starts with a short explanation of the first step; a plan that questions starts with one question. Under 40 words. Don't list everything you know.)`
@@ -529,7 +545,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       const trimmed = head.trimStart();
       if (trimmed.startsWith(SHOW_VISUAL_MARKER)) {
         headDone = true;
-        if (!visualStarted) {
+        if (!visualStarted && tutorMayShow) {
           await startVisual(last?.content || lessonTitle || 'this lesson');
           res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
         }
@@ -546,7 +562,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
 
   // The tutor said it is putting something on the screen without the marker:
   // draw it, so its words and the panel agree.
-  if (spoken && !visualStarted && tutorPolicy.policy !== 'hints_only' && SAYS_ON_SCREEN.test(spoken)) {
+  if (spoken && !visualStarted && tutorMayShow && tutorPolicy.policy !== 'hints_only' && SAYS_ON_SCREEN.test(spoken)) {
     await startVisual(spoken.trim());
     res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
   }

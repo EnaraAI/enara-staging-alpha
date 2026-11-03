@@ -220,6 +220,41 @@ describe('live avatar', () => {
     expect(SAYS_ON_SCREEN.test("Let me show you a table of greetings.")).toBe(true);
   });
 
+  it('lets the tutor put up a new visual only every 3 turns, and tells it so in between', async () => {
+    mocks.stream.mockImplementation(async function* () { yield '[SHOW] Here is a table on the screen.'; });
+    const auth = await token('visual-gap');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    const ask = (content: string) =>
+      request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: start.body.session_id, messages: [{ role: 'user', content }] });
+    const drew = async (content: string) => (await ask(content)).text.includes('"visual"');
+    expect(await drew('What do we say in the morning and evening?')).toBe(true); // turn 1: the automatic one
+    expect(await drew('And what about the afternoon greeting?')).toBe(false); // turn 2: too soon, marker ignored
+    expect(mocks.stream.mock.calls.at(-1)[0].query).toContain("don't put up a new one this turn");
+    expect(await drew('How do we say good night to friends?')).toBe(false); // turn 3
+    expect(await drew('Can we practise a whole short dialogue now?')).toBe(true); // turn 4: allowed again
+    // Asking for one always draws.
+    expect(await drew('Please draw me a picture of that')).toBe(true);
+    expect(mocks.visual).toHaveBeenCalledTimes(3);
+  });
+
+  it('keeps the newest visual when an older, slower one finishes later', async () => {
+    let releaseFirst!: (v: string) => void;
+    mocks.visual
+      .mockImplementationOnce(() => new Promise<string>((r) => { releaseFirst = r; }))
+      .mockImplementationOnce(async () => '<p>second visual</p>');
+    const auth = await token('visual-race');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    const id = start.body.session_id;
+    const ask = (content: string) => request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: id, messages: [{ role: 'user', content }] });
+    await ask('Draw a diagram of the greetings please');
+    await ask('Now draw a table of the times of day');
+    await new Promise((r) => setTimeout(r, 50));
+    releaseFirst('<p>first visual</p>');
+    await new Promise((r) => setTimeout(r, 50));
+    const art = await request(app).get(`/api/avatar/artifact/${id}`).set('Authorization', auth);
+    expect(art.body.html).toContain('second visual');
+  });
+
   it('knows which turns are worth an automatic visual', async () => {
     const { wantsAutoVisual } = await import('../src/controllers/avatar.controller');
     expect(wantsAutoVisual('What is the job of a pilot?')).toBe(true);

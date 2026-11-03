@@ -21,6 +21,11 @@ export interface IAvatarSession extends Document {
   artifactHtml?: string;
   // Visuals drawn in this call (asked for, chosen by the tutor, or the automatic first one).
   visualsShown?: number;
+  // Student turns so far, the turn the last visual was drawn on, and a counter
+  // so only the newest visual is saved (an older, slower one never overwrites it).
+  turnCount?: number;
+  lastVisualTurn?: number;
+  visualSeq?: number;
   // Tutor-started turns are free; these bound them. The opening happens once;
   // each opening or paid turn allows up to two nudges.
   openingUsed?: boolean;
@@ -61,6 +66,9 @@ const avatarSessionSchema = new Schema<IAvatarSession>(
     language: { type: String, enum: ['english', 'arabic'], default: 'english' },
     artifactHtml: String,
     visualsShown: { type: Number, default: 0 },
+    turnCount: { type: Number, default: 0 },
+    lastVisualTurn: Number,
+    visualSeq: { type: Number, default: 0 },
     pinnedLanguage: { type: String, enum: ['english', 'arabic'] },
     voiceGender: { type: String, enum: ['woman', 'man'] },
     avatarId: String,
