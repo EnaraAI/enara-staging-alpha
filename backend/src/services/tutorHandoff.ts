@@ -30,6 +30,19 @@ export async function assignmentTutorPolicy(studentId: string): Promise<{ policy
   return hints ? { policy: 'hints_only', title: hints.title } : { policy: null };
 }
 
+// Live calls check the policy on every spoken turn. It changes only when an
+// assignment opens or is submitted, so a warm instance reuses it briefly.
+const POLICY_TTL_MS = 30_000;
+const policyCache = new Map<string, { value: Awaited<ReturnType<typeof assignmentTutorPolicy>>; at: number }>();
+export async function cachedAssignmentTutorPolicy(studentId: string) {
+  const hit = policyCache.get(studentId);
+  if (hit && Date.now() - hit.at < POLICY_TTL_MS) return hit.value;
+  const value = await assignmentTutorPolicy(studentId);
+  if (policyCache.size > 500) policyCache.delete(policyCache.keys().next().value!);
+  policyCache.set(studentId, { value, at: Date.now() });
+  return value;
+}
+
 export function policyRule(policy: 'blocked' | 'hints_only' | null) {
   return policy === 'hints_only' ? HINTS_ONLY : undefined;
 }

@@ -1,3 +1,4 @@
+import { waitUntil } from '@vercel/functions';
 import { randomUUID } from 'crypto';
 import mongoose from 'mongoose';
 import { AppError } from '../middleware/errorHandler';
@@ -243,18 +244,20 @@ export async function* meteredStream<E, F extends MessageResponse>(
     const startedAt = Date.now();
     let emitted = false;
     let settled = false;
+    let firstTokenMs: number | undefined;
     let stream: MessageStreamLike<E, F> | undefined;
     try {
       stream = open();
       for await (const event of stream) {
         emitted = true;
+        if (firstTokenMs === undefined && (event as { type?: string })?.type === 'content_block_delta') firstTokenMs = Date.now() - startedAt;
         yield event;
       }
       const final = await stream.finalMessage();
       settled = true;
       const modelName = final.model || meta.modelName;
       const status = final.stop_reason === 'refusal' ? 'refusal' : 'ok';
-      recordAiCall({ feature: meta.feature, modelName, status, startedAt, usage: final.usage ?? undefined, institutionId: meta.institutionId });
+      recordAiCall({ feature: meta.feature, modelName, status, startedAt, usage: final.usage ?? undefined, institutionId: meta.institutionId, firstTokenMs });
       await finishAttempt(ticket, { operationKey, attempt, meta, modelName, status, units: tokenUnits(final.usage) });
       out.final = final;
       return;
@@ -305,7 +308,12 @@ export async function meteredSpeech<T>(meta: GatewayMeta, characters: number, ca
       }
       throw error;
     }
-    await finishAttempt(ticket, { operationKey, attempt, meta: m, modelName: m.modelName, status: 'ok', units: { characters } });
+    // The audio is already streaming: record the result without making the
+    // listener wait for the ledger write.
+    const recorded = finishAttempt(ticket, { operationKey, attempt, meta: m, modelName: m.modelName, status: 'ok', units: { characters } }).catch((error) =>
+      logger.error('usage_ledger_write_failed', { operationKey, error: serializeError(error) }),
+    );
+    waitUntil(recorded);
     return result;
   }
 }

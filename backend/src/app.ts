@@ -53,6 +53,8 @@ function corsOptions(): CorsOptions {
   return {
     // Auth uses Bearer tokens, not cookies, so browsers never send credentials.
     credentials: false,
+    // Read by the live call to know the reply carries its own speech.
+    exposedHeaders: ['X-Enara-Speech'],
     origin(origin, callback) {
       if (!origin) {
         callback(null, true);
@@ -159,7 +161,12 @@ export function createApp() {
   // shares one budget); unauthenticated or invalid-token traffic stays per IP.
   // A coarse per-IP ceiling still bounds everything coming from one address.
   const learningOwnLimiter = (req: Request) => req.path.startsWith('/learning/') && req.path !== '/learning/objectives/extract';
-  app.use('/api', makeLimiter('api', 60 * 1000, 300, 'Too many API requests', 'verified', learningOwnLimiter));
+  // Live-call routes said many times per minute have their own per-user
+  // limits above; skipping the general per-user one saves a database round
+  // trip before each spoken sentence. The per-IP ceiling below still applies.
+  const callOwnLimiter = (req: Request) =>
+    req.method === 'POST' && (req.path === '/avatar/speak' || req.path === '/avatar/query-stream' || /^\/avatar\/session\/[^/]+\/stt-token$/.test(req.path));
+  app.use('/api', makeLimiter('api', 60 * 1000, 300, 'Too many API requests', 'verified', (req) => learningOwnLimiter(req) || callOwnLimiter(req)));
   app.use('/api', makeLimiter('api-ip', 60 * 1000, 3000, 'Too many API requests from this network', false, learningOwnLimiter));
 
   app.use(express.json({ limit: config.requestBodyLimit, verify: captureRawBody }));

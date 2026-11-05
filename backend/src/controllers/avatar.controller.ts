@@ -1,4 +1,5 @@
-import { assignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
+import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
+import { SentenceSplitter } from '../services/sentenceSplitter';
 import { TutorSession } from '../models/TutorSession';
 import { appendTutorMessages } from '../services/tutorMessages';
 import { generateMessageId } from '../utils/idGenerator';
@@ -83,9 +84,19 @@ async function createAnamSessionToken(language: Language, avatarId?: string): Pr
   return data.sessionToken;
 }
 
-async function findOwnSession(req: AuthRequest): Promise<IAvatarSession> {
-  const session = await AvatarSession.findOne({ id: req.params.id, userId: req.user!.id, endedAt: null });
-  if (!session) throw new AppError('Avatar session not found', 404);
+// One database round trip on the common path: the lookup also records the
+// request for usage metering (lastActivityAt). `extra` lets a caller fold its
+// own guarded update into the same write (the speech character count); when
+// that guard fails the call returns null instead of throwing.
+async function findOwnSession(req: AuthRequest): Promise<IAvatarSession>;
+async function findOwnSession(
+  req: AuthRequest,
+  extra: { filter: Record<string, unknown>; inc: Record<string, number> },
+): Promise<IAvatarSession | null>;
+async function findOwnSession(
+  req: AuthRequest,
+  extra?: { filter: Record<string, unknown>; inc: Record<string, number> },
+): Promise<IAvatarSession | null> {
   // Hard stop (P22): past the approved maximum length the call is ended on
   // the server and metered; the browser must start a new, newly reserved one.
   // (New calls cannot start without the limit: see requireAnam.)
@@ -93,14 +104,36 @@ async function findOwnSession(req: AuthRequest): Promise<IAvatarSession> {
   // (unit callers); a running server always has it.
   let maxSeconds: number | undefined;
   try { maxSeconds = getConfig().unpricedLimits.anamMaxSessionSeconds; } catch { maxSeconds = undefined; }
-  if (maxSeconds && Date.now() - session.createdAt.getTime() > maxSeconds * 1000) {
-    await AvatarSession.updateOne({ id: session.id, endedAt: null }, { $set: { endedAt: new Date() } });
-    void finalizeAvatarUsage(session.id).catch(() => undefined);
+  const own = { id: req.params.id, userId: req.user!.id, endedAt: null };
+  const live = maxSeconds ? { createdAt: { $gte: new Date(Date.now() - maxSeconds * 1000) } } : {};
+  const session = await AvatarSession.findOneAndUpdate(
+    { ...own, ...live, ...(extra?.filter ?? {}) },
+    { $set: { lastActivityAt: new Date() }, ...(extra ? { $inc: extra.inc } : {}) },
+    { new: true },
+  );
+  if (session) return session;
+  // Not updated: find out why (rare paths only).
+  const existing = await AvatarSession.findOne(own);
+  if (!existing) throw new AppError('Avatar session not found', 404);
+  if (maxSeconds && Date.now() - existing.createdAt.getTime() > maxSeconds * 1000) {
+    await AvatarSession.updateOne({ id: existing.id, endedAt: null }, { $set: { endedAt: new Date() } });
+    void finalizeAvatarUsage(existing.id).catch(() => undefined);
     throw new AppError('This live call reached its maximum length. Start a new call to continue.', 410, 'AVATAR_SESSION_LIMIT');
   }
-  // Heartbeat for usage metering: the latest request seen for this call.
-  await AvatarSession.updateOne({ id: session.id }, { $set: { lastActivityAt: new Date() } });
-  return session;
+  if (extra) {
+    await AvatarSession.updateOne({ id: existing.id }, { $set: { lastActivityAt: new Date() } });
+    return null;
+  }
+  // Ended between the two reads.
+  throw new AppError('Avatar session not found', 404);
+}
+
+// The voice follows the sentence's own script (Arabic letters -> Arabic), as
+// in the browser (frontend/services/voiceText.ts languageOfText).
+export function languageOfSentence(text: string): Language {
+  const arabic = (text.match(/[\u0600-\u06FF]/g) || []).length;
+  const latin = (text.match(/[A-Za-z]/g) || []).length;
+  return arabic > 0 && arabic >= latin / 3 ? 'arabic' : 'english';
 }
 
 function toLanguage(value: unknown): Language {
@@ -136,6 +169,10 @@ const VISUAL_GAP_TURNS = 3;
 const DAILY_START_FACTOR = 3;
 // ElevenLabs characters per call (roughly 20 minutes of speech).
 const MAX_SPOKEN_CHARS_PER_SESSION = 20_000;
+const speechCharsGuard = (chars: number) => ({
+  filter: { spokenChars: { $lte: MAX_SPOKEN_CHARS_PER_SESSION - chars } },
+  inc: { spokenChars: chars },
+});
 
 function optionalText(value: unknown, max: number): string | undefined {
   if (value === undefined || value === null || value === '') return undefined;
@@ -268,18 +305,15 @@ export const createAvatarSttToken = asyncHandler(async (req: AuthRequest, res: R
 export const speakAvatarText = asyncHandler(async (req: AuthRequest, res: Response) => {
   const body = req.body as { session_id?: string; text?: string; language?: string };
   req.params.id = String(body.session_id || '');
-  const session = await findOwnSession(req);
   if (!isElevenLabsVoiceConfigured()) {
     throw new AppError('Voice is not configured', 503, 'AVATAR_UNAVAILABLE');
   }
   const text = typeof body.text === 'string' ? body.text.trim() : '';
   if (!text || text.length > 1000) throw new AppError('Text must be 1-1000 characters', 400, 'VALIDATION_ERROR');
-  // Speech costs per character: cap it per call.
-  const counted = await AvatarSession.updateOne(
-    { id: session.id, spokenChars: { $lte: MAX_SPOKEN_CHARS_PER_SESSION - text.length } },
-    { $inc: { spokenChars: text.length } },
-  );
-  if (!counted.modifiedCount) throw new AppError('This call has reached its speech limit', 429, 'AVATAR_SPEECH_LIMIT');
+  // Speech costs per character: cap it per call. Counted in the same write
+  // that finds the call, so speech starts after one database round trip.
+  const session = await findOwnSession(req, speechCharsGuard(text.length));
+  if (!session) throw new AppError('This call has reached its speech limit', 429, 'AVATAR_SPEECH_LIMIT');
 
   const audio = await synthesizeSpeech(
     text,
@@ -353,7 +387,11 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     // 'opening': the tutor starts the call. 'nudge': the student has gone quiet
     // after a question. Both are started by the tutor, so they aren't charged.
     kind?: string;
+    // The browser wants the reply's speech in this response (ElevenLabs
+    // mode): saves a second round trip per sentence.
+    speak?: boolean;
   };
+  const turnStartedAt = Date.now();
   const kind: TurnKind = body.kind === 'opening' || body.kind === 'nudge' ? body.kind : 'turn';
   req.params.id = String(body.session_id || '');
   const session = await findOwnSession(req);
@@ -407,12 +445,16 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     spokenLanguage = pinned || session.language;
   }
 
-  // Assignment tutor policy applies to calls too.
-  const tutorPolicy = session.studentId ? await assignmentTutorPolicy(session.studentId) : { policy: null };
+  // Assignment tutor policy applies to calls too. Checked first and briefly
+  // cached (a blocked tutor must not spend anything), while the rest of the
+  // setup starts in parallel below.
+  const tutorPolicy = session.studentId ? await cachedAssignmentTutorPolicy(session.studentId) : { policy: null };
   if (tutorPolicy.policy === 'blocked') throw new AppError('The AI tutor is off while an assignment is open', 403, 'TUTOR_BLOCKED');
 
   // Independent setup runs in parallel: every millisecond here is silence on the call.
-  const [curriculum, learner, reservation, , plan] = await Promise.all([
+  // Student turns are counted so the tutor puts up a new visual only every few
+  // turns (seen live: one on every answer); asked-for visuals always draw.
+  const [curriculum, learner, reservation, , plan, countedTurn] = await Promise.all([
     loadSessionCurriculum(session),
     session.studentId ? getLearnerSnapshot(session.studentId) : Promise.resolve(undefined),
     session.studentId && kind === 'turn'
@@ -444,6 +486,9 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
           record: kind !== 'nudge',
         })
       : Promise.resolve(null),
+    kind === 'turn'
+      ? AvatarSession.findOneAndUpdate({ id: session.id }, { $inc: { turnCount: 1 } }, { new: true }).select('turnCount').lean()
+      : Promise.resolve(null),
   ]);
   if (spokenLanguage) session.language = spokenLanguage;
 
@@ -451,31 +496,29 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     curriculum?.chapters.find((c) => c.id === curriculum.currentLessonId)?.title || session.lessonTitle;
   // A visual on screen, either asked for or chosen by the tutor: start drawing
   // right away, alongside the spoken answer.
-  // Student turns are counted so the tutor puts up a new visual only every few
-  // turns (seen live: one on every answer); asked-for visuals always draw.
-  const turnNo = kind === 'turn'
-    ? ((await AvatarSession.findOneAndUpdate({ id: session.id }, { $inc: { turnCount: 1 } }, { new: true }).select('turnCount').lean())?.turnCount ?? 1)
-    : (session.turnCount ?? 0);
+  const turnNo = kind === 'turn' ? (countedTurn?.turnCount ?? 1) : (session.turnCount ?? 0);
   const tutorMayShow = turnNo - (session.lastVisualTurn ?? -VISUAL_GAP_TURNS) >= VISUAL_GAP_TURNS;
   let visualStarted = false;
-  const startVisual = async (question: string) => {
+  // Doesn't hold up the spoken answer: the drawing and its bookkeeping run
+  // alongside it.
+  const startVisual = (question: string) => {
     if (visualStarted) return;
     visualStarted = true;
-    const started = await AvatarSession.findOneAndUpdate(
-      { id: session.id },
-      { $unset: { artifactHtml: 1 }, $inc: { visualsShown: 1, visualSeq: 1 }, $set: { lastVisualTurn: turnNo } },
-      { new: true },
-    ).select('visualSeq').lean();
-    const seq = started?.visualSeq ?? 0;
     // The recent conversation says what "this" refers to (e.g. the equation asked about).
     const recent = messages
       .slice(-4)
       .map((m) => `${m.role === 'user' ? 'Student' : 'Tutor'}: ${m.content}`)
       .join('\n');
     const context = [lessonTitle ? `Lesson: ${lessonTitle}` : '', recent].filter(Boolean).join('\n');
+    const started = AvatarSession.findOneAndUpdate(
+      { id: session.id },
+      { $unset: { artifactHtml: 1 }, $inc: { visualsShown: 1, visualSeq: 1 }, $set: { lastVisualTurn: turnNo } },
+      { new: true },
+    ).select('visualSeq').lean();
+    const drawn = generateVisualAid({ question, context, requested: true });
     waitUntil(
-      generateVisualAid({ question, context, requested: true })
-        .then((html) => (html ? AvatarSession.updateOne({ id: session.id, visualSeq: seq }, { artifactHtml: html }) : undefined))
+      Promise.all([started, drawn])
+        .then(([row, html]) => (html ? AvatarSession.updateOne({ id: session.id, visualSeq: row?.visualSeq ?? 0 }, { artifactHtml: html }) : undefined))
         .catch((error) => logger.warn('avatar_visual_save_failed', { error: serializeError(error) })),
     );
   };
@@ -484,12 +527,64 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   // even if nobody asked. Not while an assignment limits the tutor to hints.
   const autoVisual =
     !visualRequested && kind === 'turn' && !session.visualsShown && tutorPolicy.policy !== 'hints_only' && wantsAutoVisual(last!.content);
-  if (visualRequested || autoVisual) await startVisual(last!.content);
+  if (visualRequested || autoVisual) startVisual(last!.content);
 
   res.setHeader('Content-Type', 'application/x-ndjson; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('X-Accel-Buffering', 'no');
+  const inlineSpeech = body.speak === true && isElevenLabsVoiceConfigured();
+  if (inlineSpeech) res.setHeader('X-Enara-Speech', 'inline');
   res.flushHeaders();
+  const setupMs = Date.now() - turnStartedAt;
+  // The browser stops reading when the student talks over the tutor: stop
+  // generating and speaking for this turn.
+  let closed = false;
+  res.on('close', () => {
+    closed = true;
+  });
+
+  // Inline speech: each sentence is counted against the call's speech cap and
+  // its audio requested as soon as the sentence is complete; sentences are
+  // sent in order as {say}, then its audio as base64 {audio} lines, then {said}.
+  const splitter = new SentenceSplitter();
+  let speechChain: Promise<void> = Promise.resolve();
+  let sentenceNo = 0;
+  let firstTextAt: number | undefined;
+  let firstAudioAt: number | undefined;
+  const sayInline = (sentence: string) => {
+    const n = sentenceNo++;
+    const audio = (async () => {
+      if (closed) return null;
+      const counted = await AvatarSession.updateOne({ id: session.id, ...speechCharsGuard(sentence.length).filter }, { $inc: speechCharsGuard(sentence.length).inc });
+      if (!counted.modifiedCount) return null;
+      return synthesizeSpeech(sentence, languageOfSentence(sentence), session.voiceGender);
+    })().catch((error) => {
+      logger.warn('avatar_speech_failed', { error: serializeError(error) });
+      return null;
+    });
+    speechChain = speechChain.then(async () => {
+      if (closed) return;
+      res.write(JSON.stringify({ say: sentence, s: n }) + '\n');
+      const stream = await audio;
+      if (stream) {
+        const reader = stream.getReader();
+        try {
+          while (!closed) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (!value?.length) continue;
+            firstAudioAt ??= Date.now();
+            res.write(JSON.stringify({ audio: Buffer.from(value).toString('base64'), s: n }) + '\n');
+          }
+        } catch (error) {
+          logger.warn('avatar_speech_failed', { error: serializeError(error) });
+        } finally {
+          if (closed) void reader.cancel().catch(() => undefined);
+        }
+      }
+      if (!closed) res.write(JSON.stringify({ said: n }) + '\n');
+    });
+  };
   if (visualRequested || autoVisual) res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
 
   const languageLine = spokenLanguage
@@ -523,8 +618,10 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   let headDone = false;
   const emit = (text: string) => {
     if (!text) return;
+    firstTextAt ??= Date.now();
     spoken += text;
     res.write(JSON.stringify({ content: text }) + '\n');
+    if (inlineSpeech) for (const sentence of splitter.push(text)) sayInline(sentence);
   };
   try {
     for await (const chunk of streamDirectTutorModel({
@@ -537,6 +634,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       pedagogy: [plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined,
       planActive: Boolean(plan),
     })) {
+      if (closed) break;
       if (headDone) {
         emit(chunk);
         continue;
@@ -546,7 +644,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       if (trimmed.startsWith(SHOW_VISUAL_MARKER)) {
         headDone = true;
         if (!visualStarted && tutorMayShow) {
-          await startVisual(last?.content || lessonTitle || 'this lesson');
+          startVisual(last?.content || lessonTitle || 'this lesson');
           res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
         }
         emit(trimmed.slice(SHOW_VISUAL_MARKER.length).trimStart());
@@ -559,18 +657,21 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   } catch (error) {
     logger.warn('avatar_stream_failed', { error: serializeError(error) });
   }
+  if (inlineSpeech && spoken) for (const sentence of splitter.flush()) sayInline(sentence);
 
   // The tutor said it is putting something on the screen without the marker:
   // draw it, so its words and the panel agree.
   if (spoken && !visualStarted && tutorMayShow && tutorPolicy.policy !== 'hints_only' && SAYS_ON_SCREEN.test(spoken)) {
-    await startVisual(spoken.trim());
+    startVisual(spoken.trim());
     res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
   }
 
   if (!spoken) {
     if (reservation) await releaseUsage(reservation);
     if (kind === 'turn') {
-      res.write(JSON.stringify({ content: "Sorry, I couldn't answer that just now. Please ask again." }) + '\n');
+      const sorry = "Sorry, I couldn't answer that just now. Please ask again.";
+      res.write(JSON.stringify({ content: sorry }) + '\n');
+      if (inlineSpeech) sayInline(sorry);
     }
   } else if (reservation) {
     await settleUsage(reservation, { model: getConfig().anthropicVoiceModel });
@@ -597,5 +698,17 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   // With browser transcription the language is already known for every turn.
   const target = last && !heardLanguage ? detectLanguageSwitch(last.content, session.language) : null;
   if (target) res.write(JSON.stringify({ language_switch: target }) + '\n');
+  await speechChain;
+  logger.info('avatar_turn_timing', {
+    session: session.id,
+    kind,
+    inlineSpeech,
+    setupMs,
+    firstTextMs: firstTextAt ? firstTextAt - turnStartedAt : null,
+    firstAudioMs: firstAudioAt ? firstAudioAt - turnStartedAt : null,
+    totalMs: Date.now() - turnStartedAt,
+    sentences: sentenceNo,
+    closedEarly: closed,
+  });
   res.end();
 });

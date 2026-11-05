@@ -76,6 +76,8 @@ export interface AiCallRecord {
   startedAt: number;
   usage?: TokenUsage;
   characters?: number;
+  // Time to the first generated text (streams) or first audio (speech).
+  firstTokenMs?: number;
   errorCode?: string;
   // Overrides for calls made outside a request (cron jobs).
   institutionId?: string;
@@ -92,6 +94,7 @@ export function recordAiCall(record: AiCallRecord): void {
     modelName: record.modelName,
     status: record.status,
     latencyMs: Math.max(0, Date.now() - record.startedAt),
+    firstTokenMs: record.firstTokenMs,
     inputTokens: usage.input_tokens ?? 0,
     outputTokens: usage.output_tokens ?? 0,
     cacheReadTokens: usage.cache_read_input_tokens ?? 0,
