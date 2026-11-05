@@ -13,6 +13,7 @@ import {
 import { toast } from '../../services/toastService';
 import { FaceGallery } from './FaceGallery';
 import { AvatarVoice, SentenceSplitter, type VoiceLanguage } from '../../services/avatarVoice';
+import { notCaughtLine } from '../../services/voiceText';
 import { WebAudioSink } from '../../services/webAudioSink';
 
 interface LiveAvatarModalProps {
@@ -79,6 +80,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const answeringRef = useRef(false);
   const lastUserMessageRef = useRef<string>('');
   const anamLanguageRef = useRef<'english' | 'arabic'>('english');
+  const lastHeardLanguageRef = useRef<'english' | 'arabic' | null>(null);
+  const notCaughtAtRef = useRef(0);
   const switchingLanguageRef = useRef(false);
   // Always points at the latest switchAnamLanguage closure so
   // streamEnaraAnswerToAnam (defined earlier) can call it without being
@@ -174,6 +177,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     answeringRef.current = false;
     lastUserMessageRef.current = '';
     anamLanguageRef.current = 'english';
+    lastHeardLanguageRef.current = null;
     switchingLanguageRef.current = false;
     setLanguageChoice(null);
   }, []);
@@ -385,7 +389,19 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const startVoice = useCallback((sink: import('../../services/avatarVoice').AudioSink, interrupt: () => void) => {
     if (!sessionIdRef.current) return;
     const voice = new AvatarVoice(sessionIdRef.current, sink, {
-      onUtterance: (text, language) => void answerSpokenTurn(text, language),
+      onUtterance: (text, language) => {
+        lastHeardLanguageRef.current = language;
+        void answerSpokenTurn(text, language);
+      },
+      // Misheard as another language: ask again in the call's language, at
+      // most every 8 s, and never send it to the tutor.
+      onNotCaught: () => {
+        const now = Date.now();
+        if (now - notCaughtAtRef.current < 8000 || !voiceRef.current) return;
+        notCaughtAtRef.current = now;
+        voiceRef.current.say(notCaughtLine(lastHeardLanguageRef.current ?? anamLanguageRef.current));
+        void voiceRef.current.finishTurn();
+      },
       // The student is talking: no nudge.
       onHearing: () => clearSilenceTimer(),
       onInterrupt: interrupt,
