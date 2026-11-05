@@ -13,6 +13,7 @@ import {
 import { toast } from '../../services/toastService';
 import { FaceGallery } from './FaceGallery';
 import { AvatarVoice, SentenceSplitter, type VoiceLanguage } from '../../services/avatarVoice';
+import { markRelayDown, relayBase } from '../../services/relay';
 import { notCaughtLine } from '../../services/voiceText';
 import { WebAudioSink } from '../../services/webAudioSink';
 
@@ -467,11 +468,21 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     startVoiceOnlyRef.current = startVoiceOnly;
   }, [startVoiceOnly]);
 
-  const startAnam = useCallback(async (sessionToken: string) => {
+  // Check Enara's relay while the call is being set up, not after.
+  useEffect(() => {
+    void relayBase();
+  }, []);
+
+  const startAnam = useCallback(async (sessionToken: string, allowRelay = true): Promise<void> => {
     anamReadyRef.current = false;
     const elevenlabs = speechModeRef.current === 'elevenlabs';
+    // The video service's signalling goes through Enara's relay when it answers.
+    const relay = allowRelay ? await relayBase() : null;
     // In ElevenLabs mode the microphone goes to ElevenLabs, not to Anam.
-    const client = createClient(sessionToken, elevenlabs ? { disableInputAudio: true } : undefined);
+    const client = createClient(sessionToken, {
+      ...(elevenlabs ? { disableInputAudio: true } : {}),
+      ...(relay ? { apiGateway: { enabled: true, baseUrl: `${relay}/v`, wsPath: '/v/ws' } } : {}),
+    });
     anamClientRef.current = client;
 
     client.addListener(AnamEvent.CONNECTION_ESTABLISHED, () => {
@@ -522,6 +533,12 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         return;
       }
       if (closingRef.current || anamClientRef.current !== client) return;
+      // Closed before the call started through the relay: try once directly.
+      if (!anamReadyRef.current && relay) {
+        markRelayDown();
+        void startAnam(sessionToken, false).catch(() => void startVoiceOnly());
+        return;
+      }
       // Closed before the call even started: Anam is refusing sessions (for
       // example an account limit), so reconnecting won't help.
       if (!anamReadyRef.current) {
@@ -545,7 +562,18 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       await switchToTavus(`anam_connection_closed:${String(reason)}`);
     });
 
-    await client.streamToVideoElement('enara-anam-video');
+    try {
+      await client.streamToVideoElement('enara-anam-video');
+    } catch (error) {
+      // Already handled (closed and retried directly, or the call ended).
+      if (anamClientRef.current !== client) return;
+      if (!relay) throw error;
+      // The relay couldn't start the video: connect directly instead.
+      markRelayDown();
+      anamClientRef.current = null;
+      void client.stopStreaming().catch(() => {});
+      await startAnam(sessionToken, false);
+    }
   }, [startVoice, startVoiceOnly, streamEnaraAnswerToAnam, switchToTavus]);
 
   // Anam has no mid-call language switch: the adapter decides (from the
