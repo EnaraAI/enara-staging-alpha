@@ -83,10 +83,13 @@ import {
   toggleAvatarActiveStatus,
   fetchAvatarAnalytics
 } from '../../services/avatarService';
+import { getSessionUser } from '../../services/apiService';
 import { LiveAvatarModal } from './LiveAvatarModal';
 
 export const AdminAvatarControlCenter: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'config' | 'avatars' | 'analytics' | 'tester'>('avatars');
+  // API settings are for Enara admins only; school admins pick tutor faces and see sessions.
+  const canEditApi = getSessionUser()?.role === 'enara-admin';
   const [avatars, setAvatars] = useState<LiveAvatar[]>([]);
   const [config, setConfig] = useState<AvatarConfig>({
     provider: 'enara-webrtc',
@@ -284,6 +287,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
           Tutor faces
         </button>
 
+        {canEditApi && (
         <button
           onClick={() => setActiveTab('config')}
           aria-pressed={activeTab === 'config'}
@@ -296,6 +300,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
           <Key size={16} />
           API & Provider Config
         </button>
+        )}
 
         <button
           onClick={() => setActiveTab('analytics')}
@@ -315,7 +320,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
       {activeTab === 'avatars' && <TutorFacePicker />}
 
       {/* TAB 2: API & PROVIDER CONFIG */}
-      {activeTab === 'config' && (
+      {canEditApi && activeTab === 'config' && (
         <div className="max-w-4xl bg-white rounded-xl p-6 border border-slate-200 space-y-8">
           <div>
             <h3 className="text-lg font-bold text-slate-900">Server-Side Avatar Service API & WebRTC Setup</h3>

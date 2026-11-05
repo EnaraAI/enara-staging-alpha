@@ -523,7 +523,7 @@ const App: React.FC = () => {
           {state.page === 'teaching' && <TeachingDashboard />}
           {state.page === 'lesson-planner' && <LessonPlanner />}
           {state.page === 'operations' && <div className="p-20 text-center text-slate-400">Operational Efficiency & Resource Management</div>}
-          {state.page === 'integrations' && <Integrations />}
+          {/* Integrations (API keys) is for Enara admins only. */}
           {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
           {state.page === 'governance' && <div className="p-20 text-center text-slate-400">Platform Governance & Security</div>}
           {state.page === 'compliance' && <div className="p-20 text-center text-slate-400">Accessibility & Compliance Audits</div>}
