@@ -202,6 +202,21 @@ export class AvatarVoice {
     this.playback = this.playback.then(() => this.play(audio, generation)).catch(() => {});
   }
 
+  // Queues one sentence whose audio the server sends inside the reply stream
+  // (no /speak request): push its PCM chunks as they arrive, then end().
+  sayInline(text: string): { push(chunk: Uint8Array): void; end(): void } {
+    const clean = text.trim();
+    const generation = this.generation;
+    const queue = new ChunkQueue();
+    if (!clean || this.stopped) {
+      queue.end();
+      return queue;
+    }
+    this.spokenText += ` ${clean}`;
+    this.playback = this.playback.then(() => this.playChunks(queue.chunks(), generation, () => queue.end())).catch(() => {});
+    return queue;
+  }
+
   // Resolves once everything queued has been spoken; then ends Anam's turn.
   async finishTurn(): Promise<void> {
     const generation = this.generation;
@@ -235,15 +250,33 @@ export class AvatarVoice {
   private async play(audio: Promise<Response>, generation: number): Promise<void> {
     const res = await audio;
     if (!res.ok || !res.body || this.stopped || generation !== this.generation) return;
+    const reader = res.body.getReader();
+    await this.playChunks(
+      (async function* () {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) return;
+          yield value;
+        }
+      })(),
+      generation,
+      () => void reader.cancel().catch(() => {}),
+    );
+  }
 
+  private async playChunks(source: AsyncIterable<Uint8Array>, generation: number, cancel: () => void): Promise<void> {
+    if (this.stopped || generation !== this.generation) {
+      cancel();
+      return;
+    }
     // ElevenLabs returns audio faster than real time; sending it to Anam in one
     // burst desyncs the lip-sync, so chunks go out at the PCM's own playback rate.
-    const reader = res.body.getReader();
+    const iterator = source[Symbol.asyncIterator]();
     const started = performance.now();
     let sent = 0;
     let carry: Uint8Array | null = null;
     while (!this.stopped && generation === this.generation) {
-      const { done, value } = await reader.read();
+      const { done, value } = await iterator.next();
       if (done) break;
       let chunk = value;
       if (carry) {
@@ -264,11 +297,12 @@ export class AvatarVoice {
       try {
         this.sink.sendAudioChunk(amplify(chunk));
       } catch {
+        cancel();
         return;
       }
       sent += chunk.length;
     }
-    if (generation !== this.generation) void reader.cancel().catch(() => {});
+    if (generation !== this.generation || this.stopped) cancel();
   }
 
   stop(): void {
@@ -280,6 +314,36 @@ export class AvatarVoice {
       connection?.close();
     } catch {
       // best effort
+    }
+  }
+}
+
+// Audio chunks for one inline sentence, readable once, in arrival order.
+class ChunkQueue {
+  private items: Uint8Array[] = [];
+  private done = false;
+  private wake: (() => void) | null = null;
+
+  push(chunk: Uint8Array): void {
+    if (this.done || !chunk.length) return;
+    this.items.push(chunk);
+    this.wake?.();
+  }
+
+  end(): void {
+    this.done = true;
+    this.wake?.();
+  }
+
+  async *chunks(): AsyncGenerator<Uint8Array> {
+    while (true) {
+      if (this.items.length) {
+        yield this.items.shift()!;
+        continue;
+      }
+      if (this.done) return;
+      await new Promise<void>((resolve) => (this.wake = resolve));
+      this.wake = null;
     }
   }
 }

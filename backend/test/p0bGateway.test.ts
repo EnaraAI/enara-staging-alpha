@@ -221,11 +221,21 @@ describe('P0b gateway: nested services', () => {
   });
 
   it('avatar visuals: one row per call', async () => {
-    ai.create.mockResolvedValue(reply('<div>diagram</div>', { model: 'claude-sonnet-5-5' }));
-    await inCtx(() => generateVisualAid({ question: 'draw a triangle', requested: true }));
+    ai.create.mockResolvedValue(reply('{"kind":"steps","title":"Triangle","items":["Draw a base","Join the ends"]}', { model: 'claude-sonnet-5-5' }));
+    const html = await inCtx(() => generateVisualAid({ question: 'draw a triangle', requested: true }));
+    expect(html).toContain('<ol>');
     const rows = await ledger();
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({ feature: 'avatar_visual', modelName: 'claude-sonnet-5-5', costStatus: 'estimated' });
+  });
+
+  it('avatar visuals: an unusable description falls back to a full page, each call metered', async () => {
+    ai.create.mockResolvedValue(reply('<div>diagram</div>', { model: 'claude-sonnet-5-5' }));
+    const html = await inCtx(() => generateVisualAid({ question: 'draw a triangle', requested: true }));
+    expect(html).toContain('<div>diagram</div>');
+    const rows = await ledger();
+    expect(rows).toHaveLength(2);
+    expect(rows.every((r: { feature: string }) => r.feature === 'avatar_visual')).toBe(true);
   });
 });
 
@@ -294,8 +304,9 @@ describe('P0b gateway: speech', () => {
   it('meters TTS characters once per accepted request; ai_calls logging unchanged', async () => {
     ai.tts.mockResolvedValue(new ReadableStream());
     await inCtx(() => synthesizeSpeech('Hello there', 'english'));
+    // The ok row is written in the background, once the audio is streaming.
+    await vi.waitFor(async () => expect(await ledger()).toHaveLength(1));
     const rows = await ledger();
-    expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({ provider: 'elevenlabs', feature: 'tts', modelName: 'eleven_flash_v2_5', units: { characters: 11 }, costStatus: 'estimated', costInternal: 0.00088 });
     expect(await aiCalls(1)).toHaveLength(1);
   });
@@ -303,6 +314,7 @@ describe('P0b gateway: speech', () => {
   it('a retried TTS failure gives two rows, the failed one with unknown usage', async () => {
     ai.tts.mockRejectedValueOnce(Object.assign(new Error('busy'), { statusCode: 503 })).mockResolvedValueOnce(new ReadableStream());
     await inCtx(() => synthesizeSpeech('Hi', 'english'));
+    await vi.waitFor(async () => expect(await ledger()).toHaveLength(2));
     expect((await ledger()).map((r) => [r.attempt, r.status, r.costStatus])).toEqual([[1, 'error', 'usage_unknown'], [2, 'ok', 'estimated']]);
   });
 });

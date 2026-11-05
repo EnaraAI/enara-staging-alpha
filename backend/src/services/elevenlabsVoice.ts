@@ -1,5 +1,5 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
-import { recordAiCall } from './aiCalls';
+import { errorCodeOf, recordAiCall } from './aiCalls';
 import { meteredCall, meteredSpeech } from './aiGateway';
 import { getConfig } from '../config/env';
 import type { AvatarLanguage } from './avatarLanguage';
@@ -48,13 +48,22 @@ export async function synthesizeSpeech(
   const voiceId =
     gender === 'woman' ? el.config.femaleVoiceId : language === 'arabic' ? el.config.voiceIdAr : el.config.voiceIdEn;
   const startedAt = Date.now();
-  recordAiCall({ feature: 'tts', provider: 'elevenlabs', modelName: el.config.ttsModel, status: 'ok', startedAt, characters: text.length });
-  return meteredSpeech({ feature: 'tts', modelName: el.config.ttsModel, maxAttempts: 2 }, text.length, () =>
-    el.client.textToSpeech.stream(voiceId, {
-      text,
-      modelId: el.config.ttsModel,
-      outputFormat: 'pcm_16000',
-      languageCode: language === 'arabic' ? 'ar' : 'en',
-    }),
-  );
+  let audio: ReadableStream<Uint8Array>;
+  try {
+    audio = await meteredSpeech({ feature: 'tts', modelName: el.config.ttsModel, maxAttempts: 2 }, text.length, () =>
+      el.client.textToSpeech.stream(voiceId, {
+        text,
+        modelId: el.config.ttsModel,
+        outputFormat: 'pcm_16000',
+        languageCode: language === 'arabic' ? 'ar' : 'en',
+      }),
+    );
+  } catch (error) {
+    recordAiCall({ feature: 'tts', provider: 'elevenlabs', modelName: el.config.ttsModel, status: 'error', startedAt, errorCode: errorCodeOf(error) });
+    throw error;
+  }
+  // Recorded once the audio starts: its latency is the time to the first audio.
+  const firstTokenMs = Date.now() - startedAt;
+  recordAiCall({ feature: 'tts', provider: 'elevenlabs', modelName: el.config.ttsModel, status: 'ok', startedAt, characters: text.length, firstTokenMs });
+  return audio;
 }

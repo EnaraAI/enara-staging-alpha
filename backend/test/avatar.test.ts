@@ -490,6 +490,103 @@ describe('live avatar', () => {
     expect(mocks.stream.mock.calls[0][0].query).toContain('Reply only in Egyptian Arabic');
   });
 
+  it('speaks the reply inside the answer stream when the browser asks, in sentence order', async () => {
+    mocks.voice.configured = true;
+    const pcm = (bytes: number[]) =>
+      new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(new Uint8Array(bytes));
+          controller.close();
+        },
+      });
+    // The second sentence's audio is ready first: it must still be sent second.
+    mocks.synth.mockImplementation(async (text: string) => {
+      if (text.startsWith('First')) await new Promise((r) => setTimeout(r, 40));
+      return text.startsWith('First') ? pcm([1, 2]) : pcm([3, 4]);
+    });
+    mocks.stream.mockImplementation(async function* () {
+      yield 'First sentence here. ';
+      yield 'وده التاني.';
+    });
+    const auth = await token('inline-voice', 'student');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    const res = await request(app)
+      .post('/api/avatar/query-stream')
+      .set('Authorization', auth)
+      .send({ session_id: start.body.session_id, language: 'english', speak: true, messages: [{ role: 'user', content: 'tell me two things' }] });
+    expect(res.status).toBe(200);
+    expect(res.headers['x-enara-speech']).toBe('inline');
+    const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
+    const speech = lines.filter((l) => 'say' in l || 'audio' in l || 'said' in l);
+    expect(speech).toEqual([
+      { say: 'First sentence here.', s: 0 },
+      { audio: Buffer.from([1, 2]).toString('base64'), s: 0 },
+      { said: 0 },
+      { say: 'وده التاني.', s: 1 },
+      { audio: Buffer.from([3, 4]).toString('base64'), s: 1 },
+      { said: 1 },
+    ]);
+    // Each sentence in its own script's voice, counted against the call's cap.
+    expect(mocks.synth).toHaveBeenCalledWith('First sentence here.', 'english', undefined);
+    expect(mocks.synth).toHaveBeenCalledWith('وده التاني.', 'arabic', undefined);
+    const { AvatarSession } = await import('../src/models/AvatarSession');
+    const row = await AvatarSession.findOne({ id: start.body.session_id }).lean();
+    expect(row?.spokenChars).toBe('First sentence here.'.length + 'وده التاني.'.length);
+    // Text still streams for the transcript.
+    expect(lines.filter((l) => l.content).map((l) => l.content).join('')).toBe('First sentence here. وده التاني.');
+  });
+
+  it('keeps sending text only to a browser that does not ask for speech, or when voice is off', async () => {
+    const auth = await token('text-only', 'student');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    const res = await request(app)
+      .post('/api/avatar/query-stream')
+      .set('Authorization', auth)
+      .send({ session_id: start.body.session_id, speak: true, messages: [{ role: 'user', content: 'hi there friend' }] });
+    expect(res.headers['x-enara-speech']).toBeUndefined();
+    expect(res.text).not.toContain('"say"');
+    expect(mocks.synth).not.toHaveBeenCalled();
+  });
+
+  it('stops speaking inline at the call speech cap', async () => {
+    mocks.voice.configured = true;
+    mocks.synth.mockResolvedValue(new ReadableStream({ start: (c) => c.close() }));
+    const auth = await token('inline-cap', 'student');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    const { AvatarSession } = await import('../src/models/AvatarSession');
+    await AvatarSession.updateOne({ id: start.body.session_id }, { $set: { spokenChars: 19_995 } });
+    const res = await request(app)
+      .post('/api/avatar/query-stream')
+      .set('Authorization', auth)
+      .send({ session_id: start.body.session_id, speak: true, messages: [{ role: 'user', content: 'what is a variable' }] });
+    expect(res.status).toBe(200);
+    expect(mocks.synth).not.toHaveBeenCalled();
+    // The browser is still told each sentence ended, so playback never waits for audio.
+    expect(res.text).toContain('"said":0');
+  });
+
+  it('finds the call and records activity in one database write', async () => {
+    mocks.voice.configured = true;
+    mocks.synth.mockResolvedValue(new ReadableStream({ start: (c) => c.close() }));
+    const auth = await token('one-write', 'student');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    const { AvatarSession } = await import('../src/models/AvatarSession');
+    const reads = vi.spyOn(AvatarSession, 'findOne');
+    const updates = vi.spyOn(AvatarSession, 'updateOne');
+    const res = await request(app).post('/api/avatar/speak').set('Authorization', auth).send({ session_id: start.body.session_id, text: 'Hello there' });
+    expect(res.status).toBe(200);
+    expect(reads).not.toHaveBeenCalled();
+    expect(updates).not.toHaveBeenCalled();
+    const row = await AvatarSession.findOne({ id: start.body.session_id }).lean();
+    expect(row?.spokenChars).toBe(11);
+    expect(row?.lastActivityAt).toBeTruthy();
+    reads.mockRestore();
+    updates.mockRestore();
+    // An unknown call is still a 404, a call past the speech cap a 429.
+    const missing = await request(app).post('/api/avatar/speak').set('Authorization', auth).send({ session_id: 'nope', text: 'Hello there' });
+    expect(missing.status).toBe(404);
+  });
+
   it('keeps replying in a language the student explicitly asked for', async () => {
     mocks.voice.configured = true;
     const auth = await token('pin');

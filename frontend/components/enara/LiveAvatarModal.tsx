@@ -43,6 +43,13 @@ type AvatarSessionResponse = {
 
 const MIC_PERMISSION_DENIED_REASON = 'CONNECTION_CLOSED_CODE_MICROPHONE_PERMISSION_DENIED';
 
+function decodeBase64(value: string): Uint8Array {
+  const binary = atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
 // Shown in the visual panel while a requested drawing is being made.
 const DRAWING_PLACEHOLDER =
   '<div style="font-family:system-ui,sans-serif;color:#475569;display:flex;align-items:center;justify-content:center;height:90vh;font-size:15px">Drawing a visual for you… / جاري الرسم…</div>';
@@ -324,12 +331,20 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         : [...voiceHistoryRef.current];
     const splitter = new SentenceSplitter();
     let reply = '';
+    // Sentences whose audio arrives inside the reply (server-side speech).
+    const inlineSentences = new Map<number, { push(chunk: Uint8Array): void; end(): void }>();
+    const endInline = () => {
+      inlineSentences.forEach((sentence) => sentence.end());
+      inlineSentences.clear();
+    };
     try {
       const res = await avatarFetch('/query-stream', {
         method: 'POST',
-        body: { session_id: sessionId, messages, language, kind },
+        body: { session_id: sessionId, messages, language, kind, speak: true },
       });
       if (!res.ok || !res.body) throw new Error(`ENARA query failed (${res.status})`);
+      // An older server sends text only: the browser then speaks each sentence itself.
+      const inline = res.headers.get('X-Enara-Speech') === 'inline';
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -340,7 +355,13 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
         if (data.content) {
           reply += data.content;
-          for (const sentence of splitter.push(data.content)) voice.say(sentence);
+          if (!inline) for (const sentence of splitter.push(data.content)) voice.say(sentence);
+        }
+        if (inline && typeof data.say === 'string') inlineSentences.set(data.s, voice.sayInline(data.say));
+        if (inline && typeof data.audio === 'string') inlineSentences.get(data.s)?.push(decodeBase64(data.audio));
+        if (inline && typeof data.said === 'number') {
+          inlineSentences.get(data.said)?.end();
+          inlineSentences.delete(data.said);
         }
       };
       while (current()) {
@@ -358,7 +379,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         return;
       }
       handleLine(buffer);
-      for (const sentence of splitter.flush()) voice.say(sentence);
+      endInline();
+      if (!inline) for (const sentence of splitter.flush()) voice.say(sentence);
       if (reply) voiceHistoryRef.current = [...messages, { role: 'assistant' as const, content: reply }].slice(-12);
       await voice.finishTurn();
       // Ended on a question: if the student stays quiet, help them along.
@@ -377,6 +399,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       voice.say(language === 'arabic' ? 'آسف، حصلت مشكلة. ممكن تسأل تاني؟' : 'Sorry, I had trouble answering that. Please try again.');
       await voice.finishTurn();
     } finally {
+      // A broken stream must not leave a sentence waiting for audio forever.
+      endInline();
       if (current()) setStatus('Listening…');
     }
   }, [clearSilenceTimer]);

@@ -3,6 +3,7 @@ import { meteredMessage } from './aiGateway';
 import { textTokenBound } from './priceCatalog';
 import { getConfig } from '../config/env';
 import { logger } from '../utils/logging';
+import { parseVisualSpec, renderVisualSpec, VISUAL_SPEC_FORMAT } from './visualSpec';
 
 // Visual aid for the live avatar's side panel (ported from the avatar adapter):
 // after an answer, Claude decides whether a table, diagram or step list would
@@ -86,11 +87,70 @@ export async function generateVisualAid(params: {
   // tutor uses 'tutor_visual', which stays under it.
   feature?: 'avatar_visual' | 'tutor_visual';
 }): Promise<string | null> {
-  const { question, answer, context, requested, feature = 'avatar_visual' } = params;
   const config = getConfig();
   if (!config.anthropicApiKey) return null;
   client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 40_000, maxRetries: 0 });
+  // Fast path: a short description built into the page here. A full page is
+  // written only when the description can't be used.
+  const described = await describeVisual(params);
+  if (described !== undefined) return described;
+  return writeVisualPage(params);
+}
 
+function visualPrompt(params: { question: string; answer?: string; context?: string; requested?: boolean }): string {
+  const { question, answer, context, requested } = params;
+  return (
+    'You make visual aids for an AI tutor talking with a school student.\n\n' +
+    (context ? `<lesson_context>${context}</lesson_context>\n` : '') +
+    `<student_message>${question}</student_message>\n` +
+    (answer ? `<tutor_answer>${answer}</tutor_answer>\n` : '') +
+    '\n' +
+    (requested
+      ? 'The student asked to see this visually. Make the clearest visual explanation of the concept they ' +
+        'are asking about (use the lesson context if they say "this" or "it"): a labelled diagram, worked ' +
+        'steps, a table, a number line, a graph or a simple illustration.\n'
+      : 'Decide whether a visual aid genuinely helps here. Good cases: worked steps, formulas, tables, ' +
+        'comparisons, timelines, vocabulary lists, diagrams. Small talk and simple yes/no answers do not need one.\n') +
+    'Write it in the language of the student message.\n'
+  );
+}
+
+// undefined: no usable description (the caller writes a full page instead).
+async function describeVisual(params: Parameters<typeof generateVisualAid>[0]): Promise<string | null | undefined> {
+  const { question, answer, context, requested, feature = 'avatar_visual' } = params;
+  const config = getConfig();
+  try {
+    const bound = { inputTokens: textTokenBound(question, answer, context, VISUAL_SPEC_FORMAT) + 1500, outputTokens: 3000 };
+    const response = await meteredMessage({ feature, modelName: config.anthropicVisualModel, bound }, () => client!.messages.create({
+      model: config.anthropicVisualModel,
+      max_tokens: 3000,
+      output_config: { effort: 'low' },
+      messages: [
+        {
+          role: 'user',
+          content: visualPrompt(params) + VISUAL_SPEC_FORMAT + (requested ? '' : '\nIf it does not help, reply with exactly {"kind":"none"}'),
+        },
+      ],
+    }));
+    if (response.stop_reason === 'refusal') return null;
+    if (response.stop_reason === 'max_tokens') return undefined;
+    const text = response.content.map((block) => (block.type === 'text' ? block.text : '')).join('').trim();
+    const spec = parseVisualSpec(text);
+    if (!spec) {
+      logger.warn('avatar_visual_spec_unusable', { chars: text.length });
+      return undefined;
+    }
+    if (spec.kind === 'none') return requested ? undefined : null;
+    return isolateEquations(sanitizeVisualHtml(renderVisualSpec(spec, sanitizeVisualHtml)));
+  } catch (error) {
+    logger.warn('avatar_visual_failed', { message: (error as Error).message });
+    return null;
+  }
+}
+
+async function writeVisualPage(params: Parameters<typeof generateVisualAid>[0]): Promise<string | null> {
+  const { question, answer, context, requested, feature = 'avatar_visual' } = params;
+  const config = getConfig();
   try {
     // Bound: the variable parts plus 4,000 tokens for the fixed instructions.
     const bound = { inputTokens: textTokenBound(question, answer, context, LAYOUT_RULES) + 4000, outputTokens: 12_000 };

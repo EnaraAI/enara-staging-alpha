@@ -11,6 +11,8 @@ export interface IAiCall extends Document {
   modelName: string;
   status: AiCallStatus;
   latencyMs: number;
+  // Streams: time to the first generated text. TTS: time to the first audio byte.
+  firstTokenMs?: number;
   inputTokens: number;
   outputTokens: number;
   cacheReadTokens: number;
@@ -36,6 +38,7 @@ const aiCallSchema = new Schema<IAiCall>(
     modelName: { type: String, required: true },
     status: { type: String, enum: ['ok', 'error', 'refusal', 'empty'], required: true },
     latencyMs: { type: Number, default: 0 },
+    firstTokenMs: Number,
     inputTokens: { type: Number, default: 0 },
     outputTokens: { type: Number, default: 0 },
     cacheReadTokens: { type: Number, default: 0 },

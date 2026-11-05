@@ -86,6 +86,7 @@ export const getAiUsage = asyncHandler(async (req: AuthRequest, res: Response) =
         costUsd: { $sum: '$costUsd' },
         unpricedCalls: { $sum: { $cond: [{ $eq: ['$costStatus', 'unpriced'] }, 1, 0] } },
         avgLatencyMs: { $avg: '$latencyMs' },
+        avgFirstTokenMs: { $avg: '$firstTokenMs' },
       },
     },
     { $sort: { costUsd: -1 } },
@@ -104,6 +105,8 @@ export const getAiUsage = asyncHandler(async (req: AuthRequest, res: Response) =
     // Calls with no catalogue price: their cost is unknown, not zero.
     unpricedCalls: g.unpricedCalls,
     avgLatencyMs: Math.round(g.avgLatencyMs || 0),
+    // Streams and speech only: time to the first text or audio (null when not recorded).
+    avgFirstTokenMs: g.avgFirstTokenMs == null ? null : Math.round(g.avgFirstTokenMs),
   }));
   const totals = byFeature.reduce(
     (t, g) => ({ calls: t.calls + g.calls, errors: t.errors + g.errors, costUsd: t.costUsd + g.costUsd, unpricedCalls: t.unpricedCalls + g.unpricedCalls }),
