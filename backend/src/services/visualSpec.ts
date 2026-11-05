@@ -82,7 +82,7 @@ export function parseVisualSpec(text: string): VisualSpec | null {
 
 const STYLE = `<style>
 *{box-sizing:border-box;max-width:100%}
-body,.v{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a;background:#fff}
+body,.v{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,"Noto Sans Arabic",Arial,sans-serif;color:#0f172a;background:#fff}
 .v{padding:20px 22px;font-size:17px;line-height:1.5}
 h2{margin:0 0 14px;font-size:21px;color:#0056D2}
 table{border-collapse:collapse;width:100%}
