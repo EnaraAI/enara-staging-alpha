@@ -61,3 +61,21 @@ export function isRepeatUtterance(text: string, recent: { text: string; at: numb
     return before === heard || (before.length >= 6 && heard.length >= 6 && (before.includes(heard) || heard.includes(before)));
   });
 }
+
+// Live calls are in English or Arabic. Seen live (3-4 Nov): an Arabic-speaking
+// student's short or unclear speech came back as Portuguese ("Até logo") and
+// Russian, and the tutor answered in the wrong language. A transcript the
+// detector labels as another language, or written in another script, is
+// treated as not caught. Mixing English and Arabic stays allowed.
+const OTHER_SCRIPT = /[\u0370-\u03FF\u0400-\u052F\u0590-\u05FF\u0900-\u0DFF\u0E00-\u0EFF\u1100-\u11FF\u3040-\u30FF\u3400-\u9FFF\uAC00-\uD7AF]/;
+export function isOffLanguage(text: string, code: string | null | undefined): boolean {
+  if (OTHER_SCRIPT.test(text)) return true;
+  const c = (code || '').toLowerCase();
+  if (!c) return false;
+  return !(c.startsWith('en') || c.startsWith('ar'));
+}
+
+// What the tutor says when it didn't catch the student, in the call's language.
+export function notCaughtLine(language: VoiceLanguage): string {
+  return language === 'arabic' ? 'معلش، مسمعتكش كويس. ممكن تقولها تاني؟' : "Sorry, I didn't catch that. Could you say it again?";
+}

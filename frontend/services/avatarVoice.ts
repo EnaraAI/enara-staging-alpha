@@ -2,7 +2,7 @@ import { QUICK_CLOSE_MS, transcriptionReconnectDelayMs } from './retryPolicy';
 import { CommitStrategy, RealtimeEvents, Scribe, type RealtimeConnection } from '@elevenlabs/client';
 import { avatarFetch } from './apiService';
 
-import { isEcho, isRepeatUtterance, languageOfText, REPEAT_WINDOW_MS, toVoiceLanguage, voiceWords as words, type VoiceLanguage } from './voiceText';
+import { isEcho, isOffLanguage, isRepeatUtterance, languageOfText, REPEAT_WINDOW_MS, toVoiceLanguage, voiceWords as words, type VoiceLanguage } from './voiceText';
 
 export { SentenceSplitter } from './sentenceSplitter';
 export { languageOfText, type VoiceLanguage } from './voiceText';
@@ -26,6 +26,8 @@ export interface VoiceCallbacks {
   onHearing?(text: string): void;
   // The student talked over the avatar: stop its current speech.
   onInterrupt?(): void;
+  // Speech that came back in neither English nor Arabic: ask again, don't answer it.
+  onNotCaught?(): void;
   onError(message: string): void;
 }
 
@@ -110,6 +112,12 @@ export class AvatarVoice {
       const now = performance.now();
       if (isRepeatUtterance(text, this.recentHeard, now)) return;
       this.recentHeard = [...this.recentHeard.filter((r) => now - r.at <= REPEAT_WINDOW_MS), { text, at: now }];
+      if (isOffLanguage(text, msg.language_code)) {
+        // Talking over the avatar in a misheard language isn't an interruption.
+        if (!this.isSpeaking) this.callbacks.onNotCaught?.();
+        void this.rotate();
+        return;
+      }
       if (this.isSpeaking) {
         // Real speech over the avatar interrupts it; a stray word or two
         // (often the avatar's own voice, partly heard) doesn't.
