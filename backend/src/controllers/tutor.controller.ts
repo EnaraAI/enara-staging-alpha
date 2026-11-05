@@ -1,3 +1,4 @@
+import { publicVersion } from '../utils/vendorNeutral';
 import { assignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { isFeatureEnabled, isShadowMode } from '../services/featureFlags';
 import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSource } from '../services/curriculumRetrieval';
@@ -322,7 +323,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
     meta: {
       intent: aiResult.intent,
       contextFound: aiResult.context_found,
-      version: aiResult.version,
+      version: publicVersion(aiResult.version),
       teachingMethod: turn.method,
       ...(citations.length ? { citations } : {}),
       // Recorded only when the plan was actually used for this reply (a model reply).
@@ -343,7 +344,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
 const replyMeta = (aiResult: TutorReply, method: TeachingMethod) => ({
   intent: aiResult.intent,
   contextFound: aiResult.context_found,
-  version: aiResult.version,
+  version: publicVersion(aiResult.version),
   teachingMethod: method,
 });
 

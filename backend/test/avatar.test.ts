@@ -129,7 +129,7 @@ describe('live avatar', () => {
       .send({ preferred_language: 'arabic', lesson_title: 'Algebra' });
 
     expect(res.status, JSON.stringify(res.body)).toBe(200);
-    expect(res.body).toMatchObject({ provider: 'anam', session_token: 'anam-token' });
+    expect(res.body).toMatchObject({ provider: 'video', speech: 'avatar', session_token: 'anam-token' });
     const sent = JSON.parse(anamFetch.mock.calls[0][1].body);
     expect(sent.personaConfig).toMatchObject({ voiceId: 'voice-ar', llmId: 'CUSTOMER_CLIENT_V1', languageCode: 'ar' });
   });
@@ -458,7 +458,7 @@ describe('live avatar', () => {
     );
     const auth = await token('voice');
     const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
-    expect(start.body.speech).toBe('elevenlabs');
+    expect(start.body.speech).toBe('server');
     const persona = JSON.parse(anamFetch.mock.calls[0][1].body).personaConfig;
     expect(persona).toMatchObject({ enableAudioPassthrough: true });
     expect(persona.llmId).toBeUndefined();
@@ -644,6 +644,44 @@ describe('live avatar', () => {
     // Removing the course's face falls back to the school default.
     await request(app).put('/api/tutor-faces').set('Authorization', admin).send({ courseId: 'MATH', avatarId: null });
     expect((await sessionFor('MATH')).persona.avatarId).toBe('face-leo');
+  });
+
+  it('serves tutor face pictures from ENARA, never the video provider\'s address', async () => {
+    const admin = await token('faces-neutral');
+    const list = await request(app).get('/api/tutor-faces').set('Authorization', admin);
+    expect(list.status).toBe(200);
+    expect(list.body.avatars.map((a: { imageUrl: string }) => a.imageUrl)).toEqual(['/api/tutor-faces/image/face-leo', '/api/tutor-faces/image/face-layla']);
+    expect(JSON.stringify(list.body)).not.toContain('https://img/');
+    await request(app).put('/api/tutor-faces').set('Authorization', admin).send({ avatarId: 'face-leo' });
+    expect((await request(app).get('/api/tutor-faces').set('Authorization', admin)).body.default.imageUrl).toBe('/api/tutor-faces/image/face-leo');
+
+    // The picture itself: no sign-in needed (an <img> sends no token), fetched from the provider.
+    const wrapped = globalThis.fetch;
+    globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) =>
+      String(url) === 'https://img/leo' ? new Response(new Uint8Array([137, 80, 78, 71]), { status: 200, headers: { 'Content-Type': 'image/png' } }) : wrapped(url, init)) as typeof fetch;
+    try {
+      const img = await request(app).get('/api/tutor-faces/image/face-leo').buffer(true);
+      expect(img.status).toBe(200);
+      expect(img.headers['content-type']).toBe('image/png');
+      expect((await request(app).get('/api/tutor-faces/image/nobody')).status).toBe(404);
+    } finally {
+      globalThis.fetch = wrapped;
+    }
+  });
+
+  it('shows schools AI usage per feature without the provider model', async () => {
+    const { AiCall } = await import('../src/models/AiCall');
+    await AiCall.create([
+      { feature: 'tutor_chat', provider: 'anthropic', modelName: 'claude-opus-5-5', status: 'ok', latencyMs: 4000, institutionId: 'inst' },
+      { feature: 'tutor_chat', provider: 'anthropic', modelName: 'claude-sonnet-5-5', status: 'ok', latencyMs: 2000, institutionId: 'inst' },
+    ]);
+    const admin = await token('usage-neutral');
+    const res = await request(app).get('/api/analytics/ai-usage?days=1').set('Authorization', admin);
+    expect(res.status).toBe(200);
+    const chat = res.body.byFeature.filter((r: { feature: string }) => r.feature === 'tutor_chat');
+    expect(chat).toHaveLength(1);
+    expect(chat[0]).toMatchObject({ calls: 2, avgLatencyMs: 3000 });
+    expect(JSON.stringify(res.body)).not.toMatch(/claude|anthropic|model/i);
   });
 
   it('lets students choose their own tutor from the faces the school offers', async () => {

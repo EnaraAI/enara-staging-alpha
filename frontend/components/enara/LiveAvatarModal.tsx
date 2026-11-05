@@ -33,12 +33,13 @@ type AvatarProvider = 'anam' | 'tavus' | 'voice';
 
 type AvatarSessionResponse = {
   session_id: string;
-  provider: AvatarProvider;
+  // 'video' (older servers: 'anam') is the lip-synced face.
+  provider: AvatarProvider | 'video';
   session_token?: string;
   conversation_url?: string;
   fallback_reason?: string | null;
-  // 'elevenlabs': ElevenLabs listens and speaks, Anam is only the face.
-  speech?: 'anam' | 'elevenlabs';
+  // 'server' (older servers: 'elevenlabs'): ENARA listens and speaks, the video is only the face.
+  speech?: 'server' | 'avatar' | 'anam' | 'elevenlabs';
 };
 
 const MIC_PERMISSION_DENIED_REASON = 'CONNECTION_CLOSED_CODE_MICROPHONE_PERMISSION_DENIED';
@@ -514,7 +515,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     });
 
     client.addListener(AnamEvent.CONNECTION_CLOSED, async (reason: unknown) => {
-      console.warn('[AVATAR] Anam connection closed', reason);
+      console.warn('[AVATAR] video connection closed', reason);
       if (String(reason) === MIC_PERMISSION_DENIED_REASON) {
         setError('Microphone permission is required for the live tutor.');
         setLoading(false);
@@ -581,7 +582,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       await stopAnam();
       await startAnam(data.session_token);
     } catch (e) {
-      console.error('[AVATAR] Anam language switch failed', e);
+      console.error('[AVATAR] video language switch failed', e);
       setStatus('Connected');
       // Non-fatal: the current voice keeps working, and the next turn will
       // retry the switch if the student is still speaking the other language.
@@ -630,7 +631,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
 
       const data: AvatarSessionResponse = await res.json();
       sessionIdRef.current = data.session_id;
-      speechModeRef.current = data.speech === 'elevenlabs' ? 'elevenlabs' : 'anam';
+      // 'server' (and the older 'elevenlabs'): ENARA speaks and listens itself.
+      speechModeRef.current = data.speech === 'server' || data.speech === 'elevenlabs' ? 'elevenlabs' : 'anam';
       // A reconnect continues the same conversation.
       if (!reconnect) {
         voiceHistoryRef.current = [];
@@ -638,12 +640,12 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       }
       startPolling(data.session_id);
 
-      if (data.provider === 'anam' && data.session_token) {
+      if ((data.provider === 'video' || data.provider === 'anam') && data.session_token) {
         setProvider('anam');
         try {
           await startAnam(data.session_token);
         } catch (e) {
-          console.error('[AVATAR] Anam startup failed', e);
+          console.error('[AVATAR] video startup failed', e);
           // The video didn't start: carry on as a voice-only tutor when the
           // voice is ours (ElevenLabs) instead of a backup video service.
           if (speechModeRef.current === 'elevenlabs') await startVoiceOnly();

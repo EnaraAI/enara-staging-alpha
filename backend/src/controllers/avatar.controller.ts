@@ -266,9 +266,11 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
 
   res.json({
     session_id: session.id,
-    provider: 'anam',
+    // Neutral names: the browser sees no provider names ('video' is the
+    // lip-synced face; speech 'server' is ENARA's own voice pipeline).
+    provider: 'video',
     session_token: sessionToken,
-    speech: isElevenLabsVoiceConfigured() ? 'elevenlabs' : 'anam',
+    speech: isElevenLabsVoiceConfigured() ? 'server' : 'avatar',
     fallback_reason: null,
   });
 });

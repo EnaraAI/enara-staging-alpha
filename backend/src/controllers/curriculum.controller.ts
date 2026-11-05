@@ -53,7 +53,11 @@ import {
 } from '../services/uploadStorage';
 
 function toCurriculumResponse(doc: InstanceType<typeof Curriculum>) {
-  return toPlainObject(doc);
+  const plain = toPlainObject(doc) as Record<string, unknown>;
+  // The saved link holds the address the site had when the course was
+  // published (once a hosting address): always give the current one.
+  if (plain.deploymentLink) plain.deploymentLink = buildDeploymentLink(String(plain.id));
+  return plain;
 }
 
 // Who may see or change a curriculum (P1). School content managers (admins)

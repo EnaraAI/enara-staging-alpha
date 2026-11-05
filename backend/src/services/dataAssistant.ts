@@ -1,3 +1,4 @@
+import { IDENTITY_RULE } from '../utils/vendorNeutral';
 import Anthropic from '@anthropic-ai/sdk';
 import { getConfig } from '../config/env';
 import { AppError } from '../middleware/errorHandler';
@@ -71,7 +72,9 @@ export async function answerDataQuestion(scope: Record<string, unknown>, message
     'is computed from real activity. If the data does not answer the question, say so plainly; never ' +
     'invent students, numbers or deadlines. Be concise and use Markdown lists or tables where they help. ' +
     'The data has no individual students. If asked about a particular student, say that individual reports are in ' +
-    'Educator Chat (class analytics) and give school-level context only.\n\n' +
+    'Educator Chat (class analytics) and give school-level context only. ' +
+    IDENTITY_RULE +
+    '\n\n' +
     `<school_data>${JSON.stringify(data)}</school_data>`;
   const messages = [...history.slice(-6), { role: 'user' as const, content: message }].map((m) => ({ ...m, content: redact(m.content) }));
   const response = await meteredMessage(
