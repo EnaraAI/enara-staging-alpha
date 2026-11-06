@@ -1,6 +1,7 @@
 import { TutorMessage } from '../models/TutorMessage';
 import { recordLearningEvents } from './learningEvents';
 import type { ITutorMessage } from '../models/TutorSession';
+import { publicVersion } from '../utils/vendorNeutral';
 
 // Tutor chat messages live in the tutor_messages collection. Sessions from
 // before the split may also hold messages embedded in the session document;
@@ -24,7 +25,10 @@ function plainMessage(m: StoredMessage): StoredMessage {
     timestamp: m.timestamp,
     ...(m.imageUrl ? { imageUrl: m.imageUrl } : {}),
     ...(m.imagePrompt ? { imagePrompt: m.imagePrompt } : {}),
-    ...(m.meta && Object.values(m.meta).some((v) => v !== undefined) ? { meta: m.meta } : {}),
+    // Older replies stored the engine's provider name; schools see a neutral label.
+    ...(m.meta && Object.values(m.meta).some((v) => v !== undefined)
+      ? { meta: m.meta.version ? { ...m.meta, version: publicVersion(m.meta.version) } : m.meta }
+      : {}),
   };
 }
 

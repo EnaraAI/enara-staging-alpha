@@ -40,9 +40,19 @@ export class ApiError extends Error {
 // Fired when the backend rejects our token, so the app can return to login.
 export const SESSION_EXPIRED_EVENT = 'enara-session-expired';
 
+// Demo sessions live in sessionStorage: closing the browser forgets them.
+const DEMO_KEY = 'enara_demo';
+export function isDemoSession(): boolean {
+  try {
+    return sessionStorage.getItem(DEMO_KEY) === '1' && !!sessionStorage.getItem(TOKEN_KEY);
+  } catch {
+    return false;
+  }
+}
+
 export function getToken(): string | null {
   try {
-    return localStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY);
   } catch {
     return null;
   }
@@ -50,20 +60,25 @@ export function getToken(): string | null {
 
 export function getSessionUser(): SessionUser | null {
   try {
-    const raw = localStorage.getItem(USER_KEY);
+    const raw = sessionStorage.getItem(USER_KEY) || localStorage.getItem(USER_KEY);
     return raw && getToken() ? (JSON.parse(raw) as SessionUser) : null;
   } catch {
     return null;
   }
 }
 
-function saveSession(token: string, user: SessionUser) {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+function saveSession(token: string, user: SessionUser, demo = false) {
+  const store = demo ? sessionStorage : localStorage;
+  store.setItem(TOKEN_KEY, token);
+  store.setItem(USER_KEY, JSON.stringify(user));
+  if (demo) sessionStorage.setItem(DEMO_KEY, '1');
 }
 
 export function clearSession() {
   try {
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(DEMO_KEY);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     // Keys used by older versions of the app.
@@ -125,6 +140,32 @@ async function request<T = any>(method: string, path: string, body?: unknown, is
 export const requestIdOf = (value: unknown): string | null => (value && typeof value === 'object' ? ((value as { __requestId?: string }).__requestId ?? null) : null);
 
 // AUTH
+// Partner demo: one click opens a fresh demo school as this role.
+export const DEMO_CHANGED_EVENT = 'enara-demo-changed';
+export type DemoRole = 'student' | 'teacher' | 'admin';
+export async function fetchDemoStatus(): Promise<{ available: boolean; full: boolean }> {
+  return request('GET', '/api/demo/status');
+}
+export async function startDemo(role: DemoRole): Promise<SessionUser> {
+  try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); } catch { /* storage unavailable */ }
+  const data = await request<{ token: string; user: SessionUser }>('POST', '/api/demo/start', { role });
+  saveSession(data.token, data.user, true);
+  window.dispatchEvent(new Event(DEMO_CHANGED_EVENT));
+  return data.user;
+}
+export async function switchDemoRole(role: DemoRole): Promise<SessionUser> {
+  const data = await request<{ token: string; user: SessionUser }>('POST', '/api/demo/switch', { role });
+  saveSession(data.token, data.user, true);
+  return data.user;
+}
+export async function demoHeartbeat(): Promise<void> {
+  await request('POST', '/api/demo/heartbeat');
+}
+export async function endDemo(): Promise<void> {
+  await request('POST', '/api/demo/end').catch(() => undefined);
+  clearSession();
+}
+
 export async function login(email: string, password: string): Promise<SessionUser> {
   const data = await request<{ token: string; user: SessionUser }>('POST', '/api/auth/login', {
     email: email.trim(),
@@ -138,8 +179,10 @@ export async function login(email: string, password: string): Promise<SessionUse
 // doesn't come back on another device) and in the stored session.
 export async function completeTour(): Promise<void> {
   try {
-    const raw = localStorage.getItem(USER_KEY);
-    if (raw) localStorage.setItem(USER_KEY, JSON.stringify({ ...JSON.parse(raw), tourPending: false }));
+    for (const store of [sessionStorage, localStorage]) {
+      const raw = store.getItem(USER_KEY);
+      if (raw) store.setItem(USER_KEY, JSON.stringify({ ...JSON.parse(raw), tourPending: false }));
+    }
   } catch { /* storage unavailable: the server copy still counts */ }
   await request('POST', '/api/auth/tour/complete').catch(() => undefined);
 }
@@ -147,6 +190,11 @@ export async function completeTour(): Promise<void> {
 // Signs out on the server too (S-1): every token of the account stops
 // working, on every device. Best effort; the local session is cleared anyway.
 export function logout() {
+  // Signing out of a demo ends it (its school is wiped).
+  if (isDemoSession()) {
+    void endDemo();
+    return;
+  }
   if (getToken()) void request('POST', '/api/auth/logout').catch(() => undefined);
   clearSession();
 }

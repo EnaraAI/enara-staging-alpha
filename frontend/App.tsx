@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Login } from './pages/Login';
 import { AccountLink, accountLinkFromLocation } from './pages/AccountLink';
+import { DemoPortal } from './pages/DemoPortal';
 import { People } from './pages/workspace/People';
 import { StudentDashboard } from './pages/StudentDashboard';
 import { CoursePage } from './pages/CoursePage';
@@ -267,6 +268,11 @@ const App: React.FC = () => {
   const accountLink = accountLinkFromLocation();
   if (accountLink) return <AccountLink kind={accountLink.kind} token={accountLink.token} />;
 
+ // Public partner demo: one-click sign-in into a fresh demo school.
+  if (!state.role && window.location.pathname.replace(/\/$/, '') === '/demo') {
+    return <DemoPortal onStart={handleLogin} />;
+  }
+
   if (!state.role) {
     return (
       <Login 
@@ -523,7 +529,7 @@ const App: React.FC = () => {
           {state.page === 'teaching' && <TeachingDashboard />}
           {state.page === 'lesson-planner' && <LessonPlanner />}
           {state.page === 'operations' && <div className="p-20 text-center text-slate-400">Operational Efficiency & Resource Management</div>}
-          {state.page === 'integrations' && <Integrations />}
+          {/* Integrations (API keys) is for Enara admins only. */}
           {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
           {state.page === 'governance' && <div className="p-20 text-center text-slate-400">Platform Governance & Security</div>}
           {state.page === 'compliance' && <div className="p-20 text-center text-slate-400">Accessibility & Compliance Audits</div>}

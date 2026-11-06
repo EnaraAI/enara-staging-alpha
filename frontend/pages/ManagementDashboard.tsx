@@ -183,7 +183,7 @@ export const ManagementDashboard: React.FC = () => {
                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">AI Engine</p>
-                      <p className="text-xs sm:text-sm font-medium truncate">Gemini Pro 1.5 • Online</p>
+                      <p className="text-xs sm:text-sm font-medium truncate">Enara AI • Online</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/10">

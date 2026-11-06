@@ -13,6 +13,7 @@ import {
 import { toast } from '../../services/toastService';
 import { FaceGallery } from './FaceGallery';
 import { AvatarVoice, SentenceSplitter, type VoiceLanguage } from '../../services/avatarVoice';
+import { markRelayDown, relayBase } from '../../services/relay';
 import { notCaughtLine } from '../../services/voiceText';
 import { WebAudioSink } from '../../services/webAudioSink';
 
@@ -33,12 +34,13 @@ type AvatarProvider = 'anam' | 'tavus' | 'voice';
 
 type AvatarSessionResponse = {
   session_id: string;
-  provider: AvatarProvider;
+  // 'video' (older servers: 'anam') is the lip-synced face.
+  provider: AvatarProvider | 'video';
   session_token?: string;
   conversation_url?: string;
   fallback_reason?: string | null;
-  // 'elevenlabs': ElevenLabs listens and speaks, Anam is only the face.
-  speech?: 'anam' | 'elevenlabs';
+  // 'server' (older servers: 'elevenlabs'): ENARA listens and speaks, the video is only the face.
+  speech?: 'server' | 'avatar' | 'anam' | 'elevenlabs';
 };
 
 const MIC_PERMISSION_DENIED_REASON = 'CONNECTION_CLOSED_CODE_MICROPHONE_PERMISSION_DENIED';
@@ -96,6 +98,15 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const switchAnamLanguageRef = useRef<(target: string) => Promise<void>>(async () => {});
   // Restarts the call after a dropped connection; set once `start` exists.
   const restartRef = useRef<() => Promise<void>>(async () => {});
+  // Once per call: restart it so the server hands back the video tutor's own
+  // voice and listening (it has marked ENARA's voice as refused).
+  const voiceSwitchedRef = useRef(false);
+  const switchToAvatarVoice = useCallback(() => {
+    if (voiceSwitchedRef.current || closingRef.current) return;
+    voiceSwitchedRef.current = true;
+    setStatus('Switching voice…');
+    void restartRef.current();
+  }, []);
   const reconnectsRef = useRef<number[]>([]);
   const speechModeRef = useRef<'anam' | 'elevenlabs'>('anam');
   const voiceRef = useRef<AvatarVoice | null>(null);
@@ -175,6 +186,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   }, []);
 
   const resetUi = useCallback(() => {
+    voiceSwitchedRef.current = false;
     setProvider(null);
     setTavusUrl(null);
     setArtifactHtml(null);
@@ -337,6 +349,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       inlineSentences.forEach((sentence) => sentence.end());
       inlineSentences.clear();
     };
+    let voiceDown = false;
     try {
       const res = await avatarFetch('/query-stream', {
         method: 'POST',
@@ -359,6 +372,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         }
         if (inline && typeof data.say === 'string') inlineSentences.set(data.s, voice.sayInline(data.say));
         if (inline && typeof data.audio === 'string') inlineSentences.get(data.s)?.push(decodeBase64(data.audio));
+        if (data.voice === 'unavailable') voiceDown = true;
         if (inline && typeof data.said === 'number') {
           inlineSentences.get(data.said)?.end();
           inlineSentences.delete(data.said);
@@ -380,6 +394,12 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       }
       handleLine(buffer);
       endInline();
+      // ENARA's voice was refused: carry on with the video tutor's voice.
+      if (voiceDown) {
+        if (reply) voiceHistoryRef.current = [...messages, { role: 'assistant' as const, content: reply }].slice(-12);
+        switchToAvatarVoice();
+        return;
+      }
       if (!inline) for (const sentence of splitter.flush()) voice.say(sentence);
       if (reply) voiceHistoryRef.current = [...messages, { role: 'assistant' as const, content: reply }].slice(-12);
       await voice.finishTurn();
@@ -403,7 +423,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       endInline();
       if (current()) setStatus('Listening…');
     }
-  }, [clearSilenceTimer]);
+  }, [clearSilenceTimer, switchToAvatarVoice]);
 
   useEffect(() => {
     answerSpokenTurnRef.current = answerSpokenTurn;
@@ -429,6 +449,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       // The student is talking: no nudge.
       onHearing: () => clearSilenceTimer(),
       onInterrupt: interrupt,
+      onVoiceUnavailable: () => switchToAvatarVoice(),
       onError: (message) => setError(message),
     });
     voiceRef.current = voice;
@@ -443,7 +464,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         console.error('[AVATAR] Voice start failed', e);
         setError('Microphone permission is required for the live tutor.');
       });
-  }, [answerSpokenTurn, clearSilenceTimer]);
+  }, [answerSpokenTurn, clearSilenceTimer, switchToAvatarVoice]);
 
   // The video avatar refused the call: carry on as a voice-only tutor.
   const startVoiceOnly = useCallback(async () => {
@@ -466,11 +487,21 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     startVoiceOnlyRef.current = startVoiceOnly;
   }, [startVoiceOnly]);
 
-  const startAnam = useCallback(async (sessionToken: string) => {
+  // Check Enara's relay while the call is being set up, not after.
+  useEffect(() => {
+    void relayBase();
+  }, []);
+
+  const startAnam = useCallback(async (sessionToken: string, allowRelay = true): Promise<void> => {
     anamReadyRef.current = false;
     const elevenlabs = speechModeRef.current === 'elevenlabs';
+    // The video service's signalling goes through Enara's relay when it answers.
+    const relay = allowRelay ? await relayBase() : null;
     // In ElevenLabs mode the microphone goes to ElevenLabs, not to Anam.
-    const client = createClient(sessionToken, elevenlabs ? { disableInputAudio: true } : undefined);
+    const client = createClient(sessionToken, {
+      ...(elevenlabs ? { disableInputAudio: true } : {}),
+      ...(relay ? { apiGateway: { enabled: true, baseUrl: `${relay}/v`, wsPath: '/v/ws' } } : {}),
+    });
     anamClientRef.current = client;
 
     client.addListener(AnamEvent.CONNECTION_ESTABLISHED, () => {
@@ -514,13 +545,19 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     });
 
     client.addListener(AnamEvent.CONNECTION_CLOSED, async (reason: unknown) => {
-      console.warn('[AVATAR] Anam connection closed', reason);
+      console.warn('[AVATAR] video connection closed', reason);
       if (String(reason) === MIC_PERMISSION_DENIED_REASON) {
         setError('Microphone permission is required for the live tutor.');
         setLoading(false);
         return;
       }
       if (closingRef.current || anamClientRef.current !== client) return;
+      // Closed before the call started through the relay: try once directly.
+      if (!anamReadyRef.current && relay) {
+        markRelayDown();
+        void startAnam(sessionToken, false).catch(() => void startVoiceOnly());
+        return;
+      }
       // Closed before the call even started: Anam is refusing sessions (for
       // example an account limit), so reconnecting won't help.
       if (!anamReadyRef.current) {
@@ -544,7 +581,18 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       await switchToTavus(`anam_connection_closed:${String(reason)}`);
     });
 
-    await client.streamToVideoElement('enara-anam-video');
+    try {
+      await client.streamToVideoElement('enara-anam-video');
+    } catch (error) {
+      // Already handled (closed and retried directly, or the call ended).
+      if (anamClientRef.current !== client) return;
+      if (!relay) throw error;
+      // The relay couldn't start the video: connect directly instead.
+      markRelayDown();
+      anamClientRef.current = null;
+      void client.stopStreaming().catch(() => {});
+      await startAnam(sessionToken, false);
+    }
   }, [startVoice, startVoiceOnly, streamEnaraAnswerToAnam, switchToTavus]);
 
   // Anam has no mid-call language switch: the adapter decides (from the
@@ -581,7 +629,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       await stopAnam();
       await startAnam(data.session_token);
     } catch (e) {
-      console.error('[AVATAR] Anam language switch failed', e);
+      console.error('[AVATAR] video language switch failed', e);
       setStatus('Connected');
       // Non-fatal: the current voice keeps working, and the next turn will
       // retry the switch if the student is still speaking the other language.
@@ -630,7 +678,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
 
       const data: AvatarSessionResponse = await res.json();
       sessionIdRef.current = data.session_id;
-      speechModeRef.current = data.speech === 'elevenlabs' ? 'elevenlabs' : 'anam';
+      // 'server' (and the older 'elevenlabs'): ENARA speaks and listens itself.
+      speechModeRef.current = data.speech === 'server' || data.speech === 'elevenlabs' ? 'elevenlabs' : 'anam';
       // A reconnect continues the same conversation.
       if (!reconnect) {
         voiceHistoryRef.current = [];
@@ -638,12 +687,12 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       }
       startPolling(data.session_id);
 
-      if (data.provider === 'anam' && data.session_token) {
+      if ((data.provider === 'video' || data.provider === 'anam') && data.session_token) {
         setProvider('anam');
         try {
           await startAnam(data.session_token);
         } catch (e) {
-          console.error('[AVATAR] Anam startup failed', e);
+          console.error('[AVATAR] video startup failed', e);
           // The video didn't start: carry on as a voice-only tutor when the
           // voice is ours (ElevenLabs) instead of a backup video service.
           if (speechModeRef.current === 'elevenlabs') await startVoiceOnly();

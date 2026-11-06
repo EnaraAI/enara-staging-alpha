@@ -83,10 +83,13 @@ import {
   toggleAvatarActiveStatus,
   fetchAvatarAnalytics
 } from '../../services/avatarService';
+import { getSessionUser } from '../../services/apiService';
 import { LiveAvatarModal } from './LiveAvatarModal';
 
 export const AdminAvatarControlCenter: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'config' | 'avatars' | 'analytics' | 'tester'>('avatars');
+  // API settings are for Enara admins only; school admins pick tutor faces and see sessions.
+  const canEditApi = getSessionUser()?.role === 'enara-admin';
   const [avatars, setAvatars] = useState<LiveAvatar[]>([]);
   const [config, setConfig] = useState<AvatarConfig>({
     provider: 'enara-webrtc',
@@ -177,7 +180,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
         subject: 'General Education',
         provider: 'enara-webrtc',
         avatarModelId: 'Athena_Expressive_v2',
-        voiceId: 'en-US-JennyNeural',
+        voiceId: 'enara-voice-jenny',
         avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=600',
         accent: 'Clear Academic',
         personalityPrompt: 'Encouraging, step-by-step guidance.',
@@ -264,7 +267,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
             <span>Provider</span>
             <Server size={16} className="text-slate-600" />
           </div>
-          <p className="text-3xl font-extrabold text-slate-900 mt-1"><span className="text-xl">{config.provider}</span></p>
+          <p className="text-3xl font-extrabold text-slate-900 mt-1"><span className="text-xl">Enara Live</span></p>
           <p className="text-xs text-slate-600 mt-1">{config.quality} default quality</p>
         </div>
       </div>
@@ -284,6 +287,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
           Tutor faces
         </button>
 
+        {canEditApi && (
         <button
           onClick={() => setActiveTab('config')}
           aria-pressed={activeTab === 'config'}
@@ -296,6 +300,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
           <Key size={16} />
           API & Provider Config
         </button>
+        )}
 
         <button
           onClick={() => setActiveTab('analytics')}
@@ -315,7 +320,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
       {activeTab === 'avatars' && <TutorFacePicker />}
 
       {/* TAB 2: API & PROVIDER CONFIG */}
-      {activeTab === 'config' && (
+      {canEditApi && activeTab === 'config' && (
         <div className="max-w-4xl bg-white rounded-xl p-6 border border-slate-200 space-y-8">
           <div>
             <h3 className="text-lg font-bold text-slate-900">Server-Side Avatar Service API & WebRTC Setup</h3>
@@ -334,7 +339,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
               <h4 className="text-sm font-bold text-slate-900">1. Enara Avatar Credentials</h4>
               
               <p className="text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-md p-3">
-                Provider API keys (Anam, ElevenLabs) are set as server environment variables and are never entered or stored in the browser.
+                Enara video and voice keys are kept on the Enara servers and are never entered or stored in the browser.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -640,7 +645,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
                         <td className="py-3 px-3 text-slate-900 font-semibold">{sess.avatarName}</td>
                         <td className="py-3 px-3">
                           <span className="rounded-full px-2.5 py-1 bg-slate-100 text-xs font-bold text-slate-700">
-                            {sess.provider}
+                            Enara Live
                           </span>
                         </td>
                         <td className="py-3 px-3 text-slate-700 font-semibold">{sess.latencyMs}ms</td>
@@ -742,7 +747,7 @@ export const AdminAvatarControlCenter: React.FC = () => {
                       required
                       value={editingAvatar.voiceId || ''}
                       onChange={(e) => setEditingAvatar({ ...editingAvatar, voiceId: e.target.value })}
-                      placeholder="e.g. en-US-JennyNeural"
+                      placeholder="e.g. enara-voice-sara"
                       className="w-full bg-white border border-slate-300 rounded-md p-3 text-sm font-mono focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 focus:outline-none"
                     />
                   </div>

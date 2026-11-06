@@ -1,3 +1,4 @@
+import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
 import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { SentenceSplitter } from '../services/sentenceSplitter';
 import { TutorSession } from '../models/TutorSession';
@@ -33,6 +34,8 @@ import {
   createTranscriptionToken,
   elevenLabsSttModel,
   isElevenLabsVoiceConfigured,
+  isElevenLabsVoiceUsable,
+  isVoiceRefusal,
   synthesizeSpeech,
 } from '../services/elevenlabsVoice';
 import { Readable } from 'stream';
@@ -54,28 +57,67 @@ function requireAnam() {
   return { ...anam, reserveUsd: unpricedLimits.anamSessionReserveUsd, maxSeconds: unpricedLimits.anamMaxSessionSeconds };
 }
 
-// With ElevenLabs configured, Anam is only the face: it lip-syncs to audio the
-// browser passes through. Otherwise Anam listens and speaks itself, and the
+// With ENARA's own voice working, Anam is only the face: it lip-syncs to audio
+// the browser passes through. Otherwise Anam listens and speaks itself, and the
 // browser streams our text answers to it.
-async function createAnamSessionToken(language: Language, avatarId?: string): Promise<string> {
+//
+// Anam's own listening and voice are set up for Egyptian learners:
+// - Arabic calls expect Arabic ('ar'; Anam has no regional codes) through
+//   Anam's own recogniser, the one that supports Arabic;
+// - learners pause mid-sentence while finding words, so the end of a turn is
+//   detected later than the default (0.35 instead of 0.5);
+// - a quiet student is never hung up on by Anam (ENARA's call limits apply);
+// - the voice is the configured Arabic (Egyptian) or English voice, a woman's
+//   voice for faces that are women when one is configured.
+export function anamPersonaConfig(opts: {
+  serverVoice: boolean;
+  language: Language;
+  avatarId: string;
+  gender?: 'woman' | 'man';
+  anam: { voiceIdEn: string; voiceIdAr: string; voiceIdEnFemale?: string; voiceIdArFemale?: string };
+  listeningOptions?: boolean;
+}): Record<string, unknown> {
+  const { serverVoice, language, avatarId, gender, anam } = opts;
+  if (serverVoice) return { name: 'Enara', avatarId, enableAudioPassthrough: true };
+  const arabic = language === 'arabic';
+  const voiceId = arabic
+    ? (gender === 'woman' && anam.voiceIdArFemale) || anam.voiceIdAr
+    : (gender === 'woman' && anam.voiceIdEnFemale) || anam.voiceIdEn;
+  return {
+    name: 'Enara',
+    avatarId,
+    voiceId,
+    // Anam's own LLM stays off: the browser streams our answers to it.
+    llmId: 'CUSTOMER_CLIENT_V1',
+    languageCode: arabic ? 'ar' : 'en',
+    ...(opts.listeningOptions === false
+      ? {}
+      : {
+          voiceDetectionOptions: {
+            sttProvider: 'anam',
+            endOfSpeechSensitivity: 0.35,
+            silenceBeforeSessionEndSeconds: 0,
+          },
+        }),
+  };
+}
+
+async function createAnamSessionToken(language: Language, avatarId?: string, opts: { serverVoice: boolean; gender?: 'woman' | 'man' } = { serverVoice: false }): Promise<string> {
   const anam = requireAnam();
   avatarId ||= anam.avatarId;
-  const personaConfig = isElevenLabsVoiceConfigured()
-    ? { name: 'Enara', avatarId, enableAudioPassthrough: true }
-    : {
-        name: 'Enara',
-        avatarId,
-        voiceId: language === 'arabic' ? anam.voiceIdAr : anam.voiceIdEn,
-        // Anam's own LLM stays off: the browser streams our answers to it.
-        llmId: 'CUSTOMER_CLIENT_V1',
-        languageCode: language === 'arabic' ? 'ar' : 'en',
-      };
-  const res = await fetch('https://api.anam.ai/v1/auth/session-token', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${anam.apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ personaConfig }),
-    signal: AbortSignal.timeout(15_000),
-  });
+  const request = (listeningOptions: boolean) =>
+    fetch('https://api.anam.ai/v1/auth/session-token', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${anam.apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ personaConfig: anamPersonaConfig({ ...opts, language, avatarId: avatarId!, anam, listeningOptions }) }),
+      signal: AbortSignal.timeout(15_000),
+    });
+  let res = await request(true);
+  // Should Anam reject the listening settings, start the call without them.
+  if (res.status === 400 && !opts.serverVoice) {
+    logger.warn('anam_listening_options_rejected', { status: res.status });
+    res = await request(false);
+  }
   const data = (await res.json().catch(() => ({}))) as { sessionToken?: string };
   if (!res.ok || !data.sessionToken) {
     logger.warn('anam_session_token_failed', { status: res.status });
@@ -104,6 +146,8 @@ async function findOwnSession(
   // (unit callers); a running server always has it.
   let maxSeconds: number | undefined;
   try { maxSeconds = getConfig().unpricedLimits.anamMaxSessionSeconds; } catch { maxSeconds = undefined; }
+  // Demo sessions: short calls.
+  if (isDemoSessionInstitution(req.user!.institutionId)) maxSeconds = Math.min(maxSeconds ?? DEMO_LIMITS.avatarCallSeconds, DEMO_LIMITS.avatarCallSeconds);
   const own = { id: req.params.id, userId: req.user!.id, endedAt: null };
   const live = maxSeconds ? { createdAt: { $gte: new Date(Date.now() - maxSeconds * 1000) } } : {};
   const session = await AvatarSession.findOneAndUpdate(
@@ -207,6 +251,13 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
   if (connected >= limit || started >= limit * DAILY_START_FACTOR) {
     throw new AppError('Daily live tutor limit reached. Try again tomorrow.', 429, 'AVATAR_DAILY_LIMIT');
   }
+  // A demo session includes a few short calls, whichever role makes them.
+  if (isDemoSessionInstitution(req.user!.institutionId)) {
+    const demoCalls = await AvatarSession.countDocuments({ institutionId: req.user!.institutionId, $or: [{ lastHeartbeatAt: { $ne: null } }, { openingUsed: true }] });
+    if (demoCalls >= DEMO_LIMITS.avatarCallsPerSession) {
+      throw new AppError(`The demo includes ${DEMO_LIMITS.avatarCallsPerSession} live tutor calls, and they've been used. The chat tutor is still available.`, 429, 'AVATAR_DAILY_LIMIT');
+    }
+  }
   // No language asked for: open in the one the student ended their last call in.
   const language = body.preferred_language
     ? toLanguage(body.preferred_language)
@@ -219,9 +270,11 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
   // metered (unknown cost is never released as free).
   const sessionId = `av-${randomUUID()}`;
   const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: face?.avatarId || 'anam-default', ...(requireAnam().reserveUsd ? { boundUsd: requireAnam().reserveUsd } : {}) }, `avatar:${sessionId}`, 48 * 60 * 60 * 1000);
+  // ENARA's own voice when it works, else the video tutor's voice and listening.
+  const serverVoice = await isElevenLabsVoiceUsable();
   let sessionToken: string;
   try {
-    sessionToken = await createAnamSessionToken(language, face?.avatarId);
+    sessionToken = await createAnamSessionToken(language, face?.avatarId, { serverVoice, gender: face?.gender });
   } catch (error) {
     await releaseAiBudget(ticket);
     throw error;
@@ -246,6 +299,7 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
     language,
     avatarId: face?.avatarId,
     voiceGender: face?.gender,
+    speech: serverVoice ? 'server' : 'avatar',
   });
 
   // Students' calls are kept as a transcript with their tutor chats.
@@ -266,10 +320,52 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
 
   res.json({
     session_id: session.id,
-    provider: 'anam',
+    // Neutral names: the browser sees no provider names ('video' is the
+    // lip-synced face; speech 'server' is ENARA's own voice pipeline).
+    provider: 'video',
     session_token: sessionToken,
-    speech: isElevenLabsVoiceConfigured() ? 'elevenlabs' : 'anam',
+    speech: serverVoice ? 'server' : 'avatar',
     fallback_reason: null,
+  });
+});
+
+// Enara admins only (route): the video tutor's voice catalogue, filtered by a
+// search (name, description or tags) and/or accent country (country=EG for
+// Egyptian voices), plus the voices and listening settings in use now.
+export const listAvatarVoices = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const anam = requireAnam();
+  const search = typeof req.query.search === 'string' ? req.query.search.slice(0, 60) : '';
+  const country = typeof req.query.country === 'string' ? req.query.country.toUpperCase().slice(0, 2) : '';
+  const { voiceIdEn, voiceIdAr, voiceIdEnFemale, voiceIdArFemale } = anam;
+  const configured = new Map<string, string>(
+    ([['english', voiceIdEn], ['arabic', voiceIdAr], ['english_woman', voiceIdEnFemale], ['arabic_woman', voiceIdArFemale]] as Array<[string, string | undefined]>)
+      .filter((e): e is [string, string] => Boolean(e[1]))
+      .map(([use, id]) => [id, use]),
+  );
+  const summary = (v: Record<string, unknown>) => ({ id: v.id, name: v.displayName, gender: v.gender, country: v.country, description: v.description, tags: v.displayTags, sample: v.sampleUrl });
+  const inUse: Array<Record<string, unknown>> = [];
+  const voices: Array<Record<string, unknown>> = [];
+  for (let page = 1; page <= 10; page++) {
+    const qs = new URLSearchParams({ page: String(page), perPage: '100' });
+    const r = await fetch(`https://api.anam.ai/v1/voices?${qs}`, { headers: { Authorization: `Bearer ${anam.apiKey}` }, signal: AbortSignal.timeout(15_000) });
+    if (!r.ok) throw new AppError('Could not list voices', 502, 'AVATAR_UNAVAILABLE');
+    const data = (await r.json()) as { data?: Array<Record<string, unknown>>; meta?: { lastPage?: number } };
+    for (const v of data.data ?? []) {
+      // The voices the tutor uses now, whatever the filter.
+      const use = configured.get(String(v.id));
+      if (use) inUse.push({ use, ...summary(v) });
+      if (country && String(v.country ?? '').toUpperCase() !== country) continue;
+      const text = `${v.displayName ?? ''} ${v.description ?? ''} ${(v.displayTags as string[] | undefined)?.join(' ') ?? ''}`.toLowerCase();
+      if (search && !text.includes(search.toLowerCase())) continue;
+      voices.push(summary(v));
+    }
+    if (!data.meta?.lastPage || page >= data.meta.lastPage) break;
+  }
+  res.json({
+    current: { voiceIdEn, voiceIdAr, voiceIdEnFemale: voiceIdEnFemale ?? null, voiceIdArFemale: voiceIdArFemale ?? null },
+    inUse,
+    listening: { arabic: anamPersonaConfig({ serverVoice: false, language: 'arabic', avatarId: anam.avatarId, anam }), english: anamPersonaConfig({ serverVoice: false, language: 'english', avatarId: anam.avatarId, anam }) },
+    voices,
   });
 });
 
@@ -281,7 +377,7 @@ export const switchAvatarLanguage = asyncHandler(async (req: AuthRequest, res: R
   const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: session.avatarId || 'anam-default', ...(requireAnam().reserveUsd ? { boundUsd: requireAnam().reserveUsd } : {}) }, `avatar:${session.id}:switch:${randomUUID()}`, 48 * 60 * 60 * 1000);
   let sessionToken: string;
   try {
-    sessionToken = await createAnamSessionToken(language, session.avatarId);
+    sessionToken = await createAnamSessionToken(language, session.avatarId, { serverVoice: session.speech === 'server', gender: session.voiceGender });
   } catch (error) {
     await releaseAiBudget(ticket);
     throw error;
@@ -319,7 +415,11 @@ export const speakAvatarText = asyncHandler(async (req: AuthRequest, res: Respon
     text,
     body.language ? toLanguage(body.language) : session.language,
     session.voiceGender,
-  );
+  ).catch((error) => {
+    // Refused: the browser restarts the call with the video tutor's voice.
+    if (isVoiceRefusal(error)) throw new AppError('The tutor voice is unavailable', 503, 'AVATAR_VOICE_UNAVAILABLE');
+    throw error;
+  });
   res.setHeader('Content-Type', 'audio/L16; rate=16000; channels=1');
   res.setHeader('Cache-Control', 'no-store');
   Readable.fromWeb(audio as Parameters<typeof Readable.fromWeb>[0])
@@ -551,6 +651,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   let sentenceNo = 0;
   let firstTextAt: number | undefined;
   let firstAudioAt: number | undefined;
+  let voiceRefused = false;
+  let voiceRefusalSent = false;
   const sayInline = (sentence: string) => {
     const n = sentenceNo++;
     const audio = (async () => {
@@ -560,6 +662,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       return synthesizeSpeech(sentence, languageOfSentence(sentence), session.voiceGender);
     })().catch((error) => {
       logger.warn('avatar_speech_failed', { error: serializeError(error) });
+      if (isVoiceRefusal(error)) voiceRefused = true;
       return null;
     });
     speechChain = speechChain.then(async () => {
@@ -583,6 +686,11 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
         }
       }
       if (!closed) res.write(JSON.stringify({ said: n }) + '\n');
+      // Told once: the browser switches the call to the video tutor's voice.
+      if (voiceRefused && !voiceRefusalSent && !closed) {
+        voiceRefusalSent = true;
+        res.write(JSON.stringify({ voice: 'unavailable' }) + '\n');
+      }
     });
   };
   if (visualRequested || autoVisual) res.write(JSON.stringify({ visual: 'drawing' }) + '\n');

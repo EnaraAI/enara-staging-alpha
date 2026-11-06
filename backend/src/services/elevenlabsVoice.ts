@@ -22,6 +22,46 @@ export function isElevenLabsVoiceConfigured(): boolean {
   return Boolean(getConfig().elevenlabs);
 }
 
+// A configured voice can still be refused: a blocked free account, an
+// exhausted quota or a revoked key. Calls then use the video tutor's own voice
+// and listening instead. Checked with a two-character request at most every
+// 10 minutes per server instance; a refusal during a call marks it down too.
+const VOICE_CHECK_MS = 10 * 60_000;
+let voiceState: { ok: boolean; at: number } | null = null;
+
+export function isVoiceRefusal(error: unknown): boolean {
+  const e = error as { statusCode?: unknown; status?: unknown };
+  const status = typeof e?.statusCode === 'number' ? e.statusCode : typeof e?.status === 'number' ? e.status : undefined;
+  return status === 401 || status === 402 || status === 403;
+}
+
+export function markVoiceRefused(): void {
+  voiceState = { ok: false, at: Date.now() };
+}
+
+export function resetVoiceStateForTests(): void {
+  voiceState = null;
+}
+
+// Whether calls should use ENARA's own voice pipeline right now.
+export async function isElevenLabsVoiceUsable(): Promise<boolean> {
+  const el = getElevenLabs();
+  if (!el) return false;
+  if (voiceState && Date.now() - voiceState.at < VOICE_CHECK_MS) return voiceState.ok;
+  try {
+    const audio = await meteredSpeech({ feature: 'tts', modelName: el.config.ttsModel }, 2, () =>
+      el.client.textToSpeech.convert(el.config.voiceIdEn, { text: 'Hi', modelId: el.config.ttsModel, outputFormat: 'pcm_16000' }),
+    );
+    // Drain so the connection is released.
+    for await (const _ of audio as unknown as AsyncIterable<unknown>) void _;
+    voiceState = { ok: true, at: Date.now() };
+  } catch (error) {
+    // Only a refusal switches calls over; a passing network error does not.
+    voiceState = { ok: !isVoiceRefusal(error), at: Date.now() };
+  }
+  return voiceState.ok;
+}
+
 export function elevenLabsSttModel(): string | undefined {
   return getConfig().elevenlabs?.sttModel;
 }
@@ -60,6 +100,7 @@ export async function synthesizeSpeech(
     );
   } catch (error) {
     recordAiCall({ feature: 'tts', provider: 'elevenlabs', modelName: el.config.ttsModel, status: 'error', startedAt, errorCode: errorCodeOf(error) });
+    if (isVoiceRefusal(error)) markVoiceRefused();
     throw error;
   }
   // Recorded once the audio starts: its latency is the time to the first audio.

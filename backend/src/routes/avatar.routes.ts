@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware } from '../middleware/auth.middleware';
+import { authMiddleware, requireRole } from '../middleware/auth.middleware';
 import {
   avatarFallback,
   avatarHeartbeat,
@@ -7,6 +7,7 @@ import {
   speakAvatarText,
   endAvatarSession,
   getAvatarArtifact,
+  listAvatarVoices,
   startAvatarSession,
   streamAvatarAnswer,
   switchAvatarLanguage,
@@ -25,5 +26,7 @@ router.post('/session/:id/stt-token', createAvatarSttToken);
 router.post('/speak', speakAvatarText);
 router.delete('/session/:id', endAvatarSession);
 router.get('/artifact/:id', getAvatarArtifact);
+// Enara admins: the video tutor's voices, to choose the Arabic and English ones.
+router.get('/admin/voices', requireRole('enara-admin'), listAvatarVoices);
 
 export default router;

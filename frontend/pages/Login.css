@@ -124,3 +124,14 @@
   .enara-signin *,.enara-signin *::before,.enara-signin *::after{animation:none!important;transition:none!important}
   .si-stage{transform:none!important}
 }
+
+/* One-click partner demo */
+.si-demo{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.si-demo-title{margin:0;font-weight:700;color:var(--text);font-size:15px}
+.si-demo-sub{margin:4px 0 12px;color:var(--muted);font-size:13px}
+.si-demo-roles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.si-demo-roles button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:44px;padding:8px 6px;white-space:nowrap;border-radius:12px;border:1px solid var(--brand-200);background:var(--brand-50);color:var(--brand);font-weight:700;font-size:13.5px;cursor:pointer;transition:background .15s,border-color .15s}
+.si-demo-roles button:hover:not(:disabled){background:var(--brand-100);border-color:var(--brand-300)}
+.si-demo-roles button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.si-demo-roles button:disabled{opacity:.6;cursor:wait}
+@media (max-width:420px){.si-demo-roles{grid-template-columns:1fr}}

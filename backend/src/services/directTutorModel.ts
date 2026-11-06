@@ -1,3 +1,4 @@
+import { IDENTITY_RULE } from '../utils/vendorNeutral';
 import Anthropic from '@anthropic-ai/sdk';
 import path from 'path';
 import { getConfig } from '../config/env';
@@ -196,7 +197,9 @@ export async function buildTutorRequest(params: TutorRequestParams) {
         style +
         (params.planActive ? PLAN_GUIDANCE : METHOD_GUIDANCE[params.teachingMethod]) +
         ' ' +
-        PROACTIVE_TEACHING,
+        PROACTIVE_TEACHING +
+        ' ' +
+        IDENTITY_RULE,
     },
   ];
   if (curriculum) {
