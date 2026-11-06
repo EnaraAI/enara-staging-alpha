@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Login } from './pages/Login';
 import { AccountLink, accountLinkFromLocation } from './pages/AccountLink';
+import { DemoPortal } from './pages/DemoPortal';
 import { People } from './pages/workspace/People';
 import { StudentDashboard } from './pages/StudentDashboard';
 import { CoursePage } from './pages/CoursePage';
@@ -266,6 +267,11 @@ const App: React.FC = () => {
   // Invitation and password-reset links open their own page (P22).
   const accountLink = accountLinkFromLocation();
   if (accountLink) return <AccountLink kind={accountLink.kind} token={accountLink.token} />;
+
+ // Public partner demo: one-click sign-in into a fresh demo school.
+  if (!state.role && window.location.pathname.replace(/\/$/, '') === '/demo') {
+    return <DemoPortal onStart={handleLogin} />;
+  }
 
   if (!state.role) {
     return (

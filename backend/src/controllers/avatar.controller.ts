@@ -1,3 +1,4 @@
+import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
 import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { SentenceSplitter } from '../services/sentenceSplitter';
 import { TutorSession } from '../models/TutorSession';
@@ -104,6 +105,8 @@ async function findOwnSession(
   // (unit callers); a running server always has it.
   let maxSeconds: number | undefined;
   try { maxSeconds = getConfig().unpricedLimits.anamMaxSessionSeconds; } catch { maxSeconds = undefined; }
+  // Demo sessions: short calls.
+  if (isDemoSessionInstitution(req.user!.institutionId)) maxSeconds = Math.min(maxSeconds ?? DEMO_LIMITS.avatarCallSeconds, DEMO_LIMITS.avatarCallSeconds);
   const own = { id: req.params.id, userId: req.user!.id, endedAt: null };
   const live = maxSeconds ? { createdAt: { $gte: new Date(Date.now() - maxSeconds * 1000) } } : {};
   const session = await AvatarSession.findOneAndUpdate(
@@ -206,6 +209,13 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
   ]);
   if (connected >= limit || started >= limit * DAILY_START_FACTOR) {
     throw new AppError('Daily live tutor limit reached. Try again tomorrow.', 429, 'AVATAR_DAILY_LIMIT');
+  }
+  // A demo session includes a few short calls, whichever role makes them.
+  if (isDemoSessionInstitution(req.user!.institutionId)) {
+    const demoCalls = await AvatarSession.countDocuments({ institutionId: req.user!.institutionId, $or: [{ lastHeartbeatAt: { $ne: null } }, { openingUsed: true }] });
+    if (demoCalls >= DEMO_LIMITS.avatarCallsPerSession) {
+      throw new AppError(`The demo includes ${DEMO_LIMITS.avatarCallsPerSession} live tutor calls, and they've been used. The chat tutor is still available.`, 429, 'AVATAR_DAILY_LIMIT');
+    }
   }
   // No language asked for: open in the one the student ended their last call in.
   const language = body.preferred_language

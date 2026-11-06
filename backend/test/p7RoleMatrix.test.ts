@@ -74,7 +74,9 @@ afterAll(async () => {
   await mongo.stop();
 });
 
-const PUBLIC = [/^\/health$/, /^\/ready$/, /^\/$/, /^\/api-docs/, /^\/api\/auth\/(login|register|demo-login|password-reset|refresh|logout|invitations)/, /^\/api\/workspace\/invitations\/(accept|lookup|[^/]+$)/];
+const PUBLIC = [/^\/health$/, /^\/ready$/, /^\/$/, /^\/api-docs/, /^\/api\/auth\/(login|register|demo-login|password-reset|refresh|logout|invitations)/, /^\/api\/workspace\/invitations\/(accept|lookup|[^/]+$)/,
+  // Partner demo (one-click): status, start (a fresh demo school, rate limited) and end (only with a demo session's own token).
+  /^\/api\/demo\/(status|start|end)$/];
 const isPublic = (p: string) => PUBLIC.some((r) => r.test(p));
 const fill = (p: string) => p.replace(/:([A-Za-z]+)/g, 'qa-nonexistent');
 let sent = 0;
