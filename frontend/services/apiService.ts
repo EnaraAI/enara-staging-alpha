@@ -141,6 +141,7 @@ export const requestIdOf = (value: unknown): string | null => (value && typeof v
 
 // AUTH
 // Partner demo: one click opens a fresh demo school as this role.
+export const DEMO_CHANGED_EVENT = 'enara-demo-changed';
 export type DemoRole = 'student' | 'teacher' | 'admin';
 export async function fetchDemoStatus(): Promise<{ available: boolean; full: boolean }> {
   return request('GET', '/api/demo/status');
@@ -149,6 +150,7 @@ export async function startDemo(role: DemoRole): Promise<SessionUser> {
   try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); } catch { /* storage unavailable */ }
   const data = await request<{ token: string; user: SessionUser }>('POST', '/api/demo/start', { role });
   saveSession(data.token, data.user, true);
+  window.dispatchEvent(new Event(DEMO_CHANGED_EVENT));
   return data.user;
 }
 export async function switchDemoRole(role: DemoRole): Promise<SessionUser> {

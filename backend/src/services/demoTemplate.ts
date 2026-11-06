@@ -10,6 +10,7 @@ import { Student } from '../models/Student';
 import { User } from '../models/User';
 import { initialsFromName } from '../utils/idGenerator';
 import { DEMO_TEMPLATE_EMAILS } from './demoSandbox';
+import { ALL_FLAGS } from './featureFlags';
 
 // The demo template school's starting point: fictional staff and students, a
 // class and an original four-lesson English course. Enara admins then add
@@ -18,7 +19,8 @@ import { DEMO_TEMPLATE_EMAILS } from './demoSandbox';
 // Idempotent: fixed ids, upserts. Template accounts can't sign in with a
 // password (random, discarded); only the template-token route can open them.
 
-const p = T;
+// Ids look like a school's own (the copy appends a short suffix per session).
+const ID = { batch: 'BATCH-DEMO-A2', curriculum: 'CUR-DEMO-A2', course: 'CRS-DEMO-A2', klass: 'CLS-DEMO-A2', lesson: (i: number) => `LSN-DEMO-A2-${i}`, student: (i: number) => `STU-DEMO-${String(i).padStart(2, '0')}` };
 const LESSONS = [
   {
     title: 'Lesson 1: Hello and introductions',
@@ -59,7 +61,7 @@ async function upsertUser(u: { email: string; role: string; name: string; studen
   return User.findOneAndUpdate(
     { email: u.email },
     {
-      $set: { role: u.role, name: u.name, institutionId: T, status: 'active', origin: 'demo_seed', ...(u.studentId ? { studentId: u.studentId } : {}) },
+      $set: { role: u.role, name: u.name, institutionId: T, status: 'active', origin: 'live', ...(u.studentId ? { studentId: u.studentId } : {}) },
       $setOnInsert: { email: u.email, password: await randomHash() },
     },
     { upsert: true, new: true },
@@ -67,7 +69,12 @@ async function upsertUser(u: { email: string; role: string; name: string; studen
 }
 
 export async function buildDemoTemplate(now = new Date()) {
-  await Institution.updateOne({ id: T }, { $set: { name: 'Enara Demo School (template)' } }, { upsert: true });
+  // Every feature on, so the demo shows the whole platform; adult learners.
+  await Institution.updateOne(
+    { id: T },
+    { $set: { name: 'Enara Demo School (template)', features: Object.fromEntries(ALL_FLAGS.map((f) => [f, true])), 'learningSettings.adultLearners': true } },
+    { upsert: true },
+  );
   // Template work by Enara admins is budgeted like any school.
   await OrgBudget.updateOne(
     { institutionId: T },
@@ -85,43 +92,43 @@ export async function buildDemoTemplate(now = new Date()) {
   const teacherId = teacher!._id.toString();
 
   const students = STUDENTS.map((name, i) => ({
-    id: `${p}-stu-${i + 1}`,
+    id: ID.student(i + 1),
     name,
     email: i === 0 ? DEMO_TEMPLATE_EMAILS.student : `student${i + 1}@${T}.demo.enara.test`,
   }));
   for (const s of students) {
     await Student.updateOne(
       { id: s.id },
-      { $set: { name: s.name, email: s.email, grade: 'Adult learner (A2)', avatar: initialsFromName(s.name), institutionId: T, batchId: `${p}-batch`, origin: 'demo_seed' } },
+      { $set: { name: s.name, email: s.email, grade: 'Adult learner (A2)', avatar: initialsFromName(s.name), institutionId: T, batchId: ID.batch, origin: 'live' } },
       { upsert: true },
     );
     await upsertUser({ email: s.email, role: 'student', name: s.name, studentId: s.id });
   }
 
   await Batch.updateOne(
-    { id: `${p}-batch` },
-    { $set: { name: 'Everyday English A2', institutionId: T, academicYear: String(now.getUTCFullYear()), studentCount: students.length, curriculumId: `${p}-curriculum`, origin: 'demo_seed' } },
+    { id: ID.batch },
+    { $set: { name: 'Everyday English A2', institutionId: T, academicYear: String(now.getUTCFullYear()), studentCount: students.length, curriculumId: ID.curriculum, origin: 'live' } },
     { upsert: true },
   );
   await Curriculum.updateOne(
-    { id: `${p}-curriculum` },
+    { id: ID.curriculum },
     {
       $set: {
         name: 'Everyday English A2', institutionId: T, courseName: 'Everyday English A2', type: 'Language', level: 'A2', languages: ['English'],
         summary: 'Four short lessons for adult beginners: introductions, daily routines, ordering at a café and talking about the past.',
         description: 'An original Enara sample course for the demo.', lastUpdated: now.toISOString().slice(0, 10), subjectsCount: LESSONS.length,
-        assignedBatches: ['Everyday English A2'], status: 'deployed', createdBy: teacherId, origin: 'demo_seed',
-        chapters: LESSONS.map((l, i) => ({ id: `${p}-lesson-${i + 1}`, title: l.title, description: l.description, uploads: [] })),
+        assignedBatches: ['Everyday English A2'], status: 'deployed', createdBy: teacherId, origin: 'live',
+        chapters: LESSONS.map((l, i) => ({ id: ID.lesson(i + 1), title: l.title, description: l.description, uploads: [] })),
       },
     },
     { upsert: true },
   );
   await CourseInstance.updateOne(
-    { id: `${p}-class` },
+    { id: ID.klass },
     {
       $set: {
-        courseId: `${p}-course`, courseName: 'Everyday English A2', institutionId: T, academicYear: String(now.getUTCFullYear()), batchId: `${p}-batch`,
-        curriculumId: `${p}-curriculum`, instructorIds: [teacherId], studentIds: students.map((s) => s.id), visibility: 'student', isDemo: false, origin: 'demo_seed',
+        courseId: ID.course, courseName: 'Everyday English A2', institutionId: T, academicYear: String(now.getUTCFullYear()), batchId: ID.batch,
+        curriculumId: ID.curriculum, instructorIds: [teacherId], studentIds: students.map((s) => s.id), visibility: 'student', isDemo: false, origin: 'live',
       },
     },
     { upsert: true },

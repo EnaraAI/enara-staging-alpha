@@ -60,7 +60,8 @@ router.post('/end', express.text({ type: ['text/plain', 'application/json'], lim
 router.get('/admin/status', authMiddleware, requireRole('enara-admin'), asyncHandler(async (_req, res: Response) => { res.json(await demoStatus()); }));
 router.post('/admin/template', authMiddleware, requireRole('enara-admin'), asyncHandler(async (_req, res: Response) => { res.json(await buildDemoTemplate()); }));
 router.post('/admin/template-token', authMiddleware, requireRole('enara-admin'), asyncHandler(async (req: AuthRequest, res: Response) => {
-  res.json(await templateToken(role((req.body as { role?: unknown })?.role)));
+  const body = req.body as { role?: unknown; student?: unknown };
+  res.json(await templateToken(role(body?.role), Number(body?.student) || undefined));
 }));
 router.post('/admin/sweep', authMiddleware, requireRole('enara-admin'), asyncHandler(async (_req, res: Response) => { res.json(await sweepDemoSessions()); }));
 

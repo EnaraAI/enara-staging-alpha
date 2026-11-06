@@ -98,11 +98,12 @@ export async function copyTemplateSchool(inst: string, now = new Date()): Promis
   const users = new Map<string, string>();
   for (const [name, rows] of docs) {
     const model = mongoose.model(name);
-    const origin = model.schema.path('origin') as unknown as { enumValues?: string[] } | undefined;
     const copies = rows.map((d) => {
       const c = map(d) as Plain;
       c.institutionId = inst;
-      if (origin?.enumValues?.includes('demo_seed')) c.origin = 'demo_seed';
+      // Each demo is its own school: its records are that school's real
+      // activity (dashboards hide 'demo_seed' sample rows by default).
+      if (model.schema.path('origin')) c.origin = 'live';
       if (name === 'User') {
         c.status = 'active';
         users.set(String(c.email), (c._id as Types.ObjectId).toHexString());
@@ -173,7 +174,9 @@ export async function startDemoSession(role: DemoRole, ip: string, now = new Dat
     expiresAt: new Date(now.getTime() + DEMO_LIMITS.maxSessionMs),
   });
   try {
-    await Institution.create({ id: inst, name: 'Enara Demo School' });
+    // The template's feature switches and learner settings come along.
+    const template = await Institution.findOne({ id: DEMO_TEMPLATE_ID }).select('features learningSettings').lean();
+    await Institution.create({ id: inst, name: 'Enara Demo School', ...(template?.features ? { features: template.features } : {}), ...(template?.learningSettings ? { learningSettings: template.learningSettings } : {}) });
     await OrgBudget.create(demoBudget(inst));
     const users = await copyTemplateSchool(inst, now);
     const byRole = Object.fromEntries(
@@ -264,8 +267,10 @@ export async function sweepDemoSessions(opts: { now?: Date; limit?: number } = {
 }
 
 // For Enara admins building the template: a token for one template account.
-export async function templateToken(role: DemoRole) {
-  const user = await User.findOne({ email: DEMO_TEMPLATE_EMAILS[role], institutionId: DEMO_TEMPLATE_ID }).lean();
+export async function templateToken(role: DemoRole, studentNumber?: number) {
+  // Students 2-6 of the template class, to add their work too.
+  const email = role === 'student' && studentNumber && studentNumber > 1 ? `student${studentNumber}@${DEMO_TEMPLATE_ID}.demo.enara.test` : DEMO_TEMPLATE_EMAILS[role];
+  const user = await User.findOne({ email, institutionId: DEMO_TEMPLATE_ID }).lean();
   if (!user) throw new AppError('Build the demo template first', 404, 'NOT_FOUND');
   return { role, token: tokenFor(user as never) };
 }

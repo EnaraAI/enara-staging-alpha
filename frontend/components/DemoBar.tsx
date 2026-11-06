@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { demoHeartbeat, endDemo, getSessionUser, isDemoSession, switchDemoRole, type DemoRole } from '../services/apiService';
+import { DEMO_CHANGED_EVENT, demoHeartbeat, endDemo, getSessionUser, isDemoSession, switchDemoRole, type DemoRole } from '../services/apiService';
 import { uiRoleFor } from '../services/roleRouting';
 
 // Shown on every screen of a partner demo: which role you're in, switching
@@ -12,7 +12,13 @@ const UI_ROLE_KEY = 'enara_ui_role';
 
 export const DemoBar: React.FC = () => {
   const [busy, setBusy] = useState(false);
-  const demo = isDemoSession();
+  const [demo, setDemo] = useState(isDemoSession);
+  // A demo can start after this bar mounted (one click on the demo page).
+  useEffect(() => {
+    const update = () => setDemo(isDemoSession());
+    window.addEventListener(DEMO_CHANGED_EVENT, update);
+    return () => window.removeEventListener(DEMO_CHANGED_EVENT, update);
+  }, []);
   const role = getSessionUser()?.role as DemoRole | undefined;
 
   useEffect(() => {
