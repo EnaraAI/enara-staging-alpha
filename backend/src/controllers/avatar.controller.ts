@@ -330,25 +330,43 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
 });
 
 // Enara admins only (route): the video tutor's voice catalogue, filtered by a
-// name search and/or accent country (e.g. country=EG for Egyptian voices).
+// search (name, description or tags) and/or accent country (country=EG for
+// Egyptian voices), plus the voices and listening settings in use now.
 export const listAvatarVoices = asyncHandler(async (req: AuthRequest, res: Response) => {
   const anam = requireAnam();
   const search = typeof req.query.search === 'string' ? req.query.search.slice(0, 60) : '';
   const country = typeof req.query.country === 'string' ? req.query.country.toUpperCase().slice(0, 2) : '';
+  const { voiceIdEn, voiceIdAr, voiceIdEnFemale, voiceIdArFemale } = anam;
+  const configured = new Map<string, string>(
+    ([['english', voiceIdEn], ['arabic', voiceIdAr], ['english_woman', voiceIdEnFemale], ['arabic_woman', voiceIdArFemale]] as Array<[string, string | undefined]>)
+      .filter((e): e is [string, string] => Boolean(e[1]))
+      .map(([use, id]) => [id, use]),
+  );
+  const summary = (v: Record<string, unknown>) => ({ id: v.id, name: v.displayName, gender: v.gender, country: v.country, description: v.description, tags: v.displayTags, sample: v.sampleUrl });
+  const inUse: Array<Record<string, unknown>> = [];
   const voices: Array<Record<string, unknown>> = [];
   for (let page = 1; page <= 10; page++) {
-    const qs = new URLSearchParams({ page: String(page), perPage: '100', ...(search ? { search } : {}) });
+    const qs = new URLSearchParams({ page: String(page), perPage: '100' });
     const r = await fetch(`https://api.anam.ai/v1/voices?${qs}`, { headers: { Authorization: `Bearer ${anam.apiKey}` }, signal: AbortSignal.timeout(15_000) });
     if (!r.ok) throw new AppError('Could not list voices', 502, 'AVATAR_UNAVAILABLE');
     const data = (await r.json()) as { data?: Array<Record<string, unknown>>; meta?: { lastPage?: number } };
     for (const v of data.data ?? []) {
+      // The voices the tutor uses now, whatever the filter.
+      const use = configured.get(String(v.id));
+      if (use) inUse.push({ use, ...summary(v) });
       if (country && String(v.country ?? '').toUpperCase() !== country) continue;
-      voices.push({ id: v.id, name: v.displayName, gender: v.gender, country: v.country, description: v.description, tags: v.displayTags, sample: v.sampleUrl });
+      const text = `${v.displayName ?? ''} ${v.description ?? ''} ${(v.displayTags as string[] | undefined)?.join(' ') ?? ''}`.toLowerCase();
+      if (search && !text.includes(search.toLowerCase())) continue;
+      voices.push(summary(v));
     }
     if (!data.meta?.lastPage || page >= data.meta.lastPage) break;
   }
-  const { voiceIdEn, voiceIdAr, voiceIdEnFemale, voiceIdArFemale } = anam;
-  res.json({ current: { voiceIdEn, voiceIdAr, voiceIdEnFemale: voiceIdEnFemale ?? null, voiceIdArFemale: voiceIdArFemale ?? null }, voices });
+  res.json({
+    current: { voiceIdEn, voiceIdAr, voiceIdEnFemale: voiceIdEnFemale ?? null, voiceIdArFemale: voiceIdArFemale ?? null },
+    inUse,
+    listening: { arabic: anamPersonaConfig({ serverVoice: false, language: 'arabic', avatarId: anam.avatarId, anam }), english: anamPersonaConfig({ serverVoice: false, language: 'english', avatarId: anam.avatarId, anam }) },
+    voices,
+  });
 });
 
 export const switchAvatarLanguage = asyncHandler(async (req: AuthRequest, res: Response) => {

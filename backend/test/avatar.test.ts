@@ -841,6 +841,7 @@ describe('voice fallback to the video tutor (Egyptian learners)', () => {
         ? new Response(JSON.stringify({ data: [
             { id: 'v-eg', displayName: 'Salma', gender: 'FEMALE', country: 'EG' },
             { id: 'v-gb', displayName: 'Lucy', gender: 'FEMALE', country: 'GB' },
+            { id: 'voice-ar', displayName: 'Current Arabic', gender: 'MALE', country: 'SA' },
           ], meta: { lastPage: 1 } }), { status: 200 })
         : new Response('{}', { status: 404 }),
     );
@@ -850,5 +851,7 @@ describe('voice fallback to the video tutor (Egyptian learners)', () => {
     expect(res.status, JSON.stringify(res.body)).toBe(200);
     expect(res.body.voices.map((v: { id: string }) => v.id)).toEqual(['v-eg']);
     expect(res.body.current).toMatchObject({ voiceIdAr: 'voice-ar', voiceIdEn: 'voice-en' });
+    expect(res.body.inUse).toEqual([expect.objectContaining({ use: 'arabic', id: 'voice-ar', country: 'SA' })]);
+    expect(res.body.listening.arabic).toMatchObject({ languageCode: 'ar', voiceDetectionOptions: { sttProvider: 'anam' } });
   });
 });
