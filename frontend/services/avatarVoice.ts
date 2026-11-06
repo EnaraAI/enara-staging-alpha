@@ -29,6 +29,9 @@ export interface VoiceCallbacks {
   onInterrupt?(): void;
   // Speech that came back in neither English nor Arabic: ask again, don't answer it.
   onNotCaught?(): void;
+  // ENARA's voice was refused (account blocked or out of credit): the call
+  // switches to the video tutor's own voice.
+  onVoiceUnavailable?(): void;
   onError(message: string): void;
 }
 
@@ -259,6 +262,10 @@ export class AvatarVoice {
 
   private async play(audio: Promise<Response>, generation: number): Promise<void> {
     const res = await audio;
+    if (res.status === 503) {
+      const body = await res.clone().json().catch(() => null);
+      if (body?.error?.code === 'AVATAR_VOICE_UNAVAILABLE') this.callbacks.onVoiceUnavailable?.();
+    }
     if (!res.ok || !res.body || this.stopped || generation !== this.generation) return;
     const reader = res.body.getReader();
     await this.playChunks(

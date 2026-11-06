@@ -96,7 +96,11 @@ export interface AppConfig {
     sttModel: string;
     examSttModel: string;
   };
-  anam?: { apiKey: string; avatarId: string; voiceIdEn: string; voiceIdAr: string };
+  anam?: {
+    apiKey: string; avatarId: string; voiceIdEn: string; voiceIdAr: string;
+    // Optional women's voices for faces that are women (else the voices above).
+    voiceIdEnFemale?: string; voiceIdArFemale?: string;
+  };
   // Owner-approved cost ceilings for services without a catalogue price
   // (P22). Unset = the service refuses to start (fail closed).
   unpricedLimits: {
@@ -311,7 +315,11 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     voiceIdAr: readString(source, "ANAM_VOICE_ID_AR"),
   };
   const anam = Object.values(anamValues).every(Boolean)
-    ? (anamValues as { apiKey: string; avatarId: string; voiceIdEn: string; voiceIdAr: string })
+    ? {
+        ...(anamValues as { apiKey: string; avatarId: string; voiceIdEn: string; voiceIdAr: string }),
+        voiceIdEnFemale: readString(source, "ANAM_VOICE_ID_EN_FEMALE") || undefined,
+        voiceIdArFemale: readString(source, "ANAM_VOICE_ID_AR_FEMALE") || undefined,
+      }
     : undefined;
 
   // ElevenLabs voice for the live avatar: real-time transcription in the browser

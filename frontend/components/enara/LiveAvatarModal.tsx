@@ -98,6 +98,15 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const switchAnamLanguageRef = useRef<(target: string) => Promise<void>>(async () => {});
   // Restarts the call after a dropped connection; set once `start` exists.
   const restartRef = useRef<() => Promise<void>>(async () => {});
+  // Once per call: restart it so the server hands back the video tutor's own
+  // voice and listening (it has marked ENARA's voice as refused).
+  const voiceSwitchedRef = useRef(false);
+  const switchToAvatarVoice = useCallback(() => {
+    if (voiceSwitchedRef.current || closingRef.current) return;
+    voiceSwitchedRef.current = true;
+    setStatus('Switching voice…');
+    void restartRef.current();
+  }, []);
   const reconnectsRef = useRef<number[]>([]);
   const speechModeRef = useRef<'anam' | 'elevenlabs'>('anam');
   const voiceRef = useRef<AvatarVoice | null>(null);
@@ -177,6 +186,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   }, []);
 
   const resetUi = useCallback(() => {
+    voiceSwitchedRef.current = false;
     setProvider(null);
     setTavusUrl(null);
     setArtifactHtml(null);
@@ -339,6 +349,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       inlineSentences.forEach((sentence) => sentence.end());
       inlineSentences.clear();
     };
+    let voiceDown = false;
     try {
       const res = await avatarFetch('/query-stream', {
         method: 'POST',
@@ -361,6 +372,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         }
         if (inline && typeof data.say === 'string') inlineSentences.set(data.s, voice.sayInline(data.say));
         if (inline && typeof data.audio === 'string') inlineSentences.get(data.s)?.push(decodeBase64(data.audio));
+        if (data.voice === 'unavailable') voiceDown = true;
         if (inline && typeof data.said === 'number') {
           inlineSentences.get(data.said)?.end();
           inlineSentences.delete(data.said);
@@ -382,6 +394,12 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       }
       handleLine(buffer);
       endInline();
+      // ENARA's voice was refused: carry on with the video tutor's voice.
+      if (voiceDown) {
+        if (reply) voiceHistoryRef.current = [...messages, { role: 'assistant' as const, content: reply }].slice(-12);
+        switchToAvatarVoice();
+        return;
+      }
       if (!inline) for (const sentence of splitter.flush()) voice.say(sentence);
       if (reply) voiceHistoryRef.current = [...messages, { role: 'assistant' as const, content: reply }].slice(-12);
       await voice.finishTurn();
@@ -405,7 +423,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       endInline();
       if (current()) setStatus('Listening…');
     }
-  }, [clearSilenceTimer]);
+  }, [clearSilenceTimer, switchToAvatarVoice]);
 
   useEffect(() => {
     answerSpokenTurnRef.current = answerSpokenTurn;
@@ -431,6 +449,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       // The student is talking: no nudge.
       onHearing: () => clearSilenceTimer(),
       onInterrupt: interrupt,
+      onVoiceUnavailable: () => switchToAvatarVoice(),
       onError: (message) => setError(message),
     });
     voiceRef.current = voice;
@@ -445,7 +464,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         console.error('[AVATAR] Voice start failed', e);
         setError('Microphone permission is required for the live tutor.');
       });
-  }, [answerSpokenTurn, clearSilenceTimer]);
+  }, [answerSpokenTurn, clearSilenceTimer, switchToAvatarVoice]);
 
   // The video avatar refused the call: carry on as a voice-only tutor.
   const startVoiceOnly = useCallback(async () => {
