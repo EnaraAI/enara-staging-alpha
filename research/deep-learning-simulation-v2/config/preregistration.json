@@ -5,14 +5,42 @@
   "design": "Crossed balanced design: each AI student studies 6 outcomes (one per skill area), each in a different one of 6 conditions (Latin-square rotation, seeded). Unit of analysis: student (paired differences). Replications are independent runs with independent seeds; each student x outcome block is used once per replication (no pseudoreplication). Pre-test, immediate post-test, novel-situation transfer, simulated delayed retention (1, 7, 30 days).",
   "primaryOutcome": "Immediate learning gain (post - pre proportion correct on independent deterministic assessments), ENARA (A) minus no-teaching control (F).",
   "confirmatory": [
-    { "a": "A", "b": "F", "measure": "gain" },
-    { "a": "A", "b": "B", "measure": "post" },
-    { "a": "A", "b": "C", "measure": "post" },
-    { "a": "A", "b": "E", "measure": "post" },
-    { "a": "A", "b": "B", "measure": "transfer" }
+    {
+      "a": "A",
+      "b": "F",
+      "measure": "gain"
+    },
+    {
+      "a": "A",
+      "b": "B",
+      "measure": "gain"
+    },
+    {
+      "a": "A",
+      "b": "C",
+      "measure": "gain"
+    },
+    {
+      "a": "A",
+      "b": "E",
+      "measure": "gain"
+    },
+    {
+      "a": "A",
+      "b": "B",
+      "measure": "transfer"
+    }
   ],
-  "secondaryOutcomes": ["transfer", "delayed retention (1/7/30 days)", "mastery rate (outcome-specific criteria)", "misconception recovery", "cost per mastered outcome"],
+  "secondaryOutcomes": [
+    "transfer",
+    "delayed retention (1/7/30 days)",
+    "mastery rate (outcome-specific criteria)",
+    "misconception recovery",
+    "cost per mastered outcome"
+  ],
   "multipleComparisons": "Holm-Bonferroni over the confirmatory family; Benjamini-Hochberg over exploratory contrasts, which are labelled exploratory.",
   "inference": "Two-way (student x outcome) cluster bootstrap 95% CIs; sign-flip permutation tests on per-student differences; Hedges g.",
-  "decisionRules": "A result is reported as supported only if the Holm-adjusted p < 0.05 AND the 95% CI excludes 0. Unfavourable results are reported in full. Failed or incomplete blocks stay in the report."
+  "decisionRules": "A result is reported as supported only if the Holm-adjusted p < 0.05 AND the 95% CI excludes 0. Unfavourable results are reported in full. Failed or incomplete blocks stay in the report.",
+  "amendmentBeforeLock": "Pre-registered before the main experiment (validation campaigns excluded from it). After validation campaign 1-2 showed chance pre-test imbalance between conditions at n=48, comparisons of A with B, C and E use the pre-adjusted gain (post - pre) instead of raw post. The main experiment has not been run when this file is locked.",
+  "analysisUnitNote": "Pre-test is taken before teaching on each block; gains are therefore comparable across blocks."
 }
