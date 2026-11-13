@@ -10,7 +10,7 @@ How to read the marks:
 
 All test results come from **simulated (AI) students**. No real student has used this version yet.
 
-**Important:** everything below applies to the **text chat tutor**. The live avatar uses the same AI model but **not yet** the language-teaching engine or fixes 1–7 (linking is the next task).
+**Chat and live avatar now share one language engine (14 Nov 2026).** Both go through `backend/src/services/languageTurnPipeline.ts`: same teaching context and policy version (`ltc-v1`), same answer-hiding guards, hidden-marker removal, English-only rule, error diagnosis and learner history. The avatar adds only a thin voice layer (short spoken sentences, no lists or markdown). Tests (`backend/test/avatarLanguageLink.test.ts`) fail if either channel stops using the shared pipeline. **Trade-off:** for language courses the avatar waits for the whole reply before speaking, so the answer guards can run first; the first words come a little later than before. Not yet checked with real audio or a real student; the paid voice-vs-chat benchmark used simulated learners and no audio.
 
 ---
 
@@ -62,7 +62,7 @@ All test results come from **simulated (AI) students**. No real student has used
 | Writing (short texts, feedback) | ✅ Yes | 38–48% |
 | Vocabulary | ✅ Yes | 23–29% (the AI grader may be too strict; needs teacher review) |
 | Reading | 🟡 Partly: lessons have no field for a reading text yet | 12–15% (weakest) |
-| Listening / speaking | 🟡 Through ENARA's voice and avatar features, **but the avatar does not yet use the language engine or fixes 1–7** | Not measured |
+| Listening / speaking | 🟡 Through ENARA's voice and avatar features; the avatar now uses the shared language engine (text path tested; audio not tested) | See `docs/benchmarks/language-teaching/` voice-vs-chat report |
 | Pronunciation scoring | ⚪ Provider-neutral interface and Azure adapter rebuilt and tested with a mocked provider; **off** until a supplier, price and audio consent are decided (no student route yet) | Not measured |
 
 ## 5. Does it help students learn?
@@ -95,7 +95,7 @@ All test results come from **simulated (AI) students**. No real student has used
 
 - **r4.4 features (rebuilt 13 Nov):** mistake-cause diagnosis, cross-session learner history (new collection, error types only), transfer checks, and the pronunciation adapter are back in the repository with tests. They have **not yet been measured in a paid run**.
 
-- **Live avatar calls:** use the same AI model but **not** the language-teaching improvements (hint ladder, answer guards, level limits, English-only). Everything measured above is text chat only. Linking is the next task, built so that chat and avatar share one engine and can't drift apart.
+- **Live avatar:** now linked to the shared language engine (see the note at the top). Everything measured in the earlier experiments is text chat only; the avatar was checked with simulated learners and no audio. Real voice quality, latency with the new buffering, and pronunciation are not measured.
 - **Most simulated students keep their mistaken belief after a short lesson.** The tutor helps, but about 7 in 10 still get new questions wrong.
 - **Reading lessons:** there is no proper place for a reading text, and reading is the weakest skill.
 - **Grading reliability:** the two AI graders agree only moderately (κ about 0.2–0.3), so human teacher review is required. The review package exists.

@@ -6,7 +6,7 @@ import path from 'path';
 import type { Outcome } from '../benchmark/schema';
 const BACKEND = path.resolve(__dirname, '../../../../backend');
 
-export interface EnaraEnv { ablate?: string[]; }
+export interface EnaraEnv { ablate?: string[]; voice?: boolean; }
 export class EnaraRuntime {
   private app: any; private M: Record<string, any> = {}; private mongo: any; private mongoose: any; private request: any; private hash = ''; private n = 0;
   private PW = 'research-local-password-1';
@@ -19,16 +19,34 @@ export class EnaraRuntime {
     Object.assign(process.env, {
       NODE_ENV: 'test', MONGODB_URI: this.mongo.getUri(), JWT_SECRET: 'research-local-jwt-secret-32-characters-min', JWT_EXPIRES_IN: '2h', JWT_ISSUER: 'enara-backend', JWT_AUDIENCE: 'enara-platform',
       INGEST_HMAC_SECRET: 'research-local-hmac-secret-32-characters-min', CORS_ALLOWED_ORIGINS: 'http://localhost:5173', AWS_S3_BUCKET: '', TRUST_PROXY: 'false', SERVE_LOCAL_UPLOADS: 'false',
-      ANTHROPIC_API_KEY: apiKey, AI_TEST_SPEND_CAP_USD: '100000', AI_TEST_SPEND_ID: 'research-v2-local', // throwaway DB only; never a production cap
+      ANTHROPIC_API_KEY: apiKey, ANAM_API_KEY: 'anam-stub', ANAM_AVATAR_ID: 'avatar-1', ANAM_VOICE_ID_EN: 'voice-en', ANAM_VOICE_ID_AR: 'voice-ar', AI_TEST_SPEND_CAP_USD: '100000', AI_TEST_SPEND_ID: 'research-v2-local', // throwaway DB only; never a production cap
       ...(env.ablate?.length ? { ENARA_RESEARCH_ABLATE: env.ablate.join(',') } : {}),
     });
-    for (const k of ['ENARA_ORCHESTRATOR_URL', 'ENARA_API_KEY', 'AI_ENGINE_URL', 'ELEVENLABS_API_KEY', 'ANAM_API_KEY', 'DATABASE_URL', 'AI_PAUSED', 'ANTHROPIC_TUTOR_MODEL', 'ANTHROPIC_TUTOR_EFFORT', 'ANTHROPIC_INTENT_MODEL', 'AZURE_SPEECH_KEY']) delete process.env[k];
+    for (const k of ['ENARA_ORCHESTRATOR_URL', 'ENARA_API_KEY', 'AI_ENGINE_URL', 'ELEVENLABS_API_KEY', ...(env.voice ? [] : ['ANAM_API_KEY']), 'DATABASE_URL', 'AI_PAUSED', 'ANTHROPIC_TUTOR_MODEL', 'ANTHROPIC_TUTOR_EFFORT', 'ANTHROPIC_INTENT_MODEL', 'AZURE_SPEECH_KEY']) delete process.env[k];
     const { resetConfigForTests } = await import(path.join(BACKEND, 'src/config/env'));
     resetConfigForTests();
     await this.mongoose.connect(this.mongo.getUri());
     for (const name of ['User', 'Institution', 'CourseInstance', 'Student', 'StudentCredit', 'Batch', 'Curriculum', 'LearningObjective', 'StudentObjectiveMastery', 'StudentMisconception']) this.M[name] = (await import(path.join(BACKEND, `src/models/${name}`)))[name];
     this.app = (await import(path.join(BACKEND, 'src/app'))).createApp();
+    const prev = globalThis.fetch; // third-party Anam only is stubbed; model calls stay real
+    globalThis.fetch = ((u: any, i?: any) => (String(u).startsWith('https://api.anam.ai/') ? Promise.resolve(new Response(JSON.stringify({ sessionToken: 'anam-stub', data: [], meta: { lastPage: 1 } }), { status: 200 })) : prev(u, i))) as typeof fetch;
     this.hash = bcrypt.hashSync(this.PW, 4);
+  }
+  /** Same seeding as openSession, but the learner talks to the LIVE AVATAR route (/api/avatar/query-stream, text path; Anam is stubbed, the model call is real). */
+  async openVoiceSession(o: Outcome, cohort: 'child' | 'teen' | 'adult'): Promise<{ send: (text: string) => Promise<{ reply: string; status: number; meta: unknown }> }> {
+    await this.openSession(o, cohort);
+    const { request, app } = this; const k = String(this.n).padStart(5, '0'); const email = `rs-learner-${k}@research.invalid`;
+    const login = await request(app).post('/api/auth/login').send({ email, password: this.PW }); const auth = `Bearer ${login.body.token}`;
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ course_id: `rs-crs-${k}`, lesson_id: `rs-lsn-${k}`, preferred_language: 'english' });
+    const sid = start.body.session_id; if (!sid) throw new Error(`avatar session failed: HTTP ${start.status} ${JSON.stringify(start.body).slice(0, 200)}`);
+    const coll = this.mongoose.connection.collection('tutor_messages');
+    return { send: async (text: string) => {
+      const r = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: sid, messages: [{ role: 'user', content: text }] }).buffer(true).parse((res: any, cb: any) => { let d = ''; res.on('data', (x: Buffer) => { d += x.toString(); }); res.on('end', () => cb(null, d)); });
+      const reply = String(r.body ?? '').split('\n').filter(Boolean).map((l: string) => { try { return JSON.parse(l); } catch { return {}; } }).filter((e: any) => e.content).map((e: any) => e.content).join('');
+      if (r.status !== 200 || !reply) throw new Error(`avatar route failed: HTTP ${r.status}`);
+      const doc = await coll.find({ sessionId: sid, role: 'ai' }).sort({ timestamp: -1 }).limit(1).toArray();
+      return { reply, status: r.status, meta: doc[0]?.meta ?? null };
+    } };
   }
   async stop(): Promise<void> { await this.mongoose?.disconnect(); await this.mongo?.stop(); }
   /** One synthetic school/class/student/lesson per block; returns a session handle. */

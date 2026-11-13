@@ -20,7 +20,7 @@ Until all three exist, ENARA must not claim the title. Simulated (AI-student) re
 | Grammar teaching quality | About 66 of 120 test conversations meet the bar; level fit 91% |
 | Other skills (vocabulary, reading, writing, conversation) | 12–48% meet the bar; reading weakest |
 | Fixing mistaken beliefs | 28% of simulated students (notes only: 15–20%) |
-| Live avatar | Uses the same AI model, **not** the language engine or fixes 1–7 |
+| Live avatar | **Linked 14 Nov** to the shared language engine; parity tests in place; voice-vs-chat benchmark run with simulated learners (no audio) |
 | Real-student evidence | None yet; pilot protocol written |
 | r4.4 features | Rebuilt 13 Nov (diagnosis, learner history, transfer checks, pronunciation adapter); not yet measured in a paid run |
 
@@ -29,7 +29,7 @@ Until all three exist, ENARA must not claim the title. Simulated (AI-student) re
 | # | Stage | Target (how we will know) |
 |---|---|---|
 | 1 | **Rebuild r4.4 features:** mistake-cause diagnosis, cross-session learner history, transfer checks, pronunciation adapter (off by default) | **Done 13 Nov:** tests pass, in the repository. Paid measurement still to do |
-| 2 | **Link the live avatar** to one shared language engine, with a test that fails if chat and avatar drift apart | Same policy version in both; voice benchmark run |
+| 2 | **Link the live avatar** to one shared language engine, with a test that fails if chat and avatar drift apart | **Done 14 Nov:** same policy version in both, parity tests pass, voice benchmark run (simulated learners, no audio) |
 | 3 | **Teach better:** diagnose the mistake before hinting, fix reading and "why?" answers, rule-in-own-words checks | At least 85% of conversations meet the bar on every skill; at least 50% of simulated students fix their mistaken belief |
 | 4 | **Teacher validation:** teachers review about 30 conversations and sign off the grading rubric | AI grader and teachers agree (κ ≥ 0.6) |
 | 5 | **Learning-outcome experiment** (running now) and its repeats after each major change | Positive simulated signal, three independent campaigns |
