@@ -1,12 +1,12 @@
 # Report 7: Economic efficiency (actual recorded provider cost; unknown cost is reported, never guessed)
 
-Experiment exp5c-main · run exp5c-main-2026-11-13T18-10-05-679Z
+Experiment exp5c-main · run exp5c-main-2026-11-13T18-28-03-299Z
 
 > **SIMULATION ONLY.** Every number below comes from AI-simulated students. It is not evidence that real students learn. Generated from recorded results only.
 
-243 completed blocks, 63 failed/incomplete blocks (failed blocks are listed, never dropped).
+243 completed blocks, 126 failed/incomplete blocks (failed blocks are listed, never dropped).
 
-Total recorded provider cost: **$28.93** over 16997 attempts (405 failed; retry cost $0.03; failed-attempt cost $0.00; **400 attempts with unknown/unpriced cost**).
+Total recorded provider cost: **$28.93** over 17186 attempts (594 failed; retry cost $0.03; failed-attempt cost $0.00; **589 attempts with unknown/unpriced cost**).
 
 | Condition | blocks | tutor calls/block | exposure words/block | cost/block (tutor-side + student) | cost per mastered outcome |
 |---|---|---|---|---|---|

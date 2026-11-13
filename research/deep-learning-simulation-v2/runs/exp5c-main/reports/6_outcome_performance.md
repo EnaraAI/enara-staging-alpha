@@ -1,10 +1,10 @@
 # Report 6: Outcome performance and difficulty
 
-Experiment exp5c-main · run exp5c-main-2026-11-13T18-10-05-679Z
+Experiment exp5c-main · run exp5c-main-2026-11-13T18-28-03-299Z
 
 > **SIMULATION ONLY.** Every number below comes from AI-simulated students. It is not evidence that real students learn. Generated from recorded results only.
 
-243 completed blocks, 63 failed/incomplete blocks (failed blocks are listed, never dropped).
+243 completed blocks, 126 failed/incomplete blocks (failed blocks are listed, never dropped).
 
 | Outcome | area | difficulty | blocks | post (taught A/C/D/E) | post (control F) | gain taught | mastery taught |
 |---|---|---|---|---|---|---|---|
@@ -27,4 +27,4 @@ Experiment exp5c-main · run exp5c-main-2026-11-13T18-10-05-679Z
 
 ## Failure analysis
 
-Taught blocks that did not improve (post ≤ pre): 106 of 203. Failed/incomplete blocks: 63 (r1-S003-VO-02-C: assessment text in outgoing student_teach request: "what is the opposite of hot write one word"; r1-S008-FN-06-B: provider rejected request (400); r1-S009-GR-02-B: provider rejected request (400); r1-S009-VO-02-B: provider rejected request (400); r1-S008-WR-06-B: provider rejected request (400); r1-S009-RD-06-B: provider rejected request (400); r1-S009-WR-02-B: provider rejected request (400); r1-S009-FN-08-B: provider rejected request (400); r1-S009-LS-02-B: provider rejected request (400); r1-S010-GR-06-B: provider rejected request (400)).
+Taught blocks that did not improve (post ≤ pre): 106 of 203. Failed/incomplete blocks: 126 (r1-S003-VO-02-C: assessment text in outgoing student_teach request: "what is the opposite of hot write one word"; r1-S008-FN-06-B: provider rejected request (400); r1-S009-GR-02-B: provider rejected request (400); r1-S009-VO-02-B: provider rejected request (400); r1-S008-WR-06-B: provider rejected request (400); r1-S009-RD-06-B: provider rejected request (400); r1-S009-WR-02-B: provider rejected request (400); r1-S009-FN-08-B: provider rejected request (400); r1-S009-LS-02-B: provider rejected request (400); r1-S010-GR-06-B: provider rejected request (400)).

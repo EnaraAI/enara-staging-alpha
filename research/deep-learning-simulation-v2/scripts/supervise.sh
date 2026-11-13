@@ -10,7 +10,7 @@ while true; do
     alive=1
     if ! pgrep -f "cli.ts run .*$cfg.json" >/dev/null; then
       echo "$(date -u +%FT%TZ) restarting $cfg" >> "$LOG"
-      (cd $REPO/backend && ENARA_KEY_FILE=/home/user/.enara_key setsid nohup npx tsx ../research/deep-learning-simulation-v2/src/cli.ts run ../research/deep-learning-simulation-v2/config/$cfg.json >> /tmp/${cfg}_run.log 2>&1 < /dev/null &)
+      (cd $REPO/backend && RETRY_FAILED=${RETRY_FAILED:-0} ENARA_KEY_FILE=/home/user/.enara_key setsid nohup npx tsx ../research/deep-learning-simulation-v2/src/cli.ts run ../research/deep-learning-simulation-v2/config/$cfg.json >> /tmp/${cfg}_run.log 2>&1 < /dev/null &)
     fi
   done
   [ $alive -eq 0 ] && { echo "$(date -u +%FT%TZ) all finished" >> "$LOG"; exit 0; }

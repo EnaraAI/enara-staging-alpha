@@ -1,10 +1,10 @@
 # Report 6: Outcome performance and difficulty
 
-Experiment exp5b-main · run exp5b-main-2026-11-13T18-10-05-679Z
+Experiment exp5b-main · run exp5b-main-2026-11-13T18-28-03-301Z
 
 > **SIMULATION ONLY.** Every number below comes from AI-simulated students. It is not evidence that real students learn. Generated from recorded results only.
 
-796 completed blocks, 104 failed/incomplete blocks (failed blocks are listed, never dropped).
+796 completed blocks, 208 failed/incomplete blocks (failed blocks are listed, never dropped).
 
 | Outcome | area | difficulty | blocks | post (taught A/C/D/E) | post (control F) | gain taught | mastery taught |
 |---|---|---|---|---|---|---|---|
@@ -27,4 +27,4 @@ Experiment exp5b-main · run exp5b-main-2026-11-13T18-10-05-679Z
 
 ## Failure analysis
 
-Taught blocks that did not improve (post ≤ pre): 319 of 600. Failed/incomplete blocks: 104 (r1-S036-RD-08-B: provider rejected request (400); r1-S034-VO-04-B: provider rejected request (400); r1-S036-WR-06-B: provider rejected request (400); r1-S036-FN-04-B: provider rejected request (400); r1-S035-LS-05-B: provider rejected request (400); r1-S035-VO-02-B: provider rejected request (400); r1-S035-WR-02-B: provider rejected request (400); r1-S036-LS-02-B: provider rejected request (400); r1-S037-GR-04-B: provider rejected request (400); r1-S037-VO-02-B: provider rejected request (400)).
+Taught blocks that did not improve (post ≤ pre): 319 of 600. Failed/incomplete blocks: 208 (r1-S036-RD-08-B: provider rejected request (400); r1-S034-VO-04-B: provider rejected request (400); r1-S036-WR-06-B: provider rejected request (400); r1-S036-FN-04-B: provider rejected request (400); r1-S035-LS-05-B: provider rejected request (400); r1-S035-VO-02-B: provider rejected request (400); r1-S035-WR-02-B: provider rejected request (400); r1-S036-LS-02-B: provider rejected request (400); r1-S037-GR-04-B: provider rejected request (400); r1-S037-VO-02-B: provider rejected request (400)).

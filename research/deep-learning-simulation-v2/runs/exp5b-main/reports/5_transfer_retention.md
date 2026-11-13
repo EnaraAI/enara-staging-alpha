@@ -1,10 +1,10 @@
 # Report 5: Transfer and retention
 
-Experiment exp5b-main · run exp5b-main-2026-11-13T18-10-05-679Z
+Experiment exp5b-main · run exp5b-main-2026-11-13T18-28-03-301Z
 
 > **SIMULATION ONLY.** Every number below comes from AI-simulated students. It is not evidence that real students learn. Generated from recorded results only.
 
-796 completed blocks, 104 failed/incomplete blocks (failed blocks are listed, never dropped).
+796 completed blocks, 208 failed/incomplete blocks (failed blocks are listed, never dropped).
 
 | Condition | blocks | pre | post | transfer | delayed | mastery | extra |
 |---|---|---|---|---|---|---|---|
