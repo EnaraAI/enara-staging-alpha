@@ -278,6 +278,8 @@ export interface LanguageTeachingContext {
   parts?: { stable: string; dynamic: string };
   // v2 (memory): the moves of the previous tutor turn, so a later independent success can be credited to the explanation style that preceded it.
   prevMoves?: string[];
+  // v2 (arbitration): primary method of the active teaching plan.
+  planPrimary?: string;
   prompt: string;
 }
 
@@ -1095,6 +1097,9 @@ const WHY_ASK = /\b(why|which part|what'?s wrong|what is wrong)\b|ليه|ازا�
 // Fix 5: hints alone left most simulated learners with their wrong belief. After the
 // second miss on an item the tutor teaches the rule clearly (the item's answer stays
 // hidden); after a success that followed a miss it ends with a one-line rule summary.
+export const EXPLICIT_METHODS = ['direct_instruction', 'worked_example'];
+export const ARBITRATION_LINE = 'Order of authority for this reply: (1) the answer-hiding rules and the support level in this block decide what may be revealed and when; (2) the teaching plan decides how you explain (modelling, questions, examples); (3) base style. When the plan says to model or demonstrate, use a new example built from words that appear in no lesson exercise, never the open exercise; model on the learner\'s own attempt only after they have tried. When the plan says to ask questions, ask no more than the support level allows.';
+export const EXPLICIT_FIRST_LINE = 'The teaching plan calls for explicit instruction for this learner (their record shows the skill is still emerging). For this reply only, this replaces the "no rule, no reminder and no example before their first try" rule: before the exercise you may give a two-sentence rule and one modelled example made of words that appear in no lesson exercise, then present the exercise exactly as written. Never show the exercise\'s answer or its target form.';
 export const HOLD_LINE = 'If they insist on a mistaken idea, never call it fine, acceptable or "a fair point". Say in one sentence where the idea is true and where it is not, and keep the correction.';
 export const beliefShift = (belief: string) => `They have now shown the same mistaken idea in more than one turn: "${belief.replace(/["<>]/g, '')}". Stop asking the same kind of hint question. In two short sentences give the scope rule (where the idea applies and where it does not), give one contrast example using words not in any open exercise, then ask them to apply it to their open task in their own words. Never write the corrected form of the open task.`;
 export const TEACH_RULE_V2 = 'Their earlier attempt on this item was wrong. If this new answer is still wrong, stop hinting: name their idea in one short line (e.g. "You are using X here"), state the rule clearly in one or two short sentences, show one worked example with a different word (not this item\'s answer), then ask them to try this item again. If this new answer is right, confirm it and do not teach the rule.';
@@ -1246,6 +1251,10 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     if (stage === 'teach_rule' && !researchAblated('teach_rule')) out.push(`- ${engineV2('wrongAnswer') ? TEACH_RULE_V2 : TEACH_RULE}`);
     else if (stage !== 'teach_rule' && s.whyAfterAttempt) out.push(`- ${WHY_AFTER_ATTEMPT}`);
     if (!researchAblated('hint_ladder')) out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? '') })}`, `- ${SUPPORT_PRECEDENCE}`);
+  }
+  if (engineV2('arbitration') && ctx.planPrimary) {
+    out.push(`- ${ARBITRATION_LINE}`);
+    if (EXPLICIT_METHODS.includes(ctx.planPrimary) && ctx.moves.some((m) => m.id === 'present_lesson_item')) out.push(`- ${EXPLICIT_FIRST_LINE}`);
   }
   if (ctx.research) {
     const r = ctx.research;
@@ -1562,6 +1571,8 @@ export async function buildLanguageTeachingContext(params: {
   history: Turn[];
   hintsOnly?: boolean;
   masteryStatus?: string;
+  // v2 (arbitration): the primary method of the teaching plan for this turn (ped-v2), if one is active.
+  planPrimary?: string;
 }): Promise<LanguageTeachingContext | null> {
   try {
     if (!params.curriculumId) return null;
@@ -1600,7 +1611,7 @@ export async function buildLanguageTeachingContext(params: {
     const history = researchAblated('learner_history') ? [] : await loadProfileLines(params.institutionId, params.studentId, { opening: !params.history.some((h) => h.role === 'user') });
     const research = researchImproved('closing') || researchImproved('strategy') || researchImproved('coverage') ? researchSignals(params.history, signals, lesson.spec) : undefined;
     const prevTurn = [...params.history].reverse().find((h) => h.role === 'assistant')?.languageTurn as { moves?: string[] } | null | undefined;
-    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}) } as const;
+    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}) } as const;
     const parts = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
     return { ...base, ...(parts ? { parts } : {}), prompt: renderLanguageContextPrompt(base) };
   } catch (error) {

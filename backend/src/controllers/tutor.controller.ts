@@ -5,7 +5,7 @@ import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSo
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
 import { type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
 import { engineV2 } from '../services/engineV2';
-import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom } from '../services/languageTurnPipeline'; // shared with the live avatar
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
 import {
   curriculumFromCourse,
@@ -307,6 +307,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     history: languageHistory,
     hintsOnly: tutorPolicy.policy === 'hints_only',
     masteryStatus: turn.plan?.masteryStatus,
+    planPrimary: turn.plan?.teaching.primary,
   }, 'chat'))?.context ?? null;
   if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language) {
     turn.orchestrator = {
@@ -333,7 +334,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
       history,
       teachingMethod: method,
       curriculum,
-      pedagogy: [turn.plan?.prompt, ...extraRules].filter(Boolean).join('\n\n') || undefined,
+      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
       planActive: Boolean(turn.plan),
       sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
       ...(engineV2('cache') && turn.language?.parts ? { languageContextStable: turn.language.parts.stable, languageContextDynamic: turn.language.parts.dynamic } : { languageContext: turn.language?.prompt }),

@@ -3,7 +3,7 @@ import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandof
 import { SentenceSplitter } from '../services/sentenceSplitter';
 import { TutorSession } from '../models/TutorSession';
 import { appendTutorMessages, loadTutorMessages } from '../services/tutorMessages';
-import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, LANGUAGE_POLICY_VERSION } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, LANGUAGE_POLICY_VERSION } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
 import { AssessmentMarkerFilter, filterSummary, type StrippedReply } from '../services/languageLearningState';
 import { generateMessageId } from '../utils/idGenerator';
 import { randomUUID } from 'crypto';
@@ -606,7 +606,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   // The engine reads stored turn state, so it gets the stored history (chat and voice turns alike), not the browser's copy.
   const storedHistory = session.studentId && session.courseId ? languageHistoryFrom((await loadTutorMessages({ id: session.id, studentId: session.studentId } as never).catch(() => [])) as { role: string; text: string; meta?: unknown }[]) : [];
   const languagePrep = session.studentId && course.curriculumId
-    ? await prepareLanguageContext({ institutionId: session.institutionId, curriculumId: course.curriculumId, lessonId: session.lessonId, studentId: session.studentId, sessionId: session.id, courseId: session.courseId, message: last?.content ?? '', history: storedHistory, hintsOnly: tutorPolicy.policy === 'hints_only', masteryStatus: plan?.masteryStatus }, 'voice').catch((error) => { logger.warn('avatar_language_context_failed', { error: serializeError(error) }); return null; })
+    ? await prepareLanguageContext({ institutionId: session.institutionId, curriculumId: course.curriculumId, lessonId: session.lessonId, studentId: session.studentId, sessionId: session.id, courseId: session.courseId, message: last?.content ?? '', history: storedHistory, hintsOnly: tutorPolicy.policy === 'hints_only', masteryStatus: plan?.masteryStatus, planPrimary: plan?.teaching.primary }, 'voice').catch((error) => { logger.warn('avatar_language_context_failed', { error: serializeError(error) }); return null; })
     : null;
 
   const lessonTitle =
@@ -760,7 +760,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       curriculum,
       mode: 'voice',
       learner: learner ? describeSnapshot(learner) : undefined,
-      pedagogy: [plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined,
+      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
       ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: languagePrep.parts.dynamic } : { languageContext: languagePrep?.prompt }),
     });

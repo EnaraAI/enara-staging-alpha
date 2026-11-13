@@ -7,6 +7,7 @@ import {
   type LanguageTeachingContext, type LanguageTurnEvidence,
 } from './languageTeachingContext';
 import { recordProfileTurn } from './learnerLanguageProfile';
+import { engineV2 } from './engineV2';
 import { stripPreAttemptModels, stripCopyReadyModels, type StrippedReply } from './languageLearningState';
 
 export type LanguageChannel = 'chat' | 'voice';
@@ -71,4 +72,12 @@ export function languageHistoryFrom(earlier: { role: string; text: string; meta?
     role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant', content: m.text,
     languageTurn: (m as { meta?: { languageTurn?: LanguageTurnEvidence } }).meta?.languageTurn ?? null,
   }));
+}
+
+/** v2 (arbitration): in a language lesson the teaching plan decides HOW to explain, the language engine decides WHAT may be revealed and when.
+ *  The plan text says "if methods disagree, follow the teaching method above", which contradicts the engine's own precedence line; this replaces it. */
+export const ARBITRATED_CONFLICT_LINE = '- If methods disagree, the language lesson rules in the language context (answer-hiding, support level, one step per reply) win; the teaching method above decides how you explain.';
+export function arbitratePedagogy(pedagogy: string | undefined, hasLanguageContext: boolean): string | undefined {
+  if (!pedagogy || !hasLanguageContext || !engineV2('arbitration')) return pedagogy;
+  return pedagogy.replace(/- If methods disagree[^\n]*/g, ARBITRATED_CONFLICT_LINE);
 }

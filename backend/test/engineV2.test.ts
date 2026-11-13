@@ -153,3 +153,32 @@ describe('v2 through the route', () => {
     delete process.env.ENARA_ENGINE_V2; const off = await request(app).get('/api/me/tutor/reviews/due').set('Authorization', tokens.two); expect(off.body.due).toEqual([]);
   }, 60_000);
 });
+
+import { arbitratePedagogy, ARBITRATED_CONFLICT_LINE } from '../src/services/languageTurnPipeline';
+import { ARBITRATION_LINE, EXPLICIT_FIRST_LINE } from '../src/services/languageTeachingContext';
+describe('item 5: arbitration between the teaching plan (how to explain) and the language engine (what may be revealed)', () => {
+  const PLAN = '- Teaching method: Direct Instruction. Teach one idea at a time; model one complete example aloud.\n- Feedback: say what is right.\n- If methods disagree (for example on giving answers or how many questions to ask), follow the teaching method above.';
+  const withPlan = (planPrimary: string | undefined, message: string, history: HistoryTurn[]) => { const b = build(message, history); const ctx = { ...b.ctx, ...(planPrimary ? { planPrimary } : {}) }; return renderLanguageContextPrompt(ctx); };
+  it('is named-only: "all" does not turn it on, so earlier preregistered runs keep their meaning', () => {
+    process.env.ENARA_ENGINE_V2 = 'all'; expect(engineV2('arbitration')).toBe(false); expect(engineV2('wrongAnswer')).toBe(true);
+    process.env.ENARA_ENGINE_V2 = 'arbitration'; expect(engineV2('arbitration')).toBe(true); expect(engineV2('belief')).toBe(false);
+  });
+  it('off: nothing changes (no authority line, plan text untouched)', () => {
+    delete process.env.ENARA_ENGINE_V2; expect(withPlan('direct_instruction', 'Can you give me one exercise?', [])).not.toContain(ARBITRATION_LINE); expect(arbitratePedagogy(PLAN, true)).toBe(PLAN);
+  });
+  it('on: the language prompt states the order of authority, and the plan\'s contradictory "methods disagree" line is replaced (language lessons only)', () => {
+    process.env.ENARA_ENGINE_V2 = 'arbitration'; expect(withPlan('formative_feedback', 'Can you give me one exercise?', [])).toContain(ARBITRATION_LINE);
+    const out = arbitratePedagogy(PLAN, true)!; expect(out).toContain(ARBITRATED_CONFLICT_LINE); expect(out).not.toMatch(/follow the teaching method above/); expect(out).toContain('model one complete example aloud'); // the method itself is kept
+    expect(arbitratePedagogy(PLAN, false)).toBe(PLAN); // non-language turns are untouched
+  });
+  it('explicit-instruction plans may give a short rule and an unrelated modelled example before the first try; other plans keep try-first', () => {
+    process.env.ENARA_ENGINE_V2 = 'arbitration';
+    const explicit = withPlan('direct_instruction', 'Can you give me one exercise?', []); expect(explicit).toContain(EXPLICIT_FIRST_LINE); expect(EXPLICIT_FIRST_LINE).toMatch(/words that appear in no lesson exercise/); expect(EXPLICIT_FIRST_LINE).toMatch(/Never show the exercise's answer or its target form/);
+    expect(withPlan('worked_example', 'Can you give me one exercise?', [])).toContain(EXPLICIT_FIRST_LINE);
+    expect(withPlan('socratic_questioning', 'Can you give me one exercise?', [])).not.toContain(EXPLICIT_FIRST_LINE); expect(withPlan('mastery_learning', 'Can you give me one exercise?', [])).not.toContain(EXPLICIT_FIRST_LINE);
+    expect(withPlan(undefined, 'Can you give me one exercise?', [])).not.toContain(ARBITRATION_LINE); // no plan: nothing to arbitrate
+  });
+  it('the pre-attempt guard wording is still in the prompt alongside the override (nothing is removed)', () => {
+    process.env.ENARA_ENGINE_V2 = 'arbitration'; expect(withPlan('direct_instruction', 'Can you give me one exercise?', [])).toMatch(/no rule, no reminder and no example before their first try/i);
+  });
+});
