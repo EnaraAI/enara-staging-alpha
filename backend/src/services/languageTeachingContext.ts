@@ -1165,6 +1165,11 @@ export function criteriaLines(criteria: string[] | undefined, learning?: Learnin
 
 const SUPPORT_MOVES: MoveId[] = ['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning'];
 
+// Research-only ablation switch (default OFF; ignored in production). ENARA_RESEARCH_ABLATE="diagnosis,hint_ladder,..." removes the named
+// adaptive-teaching instruction from the tutor prompt so the learning-simulation study can measure its contribution (condition E).
+// Features: diagnosis, hint_ladder, teach_rule, rule_check, learner_history, transfer_check.
+export const researchAblated = (feature: string): boolean => process.env.NODE_ENV !== 'production' && (process.env.ENARA_RESEARCH_ABLATE ?? '').split(',').map((x) => x.trim()).includes(feature);
+
 // r4: what the engine knows about the open task, its answer and the next step.
 function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   const s = ctx.signals;
@@ -1174,9 +1179,9 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (s.answeringCheck && s.activeLessonItem) out.push(`- The open task is lesson item [${s.activeLessonItem.id}]: ${untrusted(s.activeLessonItem.prompt)}`);
   if (s.keyVerdict && isSuccess(s.keyVerdict)) out.push('- Their answer matches the course\'s accepted answer for this item: confirm it as correct (mention a capital-letter or punctuation slip in a few words at most).');
   if (supportStage(s) === 'summarise') out.push(`- ${RULE_SUMMARY}`);
-  if (s.ruleStatement) out.push(`- ${RULE_CHECK}`);
-  if (s.diagnosis) out.push(`- ${diagnosisLine(s.diagnosis)}`);
-  if (L && Object.keys(L.criteria).length) out.push('- Don\'t re-test a success criterion they have already shown on their own in two different tasks; work on the ones not shown yet. A criterion shown on their own only once needs one more unaided check in a new context (a different word or situation, with no model of the answer next to it).');
+  if (s.ruleStatement && !researchAblated('rule_check')) out.push(`- ${RULE_CHECK}`);
+  if (s.diagnosis && !researchAblated('diagnosis')) out.push(`- ${diagnosisLine(s.diagnosis)}`);
+  if (L && Object.keys(L.criteria).length && !researchAblated('transfer_check')) out.push('- Don\'t re-test a success criterion they have already shown on their own in two different tasks; work on the ones not shown yet. A criterion shown on their own only once needs one more unaided check in a new context (a different word or situation, with no model of the answer next to it).');
   if (s.learnerIntent === 'PARTIAL_ANSWER_ATTEMPT' && s.answeringCheck) out.push(`- ${WHY_PROBE}`);
   if (s.answeringCheck || s.unpromptedSentence) {
     const assisted = (L?.hintTurnsOnItem ?? 0) > 0;
@@ -1195,9 +1200,9 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     const stage = supportStage(s);
     // Fix 5: teaching the rule after two misses is the worked-example level (item answer still hidden).
     const level = ctx.moves.some((m) => m.id === 'answer_with_reasoning') ? 6 : stage === 'teach_rule' ? Math.max(5, s.hintLevel) : s.hintLevel;
-    if (stage === 'teach_rule') out.push(`- ${TEACH_RULE}`);
-    else if (s.whyAfterAttempt) out.push(`- ${WHY_AFTER_ATTEMPT}`);
-    out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? '') })}`, `- ${SUPPORT_PRECEDENCE}`);
+    if (stage === 'teach_rule' && !researchAblated('teach_rule')) out.push(`- ${TEACH_RULE}`);
+    else if (stage !== 'teach_rule' && s.whyAfterAttempt) out.push(`- ${WHY_AFTER_ATTEMPT}`);
+    if (!researchAblated('hint_ladder')) out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? '') })}`, `- ${SUPPORT_PRECEDENCE}`);
   }
   return out;
 }
@@ -1497,7 +1502,7 @@ export async function buildLanguageTeachingContext(params: {
     // r2: a clarification-only turn is one short question, so a tighter target.
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
     const length = clarifyOnly ? { targetWords: Math.min(base0.targetWords, 40), maxWords: Math.min(base0.maxWords, 60), basis: `${base0.basis}:clarify` } : base0;
-    const history = await loadProfileLines(params.institutionId, params.studentId);
+    const history = researchAblated('learner_history') ? [] : await loadProfileLines(params.institutionId, params.studentId);
     const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}) } as const;
     return { ...base, prompt: renderLanguageContextPrompt(base) };
   } catch (error) {

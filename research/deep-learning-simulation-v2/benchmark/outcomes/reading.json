@@ -1,0 +1,2723 @@
+{
+ "outcomes": [
+  {
+   "id": "RD-01",
+   "area": "reading",
+   "title": "Finding a specific detail (name, number, time)",
+   "objective": "Find a name, number, colour or time in a very short text by matching the question word to the right detail.",
+   "prerequisites": [
+    "Knows numbers 1-20",
+    "Knows basic colours and times"
+   ],
+   "difficulty": 1,
+   "cefr": "A1",
+   "modality": "text",
+   "audioListening": false,
+   "misconceptions": [
+    {
+     "id": "RD-01-M1",
+     "description": "Picks any detail from the text instead of the one the question asks for",
+     "exampleWrong": "Q: What colour? A: ten"
+    },
+    {
+     "id": "RD-01-M2",
+     "description": "Mixes up two numbers or names in the same text",
+     "exampleWrong": "Q: How old? A: the number of the house"
+    }
+   ],
+   "teachingSuccessCriteria": [
+    "Uses the question word (what, how many, what time) to choose the detail",
+    "Copies the exact word or number from the text"
+   ],
+   "mastery": {
+    "postMinCorrect": 1,
+    "transferMinCorrect": 0.5
+   },
+   "lesson": {
+    "title": "Maria and her cat",
+    "objective": "Find a name, number, colour or time in a very short text by matching the question word to the right detail.",
+    "spec": {
+     "objectives": [
+      "Find a name, number, colour or time in a very short text by matching the question word to the right detail."
+     ],
+     "successCriteria": [
+      "Matches the question word to the detail",
+      "Answers with the exact word or number"
+     ],
+     "vocabulary": [
+      "colour",
+      "how many",
+      "what time",
+      "name"
+     ],
+     "grammar": [],
+     "functions": [
+      "finding information"
+     ],
+     "skills": [
+      "reading"
+     ],
+     "examples": [
+      "Question: How old is Maria? Look for a number.",
+      "Question: What is the cat called? Look for a name."
+     ],
+     "items": [
+      {
+       "id": "p1",
+       "prompt": "What is the cat called?",
+       "material": "Maria is eight. She has a grey cat called Coco. School starts at half past eight.",
+       "acceptedAnswers": [
+        "coco"
+       ],
+       "criteria": [
+        1
+       ]
+      },
+      {
+       "id": "p2",
+       "prompt": "What time does school start?",
+       "material": "Maria is eight. She has a grey cat called Coco. School starts at half past eight.",
+       "acceptedAnswers": [
+        "half past eight",
+        "8 30"
+       ],
+       "criteria": [
+        1,
+        2
+       ]
+      }
+     ]
+    }
+   },
+   "studyNotes": "When you read to find a detail, look at the question word first. What colour? Look for a colour word. How many? Look for a number. What time? Look for a time. Who? Look for a name. Then find that kind of word in the text and copy it. Do not answer with a different detail. Example: Pia has two dogs. The dogs are black. How many dogs? Two. What colour? Black. Read the question again before you answer, and check that your answer is the same kind of word.",
+   "scriptedTutor": {
+    "explanation": "To find a detail, read the question word first. What colour asks for a colour, how many asks for a number, what time asks for a time. Then find that kind of word in the text.",
+    "hints": [
+     "Look at the question word. What kind of word do you need?",
+     "Find a number, a colour or a name in the text that matches the question."
+    ],
+    "correctFeedback": "Yes, that is the right detail.",
+    "incorrectFeedback": "Not quite. Check the question word and look again at the text.",
+    "closing": "Good work. Match the question word to the detail."
+   },
+   "prereqProbe": {
+    "id": "RD-01-PR",
+    "stage": "pre",
+    "prompt": "Which word is a number: bus, seven or red?",
+    "scoring": {
+     "type": "key",
+     "accepted": [
+      "seven"
+     ],
+     "mode": "exact"
+    },
+    "right": [
+     "seven"
+    ],
+    "wrong": [
+     "bus",
+     "red"
+    ]
+   },
+   "items": {
+    "pre": [
+     {
+      "id": "RD-01-PRE1",
+      "stage": "pre",
+      "prompt": "What colour is Tom's bike?",
+      "material": "Tom is ten. He has a red bike and a small dog called Max.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "red"
+       ]
+      },
+      "right": [
+       "red",
+       "It is red."
+      ],
+      "wrong": [
+       "ten",
+       "Max",
+       "blue"
+      ],
+      "misconceptionId": "RD-01-M1"
+     },
+     {
+      "id": "RD-01-PRE2",
+      "stage": "pre",
+      "prompt": "What time does the class finish?",
+      "material": "Anna's class starts at nine o'clock. It finishes at twelve.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "twelve",
+        "12"
+       ]
+      },
+      "right": [
+       "twelve",
+       "12"
+      ],
+      "wrong": [
+       "nine",
+       "9"
+      ],
+      "misconceptionId": "RD-01-M2"
+     }
+    ],
+    "post": [
+     {
+      "id": "RD-01-POST1",
+      "stage": "post",
+      "prompt": "How many sisters does Sam have?",
+      "material": "Sam lives in Leeds. He has two sisters and a brother. His brother is called Jack.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "two",
+        "2"
+       ]
+      },
+      "right": [
+       "two",
+       "2"
+      ],
+      "wrong": [
+       "three",
+       "one",
+       "Jack"
+      ],
+      "misconceptionId": "RD-01-M1"
+     },
+     {
+      "id": "RD-01-POST2",
+      "stage": "post",
+      "prompt": "How much is the soup?",
+      "material": "The Green Cafe opens at eight. It sells tea, cake and soup. Soup costs four pounds.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "four",
+        "4"
+       ]
+      },
+      "right": [
+       "four pounds",
+       "4"
+      ],
+      "wrong": [
+       "eight",
+       "8",
+       "tea"
+      ],
+      "misconceptionId": "RD-01-M2"
+     }
+    ],
+    "transfer": [
+     {
+      "id": "RD-01-TR1",
+      "stage": "transfer",
+      "prompt": "Which day is the pool closed?",
+      "material": "NOTICE. Swimming pool CLOSED on Monday. Open Tuesday to Sunday, 9 to 6. Children under eight must have an adult.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "monday"
+       ]
+      },
+      "right": [
+       "Monday"
+      ],
+      "wrong": [
+       "Tuesday",
+       "Sunday",
+       "eight"
+      ]
+     },
+     {
+      "id": "RD-01-TR2",
+      "stage": "transfer",
+      "prompt": "What time is dinner?",
+      "material": "Text from Mum: Buy milk and eggs. I am at the dentist at four. Dinner is at six.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "six",
+        "6"
+       ]
+      },
+      "right": [
+       "six",
+       "6"
+      ],
+      "wrong": [
+       "four",
+       "4",
+       "milk"
+      ]
+     }
+    ],
+    "delayed": [
+     {
+      "id": "RD-01-D1",
+      "stage": "delayed",
+      "prompt": "What fruit is in the bag?",
+      "material": "Lucy has a green bag. In it she has a book, a pen and an apple.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "apple"
+       ]
+      },
+      "right": [
+       "apple"
+      ],
+      "wrong": [
+       "book",
+       "pen",
+       "green"
+      ]
+     },
+     {
+      "id": "RD-01-D2",
+      "stage": "delayed",
+      "prompt": "Which platform does the train leave from?",
+      "material": "Our train leaves from Platform 5 at 10:30. It arrives in York at noon.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "5",
+        "five"
+       ]
+      },
+      "right": [
+       "5",
+       "five"
+      ],
+      "wrong": [
+       "York",
+       "noon",
+       "10"
+      ]
+     },
+     {
+      "id": "RD-01-D3",
+      "stage": "delayed",
+      "prompt": "How old is Omar?",
+      "material": "My friend Omar is from Egypt. He speaks Arabic and English. He is twenty-two.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "twenty two",
+        "22"
+       ]
+      },
+      "right": [
+       "22",
+       "twenty-two"
+      ],
+      "wrong": [
+       "Egypt",
+       "twenty",
+       "Arabic"
+      ]
+     },
+     {
+      "id": "RD-01-D4",
+      "stage": "delayed",
+      "prompt": "How much is a room for one night?",
+      "material": "The Blue Hotel has 40 rooms. Breakfast is free. A room costs 60 pounds a night.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "60",
+        "sixty"
+       ]
+      },
+      "right": [
+       "60 pounds",
+       "sixty"
+      ],
+      "wrong": [
+       "40",
+       "forty",
+       "free"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "RD-02",
+   "area": "reading",
+   "title": "True, false or not given",
+   "objective": "Decide if a sentence about a short text is true, false or not given, using only what the text says.",
+   "prerequisites": [
+    "Understands simple present sentences",
+    "Knows true and false"
+   ],
+   "difficulty": 2,
+   "cefr": "A1",
+   "modality": "text",
+   "audioListening": false,
+   "misconceptions": [
+    {
+     "id": "RD-02-M1",
+     "description": "Says false when the text does not mention the information",
+     "exampleWrong": "The text does not say it, so it is false."
+    },
+    {
+     "id": "RD-02-M2",
+     "description": "Says true because it seems likely in real life, not because the text says it",
+     "exampleWrong": "Most people have a TV, so true."
+    }
+   ],
+   "teachingSuccessCriteria": [
+    "Says true only when the text says the same thing",
+    "Says false only when the text says the opposite",
+    "Says not given when the text is silent"
+   ],
+   "mastery": {
+    "postMinCorrect": 1,
+    "transferMinCorrect": 0.5
+   },
+   "lesson": {
+    "title": "Pedro's flat",
+    "objective": "Decide if a sentence about a short text is true, false or not given, using only what the text says.",
+    "spec": {
+     "objectives": [
+      "Decide if a sentence about a short text is true, false or not given, using only what the text says."
+     ],
+     "successCriteria": [
+      "Chooses true, false or not given from the text only",
+      "Uses not given when the text does not say"
+     ],
+     "vocabulary": [
+      "true",
+      "false",
+      "not given"
+     ],
+     "grammar": [],
+     "functions": [
+      "checking information"
+     ],
+     "skills": [
+      "reading"
+     ],
+     "examples": [
+      "Text: Ali has a bike. Sentence: Ali has a bike. True.",
+      "Text: Ali has a bike. Sentence: Ali has a car. Not given."
+     ],
+     "items": [
+      {
+       "id": "p1",
+       "prompt": "Is this true, false or not given? \"Pedro has two bedrooms.\"",
+       "material": "Pedro has a small flat. It has one bedroom. He lives alone.",
+       "acceptedAnswers": [
+        "false"
+       ],
+       "criteria": [
+        1
+       ]
+      },
+      {
+       "id": "p2",
+       "prompt": "Is this true, false or not given? \"Pedro has a big TV.\"",
+       "material": "Pedro has a small flat. It has one bedroom. He lives alone.",
+       "acceptedAnswers": [
+        "not given"
+       ],
+       "criteria": [
+        2
+       ]
+      }
+     ]
+    }
+   },
+   "studyNotes": "For true, false or not given, use only the text. TRUE: the text says the same thing. FALSE: the text says something different or the opposite. NOT GIVEN: the text does not say it, so you cannot know. Do not use your own ideas. Example text: Kim has a red car. Kim has a car: true. Kim has a blue car: false. Kim has a big house: not given. If the information is missing, the answer is not given, not false. Always ask: does the text say this?",
+   "scriptedTutor": {
+    "explanation": "Use only the text. If it says the same, the answer is true. If it says something different, the answer is false. If it does not say, the answer is not given.",
+    "hints": [
+     "Find the part of the text about this sentence. Does it say the same or something different?",
+     "If you cannot find the information in the text, what is the answer?"
+    ],
+    "correctFeedback": "Yes, you used the text.",
+    "incorrectFeedback": "Not quite. Go back to the text and check what it says.",
+    "closing": "Good work. Use only the text."
+   },
+   "prereqProbe": {
+    "id": "RD-02-PR",
+    "stage": "pre",
+    "prompt": "Ben has a cat. Is the sentence \"Ben has a cat\" true or false? Reply with one word.",
+    "scoring": {
+     "type": "key",
+     "accepted": [
+      "true"
+     ],
+     "mode": "exact"
+    },
+    "right": [
+     "true"
+    ],
+    "wrong": [
+     "false"
+    ]
+   },
+   "items": {
+    "pre": [
+     {
+      "id": "RD-02-PRE1",
+      "stage": "pre",
+      "prompt": "Read the text. Is this sentence true, false or not given? Reply with one of those. Sentence: \"Rita works in a school.\"",
+      "material": "Rita works in a shop. She starts at nine.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "false"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "false"
+      ],
+      "wrong": [
+       "true",
+       "not given"
+      ],
+      "misconceptionId": "RD-02-M2"
+     },
+     {
+      "id": "RD-02-PRE2",
+      "stage": "pre",
+      "prompt": "Read the text. Is this sentence true, false or not given? Reply with one of those. Sentence: \"Dan plays tennis with his father.\"",
+      "material": "Dan plays tennis on Saturday. He likes it a lot.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "not given"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "not given"
+      ],
+      "wrong": [
+       "false",
+       "true"
+      ],
+      "misconceptionId": "RD-02-M1"
+     }
+    ],
+    "post": [
+     {
+      "id": "RD-02-POST1",
+      "stage": "post",
+      "prompt": "Read the text. Is this sentence true, false or not given? Reply with one of those. Sentence: \"Eva has lunch at home.\"",
+      "material": "Eva has lunch at school. She eats rice and fish.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "false"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "false"
+      ],
+      "wrong": [
+       "true",
+       "not given"
+      ],
+      "misconceptionId": "RD-02-M2"
+     },
+     {
+      "id": "RD-02-POST2",
+      "stage": "post",
+      "prompt": "Read the text. Is this sentence true, false or not given? Reply with one of those. Sentence: \"Leo goes to the park with his friends.\"",
+      "material": "Leo goes to the park on Sundays. He runs and plays football.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "not given"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "not given"
+      ],
+      "wrong": [
+       "false",
+       "true"
+      ],
+      "misconceptionId": "RD-02-M1"
+     }
+    ],
+    "transfer": [
+     {
+      "id": "RD-02-TR1",
+      "stage": "transfer",
+      "prompt": "Read the text. Is this sentence true, false or not given? Reply with one of those. Sentence: \"The library is open on Saturday.\"",
+      "material": "Library. Open Monday to Friday, 10 to 5. Closed at weekends.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "false"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "false"
+      ],
+      "wrong": [
+       "true",
+       "not given"
+      ],
+      "misconceptionId": "RD-02-M2"
+     },
+     {
+      "id": "RD-02-TR2",
+      "stage": "transfer",
+      "prompt": "Read the text. Is this sentence true, false or not given? Reply with one of those. Sentence: \"The room has a kitchen.\"",
+      "material": "Room for rent. Two beds, one bathroom, near the station. 300 pounds a month.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "not given"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "not given"
+      ],
+      "wrong": [
+       "false",
+       "true"
+      ],
+      "misconceptionId": "RD-02-M1"
+     }
+    ],
+    "delayed": [
+     {
+      "id": "RD-02-D1",
+      "stage": "delayed",
+      "prompt": "Read the text. Is this sentence true, false or not given? Reply with one of those. Sentence: \"Zoe has two brothers.\"",
+      "material": "Zoe has two brothers. They live in Paris.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "true"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "true"
+      ],
+      "wrong": [
+       "false",
+       "not given"
+      ]
+     },
+     {
+      "id": "RD-02-D2",
+      "stage": "delayed",
+      "prompt": "Read the text. Is this sentence true, false or not given? Reply with one of those. Sentence: \"The shop is open on Sundays.\"",
+      "material": "The shop sells shoes and bags. It is closed on Sundays.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "false"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "false"
+      ],
+      "wrong": [
+       "true",
+       "not given"
+      ],
+      "misconceptionId": "RD-02-M2"
+     },
+     {
+      "id": "RD-02-D3",
+      "stage": "delayed",
+      "prompt": "Read the text. Is this sentence true, false or not given? Reply with one of those. Sentence: \"Kofi is married.\"",
+      "material": "Kofi is a doctor. He works at night.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "not given"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "not given"
+      ],
+      "wrong": [
+       "false",
+       "true"
+      ],
+      "misconceptionId": "RD-02-M1"
+     },
+     {
+      "id": "RD-02-D4",
+      "stage": "delayed",
+      "prompt": "Read the text. Is this sentence true, false or not given? Reply with one of those. Sentence: \"Mina's aunt gave her the phone.\"",
+      "material": "Mina has a blue phone. It was a present from her aunt.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "true"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "true"
+      ],
+      "wrong": [
+       "false",
+       "not given"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "RD-03",
+   "area": "reading",
+   "title": "Reference words: it, they, them, he, she",
+   "objective": "Say which person or thing a pronoun such as it, they, them, he or she refers to in a short text.",
+   "prerequisites": [
+    "Knows subject and object pronouns",
+    "Knows singular and plural"
+   ],
+   "difficulty": 2,
+   "cefr": "A2",
+   "modality": "text",
+   "audioListening": false,
+   "misconceptions": [
+    {
+     "id": "RD-03-M1",
+     "description": "Chooses the noun nearest to the pronoun without checking",
+     "exampleWrong": "Two apples and a pear... \"them\" = the pear"
+    },
+    {
+     "id": "RD-03-M2",
+     "description": "Ignores number or gender of the pronoun",
+     "exampleWrong": "\"They\" = the puppy"
+    }
+   ],
+   "teachingSuccessCriteria": [
+    "Checks singular/plural and gender of the pronoun",
+    "Finds the noun that matches in the sentence before"
+   ],
+   "mastery": {
+    "postMinCorrect": 1,
+    "transferMinCorrect": 0.5
+   },
+   "lesson": {
+    "title": "Twins and shells",
+    "objective": "Say which person or thing a pronoun such as it, they, them, he or she refers to in a short text.",
+    "spec": {
+     "objectives": [
+      "Say which person or thing a pronoun such as it, they, them, he or she refers to in a short text."
+     ],
+     "successCriteria": [
+      "Matches the pronoun with the right noun",
+      "Checks singular or plural"
+     ],
+     "vocabulary": [
+      "it",
+      "they",
+      "them",
+      "he",
+      "she"
+     ],
+     "grammar": [],
+     "functions": [
+      "following references"
+     ],
+     "skills": [
+      "reading"
+     ],
+     "examples": [
+      "Luca plays the guitar. He plays it every day.",
+      "The twins found two shells. They put them in a bucket."
+     ],
+     "items": [
+      {
+       "id": "p1",
+       "prompt": "Who does \"He\" mean?",
+       "material": "Anna has a brother, Luca. He plays the guitar in a band.",
+       "acceptedAnswers": [
+        "luca"
+       ],
+       "criteria": [
+        1
+       ]
+      },
+      {
+       "id": "p2",
+       "prompt": "Which things are \"them\" in the second sentence?",
+       "material": "The twins found two shells on the beach. They put them in a bucket.",
+       "acceptedAnswers": [
+        "shells",
+        "two shells"
+       ],
+       "criteria": [
+        1,
+        2
+       ]
+      }
+     ]
+    }
+   },
+   "studyNotes": "Reference words stop us repeating nouns. He and she are for one man or one woman. It is for one thing or animal. They and them are for more than one person or thing. To find the meaning, look back at the sentence before. Find a noun that matches the pronoun: one or many, person or thing. Example: Tom bought two books. He read them at night. He means Tom, because Tom is a man. Them means the books, because it is plural. The nearest noun is not always correct.",
+   "scriptedTutor": {
+    "explanation": "A reference word points back to a noun. Check if it is one or many, and a person or a thing. Then find the noun that fits.",
+    "hints": [
+     "Is the pronoun singular or plural?",
+     "Look at the sentence before. Which noun matches?"
+    ],
+    "correctFeedback": "Yes, that noun matches.",
+    "incorrectFeedback": "Not quite. Check if the pronoun is singular or plural, then look back again.",
+    "closing": "Good work. Match the pronoun to the noun."
+   },
+   "prereqProbe": {
+    "id": "RD-03-PR",
+    "stage": "pre",
+    "prompt": "Which word means more than one person: they, she or it?",
+    "scoring": {
+     "type": "key",
+     "accepted": [
+      "they"
+     ],
+     "mode": "exact"
+    },
+    "right": [
+     "they"
+    ],
+    "wrong": [
+     "she",
+     "it"
+    ]
+   },
+   "items": {
+    "pre": [
+     {
+      "id": "RD-03-PRE1",
+      "stage": "pre",
+      "prompt": "What does \"them\" mean?",
+      "material": "Mr Lee bought two apples and a pear. He ate them on the bus.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "apples",
+        "two apples"
+       ]
+      },
+      "right": [
+       "apples",
+       "the two apples"
+      ],
+      "wrong": [
+       "pear",
+       "bus"
+      ],
+      "misconceptionId": "RD-03-M1"
+     },
+     {
+      "id": "RD-03-PRE2",
+      "stage": "pre",
+      "prompt": "What does \"It\" mean?",
+      "material": "My sister gave me a scarf. It was blue and very soft.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "scarf"
+       ]
+      },
+      "right": [
+       "the scarf",
+       "scarf"
+      ],
+      "wrong": [
+       "sister"
+      ],
+      "misconceptionId": "RD-03-M2"
+     }
+    ],
+    "post": [
+     {
+      "id": "RD-03-POST1",
+      "stage": "post",
+      "prompt": "Who is \"She\"?",
+      "material": "Hana and her brother visit their grandmother on Sundays. She makes soup for them.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "grandmother"
+       ]
+      },
+      "right": [
+       "grandmother",
+       "their grandmother"
+      ],
+      "wrong": [
+       "Hana",
+       "brother"
+      ],
+      "misconceptionId": "RD-03-M1"
+     },
+     {
+      "id": "RD-03-POST2",
+      "stage": "post",
+      "prompt": "Who does \"They\" mean?",
+      "material": "The children found a puppy under the car. They gave it some water.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "children"
+       ]
+      },
+      "right": [
+       "the children",
+       "children"
+      ],
+      "wrong": [
+       "puppy",
+       "car"
+      ],
+      "misconceptionId": "RD-03-M2"
+     }
+    ],
+    "transfer": [
+     {
+      "id": "RD-03-TR1",
+      "stage": "transfer",
+      "prompt": "What does \"it\" mean?",
+      "material": "Hi Jo, I sent you the photos and the video yesterday. They are in your inbox. Please watch it before Friday.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "video"
+       ]
+      },
+      "right": [
+       "the video",
+       "video"
+      ],
+      "wrong": [
+       "photos",
+       "inbox"
+      ],
+      "misconceptionId": "RD-03-M1"
+     },
+     {
+      "id": "RD-03-TR2",
+      "stage": "transfer",
+      "prompt": "What does \"them\" mean?",
+      "material": "Put the eggs and the milk in a bowl. Mix them well, then pour everything into a hot pan.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "eggs"
+       ]
+      },
+      "right": [
+       "the eggs and the milk",
+       "eggs"
+      ],
+      "wrong": [
+       "bowl",
+       "pan"
+      ],
+      "misconceptionId": "RD-03-M1"
+     }
+    ],
+    "delayed": [
+     {
+      "id": "RD-03-D1",
+      "stage": "delayed",
+      "prompt": "What does \"It\" mean?",
+      "material": "Our neighbours have a big dog. It barks all night.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "dog"
+       ]
+      },
+      "right": [
+       "dog",
+       "the dog"
+      ],
+      "wrong": [
+       "neighbours",
+       "night"
+      ]
+     },
+     {
+      "id": "RD-03-D2",
+      "stage": "delayed",
+      "prompt": "What does \"it\" mean?",
+      "material": "Pablo and Sara love football. They play it every weekend.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "football"
+       ]
+      },
+      "right": [
+       "football"
+      ],
+      "wrong": [
+       "Sara",
+       "weekend"
+      ]
+     },
+     {
+      "id": "RD-03-D3",
+      "stage": "delayed",
+      "prompt": "Who does \"them\" mean?",
+      "material": "I called my aunt and my cousins. I told them about the party.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "cousins"
+       ]
+      },
+      "right": [
+       "my cousins",
+       "cousins"
+      ],
+      "wrong": [
+       "aunt",
+       "party"
+      ],
+      "misconceptionId": "RD-03-M2"
+     },
+     {
+      "id": "RD-03-D4",
+      "stage": "delayed",
+      "prompt": "What does \"it\" mean?",
+      "material": "The museum has a new robot. Children love it because it can dance.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "robot"
+       ]
+      },
+      "right": [
+       "the robot",
+       "robot"
+      ],
+      "wrong": [
+       "museum",
+       "children"
+      ],
+      "misconceptionId": "RD-03-M1"
+     }
+    ]
+   }
+  },
+  {
+   "id": "RD-04",
+   "area": "reading",
+   "title": "Finding the main idea",
+   "objective": "Choose the sentence that gives the main idea of a short text, not a single detail or an idea that is too general.",
+   "prerequisites": [
+    "Can find the topic of a short text"
+   ],
+   "difficulty": 3,
+   "cefr": "A2",
+   "modality": "text",
+   "audioListening": false,
+   "misconceptions": [
+    {
+     "id": "RD-04-M1",
+     "description": "Chooses a detail from one sentence as the main idea",
+     "exampleWrong": "Picks a true sentence that is only one example"
+    },
+    {
+     "id": "RD-04-M2",
+     "description": "Chooses an idea that is too general and not about this text",
+     "exampleWrong": "Sport is popular"
+    }
+   ],
+   "teachingSuccessCriteria": [
+    "Rejects details that cover only one sentence",
+    "Rejects ideas that are too general",
+    "Chooses the idea that covers the whole text"
+   ],
+   "mastery": {
+    "postMinCorrect": 1,
+    "transferMinCorrect": 0.5
+   },
+   "lesson": {
+    "title": "Penguins",
+    "objective": "Choose the sentence that gives the main idea of a short text, not a single detail or an idea that is too general.",
+    "spec": {
+     "objectives": [
+      "Choose the sentence that gives the main idea of a short text, not a single detail or an idea that is too general."
+     ],
+     "successCriteria": [
+      "Chooses the idea that covers all sentences",
+      "Rejects details and too-general ideas"
+     ],
+     "vocabulary": [
+      "main idea",
+      "detail",
+      "topic"
+     ],
+     "grammar": [],
+     "functions": [
+      "summarising"
+     ],
+     "skills": [
+      "reading"
+     ],
+     "examples": [
+      "A text about penguins keeping warm: main idea = Penguins have ways to stay warm."
+     ],
+     "items": [
+      {
+       "id": "p1",
+       "prompt": "What is the main idea? A) Penguins live in the cold. B) Penguins stand close together to stay warm. C) Animals need heat. Reply with the letter only.",
+       "material": "Penguins stand in big groups when it is very cold. They push close together and take turns standing in the middle. This keeps every bird warm.",
+       "acceptedAnswers": [
+        "b"
+       ],
+       "criteria": [
+        1,
+        2
+       ]
+      },
+      {
+       "id": "p2",
+       "prompt": "What is the main idea? A) Some birds cannot fly. B) Penguins eat fish. C) Penguins swim very well. Reply with the letter only.",
+       "material": "Penguins cannot fly, but they are excellent swimmers. They move fast under water and can dive deep to catch fish.",
+       "acceptedAnswers": [
+        "c"
+       ],
+       "criteria": [
+        1,
+        2
+       ]
+      }
+     ]
+    }
+   },
+   "studyNotes": "The main idea is what the whole text is about. A detail is one small fact. A general idea is too big and could be about many texts. To find the main idea, read the whole text. Ask: what do all the sentences talk about? Check each answer. If it covers only one sentence, it is a detail. If it could fit any text on the topic, it is too general. The best answer covers all the sentences. Example: Sam runs on Monday, swims on Tuesday and cycles on Friday. Main idea: Sam does a lot of sport.",
+   "scriptedTutor": {
+    "explanation": "The main idea covers the whole text. A detail covers one sentence. A general idea is too big. Choose the one that fits all sentences.",
+    "hints": [
+     "Check every sentence. Does the answer cover all of them or just one?",
+     "Is the answer about this text, or could it be about any text on the topic?"
+    ],
+    "correctFeedback": "Yes, that covers the whole text.",
+    "incorrectFeedback": "Not quite. Check if your answer is just a detail or too general.",
+    "closing": "Good work. The main idea covers the whole text."
+   },
+   "prereqProbe": {
+    "id": "RD-04-PR",
+    "stage": "pre",
+    "prompt": "What is this text about? Reply with one word: lions, Africa or food?",
+    "material": "Lions live in Africa. Lions hunt in groups. Lions are big cats.",
+    "scoring": {
+     "type": "key",
+     "accepted": [
+      "lions"
+     ],
+     "mode": "exact"
+    },
+    "right": [
+     "lions"
+    ],
+    "wrong": [
+     "Africa",
+     "food"
+    ]
+   },
+   "items": {
+    "pre": [
+     {
+      "id": "RD-04-PRE1",
+      "stage": "pre",
+      "prompt": "What is the main idea? A) Children in Kenya go to school. B) Kenya has many hills. C) Running is very important in Kenya. Reply with the letter only.",
+      "material": "Many people in Kenya run for a living. Children run to school every day. Kenyan runners win big races because they train in the hills.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "c"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "C"
+      ],
+      "wrong": [
+       "A",
+       "B"
+      ],
+      "misconceptionId": "RD-04-M1"
+     },
+     {
+      "id": "RD-04-PRE2",
+      "stage": "pre",
+      "prompt": "What is the main idea? A) Students should sleep enough to study well. B) Students forget facts. C) Tests are difficult. Reply with the letter only.",
+      "material": "A good night of sleep helps students. Tired students forget facts and make mistakes. Students who sleep eight hours do better in tests.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "a"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "A"
+      ],
+      "wrong": [
+       "B",
+       "C"
+      ],
+      "misconceptionId": "RD-04-M1"
+     }
+    ],
+    "post": [
+     {
+      "id": "RD-04-POST1",
+      "stage": "post",
+      "prompt": "What is the main idea? A) Other bees watch the dance. B) Bees use a dance to share information. C) Insects are interesting animals. Reply with the letter only.",
+      "material": "Honey bees dance to tell friends where flowers are. The dance shows the direction and how far to fly. Other bees watch it and then fly there.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-04-M2"
+     },
+     {
+      "id": "RD-04-POST2",
+      "stage": "post",
+      "prompt": "What is the main idea? A) Cycling is good for people and cities. B) Cleaner air is nice. C) Transport is a big topic. Reply with the letter only.",
+      "material": "More cities now have bike lanes. People who cycle save money and stay fit. Cities also get less traffic and cleaner air.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "a"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "A"
+      ],
+      "wrong": [
+       "B",
+       "C"
+      ],
+      "misconceptionId": "RD-04-M2"
+     }
+    ],
+    "transfer": [
+     {
+      "id": "RD-04-TR1",
+      "stage": "transfer",
+      "prompt": "What is the main idea of this advert? A) The gym is open at night. B) Sunset Gym invites people to join. C) Exercise is healthy. Reply with the letter only.",
+      "material": "Come to Sunset Gym! Open 6 a.m. to midnight. New members get a free month. Classes for all ages.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-04-M1"
+     },
+     {
+      "id": "RD-04-TR2",
+      "stage": "transfer",
+      "prompt": "What is the main idea of this email? A) The repair man comes on Friday. B) Printers are useful. C) Use the third-floor printer while the other is broken. Reply with the letter only.",
+      "material": "Hi team, the printer on floor two is broken. Please use the printer on floor three until Monday. The repair man comes on Friday.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "c"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "C"
+      ],
+      "wrong": [
+       "A",
+       "B"
+      ],
+      "misconceptionId": "RD-04-M1"
+     }
+    ],
+    "delayed": [
+     {
+      "id": "RD-04-D1",
+      "stage": "delayed",
+      "prompt": "What is the main idea? A) Tea is popular in many places. B) People drink tea cold. C) Britain likes tea. Reply with the letter only.",
+      "material": "Tea is the second most popular drink in the world. People drink it hot or cold. In India, China and Britain it is part of daily life.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "a"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "A"
+      ],
+      "wrong": [
+       "B",
+       "C"
+      ]
+     },
+     {
+      "id": "RD-04-D2",
+      "stage": "delayed",
+      "prompt": "What is the main idea? A) Students plant seeds in spring. B) Gardens are green. C) Students grow and eat food in the school garden. Reply with the letter only.",
+      "material": "Our school garden has grown a lot this year. Students plant seeds in spring. In summer they eat the vegetables at lunch.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "c"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "C"
+      ],
+      "wrong": [
+       "A",
+       "B"
+      ]
+     },
+     {
+      "id": "RD-04-D3",
+      "stage": "delayed",
+      "prompt": "What is the main idea? A) Joining a club helps when you are new in a city. B) Moving is hard. C) Clubs are fun. Reply with the letter only.",
+      "material": "Moving to a new city is hard. You do not know anyone. But joining a club can help you make friends quickly.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "a"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "A"
+      ],
+      "wrong": [
+       "B",
+       "C"
+      ]
+     },
+     {
+      "id": "RD-04-D4",
+      "stage": "delayed",
+      "prompt": "What is the main idea? A) The north road is busy. B) The old bridge will close and be rebuilt. C) Towns need bridges. Reply with the letter only.",
+      "material": "The old bridge in our town is closing next week. Workers will rebuild it, and it will reopen in May. Drivers must use the north road meanwhile.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "RD-05",
+   "area": "reading",
+   "title": "Sequencing events with time words",
+   "objective": "Work out the order of events in a text that uses before, after, once, until and earlier, even when the order of sentences is different.",
+   "prerequisites": [
+    "Knows before and after",
+    "Knows days of the week"
+   ],
+   "difficulty": 3,
+   "cefr": "B1",
+   "modality": "text",
+   "audioListening": false,
+   "misconceptions": [
+    {
+     "id": "RD-05-M1",
+     "description": "Takes the first event mentioned as the first event that happened",
+     "exampleWrong": "\"Before bed he brushed his teeth\" so teeth were first"
+    },
+    {
+     "id": "RD-05-M2",
+     "description": "Ignores time words and takes the last event mentioned as the last that happened",
+     "exampleWrong": "Picks the last sentence as the last event"
+    }
+   ],
+   "teachingSuccessCriteria": [
+    "Uses before, after, once and earlier to order events",
+    "Puts events in time order, not text order"
+   ],
+   "mastery": {
+    "postMinCorrect": 1,
+    "transferMinCorrect": 0.5
+   },
+   "lesson": {
+    "title": "Nadia's morning",
+    "objective": "Work out the order of events in a text that uses before, after, once, until and earlier, even when the order of sentences is different.",
+    "spec": {
+     "objectives": [
+      "Work out the order of events in a text that uses before, after, once, until and earlier, even when the order of sentences is different."
+     ],
+     "successCriteria": [
+      "Orders events using time words",
+      "Does not trust the order of sentences"
+     ],
+     "vocabulary": [
+      "before",
+      "after",
+      "once",
+      "earlier",
+      "then"
+     ],
+     "grammar": [],
+     "functions": [
+      "sequencing events"
+     ],
+     "skills": [
+      "reading"
+     ],
+     "examples": [
+      "Before the film, we ate. = We ate first, then watched the film."
+     ],
+     "items": [
+      {
+       "id": "p1",
+       "prompt": "What did Nadia do first?",
+       "material": "Nadia drank coffee after she finished her homework. Before the homework, she walked her dog.",
+       "acceptedAnswers": [
+        "walked her dog",
+        "walked",
+        "dog"
+       ],
+       "criteria": [
+        1
+       ]
+      },
+      {
+       "id": "p2",
+       "prompt": "What did Nadia do last?",
+       "material": "Nadia drank coffee after she finished her homework. Before the homework, she walked her dog.",
+       "acceptedAnswers": [
+        "coffee",
+        "drank coffee"
+       ],
+       "criteria": [
+        1,
+        2
+       ]
+      }
+     ]
+    }
+   },
+   "studyNotes": "Texts do not always tell events in the order they happened. Time words show the real order. Before X, Y: Y comes first? No. Before X, Y means Y happened before X, so Y was first. After X, Y means X was first and Y came later. Once X, Y means Y came when X was finished. Earlier means at a time before. Example: Before she slept, Mia read a book. She had cooked dinner earlier. Real order: cook dinner, read, sleep. Write the events in a list in time order, then answer the question.",
+   "scriptedTutor": {
+    "explanation": "The order of the sentences may not be the order of the events. Use before, after and once to put the events in time order, then answer.",
+    "hints": [
+     "Make a short list of the events in time order.",
+     "Which event has a time word that shows it happened earlier than the others?"
+    ],
+    "correctFeedback": "Yes, that is the right order.",
+    "incorrectFeedback": "Not quite. Use the time words to put the events in order first.",
+    "closing": "Good work. Time words show the real order."
+   },
+   "prereqProbe": {
+    "id": "RD-05-PR",
+    "stage": "pre",
+    "prompt": "Which day comes first: Monday or Tuesday? Reply with one word.",
+    "scoring": {
+     "type": "key",
+     "accepted": [
+      "monday"
+     ],
+     "mode": "exact"
+    },
+    "right": [
+     "Monday"
+    ],
+    "wrong": [
+     "Tuesday"
+    ]
+   },
+   "items": {
+    "pre": [
+     {
+      "id": "RD-05-PRE1",
+      "stage": "pre",
+      "prompt": "What did Karim do first?",
+      "material": "Before he went to bed, Karim brushed his teeth. He had watched a film earlier, and after the film he made tea.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "film",
+        "watched"
+       ]
+      },
+      "right": [
+       "watched a film",
+       "the film"
+      ],
+      "wrong": [
+       "teeth",
+       "tea",
+       "bed"
+      ],
+      "misconceptionId": "RD-05-M1"
+     },
+     {
+      "id": "RD-05-PRE2",
+      "stage": "pre",
+      "prompt": "What happened first?",
+      "material": "The plane landed after the storm ended. Before the storm, the passengers had waited two hours.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "waited",
+        "wait"
+       ]
+      },
+      "right": [
+       "the passengers waited",
+       "waited two hours"
+      ],
+      "wrong": [
+       "storm",
+       "landed"
+      ],
+      "misconceptionId": "RD-05-M2"
+     }
+    ],
+    "post": [
+     {
+      "id": "RD-05-POST1",
+      "stage": "post",
+      "prompt": "What happened first?",
+      "material": "Ines opened the shop after she had cleaned the floor. She cleaned only when the delivery had gone.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "delivery"
+       ]
+      },
+      "right": [
+       "the delivery went",
+       "delivery"
+      ],
+      "wrong": [
+       "cleaned",
+       "opened"
+      ],
+      "misconceptionId": "RD-05-M1"
+     },
+     {
+      "id": "RD-05-POST2",
+      "stage": "post",
+      "prompt": "What did Pavel do last?",
+      "material": "Once the dough had risen, Pavel put it in the oven. First, though, he mixed flour, water and yeast. When the bread was ready, he let it cool.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "cool",
+        "cooled"
+       ]
+      },
+      "right": [
+       "he let it cool",
+       "cool"
+      ],
+      "wrong": [
+       "oven",
+       "mixed",
+       "risen"
+      ],
+      "misconceptionId": "RD-05-M2"
+     }
+    ],
+    "transfer": [
+     {
+      "id": "RD-05-TR1",
+      "stage": "transfer",
+      "prompt": "What did the writer do first?",
+      "material": "Tuesday. I missed the bus, so I ran to the station, but the train had already left. In the end I got a taxi, which arrived after twenty minutes.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "missed the bus",
+        "missed"
+       ]
+      },
+      "right": [
+       "missed the bus",
+       "missed"
+      ],
+      "wrong": [
+       "taxi",
+       "ran"
+      ],
+      "misconceptionId": "RD-05-M1"
+     },
+     {
+      "id": "RD-05-TR2",
+      "stage": "transfer",
+      "prompt": "What should you do first?",
+      "material": "Setting up your phone. Do not turn it on until the battery has charged. Insert the SIM card before you charge it. When the screen lights up, enter your PIN.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "sim",
+        "insert"
+       ]
+      },
+      "right": [
+       "insert the SIM card",
+       "SIM"
+      ],
+      "wrong": [
+       "PIN",
+       "charge",
+       "turn it on"
+      ],
+      "misconceptionId": "RD-05-M1"
+     }
+    ],
+    "delayed": [
+     {
+      "id": "RD-05-D1",
+      "stage": "delayed",
+      "prompt": "What did Rosa do first?",
+      "material": "Before Rosa joined the choir, she had taken piano lessons. She sang in public only after she joined.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "piano"
+       ]
+      },
+      "right": [
+       "piano lessons",
+       "piano"
+      ],
+      "wrong": [
+       "choir",
+       "sang"
+      ],
+      "misconceptionId": "RD-05-M1"
+     },
+     {
+      "id": "RD-05-D2",
+      "stage": "delayed",
+      "prompt": "What happened first?",
+      "material": "The meeting began once everyone had arrived. Before that, Jin set up the projector. Lunch was served when the meeting ended.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "projector",
+        "set up"
+       ]
+      },
+      "right": [
+       "Jin set up the projector",
+       "projector"
+      ],
+      "wrong": [
+       "arrived",
+       "lunch",
+       "meeting"
+      ],
+      "misconceptionId": "RD-05-M2"
+     },
+     {
+      "id": "RD-05-D3",
+      "stage": "delayed",
+      "prompt": "What did the children do first?",
+      "material": "After the rain stopped, the children went outside. They had stayed in the hall during the rain, drawing pictures.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "hall",
+        "stayed",
+        "drawing"
+       ]
+      },
+      "right": [
+       "stayed in the hall",
+       "drawing pictures"
+      ],
+      "wrong": [
+       "outside",
+       "rain stopped"
+      ],
+      "misconceptionId": "RD-05-M1"
+     },
+     {
+      "id": "RD-05-D4",
+      "stage": "delayed",
+      "prompt": "What did Mario do last?",
+      "material": "Mario filled in the form after the clerk checked his passport. He had stood in the queue for an hour before that.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "form",
+        "filled"
+       ]
+      },
+      "right": [
+       "filled in the form",
+       "the form"
+      ],
+      "wrong": [
+       "queue",
+       "passport"
+      ],
+      "misconceptionId": "RD-05-M2"
+     }
+    ]
+   }
+  },
+  {
+   "id": "RD-06",
+   "area": "reading",
+   "title": "Vocabulary from context",
+   "objective": "Work out the meaning of an unknown or multi-meaning word from the words and sentences around it.",
+   "prerequisites": [
+    "Knows about 1500 common English words"
+   ],
+   "difficulty": 4,
+   "cefr": "B1",
+   "modality": "text",
+   "audioListening": false,
+   "misconceptions": [
+    {
+     "id": "RD-06-M1",
+     "description": "Chooses the most common meaning of the word even when the context shows a different one",
+     "exampleWrong": "\"bank\" = a place for money, in a text about a river"
+    },
+    {
+     "id": "RD-06-M2",
+     "description": "Ignores the context clues and guesses from how the word looks or sounds",
+     "exampleWrong": "Picks the answer that looks similar to the word"
+    }
+   ],
+   "teachingSuccessCriteria": [
+    "Reads the sentences around the word for clues",
+    "Checks the meaning fits the whole text"
+   ],
+   "mastery": {
+    "postMinCorrect": 1,
+    "transferMinCorrect": 0.5
+   },
+   "lesson": {
+    "title": "Unknown words in a story",
+    "objective": "Work out the meaning of an unknown or multi-meaning word from the words and sentences around it.",
+    "spec": {
+     "objectives": [
+      "Work out the meaning of an unknown or multi-meaning word from the words and sentences around it."
+     ],
+     "successCriteria": [
+      "Uses context clues to find meaning",
+      "Tests the meaning in the sentence"
+     ],
+     "vocabulary": [
+      "context",
+      "clue",
+      "meaning",
+      "synonym"
+     ],
+     "grammar": [],
+     "functions": [
+      "guessing meaning"
+     ],
+     "skills": [
+      "reading"
+     ],
+     "examples": [
+      "The crowd was huge; thousands of people filled the street. Huge means very big."
+     ],
+     "items": [
+      {
+       "id": "p1",
+       "prompt": "What does \"miserable\" mean here? A) very happy B) very sad C) very fast. Reply with the letter only.",
+       "material": "It rained all week and nobody visited. Joe sat alone at the window, feeling miserable.",
+       "acceptedAnswers": [
+        "b"
+       ],
+       "criteria": [
+        1,
+        2
+       ]
+      },
+      {
+       "id": "p2",
+       "prompt": "What does \"fair\" mean here? A) a funfair B) light in colour C) treating everyone the same. Reply with the letter only.",
+       "material": "The teacher was fair. She gave every student the same time and the same rules.",
+       "acceptedAnswers": [
+        "c"
+       ],
+       "criteria": [
+        1,
+        2
+       ]
+      }
+     ]
+    }
+   },
+   "studyNotes": "When you meet a new word, do not stop. Read the sentence before and after. Look for clues: examples, opposites, reasons or explanations. Some words have more than one meaning, so check which meaning fits the text. Try your meaning in the sentence. Does it make sense? Example: The soup was bland, with no salt or spice. The clue no salt or spice shows that bland means without much taste. The most common meaning is not always the right one. Choose the meaning that fits the clues.",
+   "scriptedTutor": {
+    "explanation": "Look at the words around the unknown word. They give clues. Put your meaning into the sentence and check that it makes sense. Remember that some words have more than one meaning.",
+    "hints": [
+     "Which words near the word give a clue?",
+     "Try your meaning in the sentence. Does it fit the story?"
+    ],
+    "correctFeedback": "Yes, that meaning fits the context.",
+    "incorrectFeedback": "Not quite. Look for clues around the word and check the meaning fits.",
+    "closing": "Good work. Use the clues around a word."
+   },
+   "prereqProbe": {
+    "id": "RD-06-PR",
+    "stage": "pre",
+    "prompt": "She was very hungry, so she ate three plates. Does \"hungry\" mean wanting food or wanting sleep? Reply with one word.",
+    "scoring": {
+     "type": "key",
+     "accepted": [
+      "food"
+     ]
+    },
+    "right": [
+     "food"
+    ],
+    "wrong": [
+     "sleep"
+    ]
+   },
+   "items": {
+    "pre": [
+     {
+      "id": "RD-06-PRE1",
+      "stage": "pre",
+      "prompt": "What does \"bank\" mean here? A) a place for money B) the side of a river C) a kind of tree Reply with the letter only.",
+      "material": "We sat on the bank and watched the boats go past on the water.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-06-M1"
+     },
+     {
+      "id": "RD-06-PRE2",
+      "stage": "pre",
+      "prompt": "What does \"reluctant\" mean here? A) happy B) unwilling C) fast Reply with the letter only.",
+      "material": "Mia was reluctant to dive. She stood at the edge for ten minutes, shaking her head.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-06-M2"
+     }
+    ],
+    "post": [
+     {
+      "id": "RD-06-POST1",
+      "stage": "post",
+      "prompt": "What does \"strike\" mean here? A) hit with the hand B) hit a ball C) stop working in protest Reply with the letter only.",
+      "material": "The workers decided to strike, so the factory stopped and nobody went to work for a week.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "c"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "C"
+      ],
+      "wrong": [
+       "A",
+       "B"
+      ],
+      "misconceptionId": "RD-06-M1"
+     },
+     {
+      "id": "RD-06-POST2",
+      "stage": "post",
+      "prompt": "What does \"frail\" mean here? A) weak and thin B) rich C) angry Reply with the letter only.",
+      "material": "The old man was frail. He needed a stick and a helping arm just to cross the road.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "a"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "A"
+      ],
+      "wrong": [
+       "B",
+       "C"
+      ],
+      "misconceptionId": "RD-06-M2"
+     }
+    ],
+    "transfer": [
+     {
+      "id": "RD-06-TR1",
+      "stage": "transfer",
+      "prompt": "What does \"gem\" mean here? A) a type of food B) something very good C) a stone for rings Reply with the letter only.",
+      "material": "This hotel is a gem. The staff were friendly, the beds were comfy and the breakfast was amazing.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-06-M1"
+     },
+     {
+      "id": "RD-06-TR2",
+      "stage": "transfer",
+      "prompt": "What does \"refrain from\" mean here? A) continue B) not do C) pay for Reply with the letter only.",
+      "material": "Notice. Residents must refrain from parking in front of the gate. Cars left there will be towed away.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-06-M2"
+     }
+    ],
+    "delayed": [
+     {
+      "id": "RD-06-D1",
+      "stage": "delayed",
+      "prompt": "What does \"run\" mean here? A) move fast B) try to be elected C) escape Reply with the letter only.",
+      "material": "He decided to run for mayor, so he put up posters and gave speeches in every street.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-06-M1"
+     },
+     {
+      "id": "RD-06-D2",
+      "stage": "delayed",
+      "prompt": "What does \"bright\" mean here? A) full of light B) clever C) loud Reply with the letter only.",
+      "material": "He is a bright boy. He finished all the maths questions in five minutes and got every one right.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-06-M1"
+     },
+     {
+      "id": "RD-06-D3",
+      "stage": "delayed",
+      "prompt": "What does \"launch\" mean here? A) throw B) start selling C) repair Reply with the letter only.",
+      "material": "The company will launch a new phone next month, with a big party for the press.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-06-M2"
+     },
+     {
+      "id": "RD-06-D4",
+      "stage": "delayed",
+      "prompt": "What does \"exhausted\" mean here? A) very tired B) lost C) hungry Reply with the letter only.",
+      "material": "After the long walk, the hikers were exhausted, so they fell asleep as soon as they sat down.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "a"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "A"
+      ],
+      "wrong": [
+       "B",
+       "C"
+      ],
+      "misconceptionId": "RD-06-M2"
+     }
+    ]
+   }
+  },
+  {
+   "id": "RD-07",
+   "area": "reading",
+   "title": "Making inferences from clues",
+   "objective": "Work out what a text suggests but does not say, using clues in the text and avoiding guesses that have no support.",
+   "prerequisites": [
+    "Understands main ideas",
+    "Knows common feeling words"
+   ],
+   "difficulty": 4,
+   "cefr": "B2",
+   "modality": "text",
+   "audioListening": false,
+   "misconceptions": [
+    {
+     "id": "RD-07-M1",
+     "description": "Answers with what the text literally says instead of what it suggests",
+     "exampleWrong": "Repeats the notice words as the answer"
+    },
+    {
+     "id": "RD-07-M2",
+     "description": "Over-infers: chooses an answer with no clue in the text",
+     "exampleWrong": "Picks an exciting but unsupported idea"
+    }
+   ],
+   "teachingSuccessCriteria": [
+    "Finds at least one clue in the text",
+    "Chooses the answer supported by the clue",
+    "Rejects answers with no evidence"
+   ],
+   "mastery": {
+    "postMinCorrect": 1,
+    "transferMinCorrect": 0.5
+   },
+   "lesson": {
+    "title": "Reading between the lines",
+    "objective": "Work out what a text suggests but does not say, using clues in the text and avoiding guesses that have no support.",
+    "spec": {
+     "objectives": [
+      "Work out what a text suggests but does not say, using clues in the text and avoiding guesses that have no support."
+     ],
+     "successCriteria": [
+      "Uses clues to infer",
+      "Rejects unsupported guesses"
+     ],
+     "vocabulary": [
+      "infer",
+      "clue",
+      "suggest",
+      "evidence"
+     ],
+     "grammar": [],
+     "functions": [
+      "inferring"
+     ],
+     "skills": [
+      "reading"
+     ],
+     "examples": [
+      "He wore a coat and gloves. Inference: it was cold."
+     ],
+     "items": [
+      {
+       "id": "p1",
+       "prompt": "How does Yuki probably feel? Reply with one word: excited, nervous or sleepy?",
+       "material": "Yuki checked her notes again and again. Her hands shook as the audience took their seats.",
+       "acceptedAnswers": [
+        "nervous"
+       ],
+       "criteria": [
+        1,
+        2
+       ]
+      },
+      {
+       "id": "p2",
+       "prompt": "Was the shop busy? Reply yes or no.",
+       "material": "The queue reached the door. People waited with full baskets while the staff hurried between the tills.",
+       "acceptedAnswers": [
+        "yes"
+       ],
+       "criteria": [
+        1
+       ]
+      }
+     ]
+    }
+   },
+   "studyNotes": "An inference is an idea the text suggests but does not say. To infer, find clues: actions, details and word choices. Then ask what they show. Example: Mara looked at the clock and tapped her foot. The text does not say she is impatient, but the clues show it. A good inference has evidence in the text. A weak guess has none. Do not just repeat the text, and do not invent a story. Check your answer: which words in the text support it? If you cannot point to a clue, choose another answer.",
+   "scriptedTutor": {
+    "explanation": "An inference is not written in the text, but the clues show it. Find the clues, think about what they mean, and choose the answer the text supports.",
+    "hints": [
+     "Underline the actions and details. What do they suggest?",
+     "Can you point to words in the text that support your answer?"
+    ],
+    "correctFeedback": "Yes, the clues support that answer.",
+    "incorrectFeedback": "Not quite. Look for the clues and choose the answer they support.",
+    "closing": "Good work. Infer from the clues, not from guesses."
+   },
+   "prereqProbe": {
+    "id": "RD-07-PR",
+    "stage": "pre",
+    "prompt": "Tom wore a coat and scarf and his breath made clouds. Is it likely to be hot or cold? Reply with one word.",
+    "scoring": {
+     "type": "key",
+     "accepted": [
+      "cold"
+     ],
+     "mode": "exact"
+    },
+    "right": [
+     "cold"
+    ],
+    "wrong": [
+     "hot"
+    ]
+   },
+   "items": {
+    "pre": [
+     {
+      "id": "RD-07-PRE1",
+      "stage": "pre",
+      "prompt": "Which is most likely true? A) Elena is the waiter's friend. B) Elena's guest has not arrived yet. C) The restaurant is closed. Reply with the letter only.",
+      "material": "Elena checked her watch for the fifth time and looked at the door again. The chair opposite her was empty when the waiter asked, kindly, if she wanted to order.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-07-M2"
+     },
+     {
+      "id": "RD-07-PRE2",
+      "stage": "pre",
+      "prompt": "What can we infer about the shop? A) Its owner is coming back soon. B) It has probably been closed for a long time. C) It is a very busy shop. Reply with the letter only.",
+      "material": "The notice on the shop door said \"Back in ten minutes\". It had been there since Monday morning, and the window was covered in dust.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "b"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "B"
+      ],
+      "wrong": [
+       "A",
+       "C"
+      ],
+      "misconceptionId": "RD-07-M1"
+     }
+    ],
+    "post": [
+     {
+      "id": "RD-07-POST1",
+      "stage": "post",
+      "prompt": "How does Dev probably feel about the results? Reply with one word: nervous, proud or bored?",
+      "material": "When the results came, Dev did not open the envelope. He put it in a drawer, picked up his guitar, and played until it was dark.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "nervous"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "nervous"
+      ],
+      "wrong": [
+       "proud",
+       "bored"
+      ],
+      "misconceptionId": "RD-07-M2"
+     },
+     {
+      "id": "RD-07-POST2",
+      "stage": "post",
+      "prompt": "How did the fans feel about the match? Reply with one word: pleased or disappointed?",
+      "material": "Despite the heavy rain, the stadium was full, and fans sang loudly until the final whistle. Many were still smiling as they left, with wet scarves.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "pleased"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "pleased"
+      ],
+      "wrong": [
+       "disappointed",
+       "wet"
+      ],
+      "misconceptionId": "RD-07-M1"
+     }
+    ],
+    "transfer": [
+     {
+      "id": "RD-07-TR1",
+      "stage": "transfer",
+      "prompt": "Is the lift working? Reply yes or no.",
+      "material": "\"Nice flat,\" said Ana. \"Is the lift working yet?\" Marco laughed. \"Ask me again after you climb to the sixth floor.\"",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "no"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "no"
+      ],
+      "wrong": [
+       "yes"
+      ],
+      "misconceptionId": "RD-07-M1"
+     },
+     {
+      "id": "RD-07-TR2",
+      "stage": "transfer",
+      "prompt": "Did the company offer Mr Hall a job? Reply yes or no.",
+      "material": "Dear Mr Hall, thank you for your letter. We have noted your comments, and we will keep your CV on file. We wish you every success in the future.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "no"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "no"
+      ],
+      "wrong": [
+       "yes"
+      ],
+      "misconceptionId": "RD-07-M2"
+     }
+    ],
+    "delayed": [
+     {
+      "id": "RD-07-D1",
+      "stage": "delayed",
+      "prompt": "Where is Sara most likely? Reply with one word: airport, school or hospital?",
+      "material": "Sara's suitcase was heavy, her passport was in her hand, and she kept looking at the departures board with a smile.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "airport"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "airport"
+      ],
+      "wrong": [
+       "school",
+       "hospital"
+      ]
+     },
+     {
+      "id": "RD-07-D2",
+      "stage": "delayed",
+      "prompt": "Did Tim do well in the test? Reply yes or no.",
+      "material": "The teacher handed back the tests face down. Tim slid his under his book without looking and stared out of the window.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "no"
+       ],
+       "mode": "exact"
+      },
+      "right": [
+       "no"
+      ],
+      "wrong": [
+       "yes"
+      ],
+      "misconceptionId": "RD-07-M2"
+     },
+     {
+      "id": "RD-07-D3",
+      "stage": "delayed",
+      "prompt": "How does Grandpa feel about his medals? Reply with one word: proud or careless?",
+      "material": "Grandpa polished his old medals every Sunday and never let anyone touch the box.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "proud"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "proud"
+      ],
+      "wrong": [
+       "careless"
+      ],
+      "misconceptionId": "RD-07-M1"
+     },
+     {
+      "id": "RD-07-D4",
+      "stage": "delayed",
+      "prompt": "How does Lena feel? Reply with one word: annoyed, delighted or sleepy?",
+      "material": "By the third phone call, Lena's voice was tight. \"I told you,\" she said slowly, \"the parcel was due on Monday.\" It was now Friday.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "annoyed"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "annoyed"
+      ],
+      "wrong": [
+       "delighted",
+       "sleepy"
+      ],
+      "misconceptionId": "RD-07-M2"
+     }
+    ]
+   }
+  },
+  {
+   "id": "RD-08",
+   "area": "reading",
+   "title": "Author purpose and tone",
+   "objective": "Decide why an author wrote a text (inform, persuade, warn, complain) and what tone it has, using the language the writer chooses.",
+   "prerequisites": [
+    "Understands main ideas",
+    "Knows words such as formal, angry and sarcastic"
+   ],
+   "difficulty": 5,
+   "cefr": "B2",
+   "modality": "text",
+   "audioListening": false,
+   "misconceptions": [
+    {
+     "id": "RD-08-M1",
+     "description": "Decides the purpose from the topic only and not from the language",
+     "exampleWrong": "A text about a library must be informing"
+    },
+    {
+     "id": "RD-08-M2",
+     "description": "Reads ironic or sarcastic words literally",
+     "exampleWrong": "\"Thank you so much for the delay\" = grateful"
+    }
+   ],
+   "teachingSuccessCriteria": [
+    "Looks at commands, emotive words and facts to find purpose",
+    "Notices when praise is sarcastic",
+    "Names a tone that fits the whole text"
+   ],
+   "mastery": {
+    "postMinCorrect": 1,
+    "transferMinCorrect": 0.5
+   },
+   "lesson": {
+    "title": "Why was it written?",
+    "objective": "Decide why an author wrote a text (inform, persuade, warn, complain) and what tone it has, using the language the writer chooses.",
+    "spec": {
+     "objectives": [
+      "Decide why an author wrote a text (inform, persuade, warn, complain) and what tone it has, using the language the writer chooses."
+     ],
+     "successCriteria": [
+      "Identifies purpose from the language",
+      "Detects sarcasm and formal tone"
+     ],
+     "vocabulary": [
+      "purpose",
+      "tone",
+      "persuade",
+      "inform",
+      "sarcastic",
+      "formal"
+     ],
+     "grammar": [],
+     "functions": [
+      "evaluating a writer"
+     ],
+     "skills": [
+      "reading"
+     ],
+     "examples": [
+      "Buy now before it is too late! = persuade",
+      "Great, it is raining on my holiday. = sarcastic"
+     ],
+     "items": [
+      {
+       "id": "p1",
+       "prompt": "Why did the writer write this text? Give one word, such as inform, persuade, warn or complain.",
+       "material": "Don't miss our summer sale! Everything half price, this weekend only. You will not find better coats anywhere, so come early.",
+       "acceptedAnswers": [
+        "persuade"
+       ],
+       "criteria": [
+        1
+       ]
+      },
+      {
+       "id": "p2",
+       "prompt": "Name the writer's attitude in one word, such as sarcastic, sincere or confused.",
+       "material": "Fantastic. The wifi has gone again, just as I started my online exam. What a lovely surprise.",
+       "acceptedAnswers": [
+        "sarcastic"
+       ],
+       "criteria": [
+        2,
+        3
+       ]
+      }
+     ]
+    }
+   },
+   "studyNotes": "Authors write to inform (give facts), to persuade (make you agree or buy), to warn (stop you getting hurt) or to complain (say something is wrong). Look at the language. Facts and dates suggest inform. Commands like buy or join, and strong praise, suggest persuade. Words like danger or avoid suggest warn. Angry details suggest complain. The topic alone does not decide purpose. Tone is the writer's attitude: formal, angry, joyful, sarcastic. Sarcasm says the opposite of what is meant, such as Great, another delay. Ask whether the praise fits the situation.",
+   "scriptedTutor": {
+    "explanation": "Look at the language, not just the topic. Facts inform. Commands and praise persuade. Danger words warn. Angry details complain. For tone, ask if the words match the situation. If praise is used about something bad, it is sarcastic.",
+    "hints": [
+     "Does the text give facts, give orders, or show anger?",
+     "Does the praise fit the situation, or does it say the opposite of what the writer feels?"
+    ],
+    "correctFeedback": "Yes, that fits the language of the text.",
+    "incorrectFeedback": "Not quite. Check the language the writer uses, not only the topic.",
+    "closing": "Good work. Purpose and tone come from the writer's language."
+   },
+   "prereqProbe": {
+    "id": "RD-08-PR",
+    "stage": "pre",
+    "prompt": "Which word describes a writer who is angry about bad service: complaining or thanking? Reply with one word.",
+    "scoring": {
+     "type": "key",
+     "accepted": [
+      "complaining"
+     ],
+     "mode": "exact"
+    },
+    "right": [
+     "complaining"
+    ],
+    "wrong": [
+     "thanking"
+    ]
+   },
+   "items": {
+    "pre": [
+     {
+      "id": "RD-08-PRE1",
+      "stage": "pre",
+      "prompt": "What is the writer's main purpose? Reply with one word: inform, persuade, warn or complain?",
+      "material": "Everyone deserves clean rivers. Sign our petition today and demand that the council stops factories dumping waste. Your signature can save our wildlife.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "persuade"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "persuade"
+      ],
+      "wrong": [
+       "inform",
+       "warn"
+      ],
+      "misconceptionId": "RD-08-M1"
+     },
+     {
+      "id": "RD-08-PRE2",
+      "stage": "pre",
+      "prompt": "What is the writer's main purpose? Reply with one word: inform, persuade, warn or complain?",
+      "material": "Caution: the path along the cliff edge is unstable after heavy rain. Walkers should keep to the marked trail and avoid the edge.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "warn"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "warn"
+      ],
+      "wrong": [
+       "inform",
+       "persuade"
+      ],
+      "misconceptionId": "RD-08-M1"
+     }
+    ],
+    "post": [
+     {
+      "id": "RD-08-POST1",
+      "stage": "post",
+      "prompt": "What is the writer's main purpose? Reply with one word: inform, persuade, warn or complain?",
+      "material": "I have waited three weeks for my refund, and I have called your helpline six times. Nobody has explained the delay. This is unacceptable.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "complain"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "complain"
+      ],
+      "wrong": [
+       "inform",
+       "persuade"
+      ],
+      "misconceptionId": "RD-08-M1"
+     },
+     {
+      "id": "RD-08-POST2",
+      "stage": "post",
+      "prompt": "What is the writer's main purpose? Reply with one word: inform, persuade, warn or complain?",
+      "material": "Last Tuesday, the council opened a new library on Mill Street. It has 20,000 books and a children's area, and is open from nine until six.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "inform"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "inform"
+      ],
+      "wrong": [
+       "persuade",
+       "warn"
+      ],
+      "misconceptionId": "RD-08-M1"
+     }
+    ],
+    "transfer": [
+     {
+      "id": "RD-08-TR1",
+      "stage": "transfer",
+      "prompt": "What is the tone of the text? Reply with one word: formal, playful or bitter?",
+      "material": "Dear Sir or Madam, I am writing to enquire about the position advertised on your website. I would be grateful if you could send further details.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "formal"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "formal"
+      ],
+      "wrong": [
+       "playful",
+       "bitter"
+      ],
+      "misconceptionId": "RD-08-M1"
+     },
+     {
+      "id": "RD-08-TR2",
+      "stage": "transfer",
+      "prompt": "What is the tone of the text? Reply with one word: sarcastic, grateful or cheerful?",
+      "material": "Oh great, another delay. Of course the train breaks down on the one day I have an important meeting. Thank you so much, railway, for your wonderful service.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "sarcastic"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "sarcastic"
+      ],
+      "wrong": [
+       "grateful",
+       "cheerful"
+      ],
+      "misconceptionId": "RD-08-M2"
+     }
+    ],
+    "delayed": [
+     {
+      "id": "RD-08-D1",
+      "stage": "delayed",
+      "prompt": "What is the writer's main purpose? Reply with one word: inform, persuade, warn or complain?",
+      "material": "Cycling to work saves money, keeps you fit and cuts pollution. Why not leave the car at home this week? You will not regret it.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "persuade"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "persuade"
+      ],
+      "wrong": [
+       "inform",
+       "warn"
+      ],
+      "misconceptionId": "RD-08-M1"
+     },
+     {
+      "id": "RD-08-D2",
+      "stage": "delayed",
+      "prompt": "What is the writer's main purpose? Reply with one word: inform, persuade, warn or complain?",
+      "material": "Please note that the swimming pool will be closed from 1 to 5 May for repairs. It will reopen on 6 May.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "inform"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "inform"
+      ],
+      "wrong": [
+       "persuade",
+       "warn"
+      ],
+      "misconceptionId": "RD-08-M1"
+     },
+     {
+      "id": "RD-08-D3",
+      "stage": "delayed",
+      "prompt": "What is the tone of the text? Reply with one word: delighted, bored or angry?",
+      "material": "What a delightful surprise! The staff greeted us with flowers, and the view from our room took my breath away.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "delighted"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "delighted"
+      ],
+      "wrong": [
+       "bored",
+       "angry"
+      ]
+     },
+     {
+      "id": "RD-08-D4",
+      "stage": "delayed",
+      "prompt": "What is the tone of the text? Reply with one word: sarcastic, sincere or confused?",
+      "material": "Wonderful, the lift is broken again. I just love climbing seven floors with the shopping.",
+      "scoring": {
+       "type": "key",
+       "accepted": [
+        "sarcastic"
+       ],
+       "mode": "contains"
+      },
+      "right": [
+       "sarcastic"
+      ],
+      "wrong": [
+       "sincere",
+       "confused"
+      ],
+      "misconceptionId": "RD-08-M2"
+     }
+    ]
+   }
+  }
+ ]
+}
