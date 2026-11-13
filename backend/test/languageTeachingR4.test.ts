@@ -681,7 +681,8 @@ describe('through the tutor route (SDK mocked): state, markers, streaming, isola
     const t3 = await send('one', sid, 'My dad watches TV after dinner. I always do my homework before that.');
     const sys3 = lastSystem();
     expect(sys3).toContain('Their previous answer on this task was correct');
-    expect(sys3).toContain('1. Adds -s/-es with he/she/it (shown on their own)');
+    // r4.4 #3 (intentional): one independent success is no longer final; the tutor asks for one more check in a new context.
+    expect(sys3).toContain('1. Adds -s/-es with he/she/it (shown on their own once: check it once more in a new context');
     expect(sys3).toContain('next give a short freer task');
     expect(t3.body.assistantMessage.meta.languageTurn.confirmedSuccessStreak).toBe(1);
     for (const doc of await stored(sid)) expect(doc.text).not.toContain('[[assess');

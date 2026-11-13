@@ -1145,9 +1145,18 @@ export const ASSESSMENT_INSTRUCTION =
 // strategy says "model one complete example", which can reveal an item's answer).
 const SUPPORT_PRECEDENCE = 'For hints and when to show an answer, the support level below takes precedence over any other tutoring guidance you were given.';
 
-function criteriaLines(criteria: string[] | undefined, learning?: LearningState): string[] {
+// r4.4 #3: one partly right answer is probed for its reasoning before the next step.
+export const WHY_PROBE = 'Their answer is partly right: credit the part that is right, then ask one short question about why they chose it (their reasoning), before correcting anything.';
+
+export function criteriaLines(criteria: string[] | undefined, learning?: LearningState): string[] {
   if (!criteria?.length) return [];
-  const status = (n: number) => (learning?.criteria[n] === 'independent' ? ' (shown on their own)' : learning?.criteria[n] === 'assisted' ? ' (shown with help)' : '');
+  const status = (n: number) => {
+    if (learning?.criteria[n] === 'independent') {
+      const k = learning.independentEvidence?.[n]?.length ?? 1;
+      return k >= 2 ? ` (shown on their own in ${k} different tasks)` : ' (shown on their own once: check it once more in a new context before moving on from it)';
+    }
+    return learning?.criteria[n] === 'assisted' ? ' (shown with help)' : '';
+  };
   return [`  Success criteria: ${criteria.map((c, i) => `${i + 1}. ${c}${status(i + 1)}`).join('; ')}`];
 }
 
@@ -1164,7 +1173,8 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (supportStage(s) === 'summarise') out.push(`- ${RULE_SUMMARY}`);
   if (s.ruleStatement) out.push(`- ${RULE_CHECK}`);
   if (s.diagnosis) out.push(`- ${diagnosisLine(s.diagnosis)}`);
-  if (L && Object.keys(L.criteria).length) out.push('- Don\'t re-test a success criterion they have already shown on their own; work on the ones not shown yet.');
+  if (L && Object.keys(L.criteria).length) out.push('- Don\'t re-test a success criterion they have already shown on their own in two different tasks; work on the ones not shown yet. A criterion shown on their own only once needs one more unaided check in a new context (a different word or situation, with no model of the answer next to it).');
+  if (s.learnerIntent === 'PARTIAL_ANSWER_ATTEMPT' && s.answeringCheck) out.push(`- ${WHY_PROBE}`);
   if (s.answeringCheck || s.unpromptedSentence) {
     const assisted = (L?.hintTurnsOnItem ?? 0) > 0;
     const next = assisted

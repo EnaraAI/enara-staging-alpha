@@ -294,6 +294,8 @@ export interface LearningState {
   attemptsOnItem: number;
   // Items whose answer was disclosed in this scope.
   revealedItems: string[];
+  // r4.4 #3: per success criterion (1-based), the distinct tasks it was shown independently on.
+  independentEvidence: Record<number, string[]>;
 }
 
 // r4.1 (POST-03): when a scope is given, only turns stored under that same scope
@@ -305,7 +307,7 @@ export function inScope(lt: StoredLearningFields | null | undefined, scope?: str
 }
 
 export function deriveLearningState(history: HistoryTurn[], scope?: string): LearningState {
-  const s: LearningState = { activeItem: null, hintLevelOnItem: 0, hintTurnsOnItem: 0, successStreak: 0, criteria: {}, satisfiedLessonItems: [], previousStructured: false, structuredTurns: 0, attemptsOnItem: 0, revealedItems: [] };
+  const s: LearningState = { activeItem: null, hintLevelOnItem: 0, hintTurnsOnItem: 0, successStreak: 0, criteria: {}, satisfiedLessonItems: [], previousStructured: false, structuredTurns: 0, attemptsOnItem: 0, revealedItems: [], independentEvidence: {} };
   for (const h of history) {
     if (h.role !== 'assistant') continue;
     const lt = inScope(h.languageTurn, scope) ? h.languageTurn ?? undefined : undefined;
@@ -330,6 +332,11 @@ export function deriveLearningState(history: HistoryTurn[], scope?: string): Lea
         for (const c of a.criteria ?? []) {
           // Independent evidence is never downgraded by a later assisted one.
           if (s.criteria[c] !== 'independent') s.criteria[c] = assisted ? 'assisted' : 'independent';
+          if (!assisted) {
+            const ctxKey = s.activeItem?.id ?? 'free';
+            const list = (s.independentEvidence[c] ??= []);
+            if (!list.includes(ctxKey)) list.push(ctxKey);
+          }
         }
         // Only an answer to the active item completes that item.
         if (structured(a) && a.relevance === 'ACTIVE_ITEM' && s.activeItem?.lessonItemId && !s.satisfiedLessonItems.includes(s.activeItem.lessonItemId)) {
