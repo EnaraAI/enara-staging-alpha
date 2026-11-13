@@ -1,0 +1,55 @@
+{
+  "title": "ENARA Experiment 5c - pre-registration (does the plan/engine arbitration add anything? one third of the Experiment 5b size)",
+  "note": "AI-simulated students only; not evidence about real learners. Locked before any run. This experiment tests the owner's ship bar: ENARA must clearly beat the plain AI tutor.",
+  "seed": "enara-dls-v2-exp5c-prereg",
+  "design": "Matched triplets as in Experiments 4-5b; evidence-seeded learners (as in 5b); 17 NEW students (new seed) x 6 areas x 1 replication = 102 triplets (one third of 5b's 300) on the 16 hold-out outcomes; 4 items per stage; 3 answer samples per item; deterministic scoring; blind judge sample.",
+  "conditions": {
+    "A": "ENARA with ENARA_ENGINE_V2=all (wrongAnswer, belief, memory, cache), arbitration OFF - the Experiment 5b ENARA arm",
+    "B": "ENARA with ENARA_ENGINE_V2=all,arbitration - differs from A in exactly one switch",
+    "C": "plain AI tutor with the same school record as text (as in 5b)"
+  },
+  "holdout": {
+    "file": "config/exp4_holdout.json",
+    "sha256": "5f787e2bd11e069133464c2c993e7a346664e35f78125264d887516d65cb6c40",
+    "disclosure": "The 16 hold-out outcomes were already scored under A, B (research flag) and C in Experiment 4, so aggregate results on them were seen; their transcripts were not read. The v2 changes were designed from code review plus Experiment 2-4 aggregate and transcript evidence on development outcomes. New students and a new seed are used, so no Experiment 4 block is reused."
+  },
+  "primaryOutcome": "Learning gain (post minus pre proportion correct on independent deterministic assessments).",
+  "confirmatory": [
+    {
+      "a": "B",
+      "b": "A",
+      "measure": "gain"
+    },
+    {
+      "a": "B",
+      "b": "C",
+      "measure": "gain"
+    }
+  ],
+  "targetEffect": 0.08,
+  "secondaryOutcomes": [
+    "transfer",
+    "delayed retention",
+    "mastery rate",
+    "independent performance",
+    "misconception correction",
+    "cost per block",
+    "cost per mastered outcome",
+    "input tokens and cache-read tokens per tutor call",
+    "process metrics exp4-pm-v1"
+  ],
+  "sampleSize": "102 triplets by owner request (one third of 300). Power: with a per-triplet gain-difference variance of about 0.15 (Experiments 4-5b), 80% power at alpha 0.025 needs a true effect of about 0.12 (12 points) or more (n = 9.505 * sigma2 / delta^2 -> delta = sqrt(9.505*0.15/102) = 0.118). A null result therefore says nothing about effects smaller than about 12 points; the study is a screening test, not a decisive one.",
+  "inference": "Two-way (student x outcome) cluster bootstrap 95% CI; sign-flip permutation test on per-student mean differences; Holm-Bonferroni over the two confirmatory contrasts; Benjamini-Hochberg for exploratory contrasts; paired d_z with Hedges correction.",
+  "shipBar": "Not a ship decision. B is worth carrying into a full-size confirmatory run only if B-A is positive with a 95% CI excluding 0, or the point estimate is at least +0.08 with Holm-adjusted p < 0.2 (screening threshold, declared in advance). The owner's bar for shipping (ENARA clearly beats the plain tutor, Holm p < 0.05, CI excludes 0) is unchanged and applies to the full-size run.",
+  "decisionRules": "B better than A (or C) only if Holm-adjusted p < 0.05 and the CI excludes 0; the screening rule above decides only whether a full-size run is justified. Failed or incomplete blocks stay in the data.",
+  "knownLimits": "Screening size (about 12-point minimum detectable effect). Single-session simulation; memory cannot act. Hold-out outcomes were already scored in Experiments 4 and 5b (aggregates seen); this run uses new students and seed, and the same 16 outcomes.",
+  "amendmentLog": [],
+  "supersedes": null,
+  "reasonForChange": null,
+  "evidenceSeeding": {
+    "rule": "From the hidden learner state (identical for A, B and C): knowsAlready -> mastery status proficient (estimate 0.8, 4 evidence items, 3 independent); otherwise -> status emerging (0.3) plus, when the learner holds a misconception, a confirmed mistaken-idea record whose text is the benchmark misconception description (never an assessment item).",
+    "A_B": "seeded into the throwaway database as StudentObjectiveMastery and StudentMisconception records, as the school's system would hold them (the same mapping the fixture harness uses)",
+    "C": "the plain tutor receives the same record as one sentence of text in its prompt (a deliberately generous baseline: the plain tutor is given the information, so ENARA wins only through what it does with it)",
+    "probe": "With seeding, the plan changes: emerging + misconception -> direct_instruction + worked_example; proficient -> mastery_learning + elaborative_interrogation; without seeding -> formative_feedback + retrieval_practice (NO_EVIDENCE)."
+  }
+}

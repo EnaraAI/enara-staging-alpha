@@ -19,8 +19,8 @@ import { judgeSample, agreement, leakageScan, disagreementSample, type JudgeReco
 import { buildReports, type BlockResult, type Prereg } from '../analytics/analyze';
 
 export interface ExperimentConfig {
-  experimentId: string; kind: 'validation_campaign' | 'full_experiment' | 'dry' | 'experiment_4_pilot' | 'experiment_4_main' | 'experiment_5_main'; seed: string; students: number; replications: number; maxTurns: number; adversarialShare: number;
-  models: { student: string; genericTutor: string; judge: string }; budgetCapUsd: number; concurrency: number; judgeRate: number; ablate: string[]; conditions: Condition[]; samples?: number; matched?: boolean; outcomePool?: string[]; preregFile?: string; improve?: string[]; engineV2?: string; seedEvidence?: boolean;
+  experimentId: string; kind: 'validation_campaign' | 'full_experiment' | 'dry' | 'experiment_4_pilot' | 'experiment_4_main' | 'experiment_5_main' | 'experiment_5c_main'; seed: string; students: number; replications: number; maxTurns: number; adversarialShare: number;
+  models: { student: string; genericTutor: string; judge: string }; budgetCapUsd: number; concurrency: number; judgeRate: number; ablate: string[]; conditions: Condition[]; samples?: number; matched?: boolean; outcomePool?: string[]; preregFile?: string; improve?: string[]; engineV2?: string; seedEvidence?: boolean; conditionEnv?: Partial<Record<Condition, string>>;
 }
 const ROOT = path.resolve(__dirname, '../..');
 export const loadBenchmark = (): Outcome[] => readdirSync(path.join(ROOT, 'benchmark/outcomes')).filter((f) => f.endsWith('.json')).sort().flatMap((f) => JSON.parse(readFileSync(path.join(ROOT, 'benchmark/outcomes', f), 'utf8')).outcomes as Outcome[]);
@@ -40,8 +40,8 @@ export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean
   const outcomes = loadBenchmark(); const bErr = validateBenchmark(outcomes); if (bErr.length) throw new Error(`benchmark invalid: ${bErr[0]}`);
   const byId = new Map(outcomes.map((o) => [o.id, o])); const pool = cfg.outcomePool ? new Set(cfg.outcomePool) : null;
   const outcomesByArea = Object.fromEntries(AREAS.map((a) => [a, outcomes.filter((o) => o.area === a && (!pool || pool.has(o.id))).map((o) => o.id)])) as Record<Area, string[]>;
-  const isExp4 = cfg.kind === 'experiment_4_pilot' || cfg.kind === 'experiment_4_main' || cfg.kind === 'experiment_5_main';
-  const pr = checkPrereg(cfg.kind === 'full_experiment' || cfg.kind === 'experiment_4_main' || cfg.kind === 'experiment_5_main', cfg.preregFile ?? 'preregistration.json');
+  const isExp4 = cfg.kind === 'experiment_4_pilot' || cfg.kind === 'experiment_4_main' || cfg.kind === 'experiment_5_main' || cfg.kind === 'experiment_5c_main';
+  const pr = checkPrereg(cfg.kind === 'full_experiment' || cfg.kind === 'experiment_4_main' || cfg.kind === 'experiment_5_main' || cfg.kind === 'experiment_5c_main', cfg.preregFile ?? 'preregistration.json');
   const pop: StudentState[] = Array.from({ length: cfg.students }, (_, i) => makeStudent(i, cfg.seed, { adversarial: i < Math.round(cfg.students * cfg.adversarialShare) }));
   const popChecks = populationChecks(pop.map((s) => s)).filter((c) => !c.pass && cfg.students >= 100 && cfg.students <= 200);
   const allBlocks: Block[] = []; const active = opts.dry ? cfg.conditions.filter((c) => c !== 'A' && c !== 'E') : cfg.conditions; // dry mode never fakes the real ENARA tutor: A/E are simply not run
@@ -55,7 +55,7 @@ export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean
     code: { commit: git('rev-parse HEAD'), dirty: git('status --porcelain -- .') !== '', branch: git('rev-parse --abbrev-ref HEAD') }, node: process.version,
     benchmarkSha256: sha256(JSON.stringify(outcomes)), promptsSha256: filesHash(['src/conditions/types.ts', 'src/conditions/simple.ts', 'src/conditions/enara.ts', 'src/students/population.ts', 'src/evaluation/assess.ts', 'src/evaluation/judge.ts']),
     assignmentSha256: assignmentHash(allBlocks), blocksPlanned: allBlocks.length, populationChecksFailed: popChecks, models: cfg.models, enaraTutorRoute: 'POST /api/me/tutor/sessions/:id/messages (real controller, in-process, throwaway DB)', tutorModelNote: 'tutor/intent models are ENARA defaults from backend config; recorded per call in provider_attempts.jsonl',
-    ablatedFeatures: cfg.ablate, improvedFeatures: cfg.improve ?? [], engineV2: cfg.engineV2 ?? null, seedEvidence: Boolean(cfg.seedEvidence), outcomePool: cfg.outcomePool ?? null, matched: Boolean(cfg.matched), simulationOnly: true,
+    ablatedFeatures: cfg.ablate, improvedFeatures: cfg.improve ?? [], conditionEnv: cfg.conditionEnv ?? null, engineV2: cfg.engineV2 ?? null, seedEvidence: Boolean(cfg.seedEvidence), outcomePool: cfg.outcomePool ?? null, matched: Boolean(cfg.matched), simulationOnly: true,
   };
   writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify(manifest, null, 2));
   const ledger = new Ledger(dir, runId, cfg.budgetCapUsd); const rawFile = path.join(dir, 'raw/blocks.jsonl'); const auditFile = path.join(dir, 'raw/audit.jsonl'); const judgeFile = path.join(dir, 'raw/judge.jsonl');
@@ -110,9 +110,14 @@ export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean
   };
   // Phase 1: all conditions except E; Phase 2: E with the research ablation env set (the env is process-wide, so E runs alone).
   const envCond: Condition = isExp4 ? 'B' : 'E'; // the condition that needs a process-wide research env runs alone, in phase 2
-  const phases: Block[][] = [allBlocks.filter((b) => b.condition !== envCond && !done.has(b.blockId)), allBlocks.filter((b) => b.condition === envCond && !done.has(b.blockId))];
-  for (const [i, phase] of phases.entries()) {
-    if (i === 1) { if (isExp4) { if (cfg.improve?.length) process.env.ENARA_RESEARCH_IMPROVE = cfg.improve.join(','); if (cfg.engineV2) process.env.ENARA_ENGINE_V2 = cfg.engineV2; } else if (cfg.ablate.length) process.env.ENARA_RESEARCH_ABLATE = cfg.ablate.join(','); } else { delete process.env.ENARA_RESEARCH_ABLATE; delete process.env.ENARA_RESEARCH_IMPROVE; delete process.env.ENARA_ENGINE_V2; }
+  // Per-condition switch settings (Experiment 5c: both ENARA arms use v2 switches but differ in one): conditions are grouped by their ENARA_ENGINE_V2 value and each group runs alone.
+  const groups: { env?: string; blocks: Block[] }[] = cfg.conditionEnv
+    ? [...new Set(allBlocks.map((b) => cfg.conditionEnv![b.condition] ?? ''))].sort().map((env) => ({ env, blocks: allBlocks.filter((b) => (cfg.conditionEnv![b.condition] ?? '') === env && !done.has(b.blockId)) }))
+    : [{ blocks: allBlocks.filter((b) => b.condition !== envCond && !done.has(b.blockId)) }, { env: undefined, blocks: allBlocks.filter((b) => b.condition === envCond && !done.has(b.blockId)) }];
+  for (const [i, group] of groups.entries()) {
+    const phase = group.blocks;
+    if (cfg.conditionEnv) { delete process.env.ENARA_RESEARCH_ABLATE; delete process.env.ENARA_RESEARCH_IMPROVE; if (group.env) process.env.ENARA_ENGINE_V2 = group.env; else delete process.env.ENARA_ENGINE_V2; }
+    else if (i === 1) { if (isExp4) { if (cfg.improve?.length) process.env.ENARA_RESEARCH_IMPROVE = cfg.improve.join(','); if (cfg.engineV2) process.env.ENARA_ENGINE_V2 = cfg.engineV2; } else if (cfg.ablate.length) process.env.ENARA_RESEARCH_ABLATE = cfg.ablate.join(','); } else { delete process.env.ENARA_RESEARCH_ABLATE; delete process.env.ENARA_RESEARCH_IMPROVE; delete process.env.ENARA_ENGINE_V2; }
     let next = 0; await Promise.all(Array.from({ length: cfg.concurrency }, async () => { while (next < phase.length && !stopFlag.reason) { const b = phase[next++]; await runBlock(b); console.log(`${b.blockId} ${b.condition} $${ledger.spentUsd.toFixed(2)}`); } }));
     if (stopFlag.reason) break;
   }
