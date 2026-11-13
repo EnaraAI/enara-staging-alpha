@@ -22,13 +22,13 @@ Until all three exist, ENARA must not claim the title. Simulated (AI-student) re
 | Fixing mistaken beliefs | 28% of simulated students (notes only: 15–20%) |
 | Live avatar | Uses the same AI model, **not** the language engine or fixes 1–7 |
 | Real-student evidence | None yet; pilot protocol written |
-| Lost r4.4 features | Diagnosis, learner history, transfer checks, pronunciation: rebuilding |
+| r4.4 features | Rebuilt 13 Nov (diagnosis, learner history, transfer checks, pronunciation adapter); not yet measured in a paid run |
 
 ## Stages, in order
 
 | # | Stage | Target (how we will know) |
 |---|---|---|
-| 1 | **Rebuild r4.4 features:** mistake-cause diagnosis, cross-session learner history, transfer checks, pronunciation adapter (off by default) | Tests pass; features in the repository |
+| 1 | **Rebuild r4.4 features:** mistake-cause diagnosis, cross-session learner history, transfer checks, pronunciation adapter (off by default) | **Done 13 Nov:** tests pass, in the repository. Paid measurement still to do |
 | 2 | **Link the live avatar** to one shared language engine, with a test that fails if chat and avatar drift apart | Same policy version in both; voice benchmark run |
 | 3 | **Teach better:** diagnose the mistake before hinting, fix reading and "why?" answers, rule-in-own-words checks | At least 85% of conversations meet the bar on every skill; at least 50% of simulated students fix their mistaken belief |
 | 4 | **Teacher validation:** teachers review about 30 conversations and sign off the grading rubric | AI grader and teachers agree (κ ≥ 0.6) |

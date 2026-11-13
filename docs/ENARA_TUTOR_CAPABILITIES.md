@@ -43,6 +43,9 @@ All test results come from **simulated (AI) students**. No real student has used
 |---|---|---|
 | Student answers correctly | Confirms specifically, moves to the next exercise, never claims "mastery" from one answer | ✅ |
 | Student makes a mistake | Points to the problem with a hint and lets them retry | ✅ |
+| Student's wrong answer | Works out the likely cause (for example a missing -s) and aims the hint at the cause, never at the answer | 🟡 r4.4 #1 |
+| Student keeps making the same type of mistake across sessions | Remembers the error type (not their text) and plans a spaced review | 🟡 r4.4 #2 |
+| Student gets it right once | Asks for one more unaided check in a new context before moving on | 🟡 r4.4 #3 |
 | Student misses twice | Names the mistaken idea, explains the rule with a different example, then lets them retry | 🟡 Fix 5 |
 | Student gets it right after a mistake | Asks "Tell me the rule in your own words", then confirms with "Remember: …" or corrects only the wrong part | 🟡 Fix 7 |
 | Student asks "why?" | Gives the reason as a clue, not the corrected answer | 🟡 Fix 4 |
@@ -60,7 +63,7 @@ All test results come from **simulated (AI) students**. No real student has used
 | Vocabulary | ✅ Yes | 23–29% (the AI grader may be too strict; needs teacher review) |
 | Reading | 🟡 Partly: lessons have no field for a reading text yet | 12–15% (weakest) |
 | Listening / speaking | 🟡 Through ENARA's voice and avatar features, **but the avatar does not yet use the language engine or fixes 1–7** | Not measured |
-| Pronunciation scoring | ❌ An Azure adapter was written but **lost in a machine restart before it reached the repository**; it must be rebuilt, and stays off until a supplier is chosen | Not measured |
+| Pronunciation scoring | ⚪ Provider-neutral interface and Azure adapter rebuilt and tested with a mocked provider; **off** until a supplier, price and audio consent are decided (no student route yet) | Not measured |
 
 ## 5. Does it help students learn?
 
@@ -90,7 +93,7 @@ All test results come from **simulated (AI) students**. No real student has used
 
 ## 7. Known limits (what it can't do yet)
 
-- **Lost work to rebuild (r4.4):** the mistake-cause diagnosis, the cross-session learner history, the transfer checks and the pronunciation adapter, with their tests, existed only in a working copy that was lost. None is in the repository. The classroom pilot protocol is.
+- **r4.4 features (rebuilt 13 Nov):** mistake-cause diagnosis, cross-session learner history (new collection, error types only), transfer checks, and the pronunciation adapter are back in the repository with tests. They have **not yet been measured in a paid run**.
 
 - **Live avatar calls:** use the same AI model but **not** the language-teaching improvements (hint ladder, answer guards, level limits, English-only). Everything measured above is text chat only. Linking is the next task, built so that chat and avatar share one engine and can't drift apart.
 - **Most simulated students keep their mistaken belief after a short lesson.** The tutor helps, but about 7 in 10 still get new questions wrong.
