@@ -3,7 +3,8 @@ import { assignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { isFeatureEnabled, isShadowMode } from '../services/featureFlags';
 import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSource } from '../services/curriculumRetrieval';
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
-import { buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, turnEvidence, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
+import { buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, independentSuccessItem, turnEvidence, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
+import { recordProfileTurn } from '../services/learnerLanguageProfile';
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, stripPreAttemptModels, stripCopyReadyModels, type StrippedReply } from '../services/languageLearningState';
 import {
   curriculumFromCourse,
@@ -411,6 +412,13 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
         ...(preAttemptRemoved ? { preAttemptModelsRemoved: preAttemptRemoved } : {}),
       }
     : undefined;
+  // r4.4 #2: remember error types and independent successes across sessions (language turns only; failure-tolerant).
+  if (turn.language && reply && languageTurn) {
+    await recordProfileTurn(turn.session.institutionId, turn.session.studentId, {
+      errorCode: turn.language.signals.diagnosis?.code,
+      independentSuccessOn: independentSuccessItem(turn.language, languageTurn),
+    });
+  }
   const assistantMessage = {
     id: assistantId,
     role: 'ai' as const,

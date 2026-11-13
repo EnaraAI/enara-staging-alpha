@@ -302,6 +302,24 @@ describe('r4.3 route: session integrity (POST-07) and student data exposure (POS
     expect(ai1.meta?.languageTurn?.preAttemptModelsRemoved).toBe(1);
   });
 
+  it('r4.4 #2: a wrong answer is remembered as an error type and the next session\'s tutor instructions mention it', async () => {
+    const ask = async (sid: string, text: string, reply: string, who = 'two') => { ai.create.mockResolvedValueOnce(msg(reply)); return send(who, sid, text); };
+    const s1 = await newSession('two');
+    await ask(s1, 'Can I have an exercise?', '[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NEW_ITEM item=i1]]\nHere: Correct the verb: "She go to bed at ten."');
+    await ask(s1, 'She go to sleep at ten pm.', '[[assess verdict=INCORRECT relevance=ACTIVE_ITEM next=SAME_ITEM item=i1]]\nLook at the verb after she.');
+    await ask(s1, 'She go to sleep at eleven pm.', '[[assess verdict=INCORRECT relevance=ACTIVE_ITEM next=SAME_ITEM item=i1]]\nThink about she.');
+    const doc = await mongoose.connection.collection('learner_language_profiles').findOne({ institutionId: 'r43-school', studentId: 'r43-two' });
+    expect(doc?.entries?.find((e: { code: string }) => e.code === 'missing_third_person_s')?.occurrences).toBeGreaterThanOrEqual(2);
+    expect(JSON.stringify(doc)).not.toMatch(/She go to sleep/); // types only, never the learner's text
+    const s2 = await newSession('two');
+    await ask(s2, 'Hello, can we practise?', '[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NONE]]\nSure.');
+    expect(JSON.stringify(ai.create.mock.calls.at(-1)?.[0]?.system ?? '')).toContain('Recurring difficulty: leaving out -s/-es');
+    // another learner in the same school sees nothing of it
+    const s3 = await newSession('one');
+    expect((await ask(s3, 'Hello, can we practise?', '[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NONE]]\nSure.', 'one')).status).toBe(200);
+    expect(JSON.stringify(ai.create.mock.calls.at(-1)?.[0]?.system ?? '')).not.toContain('Recurring difficulty');
+  }, 30_000);
+
   it('POST-14: the student curriculum context exposes no storage paths or internal identifiers', async () => {
     const r = await request(app).get('/api/me/courses/r43-crs/curriculum').set('Authorization', tokens.one);
     expect(r.status).toBe(200);

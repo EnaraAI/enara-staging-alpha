@@ -4,6 +4,7 @@ import { Institution } from '../models/Institution';
 import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
 import { isLearnerAgeBand } from '../models/learnerAgeBand';
+import { loadProfileLines } from './learnerLanguageProfile';
 import { logger, serializeError } from '../utils/logging';
 import {
   contrastPairClaimMismatch,
@@ -268,6 +269,8 @@ export interface LanguageTeachingContext {
   signals: TurnSignals;
   moves: SelectedMove[];
   length?: LengthTarget;
+  // r4.4 #2: cross-session learner history lines (error types only), loaded server-side.
+  history?: string[];
   prompt: string;
 }
 
@@ -1238,6 +1241,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
   const band: AgeBand = l.ageBand.status === 'known' && l.ageBand.value ? l.ageBand.value : 'unknown';
   const step = cefrStep(l.proficiency.value);
   lines.push(
+    ...(ctx.history?.length ? [...ctx.history.map(untrusted)] : []),
     'Teaching moves for this reply:',
     ...ctx.moves.map((m) => `- ${moveText(m)}`),
     ...stateLines(ctx),
@@ -1493,7 +1497,8 @@ export async function buildLanguageTeachingContext(params: {
     // r2: a clarification-only turn is one short question, so a tighter target.
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
     const length = clarifyOnly ? { targetWords: Math.min(base0.targetWords, 40), maxWords: Math.min(base0.maxWords, 60), basis: `${base0.basis}:clarify` } : base0;
-    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length } as const;
+    const history = await loadProfileLines(params.institutionId, params.studentId);
+    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}) } as const;
     return { ...base, prompt: renderLanguageContextPrompt(base) };
   } catch (error) {
     logger.warn('language_context_failed', { error: serializeError(error) });
@@ -1521,4 +1526,13 @@ export function guardedItems(ctx: Pick<LanguageTeachingContext, 'signals' | 'les
   const solved = s.keyVerdict === 'CORRECT' || s.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
   if (open && !out.includes(open) && !revealing && !solved && (s.hintLevel ?? 1) < 6) out.push(open);
   return out;
+}
+
+// r4.4 #2: the item the learner just answered correctly with no help, if any (feeds the learner history).
+export function independentSuccessItem(ctx: Pick<LanguageTeachingContext, 'signals'>, finalized: { assessment: { verdict: string } }): LessonItem | undefined {
+  const s = ctx.signals;
+  if (!s.answeringCheck || !s.activeLessonItem) return undefined;
+  if (!isSuccess(finalized.assessment.verdict as never)) return undefined;
+  if ((s.learning?.hintTurnsOnItem ?? 0) > 0) return undefined;
+  return s.activeLessonItem;
 }
