@@ -1104,6 +1104,10 @@ export const EXPLICIT_FIRST_LINE = 'The teaching plan calls for explicit instruc
 export const HOLD_LINE = 'If they insist on a mistaken idea, never call it fine, acceptable or "a fair point". Say in one sentence where the idea is true and where it is not, and keep the correction.';
 export const beliefShift = (belief: string) => `They have now shown the same mistaken idea in more than one turn: "${belief.replace(/["<>]/g, '')}". Stop asking the same kind of hint question. In two short sentences give the scope rule (where the idea applies and where it does not), give one contrast example using words not in any open exercise, then ask them to apply it to their open task in their own words. Never write the corrected form of the open task.`;
 export const TEACH_RULE_V2 = 'Their earlier attempt on this item was wrong. If this new answer is still wrong, stop hinting: name their idea in one short line (e.g. "You are using X here"), state the rule clearly in one or two short sentences, show one worked example with a different word (not this item\'s answer), then ask them to try this item again. If this new answer is right, confirm it and do not teach the rule.';
+export const CLARITY_LINE = 'Make this explanation easy to follow: use everyday words at the learner\'s level, one idea per sentence, and no grammar labels they have not met. State the rule first in one plain sentence, then give a short contrast (a right use and a wrong use side by side) with words that are not in any open exercise, then ask them to apply it themselves. Never write the corrected form of the open task.';
+/** v2 (clarity): the learner is stuck, confused or asking why, so the reply should explain rather than only ask. */
+export const needsClarity = (s: { learning?: { hintTurnsOnItem?: number; attemptsOnItem?: number }; whyAfterAttempt?: boolean; hintRequest?: boolean; errorRecurrence?: unknown }, stage: string | null): boolean =>
+  stage === 'teach_rule' || Boolean(s.whyAfterAttempt || s.hintRequest || s.errorRecurrence) || (s.learning?.hintTurnsOnItem ?? 0) >= 2 || (s.learning?.attemptsOnItem ?? 0) >= 2;
 export const TEACH_RULE = 'They have now missed this item twice, so stop hinting: name their belief in one short line (e.g. "You are using X here"), state the rule clearly in one or two short sentences, show one worked example with a different word (not this item\'s answer), then ask them to try this item again.';
 export const RULE_SUMMARY = 'They got it right after a mistake: praise it in a few words, then ask them to say the rule in your own words in one short sentence (e.g. "Tell me the rule in your own words."). Do not give the next exercise in this reply.';
 // Fix 7: the turn after asking for the rule.
@@ -1256,6 +1260,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     else if (stage !== 'teach_rule' && s.whyAfterAttempt) out.push(`- ${WHY_AFTER_ATTEMPT}`);
     if (!researchAblated('hint_ladder')) out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? '') })}`, `- ${SUPPORT_PRECEDENCE}`);
   }
+  if (engineV2('clarity') && s.activeLessonItem && needsClarity(s, supportStage(s))) out.push(`- ${CLARITY_LINE}`);
   if (engineV2('arbitration') && ctx.planPrimary) {
     out.push(`- ${ARBITRATION_LINE}`);
     if (EXPLICIT_METHODS.includes(ctx.planPrimary) && ctx.moves.some((m) => m.id === 'present_lesson_item')) out.push(`- ${EXPLICIT_FIRST_LINE}`);

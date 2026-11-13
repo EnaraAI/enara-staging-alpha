@@ -65,3 +65,16 @@ describe('selfCheck (independent check on the tutor grade)', () => {
     expect((fin('They get married in April', late).assessment as { verdict: string }).verdict).toBe('CORRECT');
   });
 });
+
+describe('clarity (explain plainly when stuck)', () => {
+  it('off by default and not in "all"; on: only when stuck / asking why, never with a first attempt', async () => {
+    const { CLARITY_LINE } = await import('../src/services/languageTeachingContext');
+    delete process.env.ENARA_ENGINE_V2; expect(build('on April', late).prompt).not.toContain(CLARITY_LINE);
+    process.env.ENARA_ENGINE_V2 = 'all'; expect(engineV2('clarity')).toBe(false);
+    process.env.ENARA_ENGINE_V2 = 'clarity'; expect(engineV2('clarity')).toBe(true);
+    expect(build('on April', late).prompt).toContain(CLARITY_LINE);
+    expect(build('on April', early).prompt).not.toContain(CLARITY_LINE);
+    expect(build('Why is it not on?', late).prompt).toContain(CLARITY_LINE);
+    expect(CLARITY_LINE).toMatch(/Never write the corrected form of the open task/);
+  });
+});
