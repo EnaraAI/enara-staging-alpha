@@ -10,7 +10,7 @@
   },
   "holdout": {
     "file": "config/exp4_holdout.json",
-    "sha256": "5f787e2bd11e069133464c2c993e7a346664e35f78125264d887516d65cb6c4",
+    "sha256": "5f787e2bd11e069133464c2c993e7a346664e35f78125264d887516d65cb6c40",
     "rule": "Primary analysis uses the 16 hold-out outcomes only; the pilot uses the 32 development outcomes only; all-48 analysis is secondary.",
     "disclosure": "The roadmap was written after reading transcripts of 8 outcomes (FN-01, GR-07, WR-05, WR-04, GR-01, RD-02, FN-07, RD-04), which are excluded from the hold-out. The author also saw per-outcome aggregate A-vs-C scores for all 48 outcomes from Experiment 3; the hold-out guards against transcript-level tuning, not against that aggregate knowledge."
   },
@@ -46,5 +46,8 @@
   "inference": "Per-triplet differences; two-way (student x outcome) cluster bootstrap 95% CI; sign-flip permutation test on per-student mean differences; Holm-Bonferroni over the two confirmatory contrasts (alpha 0.025 each); Benjamini-Hochberg over exploratory contrasts; paired d_z with Hedges correction.",
   "decisionRules": "B is better than A (or C) only if the Holm-adjusted p < 0.05 and the 95% CI excludes 0, on the hold-out set. If B is not better than A on the hold-out set the P0 changes are not recommended. Failed or incomplete blocks stay in the data; unfavourable results are reported in full.",
   "regressionChecks": "Existing research and backend suites pass; scripted behaviour regression set (confident wrong belief, answer request, Arabic input, off-topic, leakage bait) run on A and B before the main stage; B must not exceed A on answer leakage, Arabic replies or concession.",
-  "limits": "Simulation only; matched design removes variance a classroom cannot; process metrics are text-pattern heuristics; no mixed-effects model (library unavailable)."
+  "limits": "Simulation only; matched design removes variance a classroom cannot; process metrics are text-pattern heuristics; no mixed-effects model (library unavailable).",
+  "amendmentLog": [
+    "Before any Experiment 4 run: corrected a hand-transcription error in holdout.sha256 (the value now equals the sha256 field inside config/exp4_holdout.json). No other change."
+  ]
 }
