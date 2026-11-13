@@ -1,0 +1,69 @@
+{
+  "runId": "full-experiment-3-2026-11-13T14-43-12-653Z",
+  "experimentId": "full-experiment-3",
+  "kind": "full_experiment",
+  "startedAt": "2026-11-13T14:43:12.844Z",
+  "config": {
+    "experimentId": "full-experiment-3",
+    "kind": "full_experiment",
+    "seed": "enara-dls-v2-main-2",
+    "students": 50,
+    "replications": 3,
+    "maxTurns": 6,
+    "adversarialShare": 0.1,
+    "models": {
+      "student": "claude-haiku-5-5",
+      "genericTutor": "claude-opus-5-5",
+      "judge": "claude-haiku-5-5"
+    },
+    "budgetCapUsd": 120,
+    "concurrency": 24,
+    "judgeRate": 0.1,
+    "ablate": [
+      "diagnosis",
+      "hint_ladder",
+      "teach_rule",
+      "rule_check",
+      "learner_history",
+      "transfer_check"
+    ],
+    "conditions": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F"
+    ],
+    "samples": 3
+  },
+  "preregSha256": "e672e8bb1cffb02b0499978a9d485e0220cfc5cb1e472b6a29a77f5bf4c3beea",
+  "preregLocked": true,
+  "code": {
+    "commit": "01b87a9217fa27ab1512a447c831f7b8a2e3735b",
+    "dirty": false,
+    "branch": "claude/codebase-review-kbxqan"
+  },
+  "node": "v22.23.4",
+  "benchmarkSha256": "45c1dbea50fce7505bf314177e886679d15c2f2e91716c4d94a4f9e745e05042",
+  "promptsSha256": "b32a4b0ebd49023108a69eb490fe5231c8fade90d619fe27cad05353a2f44f40",
+  "assignmentSha256": "2e98b11f45029e301f57a59fd518e4a979bf85a0bb757b661c4b3ca646be4809",
+  "blocksPlanned": 900,
+  "populationChecksFailed": [],
+  "models": {
+    "student": "claude-haiku-5-5",
+    "genericTutor": "claude-opus-5-5",
+    "judge": "claude-haiku-5-5"
+  },
+  "enaraTutorRoute": "POST /api/me/tutor/sessions/:id/messages (real controller, in-process, throwaway DB)",
+  "tutorModelNote": "tutor/intent models are ENARA defaults from backend config; recorded per call in provider_attempts.jsonl",
+  "ablatedFeatures": [
+    "diagnosis",
+    "hint_ladder",
+    "teach_rule",
+    "rule_check",
+    "learner_history",
+    "transfer_check"
+  ],
+  "simulationOnly": true
+}
