@@ -19,9 +19,13 @@ export class OutgoingScanner {
 export const readKey = (file = process.env.ENARA_KEY_FILE ?? ''): string => { if (!file) throw new Error('ENARA_KEY_FILE is not set'); return readFileSync(file, 'utf8').trim(); };
 
 const price = (model: string, k: 'input_token' | 'output_token') => unitPriceUsd('anthropic', model, k);
-export const costOf = (model: string, inTok: number | null, outTok: number | null): number | null => {
+/** Cost of one call. Anthropic reports cached tokens separately from input_tokens: cache reads cost 0.1x the input price and 5-minute cache writes 1.25x.
+ *  Omitting them (as the first version of this ledger did) understates the cost of any prompt that uses caching. */
+export const CACHE_READ_MULT = 0.1; export const CACHE_WRITE_MULT = 1.25;
+export const costOf = (model: string, inTok: number | null, outTok: number | null, cacheRead: number | null = 0, cacheWrite: number | null = 0): number | null => {
   const pi = price(model, 'input_token'); const po = price(model, 'output_token');
-  if (inTok === null || outTok === null || pi == null || po == null) return null; return inTok * pi + outTok * po;
+  if (inTok === null || outTok === null || pi == null || po == null) return null;
+  return inTok * pi + outTok * po + (cacheRead ?? 0) * pi * CACHE_READ_MULT + (cacheWrite ?? 0) * pi * CACHE_WRITE_MULT;
 };
 
 export interface ChatOpts { model: string; system: string; user: string; maxTokens?: number; effort?: 'low' | 'medium' | 'high'; temperature?: number; }
@@ -39,12 +43,13 @@ export class Provider {
           body: JSON.stringify({ model: o.model, max_tokens: o.maxTokens ?? 1500, ...(o.effort ? { output_config: { effort: o.effort } } : {}), system: o.system, messages: [{ role: 'user', content: o.user }] }) });
         status = res.status; body = await res.text();
       } catch (e) { err = (e as Error).message; }
-      let usage: { input_tokens?: number; output_tokens?: number } | null = null; let text = ''; let ok = status !== null && status >= 200 && status < 300;
+      let usage: { input_tokens?: number; output_tokens?: number; cache_read_input_tokens?: number; cache_creation_input_tokens?: number } | null = null; let text = ''; let ok = status !== null && status >= 200 && status < 300;
       if (ok) { try { const j = JSON.parse(body); usage = j.usage ?? null; text = (j.content ?? []).filter((b: { type?: string }) => b.type === 'text').map((b: { text?: string }) => b.text ?? '').join('').trim(); if (!text) { ok = false; err = 'empty text'; } } catch { ok = false; err = 'unparseable body'; } }
       else if (!err) err = `http ${status}`;
       const inTok = usage?.input_tokens ?? null; const outTok = usage?.output_tokens ?? null;
-      const cost = usage ? costOf(o.model, inTok, outTok) : null;
-      const row = this.ledger.record({ campaign: ctx.campaign, studentId: ctx.studentId, blockId: ctx.blockId, role: ctx.role, provider: 'anthropic', model: o.model, httpStatus: status, ok, retryOf: firstSeq, inputTokens: inTok, outputTokens: outTok, cacheReadTokens: null, cacheWriteTokens: null, costUsd: cost, priced: cost !== null, error: ok ? null : err });
+      const cRead = usage?.cache_read_input_tokens ?? null; const cWrite = usage?.cache_creation_input_tokens ?? null;
+      const cost = usage ? costOf(o.model, inTok, outTok, cRead, cWrite) : null;
+      const row = this.ledger.record({ campaign: ctx.campaign, studentId: ctx.studentId, blockId: ctx.blockId, role: ctx.role, provider: 'anthropic', model: o.model, httpStatus: status, ok, retryOf: firstSeq, inputTokens: inTok, outputTokens: outTok, cacheReadTokens: cRead, cacheWriteTokens: cWrite, costUsd: cost, priced: cost !== null, error: ok ? null : err });
       if (firstSeq === null) firstSeq = row.seq; spent += cost ?? 0;
       if (ok) return { text, costUsd: spent };
       if (status === 400 || status === 404) throw new Error(`provider rejected request (${status})`);
@@ -66,10 +71,10 @@ export function installFetchGuard(ledger: Ledger, getCtx: () => CallCtx, scanner
     if (scanner) { const hit = scanner.scan(reqBody); if (hit) { leaks.push(`${ctx.blockId}: ${hit.slice(0, 80)}`); throw new LeakageDetected('assessment text in outgoing tutor request'); } }
     let model = 'unknown'; try { model = JSON.parse(reqBody).model ?? 'unknown'; } catch { /* keep unknown */ }
     let res: Response | null = null; let err: string | null = null; try { res = await orig(input as never, init); } catch (e) { err = (e as Error).message; }
-    let usage: { input_tokens?: number; output_tokens?: number } | null = null;
+    let usage: { input_tokens?: number; output_tokens?: number; cache_read_input_tokens?: number; cache_creation_input_tokens?: number } | null = null;
     if (res) { try { const j = await res.clone().json(); usage = j.usage ?? null; } catch { /* streaming or non-json: usage unknown */ } }
-    const inTok = usage?.input_tokens ?? null; const outTok = usage?.output_tokens ?? null; const cost = usage ? costOf(model, inTok, outTok) : null;
-    ledger.record({ campaign: ctx.campaign, studentId: ctx.studentId, blockId: ctx.blockId, role: ctx.role, provider: 'anthropic', model, httpStatus: res?.status ?? null, ok: !!res && res.ok, retryOf: null, inputTokens: inTok, outputTokens: outTok, cacheReadTokens: null, cacheWriteTokens: null, costUsd: cost, priced: cost !== null, error: res?.ok ? null : err ?? `http ${res?.status}` });
+    const inTok = usage?.input_tokens ?? null; const outTok = usage?.output_tokens ?? null; const cRead = usage?.cache_read_input_tokens ?? null; const cWrite = usage?.cache_creation_input_tokens ?? null; const cost = usage ? costOf(model, inTok, outTok, cRead, cWrite) : null;
+    ledger.record({ campaign: ctx.campaign, studentId: ctx.studentId, blockId: ctx.blockId, role: ctx.role, provider: 'anthropic', model, httpStatus: res?.status ?? null, ok: !!res && res.ok, retryOf: null, inputTokens: inTok, outputTokens: outTok, cacheReadTokens: cRead, cacheWriteTokens: cWrite, costUsd: cost, priced: cost !== null, error: res?.ok ? null : err ?? `http ${res?.status}` });
     if (!res) throw new Error(err ?? 'fetch failed'); return res;
   }) as typeof fetch;
   return () => { globalThis.fetch = orig; };

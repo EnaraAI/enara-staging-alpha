@@ -40,3 +40,9 @@ cd backend && RETRY_FAILED=1 ENARA_KEY_FILE=/home/user/.enara_key npx tsx ../res
 cd backend && RETRY_FAILED=1 ENARA_KEY_FILE=/home/user/.enara_key npx tsx ../research/deep-learning-simulation-v2/src/cli.ts run ../research/deep-learning-simulation-v2/config/exp5c_main.json
 ```
 Estimated cost: about $20 for the 104 B blocks of 5b and about $8 for the 62 B blocks of 5c.
+
+## Offline findings from the recorded 5b data (no API used)
+
+- **Tokens and cost of the tutor calls (ok blocks):** current ENARA 3,872 input tokens per call (300 blocks, 1,847 calls); ENARA with v2 2,461 non-cached input tokens per call (196 blocks, 1,256 calls), a 36% drop because about 1,400 tokens per call moved into the cache. Recorded tutor-side cost per block: $0.158 vs $0.129.
+- **Cost accounting gap found and fixed:** the ledger counted only non-cached input tokens, so the v2 arm's recorded cost **omits cache read and write charges** (reads cost 0.1x and writes 1.25x the input price; the cached-token counts were not captured). The corrected estimate for the v2 arm is about **$0.131 to $0.139 per block** (12 to 17% below current ENARA) if each block writes the cached prefix once and reads it on later turns; a worst case where every call wrote the cache would put it above current ENARA, which the 36% token drop makes very unlikely but this data cannot exclude. The ledger now records `cache_read_input_tokens` and `cache_creation_input_tokens` and prices them (2 new tests), so future runs are exact. Cost figures for the v2 arm in this report and in earlier summaries should be read with this caveat.
+- **Behaviour (196 complete triplets, text-pattern metrics):** three or more consecutive same-shape hint turns: current ENARA 19.4%, v2 17.3%, plain tutor 36.2%. Recap in the last turn: 13.3%, 7.1%, 27.6%. Concession phrases about 1% in all arms.

@@ -34,3 +34,20 @@ describe('provider guard', () => {
 describe('scanner precision', () => {
   it('ignores short generic phrases (fewer than 6 words) but still catches full assessment sentences', () => { const sc = new OutgoingScanner(['what does it mean', 'Ben reads a book every night']); expect(sc.scan('Tutor: what does it mean here?')).toBeNull(); expect(new OutgoingScanner(['Ben reads a book every single night']).scan('Write: ben reads a book every single night.')).not.toBeNull(); expect(sc.scan('Please put these words in order: the dog is big or small today')).toBeNull(); });
 });
+
+import { costOf, CACHE_READ_MULT, CACHE_WRITE_MULT } from '../src/providers/guard';
+import { unitPriceUsd } from '../../../backend/src/services/priceCatalog';
+describe('cost accounting includes cached tokens', () => {
+  const pi = unitPriceUsd('anthropic', 'claude-opus-5-5', 'input_token')!; const po = unitPriceUsd('anthropic', 'claude-opus-5-5', 'output_token')!;
+  it('cache reads cost 0.1x and writes 1.25x the input price; without cache fields the cost is unchanged', () => {
+    expect(costOf('claude-opus-5-5', 1000, 100)).toBeCloseTo(1000 * pi + 100 * po, 10);
+    expect(costOf('claude-opus-5-5', 1000, 100, 1800, 0)).toBeCloseTo(1000 * pi + 100 * po + 1800 * pi * CACHE_READ_MULT, 10);
+    expect(costOf('claude-opus-5-5', 1000, 100, 0, 1800)).toBeCloseTo(1000 * pi + 100 * po + 1800 * pi * CACHE_WRITE_MULT, 10);
+    expect(costOf('claude-opus-5-5', null, 5, 100, 0)).toBeNull(); expect(costOf('unpriced-model', 10, 10, 5, 5)).toBeNull();
+  });
+  it('the ledger records cache tokens from the provider response and prices them', async () => {
+    const l = mk(); const f = (async () => new Response(JSON.stringify({ content: [{ type: 'text', text: 'x' }], usage: { input_tokens: 100, output_tokens: 10, cache_read_input_tokens: 1800, cache_creation_input_tokens: 0 } }), { status: 200 })) as unknown as typeof fetch;
+    await new Provider(l, 'k', null, f, async () => {}).chat({ model: 'claude-opus-5-5', system: 's', user: 'u' }, ctx); const row = Ledger.read(l.file)[0];
+    expect(row.cacheReadTokens).toBe(1800); expect(row.costUsd).toBeCloseTo(100 * pi + 10 * po + 1800 * pi * 0.1, 10);
+  });
+});

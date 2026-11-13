@@ -4,9 +4,10 @@
 //  belief      - the tutor names the learner's mistaken idea in its hidden marker; repeated ideas trigger hold-the-line + scope-rule teaching
 //  memory      - beliefs, what worked and due reviews persist across sessions; an opening review check; due-review endpoint
 //  cache       - stable instructions first with a cache breakpoint, volatile state last (same content, cheaper input)
+//  keyMatch    - the answer key treats contractions as their full forms (doesn't = does not); named-only, NOT part of "all"
 //  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
-export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration';
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch';
 export const engineV2 = (feature: EngineV2Feature): boolean => {
   const v = (process.env.ENARA_ENGINE_V2 ?? '').split(',').map((x) => x.trim());
-  return v.includes(feature) || (v.includes('all') && feature !== 'arbitration');
+  return v.includes(feature) || (v.includes('all') && feature !== 'arbitration' && feature !== 'keyMatch');
 };

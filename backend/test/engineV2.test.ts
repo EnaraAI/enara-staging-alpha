@@ -182,3 +182,17 @@ describe('item 5: arbitration between the teaching plan (how to explain) and the
     process.env.ENARA_ENGINE_V2 = 'arbitration'; expect(withPlan('direct_instruction', 'Can you give me one exercise?', [])).toMatch(/no rule, no reminder and no example before their first try/i);
   });
 });
+
+import { evaluateAgainstKey, expandContractions } from '../src/services/languageLearningState';
+describe('item 6: answer key treats contractions as full forms (keyMatch, named-only)', () => {
+  const item = { id: 'k', prompt: 'x', acceptedAnswers: ['She does not go to school on Sundays', 'He has finished'], targetForms: ['does not'], criteria: [1] };
+  it('off: exact strings only (unchanged); on: contractions match, wrong answers still do not', () => {
+    delete process.env.ENARA_ENGINE_V2; expect(evaluateAgainstKey("She doesn't go to school on Sundays", item as never)).toBeNull(); expect(evaluateAgainstKey('She does not go to school on Sundays.', item as never)).toBe('CORRECT');
+    process.env.ENARA_ENGINE_V2 = 'keyMatch'; expect(evaluateAgainstKey("She doesn't go to school on Sundays", item as never)).toBe('CORRECT'); expect(evaluateAgainstKey('She doesn’t go to school on Sundays!', item as never)).toBe('CORRECT');
+    expect(evaluateAgainstKey('She do not go to school on Sundays', item as never)).toBeNull(); expect(evaluateAgainstKey("She doesn't goes to school on Sundays", item as never)).toBeNull(); expect(evaluateAgainstKey("He's finished", item as never)).toBeNull(); // 's is ambiguous: left to the tutor
+  });
+  it('is named-only: "all" does not enable it; expansion is correct for common forms', () => {
+    process.env.ENARA_ENGINE_V2 = 'all'; expect(engineV2('keyMatch')).toBe(false);
+    expect(expandContractions("I can't, won't, don't; they're; we've; I'll; I'm")).toBe('I can not, will not, do not; they are; we have; I will; i am');
+  });
+});

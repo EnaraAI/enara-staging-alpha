@@ -15,6 +15,7 @@
 //   3. prose_fallback   - the r3 confirmsCorrect() reading of the reply, used only
 //                         when neither of the above exists (older messages).
 
+import { engineV2 } from './engineV2';
 export const ANSWER_VERDICTS = ['NOT_EVALUATED', 'INCORRECT', 'PARTIALLY_CORRECT', 'CORRECT', 'CORRECT_WITH_EQUIVALENT_FORMULATION', 'AMBIGUOUS'] as const;
 export type AnswerVerdict = (typeof ANSWER_VERDICTS)[number];
 // Relevance of the learner's message to the task the tutor left open.
@@ -270,13 +271,19 @@ const SELF_CORRECTION_SPLIT = /\s*(?:—|–|-{2}|\bsorry\b,?|\bi mean\b,?|\bi m
 
 // Only ever returns a success verdict: an answer that doesn't match a stored
 // accepted answer may still be right (valid alternative), so the tutor decides.
+/** v2 (keyMatch): contractions are matched as their full forms on both sides (She doesn't go = She does not go). Ambiguous 's and 'd are left alone. */
+export function expandContractions(t: string): string {
+  return t.replace(/[’‘]/g, "'").replace(/\bcan't\b/gi, 'can not').replace(/\bcannot\b/gi, 'can not').replace(/\bwon't\b/gi, 'will not').replace(/\bshan't\b/gi, 'shall not')
+    .replace(/n't\b/gi, ' not').replace(/\b(\w+)'re\b/gi, '$1 are').replace(/\b(\w+)'ve\b/gi, '$1 have').replace(/\b(\w+)'ll\b/gi, '$1 will').replace(/\bi'm\b/gi, 'i am');
+}
 export function evaluateAgainstKey(answer: string, item: LessonItem | undefined): AnswerVerdict | null {
   if (!item?.acceptedAnswers?.length) return null;
-  const accepted = item.acceptedAnswers.map(normAnswer).filter(Boolean);
-  const whole = normAnswer(answer);
+  const nrm = engineV2('keyMatch') ? (x: string) => normAnswer(expandContractions(x)) : normAnswer;
+  const accepted = item.acceptedAnswers.map(nrm).filter(Boolean);
+  const whole = nrm(answer);
   if (accepted.includes(whole)) return 'CORRECT';
   const parts = answer.split(SELF_CORRECTION_SPLIT).filter((p) => p && p.trim());
-  if (parts.length > 1 && accepted.includes(normAnswer(parts[parts.length - 1]))) return 'CORRECT';
+  if (parts.length > 1 && accepted.includes(nrm(parts[parts.length - 1]))) return 'CORRECT';
   return null;
 }
 
