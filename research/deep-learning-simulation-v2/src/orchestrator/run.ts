@@ -20,7 +20,7 @@ import { buildReports, type BlockResult, type Prereg } from '../analytics/analyz
 
 export interface ExperimentConfig {
   experimentId: string; kind: 'validation_campaign' | 'full_experiment' | 'dry'; seed: string; students: number; replications: number; maxTurns: number; adversarialShare: number;
-  models: { student: string; genericTutor: string; judge: string }; budgetCapUsd: number; concurrency: number; judgeRate: number; ablate: string[]; conditions: Condition[]; areasPerStudent?: number;
+  models: { student: string; genericTutor: string; judge: string }; budgetCapUsd: number; concurrency: number; judgeRate: number; ablate: string[]; conditions: Condition[]; samples?: number;
 }
 const ROOT = path.resolve(__dirname, '../..');
 export const loadBenchmark = (): Outcome[] => readdirSync(path.join(ROOT, 'benchmark/outcomes')).filter((f) => f.endsWith('.json')).sort().flatMap((f) => JSON.parse(readFileSync(path.join(ROOT, 'benchmark/outcomes', f), 'utf8')).outcomes as Outcome[]);
@@ -68,12 +68,12 @@ export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean
   const runBlock = async (b: Block) => {
     const s = pop.find((x) => x.id === b.studentId)!; const o = byId.get(b.outcomeId)!; const t0 = Date.now();
     const ctxOf = (role: string): CallCtx => ({ campaign: cfg.experimentId, studentId: s.id, blockId: b.blockId, role });
-    const start = blockStart(s, o.area, o.id, o.misconceptions.length); const mis = o.misconceptions[start.heldMisconceptionIdx] ?? null;
+    const start = blockStart(s, o.area, o.id, o.misconceptions.length, o.difficulty); const mis = o.misconceptions[start.heldMisconceptionIdx] ?? null;
     const persona = studentPersona(s, { cefr: o.cefr, area: o.area, heldMisconception: mis, knowsAlready: start.knowsAlready });
     let rec: TeachingRecord | null = null; let scores: BlockScores | null = null; let error: string | null = null; let leakEvents = 0;
     try {
       await als.run(ctxOf('tutor'), async () => {
-        const base = { provider, model: cfg.models.student, persona, student: s, blockId: b.blockId, outcome: o, note: '', ctx: ctxOf };
+        const base = { provider, model: cfg.models.student, persona, student: s, blockId: b.blockId, outcome: o, note: '', ctx: ctxOf, samples: cfg.samples, know: { knowsAlready: start.knowsAlready, misconception: mis, difficulty: o.difficulty } };
         scores = await assessBlock(base);                                   // pre-test, before any instruction
         rec = await adapters[b.condition].teach({ student: s, outcome: o, blockId: b.blockId, persona, provider, studentModel: cfg.models.student, ctx: ctxOf, maxTurns: cfg.maxTurns });
         scores = await assessAfter({ ...base, note: rec.notes }, scores);   // post, transfer, delayed: independent of the tutor

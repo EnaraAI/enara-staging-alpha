@@ -2,7 +2,9 @@ import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
 import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { SentenceSplitter } from '../services/sentenceSplitter';
 import { TutorSession } from '../models/TutorSession';
-import { appendTutorMessages } from '../services/tutorMessages';
+import { appendTutorMessages, loadTutorMessages } from '../services/tutorMessages';
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, LANGUAGE_POLICY_VERSION } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
+import { AssessmentMarkerFilter, filterSummary, type StrippedReply } from '../services/languageLearningState';
 import { generateMessageId } from '../utils/idGenerator';
 import { randomUUID } from 'crypto';
 import { Response } from 'express';
@@ -187,21 +189,28 @@ function toLanguage(value: unknown): Language {
 // The course outline for a call is loaded once and reused for each turn while
 // the instance stays warm.
 const CURRICULUM_TTL_MS = 10 * 60 * 1000;
-const curriculumCache = new Map<string, { curriculum?: TutorCurriculum; at: number }>();
+const curriculumCache = new Map<string, { curriculum?: TutorCurriculum; curriculumId?: string; at: number }>();
 
 async function loadSessionCurriculum(session: IAvatarSession): Promise<TutorCurriculum | undefined> {
-  if (!session.courseId || !session.studentId) return undefined;
+  return (await loadSessionCourse(session)).curriculum;
+}
+// The enrolment-checked curriculum id is what the language engine reads (same as the chat route).
+async function loadSessionCourse(session: IAvatarSession): Promise<{ curriculum?: TutorCurriculum; curriculumId?: string }> {
+  if (!session.courseId || !session.studentId) return {};
   const cached = curriculumCache.get(session.id);
-  if (cached && Date.now() - cached.at < CURRICULUM_TTL_MS) return cached.curriculum;
+  if (cached && Date.now() - cached.at < CURRICULUM_TTL_MS) return cached;
   let curriculum: TutorCurriculum | undefined;
+  let curriculumId: string | undefined;
   try {
-    curriculum = curriculumFromCourse(await buildCourseTree(session.studentId, session.courseId), session.lessonId);
+    const tree = await buildCourseTree(session.studentId, session.courseId);
+    curriculumId = tree.curriculumId;
+    curriculum = curriculumFromCourse(tree, session.lessonId);
   } catch {
     // Answer without the curriculum if the course can't be loaded.
   }
   if (curriculumCache.size > 200) curriculumCache.delete(curriculumCache.keys().next().value!);
-  curriculumCache.set(session.id, { curriculum, at: Date.now() });
-  return curriculum;
+  curriculumCache.set(session.id, { curriculum, curriculumId, at: Date.now() });
+  return { curriculum, curriculumId };
 }
 
 // Calls a user may start per day. Staff only preview the tutor and aren't
@@ -554,8 +563,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   // Independent setup runs in parallel: every millisecond here is silence on the call.
   // Student turns are counted so the tutor puts up a new visual only every few
   // turns (seen live: one on every answer); asked-for visuals always draw.
-  const [curriculum, learner, reservation, , plan, countedTurn] = await Promise.all([
-    loadSessionCurriculum(session),
+  const [course, learner, reservation, , plan, countedTurn] = await Promise.all([
+    loadSessionCourse(session),
     session.studentId ? getLearnerSnapshot(session.studentId) : Promise.resolve(undefined),
     session.studentId && kind === 'turn'
       ? reserveUsage({ userId: req.user!.id, studentId: session.studentId, feature: 'voice', sessionId: session.id }).catch(
@@ -590,7 +599,15 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       ? AvatarSession.findOneAndUpdate({ id: session.id }, { $inc: { turnCount: 1 } }, { new: true }).select('turnCount').lean()
       : Promise.resolve(null),
   ]);
+  const curriculum = course.curriculum;
   if (spokenLanguage) session.language = spokenLanguage;
+
+  // Language course: the SAME engine as the text chat (shared pipeline). Null for non-language courses (the call then teaches as before).
+  // The engine reads stored turn state, so it gets the stored history (chat and voice turns alike), not the browser's copy.
+  const storedHistory = session.studentId && session.courseId ? languageHistoryFrom((await loadTutorMessages({ id: session.id, studentId: session.studentId } as never).catch(() => [])) as { role: string; text: string; meta?: unknown }[]) : [];
+  const languagePrep = session.studentId && course.curriculumId
+    ? await prepareLanguageContext({ institutionId: session.institutionId, curriculumId: course.curriculumId, lessonId: session.lessonId, studentId: session.studentId, sessionId: session.id, courseId: session.courseId, message: last?.content ?? '', history: storedHistory, hintsOnly: tutorPolicy.policy === 'hints_only', masteryStatus: plan?.masteryStatus }, 'voice').catch((error) => { logger.warn('avatar_language_context_failed', { error: serializeError(error) }); return null; })
+    : null;
 
   const lessonTitle =
     curriculum?.chapters.find((c) => c.id === curriculum.currentLessonId)?.title || session.lessonTitle;
@@ -695,7 +712,9 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   };
   if (visualRequested || autoVisual) res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
 
-  const languageLine = spokenLanguage
+  const languageLine = languagePrep
+    ? '(Reply only in English.)'
+    : spokenLanguage
     ? `(Reply only in ${spokenLanguage === 'arabic' ? 'Egyptian Arabic' : 'English'}, whatever language earlier turns used.)`
     : '';
   const query = [
@@ -719,6 +738,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     .filter(Boolean)
     .join('\n');
 
+  let languageMarker: StrippedReply | undefined;
+  let guardedRemoved = 0;
   let spoken = '';
   // The reply may open with the hidden marker: hold the first characters until
   // it's clear whether it does.
@@ -732,7 +753,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     if (inlineSpeech) for (const sentence of splitter.push(text)) sayInline(sentence);
   };
   try {
-    for await (const chunk of streamDirectTutorModel({
+    const modelStream = streamDirectTutorModel({
       query,
       history: messages,
       teachingMethod: 'socratic',
@@ -741,7 +762,22 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       learner: learner ? describeSnapshot(learner) : undefined,
       pedagogy: [plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined,
       planActive: Boolean(plan),
-    })) {
+      languageContext: languagePrep?.prompt,
+    });
+    // Language course: buffer the reply so the shared guards and marker handling run BEFORE anything is spoken or shown (same guarantees as the text chat).
+    async function* chunks(): AsyncGenerator<string> {
+      if (!languagePrep) { yield* modelStream; return; }
+      const filter = new AssessmentMarkerFilter();
+      let answer = '';
+      for await (const d of modelStream) { if (closed) break; const v = filter.push(d); if (v) answer += v; }
+      const tail = filter.end();
+      if (tail) answer += tail;
+      languageMarker = filterSummary(filter, answer);
+      const g = applyReplyGuards(languagePrep.context, answer.trim(), last?.content ?? '');
+      guardedRemoved = g.removed;
+      if (g.text) yield g.text;
+    }
+    for await (const chunk of chunks()) {
       if (closed) break;
       if (headDone) {
         emit(chunk);
@@ -784,11 +820,15 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   } else if (reservation) {
     await settleUsage(reservation, { model: getConfig().anthropicVoiceModel });
   }
+  const aiMessageId = generateMessageId();
+  const languageTurn = spoken && session.studentId && languagePrep
+    ? await completeLanguageTurn({ language: languagePrep.context, objectiveId: plan?.teaching.objectiveId, reply: spoken.trim(), learnerText: last?.content ?? '', messageId: aiMessageId, marker: languageMarker, removed: guardedRemoved, institutionId: session.institutionId as string, studentId: session.studentId }).catch((error) => { logger.warn('avatar_language_turn_failed', { error: serializeError(error) }); return undefined; })
+    : undefined;
   if (spoken && session.studentId) {
     const now = Date.now();
     const turn = [
       ...(last ? [{ id: generateMessageId(), role: 'user' as const, text: last.content, timestamp: new Date(now - 1) }] : []),
-      { id: generateMessageId(), role: 'ai' as const, text: spoken.trim(), timestamp: new Date(now) },
+      { id: aiMessageId, role: 'ai' as const, text: spoken.trim(), timestamp: new Date(now), ...(languageTurn ? { meta: { intent: 'tutor_voice', version: LANGUAGE_POLICY_VERSION, languageTurn } } : {}) },
     ];
     await appendTutorMessages(
       { id: session.id, studentId: session.studentId, institutionId: req.user!.institutionId, courseId: session.courseId, lessonId: session.lessonId },

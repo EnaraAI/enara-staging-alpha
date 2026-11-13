@@ -3,9 +3,9 @@ import { assignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { isFeatureEnabled, isShadowMode } from '../services/featureFlags';
 import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSource } from '../services/curriculumRetrieval';
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
-import { buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, independentSuccessItem, turnEvidence, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
-import { recordProfileTurn } from '../services/learnerLanguageProfile';
-import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, stripPreAttemptModels, stripCopyReadyModels, type StrippedReply } from '../services/languageLearningState';
+import { type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom } from '../services/languageTurnPipeline'; // shared with the live avatar
+import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
 import {
   curriculumFromCourse,
   isDirectTutorModelConfigured,
@@ -246,14 +246,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
 
   // r4: the same recent turns with their stored language-turn state, for the
   // engine only (the model never receives metadata; it gets `history`).
-  const languageHistory = earlier
-    .filter((m) => m.role === 'user' || m.role === 'ai')
-    .slice(-12)
-    .map((m) => ({
-      role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
-      content: m.text,
-      languageTurn: (m as { meta?: { languageTurn?: LanguageTurnEvidence } }).meta?.languageTurn ?? null,
-    }));
+  const languageHistory = languageHistoryFrom(earlier as { role: string; text: string; meta?: unknown }[]);
 
   const enrichedQuery = [
     curriculumSummary ? `Curriculum context: ${curriculumSummary}` : '',
@@ -300,7 +293,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
   // Language course: labelled learner/lesson context and this turn's teaching
   // moves. Built from server-side records only (session owner, enrolled course,
   // the school's own curriculum). Like a plan, it needs the direct model.
-  turn.language = await buildLanguageTeachingContext({
+  turn.language = (await prepareLanguageContext({
     institutionId: session.institutionId,
     curriculumId: resolvedCurriculumId,
     lessonId: session.lessonId,
@@ -313,7 +306,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     history: languageHistory,
     hintsOnly: tutorPolicy.policy === 'hints_only',
     masteryStatus: turn.plan?.masteryStatus,
-  });
+  }, 'chat'))?.context ?? null;
   if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language) {
     turn.orchestrator = {
       course_id: enaraCourseId,
@@ -389,36 +382,14 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
   // form are removed (stored and sent text alike; the stream gets a replace event).
   let preAttemptRemoved = 0;
   if (turn.language && reply) {
-    const guarded = stripPreAttemptModels(aiResult.answer, guardedItems(turn.language), turn.text, [...(turn.language.lesson.spec?.vocabulary ?? []), ...(turn.language.lesson.spec?.examples ?? [])]);
-    if (guarded.removed.length) { aiResult = { ...aiResult, answer: guarded.text }; preAttemptRemoved = guarded.removed.length; }
-    // Fix 2A: a gapped check is never answerable by copying a filled model of it.
-    const copy = stripCopyReadyModels(aiResult.answer, turn.text);
-    if (copy.removed.length) { aiResult = { ...aiResult, answer: copy.text }; preAttemptRemoved += copy.removed.length; }
+    const g = applyReplyGuards(turn.language, aiResult.answer, turn.text);
+    if (g.removed) { aiResult = { ...aiResult, answer: g.text }; preAttemptRemoved = g.removed; }
   }
   const citations = citationsIn(aiResult.answer, turn.sources);
   const assistantId = generateMessageId();
   const languageTurn = turn.language && reply
-    ? {
-        ...turnEvidence(turn.language, turn.plan?.teaching.objectiveId),
-        ...finalizeLanguageTurn(turn.language, {
-          reply: aiResult.answer,
-          learnerText: turn.text,
-          messageId: assistantId,
-          parsed: turn.languageMarker?.assessment ?? null,
-          malformed: turn.languageMarker?.malformed,
-          untrustedMarkers: turn.languageMarker?.untrustedMarkers,
-          firstMarkerNotLeading: turn.languageMarker?.firstMarkerNotLeading,
-        }),
-        ...(preAttemptRemoved ? { preAttemptModelsRemoved: preAttemptRemoved } : {}),
-      }
+    ? await completeLanguageTurn({ language: turn.language, objectiveId: turn.plan?.teaching.objectiveId, reply: aiResult.answer, learnerText: turn.text, messageId: assistantId, marker: turn.languageMarker, removed: preAttemptRemoved, institutionId: turn.session.institutionId as string, studentId: turn.studentId })
     : undefined;
-  // r4.4 #2: remember error types and independent successes across sessions (language turns only; failure-tolerant).
-  if (turn.language && reply && languageTurn) {
-    await recordProfileTurn(turn.session.institutionId, turn.session.studentId, {
-      errorCode: turn.language.signals.diagnosis?.code,
-      independentSuccessOn: independentSuccessItem(turn.language, languageTurn),
-    });
-  }
   const assistantMessage = {
     id: assistantId,
     role: 'ai' as const,

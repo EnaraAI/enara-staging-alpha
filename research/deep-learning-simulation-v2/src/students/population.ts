@@ -44,15 +44,16 @@ export const makePopulation = (n: number, masterSeed: string): StudentState[] =>
 
 /** Per-block hidden starting state for one outcome: does the student already know it, and which misconception do they hold. */
 export interface BlockStart { knowsAlready: boolean; heldMisconceptionIdx: number; }
-export function blockStart(s: StudentState, area: Area, outcomeId: string, misconceptionCount: number): BlockStart {
+export function blockStart(s: StudentState, area: Area, outcomeId: string, misconceptionCount: number, difficulty = 3): BlockStart {
   const r = Rng.of(s.seed, 'blockstart', outcomeId);
-  return { knowsAlready: r.bool(s.priorKnowledge[area]), heldMisconceptionIdx: r.int(Math.max(1, misconceptionCount)) };
+  return { knowsAlready: r.bool(Math.max(0, Math.min(1, s.priorKnowledge[area] + 0.15 - 0.06 * (difficulty - 1)))), heldMisconceptionIdx: r.int(Math.max(1, misconceptionCount)) };
 }
 /** Seeded per-item behaviour flags, recorded in the audit log (so student behaviour is auditable and reproducible). */
-export interface ItemBehaviour { lapse: boolean; guess: boolean; noiseRoll: number; }
-export function itemBehaviour(s: StudentState, blockId: string, itemId: string, stage: string): ItemBehaviour {
+export interface ItemBehaviour { lapse: boolean; guess: boolean; slip: boolean; noiseRoll: number; }
+/** `slip`: difficulty-driven error (a typical slip on hard points), probability 0.07 x (difficulty-1), so harder outcomes lower accuracy. */
+export function itemBehaviour(s: StudentState, blockId: string, itemId: string, stage: string, difficulty = 3): ItemBehaviour {
   const r = Rng.of(s.seed, 'item', blockId, itemId, stage);
-  return { lapse: r.bool(s.attentionLapse), guess: r.bool(s.guessRate), noiseRoll: r.next() };
+  return { lapse: r.bool(s.attentionLapse), guess: r.bool(s.guessRate), slip: r.bool(0.07 * (difficulty - 1)), noiseRoll: r.next() };
 }
 /** Probability a learned item is still retained after `days` (exponential forgetting with student's half-life). */
 export const retention = (halfLifeDays: number, days: number): number => Math.exp((-Math.LN2 * days) / halfLifeDays);
