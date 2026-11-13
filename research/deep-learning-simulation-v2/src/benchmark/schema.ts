@@ -66,5 +66,5 @@ export interface Outcome {
   items: { pre: AssessmentItem[]; post: AssessmentItem[]; transfer: AssessmentItem[]; delayed: AssessmentItem[] };
 }
 
-export const ITEM_COUNTS: Record<Stage, number> = { pre: 2, post: 2, transfer: 2, delayed: 4 };
+export const ITEM_COUNTS: Record<Stage, number> = { pre: 4, post: 4, transfer: 4, delayed: 4 };
 export const AREA_PREFIX: Record<Area, string> = { grammar: 'GR', vocabulary: 'VO', reading: 'RD', writing: 'WR', functional: 'FN', listening: 'LS' };
