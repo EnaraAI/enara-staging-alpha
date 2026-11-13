@@ -127,6 +127,7 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           learnerIntent: String,
           revealedItemId: String,
           preAttemptModelsRemoved: Number,
+          diagnosis: String,
           _id: false,
         },
         default: undefined,

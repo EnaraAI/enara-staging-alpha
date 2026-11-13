@@ -622,3 +622,63 @@ export function loadOverBudget(reply: string, maxWords: number): string[] {
   if (reply.split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length > maxWords) flags.push('over_length');
   return flags;
 }
+
+// ---------------------------------------------------------------------------
+// r4.4 #1 (rebuilt): diagnose the likely CAUSE of a wrong answer so the hint targets the cause.
+// Deterministic and generic (forms come from the item's own targetForms); the cue never contains
+// the item's answer form.
+export const ERROR_CODES = [
+  'missing_third_person_s', 'wrong_third_person_ending', 'past_form_for_routine', 'pronoun_gender_swap', 'pronoun_omitted',
+  'perfect_with_finished_time', 'past_for_life_experience', 'wrong_participle', 'unchanged_from_prompt', 'unknown',
+] as const;
+export type ErrorCode = (typeof ERROR_CODES)[number];
+export interface Diagnosis { code: ErrorCode; cue: string; evidence: string }
+
+const CUES: Record<ErrorCode, string> = {
+  missing_third_person_s: 'the verb after he/she/it in the present simple still has its base form: point them to the subject and ask what happens to the verb with he/she/it',
+  wrong_third_person_ending: 'they know the verb changes but chose the wrong ending: ask which ending this verb takes (think about how it is spelled at the end)',
+  past_form_for_routine: 'they used a past form for something that happens every day: ask whether the sentence is about yesterday or about a routine',
+  pronoun_gender_swap: 'they chose the other pronoun: ask them to look at the family word and think about who it describes',
+  pronoun_omitted: 'they left out the pronoun: ask who the second sentence is about and what word we use for that person',
+  perfect_with_finished_time: 'they used have/has with a finished time: ask whether the time they mention is finished or still going on',
+  past_for_life_experience: 'they used a past form for a life experience: ask whether the sentence is about a time in their whole life, and what helper word goes before the verb',
+  wrong_participle: 'the helper word is right but the verb form after it is not: ask them to think about the form we use after have/has',
+  unchanged_from_prompt: 'they copied the sentence without changing anything: ask them what in the sentence needs to change',
+  unknown: 'the cause is not clear: ask them to say in their own words what they were thinking',
+};
+
+const toks = (t: string) => normAnswer(t).split(' ').filter(Boolean);
+const DIRECT_PRONOUNS = new Set(['he', 'she']);
+
+export function diagnoseError(answer: string, item: LessonItem | undefined): Diagnosis | null {
+  if (!item?.acceptedAnswers?.length || evaluateAgainstKey(answer, item)) return null;
+  const a = toks(answer.split(SELF_CORRECTION_SPLIT).filter((p) => p.trim()).pop() ?? answer);
+  if (!a.length) return null;
+  const promptBody = toks((/"([^"]+)"/.exec(item.prompt)?.[1] ?? '').replace(/\([^)]*\)/g, ' ').replace(/_+/g, ' '));
+  const forms = (item.targetForms ?? []).map((f) => f.toLowerCase());
+  const mk = (code: ErrorCode, evidence: string): Diagnosis => ({ code, cue: CUES[code], evidence });
+  if (promptBody.length > 2 && a.join(' ') === promptBody.join(' ')) return mk('unchanged_from_prompt', a.join(' '));
+  if (forms.length && forms.every((f) => DIRECT_PRONOUNS.has(f))) {
+    const want = forms[0];
+    if (a.includes(want === 'he' ? 'she' : 'he')) return mk('pronoun_gender_swap', want === 'he' ? 'she' : 'he');
+    if (!a.some((w) => DIRECT_PRONOUNS.has(w))) return mk('pronoun_omitted', a.join(' '));
+    return null;
+  }
+  for (const f of forms) {
+    if (/(?:s|es)$/.test(f) && f.length > 2) {
+      const base = f.endsWith('ies') ? f.slice(0, -3) + 'y' : f.endsWith('es') && /(o|sh|ch|ss|x|z)es$/.test(f) ? f.slice(0, -2) : f.slice(0, -1);
+      if (a.includes(base)) return mk('missing_third_person_s', base);
+      const stem = base.replace(/e$/, '');
+      const wrong = a.find((w) => w !== f && w.startsWith(stem) && w.length > stem.length && !w.endsWith('ed'));
+      if (wrong) return mk('wrong_third_person_ending', wrong);
+      const past = a.find((w) => w.startsWith(stem) && w.endsWith('ed'));
+      if (past || a.some((w) => ['went', 'watched', 'did', 'was'].includes(w))) return mk('past_form_for_routine', past ?? 'past form');
+    }
+    if (f.endsWith('ed') && a.includes(f) && a.some((w) => ['have', 'has', "'ve"].includes(w))) return mk('perfect_with_finished_time', `have ${f}`);
+    if (['seen', 'been', 'done', 'gone', 'eaten', 'written', 'taken'].includes(f)) {
+      if (a.some((w) => ['have', 'has'].includes(w)) && !a.includes(f)) return mk('wrong_participle', a.join(' '));
+      if (!a.some((w) => ['have', 'has'].includes(w)) && a.some((w) => /ed$|saw|went|did|ate|wrote|took/.test(w))) return mk('past_for_life_experience', a.join(' '));
+    }
+  }
+  return mk('unknown', a.join(' '));
+}

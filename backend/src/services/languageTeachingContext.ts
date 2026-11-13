@@ -16,6 +16,8 @@ import {
   isSuccess,
   learnerQuoteMismatches,
   possibleAnswerLeak,
+  diagnoseError,
+  type Diagnosis,
   isBinaryItem,
   loadOverBudget,
   selectHintLevel,
@@ -193,6 +195,8 @@ export interface TurnSignals {
   whyAfterAttempt?: boolean;
   // Fix 7: the tutor's last message asked for the rule in their own words.
   ruleStatement?: boolean;
+  // r4.4 #1: likely cause of a wrong answer to the open item (never the answer).
+  diagnosis?: Diagnosis;
   dontKnow?: boolean;
   repeatRequest?: boolean;
   exampleRequest?: boolean;
@@ -285,6 +289,7 @@ export interface LanguageTurnEvidence {
   confusionSignals: number;
   answeringCheck: boolean;
   proficiency: { status: KnowledgeStatus; value?: string; source: string };
+  diagnosis?: string;
   nextStep?: string;
   provenance: 'deterministic_turn_signals';
   confidence: 'low';
@@ -803,6 +808,7 @@ function r4Signals(text: string, history: Turn[], learnerResponse: LearnerRespon
   const out: Partial<TurnSignals> = { learning, exerciseRequest, hintLevel, keyVerdict: learnerResponse === 'answer' ? evaluateAgainstKey(text, activeLessonItem) : null };
   if (activeLessonItem && learnerResponse !== 'answer' && learning.attemptsOnItem > 0 && WHY_ASK.test(text)) out.whyAfterAttempt = true;
   if (askedForRule([...history].reverse().find((h) => h.role === 'assistant')?.content ?? '')) out.ruleStatement = true;
+  if (learnerResponse === 'answer' && activeLessonItem) { const d = diagnoseError(text, activeLessonItem); if (d) out.diagnosis = d; }
   if (activeLessonItem) out.activeLessonItem = activeLessonItem;
   if (presentLessonItem) out.presentLessonItem = presentLessonItem;
   if (nextLessonItem) out.nextLessonItem = nextLessonItem;
@@ -1082,6 +1088,7 @@ const WHY_ASK = /\b(why|which part|what'?s wrong|what is wrong)\b|ليه|ازا�
 export const TEACH_RULE = 'They have now missed this item twice, so stop hinting: name their belief in one short line (e.g. "You are using X here"), state the rule clearly in one or two short sentences, show one worked example with a different word (not this item\'s answer), then ask them to try this item again.';
 export const RULE_SUMMARY = 'They got it right after a mistake: praise it in a few words, then ask them to say the rule in your own words in one short sentence (e.g. "Tell me the rule in your own words."). Do not give the next exercise in this reply.';
 // Fix 7: the turn after asking for the rule.
+export const diagnosisLine = (d: Diagnosis) => `Likely cause of their error (${d.code.replace(/_/g, ' ')}): ${d.cue}. Aim your hint at this cause; don't name the correct form.`;
 export const RULE_CHECK = 'They have just tried to say the rule in their own words. If it is right, confirm it in one line starting "Remember:" and then give the next task. If it is wrong or incomplete, correct only the wrong part in one short sentence and ask them to say it again (no new exercise yet).';
 export const askedForRule = (t: string) => /\b(?:rule|it)\b[^.?!\n]{0,30}\bin your own words\b|\bin your own words\b[^.?!\n]{0,40}\brule\b|tell me the rule/i.test(t);
 export function supportStage(s: { answeringCheck?: boolean; keyVerdict?: string | null; whyAfterAttempt?: boolean; hintRequest?: boolean; activeLessonItem?: unknown; learning?: { attemptsOnItem?: number } }): 'teach_rule' | 'summarise' | null {
@@ -1156,6 +1163,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (s.keyVerdict && isSuccess(s.keyVerdict)) out.push('- Their answer matches the course\'s accepted answer for this item: confirm it as correct (mention a capital-letter or punctuation slip in a few words at most).');
   if (supportStage(s) === 'summarise') out.push(`- ${RULE_SUMMARY}`);
   if (s.ruleStatement) out.push(`- ${RULE_CHECK}`);
+  if (s.diagnosis) out.push(`- ${diagnosisLine(s.diagnosis)}`);
   if (L && Object.keys(L.criteria).length) out.push('- Don\'t re-test a success criterion they have already shown on their own; work on the ones not shown yet.');
   if (s.answeringCheck || s.unpromptedSentence) {
     const assisted = (L?.hintTurnsOnItem ?? 0) > 0;
@@ -1272,6 +1280,7 @@ export function turnEvidence(ctx: LanguageTeachingContext, objectiveId?: string)
     ...(ctx.signals.stateScope ? { stateScope: ctx.signals.stateScope } : {}),
     ...(ctx.signals.attemptsOnTask !== undefined ? { attemptsOnTask: ctx.signals.attemptsOnTask } : {}),
     ...(ctx.signals.offTopic ? { offTopic: ctx.signals.offTopic } : {}),
+    ...(ctx.signals.diagnosis ? { diagnosis: ctx.signals.diagnosis.code } : {}),
     ...(ctx.length ? { lengthTarget: ctx.length } : {}),
     ...(ctx.signals.errorRecurrence ? { errorRecurrence: ctx.signals.errorRecurrence } : {}),
     ...(() => {
