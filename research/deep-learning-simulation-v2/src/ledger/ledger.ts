@@ -9,7 +9,7 @@ export interface Attempt {
 }
 export class BudgetExceeded extends Error {}
 export class Ledger {
-  private seq = 0; private total = 0; private unknown = 0; readonly file: string;
+  private seq = 0; private total = 0; readonly costByBlock = new Map<string, { usd: number; unknown: boolean }>(); private unknown = 0; readonly file: string;
   constructor(dir: string, readonly runId: string, readonly capUsd: number) { mkdirSync(dir, { recursive: true }); this.file = path.join(dir, 'provider_attempts.jsonl'); if (existsSync(this.file)) for (const a of Ledger.read(this.file)) { this.seq = Math.max(this.seq, a.seq); this.total += a.costUsd ?? 0; if (a.costUsd === null) this.unknown += 1; } }
   static read(file: string): Attempt[] { return readFileSync(file, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)); }
   get spentUsd(): number { return this.total; }
@@ -18,7 +18,7 @@ export class Ledger {
   assertBudget(): void { if (this.total >= this.capUsd) throw new BudgetExceeded(`budget cap $${this.capUsd} reached (spent $${this.total.toFixed(4)})`); }
   record(a: Omit<Attempt, 'ts' | 'seq' | 'runId'>): Attempt {
     const full: Attempt = { ts: new Date().toISOString(), seq: ++this.seq, runId: this.runId, ...a };
-    appendFileSync(this.file, JSON.stringify(full) + '\n'); this.total += full.costUsd ?? 0; if (full.costUsd === null) this.unknown += 1; return full;
+    appendFileSync(this.file, JSON.stringify(full) + '\n'); this.total += full.costUsd ?? 0; if (full.costUsd === null) this.unknown += 1; if (full.blockId) { const e = this.costByBlock.get(full.blockId) ?? { usd: 0, unknown: false }; e.usd += full.costUsd ?? 0; e.unknown = e.unknown || full.costUsd === null; this.costByBlock.set(full.blockId, e); } return full;
   }
 }
 export function summarizeLedger(attempts: Attempt[]) {

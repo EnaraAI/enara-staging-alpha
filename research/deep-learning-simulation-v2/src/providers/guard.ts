@@ -5,6 +5,8 @@ import { norm } from '../benchmark/scoring';
 
 export interface CallCtx { campaign: string; studentId: string | null; blockId: string | null; role: string; }
 export class LeakageDetected extends Error {}
+/** Roles whose outgoing requests must never contain assessment text. (student_assess and judge legitimately see quiz questions.) */
+export const SCANNED_ROLES = new Set(['tutor', 'generic_tutor', 'student_teach']);
 
 /** Outgoing-request guard. `forbidden` = every assessment prompt/material/accepted phrase (>=2 words). Tutor-side and student-side
  *  requests are scanned; a hit aborts the call and is logged by the caller as a leakage event (never silently ignored). */
@@ -27,7 +29,7 @@ export class Provider {
   constructor(readonly ledger: Ledger, private key: string, private scanner: OutgoingScanner | null, private fetchImpl: typeof fetch = fetch, private sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))) {}
   /** One logical call with up to 10 attempts; EVERY attempt (success or failure) is a ledger row. Retry rows carry retryOf. */
   async chat(o: ChatOpts, ctx: CallCtx): Promise<{ text: string; costUsd: number | null }> {
-    if (this.scanner) { const hit = this.scanner.scan(o.system + '\n' + o.user); if (hit) throw new LeakageDetected(`assessment text in outgoing ${ctx.role} request: "${hit.slice(0, 60)}"`); }
+    if (this.scanner && SCANNED_ROLES.has(ctx.role)) { const hit = this.scanner.scan(o.system + '\n' + o.user); if (hit) throw new LeakageDetected(`assessment text in outgoing ${ctx.role} request: "${hit.slice(0, 60)}"`); }
     let firstSeq: number | null = null; let spent = 0;
     for (let attempt = 1; attempt <= 10; attempt += 1) {
       this.ledger.assertBudget();

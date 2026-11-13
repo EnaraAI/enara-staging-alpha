@@ -24,7 +24,7 @@ export async function answerItem(o: { provider: Provider; model: string; persona
   const sys = `${o.persona}\n\nNow you take a short quiz on your own (no help). Answer as this learner really would, with your current knowledge and habits. ${directives}\nReply in exactly this format:\nANSWER: <your answer only>\nCONFIDENCE: <0-100, how sure you are>`;
   const mem = o.memory.trim() ? `Your note to yourself from studying${o.days > 0 ? ` (${o.days} days ago; this is what you still remember)` : ''}: ${o.memory}` : '(You have not studied this point.)';
   const q = `${mem}\n\nQuiz question: ${item.prompt}${item.material ? `\n\n${item.material}` : ''}`;
-  const raw = (await o.provider.chat({ model: o.model, system: sys, user: q, maxTokens: 1500, effort: 'low' }, o.ctx('student'))).text;
+  const raw = (await o.provider.chat({ model: o.model, system: sys, user: q, maxTokens: 1500, effort: 'low' }, o.ctx('student_assess'))).text;
   const { answer, confidence } = parseAnswer(raw); const r = scoreItem(answer, item);
   return { itemId: item.id, stage: o.stage, days: o.days, answer, confidence, correct: r.correct, scoreDetail: r.detail, lapse: b.lapse, guess: b.guess, memoryChars: o.memory.length, misconceptionId: item.misconceptionId ?? null };
 }

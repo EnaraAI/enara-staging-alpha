@@ -4,7 +4,7 @@ import { Ledger } from '../src/ledger/ledger';
 import { Provider, OutgoingScanner, LeakageDetected, installFetchGuard } from '../src/providers/guard';
 const ok = (text: string, i = 100, o = 20) => new Response(JSON.stringify({ content: [{ type: 'text', text }], usage: { input_tokens: i, output_tokens: o } }), { status: 200 });
 const mk = (cap = 5) => new Ledger(mkdtempSync(path.join(tmpdir(), 'pv-')), 'r', cap);
-const ctx = { campaign: 'c', studentId: 's', blockId: 'b', role: 'student' };
+const ctx = { campaign: 'c', studentId: 's', blockId: 'b', role: 'tutor' };
 describe('provider guard', () => {
   it('logs every attempt, marks retries, prices known models, never invents unknown usage', async () => {
     const l = mk(); let n = 0; const f = (async () => (++n === 1 ? new Response('x', { status: 503 }) : ok('hi'))) as unknown as typeof fetch;
@@ -26,7 +26,7 @@ describe('provider guard', () => {
   it('fetch guard logs the in-process tutor provider calls and blocks leaks', async () => {
     const l = mk(); const orig = globalThis.fetch; globalThis.fetch = (async () => ok('tutor reply', 500, 50)) as unknown as typeof fetch; const leaks: string[] = [];
     const restore = installFetchGuard(l, () => ctx, new OutgoingScanner(['She watches television every evening after school']), leaks);
-    try { await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', body: JSON.stringify({ model: 'claude-opus-5-5', messages: [{ role: 'user', content: 'hello' }] }) }); expect(Ledger.read(l.file).length).toBe(1); expect(Ledger.read(l.file)[0].role).toBe('student');
+    try { await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', body: JSON.stringify({ model: 'claude-opus-5-5', messages: [{ role: 'user', content: 'hello' }] }) }); expect(Ledger.read(l.file).length).toBe(1); expect(Ledger.read(l.file)[0].role).toBe('tutor');
       await expect(fetch('https://api.anthropic.com/v1/messages', { method: 'POST', body: JSON.stringify({ model: 'claude-opus-5-5', messages: [{ role: 'user', content: 'She watches television every evening after school' }] }) })).rejects.toBeInstanceOf(LeakageDetected); expect(leaks.length).toBe(1);
     } finally { restore(); globalThis.fetch = orig; }
   });
