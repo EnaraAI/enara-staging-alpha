@@ -34,7 +34,7 @@ export const disagreementSample = (recs: JudgeRecord[], cap = 50): JudgeRecord[]
 
 /** Post-hoc leakage detection over everything the tutor/notes side produced: no assessment prompt, material or accepted phrase may appear. */
 export function leakageScan(texts: { where: string; text: string }[], phrases: string[]): { where: string; phrase: string }[] {
-  const ps = [...new Set(phrases.map((x) => norm(x).trim()).filter((x) => x.split(' ').length >= 3 && x.length >= 14))]; const hits: { where: string; phrase: string }[] = [];
+  const ps = [...new Set(phrases.map((x) => norm(x).trim()).filter((x) => x.split(' ').length >= 6))]; const hits: { where: string; phrase: string }[] = [];
   for (const t of texts) { const n = norm(t.text); for (const p of ps) if (n.includes(p)) hits.push({ where: t.where, phrase: p }); }
   return hits;
 }

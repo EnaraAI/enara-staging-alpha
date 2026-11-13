@@ -31,3 +31,6 @@ describe('provider guard', () => {
     } finally { restore(); globalThis.fetch = orig; }
   });
 });
+describe('scanner precision', () => {
+  it('ignores short generic phrases (fewer than 6 words) but still catches full assessment sentences', () => { const sc = new OutgoingScanner(['what does it mean', 'Ben reads a book every night']); expect(sc.scan('Tutor: what does it mean here?')).toBeNull(); expect(new OutgoingScanner(['Ben reads a book every single night']).scan('Write: ben reads a book every single night.')).not.toBeNull(); expect(sc.scan('Please put these words in order: the dog is big or small today')).toBeNull(); });
+});

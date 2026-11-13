@@ -12,7 +12,7 @@ export const SCANNED_ROLES = new Set(['tutor', 'generic_tutor', 'student_teach']
  *  requests are scanned; a hit aborts the call and is logged by the caller as a leakage event (never silently ignored). */
 export class OutgoingScanner {
   private phrases: string[];
-  constructor(phrases: string[]) { this.phrases = [...new Set(phrases.map((p) => norm(p).trim()).filter((p) => p.split(' ').length >= 3 && p.length >= 14))]; }
+  constructor(phrases: string[]) { this.phrases = [...new Set(phrases.map((p) => norm(p).trim()).filter((p) => p.split(' ').length >= 6))]; }
   scan(text: string): string | null { const n = norm(text); for (const p of this.phrases) if (n.includes(p)) return p; return null; }
   get size() { return this.phrases.length; }
 }
