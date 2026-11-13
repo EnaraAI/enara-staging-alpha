@@ -1,0 +1,50 @@
+{
+  "title": "ENARA Experiment 4 - pre-registration (current ENARA vs improved ENARA vs plain AI tutor)",
+  "note": "AI-simulated students only; not evidence about real learners. Locked (SHA-256 recorded) before the pilot. The main stage may only start after the pilot's variance estimate fixes N by the rule below.",
+  "seed": "enara-dls-v2-exp4-prereg",
+  "design": "Matched triplets: each unit (student, outcome, replication) is run under A, B and C with identical hidden learner state and per-item behaviour flags (seeded from student, outcome and replication only). One outcome per area per student-replication. Pre-test, immediate post-test, transfer, simulated delayed retention (1/7/30 days), 4 items per stage, 3 answer samples per item with majority vote.",
+  "conditions": {
+    "A": "current ENARA, flag off (code state of Experiment 3; commit 070458d plus default-off research hooks)",
+    "B": "improved ENARA: ENARA_RESEARCH_IMPROVE=closing,strategy,coverage (non-production research flag)",
+    "C": "plain AI tutor (same prompt and model as Experiment 3)"
+  },
+  "holdout": {
+    "file": "config/exp4_holdout.json",
+    "sha256": "5f787e2bd11e069133464c2c993e7a346664e35f78125264d887516d65cb6c4",
+    "rule": "Primary analysis uses the 16 hold-out outcomes only; the pilot uses the 32 development outcomes only; all-48 analysis is secondary.",
+    "disclosure": "The roadmap was written after reading transcripts of 8 outcomes (FN-01, GR-07, WR-05, WR-04, GR-01, RD-02, FN-07, RD-04), which are excluded from the hold-out. The author also saw per-outcome aggregate A-vs-C scores for all 48 outcomes from Experiment 3; the hold-out guards against transcript-level tuning, not against that aggregate knowledge."
+  },
+  "primaryOutcome": "Learning gain (post minus pre proportion correct on independent deterministic assessments).",
+  "confirmatory": [
+    {
+      "a": "B",
+      "b": "A",
+      "measure": "gain"
+    },
+    {
+      "a": "B",
+      "b": "C",
+      "measure": "gain"
+    }
+  ],
+  "targetEffect": 0.08,
+  "secondaryOutcomes": [
+    "transfer",
+    "delayed retention",
+    "mastery rate",
+    "independent performance",
+    "misconception correction",
+    "cost per block",
+    "cost per mastered outcome",
+    "recap rate in last tutor turn",
+    "rule-in-own-words rate",
+    "share of sessions with 3+ consecutive same-shape hints",
+    "concession rate"
+  ],
+  "nonInferiority": "B not worse than A on delayed retention by more than 0.03",
+  "sampleSizeRule": "N_triplets = max(150, ceil(1.2 * 9.505 * sigma2_d / 0.08^2)) with sigma2_d the larger of the pilot variances of the per-triplet gain difference for B-A and B-C; capped at the owner-approved budget; pilot data are not pooled into the main analysis. If the rule exceeds the cap the study stops and reports.",
+  "inference": "Per-triplet differences; two-way (student x outcome) cluster bootstrap 95% CI; sign-flip permutation test on per-student mean differences; Holm-Bonferroni over the two confirmatory contrasts (alpha 0.025 each); Benjamini-Hochberg over exploratory contrasts; paired d_z with Hedges correction.",
+  "decisionRules": "B is better than A (or C) only if the Holm-adjusted p < 0.05 and the 95% CI excludes 0, on the hold-out set. If B is not better than A on the hold-out set the P0 changes are not recommended. Failed or incomplete blocks stay in the data; unfavourable results are reported in full.",
+  "regressionChecks": "Existing research and backend suites pass; scripted behaviour regression set (confident wrong belief, answer request, Arabic input, off-topic, leakage bait) run on A and B before the main stage; B must not exceed A on answer leakage, Arabic replies or concession.",
+  "limits": "Simulation only; matched design removes variance a classroom cannot; process metrics are text-pattern heuristics; no mixed-effects model (library unavailable)."
+}

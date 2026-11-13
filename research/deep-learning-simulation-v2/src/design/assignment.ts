@@ -36,3 +36,23 @@ export function balance(blocks: Block[]): BalanceReport {
   const v = Object.values(c); const byStudent = new Map<string, Set<string>>(); for (const b of blocks) (byStudent.get(b.studentId) ?? byStudent.set(b.studentId, new Set()).get(b.studentId)!).add(b.condition);
   return { perConditionPerArea: c, maxImbalance: Math.max(...v) - Math.min(...v), studentsWithAllConditions: [...byStudent.values()].filter((s) => s.size === 6).length, students: byStudent.size };
 }
+
+/** Experiment 4 matched design: each unit (student, outcome, replication) is run under EVERY listed condition with identical hidden state.
+ *  One outcome per area per student-replication, outcomes drawn from the allowed pool in a seeded, balanced cycle. */
+export interface MatchedBlock extends Block { unit: string; seedKey: string; }
+export function assignMatched(opts: { seed: string; replication: number; students: string[]; outcomesByArea: Record<Area, string[]>; conditions: Condition[] }): MatchedBlock[] {
+  const { seed, replication, students, outcomesByArea, conditions } = opts;
+  const rng = Rng.of(seed, 'assign-matched', replication);
+  const cycles = new Map<Area, string[]>(); const pos = new Map<Area, number>();
+  for (const a of AREAS) { cycles.set(a, rng.shuffle(outcomesByArea[a])); pos.set(a, 0); }
+  const out: MatchedBlock[] = [];
+  for (const studentId of students) {
+    const units: { area: Area; outcomeId: string }[] = [];
+    for (const area of AREAS) { const list = cycles.get(area)!; const p = pos.get(area)!; pos.set(area, p + 1); units.push({ area, outcomeId: list[p % list.length] }); }
+    const blocks: MatchedBlock[] = [];
+    units.forEach((u, ai) => { const seedKey = `r${replication}-${studentId}-${u.outcomeId}`; for (const condition of conditions) blocks.push({ studentId, replication, blockIndex: ai, order: 0, area: u.area, outcomeId: u.outcomeId, condition, blockId: `${seedKey}-${condition}`, unit: seedKey, seedKey }); });
+    const order = Rng.of(seed, 'order-matched', replication, studentId).shuffle(blocks.map((_, i) => i)); blocks.forEach((b, i) => { b.order = order[i]; });
+    out.push(...blocks);
+  }
+  return out;
+}

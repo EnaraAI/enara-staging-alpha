@@ -271,6 +271,8 @@ export interface LanguageTeachingContext {
   length?: LengthTarget;
   // r4.4 #2: cross-session learner history lines (error types only), loaded server-side.
   history?: string[];
+  // Research only (Experiment 4, condition B); absent unless ENARA_RESEARCH_IMPROVE is set outside production.
+  research?: ResearchSignals;
   prompt: string;
 }
 
@@ -1170,6 +1172,26 @@ const SUPPORT_MOVES: MoveId[] = ['corrective_feedback_retry', 'scaffold_hint', '
 // Features: diagnosis, hint_ladder, teach_rule, rule_check, learner_history, transfer_check.
 export const researchAblated = (feature: string): boolean => process.env.NODE_ENV !== 'production' && (process.env.ENARA_RESEARCH_ABLATE ?? '').split(',').map((x) => x.trim()).includes(feature);
 
+// Research-only "improved ENARA" switch (default OFF; ignored in production). ENARA_RESEARCH_IMPROVE="closing,strategy,coverage" adds three prompt-level
+// behaviours evaluated in Experiment 4 (condition B): a closing recap with a rule-in-own-words check, a strategy change when the learner is stuck on the
+// same difficulty, and explicit coverage of every success criterion. Nothing here relaxes a guard: the pre-attempt answer guards and try-first rules are unchanged.
+export const researchImproved = (feature: 'closing' | 'strategy' | 'coverage'): boolean => process.env.NODE_ENV !== 'production' && (process.env.ENARA_RESEARCH_IMPROVE ?? '').split(',').map((x) => x.trim()).includes(feature);
+export interface ResearchSignals { turnNo: number; stuck: boolean; uncovered: string[]; allShown: boolean; }
+export const RESEARCH_CLOSING_TURN = 5;
+export const STRATEGY_SHIFT = 'They have now met the same difficulty in more than one turn, so stop asking the same kind of hint question. In one or two short sentences state the general rule for this difficulty (when it applies and when it does not) and give one contrast example that uses words not in any open exercise; then ask them to apply it to their own open task in their own words. Never write the corrected form of the open task.';
+export const coverageRule = (uncovered: string[]) => `Success criteria they have not shown yet: ${uncovered.map((c, i) => `(${i + 1}) ${c}`).join('; ')}. When you next explain a rule, state the whole family once in one short line (every form the lesson covers, not only the one they got wrong), so no criterion is left untaught; keep asking them to try before you reveal anything for an open task.`;
+export const CLOSING_RECAP = 'This is the point to close the lesson unit. This overrides the "next task" instructions above: (1) answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) in two short lines recap the rule, using their own earlier words where you can; (3) end by asking: "Tell me the rule in your own words." Do not set a new exercise this turn and never write a completed answer to an open exercise.';
+export function researchSignals(history: { role: string; content: string; languageTurn?: unknown }[], s: TurnSignals, spec: { successCriteria?: string[] } | undefined): ResearchSignals {
+  const turnNo = history.filter((h) => h.role === 'user').length + 1;
+  const prior = history.filter((h) => h.role === 'assistant').map((h) => h.languageTurn as { assessment?: { verdict?: string } } | null | undefined).filter(Boolean) as { assessment?: { verdict?: string } }[];
+  const wrongRecent = prior.slice(-2).filter((t) => t.assessment?.verdict === 'INCORRECT').length;
+  const stuck = (s.learning?.hintTurnsOnItem ?? 0) >= 2 || wrongRecent >= 2 || Boolean(s.errorRecurrence);
+  const criteria = spec?.successCriteria ?? [];
+  const shown = new Set(Object.keys(s.learning?.criteria ?? {}).map(Number));
+  const uncovered = criteria.filter((_, i) => !shown.has(i + 1)).slice(0, 4);
+  return { turnNo, stuck, uncovered, allShown: criteria.length > 0 && uncovered.length === 0 };
+}
+
 // r4: what the engine knows about the open task, its answer and the next step.
 function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   const s = ctx.signals;
@@ -1203,6 +1225,12 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     if (stage === 'teach_rule' && !researchAblated('teach_rule')) out.push(`- ${TEACH_RULE}`);
     else if (stage !== 'teach_rule' && s.whyAfterAttempt) out.push(`- ${WHY_AFTER_ATTEMPT}`);
     if (!researchAblated('hint_ladder')) out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? '') })}`, `- ${SUPPORT_PRECEDENCE}`);
+  }
+  if (ctx.research) {
+    const r = ctx.research;
+    if (r.stuck && researchImproved('strategy')) out.push(`- ${STRATEGY_SHIFT}`);
+    if (r.uncovered.length && r.turnNo >= 2 && researchImproved('coverage')) out.push(`- ${coverageRule(r.uncovered)}`);
+    if ((r.turnNo >= RESEARCH_CLOSING_TURN || r.allShown) && researchImproved('closing')) out.push(`- ${CLOSING_RECAP}`);
   }
   return out;
 }
@@ -1503,7 +1531,8 @@ export async function buildLanguageTeachingContext(params: {
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
     const length = clarifyOnly ? { targetWords: Math.min(base0.targetWords, 40), maxWords: Math.min(base0.maxWords, 60), basis: `${base0.basis}:clarify` } : base0;
     const history = researchAblated('learner_history') ? [] : await loadProfileLines(params.institutionId, params.studentId);
-    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}) } as const;
+    const research = researchImproved('closing') || researchImproved('strategy') || researchImproved('coverage') ? researchSignals(params.history, signals, lesson.spec) : undefined;
+    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}) } as const;
     return { ...base, prompt: renderLanguageContextPrompt(base) };
   } catch (error) {
     logger.warn('language_context_failed', { error: serializeError(error) });
