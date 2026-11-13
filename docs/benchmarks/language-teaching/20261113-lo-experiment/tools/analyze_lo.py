@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # LO experiment analysis. Usage: analyze_lo.py <campaign dirs...>  -> prints a JSON summary
-import json, sys, collections
+import json, sys, collections, os
 STAGES = ('post', 'transfer', 'ret1', 'ret2')
 def load(d):
-    rows = [json.loads(l) for l in open(f'{d}/lo_assessment.jsonl')]
+    rows = [json.loads(l) for l in open(f'{d}/' + os.environ.get('LO_ASSESS_FILE', 'lo_assessment.jsonl'))]
     live = {json.loads(l)['caseId']: json.loads(l) for l in open(f'{d}/live/raw_results.jsonl')}
     return rows, live, json.load(open(f'{d}/live/run_status.json')), json.load(open(f'{d}/lo_assessment_status.json'))
 def S(r, k): return sum(i['itemCorrect'] for i in r[k]) / 2 if k in r else None
