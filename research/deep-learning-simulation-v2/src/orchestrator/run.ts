@@ -20,7 +20,7 @@ import { buildReports, type BlockResult, type Prereg } from '../analytics/analyz
 
 export interface ExperimentConfig {
   experimentId: string; kind: 'validation_campaign' | 'full_experiment' | 'dry' | 'experiment_4_pilot' | 'experiment_4_main' | 'experiment_5_main'; seed: string; students: number; replications: number; maxTurns: number; adversarialShare: number;
-  models: { student: string; genericTutor: string; judge: string }; budgetCapUsd: number; concurrency: number; judgeRate: number; ablate: string[]; conditions: Condition[]; samples?: number; matched?: boolean; outcomePool?: string[]; preregFile?: string; improve?: string[]; engineV2?: string;
+  models: { student: string; genericTutor: string; judge: string }; budgetCapUsd: number; concurrency: number; judgeRate: number; ablate: string[]; conditions: Condition[]; samples?: number; matched?: boolean; outcomePool?: string[]; preregFile?: string; improve?: string[]; engineV2?: string; seedEvidence?: boolean;
 }
 const ROOT = path.resolve(__dirname, '../..');
 export const loadBenchmark = (): Outcome[] => readdirSync(path.join(ROOT, 'benchmark/outcomes')).filter((f) => f.endsWith('.json')).sort().flatMap((f) => JSON.parse(readFileSync(path.join(ROOT, 'benchmark/outcomes', f), 'utf8')).outcomes as Outcome[]);
@@ -55,7 +55,7 @@ export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean
     code: { commit: git('rev-parse HEAD'), dirty: git('status --porcelain -- .') !== '', branch: git('rev-parse --abbrev-ref HEAD') }, node: process.version,
     benchmarkSha256: sha256(JSON.stringify(outcomes)), promptsSha256: filesHash(['src/conditions/types.ts', 'src/conditions/simple.ts', 'src/conditions/enara.ts', 'src/students/population.ts', 'src/evaluation/assess.ts', 'src/evaluation/judge.ts']),
     assignmentSha256: assignmentHash(allBlocks), blocksPlanned: allBlocks.length, populationChecksFailed: popChecks, models: cfg.models, enaraTutorRoute: 'POST /api/me/tutor/sessions/:id/messages (real controller, in-process, throwaway DB)', tutorModelNote: 'tutor/intent models are ENARA defaults from backend config; recorded per call in provider_attempts.jsonl',
-    ablatedFeatures: cfg.ablate, improvedFeatures: cfg.improve ?? [], engineV2: cfg.engineV2 ?? null, outcomePool: cfg.outcomePool ?? null, matched: Boolean(cfg.matched), simulationOnly: true,
+    ablatedFeatures: cfg.ablate, improvedFeatures: cfg.improve ?? [], engineV2: cfg.engineV2 ?? null, seedEvidence: Boolean(cfg.seedEvidence), outcomePool: cfg.outcomePool ?? null, matched: Boolean(cfg.matched), simulationOnly: true,
   };
   writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify(manifest, null, 2));
   const ledger = new Ledger(dir, runId, cfg.budgetCapUsd); const rawFile = path.join(dir, 'raw/blocks.jsonl'); const auditFile = path.join(dir, 'raw/audit.jsonl'); const judgeFile = path.join(dir, 'raw/judge.jsonl');
@@ -81,7 +81,7 @@ export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean
       await als.run(ctxOf('tutor'), async () => {
         const base = { provider, model: cfg.models.student, persona, student: s, blockId: seedKeyOf.get(b.blockId) ?? b.blockId, outcome: o, note: '', ctx: ctxOf, samples: cfg.samples, know: { knowsAlready: start.knowsAlready, misconception: mis, difficulty: o.difficulty } };
         scores = await assessBlock(base);                                   // pre-test, before any instruction
-        rec = await adapters[b.condition].teach({ student: s, outcome: o, blockId: b.blockId, persona, provider, studentModel: cfg.models.student, ctx: ctxOf, maxTurns: cfg.maxTurns });
+        rec = await adapters[b.condition].teach({ student: s, outcome: o, blockId: b.blockId, persona, provider, studentModel: cfg.models.student, ctx: ctxOf, maxTurns: cfg.maxTurns, seedEvidence: cfg.seedEvidence, hidden: { knowsAlready: start.knowsAlready, misconception: mis?.description ?? null } });
         scores = await assessAfter({ ...base, note: rec.notes }, scores);   // post, transfer, delayed: independent of the tutor
       });
     } catch (e) { error = (e as Error).message; if (e instanceof BudgetExceeded) stopFlag.reason = error; if (e instanceof LeakageDetected) leakEvents += 1; }

@@ -7,7 +7,10 @@ export interface TeachingRecord {
   condition: string; blockId: string; turns: Turn[]; materialShown: string | null; // what the learner saw (notes / lesson text)
   exposureWords: number; tutorCalls: number; notes: string; unavoidableDifferences: string[];
 }
-export interface TeachCtx { student: StudentState; outcome: Outcome; blockId: string; persona: string; provider: Provider; studentModel: string; ctx: (role: string) => CallCtx; maxTurns: number; }
+export interface HiddenState { knowsAlready: boolean; misconception: string | null }
+export interface TeachCtx {
+  /** Prior evidence the school's records would hold for this learner (derived from the hidden state, identical for every condition). */
+  hidden?: HiddenState; seedEvidence?: boolean; student: StudentState; outcome: Outcome; blockId: string; persona: string; provider: Provider; studentModel: string; ctx: (role: string) => CallCtx; maxTurns: number; }
 export interface ConditionAdapter { id: 'A' | 'B' | 'C' | 'D' | 'E' | 'F'; name: string; teach(c: TeachCtx): Promise<TeachingRecord>; }
 
 export const wordCount = (t: string): number => (t.trim() ? t.trim().split(/\s+/).length : 0);

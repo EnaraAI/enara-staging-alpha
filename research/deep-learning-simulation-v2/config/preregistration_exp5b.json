@@ -1,0 +1,55 @@
+{
+  "title": "ENARA Experiment 5b - pre-registration (evidence-seeded learners; supersedes preregistration_exp5.json)",
+  "note": "AI-simulated students only; not evidence about real learners. Locked before any run. This experiment tests the owner's ship bar: ENARA must clearly beat the plain AI tutor.",
+  "seed": "enara-dls-v2-exp5b-prereg",
+  "design": "Same matched-triplet design as Experiment 4: each unit (student, outcome, replication) under A, B, C with identical hidden learner state and seeded behaviour flags; 50 new students (new seed) x 6 areas x 1 replication = 300 triplets on the 16 hold-out outcomes; 4 items per stage; 3 answer samples per item (majority); deterministic scoring; blind judge sample.",
+  "conditions": {
+    "A": "current ENARA, all v2 switches off",
+    "B": "ENARA with ENARA_ENGINE_V2=all (wrongAnswer, belief, memory, cache)",
+    "C": "plain AI tutor (same prompt and model as Experiments 3-4)"
+  },
+  "holdout": {
+    "file": "config/exp4_holdout.json",
+    "sha256": "5f787e2bd11e069133464c2c993e7a346664e35f78125264d887516d65cb6c40",
+    "disclosure": "The 16 hold-out outcomes were already scored under A, B (research flag) and C in Experiment 4, so aggregate results on them were seen; their transcripts were not read. The v2 changes were designed from code review plus Experiment 2-4 aggregate and transcript evidence on development outcomes. New students and a new seed are used, so no Experiment 4 block is reused."
+  },
+  "primaryOutcome": "Learning gain (post minus pre proportion correct on independent deterministic assessments).",
+  "confirmatory": [
+    {
+      "a": "B",
+      "b": "C",
+      "measure": "gain"
+    },
+    {
+      "a": "B",
+      "b": "A",
+      "measure": "gain"
+    }
+  ],
+  "targetEffect": 0.08,
+  "secondaryOutcomes": [
+    "transfer",
+    "delayed retention",
+    "mastery rate",
+    "independent performance",
+    "misconception correction",
+    "cost per block",
+    "cost per mastered outcome",
+    "input tokens and cache-read tokens per tutor call",
+    "process metrics exp4-pm-v1"
+  ],
+  "sampleSize": "300 triplets, from the Experiment 4 variance of the per-triplet gain difference (0.152 for B-A; rule max(150, ceil(1.2*9.505*sigma2/0.08^2)) = 272, rounded up to 300). No pilot.",
+  "inference": "Two-way (student x outcome) cluster bootstrap 95% CI; sign-flip permutation test on per-student mean differences; Holm-Bonferroni over the two confirmatory contrasts; Benjamini-Hochberg for exploratory contrasts; paired d_z with Hedges correction.",
+  "shipBar": "The owner's bar: ENARA (B) clearly beats the plain tutor (C) = the B-C gain difference is positive with Holm-adjusted p < 0.05 and a 95% CI that excludes 0. If not met, v2 is not shipped as a learning improvement. The cache feature is judged separately on measured cost.",
+  "decisionRules": "B better than C (or A) only if Holm-adjusted p < 0.05 and the CI excludes 0. Failed or incomplete blocks stay in the data; unfavourable results are reported in full.",
+  "knownLimits": "Single-session simulation: the memory feature (cross-session beliefs, spaced review, opening review) cannot show an effect because each simulated block is a fresh learner record; only wrongAnswer, belief and cache can act here. Simulated learners only; closing turn coincidence is not part of v2. The ped-v2 teaching plan and the language engine still run side by side without arbitration (a known gap); the plan may ask for modelling while the language engine hides answers until an attempt. Memory features cannot act in a single-session block.",
+  "amendmentLog": [],
+  "supersedes": "preregistration_exp5.json (run aborted at 165 of 900 blocks; kept in runs/aborted-exp5-no-evidence, not analysed, not used)",
+  "reasonForChange": "A probe showed the teaching-method layer (23 methods) ran with reason code NO_EVIDENCE for every brand-new simulated learner and always chose the same default plan, so ENARA's adaptive method selection was never exercised in Experiments 2-5. In this version every learner arrives with prior evidence in the school's records.",
+  "evidenceSeeding": {
+    "rule": "From the hidden learner state (identical for A, B and C): knowsAlready -> mastery status proficient (estimate 0.8, 4 evidence items, 3 independent); otherwise -> status emerging (0.3) plus, when the learner holds a misconception, a confirmed mistaken-idea record whose text is the benchmark misconception description (never an assessment item).",
+    "A_B": "seeded into the throwaway database as StudentObjectiveMastery and StudentMisconception records, as the school's system would hold them (the same mapping the fixture harness uses)",
+    "C": "the plain tutor receives the same record as one sentence of text in its prompt (a deliberately generous baseline: the plain tutor is given the information, so ENARA wins only through what it does with it)",
+    "probe": "With seeding, the plan changes: emerging + misconception -> direct_instruction + worked_example; proficient -> mastery_learning + elaborative_interrogation; without seeding -> formative_feedback + retrieval_practice (NO_EVIDENCE)."
+  }
+}

@@ -50,7 +50,7 @@ export class EnaraRuntime {
   }
   async stop(): Promise<void> { await this.mongoose?.disconnect(); await this.mongo?.stop(); }
   /** One synthetic school/class/student/lesson per block; returns a session handle. */
-  async openSession(o: Outcome, cohort: 'child' | 'teen' | 'adult'): Promise<{ send: (text: string) => Promise<{ reply: string; status: number; meta: unknown }> }> {
+  async openSession(o: Outcome, cohort: 'child' | 'teen' | 'adult', evidence?: { knowsAlready: boolean; misconception: string | null }): Promise<{ send: (text: string) => Promise<{ reply: string; status: number; meta: unknown }> }> {
     const { M, mongoose, request, app } = this; const k = String(++this.n).padStart(5, '0');
     const inst = `rs-school-${k}`; const sid = `rs-stu-${k}`; const email = `rs-learner-${k}@research.invalid`; const curId = `rs-cur-${k}`; const lessonId = `rs-lsn-${k}`; const courseId = `rs-crs-${k}`; const objId = `rs-obj-${k}`;
     await M.Institution.create({ id: inst, name: `Research School ${k}`, features: { teaching_workflow_enabled: true, learning_intelligence_enabled: true, adaptive_pedagogy_enabled: true, mastery_tracking_enabled: true, misconception_detection_enabled: true }, learningSettings: { adultLearners: false } });
@@ -62,6 +62,12 @@ export class EnaraRuntime {
     await M.Curriculum.create({ id: curId, name: `English ${o.cefr}`, institutionId: inst, courseName: `English ${o.cefr}`, type: 'Language', level: o.cefr, languages: ['English'], summary: `Synthetic English course, level ${o.cefr}.`, lastUpdated: '2026-11-13', status: 'deployed', chapters: [{ id: lessonId, title: o.lesson.title, description: o.lesson.objective, languageSpec: spec }] });
     await M.CourseInstance.create({ id: `rs-cls-${k}`, courseId, courseName: `English ${o.cefr}`, institutionId: inst, academicYear: '2026', batchId: `rs-b-${k}`, curriculumId: curId, studentIds: [sid], instructorIds: [], visibility: 'student' });
     await M.LearningObjective.create({ id: objId, institutionId: inst, curriculumId: curId, courseId, lessonIds: [lessonId], code: `RS-${k}`, title: o.lesson.objective.slice(0, 200), status: 'approved' });
+    if (evidence) {
+      // Prior evidence in the school's records (same mapping the fixture harness uses): mastery status and, when the learner holds one, a confirmed mistaken idea.
+      const est = evidence.knowsAlready ? 0.8 : 0.3; const status = evidence.knowsAlready ? 'proficient' : 'emerging';
+      await M.StudentObjectiveMastery.create({ institutionId: inst, studentId: sid, objectiveId: objId, masteryEstimate: est, evidenceStrength: 'moderate', masteryStatus: status, evidenceCount: 4, independentEvidenceCount: 3, distinctIndependentItems: 3, lastEvidenceAt: new Date(), lastMasteryUpdateAt: new Date(), modelVersion: 'research-seed' });
+      if (!evidence.knowsAlready && evidence.misconception) await M.StudentMisconception.create({ id: `rs-mis-${k}`, institutionId: inst, studentId: sid, objectiveId: objId, ruleKey: 'research_seed', category: 'grammar', description: evidence.misconception, confidence: 0.7, status: 'confirmed', source: 'rule', detectedAt: new Date(), detectionVersion: 'research-seed' });
+    }
     await mongoose.connection.collection('rate_limits').deleteMany({});
     const adminEmail = `rs-admin-${k}@research.invalid`; await M.User.create({ email: adminEmail, password: this.hash, role: 'admin', name: `Research Admin ${k}`, status: 'active', institutionId: inst });
     const al = await request(app).post('/api/auth/login').send({ email: adminEmail, password: this.PW }); const adminAuth = `Bearer ${al.body.token}`;

@@ -29,7 +29,7 @@ export const conditionD: ConditionAdapter = { id: 'D', name: 'scripted human-lik
 
 // C: generic AI tutor. Opus with a minimal tutoring prompt + the lesson spec; no ENARA pipeline.
 export const conditionC: ConditionAdapter = { id: 'C', name: 'generic AI tutor', async teach(c) {
-  const sys = `You are a friendly English tutor. Help the student learn the lesson below through conversation. Keep replies short and in simple English.\n\n${lessonText(c.outcome)}\n\nPractice exercises you may use:\n${practiceList(c.outcome)}`;
+  const sys = `You are a friendly English tutor. Help the student learn the lesson below through conversation. Keep replies short and in simple English.\n\n${lessonText(c.outcome)}\n\nPractice exercises you may use:\n${practiceList(c.outcome)}${c.seedEvidence && c.hidden ? `\n\nStudent record from the school's system: earlier assessments show this skill is ${c.hidden.knowsAlready ? 'largely mastered' : 'still emerging (not yet secure)'}.${!c.hidden.knowsAlready && c.hidden.misconception ? ` A confirmed mistaken idea from earlier work: ${c.hidden.misconception}.` : ''} Use this record to choose how to teach.` : ''}`;
   const turns: Turn[] = [];
   for (let t = 0; t < c.maxTurns; t += 1) {
     const learner = await studentReply(c, turns, t === 0);

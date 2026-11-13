@@ -28,3 +28,23 @@ describe('Experiment 4 matched design', () => {
     expect(drawHoldout({ seed: 's', outcomesByArea: byArea, excluded: ['GR-01', 'VO-02'], perArea: { grammar: 3, vocabulary: 2, reading: 3, writing: 2, functional: 3, listening: 3 } }).sha256).toBe(d.sha256);
   });
 });
+
+import { conditionC } from '../src/conditions/simple';
+import { Provider } from '../src/providers/guard';
+import { Ledger } from '../src/ledger/ledger';
+import { mkdtempSync, readFileSync } from 'fs'; import { tmpdir } from 'os'; import path from 'path';
+describe('evidence seeding: the plain tutor gets the same record as text, only when seeding is on', () => {
+  const ex = JSON.parse(readFileSync(path.join(__dirname, '../docs/example_outcome.json'), 'utf8')).outcomes[0];
+  const run = async (seed: boolean) => {
+    const systems: string[] = []; const f = (async (_u: string, init: { body: string }) => { const b = JSON.parse(init.body); systems.push(String(b.system)); return new Response(JSON.stringify({ content: [{ type: 'text', text: 'ANSWER: x' }], usage: { input_tokens: 10, output_tokens: 5 } }), { status: 200 }); }) as unknown as typeof fetch;
+    const p = new Provider(new Ledger(mkdtempSync(path.join(tmpdir(), 'es-')), 'r', 5), 'k', null, f, async () => {});
+    const stu = makePopulation(2, 's')[0];
+    await conditionC.teach({ student: stu, outcome: ex, blockId: 'b', persona: 'p', provider: p, studentModel: 'claude-haiku-5-5', ctx: (role) => ({ campaign: 'c', studentId: 's', blockId: 'b', role }), maxTurns: 1, seedEvidence: seed, hidden: { knowsAlready: false, misconception: 'The verb is the same for every person' } });
+    return systems.find((x) => x.includes('You are a friendly English tutor')) ?? '';
+  };
+  it('record present when on, absent when off; never contains assessment prompts', async () => {
+    const on = await run(true); const off = await run(false);
+    expect(on).toContain("Student record from the school's system"); expect(on).toContain('still emerging'); expect(on).toContain('The verb is the same for every person'); expect(off).not.toContain('Student record');
+    for (const it of [...ex.items.post, ...ex.items.transfer]) expect(on).not.toContain(it.prompt);
+  });
+});
