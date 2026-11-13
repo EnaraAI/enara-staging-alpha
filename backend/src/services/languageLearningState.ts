@@ -276,6 +276,13 @@ export function expandContractions(t: string): string {
   return t.replace(/[’‘]/g, "'").replace(/\bcan't\b/gi, 'can not').replace(/\bcannot\b/gi, 'can not').replace(/\bwon't\b/gi, 'will not').replace(/\bshan't\b/gi, 'shall not')
     .replace(/n't\b/gi, ' not').replace(/\b(\w+)'re\b/gi, '$1 are').replace(/\b(\w+)'ve\b/gi, '$1 have').replace(/\b(\w+)'ll\b/gi, '$1 will').replace(/\bi'm\b/gi, 'i am');
 }
+/** v2 (selfCheck): does the learner's answer contain any of the item's target forms? null = cannot tell (no target forms). Used only to HOLD BACK credit, never to give it. */
+export function answerHasTargetForm(answer: string, item: LessonItem | undefined): boolean | null {
+  const forms = (item?.targetForms ?? []).map((f) => normAnswer(expandContractions(f))).filter(Boolean);
+  if (!forms.length) return null;
+  const a = ` ${normAnswer(expandContractions(answer))} `;
+  return forms.some((f) => a.includes(` ${f} `));
+}
 export function evaluateAgainstKey(answer: string, item: LessonItem | undefined): AnswerVerdict | null {
   if (!item?.acceptedAnswers?.length) return null;
   const nrm = engineV2('keyMatch') ? (x: string) => normAnswer(expandContractions(x)) : normAnswer;

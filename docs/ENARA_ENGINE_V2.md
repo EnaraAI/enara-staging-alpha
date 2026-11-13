@@ -22,3 +22,9 @@ Four changes from the system deep-dive (`research/deep-learning-simulation-v2/re
 - The model's own "CORRECT" self-grade is still trusted (no independent check yet); answer-key matching is still exact-string.
 - The repository has no student-data-erasure routine, so `learner_language_profiles` (old and new fields) is not covered by one; this needs an owner decision.
 - Reading/writing/functional-language kinds, the reading guard exemption and the ped-v2 vs language-engine arbitration are unchanged.
+
+## Added 13 Nov 2026 (default OFF, named-only: not part of `all`)
+- `closing` — production-capable version of the research closing recap. From the learner's 5th message (or when every success criterion has been shown) the prompt asks for a two-line rule recap and "Tell me the rule in your own words". The engine appends that ask itself if the model leaves it out (`applyReplyGuards`), so the ask no longer depends on the model remembering it.
+- `selfCheck` — independent check on the tutor's own CORRECT grade (deep-dive gap G3). For closed items (not open tasks), if the learner's answer contains none of the item's `targetForms` and the answer key did not confirm it, credit is held back (`AMBIGUOUS`, no criteria, same item, flag `self_grade_unverified`). It can only withhold credit, never give it. Known cost: a valid alternative answer without a target form gets no credit that turn.
+- The wrong-answer teaching fix (G1) is the existing `wrongAnswer` switch.
+Tests: `backend/test/engineV2Closing.test.ts` (6). Effect on learning or on rater scores: **not yet measured**.
