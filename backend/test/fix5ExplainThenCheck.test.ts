@@ -22,6 +22,7 @@ describe('fix 5: explain clearly after two misses, then summarise', () => {
     expect(LTC.TEACH_RULE).toMatch(/name their belief/i);
     expect(LTC.TEACH_RULE).toMatch(/different word/i);
     expect(LTC.TEACH_RULE).toMatch(/not this item's answer/i);
-    expect(LTC.RULE_SUMMARY).toMatch(/Remember:/);
+    // fix 7 (intentional): the "Remember:" line now follows the learner's own statement of the rule.
+    expect(LTC.RULE_CHECK).toMatch(/Remember:/);
   });
 });

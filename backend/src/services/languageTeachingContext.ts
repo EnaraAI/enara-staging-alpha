@@ -191,6 +191,8 @@ export interface TurnSignals {
   hintRequest?: boolean;
   // Fix 4: they ask why after an attempt on the open item.
   whyAfterAttempt?: boolean;
+  // Fix 7: the tutor's last message asked for the rule in their own words.
+  ruleStatement?: boolean;
   dontKnow?: boolean;
   repeatRequest?: boolean;
   exampleRequest?: boolean;
@@ -800,6 +802,7 @@ function r4Signals(text: string, history: Turn[], learnerResponse: LearnerRespon
   });
   const out: Partial<TurnSignals> = { learning, exerciseRequest, hintLevel, keyVerdict: learnerResponse === 'answer' ? evaluateAgainstKey(text, activeLessonItem) : null };
   if (activeLessonItem && learnerResponse !== 'answer' && learning.attemptsOnItem > 0 && WHY_ASK.test(text)) out.whyAfterAttempt = true;
+  if (askedForRule([...history].reverse().find((h) => h.role === 'assistant')?.content ?? '')) out.ruleStatement = true;
   if (activeLessonItem) out.activeLessonItem = activeLessonItem;
   if (presentLessonItem) out.presentLessonItem = presentLessonItem;
   if (nextLessonItem) out.nextLessonItem = nextLessonItem;
@@ -1077,7 +1080,10 @@ const WHY_ASK = /\b(why|which part|what'?s wrong|what is wrong)\b|ليه|ازا�
 // second miss on an item the tutor teaches the rule clearly (the item's answer stays
 // hidden); after a success that followed a miss it ends with a one-line rule summary.
 export const TEACH_RULE = 'They have now missed this item twice, so stop hinting: name their belief in one short line (e.g. "You are using X here"), state the rule clearly in one or two short sentences, show one worked example with a different word (not this item\'s answer), then ask them to try this item again.';
-export const RULE_SUMMARY = 'They got it right after a mistake: end with one short line that sums up the rule in simple words, starting with "Remember:", then continue.';
+export const RULE_SUMMARY = 'They got it right after a mistake: praise it in a few words, then ask them to say the rule in your own words in one short sentence (e.g. "Tell me the rule in your own words."). Do not give the next exercise in this reply.';
+// Fix 7: the turn after asking for the rule.
+export const RULE_CHECK = 'They have just tried to say the rule in their own words. If it is right, confirm it in one line starting "Remember:" and then give the next task. If it is wrong or incomplete, correct only the wrong part in one short sentence and ask them to say it again (no new exercise yet).';
+export const askedForRule = (t: string) => /\b(?:rule|it)\b[^.?!\n]{0,30}\bin your own words\b|\bin your own words\b[^.?!\n]{0,40}\brule\b|tell me the rule/i.test(t);
 export function supportStage(s: { answeringCheck?: boolean; keyVerdict?: string | null; whyAfterAttempt?: boolean; hintRequest?: boolean; activeLessonItem?: unknown; learning?: { attemptsOnItem?: number } }): 'teach_rule' | 'summarise' | null {
   if (!s.activeLessonItem) return null;
   const tries = s.learning?.attemptsOnItem ?? 0;
@@ -1149,6 +1155,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (s.answeringCheck && s.activeLessonItem) out.push(`- The open task is lesson item [${s.activeLessonItem.id}]: ${untrusted(s.activeLessonItem.prompt)}`);
   if (s.keyVerdict && isSuccess(s.keyVerdict)) out.push('- Their answer matches the course\'s accepted answer for this item: confirm it as correct (mention a capital-letter or punctuation slip in a few words at most).');
   if (supportStage(s) === 'summarise') out.push(`- ${RULE_SUMMARY}`);
+  if (s.ruleStatement) out.push(`- ${RULE_CHECK}`);
   if (L && Object.keys(L.criteria).length) out.push('- Don\'t re-test a success criterion they have already shown on their own; work on the ones not shown yet.');
   if (s.answeringCheck || s.unpromptedSentence) {
     const assisted = (L?.hintTurnsOnItem ?? 0) > 0;
