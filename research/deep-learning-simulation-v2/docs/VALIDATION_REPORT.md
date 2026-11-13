@@ -51,3 +51,28 @@ Pre-registered contrasts (Holm-adjusted, 47 students): A−F gain +0.05 [−0.22
 2. Strengthen the link between hidden knowledge and answers (state the held misconception/known rule explicitly as the learner's own memory at pre-test) and re-check difficulty/prior-knowledge sensitivity.
 3. Add repeat-run consistency and a second simulator configuration (e.g. a larger student model) to the validity suite.
 4. Then re-run a validation campaign; only then approve the full experiment (estimated ≈ $17 per 48-student replication → about $160–$200 for 150 students × 3 replications at the same settings).
+
+---
+
+## Update (14 Nov 2026): fixes, re-validation, voice benchmark
+
+**Fixes applied after campaign 1:** majority of 3 answers per item; the learner's hidden knowledge state stated explicitly; a seeded difficulty "slip"; leak scanner needs ≥ 6 words; the generic WR-03 pre-test item replaced; two simulator checks redefined to be more informative (difficulty uses every block's pre-test; "identical behaviour" uses the full answer vector). The redefinition was made after seeing campaign 1, so it is flagged here.
+
+**Campaign 2 (same 48 students, fixes on, $18.11):** ENARA post 52% vs no-teaching 25%; A−F gain +0.22 [−0.05, 0.52], raw p 0.016, Holm 0.079 (not significant). Prior-knowledge sensitivity now PASS (55% vs 17%). Judge agreement 95.7% (κ 0.91). 2 failed blocks (WR-03 coincidence, then fixed).
+
+**Repeat-run consistency** (same seed, independent sampling, 24 students, conditions B and F): 89.4% agreement, κ = 0.76 over 480 items. **Second simulator configuration** (Sonnet-class learner instead of Haiku-class): prior-knowledge sensitivity much stronger (78% vs 35% at pre-test), lapse, forgetting and adversarial checks PASS; difficulty sensitivity near zero in both.
+
+**Full experiment:** see `FULL_EXPERIMENT_REPORT.md` (50 students × 3 replications, $57.24; no pre-registered contrast supported).
+
+**Voice vs chat benchmark** (24 sessions per channel, simulated learners, real ENARA tutor, avatar text path, no audio; `runs/voice-benchmark-1/`, $3.94):
+
+| Metric | chat | voice |
+|---|---|---|
+| Arabic in any reply | 0/24 | 0/24 |
+| Hidden assessment marker visible | 0/24 | 0/24 |
+| Engine turn state stored on every turn | 24/24 | 24/24 |
+| Words per reply | 85.7 | 60.3 |
+| First reply shows an answer form (approximate text match) | 8/24 (33%) | 12/24 (50%) |
+| Guard removals per session | 1.4 | 0.6 |
+
+Reading: the shared engine's guarantees hold in voice (English only, no visible marker, state stored). Voice replies are shorter, as intended. The "answer form in first reply" rate is higher in voice (50% vs 33%) but the intervals overlap heavily (18–53% vs 31–69%) and the metric is a crude text match that also fires when the lesson item itself is shown; this needs a larger run and manual review before concluding anything. Caveats: 144 voice tutor attempts are recorded as **unknown cost** (streamed responses carry no parseable usage in the ledger), so the $3.94 is a lower bound for voice; the stored `version` field differs by channel (`enara-ai` in chat, `ltc-v1` stored by voice), which is a labelling difference, not a different engine; no real audio, latency or student was tested.
