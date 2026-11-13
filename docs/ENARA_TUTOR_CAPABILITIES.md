@@ -60,7 +60,7 @@ All test results come from **simulated (AI) students**. No real student has used
 | Vocabulary | ✅ Yes | 23–29% (the AI grader may be too strict; needs teacher review) |
 | Reading | 🟡 Partly: lessons have no field for a reading text yet | 12–15% (weakest) |
 | Listening / speaking | 🟡 Through ENARA's voice and avatar features, **but the avatar does not yet use the language engine or fixes 1–7** | Not measured |
-| Pronunciation scoring | ⚪ Built (Azure adapter), **off** until a supplier is chosen | Not measured |
+| Pronunciation scoring | ❌ An Azure adapter was written but **lost in a machine restart before it reached the repository**; it must be rebuilt, and stays off until a supplier is chosen | Not measured |
 
 ## 5. Does it help students learn?
 
@@ -89,6 +89,8 @@ All test results come from **simulated (AI) students**. No real student has used
 | Cost per 120-conversation test run | about **$5** |
 
 ## 7. Known limits (what it can't do yet)
+
+- **Lost work to rebuild (r4.4):** the mistake-cause diagnosis, the cross-session learner history, the transfer checks and the pronunciation adapter, with their tests, existed only in a working copy that was lost. None is in the repository. The classroom pilot protocol is.
 
 - **Live avatar calls:** use the same AI model but **not** the language-teaching improvements (hint ladder, answer guards, level limits, English-only). Everything measured above is text chat only. Linking is the next task, built so that chat and avatar share one engine and can't drift apart.
 - **Most simulated students keep their mistaken belief after a short lesson.** The tutor helps, but about 7 in 10 still get new questions wrong.
