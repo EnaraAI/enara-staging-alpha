@@ -4,6 +4,7 @@ import { isFeatureEnabled, isShadowMode } from '../services/featureFlags';
 import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSource } from '../services/curriculumRetrieval';
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
 import { type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
+import { engineV2 } from '../services/engineV2';
 import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
 import {
@@ -335,7 +336,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
       pedagogy: [turn.plan?.prompt, ...extraRules].filter(Boolean).join('\n\n') || undefined,
       planActive: Boolean(turn.plan),
       sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
-      languageContext: turn.language?.prompt,
+      ...(engineV2('cache') && turn.language?.parts ? { languageContextStable: turn.language.parts.stable, languageContextDynamic: turn.language.parts.dynamic } : { languageContext: turn.language?.prompt }),
       learner: await getLearnerSnapshot(studentId).then((l) => (l ? describeSnapshot(l) : undefined)),
     };
   };
@@ -526,4 +527,12 @@ export const streamTutorMessage = asyncHandler(async (req: AuthRequest, res: Res
     if (!turn.turnLockReleased) await releaseTurnLock(turn.session.id, turn.turnLockId);
     if (open) res.end();
   }
+});
+
+// v2 (memory): the learner's due reviews (mistaken ideas and error types; no learner text). Empty unless the memory feature is on.
+export const listDueReviews = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!engineV2('memory') || !req.user?.studentId || !req.user.institutionId) { res.json({ due: [] }); return; }
+  const { loadDueReviews } = await import('../services/learnerLanguageProfile');
+  const due = await loadDueReviews(req.user.institutionId, req.user.studentId);
+  res.json({ due: due.slice(0, 10).map((d) => ({ kind: d.kind, label: d.label, dueSince: d.dueSince ?? null })) });
 });

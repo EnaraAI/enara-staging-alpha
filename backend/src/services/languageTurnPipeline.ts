@@ -20,10 +20,11 @@ export const VOICE_ADAPTATION =
 
 export type PrepareInput = Parameters<typeof buildLanguageTeachingContext>[0];
 /** The one place a language turn's context is built, for either channel. */
-export async function prepareLanguageContext(input: PrepareInput, channel: LanguageChannel): Promise<{ context: LanguageTeachingContext; prompt: string } | null> {
+export async function prepareLanguageContext(input: PrepareInput, channel: LanguageChannel): Promise<{ context: LanguageTeachingContext; prompt: string; parts?: { stable: string; dynamic: string } } | null> {
   const context = await buildLanguageTeachingContext(input);
   if (!context) return null;
-  return { context, prompt: channel === 'voice' ? `${context.prompt}\n\n${VOICE_ADAPTATION}` : context.prompt };
+  const parts = context.parts ? (channel === 'voice' ? { stable: `${context.parts.stable}\n\n${VOICE_ADAPTATION}`, dynamic: context.parts.dynamic } : context.parts) : undefined;
+  return { context, prompt: channel === 'voice' ? `${context.prompt}\n\n${VOICE_ADAPTATION}` : context.prompt, ...(parts ? { parts } : {}) };
 }
 
 /** Reply guards (fixes 1 and 2A): applied to every language reply, chat or voice, before anything is stored, shown or spoken. */
@@ -50,8 +51,18 @@ export async function completeLanguageTurn(opts: {
     }),
     ...(opts.removed ? { preAttemptModelsRemoved: opts.removed } : {}),
   };
-  await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt) });
+  const belief = (lt as { assessment?: { belief?: string } }).assessment?.belief;
+  await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt), ...(belief ? { belief } : {}), lessonId: language.lesson.lessonId, lessonTitle: language.lesson.title, style: styleFromMoves(language.prevMoves) });
   return lt as unknown as LanguageTurnEvidence;
+}
+
+/** The explanation style of the previous tutor turn (what a later independent success followed). */
+export function styleFromMoves(moves: string[] | undefined): string {
+  const m = moves ?? [];
+  if (m.includes('reteach_simpler') || m.includes('answer_with_reasoning')) return 'rule_explained';
+  if (m.includes('distinct_example')) return 'contrast_example';
+  if (m.includes('scaffold_hint') || m.includes('corrective_feedback_retry')) return 'hint_ladder';
+  return 'direct_feedback';
 }
 
 /** Stored messages -> the engine's own history (with stored language-turn state). */

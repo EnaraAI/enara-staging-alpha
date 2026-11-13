@@ -762,7 +762,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       learner: learner ? describeSnapshot(learner) : undefined,
       pedagogy: [plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined,
       planActive: Boolean(plan),
-      languageContext: languagePrep?.prompt,
+      ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: languagePrep.parts.dynamic } : { languageContext: languagePrep?.prompt }),
     });
     // Language course: buffer the reply so the shared guards and marker handling run BEFORE anything is spoken or shown (same guarantees as the text chat).
     async function* chunks(): AsyncGenerator<string> {

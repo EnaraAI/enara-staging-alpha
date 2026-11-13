@@ -33,6 +33,8 @@ export interface Assessment {
   next: NextTask;
   // Lesson item the reply presented, when it presented one (echoed by the tutor).
   item?: string;
+  // v2 (belief): the learner's mistaken idea behind an INCORRECT/PARTIALLY_CORRECT answer, in a few words (sanitised, never shown to the learner).
+  belief?: string;
   source: VerdictSource;
 }
 
@@ -77,6 +79,12 @@ export function formatAssessmentMarker(a: Omit<Assessment, 'source'>): string {
 // never to success. Returns null when the text is not an assess marker.
 // r4.1 (POST-04): a marker with no next= is marked nextMissing, so the caller can
 // use the reply-based reading instead of silently closing the item.
+/** Belief text from the marker: underscores to spaces, letters/digits/space/apostrophe/hyphen only, 3-80 chars; anything else is dropped. */
+export function sanitizeBelief(v: string | undefined): string | undefined {
+  if (!v) return undefined;
+  const t = v.replace(/_+/g, ' ').replace(/[^\p{L}\p{N} '’-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 80);
+  return t.length >= 3 ? t : undefined;
+}
 export type ParsedMarker = Omit<Assessment, 'source'> & { nextMissing?: true };
 export function parseAssessmentMarker(marker: string): ParsedMarker | null {
   const m = /^\[\[assess\b([^\]]*)\]\]$/i.exec(marker.trim());
@@ -101,6 +109,7 @@ export function parseAssessmentMarker(marker: string): ParsedMarker | null {
     criteria: [...new Set(criteria)],
     next: pick(NEXT_TASK, kv.get('next'), 'NONE'),
     ...(item && /^[\w-]{1,40}$/.test(item) ? { item } : {}),
+    ...(sanitizeBelief(kv.get('belief')) ? { belief: sanitizeBelief(kv.get('belief')) } : {}),
     ...(kv.has('next') ? {} : { nextMissing: true as const }),
   };
 }
@@ -296,6 +305,8 @@ export interface LearningState {
   revealedItems: string[];
   // r4.4 #3: per success criterion (1-based), the distinct tasks it was shown independently on.
   independentEvidence: Record<number, string[]>;
+  // v2 (belief): mistaken ideas the tutor named in this session, merged by word overlap, with how many turns showed them.
+  beliefs: { text: string; count: number }[];
 }
 
 // r4.1 (POST-03): when a scope is given, only turns stored under that same scope
@@ -306,8 +317,11 @@ export function inScope(lt: StoredLearningFields | null | undefined, scope?: str
   return scope === undefined || Boolean(lt && lt.stateScope === scope);
 }
 
+const beliefTokens = (t: string) => new Set(t.toLowerCase().split(/\s+/).filter((w) => w.length > 2));
+export function sameBelief(a: string, b: string): boolean { const A = beliefTokens(a); const B = beliefTokens(b); if (!A.size || !B.size) return false; let n = 0; for (const w of A) if (B.has(w)) n += 1; return n / (A.size + B.size - n) >= 0.5; }
+function mergeBelief(list: { text: string; count: number }[], text: string) { const hit = list.find((x) => sameBelief(x.text, text)); if (hit) hit.count += 1; else list.push({ text, count: 1 }); }
 export function deriveLearningState(history: HistoryTurn[], scope?: string): LearningState {
-  const s: LearningState = { activeItem: null, hintLevelOnItem: 0, hintTurnsOnItem: 0, successStreak: 0, criteria: {}, satisfiedLessonItems: [], previousStructured: false, structuredTurns: 0, attemptsOnItem: 0, revealedItems: [], independentEvidence: {} };
+  const s: LearningState = { activeItem: null, hintLevelOnItem: 0, hintTurnsOnItem: 0, successStreak: 0, criteria: {}, satisfiedLessonItems: [], previousStructured: false, structuredTurns: 0, attemptsOnItem: 0, revealedItems: [], independentEvidence: {}, beliefs: [] };
   for (const h of history) {
     if (h.role !== 'assistant') continue;
     const lt = inScope(h.languageTurn, scope) ? h.languageTurn ?? undefined : undefined;
@@ -345,6 +359,7 @@ export function deriveLearningState(history: HistoryTurn[], scope?: string): Lea
       } else if (isFailure(a.verdict) || a.verdict === 'AMBIGUOUS') {
         s.successStreak = 0;
       }
+      if (a.belief && (a.verdict === 'INCORRECT' || a.verdict === 'PARTIALLY_CORRECT')) mergeBelief(s.beliefs, a.belief);
     }
     if (lt.revealedItemId && !s.revealedItems.includes(lt.revealedItemId)) s.revealedItems.push(lt.revealedItemId);
     // The item the learner is expected to answer after this reply.
