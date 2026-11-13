@@ -38,6 +38,12 @@ describe('pipeline: isolation, reproducibility, failure recovery, cost accountin
     expect(r.results.length).toBe(24); expect(r.results.every((x) => x.status === 'failed')).toBe(true); expect(r.finished.blocksFailed).toBe(24); expect(r.results[0].error).toMatch(/rejected/);
     const reps = generateReports(path.join(dir, 't5'), ['x']); expect(reps['6_outcome_performance']).toMatch(/Failed\/incomplete blocks: 24/);
   });
+  it('retry: with RETRY_FAILED=1 failed blocks are run again, the failed record is kept, and the later record wins', async () => {
+    const dir = tmp(); await runExperiment(cfg('t5r'), { dry: true, runsDir: dir, fetchImpl: (async () => new Response('bad', { status: 400 })) as unknown as typeof fetch });
+    process.env.RETRY_FAILED = '1'; try { await runExperiment(cfg('t5r'), { dry: true, runsDir: dir }); } finally { delete process.env.RETRY_FAILED; }
+    const lines = readFileSync(path.join(dir, 't5r/raw/blocks.jsonl'), 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l).result); const latest = new Map(lines.map((r) => [r.blockId, r.status]));
+    expect(lines.length).toBe(48); expect(lines.filter((r) => r.status === 'failed').length).toBe(24); expect([...latest.values()].every((x) => x === 'ok')).toBe(true);
+  });
   it('safe stop: a tiny budget stops the run early and marks it incomplete', async () => { const dir = tmp(); const r = await runExperiment({ ...cfg('t6'), budgetCapUsd: 0.0005, concurrency: 1 }, { dry: true, runsDir: dir }); expect(r.finished.complete).toBe(false); expect(r.finished.stoppedReason).toMatch(/budget/); expect(r.results.length).toBeLessThan(24); });
   it('cost accounting: ledger total equals tokens x catalogue price for every attempt; no invented cost', async () => {
     const dir = tmp(); const r = await runExperiment(cfg('t7'), { dry: true, runsDir: dir }); const rows = Ledger.read(path.join(dir, 't7/provider_attempts.jsonl'));

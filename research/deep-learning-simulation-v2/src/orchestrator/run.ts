@@ -59,7 +59,9 @@ export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean
   };
   writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify(manifest, null, 2));
   const ledger = new Ledger(dir, runId, cfg.budgetCapUsd); const rawFile = path.join(dir, 'raw/blocks.jsonl'); const auditFile = path.join(dir, 'raw/audit.jsonl'); const judgeFile = path.join(dir, 'raw/judge.jsonl');
-  const done = new Set<string>(existsSync(rawFile) ? readFileSync(rawFile, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l).result.blockId) : []);
+  // RETRY_FAILED=1: blocks whose recorded result failed (for example the provider account ran out of credit) are run again; the failed record stays in the raw file and the later record wins in analysis.
+  const retryFailed = process.env.RETRY_FAILED === '1';
+  const done = new Set<string>(existsSync(rawFile) ? readFileSync(rawFile, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l).result as { blockId: string; status: string }).filter((r) => !retryFailed || r.status === 'ok').map((r) => r.blockId) : []);
   const phrases = outcomes.flatMap((o) => allItems(o).flatMap((it) => [it.prompt, it.material ?? '', ...(it.scoring.type === 'key' ? it.scoring.accepted.filter((a) => a.trim().split(/\s+/).length >= 6) : [])])); // short accepted answers are generic phrases ("what does it mean"): only prompts, materials and long accepted answers are leak signals
   const scanner = new OutgoingScanner(phrases); const leaks: string[] = []; const als = new AsyncLocalStorage<CallCtx>();
   const stub = (async () => new Response(JSON.stringify({ content: [{ type: 'text', text: 'ANSWER: dry-run\nCONFIDENCE: 50' }], usage: { input_tokens: 100, output_tokens: 10 } }), { status: 200 })) as unknown as typeof fetch;
