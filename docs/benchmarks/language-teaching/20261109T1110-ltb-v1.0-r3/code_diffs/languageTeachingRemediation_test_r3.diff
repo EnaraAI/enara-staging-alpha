@@ -1,0 +1,11 @@
+--- docs/benchmarks/language-teaching/20261109T1110-ltb-v1.0-r3/pre_edit_code_snapshot/languageTeachingRemediation.test.ts	2026-11-09 11:11:48.177148939 +0000
++++ backend/test/languageTeachingRemediation.test.ts	2026-11-09 11:15:40.289080114 +0000
+@@ -86,7 +86,7 @@
+     const r = movesFor('She usually go to bed at ten.', [u('exercise'), a('Write one sentence with "usually". I\'ll check it.')], { band: 'A2' });
+     const prompt = renderLanguageContextPrompt({ version: 'ltc-v1', learner, lesson: { status: 'structured', ...FAMILY }, signals: r.signals, moves: r.moves });
+     expect(r.ids).toContain('corrective_feedback_retry');
+-    expect(prompt).toContain('Keep what is correct');
++    expect(prompt).toContain('keep what is correct'); // r3: sentence now follows the minor-slip triage
+     expect(prompt).toContain('aimed only at the gap');
+   });
+ 

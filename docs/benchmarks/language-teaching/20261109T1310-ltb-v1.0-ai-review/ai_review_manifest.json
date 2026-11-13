@@ -1,0 +1,302 @@
+{
+ "reviewId": "20261109T1310-ltb-v1.0-ai-review",
+ "generatedAt": "2026-11-09T13:34:59Z",
+ "runUnderReview": {
+  "runId": "20261109T1211-ltb-v1.0-ageband",
+  "label": "r3 + Trusted Age Band (Option B)",
+  "officialResult": "90/120 MEETS (75.0%)",
+  "benchmarkVersion": "ltb-v1.0"
+ },
+ "integrity": {
+  "cases": 120,
+  "uniqueCases": 120,
+  "turns": 219,
+  "caseSetSha256": "725edb2bcabeb316a388b702b2baba6dc35ed178c80f8de7727c9768c356a2bb",
+  "caseSetShaMatches": true,
+  "runManifestArtifactsVerified": "50/50",
+  "emptyReplies": 0,
+  "ageBandProvenanceRuntime": {
+   "child/class_age_band/known": 73,
+   "teen/class_age_band/known": 73,
+   "adult/school_setting_adult_learners/known": 73
+  },
+  "allChecksPassed": true
+ },
+ "rubricSha256": "963962bba8b427ea7e15afd5d2b7bc2ad90945fc16fcff6633813941546f0e5b",
+ "scoringSpecSha256": "8fbf752bffd4fe9c1f51831b313e06f020e3d47dc57b62e446fd65dc38f82c05",
+ "inputs": {
+  "official/benchmark_cases.jsonl": {
+   "sha256": "725edb2bcabeb316a388b702b2baba6dc35ed178c80f8de7727c9768c356a2bb",
+   "bytes": 276131,
+   "lines": 120,
+   "readByBlindReviewer": true
+  },
+  "official/rubric_v1.json": {
+   "sha256": "963962bba8b427ea7e15afd5d2b7bc2ad90945fc16fcff6633813941546f0e5b",
+   "bytes": 6445,
+   "lines": 138,
+   "readByBlindReviewer": true
+  },
+  "official/scoring_spec_v1.json": {
+   "sha256": "8fbf752bffd4fe9c1f51831b313e06f020e3d47dc57b62e446fd65dc38f82c05",
+   "bytes": 4449,
+   "lines": 38,
+   "readByBlindReviewer": false
+  },
+  "official/raw_results.jsonl": {
+   "sha256": "c1836ece21bf8690c0b00345d10b5dd116d3b56102c849388c55722761a63ee9",
+   "bytes": 456077,
+   "lines": 120,
+   "readByBlindReviewer": true
+  },
+  "official/provider_attempts.jsonl": {
+   "sha256": "dfd2c815b88cadb6f724dbb46f979db54e69ab958b9d5de412583967535f3378",
+   "bytes": 227629,
+   "lines": 219,
+   "readByBlindReviewer": false
+  },
+  "official/judge_results.jsonl": {
+   "sha256": "a1ac800f837d7a1728865b1feeea42a5220bca1e3d5a310daf32d70fa3211113",
+   "bytes": 228616,
+   "lines": 132,
+   "readByBlindReviewer": false
+  },
+  "official/judge_attempts.jsonl": {
+   "sha256": "0397a953dea47a1fca4cb259b78bd4b3dba0bcb9e5b486544b576f265bec55b9",
+   "bytes": 77161,
+   "lines": 134,
+   "readByBlindReviewer": false
+  },
+  "official/case_scores.csv": {
+   "sha256": "eb2cb70aa1157fd7d183ebd0a1a19aedeaf758c39f938d3a9465fc0dbdf1d2b8",
+   "bytes": 24667,
+   "lines": 121,
+   "readByBlindReviewer": false
+  },
+  "official/aggregate_results.json": {
+   "sha256": "e9af73db0bf8e5aaf382f0999edd123f5bc24ebb7ee4b9b32f043c5f6977ded7",
+   "bytes": 39211,
+   "lines": 1963,
+   "readByBlindReviewer": false
+  },
+  "official/comparison.json": {
+   "sha256": "9432d8d5e7f799cb73372e99d64b82f48dd794d83c22a8a4cacf692513929881",
+   "bytes": 25470,
+   "lines": 1007,
+   "readByBlindReviewer": false
+  },
+  "official/run_config.json": {
+   "sha256": "871649a9b4a22af95ce2695e609caa805de8fa76126116f6a3ae3e68bc50e7f2",
+   "bytes": 780,
+   "lines": 22,
+   "readByBlindReviewer": false
+  },
+  "official/run_status.json": {
+   "sha256": "e34f82634205f08fa0ba020dd111e5651d4b48a1540813ba69a21cf8ef6d1914",
+   "bytes": 118,
+   "lines": 6,
+   "readByBlindReviewer": false
+  },
+  "official/judge_status.json": {
+   "sha256": "2637f858a54c2826987cd9b684db7f534f9c6229041592482c9a7464704c9548",
+   "bytes": 107,
+   "lines": 6,
+   "readByBlindReviewer": false
+  },
+  "manifest.json": {
+   "sha256": "e0c8445150b787d43100029efe83f28a6d4de0fdf5217f542538409622ea7fd6",
+   "bytes": 9991,
+   "readByBlindReviewer": false
+  },
+  "preflight_manifest.json": {
+   "sha256": "b6852f941ae253ca535cfa11670b6cfc60037c947477a7819465bc620f9af9cc",
+   "bytes": 2300,
+   "readByBlindReviewer": false
+  }
+ },
+ "benchmarkCodeSha256": {
+  "run.ts": "a4d17a855b2f3023f732e3d96576fdca4668112f2b25dfbf1b2807bfc6235f9c",
+  "run_trusted_age.ts": "3c8653fc606a1f9c9fcdcebeee99c7293d3f4a6fc00106e5e8837c275ce4491f",
+  "judge.ts": "c4ebefcbea9a4621fc3a2aa06b12fe70b736016e7a3c479bfb9d034906a760c3",
+  "score.mjs": "49841ea626b957b0a872057af508fdf7571063ab5b9ead2ecbbfc422d9af3ed6",
+  "cases.mjs": "4856d8bf5179dc977500201270a2fbdd91b1c43352f355fc36281c338c6eba8b"
+ },
+ "originalModels": {
+  "tutor": "claude-opus-5-5 (effort low)",
+  "judge": "claude-sonnet-5-5 (effort medium)"
+ },
+ "reviewer": {
+  "model": "claude-haiku-5-5",
+  "effort": "high",
+  "maxTokens": 8000,
+  "provider": "anthropic (same provider as tutor and judge)",
+  "independence": "DIFFERENT CLAUDE MODEL, SAME PROVIDER — PARTIALLY INDEPENDENT, NOT CROSS-PROVIDER",
+  "selectionReason": "Only Anthropic models are configured in backend/src/services/priceCatalog.ts; no other provider is configured and no credentials were created. Opus 5.5 excluded (generated the transcripts).",
+  "blindSystemPromptSha256": "739bff14cc5c545d119509343a258b47aa024a76f91f752720ef0544d41c0d8e",
+  "usedAlsoFor": [
+   "targeted audits",
+   "adjudication",
+   "blind review of r3 transcripts for 9 regressions"
+  ]
+ },
+ "methodology": [
+  "Blind isolated per-case review (no judge scores/tags/outcomes/regression status, no engine moves, no learner grade).",
+  "Frozen ltb-scoring-v1 rule applied to independent scores with official deterministic-check results.",
+  "Evidence quotes verified against transcripts.",
+  "Payload privacy scan before every call.",
+  "Reviews sealed and hashed before judge outputs were read.",
+  "Targeted audits and anonymised randomised A/B adjudication after the seal; scores never averaged."
+ ],
+ "blindSealSha256": "64f7aa6b4c9686baec548b3465fe937f84b0e3f101df13dc73971bdf27f3754e",
+ "spend": {
+  "capUsd": 5.0,
+  "actualUsd": 0.4891,
+  "byStage": {
+   "pilot (2 cases, superseded prompt)": {
+    "calls": 2,
+    "http200": 2,
+    "retries": 0,
+    "inputTokens": 8253,
+    "outputTokens": 5358,
+    "thinkingTokensInOutput": 3342,
+    "usd": 0.003504
+   },
+   "aborted run v1 (prompt lacked restrictions 1-9; discarded)": {
+    "calls": 10,
+    "http200": 10,
+    "retries": 0,
+    "inputTokens": 42192,
+    "outputTokens": 31792,
+    "thinkingTokensInOutput": 21121,
+    "usd": 0.020115
+   },
+   "blind review (120 cases, final prompt)": {
+    "calls": 120,
+    "http200": 120,
+    "retries": 0,
+    "inputTokens": 587571,
+    "outputTokens": 423745,
+    "thinkingTokensInOutput": 290267,
+    "usd": 0.270627
+   },
+   "targeted audits + adjudication (122 tasks)": {
+    "calls": 122,
+    "http200": 122,
+    "retries": 0,
+    "inputTokens": 316436,
+    "outputTokens": 286910,
+    "thinkingTokensInOutput": 217350,
+    "usd": 0.175097
+   },
+   "blind review of r3 transcripts for the 9 regressions": {
+    "calls": 9,
+    "http200": 9,
+    "retries": 0,
+    "inputTokens": 44320,
+    "outputTokens": 30561,
+    "thinkingTokensInOutput": 20669,
+    "usd": 0.019713
+   }
+  },
+  "calls": 263,
+  "inputTokens": 998772,
+  "outputTokens": 778366,
+  "pricing": "backend/src/services/priceCatalog.ts (haiku-5-5: $0.1/$0.5 per M tokens)",
+  "note": "Aborted v1 run (10 calls) used a prompt missing restrictions 1-9 of the brief; its outputs are archived in work/aborted_v1/ and not used."
+ },
+ "coverage": {
+  "reviewed": 120,
+  "notReviewable": 0
+ },
+ "results": {
+  "independentDerived": {
+   "PARTIAL": 45,
+   "MEETS": 75
+  },
+  "independentHolistic": {
+   "PARTIAL": 41,
+   "MEETS": 79
+  },
+  "official": {
+   "MEETS": 90,
+   "PARTIAL": 30
+  },
+  "agreementPct": 70.8,
+  "kappa": 0.333,
+  "adjudication": {
+   "UNRESOLVED": 7,
+   "ACCEPT_ORIGINAL": 7,
+   "ACCEPT_INDEPENDENT": 21
+  },
+  "adjudicatedMeetsRange": [
+   70,
+   77
+  ],
+  "finalStatus": "AI_REVIEW_FINDS_MATERIAL_SCORING_DISAGREEMENT"
+ },
+ "constraints": {
+  "applicationCodeChanged": false,
+  "benchmarkRerun": false,
+  "newTutorConversations": false,
+  "stagingOrProductionAccess": false,
+  "deployment": false,
+  "gitCommitOrPush": false,
+  "budgetOrSpendControlChanges": false,
+  "AI_TEST_SPEND_ID_changed": false,
+  "originalArtifactsModified": false
+ },
+ "deliverables": {
+  "independent_case_reviews.jsonl": {
+   "sha256": "64f7aa6b4c9686baec548b3465fe937f84b0e3f101df13dc73971bdf27f3754e",
+   "bytes": 428871
+  },
+  "independent_ai_review_report.md": {
+   "sha256": "eab3fcbaa2c437aa5942fbb280f6e6a73f0b4aa46e5a5b9593ab8b598eef7f04",
+   "bytes": 11023
+  },
+  "original_vs_independent_comparison.md": {
+   "sha256": "cd5cccfea62ee546fb7ca27d6023ccee63292dd9f2a3e74a320ea7777e7f64c9",
+   "bytes": 82213
+  },
+  "targeted_issue_audit.md": {
+   "sha256": "ddbecf98b4c1b27f3dcaae82d69865a2bea5a569f450c71d583f249e63f5654a",
+   "bytes": 37591
+  },
+  "phase1_ai_review_decision.md": {
+   "sha256": "4f6e43c36d974fbcc90be6b1c45c08f38b8f8045c7a5ff14509eb2227f20e4ef",
+   "bytes": 5225
+  },
+  "ai_review_manifest.json": "this file (self-hash not embeddable; see ai_review_manifest.sha256)"
+ },
+ "workFiles": {
+  "work/adjudication_order.json": "82039bc5053023f5900a45dff82cba0be0be7d0f38119b5818b7237a1cbb76f7",
+  "work/audits_tasks.jsonl": "038df7601557591467995aaf5338c6ac8eb992c78c4bad1c41af470e7f86d522",
+  "work/r3_regression_blind_reviews.jsonl": "cf7e19d522d614cf40fc4db1d5f35d0dec5423dcca293b16b99a427030fed725",
+  "work/adjudication_tasks.jsonl": "197a33df853947cf4d4ae0a8bccee8dfdfe4f0835b23cd8b6c692a210b824bad",
+  "work/blind_run.log": "02d7907bd5526c47e5208ce9887a978237ebf4c84e7b28d0b68ecac19c7bf185",
+  "work/dry_review_attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "work/r3_regression_attempts.jsonl": "f8b1f5283f2d7e315a4e9372dd8cfab6a1434860fe8dc54206e680edc383e502",
+  "work/audit_attempts.jsonl": "8c1e415a5f85a7cc7c235ab3541312a8bf9f6c9c913d056f5c1724be89b71730",
+  "work/comparison.json": "2bd11ec2695a4835a5cbb741989158bc090867635c0af518a32a3436e3bba010",
+  "work/blind_reviews_sha256_at_seal.txt": "d990800f94f4ded745887152e598e86b76593850ce3f555620a0a8a25c49178b",
+  "work/review_attempts.jsonl": "a6f9cf7bc17bbdda260f63fe12aef880135155c203e3c11409d8a5438ad89922",
+  "work/all_tasks.jsonl": "d7e1317d59278c745a4b51b60254554c4f014ef783330c556c75b39df1232282",
+  "work/regression_pair_order.json": "196374c6dd4958ddd442fbb5d4ef81e0092bdf5da5b41ef67a8a190762161d3c",
+  "work/review_status.json": "c5bb195cb61e2371431de0f4dc27175a2b52812aaabc4daa6b11c1aa30399661",
+  "work/dry_review_status.json": "574aa087725a64bc308452bd325087168bccf11e4d3e20c7502aafc7178b9ac3",
+  "work/audit_results.jsonl": "5ba1d6874c521e3849d725b42ca8039eb1863b85ea745fa05b0d2a8b9371aa33",
+  "work/pilot_review_attempts.jsonl": "a4d4509240028332303bd6f284c5e92614ab39907eb2f941f0b919e7ab27a1a5",
+  "work/dry_independent_case_reviews.jsonl": "e45bd6b6443450eb7d256d568e36fbed86573e49dd225a432fe2eea35070ee7a",
+  "work/pilot_case_reviews.jsonl": "11749f0dd239bad17178be73ed66d51aae8e94b7bbf86edeea602af02394b8cc",
+  "work/r3_regression_status.json": "9354fe7b849c1939764abdcced27f86ebddf6b4d3a6d572254d23e0bdeeccd03",
+  "work/aborted_v1/partial_reviews_v1.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "work/aborted_v1/blind_run.log": "71e7952946e8d6e984623e6710202b96b58b72ce7c48f43b310905abfc8551ce",
+  "work/aborted_v1/review_attempts.jsonl": "a8220f95ad89ff818803b6a293bb44f2f9f7b27433f8f63498a65bd469595950",
+  "work/scripts/blind_review.ts": "8821b56a18a9dc4f8496fc5966326c8ef7fc4d071a230ac51f93ad21278bf397",
+  "work/scripts/compare.py": "8ddd7a5cdf464f1334b33b7fd99accd78808bcf69dcd2415be3eb85d85d2e21d",
+  "work/scripts/write_reports.py": "e7681632b017fba1eae10882b01ef1feb7e7447269759bad1a2053e7d31b5899",
+  "work/scripts/blind_review_v2_as_run.ts": "763226e48377d211cfcdbba3c1d4cc3f08a50d621f24a41464b0a74ef86b05ae",
+  "work/scripts/audit_calls.ts": "7b241e3f1c68212ae50f6701e75683ff8a4031cb85c5342bcd6b9bf7ace01a2a",
+  "work/scripts/build_audits.py": "806dfce0c4cacf43d0a1ed8690da5bf8af113f053f9c544fc1485378b5cf0f0b"
+ }
+}

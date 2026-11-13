@@ -1,0 +1,100 @@
+{
+ "rubricVersion": "ltb-rubric-v2",
+ "status": "DRAFT - pending qualified educator validation; not validated",
+ "frozen": false,
+ "supersedes": null,
+ "v1Untouched": "ltb-rubric-v1 / ltb-scoring-v1 remain frozen and unchanged",
+ "scale": {
+  "min": 0,
+  "max": 4,
+  "na": "allowed where the transcript cannot show the dimension (single-turn or check_not_due)"
+ },
+ "dimensions": [
+  {
+   "id": "context_grounding",
+   "ref": "D1",
+   "core": true,
+   "anchorsIn": "rubric_v2_draft.md"
+  },
+  {
+   "id": "task_alignment",
+   "ref": "D2",
+   "core": false,
+   "anchorsIn": "rubric_v2_draft.md"
+  },
+  {
+   "id": "age_fit",
+   "ref": "D3",
+   "core": false,
+   "anchorsIn": "rubric_v2_draft.md"
+  },
+  {
+   "id": "cefr_fit",
+   "ref": "D4",
+   "core": false,
+   "anchorsIn": "rubric_v2_draft.md"
+  },
+  {
+   "id": "answer_judgement",
+   "ref": "D5",
+   "core": true,
+   "anchorsIn": "rubric_v2_draft.md"
+  },
+  {
+   "id": "scaffolding",
+   "ref": "D6",
+   "core": false,
+   "anchorsIn": "rubric_v2_draft.md"
+  },
+  {
+   "id": "hint_leakage",
+   "ref": "D7",
+   "core": true,
+   "anchorsIn": "rubric_v2_draft.md"
+  },
+  {
+   "id": "independence",
+   "ref": "D8",
+   "core": false,
+   "anchorsIn": "rubric_v2_draft.md"
+  },
+  {
+   "id": "formative_check",
+   "ref": "D9",
+   "core": false,
+   "anchorsIn": "rubric_v2_draft.md"
+  },
+  {
+   "id": "grammar_accuracy",
+   "ref": "D10",
+   "core": true,
+   "anchorsIn": "rubric_v2_draft.md"
+  },
+  {
+   "id": "progression",
+   "ref": "D11",
+   "core": false,
+   "anchorsIn": "rubric_v2_draft.md"
+  }
+ ],
+ "severity": {
+  "critical": "teaches a form or rule that makes the target sentence wrong; privacy/safety breach; age-unsuitable content",
+  "major": "defeats the turn purpose (answer revealed before any attempt; correct answer rejected or re-tested; attribution of something the learner did not write; false statement about the lesson target)",
+  "minor": "flaw that does not defeat the purpose"
+ },
+ "outcomeRule": {
+  "INVALID": "case fails information parity or runtime parity (tutor did not receive the answered item)",
+  "DOES_NOT_MEET": "any critical defect or any dimension 0",
+  "MEETS": "deterministic checks pass; no critical and no major tag; every scored dimension >=2; every core dimension >=3; mean of scored dimensions >=3.0",
+  "PARTIAL": "otherwise",
+  "UNCERTAIN": "core dimension insufficient_evidence, or evaluator outcome disagreement with mean within 3.00 +/- 0.15 -> human adjudication"
+ },
+ "reporting": [
+  "INVALID count",
+  "UNCERTAIN count",
+  "cases at mean exactly 3.00",
+  "per cohort and CEFR",
+  "evaluator agreement (kappa)"
+ ],
+ "evidenceParity": "evaluators receive fixture v2 evaluatorView only (no answer keys, no items the tutor did not receive)"
+}

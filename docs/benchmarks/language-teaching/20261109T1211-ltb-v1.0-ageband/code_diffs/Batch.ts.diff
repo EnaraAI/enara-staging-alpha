@@ -1,0 +1,24 @@
+--- docs/benchmarks/language-teaching/20261109T1211-ltb-v1.0-ageband/pre_edit_code_snapshot/Batch.ts	2026-11-09 12:11:00.631043812 +0000
++++ backend/src/models/Batch.ts	2026-11-09 12:38:40.597197184 +0000
+@@ -1,3 +1,4 @@
++import { LEARNER_AGE_BANDS, type LearnerAgeBand } from './learnerAgeBand';
+ import { Schema, model, Document } from 'mongoose';
+ 
+ export interface IBatch extends Document {
+@@ -9,6 +10,8 @@
+   academicYear: string;
+   groupId?: string;
+   origin?: 'live' | 'demo_seed';
++  // Class-level trusted learner age band (see Student.learnerAgeBand).
++  learnerAgeBand?: LearnerAgeBand;
+ }
+ 
+ const batchSchema = new Schema<IBatch>(
+@@ -21,6 +24,7 @@
+     academicYear: { type: String, required: true },
+     groupId: { type: String },
+     origin: { type: String, enum: ['live', 'demo_seed'], default: 'live' },
++    learnerAgeBand: { type: String, enum: LEARNER_AGE_BANDS, select: false },
+   },
+   { timestamps: true }
+ );

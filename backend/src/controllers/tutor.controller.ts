@@ -3,6 +3,8 @@ import { assignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { isFeatureEnabled, isShadowMode } from '../services/featureFlags';
 import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSource } from '../services/curriculumRetrieval';
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
+import { buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, turnEvidence, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
+import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, stripPreAttemptModels, stripCopyReadyModels, type StrippedReply } from '../services/languageLearningState';
 import {
   curriculumFromCourse,
   isDirectTutorModelConfigured,
@@ -167,15 +169,25 @@ interface TutorTurn {
   orchestrator?: Parameters<typeof queryOrchestratorChat>[0];
   // The teaching plan (ped-v2) and the metadata stored on the reply.
   plan?: ObjectiveContext | null;
+  // Language courses (ltc-v1): context and moves for this turn.
+  language?: LanguageTeachingContext | null;
+  // r4: the hidden assessment read from the model's reply (stripped before display/storage).
+  // r4.1: plus how many markers were removed but not trusted (POST-02).
+  languageMarker?: StrippedReply;
+  turnLockId?: string;
+  turnLockReleased?: boolean;
   // Builds the direct-model request (retrieval, objective focus, learner snapshot).
   directParams?: () => Promise<TutorRequestParams>;
 }
 
 async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
   const studentId = req.user!.studentId!;
-  const session = await TutorSession.findOne({ id: req.params.id, studentId });
-  if (!session) throw new AppError('Tutor session not found', 404);
-
+  // r4.3 (POST-07): the owner check and the session's turn lock are one atomic
+  // update, taken before history is read, so a second message cannot be answered
+  // from a stale history or overwrite the message count.
+  const turnLockId = generateMessageId();
+  const session = await acquireSessionTurn(String(req.params.id), studentId, turnLockId);
+  try {
   const { text, teachingMethod, context } = req.body as { text?: string; teachingMethod?: TeachingMethod; context?: TurnContext };
   if (!text?.trim()) throw new AppError('Message text is required');
 
@@ -196,10 +208,14 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
   let enaraCourseId: string | undefined;
   let enaraSectionId: string | undefined;
   let curriculum: TutorCurriculum | undefined;
+  // The curriculum of a course resolved (and enrolment-checked) in this turn;
+  // the language context reads only this one, never an id stored on the session.
+  let resolvedCurriculumId: string | undefined;
 
   if (courseId) {
     try {
       const course = await buildCourseTree(studentId, courseId);
+      resolvedCurriculumId = course.curriculumId;
       session.courseId = course.id;
       session.curriculumId = course.curriculumId;
       curriculumSummary = curriculumSummary || course.curriculumSummary;
@@ -227,6 +243,17 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
       content: m.text,
     }));
 
+  // r4: the same recent turns with their stored language-turn state, for the
+  // engine only (the model never receives metadata; it gets `history`).
+  const languageHistory = earlier
+    .filter((m) => m.role === 'user' || m.role === 'ai')
+    .slice(-12)
+    .map((m) => ({
+      role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+      content: m.text,
+      languageTurn: (m as { meta?: { languageTurn?: LanguageTurnEvidence } }).meta?.languageTurn ?? null,
+    }));
+
   const enrichedQuery = [
     curriculumSummary ? `Curriculum context: ${curriculumSummary}` : '',
     lessonTitle ? `Current lesson: ${lessonTitle}` : '',
@@ -249,7 +276,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     throw new AppError(`The AI tutor is off while you work on "${tutorPolicy.title}"`, 403, 'TUTOR_BLOCKED');
   }
   const extraRules = [session.handoff?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean) as string[];
-  const turn: TutorTurn = { studentId, session, text: text.trim(), method, userMessage, earlierCount: earlier.length, lessonTitle, sources: [] };
+  const turn: TutorTurn = { studentId, session, text: text.trim(), method, userMessage, earlierCount: earlier.length, lessonTitle, sources: [], turnLockId };
   if (!(enaraCourseId || isDirectTutorModelConfigured())) return turn;
 
   try {
@@ -269,7 +296,24 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     tutorSessionId: session.id,
     channel: req.path.endsWith('/stream') ? 'stream' : 'chat',
   });
-  if (enaraCourseId && !extraRules.length && !turn.plan) {
+  // Language course: labelled learner/lesson context and this turn's teaching
+  // moves. Built from server-side records only (session owner, enrolled course,
+  // the school's own curriculum). Like a plan, it needs the direct model.
+  turn.language = await buildLanguageTeachingContext({
+    institutionId: session.institutionId,
+    curriculumId: resolvedCurriculumId,
+    lessonId: session.lessonId,
+    // Option B: the owner-checked session's student, for the trusted age band only.
+    studentId,
+    // r4.1 (POST-03): owner-checked session and enrolment-checked course, for the state namespace.
+    sessionId: session.id,
+    courseId: resolvedCurriculumId ? session.courseId : undefined,
+    message: text.trim(),
+    history: languageHistory,
+    hintsOnly: tutorPolicy.policy === 'hints_only',
+    masteryStatus: turn.plan?.masteryStatus,
+  });
+  if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language) {
     turn.orchestrator = {
       course_id: enaraCourseId,
       query: enrichedQuery,
@@ -297,10 +341,36 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
       pedagogy: [turn.plan?.prompt, ...extraRules].filter(Boolean).join('\n\n') || undefined,
       planActive: Boolean(turn.plan),
       sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
+      languageContext: turn.language?.prompt,
       learner: await getLearnerSnapshot(studentId).then((l) => (l ? describeSnapshot(l) : undefined)),
     };
   };
   return turn;
+  } catch (error) {
+    await releaseTurnLock(session.id, turnLockId);
+    throw error;
+  }
+}
+
+// r4.3 (POST-07): per-session turn lock. A conditional update makes acquisition
+// atomic across processes; the lock expires on its own so a crashed request
+// cannot block the session. Concurrent messages get 409 TUTOR_TURN_IN_PROGRESS.
+const TURN_LOCK_MS = 120_000;
+async function acquireSessionTurn(sessionId: string, studentId: string, lockId: string) {
+  const now = new Date();
+  const session = await TutorSession.findOneAndUpdate(
+    { id: sessionId, studentId, $or: [{ turnLock: { $exists: false } }, { turnLock: null }, { 'turnLock.until': { $lt: now } }] },
+    { $set: { turnLock: { id: lockId, until: new Date(now.getTime() + TURN_LOCK_MS) } } },
+    { new: true },
+  );
+  if (session) return session;
+  // Only on failure: tell "not yours / not found" apart from "busy".
+  if (!(await TutorSession.exists({ id: sessionId, studentId }))) throw new AppError('Tutor session not found', 404);
+  throw new AppError('The tutor is still answering your previous message. Please wait a moment.', 409, 'TUTOR_TURN_IN_PROGRESS');
+}
+async function releaseTurnLock(sessionId: string, lockId?: string) {
+  if (!lockId) return;
+  await TutorSession.updateOne({ id: sessionId, 'turnLock.id': lockId }, { $unset: { turnLock: 1 } }).catch((error) => logger.warn('tutor_turn_lock_release_failed', { error: serializeError(error) }));
 }
 
 // Settles or releases the credits and saves both messages. A null reply (no
@@ -314,9 +384,35 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
     await settleUsage(turn.reservation, { model: aiResult.version });
   }
   turn.reservation = undefined;
+  // Fix 1: before the learner's first attempt, example lines that show the tested
+  // form are removed (stored and sent text alike; the stream gets a replace event).
+  let preAttemptRemoved = 0;
+  if (turn.language && reply) {
+    const guarded = stripPreAttemptModels(aiResult.answer, guardedItems(turn.language), turn.text, [...(turn.language.lesson.spec?.vocabulary ?? []), ...(turn.language.lesson.spec?.examples ?? [])]);
+    if (guarded.removed.length) { aiResult = { ...aiResult, answer: guarded.text }; preAttemptRemoved = guarded.removed.length; }
+    // Fix 2A: a gapped check is never answerable by copying a filled model of it.
+    const copy = stripCopyReadyModels(aiResult.answer, turn.text);
+    if (copy.removed.length) { aiResult = { ...aiResult, answer: copy.text }; preAttemptRemoved += copy.removed.length; }
+  }
   const citations = citationsIn(aiResult.answer, turn.sources);
+  const assistantId = generateMessageId();
+  const languageTurn = turn.language && reply
+    ? {
+        ...turnEvidence(turn.language, turn.plan?.teaching.objectiveId),
+        ...finalizeLanguageTurn(turn.language, {
+          reply: aiResult.answer,
+          learnerText: turn.text,
+          messageId: assistantId,
+          parsed: turn.languageMarker?.assessment ?? null,
+          malformed: turn.languageMarker?.malformed,
+          untrustedMarkers: turn.languageMarker?.untrustedMarkers,
+          firstMarkerNotLeading: turn.languageMarker?.firstMarkerNotLeading,
+        }),
+        ...(preAttemptRemoved ? { preAttemptModelsRemoved: preAttemptRemoved } : {}),
+      }
+    : undefined;
   const assistantMessage = {
-    id: generateMessageId(),
+    id: assistantId,
     role: 'ai' as const,
     text: aiResult.answer,
     timestamp: new Date(),
@@ -328,6 +424,8 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
       ...(citations.length ? { citations } : {}),
       // Recorded only when the plan was actually used for this reply (a model reply).
       ...(turn.plan && reply ? { teaching: turn.plan.teaching } : {}),
+      // Recorded only for a model reply (the moves were actually given to it).
+      ...(languageTurn ? { languageTurn } : {}),
     },
   };
   const { session } = turn;
@@ -337,8 +435,14 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
   if (!session.title || session.title === 'AI Tutor chat' || session.title === 'New chat') {
     session.title = turn.text.slice(0, 60);
   }
+  // r4.3 (POST-07): release this turn's lock in the same write as the session
+  // update (no extra round trip); the conditional release in the handlers then no-ops.
+  if (turn.turnLockId && session.turnLock?.id === turn.turnLockId) {
+    session.turnLock = undefined;
+    turn.turnLockReleased = true;
+  }
   await session.save();
-  return { aiResult, assistantMessage };
+  return { aiResult, assistantMessage, preAttemptRemoved };
 }
 
 const replyMeta = (aiResult: TutorReply, method: TeachingMethod) => ({
@@ -350,10 +454,19 @@ const replyMeta = (aiResult: TutorReply, method: TeachingMethod) => ({
 
 export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Response) => {
   const turn = await prepareTutorTurn(req);
+  try {
   let reply: TutorReply | null = null;
   if (turn.orchestrator) reply = await queryOrchestratorChat(turn.orchestrator);
   // Orchestrator down or unconfigured: answer with the direct model instead.
-  if (!reply && turn.directParams) reply = await queryDirectTutorModel(await turn.directParams());
+  if (!reply && turn.directParams) {
+    reply = await queryDirectTutorModel(await turn.directParams());
+    // r4: the hidden assessment line is read and removed before anything is stored or sent.
+    if (reply && turn.language) {
+      const stripped = stripAssessmentMarkers(reply.answer);
+      turn.languageMarker = stripped;
+      reply = stripped.text ? { ...reply, answer: stripped.text } : null;
+    }
+  }
   const { aiResult, assistantMessage } = await finishTutorTurn(turn, reply);
   res.json({
     userMessage: turn.userMessage,
@@ -361,6 +474,9 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
     session: await toSessionResponse(turn.session),
     meta: replyMeta(aiResult, turn.method),
   });
+  } finally {
+    if (!turn.turnLockReleased) await releaseTurnLock(turn.session.id, turn.turnLockId);
+  }
 });
 
 // P20: the same turn, streamed as the model writes it (server-sent events), so
@@ -391,10 +507,23 @@ export const streamTutorMessage = asyncHandler(async (req: AuthRequest, res: Res
       const params = await turn.directParams();
       const status: StreamStatus = {};
       let answer = '';
+      // r4: hidden assessment markers are held back and removed as the text streams
+      // (a marker split across chunks never reaches the student).
+      const filter = turn.language ? new AssessmentMarkerFilter() : null;
       for await (const delta of streamDirectTutorModel(params, status)) {
         if (!open) break; // the student left: stop generating (metered as cancelled)
-        answer += delta;
-        send({ type: 'token', delta });
+        const visible = filter ? filter.push(delta) : delta;
+        if (!visible) continue;
+        answer += visible;
+        send({ type: 'token', delta: visible });
+      }
+      if (filter && open) {
+        const tail = filter.end();
+        if (tail) {
+          answer += tail;
+          send({ type: 'token', delta: tail });
+        }
+        turn.languageMarker = filterSummary(filter, answer);
       }
       if (!open) {
         if (turn.reservation) await releaseUsage(turn.reservation);
@@ -405,8 +534,8 @@ export const streamTutorMessage = asyncHandler(async (req: AuthRequest, res: Res
       const ok = answer.trim() && !status.refused && !status.failed;
       reply = ok ? { answer: answer.trim(), intent: 'direct_model', context_found: status.contextFound ?? 0, version: `anthropic:${status.model ?? 'unknown'}` } : null;
     }
-    const { aiResult, assistantMessage } = await finishTutorTurn(turn, reply);
-    if (!reply) send({ type: 'replace', text: aiResult.answer });
+    const { aiResult, assistantMessage, preAttemptRemoved } = await finishTutorTurn(turn, reply);
+    if (!reply || preAttemptRemoved) send({ type: 'replace', text: aiResult.answer });
     send({ type: 'done', messageId: assistantMessage.id, assistantMessage, meta: replyMeta(aiResult, turn.method), session: await toSessionResponse(turn.session) });
   } catch (error) {
     if (turn.reservation) await releaseUsage(turn.reservation).catch(() => undefined);
@@ -415,6 +544,7 @@ export const streamTutorMessage = asyncHandler(async (req: AuthRequest, res: Res
     send({ type: 'error', code, message: error instanceof AppError ? error.message : 'The tutor could not finish this reply. Please try again.' });
   } finally {
     clearInterval(heartbeat);
+    if (!turn.turnLockReleased) await releaseTurnLock(turn.session.id, turn.turnLockId);
     if (open) res.end();
   }
 });

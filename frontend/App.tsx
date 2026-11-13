@@ -4,6 +4,7 @@ import { Login } from './pages/Login';
 import { AccountLink, accountLinkFromLocation } from './pages/AccountLink';
 import { DemoPortal } from './pages/DemoPortal';
 import { People } from './pages/workspace/People';
+import { LearnerAgeBands } from './pages/workspace/LearnerAgeBands';
 import { StudentDashboard } from './pages/StudentDashboard';
 import { CoursePage } from './pages/CoursePage';
 import { AdminDashboard } from './pages/AdminDashboard';
@@ -427,6 +428,8 @@ const App: React.FC = () => {
           {page === 'dashboard' && <InstitutionAnalytics />}
           {/* P4: read-only school outcome aggregates (no class filter, no student timeline). */}
           {page === 'dashboard' && <Outcomes allowClassFilter={false} showTimeline={false} />}
+          {/* Option B: read-only for academic managers (the server returns canEdit=false and rejects writes). */}
+          {page === 'age-bands' && <LearnerAgeBands />}
         </main>
       </div>
     );
@@ -522,6 +525,8 @@ const App: React.FC = () => {
           {/* P5: Workspace Admin only; the server enforces workspace:billing too. */}
           {state.page === 'usage' && sessionUser()?.role === 'admin' && <Usage />}
           {state.page === 'people' && (sessionUser()?.role === 'admin' || sessionUser()?.role === 'enara-admin') && <People />}
+          {/* Option B: Workspace Admin edits learner age bands; the server enforces it. */}
+          {state.page === 'age-bands' && sessionUser()?.role === 'admin' && <LearnerAgeBands />}
           {state.page === 'savings' && sessionUser()?.role === 'admin' && <SavingsCenter />}
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments />}

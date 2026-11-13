@@ -42,6 +42,8 @@ const DISENGAGED_DAYS = 7;
 
 export interface ObjectiveContext {
   decision: TeachingPlan & { id?: string };
+  // The objective's mastery status from the evidence model (read-only).
+  masteryStatus?: string;
   prompt: string;
   teaching: TeachingMeta;
 }
@@ -241,7 +243,7 @@ export async function buildObjectiveContext(params: {
       decisionVersion: plan.decisionVersion,
       registryVersion: plan.registryVersion,
     };
-    return { decision: { ...plan, id }, prompt: lines.join('\n'), teaching };
+    return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching };
   } catch (error) {
     logger.warn('learning_context_failed', { error: serializeError(error) });
     return null;

@@ -145,6 +145,9 @@ export interface TutorRequestParams {
   // Retrieved course passages (services/curriculumRetrieval.ts). When given,
   // they replace sending whole lesson files.
   sourcesPrompt?: string;
+  // Language courses (ltc-v1): labelled learner/lesson context and this turn's
+  // teaching moves (services/languageTeachingContext.ts).
+  languageContext?: string;
 }
 
 // Shown to the student's own tutor in every mode: checks understanding and
@@ -224,6 +227,9 @@ export async function buildTutorRequest(params: TutorRequestParams) {
   }
   if (params.pedagogy) {
     system.push({ type: 'text', text: params.pedagogy });
+  }
+  if (params.languageContext) {
+    system.push({ type: 'text', text: params.languageContext });
   }
   if (params.sourcesPrompt) {
     system.push({ type: 'text', text: params.sourcesPrompt });

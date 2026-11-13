@@ -132,6 +132,23 @@ export const getMyCurriculumContext = asyncHandler(async (req: AuthRequest, res:
     id: curriculum?.id,
     name: curriculum?.name,
     summary: curriculum?.summary || course.curriculumSummary,
-    chapters: curriculum?.chapters || [],
+    // r4: lesson items reach students as id + prompt only; accepted answers and
+    // target forms (the answer key) stay staff-side.
+    chapters: (curriculum?.chapters || []).map(studentChapter),
   });
 });
+
+// r4.3 (POST-14): an explicit allow-list. Storage paths (uploads, including
+// unscanned files), internal section ids and answer keys never reach students;
+// downloadable materials are served by the course tree's eligibility filter.
+function studentChapter(ch: unknown) {
+  const c = typeof (ch as { toObject?: () => unknown })?.toObject === 'function' ? (ch as { toObject: () => Record<string, any> }).toObject() : (ch as Record<string, any>);
+  const spec = c?.languageSpec;
+  const items = spec?.items;
+  return {
+    id: c?.id,
+    title: c?.title,
+    description: c?.description,
+    ...(spec ? { languageSpec: { ...spec, ...(Array.isArray(items) ? { items: items.map((i: { id: string; prompt: string }) => ({ id: i.id, prompt: i.prompt })) } : {}) } } : {}),
+  };
+}

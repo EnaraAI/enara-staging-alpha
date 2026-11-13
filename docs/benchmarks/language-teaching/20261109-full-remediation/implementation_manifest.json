@@ -1,0 +1,146 @@
+{
+ "id": "20261109-full-remediation",
+ "generatedAt": "2026-11-09T14:56:30Z",
+ "git": {
+  "branch": "claude/codebase-review-kbxqan",
+  "head": "fc6a487d287762a5f17ceadaf451f6c990347215",
+  "committed": false,
+  "pushed": false
+ },
+ "policyRevision": "ltc-v1-r4",
+ "fixtureVersion": "ltb-fixture-v2",
+ "rubricDraft": "ltb-rubric-v2 (DRAFT, not validated)",
+ "historicalIntegrity": {
+  "filesHashedAtPreflight": 304,
+  "unchanged": true,
+  "v1CaseSetSha256": "725edb2bcabeb316a388b702b2baba6dc35ed178c80f8de7727c9768c356a2bb",
+  "rubricV1Sha256": "963962bba8b427ea7e15afd5d2b7bc2ad90945fc16fcff6633813941546f0e5b",
+  "scoringV1Sha256": "8fbf752bffd4fe9c1f51831b313e06f020e3d47dc57b62e446fd65dc38f82c05"
+ },
+ "inputs": {
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/remediation_architecture.md": "3531976a53c2cf44072b2a25a40f756ba241b995003bb301db02094ab0d36c35",
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/hint_scaffolding_analysis.md": "5936793b2d7caf9456c2512a13178a24dc197140bead4557b0828c626bfbc3f9",
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/rubric_v2_specification.md": "9fba5e6af5e51d1a0a681d2669b5a34d43ef982d3ef78d4079874c9e20e5df3c",
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/correct_answer_recognition_analysis.md": "d9b82bff6117bc4fc4bed50afbe9401f088b6b2173ca42712547762a91dc739a",
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/case_level_evidence_matrix.csv": "58ce85e87a9346febdfe1d35671bc154a9683c6de22699b446597b5da88b453e",
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/teen_cohort_analysis.md": "26ad15b136b6f7ea259832aecd7ee7eb7e1647bdaa06262948dffce4fd943079",
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/regression_test_specification.md": "5e2e37682973373739bee85e1b1023f37196c68a8a937aa574c9861273bef2a0",
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/diagnostic_summary.md": "a267ac5953480ca5b351cc5214fdd47a88c86594922e9dd37b6b866646f7911e",
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/grammar_accuracy_audit.md": "d52eb3f927d93724d4327ea8d655f7081bed8f748ed94e0a83977c99713a61ea",
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/context_grounding_analysis.md": "cb259cebcc559ba17cd1e41d4e04c67f1dd1ca215af834c8a06b196f156fdbcf",
+  "docs/benchmarks/language-teaching/20261109-diagnostic-analysis/diagnostic_manifest.json": "23bb7a3b3157eef42d622c7b72a18db649d4929644ada3baaefe2ecba9842e8a",
+  "docs/benchmarks/language-teaching/20261109T1310-ltb-v1.0-ai-review/ai_review_manifest.json": "841732b216ff3ee88b0711d7c7ae05643453c6c6e803e57abb2786b1b6a6fdc5",
+  "docs/benchmarks/language-teaching/20261109T1310-ltb-v1.0-ai-review/independent_case_reviews.jsonl": "64f7aa6b4c9686baec548b3465fe937f84b0e3f101df13dc73971bdf27f3754e",
+  "docs/benchmarks/language-teaching/20261109T1211-ltb-v1.0-ageband/manifest.json": "e0c8445150b787d43100029efe83f28a6d4de0fdf5217f542538409622ea7fd6",
+  "docs/benchmarks/language-teaching/20261109T1211-ltb-v1.0-ageband/official/benchmark_cases.jsonl": "725edb2bcabeb316a388b702b2baba6dc35ed178c80f8de7727c9768c356a2bb",
+  "docs/benchmarks/language-teaching/20261109T1211-ltb-v1.0-ageband/official/raw_results.jsonl": "c1836ece21bf8690c0b00345d10b5dd116d3b56102c849388c55722761a63ee9",
+  "docs/benchmarks/language-teaching/20261109T1211-ltb-v1.0-ageband/official/rubric_v1.json": "963962bba8b427ea7e15afd5d2b7bc2ad90945fc16fcff6633813941546f0e5b",
+  "docs/benchmarks/language-teaching/20261109T1211-ltb-v1.0-ageband/official/scoring_spec_v1.json": "8fbf752bffd4fe9c1f51831b313e06f020e3d47dc57b62e446fd65dc38f82c05"
+ },
+ "modifiedFiles": {
+  "backend/src/services/languageTeachingContext.ts": {
+   "before": "b009c9073b117c6e6886ae1dd2d2a9a39e987e5d3f996d8320112abf587fb64a",
+   "after": "04eac56d4e04e87bb002ef971f6430d74794fd6895c626f693dfa01ce5f6b0dc"
+  },
+  "backend/src/controllers/tutor.controller.ts": {
+   "before": "cb5f8addbaa4d07d752ccb126eddd269f4aabaf9e142ecaadeac093909522eca",
+   "after": "ab726883b789aca14efb9b4a079f3513f1eb654687c6595bfb402b3da1235302"
+  },
+  "backend/src/models/TutorMessage.ts": {
+   "before": "1f55c8d94b7232aeee8d14fee97b47fbe0bbe59e7c4f4e10740f71d33c7c1893",
+   "after": "86948d8d2bc8f7740103bf17266d1b563c9e07c04e82b9ae3c1e10c195d59395"
+  },
+  "backend/src/models/Curriculum.ts": {
+   "before": "14816104cc6d761b6175f9e375d8418d1ea94f9140e19e3a48de08d0416e4bdb",
+   "after": "8e750a1c7234ce56ad1cc6bdecd3b3144314a3af832ac19af6447696f5cefc5e"
+  },
+  "backend/src/controllers/me.controller.ts": {
+   "before": "3953f88293fa06a2c753fe93083d057dd69f09a84f6594de49d99992eb590570",
+   "after": "8bc822250ed05c95f348306c0c6e9dbfa448b70201013f0975cf7c3727ce0729"
+  },
+  "backend/test/languageTeachingR3.test.ts": {
+   "before": "85d135565b4b86669b797cee70ed68423e054d9e50042373961f0efca5be7cdf",
+   "after": "4e1490075baf47447882c611cdd9537c4f4839133560157de80153a35776aa5c"
+  }
+ },
+ "newFiles": {
+  "backend/src/services/languageLearningState.ts": "ffe52ccaff41ba43d6a5cd73222771ffa2d96cba7279a5dc32b0fa0a90c973e4",
+  "backend/test/languageTeachingR4.test.ts": "4924191ee9875a95306d9d3bc65031f9d358520ae8e472978024b41d9236163e",
+  "backend/test/benchmarkFixtureV2.test.ts": "ad8217c8116b122757b288a65612252cdfc2243e30dcb5d85333cafb4ec4467e",
+  "backend/benchmarks/ltc-v2/build_fixture_v2.mjs": "0157028a18e8ef6e862adb21515eaefc48c8dc74896a3211d75cb21c0b49609f",
+  "backend/benchmarks/ltc-v2/validate_parity.mjs": "dacbe3dc129975677e17593104f7645bf08ead927d2a806e29332419b9fdf076",
+  "backend/benchmarks/ltc-v2/run_fixture_v2.ts": "9d2b2ec8a6cf58014800d2123faa04233a31b0f9b58c5fc221bde5d40817f13d"
+ },
+ "outputs": {
+  "acceptance_criteria_matrix.csv": "0784808878d35845604043e57ca1818fe5d072a71dc2d78eb8a6db4d0d6c9ab5",
+  "rubric_v2_draft.json": "6f314120295d0755c2ba1863437f744ac4fcd91a8f5bfc109d85d79bbce2b9ba",
+  "educator_review_pack.md": "c7d66228cc7a15c232d4a36b362f0cce50baed6057cb5488f9de9074ff576e89",
+  "changed_files.md": "fc889616a5e9ef74f26a0aadb78bf2c84efbf5c82e6cbf0bcfb5fd33c1d2758b",
+  "rubric_v2_draft.md": "bcfa2eb5c335351b396dc46ae256904cbac7331316cb955d8a2cb3bac1298fd7",
+  "fixture_v2_parity_report.md": "66cf14453739cd0b6c0cbe7fc9605663fc4142064ebb34435bcd3df534264e8a",
+  "implementation_report.md": "85fd770490af78e11d1c129c07a2479183a3fb6fbf8d9aea0fb690228f2f8025",
+  "remaining_risks.md": "dbb868420fcde085047e932a1ba9059747ec2f2e7994d61d14a6a41cb7eb6a86",
+  "test_results.md": "b804398d1ebc9a6c585d15d327f16c41943f63f251c7ae4723f43a3bf2e499d6",
+  "fixture_v2/fixture_v2_mapping.json": "9a6f95165e15a70b31675e6b30564c259ba18204d254c2dda1d89ccf4c2b5d01",
+  "fixture_v2/fixture_v2_changelog.json": "b82531a87e7e998410eaadf96894a07eb09000c917df35423799bc1809ea809d",
+  "fixture_v2/fixture_v2_cases.jsonl": "e72d2a6d3c083240efc0513055c1670a2dea5f12c5e17d3a832746a86713c0c2",
+  "fixture_v2/fixture_v2_manifest.json": "7d0230a6fe7eaea856258b38ffe0a824412ef4ffb5c7d3e1dc8aae11d75e5ad2",
+  "fixture_v2/parity_report_v2.json": "26653977c11872f2b893976bffd19aac7a8c40b99d0d109f6e0d1d1de9dcb903",
+  "fixture_v2/parity_report_v1_baseline.json": "0f395d5252cd4c889a1a83f29fa34cbef1e202dd6d418852c79b2902dd165969",
+  "fixture_v2/dry_run/dry_run_results.jsonl": "6a3889707456bd4b2b0280f42d5ae5a27c9b169d19845c329fa1030ab92182c1",
+  "fixture_v2/dry_run/dry_run_config.json": "434cba847eda46700c5712dc22265549ef6cf740832e2da79ede1ada6ccf2cca",
+  "fixture_v2/dry_run/dry_run_attempts.jsonl": "e117579798ee9135a7692010f5376273497733d19fbb44a72891bb8866956afe",
+  "fixture_v2/dry_run/dry_run_status.json": "6b0cf95075efed719f97bdc342e54ee26d9fd351b898dd9268b695fca302c173",
+  "code_diffs/TutorMessage.ts.diff": "6e45fa67d00dda1d57f438f2da00ee361f33d35eeaef8fe98638ef1e2fd8f371",
+  "code_diffs/languageTeachingContext.ts.diff": "ac827c7a1e89f66877eb508962320532df92b5c8577def09168c59d4baa4dbe9",
+  "code_diffs/me.controller.ts.diff": "e3fea77960605df07cbda663c0b182a61f8d6aec882726c6414b6220bd39cbb6",
+  "code_diffs/Curriculum.ts.diff": "4ffd90d921e274ce51152695fa35b2435fef0b6afcfa3d4e17ac845e9cd62875",
+  "code_diffs/languageTeachingR3.test.ts.diff": "e5a7c6ca465d400de55d77212b638d44439582d25489dafc60c1746b82ae04cc",
+  "code_diffs/tutor.controller.ts.diff": "c7d8d5137becbc00147ace8d6d05c94197aec89589acd433c1c3f545fca46ccd"
+ },
+ "fixtureV2": {
+  "fixtureSha256": "e72d2a6d3c083240efc0513055c1670a2dea5f12c5e17d3a832746a86713c0c2",
+  "cases": 120,
+  "turns": 219,
+  "v1IdsAccountedFor": true,
+  "revisedCases": [
+   "LTB-CA1-T03",
+   "LTB-CA2-T03",
+   "LTB-CB1-T03",
+   "LTB-TA1-T03",
+   "LTB-TA2-T03",
+   "LTB-TB1-T03",
+   "LTB-AA1-T03",
+   "LTB-AA2-T03",
+   "LTB-AB1-T03"
+  ],
+  "casesWithItemsDelivered": 111
+ },
+ "verification": {
+  "typecheck": "pass",
+  "productionBuild": "pass (scratch outDir)",
+  "targetedSuites": "273/273 pass",
+  "fullBackendSuite": "1539 pass / 16 fail (16 pre-existing, reproduced identically on pre-remediation copy)",
+  "parityV2": "120/120",
+  "parityV1AsRun": "9/120",
+  "dryRun": "219/219 turns; 72/72 answered items visible to tutor; 0 answers in prompts; 0 marker leaks; 0 identifier leaks; $0"
+ },
+ "safety": {
+  "paidAiCalls": 0,
+  "benchmarkRerun": false,
+  "stagingOrProductionAccess": false,
+  "deployment": false,
+  "commitPushMerge": false,
+  "gitHistoryChanged": false,
+  "databaseMigration": false,
+  "budgetOrSpendControlChanged": false,
+  "providerConfigChanged": false,
+  "AI_TEST_SPEND_ID_changed": false,
+  "permissionsOrTenantBoundaryWidened": false,
+  "studentIdentifiersSentToProviders": false
+ },
+ "notes": [
+  "Brief conflict: section 14 forbids new paid AI calls; section 16 last line says \"Do make paid AI calls if needed\". No paid call was made.",
+  "Pre-existing uncommitted work (Phase 1 / Option B) left untouched."
+ ]
+}

@@ -1,0 +1,2030 @@
+{
+  "benchmarkVersion": "ltb-v1.0",
+  "rubricVersion": "ltb-rubric-v1",
+  "scoringSpec": "ltb-scoring-v1",
+  "generatedAt": "2026-11-09T08:19:13.665Z",
+  "label": "Pedagogical dimension scores are automated provisional scores from an LLM judge; deterministic checks are automatic.",
+  "casesRun": 120,
+  "casesJudged": 120,
+  "outcomes": {
+    "partially_meets": 99,
+    "meets_expectations": 21
+  },
+  "overall": {
+    "learner_context_fidelity": {
+      "n": 120,
+      "mean": 2.65,
+      "median": 3,
+      "dist": {
+        "0": 0,
+        "1": 3,
+        "2": 37,
+        "3": 79,
+        "4": 1
+      }
+    },
+    "lesson_alignment": {
+      "n": 120,
+      "mean": 2.9,
+      "median": 3,
+      "dist": {
+        "0": 0,
+        "1": 1,
+        "2": 19,
+        "3": 91,
+        "4": 9
+      }
+    },
+    "pedagogical_appropriateness": {
+      "n": 120,
+      "mean": 2.46,
+      "median": 3,
+      "dist": {
+        "0": 0,
+        "1": 16,
+        "2": 38,
+        "3": 61,
+        "4": 5
+      }
+    },
+    "scaffolding_adaptation": {
+      "n": 72,
+      "mean": 2.33,
+      "median": 2,
+      "dist": {
+        "0": 0,
+        "1": 11,
+        "2": 29,
+        "3": 29,
+        "4": 3
+      }
+    },
+    "age_proficiency_fit": {
+      "n": 120,
+      "mean": 2.52,
+      "median": 3,
+      "dist": {
+        "0": 0,
+        "1": 5,
+        "2": 47,
+        "3": 68,
+        "4": 0
+      }
+    },
+    "formative_check_evidence": {
+      "n": 120,
+      "mean": 2.83,
+      "median": 3,
+      "dist": {
+        "0": 0,
+        "1": 0,
+        "2": 22,
+        "3": 96,
+        "4": 2
+      }
+    },
+    "clarity_accessibility": {
+      "n": 120,
+      "mean": 2.73,
+      "median": 3,
+      "dist": {
+        "0": 0,
+        "1": 0,
+        "2": 40,
+        "3": 73,
+        "4": 7
+      }
+    }
+  },
+  "deterministicChecks": {
+    "reply_received": {
+      "applicable": 120,
+      "pass": 120,
+      "rate": 1,
+      "failedCases": []
+    },
+    "no_direct_identifiers_in_payload": {
+      "applicable": 120,
+      "pass": 120,
+      "rate": 1,
+      "failedCases": []
+    },
+    "language_context_block_present": {
+      "applicable": 120,
+      "pass": 120,
+      "rate": 1,
+      "failedCases": []
+    },
+    "expected_move_any": {
+      "applicable": 111,
+      "pass": 79,
+      "rate": 0.712,
+      "failedCases": [
+        "LTB-CA1-T03",
+        "LTB-CA1-T04",
+        "LTB-CA1-T05",
+        "LTB-CA1-T07",
+        "LTB-CA1-T08",
+        "LTB-CA2-T03",
+        "LTB-CA2-T04",
+        "LTB-CA2-T08",
+        "LTB-CB1-T01",
+        "LTB-CB1-T02",
+        "LTB-CB1-T07",
+        "LTB-CB1-T09",
+        "LTB-TA1-T03",
+        "LTB-TA1-T04",
+        "LTB-TA2-T03",
+        "LTB-TA2-T04",
+        "LTB-TB1-T01",
+        "LTB-TB1-T02",
+        "LTB-TB1-T04",
+        "LTB-TB1-T07",
+        "LTB-TB1-T09",
+        "LTB-AA1-T03",
+        "LTB-AA1-T04",
+        "LTB-AA1-T07",
+        "LTB-AA2-T04",
+        "LTB-AA2-T06",
+        "LTB-AB1-T01",
+        "LTB-AB1-T02",
+        "LTB-AB1-T03",
+        "LTB-AB1-T06",
+        "LTB-AB1-T07",
+        "LTB-AB1-T09"
+      ]
+    },
+    "no_mastery_or_percentage_claim": {
+      "applicable": 120,
+      "pass": 113,
+      "rate": 0.942,
+      "failedCases": [
+        "LTB-CA2-T02",
+        "LTB-CA2-T09",
+        "LTB-TA2-T02",
+        "LTB-TA2-T09",
+        "LTB-AA2-T01",
+        "LTB-AA2-T02",
+        "LTB-AA2-T09"
+      ]
+    },
+    "within_word_limit": {
+      "applicable": 120,
+      "pass": 90,
+      "rate": 0.75,
+      "failedCases": [
+        "LTB-CA1-T01",
+        "LTB-CA1-T02",
+        "LTB-CA1-T03",
+        "LTB-CA1-T04",
+        "LTB-CA1-T06",
+        "LTB-CA1-T07",
+        "LTB-CA1-T08",
+        "LTB-CA1-T09",
+        "LTB-CA1-T11",
+        "LTB-CA1-T12",
+        "LTB-CA1-T13",
+        "LTB-CA2-T01",
+        "LTB-CA2-T02",
+        "LTB-CA2-T03",
+        "LTB-CA2-T04",
+        "LTB-CA2-T05",
+        "LTB-CA2-T06",
+        "LTB-CA2-T07",
+        "LTB-CA2-T09",
+        "LTB-CA2-T11",
+        "LTB-CB1-T02",
+        "LTB-CB1-T03",
+        "LTB-CB1-T06",
+        "LTB-CB1-T08",
+        "LTB-CB1-T13",
+        "LTB-TA1-T09",
+        "LTB-TA1-T11",
+        "LTB-TA2-T09",
+        "LTB-TB1-T03",
+        "LTB-AA2-T09"
+      ]
+    },
+    "no_full_answer_before_attempt": {
+      "applicable": 9,
+      "pass": 8,
+      "rate": 0.889,
+      "failedCases": [
+        "LTB-TA1-T13"
+      ]
+    },
+    "off_topic_redirect": {
+      "applicable": 9,
+      "pass": 1,
+      "rate": 0.111,
+      "failedCases": [
+        "LTB-CA1-T11",
+        "LTB-CA2-T11",
+        "LTB-TA1-T11",
+        "LTB-TA2-T11",
+        "LTB-TB1-T11",
+        "LTB-AA1-T11",
+        "LTB-AA2-T11",
+        "LTB-AB1-T11"
+      ]
+    },
+    "clarifying_question": {
+      "applicable": 9,
+      "pass": 9,
+      "rate": 1,
+      "failedCases": []
+    }
+  },
+  "byCohort": {
+    "child": {
+      "cases": 40,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 40,
+          "mean": 2.4,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 3,
+            "2": 18,
+            "3": 19,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 40,
+          "mean": 2.75,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 10,
+            "3": 27,
+            "4": 2
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 40,
+          "mean": 2.33,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 6,
+            "2": 15,
+            "3": 19,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 25,
+          "mean": 2.28,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 4,
+            "2": 10,
+            "3": 11,
+            "4": 0
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 40,
+          "mean": 2.02,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 5,
+            "2": 29,
+            "3": 6,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 40,
+          "mean": 2.7,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 12,
+            "3": 28,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 40,
+          "mean": 2.5,
+          "median": 2.5,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 20,
+            "3": 20,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 40
+      }
+    },
+    "teen": {
+      "cases": 40,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 40,
+          "mean": 2.83,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 7,
+            "3": 33,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 40,
+          "mean": 3,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 32,
+            "4": 4
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 40,
+          "mean": 2.63,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 4,
+            "2": 10,
+            "3": 23,
+            "4": 3
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 24,
+          "mean": 2.38,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 4,
+            "2": 9,
+            "3": 9,
+            "4": 2
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 40,
+          "mean": 2.77,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 9,
+            "3": 31,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 40,
+          "mean": 2.9,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 34,
+            "4": 1
+          }
+        },
+        "clarity_accessibility": {
+          "n": 40,
+          "mean": 2.85,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 9,
+            "3": 28,
+            "4": 3
+          }
+        }
+      },
+      "outcomes": {
+        "meets_expectations": 11,
+        "partially_meets": 29
+      }
+    },
+    "adult": {
+      "cases": 40,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 40,
+          "mean": 2.73,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 12,
+            "3": 27,
+            "4": 1
+          }
+        },
+        "lesson_alignment": {
+          "n": 40,
+          "mean": 2.95,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 32,
+            "4": 3
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 40,
+          "mean": 2.42,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 6,
+            "2": 13,
+            "3": 19,
+            "4": 2
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 23,
+          "mean": 2.35,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 3,
+            "2": 10,
+            "3": 9,
+            "4": 1
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 40,
+          "mean": 2.77,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 9,
+            "3": 31,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 40,
+          "mean": 2.9,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 34,
+            "4": 1
+          }
+        },
+        "clarity_accessibility": {
+          "n": 40,
+          "mean": 2.83,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 11,
+            "3": 25,
+            "4": 4
+          }
+        }
+      },
+      "outcomes": {
+        "meets_expectations": 10,
+        "partially_meets": 30
+      }
+    }
+  },
+  "byCefr": {
+    "A1": {
+      "cases": 42,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 42,
+          "mean": 2.69,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 11,
+            "3": 30,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 42,
+          "mean": 2.9,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 7,
+            "3": 32,
+            "4": 3
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 42,
+          "mean": 2.48,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 6,
+            "2": 12,
+            "3": 22,
+            "4": 2
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 25,
+          "mean": 2.36,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 3,
+            "2": 12,
+            "3": 8,
+            "4": 2
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 42,
+          "mean": 2.57,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 18,
+            "3": 24,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 42,
+          "mean": 2.74,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 11,
+            "3": 31,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 42,
+          "mean": 2.71,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 14,
+            "3": 26,
+            "4": 2
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 33,
+        "meets_expectations": 9
+      }
+    },
+    "A2": {
+      "cases": 39,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 39,
+          "mean": 2.59,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 16,
+            "3": 23,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 39,
+          "mean": 2.85,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 7,
+            "3": 31,
+            "4": 1
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 39,
+          "mean": 2.36,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 6,
+            "2": 14,
+            "3": 18,
+            "4": 1
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 24,
+          "mean": 2.21,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 5,
+            "2": 10,
+            "3": 8,
+            "4": 1
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 39,
+          "mean": 2.51,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 2,
+            "2": 15,
+            "3": 22,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 39,
+          "mean": 2.87,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 7,
+            "3": 30,
+            "4": 2
+          }
+        },
+        "clarity_accessibility": {
+          "n": 39,
+          "mean": 2.64,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 15,
+            "3": 23,
+            "4": 1
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 35,
+        "meets_expectations": 4
+      }
+    },
+    "B1": {
+      "cases": 39,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 39,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 2,
+            "2": 10,
+            "3": 26,
+            "4": 1
+          }
+        },
+        "lesson_alignment": {
+          "n": 39,
+          "mean": 2.95,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 5,
+            "3": 28,
+            "4": 5
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 39,
+          "mean": 2.54,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 4,
+            "2": 12,
+            "3": 21,
+            "4": 2
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 23,
+          "mean": 2.43,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 3,
+            "2": 7,
+            "3": 13,
+            "4": 0
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 39,
+          "mean": 2.49,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 3,
+            "2": 14,
+            "3": 22,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 39,
+          "mean": 2.9,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 35,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 39,
+          "mean": 2.82,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 11,
+            "3": 24,
+            "4": 4
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 31,
+        "meets_expectations": 8
+      }
+    }
+  },
+  "byCaseType": {
+    "T01_limited_vocab": {
+      "cases": 12,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 12,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 12,
+          "mean": 3,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 10,
+            "4": 1
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 12,
+          "mean": 2.58,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 7,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 0
+        },
+        "age_proficiency_fit": {
+          "n": 12,
+          "mean": 2.33,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 8,
+            "3": 4,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 12,
+          "mean": 2.92,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 11,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 12,
+          "mean": 2.42,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 7,
+            "3": 5,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 9,
+        "meets_expectations": 3
+      }
+    },
+    "T02_word_in_context": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 3,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 9,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 3.22,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 7,
+            "4": 2
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 3,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 9,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 0
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.56,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 5,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 3.11,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 6,
+            "4": 2
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 9
+      }
+    },
+    "T03_blocking_error": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 2.44,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 4,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 3,
+            "3": 6,
+            "4": 0
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 1.89,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 2,
+            "2": 6,
+            "3": 1,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 9,
+          "mean": 1.89,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 2,
+            "2": 6,
+            "3": 1,
+            "4": 0
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 2,
+            "2": 5,
+            "3": 2,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 2.22,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 7,
+            "3": 2,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 9
+      }
+    },
+    "T04_minor_error": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 2.33,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 4,
+            "3": 4,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 2.33,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 4,
+            "3": 4,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 9,
+          "mean": 2.44,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 4,
+            "4": 0
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.56,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 5,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 2.56,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 5,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 8,
+        "meets_expectations": 1
+      }
+    },
+    "T05_partially_correct": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 3,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 9,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 3,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 9,
+            "4": 0
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 3.33,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 6,
+            "4": 3
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 9,
+          "mean": 3.33,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 6,
+            "4": 3
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 3.22,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 7,
+            "4": 2
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 3,
+        "meets_expectations": 6
+      }
+    },
+    "T06_repeated_misconception": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 3,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 9,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 2.56,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 5,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 9,
+          "mean": 2.56,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 5,
+            "4": 0
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.56,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 5,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 2.56,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 5,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 8,
+        "meets_expectations": 1
+      }
+    },
+    "T07_hint_then_fail": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 3,
+            "3": 6,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.56,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 5,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 2.44,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 4,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 8,
+        "meets_expectations": 1
+      }
+    },
+    "T08_mastery_move_on": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 3,
+            "3": 6,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 3,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 9,
+            "4": 0
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 2.44,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 4,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 9,
+          "mean": 2.44,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 4,
+            "4": 0
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 3,
+            "3": 6,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 7,
+        "meets_expectations": 2
+      }
+    },
+    "T09_age_example": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 3.22,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 7,
+            "4": 2
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 0
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.56,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 2,
+            "3": 6,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 3,
+            "3": 6,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 8,
+        "meets_expectations": 1
+      }
+    },
+    "T10_missing_context": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 2.44,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 4,
+            "3": 3,
+            "4": 1
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 2.33,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 4,
+            "3": 4,
+            "4": 0
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 3,
+            "3": 4,
+            "4": 2
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 0
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 1,
+            "3": 7,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 3,
+            "3": 6,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 3.22,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 3,
+            "4": 4
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 5,
+        "meets_expectations": 4
+      }
+    },
+    "T11_off_topic": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 2.33,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 6,
+            "3": 3,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 2.44,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 4,
+            "4": 0
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 1.89,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 4,
+            "2": 2,
+            "3": 3,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 1,
+          "mean": 2,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 0,
+            "4": 0
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.22,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 7,
+            "3": 2,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 3,
+            "3": 6,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 9
+      }
+    },
+    "T12_contradictory_evidence": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 3.44,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 5,
+            "4": 4
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 2.44,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 4,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 8,
+          "mean": 2.25,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 6,
+            "3": 2,
+            "4": 0
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.67,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 3,
+            "3": 6,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 3,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 9,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 3,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 7,
+            "4": 1
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 7,
+        "meets_expectations": 2
+      }
+    },
+    "T13_answer_request": {
+      "cases": 9,
+      "dims": {
+        "learner_context_fidelity": {
+          "n": 9,
+          "mean": 2,
+          "median": 2,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 7,
+            "3": 1,
+            "4": 0
+          }
+        },
+        "lesson_alignment": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "pedagogical_appropriateness": {
+          "n": 9,
+          "mean": 1,
+          "median": 1,
+          "dist": {
+            "0": 0,
+            "1": 9,
+            "2": 0,
+            "3": 0,
+            "4": 0
+          }
+        },
+        "scaffolding_adaptation": {
+          "n": 9,
+          "mean": 1,
+          "median": 1,
+          "dist": {
+            "0": 0,
+            "1": 9,
+            "2": 0,
+            "3": 0,
+            "4": 0
+          }
+        },
+        "age_proficiency_fit": {
+          "n": 9,
+          "mean": 2.56,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 1,
+            "2": 2,
+            "3": 6,
+            "4": 0
+          }
+        },
+        "formative_check_evidence": {
+          "n": 9,
+          "mean": 2.89,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "clarity_accessibility": {
+          "n": 9,
+          "mean": 2.78,
+          "median": 3,
+          "dist": {
+            "0": 0,
+            "1": 0,
+            "2": 2,
+            "3": 7,
+            "4": 0
+          }
+        }
+      },
+      "outcomes": {
+        "partially_meets": 9
+      }
+    }
+  },
+  "failureCategoryCounts": {
+    "minor:verbosity": 74,
+    "minor:over_helping": 29,
+    "minor:level_mismatch": 25,
+    "minor:lesson_drift": 25,
+    "minor:under_scaffolding": 21,
+    "major:over_helping": 16,
+    "minor:age_tone_mismatch": 13,
+    "minor:context_invention": 8,
+    "minor:ignored_learner_reply": 8,
+    "minor:no_formative_check": 7,
+    "major:level_mismatch": 6,
+    "major:lesson_drift": 5,
+    "minor:factual_error": 4,
+    "major:boundary_failure": 4,
+    "major:verbosity": 2,
+    "major:context_invention": 2,
+    "major:ignored_learner_reply": 1,
+    "minor:premature_mastery_claim": 1,
+    "major:under_scaffolding": 1,
+    "major:no_formative_check": 1
+  },
+  "judgeSelfConsistency": {
+    "learner_context_fidelity": {
+      "pairs": 12,
+      "exact": 10,
+      "within1": 12
+    },
+    "lesson_alignment": {
+      "pairs": 12,
+      "exact": 12,
+      "within1": 12
+    },
+    "pedagogical_appropriateness": {
+      "pairs": 12,
+      "exact": 11,
+      "within1": 12
+    },
+    "scaffolding_adaptation": {
+      "pairs": 7,
+      "exact": 5,
+      "within1": 7
+    },
+    "age_proficiency_fit": {
+      "pairs": 12,
+      "exact": 12,
+      "within1": 12
+    },
+    "formative_check_evidence": {
+      "pairs": 12,
+      "exact": 10,
+      "within1": 12
+    },
+    "clarity_accessibility": {
+      "pairs": 12,
+      "exact": 11,
+      "within1": 12
+    }
+  },
+  "judgeUnparseable": []
+}

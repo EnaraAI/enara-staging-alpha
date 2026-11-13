@@ -1152,3 +1152,25 @@ export const setWorkspaceUserStatus = (id: string, status: 'active' | 'disabled'
 export const fetchWorkspaceInvitations = () => request<{ invitations: WorkspaceInvitation[] }>('GET', '/api/workspace/invitations');
 export const createWorkspaceInvitation = (email: string, role: string) => request<{ inviteLink: string; invitation: WorkspaceInvitation }>('POST', '/api/workspace/invitations', { email, role });
 export const revokeWorkspaceInvitation = (id: string) => request<void>('DELETE', `/api/workspace/invitations/${encodeURIComponent(id)}`);
+
+// Trusted learner age band (Option B). Workspace Admin edits; Academic Manager views.
+export type LearnerAgeBandValue = 'child' | 'teen' | 'adult';
+export interface AgeBandOverview {
+  values: LearnerAgeBandValue[];
+  adultSchool: boolean;
+  canEdit: boolean;
+  classes: { id: string; name: string; ageBand: LearnerAgeBandValue | null }[];
+  students: {
+    id: string;
+    name: string;
+    classId: string | null;
+    ageBand: LearnerAgeBandValue | null;
+    classAgeBand: LearnerAgeBandValue | null;
+    effective: { ageBand: LearnerAgeBandValue | 'unknown'; source: string; status: string };
+  }[];
+}
+export const fetchAgeBands = () => request<AgeBandOverview>('GET', '/api/age-bands');
+export const setStudentAgeBand = (id: string, ageBand: LearnerAgeBandValue | null) =>
+  request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/students/${encodeURIComponent(id)}`, { ageBand });
+export const setClassAgeBand = (id: string, ageBand: LearnerAgeBandValue | null) =>
+  request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/classes/${encodeURIComponent(id)}`, { ageBand });

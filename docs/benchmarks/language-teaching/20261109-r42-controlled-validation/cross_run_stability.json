@@ -1,0 +1,892 @@
+{
+ "perRun": {
+  "1": {
+   "officialMeets": 51,
+   "independentMeets": 98,
+   "reconciled": {
+    "UNCERTAIN": 34,
+    "PARTIAL": 38,
+    "MEETS": 48
+   },
+   "evaluatorAgreement": {
+    "n": 120,
+    "agreement": 0.5417,
+    "kappa": 0.1629
+   },
+   "runUsd": 4.925794,
+   "officialUnparseable": 0,
+   "independentUnparseable": 0,
+   "markerStatus": {
+    "ok": 218,
+    "missing": 1
+   },
+   "officialNa": {
+    "answer_judgement": 43,
+    "scaffolding": 45,
+    "independence": 74,
+    "progression": 44,
+    "formative_check": 26,
+    "hint_leakage": 28
+   },
+   "officialInsufficient": {
+    "independence": 8
+   },
+   "independentNa": {
+    "answer_judgement": 55,
+    "scaffolding": 53,
+    "independence": 68,
+    "progression": 56,
+    "hint_leakage": 29,
+    "formative_check": 14,
+    "grammar_accuracy": 6
+   },
+   "independentInsufficient": {
+    "independence": 14,
+    "progression": 1
+   }
+  },
+  "2": {
+   "officialMeets": 63,
+   "independentMeets": 88,
+   "reconciled": {
+    "UNCERTAIN": 33,
+    "PARTIAL": 36,
+    "MEETS": 51
+   },
+   "evaluatorAgreement": {
+    "n": 120,
+    "agreement": 0.5833,
+    "kappa": 0.1536
+   },
+   "runUsd": 4.935965,
+   "officialUnparseable": 0,
+   "independentUnparseable": 0,
+   "markerStatus": {
+    "ok": 219
+   },
+   "officialNa": {
+    "answer_judgement": 45,
+    "scaffolding": 47,
+    "independence": 73,
+    "progression": 47,
+    "hint_leakage": 19,
+    "formative_check": 27
+   },
+   "officialInsufficient": {
+    "independence": 10
+   },
+   "independentNa": {
+    "answer_judgement": 54,
+    "scaffolding": 53,
+    "independence": 63,
+    "progression": 56,
+    "hint_leakage": 27,
+    "formative_check": 17,
+    "grammar_accuracy": 7
+   },
+   "independentInsufficient": {
+    "independence": 16,
+    "progression": 3,
+    "formative_check": 2,
+    "answer_judgement": 1
+   }
+  },
+  "3": {
+   "officialMeets": 55,
+   "independentMeets": 82,
+   "reconciled": {
+    "PARTIAL": 47,
+    "UNCERTAIN": 21,
+    "MEETS": 52
+   },
+   "evaluatorAgreement": {
+    "n": 120,
+    "agreement": 0.6833,
+    "kappa": 0.396
+   },
+   "runUsd": 4.932467,
+   "officialUnparseable": 0,
+   "independentUnparseable": 0,
+   "markerStatus": {
+    "ok": 218,
+    "missing": 1
+   },
+   "officialNa": {
+    "answer_judgement": 42,
+    "scaffolding": 44,
+    "independence": 71,
+    "progression": 45,
+    "formative_check": 23,
+    "hint_leakage": 21
+   },
+   "officialInsufficient": {
+    "independence": 12,
+    "progression": 1
+   },
+   "independentNa": {
+    "answer_judgement": 52,
+    "scaffolding": 51,
+    "independence": 66,
+    "progression": 56,
+    "hint_leakage": 24,
+    "formative_check": 20,
+    "grammar_accuracy": 8
+   },
+   "independentInsufficient": {
+    "answer_judgement": 2,
+    "independence": 11,
+    "progression": 1,
+    "formative_check": 1
+   }
+  }
+ },
+ "roles": {
+  "official": {
+   "meetsByRun": [
+    51,
+    63,
+    55
+   ],
+   "patterns": {
+    "PPP": 36,
+    "MMP": 6,
+    "PMP": 16,
+    "MPP": 7,
+    "PPM": 5,
+    "MMM": 29,
+    "MPM": 9,
+    "PMM": 12
+   },
+   "stableCases": 65,
+   "stableMeets": 29,
+   "stablePartial": 36,
+   "flippingCases": 55,
+   "completeTriplets": 120,
+   "transitions": {
+    "1->2": {
+     "PARTIAL->PARTIAL": 41,
+     "MEETS->MEETS": 35,
+     "PARTIAL->MEETS": 28,
+     "MEETS->PARTIAL": 16
+    },
+    "2->3": {
+     "PARTIAL->PARTIAL": 43,
+     "MEETS->PARTIAL": 22,
+     "PARTIAL->MEETS": 14,
+     "MEETS->MEETS": 41
+    },
+    "1->3": {
+     "PARTIAL->PARTIAL": 52,
+     "MEETS->PARTIAL": 13,
+     "PARTIAL->MEETS": 17,
+     "MEETS->MEETS": 38
+    }
+   },
+   "pairwiseAgreementKappa": {
+    "1-2": [
+     0.6333,
+     0.2721
+    ],
+    "1-3": [
+     0.75,
+     0.4937
+    ],
+    "2-3": [
+     0.7,
+     0.4025
+    ]
+   },
+   "fleissKappa3Runs": 0.3866,
+   "meanCaseMeanSd": 0.0918,
+   "casesWithMeanSdOver0_2": 9,
+   "casesNear3InAnyRun": 105,
+   "flipsNear3": 54,
+   "flipsNotNear3": 1,
+   "criteria": {
+    "context_grounding": {
+     "passRateByRun": [
+      0.933,
+      0.967,
+      0.95
+     ],
+     "meanWithinCaseSd": 0.176,
+     "casesChangingScore": 44,
+     "nTriplets": 120,
+     "core": true
+    },
+    "task_alignment": {
+     "passRateByRun": [
+      0.992,
+      0.992,
+      1.0
+     ],
+     "meanWithinCaseSd": 0.13,
+     "casesChangingScore": 33,
+     "nTriplets": 120,
+     "core": false
+    },
+    "age_fit": {
+     "passRateByRun": [
+      0.992,
+      1.0,
+      0.983
+     ],
+     "meanWithinCaseSd": 0.027,
+     "casesChangingScore": 7,
+     "nTriplets": 120,
+     "core": false
+    },
+    "cefr_fit": {
+     "passRateByRun": [
+      0.917,
+      0.892,
+      0.892
+     ],
+     "meanWithinCaseSd": 0.082,
+     "casesChangingScore": 21,
+     "nTriplets": 120,
+     "core": false
+    },
+    "answer_judgement": {
+     "passRateByRun": [
+      0.961,
+      0.973,
+      0.949
+     ],
+     "meanWithinCaseSd": 0.085,
+     "casesChangingScore": 12,
+     "nTriplets": 71,
+     "core": true
+    },
+    "scaffolding": {
+     "passRateByRun": [
+      0.947,
+      0.89,
+      0.908
+     ],
+     "meanWithinCaseSd": 0.107,
+     "casesChangingScore": 15,
+     "nTriplets": 66,
+     "core": false
+    },
+    "hint_leakage": {
+     "passRateByRun": [
+      0.446,
+      0.624,
+      0.515
+     ],
+     "meanWithinCaseSd": 0.244,
+     "casesChangingScore": 45,
+     "nTriplets": 89,
+     "core": true
+    },
+    "independence": {
+     "passRateByRun": [
+      0.921,
+      0.919,
+      0.865
+     ],
+     "meanWithinCaseSd": 0.125,
+     "casesChangingScore": 9,
+     "nTriplets": 34,
+     "core": false
+    },
+    "formative_check": {
+     "passRateByRun": [
+      0.755,
+      0.742,
+      0.804
+     ],
+     "meanWithinCaseSd": 0.183,
+     "casesChangingScore": 33,
+     "nTriplets": 85,
+     "core": false
+    },
+    "grammar_accuracy": {
+     "passRateByRun": [
+      0.925,
+      0.908,
+      0.925
+     ],
+     "meanWithinCaseSd": 0.094,
+     "casesChangingScore": 24,
+     "nTriplets": 120,
+     "core": true
+    },
+    "progression": {
+     "passRateByRun": [
+      0.921,
+      0.918,
+      0.905
+     ],
+     "meanWithinCaseSd": 0.155,
+     "casesChangingScore": 21,
+     "nTriplets": 64,
+     "core": false
+    }
+   },
+   "byType": {
+    "T01": {
+     "cases": 12,
+     "flips": 9,
+     "meetsByRun": [
+      4,
+      7,
+      3
+     ]
+    },
+    "T02": {
+     "cases": 9,
+     "flips": 3,
+     "meetsByRun": [
+      4,
+      4,
+      4
+     ]
+    },
+    "T03": {
+     "cases": 9,
+     "flips": 5,
+     "meetsByRun": [
+      2,
+      6,
+      4
+     ]
+    },
+    "T04": {
+     "cases": 9,
+     "flips": 2,
+     "meetsByRun": [
+      2,
+      2,
+      2
+     ]
+    },
+    "T05": {
+     "cases": 9,
+     "flips": 4,
+     "meetsByRun": [
+      5,
+      4,
+      5
+     ]
+    },
+    "T06": {
+     "cases": 9,
+     "flips": 4,
+     "meetsByRun": [
+      1,
+      2,
+      1
+     ]
+    },
+    "T07": {
+     "cases": 9,
+     "flips": 5,
+     "meetsByRun": [
+      2,
+      3,
+      1
+     ]
+    },
+    "T08": {
+     "cases": 9,
+     "flips": 1,
+     "meetsByRun": [
+      0,
+      1,
+      0
+     ]
+    },
+    "T09": {
+     "cases": 9,
+     "flips": 3,
+     "meetsByRun": [
+      5,
+      5,
+      7
+     ]
+    },
+    "T10": {
+     "cases": 9,
+     "flips": 0,
+     "meetsByRun": [
+      9,
+      9,
+      9
+     ]
+    },
+    "T11": {
+     "cases": 9,
+     "flips": 6,
+     "meetsByRun": [
+      7,
+      7,
+      7
+     ]
+    },
+    "T12": {
+     "cases": 9,
+     "flips": 6,
+     "meetsByRun": [
+      6,
+      6,
+      6
+     ]
+    },
+    "T13": {
+     "cases": 9,
+     "flips": 7,
+     "meetsByRun": [
+      4,
+      7,
+      6
+     ]
+    }
+   },
+   "flipIds": [
+    "LTB-AA1-T01-v2",
+    "LTB-AA1-T03",
+    "LTB-AA1-T04",
+    "LTB-AA1-T05",
+    "LTB-AA1-T06",
+    "LTB-AA1-T07",
+    "LTB-AA1-T09",
+    "LTB-AA1-T11",
+    "LTB-AA1-T13",
+    "LTB-AA2-T01",
+    "LTB-AA2-T05",
+    "LTB-AA2-T07",
+    "LTB-AA2-T11",
+    "LTB-AA2-T12",
+    "LTB-AA2-T13",
+    "LTB-AB1-T01",
+    "LTB-AB1-T02",
+    "LTB-AB1-T07",
+    "LTB-AB1-T11",
+    "LTB-CA1-T01",
+    "LTB-CA1-T05",
+    "LTB-CA1-T07",
+    "LTB-CA1-T08",
+    "LTB-CA1-T11",
+    "LTB-CA1-T12",
+    "LTB-CA1-T13",
+    "LTB-CA2-T01",
+    "LTB-CA2-T02",
+    "LTB-CA2-T06",
+    "LTB-CA2-T07",
+    "LTB-CA2-T09",
+    "LTB-CA2-T11",
+    "LTB-CA2-T12",
+    "LTB-CA2-T13",
+    "LTB-CB1-T01",
+    "LTB-CB1-T03",
+    "LTB-CB1-T04",
+    "LTB-CB1-T05",
+    "LTB-CB1-T06",
+    "LTB-CB1-T13",
+    "LTB-TA1-T01",
+    "LTB-TA1-T01-v2",
+    "LTB-TA1-T03",
+    "LTB-TA1-T06",
+    "LTB-TA1-T12",
+    "LTB-TA1-T13",
+    "LTB-TA2-T02",
+    "LTB-TA2-T03",
+    "LTB-TA2-T09",
+    "LTB-TA2-T11",
+    "LTB-TA2-T12",
+    "LTB-TA2-T13",
+    "LTB-TB1-T01",
+    "LTB-TB1-T03",
+    "LTB-TB1-T12"
+   ]
+  },
+  "independent": {
+   "meetsByRun": [
+    98,
+    88,
+    82
+   ],
+   "patterns": {
+    "PPP": 6,
+    "MPP": 8,
+    "MMM": 56,
+    "PMM": 9,
+    "MMP": 17,
+    "MPM": 14,
+    "M?M": 1,
+    "PMP": 5,
+    "MP?": 1,
+    "PPM": 2,
+    "MM?": 1
+   },
+   "stableCases": 62,
+   "stableMeets": 56,
+   "stablePartial": 6,
+   "flippingCases": 58,
+   "completeTriplets": 120,
+   "transitions": {
+    "1->2": {
+     "PARTIAL->PARTIAL": 8,
+     "MEETS->PARTIAL": 23,
+     "MEETS->MEETS": 74,
+     "PARTIAL->MEETS": 14,
+     "MEETS->UNCERTAIN": 1
+    },
+    "2->3": {
+     "PARTIAL->PARTIAL": 14,
+     "MEETS->MEETS": 65,
+     "MEETS->PARTIAL": 22,
+     "PARTIAL->MEETS": 16,
+     "UNCERTAIN->MEETS": 1,
+     "PARTIAL->UNCERTAIN": 1,
+     "MEETS->UNCERTAIN": 1
+    },
+    "1->3": {
+     "PARTIAL->PARTIAL": 11,
+     "MEETS->PARTIAL": 25,
+     "MEETS->MEETS": 71,
+     "PARTIAL->MEETS": 11,
+     "MEETS->UNCERTAIN": 2
+    }
+   },
+   "pairwiseAgreementKappa": {
+    "1-2": [
+     0.6833,
+     0.1048
+    ],
+    "1-3": [
+     0.6833,
+     0.1816
+    ],
+    "2-3": [
+     0.6583,
+     0.1889
+    ]
+   },
+   "fleissKappa3Runs": 0.155,
+   "meanCaseMeanSd": 0.098,
+   "casesWithMeanSdOver0_2": 9,
+   "casesNear3InAnyRun": 105,
+   "flipsNear3": 56,
+   "flipsNotNear3": 2,
+   "criteria": {
+    "context_grounding": {
+     "passRateByRun": [
+      0.958,
+      0.975,
+      0.967
+     ],
+     "meanWithinCaseSd": 0.152,
+     "casesChangingScore": 37,
+     "nTriplets": 120,
+     "core": true
+    },
+    "task_alignment": {
+     "passRateByRun": [
+      0.992,
+      0.992,
+      0.992
+     ],
+     "meanWithinCaseSd": 0.169,
+     "casesChangingScore": 43,
+     "nTriplets": 120,
+     "core": false
+    },
+    "age_fit": {
+     "passRateByRun": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "meanWithinCaseSd": 0.031,
+     "casesChangingScore": 8,
+     "nTriplets": 120,
+     "core": false
+    },
+    "cefr_fit": {
+     "passRateByRun": [
+      0.975,
+      0.967,
+      1.0
+     ],
+     "meanWithinCaseSd": 0.047,
+     "casesChangingScore": 12,
+     "nTriplets": 120,
+     "core": false
+    },
+    "answer_judgement": {
+     "passRateByRun": [
+      0.938,
+      0.938,
+      0.864
+     ],
+     "meanWithinCaseSd": 0.222,
+     "casesChangingScore": 29,
+     "nTriplets": 63,
+     "core": true
+    },
+    "scaffolding": {
+     "passRateByRun": [
+      0.97,
+      0.955,
+      0.971
+     ],
+     "meanWithinCaseSd": 0.123,
+     "casesChangingScore": 16,
+     "nTriplets": 64,
+     "core": false
+    },
+    "hint_leakage": {
+     "passRateByRun": [
+      0.879,
+      0.774,
+      0.802
+     ],
+     "meanWithinCaseSd": 0.347,
+     "casesChangingScore": 53,
+     "nTriplets": 80,
+     "core": true
+    },
+    "independence": {
+     "passRateByRun": [
+      0.921,
+      0.976,
+      0.884
+     ],
+     "meanWithinCaseSd": 0.088,
+     "casesChangingScore": 6,
+     "nTriplets": 32,
+     "core": false
+    },
+    "formative_check": {
+     "passRateByRun": [
+      0.953,
+      0.98,
+      0.949
+     ],
+     "meanWithinCaseSd": 0.132,
+     "casesChangingScore": 25,
+     "nTriplets": 92,
+     "core": false
+    },
+    "grammar_accuracy": {
+     "passRateByRun": [
+      1.0,
+      1.0,
+      0.938
+     ],
+     "meanWithinCaseSd": 0.138,
+     "casesChangingScore": 32,
+     "nTriplets": 112,
+     "core": true
+    },
+    "progression": {
+     "passRateByRun": [
+      0.968,
+      0.951,
+      0.937
+     ],
+     "meanWithinCaseSd": 0.143,
+     "casesChangingScore": 16,
+     "nTriplets": 56,
+     "core": false
+    }
+   },
+   "byType": {
+    "T01": {
+     "cases": 12,
+     "flips": 6,
+     "meetsByRun": [
+      6,
+      5,
+      4
+     ]
+    },
+    "T02": {
+     "cases": 9,
+     "flips": 3,
+     "meetsByRun": [
+      9,
+      9,
+      6
+     ]
+    },
+    "T03": {
+     "cases": 9,
+     "flips": 5,
+     "meetsByRun": [
+      6,
+      6,
+      5
+     ]
+    },
+    "T04": {
+     "cases": 9,
+     "flips": 5,
+     "meetsByRun": [
+      7,
+      7,
+      6
+     ]
+    },
+    "T05": {
+     "cases": 9,
+     "flips": 5,
+     "meetsByRun": [
+      7,
+      8,
+      6
+     ]
+    },
+    "T06": {
+     "cases": 9,
+     "flips": 7,
+     "meetsByRun": [
+      6,
+      6,
+      6
+     ]
+    },
+    "T07": {
+     "cases": 9,
+     "flips": 8,
+     "meetsByRun": [
+      6,
+      4,
+      3
+     ]
+    },
+    "T08": {
+     "cases": 9,
+     "flips": 6,
+     "meetsByRun": [
+      8,
+      6,
+      7
+     ]
+    },
+    "T09": {
+     "cases": 9,
+     "flips": 4,
+     "meetsByRun": [
+      8,
+      7,
+      7
+     ]
+    },
+    "T10": {
+     "cases": 9,
+     "flips": 0,
+     "meetsByRun": [
+      9,
+      9,
+      9
+     ]
+    },
+    "T11": {
+     "cases": 9,
+     "flips": 1,
+     "meetsByRun": [
+      8,
+      9,
+      9
+     ]
+    },
+    "T12": {
+     "cases": 9,
+     "flips": 2,
+     "meetsByRun": [
+      9,
+      8,
+      8
+     ]
+    },
+    "T13": {
+     "cases": 9,
+     "flips": 6,
+     "meetsByRun": [
+      9,
+      4,
+      6
+     ]
+    }
+   },
+   "flipIds": [
+    "LTB-AA1-T01-v2",
+    "LTB-AA1-T03",
+    "LTB-AA1-T04",
+    "LTB-AA1-T05",
+    "LTB-AA1-T06",
+    "LTB-AA1-T07",
+    "LTB-AA1-T08",
+    "LTB-AA1-T13",
+    "LTB-AA2-T07",
+    "LTB-AA2-T08",
+    "LTB-AA2-T09",
+    "LTB-AA2-T11",
+    "LTB-AA2-T13",
+    "LTB-AB1-T07",
+    "LTB-AB1-T08",
+    "LTB-AB1-T09",
+    "LTB-CA1-T01-v2",
+    "LTB-CA1-T03",
+    "LTB-CA1-T04",
+    "LTB-CA1-T05",
+    "LTB-CA1-T06",
+    "LTB-CA1-T07",
+    "LTB-CA1-T08",
+    "LTB-CA1-T13",
+    "LTB-CA2-T01",
+    "LTB-CA2-T02",
+    "LTB-CA2-T03",
+    "LTB-CA2-T04",
+    "LTB-CA2-T05",
+    "LTB-CA2-T06",
+    "LTB-CA2-T07",
+    "LTB-CA2-T09",
+    "LTB-CA2-T12",
+    "LTB-CB1-T05",
+    "LTB-CB1-T06",
+    "LTB-CB1-T07",
+    "LTB-CB1-T08",
+    "LTB-CB1-T13",
+    "LTB-TA1-T01",
+    "LTB-TA1-T01-v2",
+    "LTB-TA1-T02",
+    "LTB-TA1-T03",
+    "LTB-TA1-T04",
+    "LTB-TA1-T05",
+    "LTB-TA1-T06",
+    "LTB-TA1-T07",
+    "LTB-TA1-T08",
+    "LTB-TA1-T13",
+    "LTB-TA2-T03",
+    "LTB-TA2-T06",
+    "LTB-TB1-T01",
+    "LTB-TB1-T02",
+    "LTB-TB1-T04",
+    "LTB-TB1-T06",
+    "LTB-TB1-T07",
+    "LTB-TB1-T09",
+    "LTB-TB1-T12",
+    "LTB-TB1-T13"
+   ]
+  }
+ },
+ "evaluatorDisagreementRunsPerCase": {
+  "0": 35,
+  "1": 43,
+  "2": 26,
+  "3": 16
+ },
+ "engineMovesIdenticalAcrossRuns": {
+  "turns": 219,
+  "identical": 214
+ },
+ "tutorRepliesIdenticalAcrossRuns": {
+  "turns": 219,
+  "identical": 0
+ }
+}

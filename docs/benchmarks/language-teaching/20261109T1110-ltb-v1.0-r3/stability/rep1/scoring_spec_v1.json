@@ -1,0 +1,38 @@
+{
+  "scoringSpecVersion": "ltb-scoring-v1",
+  "frozenAt": "2026-11-09",
+  "frozenBefore": "the first paid provider call of the benchmark run; no live tutor output had been generated for any benchmark case",
+  "rubric": "rubric_v1.json (ltb-rubric-v1)",
+  "deterministicChecks": {
+    "reply_received": "Every turn returned HTTP 200 with a non-empty tutor reply, and the tutor model attempt for that turn returned HTTP 200.",
+    "no_direct_identifiers_in_payload": "No provider request for the case contained the synthetic learner's name, email, student id, user id, school id or school name (case-insensitive substring scan of the full request body).",
+    "language_context_block_present": "Every tutor model request for the case contained the <language_teaching_context version=\"ltc-v1\"> block.",
+    "expected_move_any": "Applies when structuredExpectations.movesAny is non-empty. Passes if the engine's recorded moves (meta.languageTurn.moves) on the FINAL turn include at least one listed move. Tests the deterministic move selector, not the model.",
+    "no_mastery_or_percentage_claim": "Applies to all cases. Fails if any tutor reply matches: a percentage figure (\\d+ ?%), the words 'mastered' or 'mastery', 'you are now (at )?[ABC][12]', 'your level is [ABC][12]', or 'you have (fully )?learned'.",
+    "within_word_limit": "Every tutor reply has at most structuredExpectations.maxWords whitespace-separated words.",
+    "no_full_answer_before_attempt": "Applies when noFullAnswer is true (T13). Fails if the FINAL tutor reply contains the case answerKey (case-insensitive, punctuation and extra spaces removed). Known limitation, declared in advance: the tutor writes its own exercise in turn 1, so the case answerKey may not be the answer to that exercise; over-helping is also judged by the rubric.",
+    "off_topic_redirect": "Applies when offTopic is true (T11). Passes if the final reply mentions English or the lesson (the word 'English', or a word of 4+ letters from the lesson title), is within maxWords, and does not contain the off-topic deliverable: for the maths variant the sum '62'; for the essay and email variants a reply of more than 120 words counts as doing the task.",
+    "clarifying_question": "Applies when clarifyGoal is true (T10). Passes if the final reply contains a question mark."
+  },
+  "judge": {
+    "role": "secondary, automated, provisional pedagogical scoring; not a substitute for educator review",
+    "model": "claude-sonnet-5-5 (different model from the tutor)",
+    "input": "rubric anchors, the case (learner facts, lesson, expectedBehavior, unacceptableBehavior, expectedNextMove) and the transcript; no engine moves and no deterministic check results are shown to the judge",
+    "output": "per-dimension integer 0-4 (or 'n/a' for scaffolding_adaptation on single-turn cases), failure categories with severity, one-sentence rationale per dimension",
+    "parseFailure": "one re-ask; a second failure is recorded as judge_unparseable and the case has no judge scores",
+    "selfConsistency": "12 cases chosen by fixed rule before the run (every 10th case in file order, starting at index 0) are judged a second time; agreement is reported as exact and within-1 agreement per dimension"
+  },
+  "caseOutcome": {
+    "meets_expectations": "All applicable deterministic checks pass, AND judge scores exist with no dimension below 2, mean of applicable dimensions >= 3.0, and no failure category marked critical.",
+    "partially_meets": "Not meets_expectations, no failure category marked critical, and no dimension scored 0.",
+    "does_not_meet": "Any critical failure category, any dimension scored 0, or reply_received / no_direct_identifiers_in_payload failed.",
+    "unscored": "Judge output missing; reported separately, never counted as pass."
+  },
+  "reporting": {
+    "perDimension": "mean, median and distribution 0-4, overall and by cohort, CEFR level and case type",
+    "noTotalOnly": true,
+    "labels": "All pedagogical scores are labelled 'automated provisional scores (LLM judge)'.",
+    "costs": "Actual cost is the sum over every provider attempt (including failed attempts and retries) of the provider-reported usage times the repo price catalog (priceCatalog.ts, current version). Estimates are labelled as estimates."
+  },
+  "noPostHocThresholds": "No threshold in this file may change after outputs are seen. Any change needs ltb-scoring-v2 and a re-score of all cases."
+}

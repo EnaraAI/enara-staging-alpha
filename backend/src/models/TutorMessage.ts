@@ -1,3 +1,4 @@
+import type { LanguageTurnEvidence } from '../services/languageTeachingContext';
 import { Schema, model, Document } from 'mongoose';
 import type { ChatRole, TeachingMethod } from './TutorSession';
 
@@ -37,6 +38,9 @@ export interface ITutorMessageDoc extends Document {
     citations?: { n: number; fileName: string; page: number | null; lessonId: string; chunkId: string }[];
     // The teaching plan this reply followed (P21); absent on older messages.
     teaching?: TeachingMeta;
+    // Language courses (ltc-v1): moves used and turn signals. Low-confidence
+    // observation, never mastery (services/languageTeachingContext.ts).
+    languageTurn?: LanguageTurnEvidence;
   };
 }
 
@@ -70,6 +74,59 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           primaryVersion: Number,
           decisionVersion: String,
           registryVersion: String,
+          _id: false,
+        },
+        default: undefined,
+      },
+      languageTurn: {
+        type: {
+          version: String,
+          lessonId: String,
+          objectiveId: String,
+          skill: String,
+          moves: { type: [String], default: undefined },
+          reasonCodes: { type: [String], default: undefined },
+          supportRequested: Boolean,
+          confusionSignals: Number,
+          answeringCheck: Boolean,
+          proficiency: { type: { status: String, value: String, source: String, _id: false }, default: undefined },
+          nextStep: String,
+          provenance: String,
+          confidence: String,
+          masteryClaim: Boolean,
+          // ltc-v1-r1
+          policyRevision: String,
+          pendingTask: String,
+          learnerResponse: String,
+          attemptsOnTask: Number,
+          offTopic: String,
+          lengthTarget: { type: { targetWords: Number, maxWords: Number, basis: String, _id: false }, default: undefined },
+          // ltc-v1-r2
+          errorRecurrence: String,
+          missingContext: { type: [String], default: undefined },
+          ageBand: String,
+          ageBandSource: String,
+          // ltc-v1-r3 / r4: success streak and structured learning state (no migration:
+          // optional fields, absent on older messages, which the engine treats as unknown).
+          ageBandStatus: String,
+          confirmedSuccessStreak: Number,
+          hintLevelOffered: Number,
+          hintLevel: Number,
+          keyVerdict: String,
+          presentedLessonItemId: String,
+          activeItemBefore: { type: { id: String, source: String, lessonItemId: String, _id: false }, default: undefined },
+          activeItem: { type: { id: String, source: String, lessonItemId: String, _id: false }, default: undefined },
+          assessment: {
+            type: { verdict: String, relevance: String, criteria: { type: [Number], default: undefined }, next: String, item: String, source: String, _id: false },
+            default: undefined,
+          },
+          qualityFlags: { type: [String], default: undefined },
+          markerStatus: String,
+          // r4.1: opaque state namespace (POST-03) and the learner's intent class (POST-12).
+          stateScope: String,
+          learnerIntent: String,
+          revealedItemId: String,
+          preAttemptModelsRemoved: Number,
           _id: false,
         },
         default: undefined,

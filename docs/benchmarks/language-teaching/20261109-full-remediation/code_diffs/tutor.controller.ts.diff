@@ -1,0 +1,117 @@
+--- ../remed2/tutor.controller.ts	2026-11-09 14:23:25.783717743 +0000
++++ backend/src/controllers/tutor.controller.ts	2026-11-09 14:29:54.610012397 +0000
+@@ -3,7 +3,8 @@
+ import { isFeatureEnabled, isShadowMode } from '../services/featureFlags';
+ import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSource } from '../services/curriculumRetrieval';
+ import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
+-import { buildLanguageTeachingContext, turnEvidence, type LanguageTeachingContext } from '../services/languageTeachingContext';
++import { buildLanguageTeachingContext, finalizeLanguageTurn, turnEvidence, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
++import { AssessmentMarkerFilter, stripAssessmentMarkers, type Assessment } from '../services/languageLearningState';
+ import {
+   curriculumFromCourse,
+   isDirectTutorModelConfigured,
+@@ -170,6 +171,8 @@
+   plan?: ObjectiveContext | null;
+   // Language courses (ltc-v1): context and moves for this turn.
+   language?: LanguageTeachingContext | null;
++  // r4: the hidden assessment read from the model's reply (stripped before display/storage).
++  languageMarker?: { parsed: Omit<Assessment, 'source'> | null; malformed: boolean };
+   // Builds the direct-model request (retrieval, objective focus, learner snapshot).
+   directParams?: () => Promise<TutorRequestParams>;
+ }
+@@ -234,6 +237,17 @@
+       content: m.text,
+     }));
+ 
++  // r4: the same recent turns with their stored language-turn state, for the
++  // engine only (the model never receives metadata; it gets `history`).
++  const languageHistory = earlier
++    .filter((m) => m.role === 'user' || m.role === 'ai')
++    .slice(-12)
++    .map((m) => ({
++      role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
++      content: m.text,
++      languageTurn: (m as { meta?: { languageTurn?: LanguageTurnEvidence } }).meta?.languageTurn ?? null,
++    }));
++
+   const enrichedQuery = [
+     curriculumSummary ? `Curriculum context: ${curriculumSummary}` : '',
+     lessonTitle ? `Current lesson: ${lessonTitle}` : '',
+@@ -286,7 +300,7 @@
+     // Option B: the owner-checked session's student, for the trusted age band only.
+     studentId,
+     message: text.trim(),
+-    history,
++    history: languageHistory,
+     hintsOnly: tutorPolicy.policy === 'hints_only',
+     masteryStatus: turn.plan?.masteryStatus,
+   });
+@@ -337,8 +351,15 @@
+   }
+   turn.reservation = undefined;
+   const citations = citationsIn(aiResult.answer, turn.sources);
++  const assistantId = generateMessageId();
++  const languageTurn = turn.language && reply
++    ? {
++        ...turnEvidence(turn.language, turn.plan?.teaching.objectiveId),
++        ...finalizeLanguageTurn(turn.language, { reply: aiResult.answer, learnerText: turn.text, messageId: assistantId, parsed: turn.languageMarker?.parsed ?? null, malformed: turn.languageMarker?.malformed }),
++      }
++    : undefined;
+   const assistantMessage = {
+-    id: generateMessageId(),
++    id: assistantId,
+     role: 'ai' as const,
+     text: aiResult.answer,
+     timestamp: new Date(),
+@@ -351,7 +372,7 @@
+       // Recorded only when the plan was actually used for this reply (a model reply).
+       ...(turn.plan && reply ? { teaching: turn.plan.teaching } : {}),
+       // Recorded only for a model reply (the moves were actually given to it).
+-      ...(turn.language && reply ? { languageTurn: turnEvidence(turn.language, turn.plan?.teaching.objectiveId) } : {}),
++      ...(languageTurn ? { languageTurn } : {}),
+     },
+   };
+   const { session } = turn;
+@@ -377,7 +398,15 @@
+   let reply: TutorReply | null = null;
+   if (turn.orchestrator) reply = await queryOrchestratorChat(turn.orchestrator);
+   // Orchestrator down or unconfigured: answer with the direct model instead.
+-  if (!reply && turn.directParams) reply = await queryDirectTutorModel(await turn.directParams());
++  if (!reply && turn.directParams) {
++    reply = await queryDirectTutorModel(await turn.directParams());
++    // r4: the hidden assessment line is read and removed before anything is stored or sent.
++    if (reply && turn.language) {
++      const stripped = stripAssessmentMarkers(reply.answer);
++      turn.languageMarker = { parsed: stripped.assessment, malformed: stripped.malformed };
++      reply = stripped.text ? { ...reply, answer: stripped.text } : null;
++    }
++  }
+   const { aiResult, assistantMessage } = await finishTutorTurn(turn, reply);
+   res.json({
+     userMessage: turn.userMessage,
+@@ -415,10 +444,23 @@
+       const params = await turn.directParams();
+       const status: StreamStatus = {};
+       let answer = '';
++      // r4: hidden assessment markers are held back and removed as the text streams
++      // (a marker split across chunks never reaches the student).
++      const filter = turn.language ? new AssessmentMarkerFilter() : null;
+       for await (const delta of streamDirectTutorModel(params, status)) {
+         if (!open) break; // the student left: stop generating (metered as cancelled)
+-        answer += delta;
+-        send({ type: 'token', delta });
++        const visible = filter ? filter.push(delta) : delta;
++        if (!visible) continue;
++        answer += visible;
++        send({ type: 'token', delta: visible });
++      }
++      if (filter && open) {
++        const tail = filter.end();
++        if (tail) {
++          answer += tail;
++          send({ type: 'token', delta: tail });
++        }
++        turn.languageMarker = { parsed: filter.assessment(), malformed: filter.malformed };
+       }
+       if (!open) {
+         if (turn.reservation) await releaseUsage(turn.reservation);

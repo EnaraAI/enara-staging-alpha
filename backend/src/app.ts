@@ -24,6 +24,7 @@ import demoRoutes from './routes/demo.routes';
 import { demoGuard } from './middleware/demoGuard';
 import cronRoutes from './routes/cron.routes';
 import tutorFacesRoutes from './routes/tutorFaces.routes';
+import learnerAgeBandRoutes from './routes/learnerAgeBand.routes';
 import batchRoutes from './routes/batch.routes';
 import courseInstanceRoutes from './routes/courseInstance.routes';
 import studentRoutes from './routes/student.routes';
@@ -281,6 +282,7 @@ export function createApp() {
   app.use('/api/cron', cronRoutes);
   app.use('/api/tutor-faces', tutorFacesRoutes);
   app.use('/api/batches', batchRoutes);
+  app.use('/api/age-bands', learnerAgeBandRoutes);
   app.use('/api/course-instances', courseInstanceRoutes);
   app.use('/api/students', studentRoutes);
   app.use('/api/assessments', assessmentRoutes);

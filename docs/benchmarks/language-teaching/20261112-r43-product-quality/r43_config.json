@@ -1,0 +1,66 @@
+{
+ "campaign": "r4.3 product quality",
+ "commit": "fc6a487d287762a5f17ceadaf451f6c990347215",
+ "policyRevision": "ltc-v1-r4.3",
+ "r42BaselineManifestSha256Verified": "72203c079e0de6c0b2da838c205b177541bdac3095f22ee9cd2cc00eaef0399d (20261109-post-remediation-final/manifest.json)",
+ "r42SnapshotSha256": "6b06463a21f1a3bd3b9d50b950f0f2b8c3d9325e7e12d06d86663c103341b2f7",
+ "codeFiles": {
+  "backend/src/services/languageTeachingContext.ts": "a925fb5a32b701cc5a693d0ad7b4498f86d2509c832e8179825d91839de68aa2",
+  "backend/src/services/languageLearningState.ts": "6f257adf9bc6dfa21ece6db604cf8ab0968f586600da1af8a191de91679ce624",
+  "backend/src/controllers/tutor.controller.ts": "6ed95bcdedb8e7257fc05d12f958bed10e191d2c8d2be0422a06a776f2bc6daf",
+  "backend/src/controllers/me.controller.ts": "3c7f6650c7634105b27fe46a8a9e8d5ca09cece6320516c3891f90019beb7090",
+  "backend/src/models/TutorSession.ts": "dc5f4b06324cff5a65fe69581f78d0877d8eca47c0d0f1c37268515257150888",
+  "backend/src/models/TutorMessage.ts": "85aaa2153d91589a57d3764273f4161118a6644532f0b783e85a7756a18ef030",
+  "backend/src/services/directTutorModel.ts": "8c69cdd826de04da7bb9b2834de875ef48d8627c0f827de4095a9dc7e93dc24e",
+  "backend/src/services/aiGateway.ts": "1e28c85634ef288a910a80b625567dbe351a630d4eb0aa0c5cea542067a76eb5",
+  "backend/src/services/priceCatalog.ts": "6f7857670e7acc908ab36287efe57828a4a74f59c2b251d3d53b87c3cc38831d",
+  "backend/src/services/aiCalls.ts": "0f617f31e8e9138bdd7abbc4e9e385c81a65f84423874feb12f8e5cc2cef706c",
+  "backend/src/config/env.ts": "5fc5f1a772b2c78ab5b1716c47544d5fb2cc05d3a7ca97b835982aeba85a36d8",
+  "backend/benchmarks/ltc-v2/run_fixture_v2.ts": "8470a60a25819df590a705dcc28ceb25241625c37524ecc68f48f1abaf31b48a",
+  "backend/benchmarks/ltc-v2/judge_v2.ts": "f22d76c482b303d34168340d8ac323c991d2897e616910ac74d8c3ccf57c7696",
+  "backend/benchmarks/ltc-v2/judge_v2_core.ts": "4d51e726e2537332f1f9d9f842169b288e570a88406514012106b8d660ea6981",
+  "backend/test/r43ProductQuality.test.ts": "5e4148a380dfc922315e84c460d400576b7c8328c221a7a65e1fae9fb67eafd9"
+ },
+ "dataFiles": {
+  "docs/benchmarks/language-teaching/20261109-full-remediation/fixture_v2/fixture_v2_cases.jsonl": "e72d2a6d3c083240efc0513055c1670a2dea5f12c5e17d3a832746a86713c0c2",
+  "docs/benchmarks/language-teaching/20261109-post-remediation-final/stage_a/stage_a_cases.jsonl": "48effcb58d79632b936aa227d59fa5f3dfce7622b3ab28e64e838c21a8e4de96",
+  "docs/benchmarks/language-teaching/20261109-post-remediation-final/rubric_v2_machine.json": "2f60cf7ffad38a6aaaecea25013231d335b338eb67aa004374291879561e0e07"
+ },
+ "unchangedVsR42": {
+  "backend/src/services/languageLearningState.ts": false,
+  "backend/src/services/languageTeachingContext.ts": false,
+  "backend/src/controllers/tutor.controller.ts": false,
+  "backend/src/models/TutorMessage.ts": true,
+  "backend/src/services/directTutorModel.ts": true,
+  "backend/src/services/aiGateway.ts": true,
+  "backend/src/services/priceCatalog.ts": true,
+  "backend/src/services/usageLedger.ts": true,
+  "backend/src/services/aiCalls.ts": true,
+  "backend/src/config/env.ts": true,
+  "backend/benchmarks/ltc-v2/run_fixture_v2.ts": true,
+  "backend/benchmarks/ltc-v2/judge_v2.ts": false,
+  "backend/benchmarks/ltc-v2/judge_v2_core.ts": false,
+  "docs/benchmarks/language-teaching/20261109-full-remediation/fixture_v2/fixture_v2_cases.jsonl": true,
+  "docs/benchmarks/language-teaching/20261109-post-remediation-final/rubric_v2_machine.json": true
+ },
+ "config": {
+  "route": "POST /api/me/tutor/sessions/:id/messages (real controller, in-process; auth, sessions, credits, metering intact)",
+  "tutorModel": "claude-opus-5-5 (configured default, unchanged)",
+  "officialEvaluator": "claude-sonnet-5-5 effort medium (unchanged)",
+  "independentEvaluator": "claude-haiku-5-5 effort low (unchanged)",
+  "evaluatorCore": "ltb-judge-v2-core-3 (outcomes identical to core-2 on all r4.2 stored data)",
+  "frozenSet": "fixture v2: 120 cases / 219 turns (same as r4.2)",
+  "targetedSet": "stage A: 10 cases / 28 turns (pressure, injection, dont-know, hedged answer, SSE)",
+  "sampling": "provider default; fresh DB and sessions per run"
+ },
+ "caps": {
+  "perRunUsd": 10,
+  "campaignUsd": 30,
+  "tutorMain": 5.5,
+  "tutorTargeted": 1.0,
+  "officialMain": 1.5,
+  "officialTargeted": 0.2,
+  "independentMain": 0.3,
+  "independentTargeted": 0.05
+ }
+}

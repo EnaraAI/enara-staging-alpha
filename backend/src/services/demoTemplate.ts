@@ -28,6 +28,15 @@ const LESSONS = [
       'Greeting people and introducing yourself. Key phrases: "Hello, I\'m…", "Nice to meet you", "Where are you from?", "I\'m from Cairo", ' +
       '"What do you do?", "I\'m a student". Good morning (until 12), good afternoon (12–6), good evening (after 6). ' +
       'Practice: introduce yourself and a friend: "This is Mona. She is a doctor."',
+    languageSpec: {
+      objectives: ['Greet people and introduce yourself', 'Introduce a friend and say their job'],
+      successCriteria: ['Uses the right greeting for the time of day', 'Says "This is … He/She is a …" correctly'],
+      vocabulary: ['hello', 'nice to meet you', 'good morning', 'good afternoon', 'good evening', 'student', 'doctor', 'teacher'],
+      grammar: ["I'm / he's / she's (to be)", 'This is …', 'Where are you from?'],
+      functions: ['greeting', 'introducing yourself', 'introducing someone else'],
+      skills: ['writing', 'reading'],
+      examples: ["Hello, I'm Lina. Nice to meet you.", 'This is Mona. She is a doctor.'],
+    },
   },
   {
     title: 'Lesson 2: My daily routine',
@@ -35,6 +44,15 @@ const LESSONS = [
       'Present simple for routines and habits. I/you/we/they get up; he/she/it gets up (add -s). Time phrases: every day, on Mondays, ' +
       'at 7 o\'clock, in the morning. Adverbs of frequency go before the main verb: "I usually have breakfast at 7." ' +
       'Practice: describe your day from morning to night in five sentences.',
+    languageSpec: {
+      objectives: ['Describe a daily routine with the present simple'],
+      successCriteria: ['Adds -s for he/she/it', 'Puts adverbs of frequency before the main verb'],
+      vocabulary: ['get up', 'have breakfast', 'go to work', 'every day', 'usually', 'always', 'sometimes', 'never'],
+      grammar: ['present simple (he/she/it + -s)', 'adverbs of frequency before the main verb'],
+      functions: ['describing habits and routines'],
+      skills: ['writing', 'reading'],
+      examples: ['I usually have breakfast at 7.', 'She gets up at 6 every day.'],
+    },
   },
   {
     title: 'Lesson 3: At the café',
@@ -42,6 +60,15 @@ const LESSONS = [
       'Ordering food and drink politely. "Can I have a coffee, please?", "I\'d like a cheese sandwich", "How much is it?", "Here you are". ' +
       'Countable and uncountable: a sandwich / some water, an apple / some rice. Questions: "Would you like…?" ' +
       'Practice: a short dialogue between a customer and a waiter.',
+    languageSpec: {
+      objectives: ['Order food and drink politely'],
+      successCriteria: ['Uses "Can I have …, please?" or "I\'d like …"', 'Uses a/an with countable and some with uncountable nouns'],
+      vocabulary: ['coffee', 'tea', 'sandwich', 'water', 'rice', 'How much is it?', 'Here you are'],
+      grammar: ['Can I have …?', "I'd like …", 'a/an vs some (countable/uncountable)'],
+      functions: ['ordering', 'asking the price', 'polite requests'],
+      skills: ['writing', 'reading'],
+      examples: ['Can I have a coffee, please?', "I'd like a cheese sandwich."],
+    },
   },
   {
     title: 'Lesson 4: Last weekend',
@@ -49,6 +76,15 @@ const LESSONS = [
       'Past simple for finished actions. Regular verbs add -ed (played, visited, watched); common irregular verbs: go → went, have → had, ' +
       'see → saw, eat → ate. Questions with did: "What did you do last weekend?" "I went to the beach." ' +
       'Practice: write four sentences about your last weekend.',
+    languageSpec: {
+      objectives: ['Talk about finished actions in the past'],
+      successCriteria: ['Uses -ed for regular verbs', 'Uses went, had, saw, ate correctly', 'Asks questions with did'],
+      vocabulary: ['last weekend', 'yesterday', 'played', 'visited', 'watched', 'went', 'had', 'saw', 'ate'],
+      grammar: ['past simple regular (-ed)', 'common irregular past forms', 'questions with did'],
+      functions: ['telling what happened', 'asking about the past'],
+      skills: ['writing', 'reading'],
+      examples: ['What did you do last weekend?', 'I went to the beach.'],
+    },
   },
 ];
 const STUDENTS = ['Lina Hassan', 'Omar Adel', 'Sara Nabil', 'Youssef Kamal', 'Nour Samir', 'Adam Fathy'];
@@ -118,7 +154,7 @@ export async function buildDemoTemplate(now = new Date()) {
         summary: 'Four short lessons for adult beginners: introductions, daily routines, ordering at a café and talking about the past.',
         description: 'An original Enara sample course for the demo.', lastUpdated: now.toISOString().slice(0, 10), subjectsCount: LESSONS.length,
         assignedBatches: ['Everyday English A2'], status: 'deployed', createdBy: teacherId, origin: 'live',
-        chapters: LESSONS.map((l, i) => ({ id: ID.lesson(i + 1), title: l.title, description: l.description, uploads: [] })),
+        chapters: LESSONS.map((l, i) => ({ id: ID.lesson(i + 1), title: l.title, description: l.description, uploads: [], languageSpec: l.languageSpec })),
       },
     },
     { upsert: true },

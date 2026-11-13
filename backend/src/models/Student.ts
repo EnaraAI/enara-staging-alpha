@@ -1,3 +1,4 @@
+import { LEARNER_AGE_BANDS, type LearnerAgeBand } from './learnerAgeBand';
 import { Schema, model, Document } from 'mongoose';
 
 export interface IStudent extends Document {
@@ -10,6 +11,10 @@ export interface IStudent extends Document {
   batchId?: string;
   academicYear?: string;
   groupId?: string;
+  // Trusted, staff-set coarse learning-context category (not an exact age).
+  // Written only by Workspace Admins via /api/age-bands; never selected by
+  // default so existing reads don't expose it.
+  learnerAgeBand?: LearnerAgeBand;
   progress?: number;
   avgScore?: number;
   studyTime?: string;
@@ -73,6 +78,7 @@ const studentSchema = new Schema<IStudent>(
     batchId: { type: String, index: true },
     academicYear: { type: String },
     groupId: { type: String },
+    learnerAgeBand: { type: String, enum: LEARNER_AGE_BANDS, select: false },
     progress: { type: Number, default: 0 },
     avgScore: { type: Number, default: 0 },
     studyTime: { type: String, default: '0h/week' },

@@ -1,0 +1,25 @@
+--- docs/benchmarks/language-teaching/20261109T0952-ltb-v1.0-remediation-r2/pre_edit_code_snapshot/languageTeachingContext.test.ts	2026-11-09 09:53:12.686977311 +0000
++++ backend/test/languageTeachingContext.test.ts	2026-11-09 10:00:48.231984029 +0000
+@@ -154,7 +154,9 @@
+ 
+   it('first turn: goal question without a lesson or for a vague greeting; prior knowledge with a lesson spec', () => {
+     expect(ids(selectLanguageMoves({ band: 'unknown', lessonStatus: 'none', signals: s({ firstTurn: true }) }))).toContain('clarify_goal');
+-    expect(ids(selectLanguageMoves({ band: 'beginner', lessonStatus: 'structured', signals: s({ firstTurn: true, vague: true }) }))).toContain('clarify_goal');
++    // ltc-v1-r2: a known lesson makes a vague greeting no reason to ask; the lesson starts.
++    expect(ids(selectLanguageMoves({ band: 'beginner', targetLanguage: 'English', lessonStatus: 'structured', signals: s({ firstTurn: true, vague: true }) }))).toContain('activate_prior_knowledge');
++    expect(ids(selectLanguageMoves({ band: 'beginner', targetLanguage: 'English', lessonStatus: 'structured', signals: s({ firstTurn: true, vague: true }) }))).not.toContain('clarify_goal');
+     expect(ids(selectLanguageMoves({ band: 'beginner', lessonStatus: 'structured', signals: s({ firstTurn: true }) }))).toContain('activate_prior_knowledge');
+   });
+ 
+@@ -320,7 +322,10 @@
+     await ask('CRS-LANG', 'LSN-PLAIN', 'hi');
+     const sys = systemText();
+     expect(sys).toContain("don't claim it covered specific items");
+-    expect(sys).toContain('First find out what the learner wants to do today');
++    // ltc-v1-r2: the lesson is known (title only), so no goal question is forced;
++    // the tutor starts on the lesson topic without claiming specific coverage.
++    expect(sys).not.toContain('First find out what the learner wants to do today');
++    expect(sys).toContain('Start by briefly connecting to what they already know');
+   });
+ 
+   it('non-language course: no language block (existing behaviour unchanged)', async () => {
