@@ -8,12 +8,11 @@ import type { LessonItem } from '../src/services/languageLearningState';
 const H = LS.hintInstruction as unknown as (l: number, o?: { kind?: string }) => string;
 const kindOf = (LTC as unknown as { itemKind?: (i: LessonItem | undefined, vocab?: string[]) => string }).itemKind;
 describe('fix 4: skill weaknesses', () => {
-  it('Arabic support is a short gloss, never an Arabic explanation', () => {
-    const t = (LTC as unknown as { MOVE_TEXT?: Record<string, string> }).MOVE_TEXT ?? {};
-    const l1 = t.l1_support ?? LTC.moveText({ id: 'l1_support', reasons: [], decisionRefs: [] } as never);
-    expect(l1).toMatch(/one to three words/i);
-    expect(l1).toMatch(/never .*explanation in Arabic|no explanation in Arabic/i);
-    expect(l1).toMatch(/English/);
+  // superseded by fix 6 (owner decision): no Arabic at all in English lessons; see fix6EnglishOnly.test.ts
+  it('Arabic writers get a short English-only reply (fix 6 supersedes the fix 4 gloss)', () => {
+    const l1 = LTC.moveText({ id: 'l1_support', reasons: [], decisionRefs: [] } as never);
+    expect(l1).toMatch(/no Arabic words/i);
+    expect(l1).toMatch(/one short English task/i);
   });
   it('item kinds: reading, word, open, form', () => {
     expect(kindOf).toBeTypeOf('function');

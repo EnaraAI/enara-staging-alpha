@@ -392,8 +392,8 @@ describe('streaming route', () => {
     expect(ai.stream).toHaveBeenCalled();
     const sys = (ai.stream.mock.calls[0][0].system as { text: string }[]).map((b) => b.text).join('\n');
     expect(sys).toContain('language_teaching_context');
-    // fix 4 (intentional): Arabic support is now a short gloss, never an Arabic explanation.
-    expect(sys).toContain('Arabic only as a gloss of one to three words');
+    // fix 6 (owner decision, intentional): English lessons are English-only, no Arabic glosses.
+    expect(sys).toContain('reply only in simple English at their level (no Arabic words at all)');
     const msgs = await mongoose.connection.collection('tutor_messages').find({ sessionId: sid, role: 'ai' }).sort({ timestamp: -1 }).toArray();
     expect(msgs[0].meta?.languageTurn).toBeUndefined();
   });

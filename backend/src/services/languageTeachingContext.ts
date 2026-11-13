@@ -967,7 +967,7 @@ const MOVE_TEXT: Record<MoveId, string> = {
   redirect_to_lesson:
     'This request is outside this English lesson. In one or two short sentences, kindly say you are their English tutor and won\'t do that task itself: no answer, no worked method, no finished text, and don\'t teach the other subject. Offer one English-language option (e.g. the English words or a sentence frame they could use to do it themselves), or return to the lesson with one small task. Keep the whole reply short.',
   reteach_simpler: 'They are confused: change approach, use a smaller step and a concrete everyday example; do not repeat the same explanation.',
-  l1_support: 'They wrote in Arabic: reply in simple English at their level; Arabic only as a gloss of one to three words (e.g. "milk = حليب"), never a sentence or explanation in Arabic and never a reply mostly in Arabic; then one short English task.',
+  l1_support: 'They wrote in Arabic: reply only in simple English at their level (no Arabic words at all); if they asked about a word, explain it in easy English with a picture-like example or a simpler synonym, then give one short English task.',
   answer_with_reasoning: 'They asked for the answer: give it with the reason in one or two sentences, then one similar item for them to try.',
   fade_support: 'They are strong: answer directly at their level with precise terms; no beginner tables, basic definitions or step-by-step scaffolds unless they ask; use fewer hints and offer a harder variant or a nuance instead.',
   independent_practice: 'Offer a short independent task (e.g. write two sentences using the target form) rather than more explanation.',
@@ -1065,6 +1065,10 @@ const AGE_REGISTER: Record<AgeBand, string> = {
 };
 
 // Fix 3: what a beginner reply may carry (the grader's overload evidence).
+// Fix 6 (owner decision): English lessons are English-only on the tutor's side.
+export const ENGLISH_ONLY_RULE = 'Language of your replies: write only in English, even if they write in Arabic; never use Arabic words, translations or glosses. Use simple English at their level instead. This overrides any instruction to reply in the student\'s language.';
+export const arabicInReply = (reply: string) => /[\u0600-\u06FF]/.test(reply);
+
 // Fix 4: a "why?" after an attempt on the open item.
 export const WHY_AFTER_ATTEMPT = 'They asked why their answer is not right yet: give the reason as a clue in one or two short sentences (the rule, or which part to check), without writing the corrected answer or any part of it, then ask them to try once more.';
 const WHY_ASK = /\b(why|which part|what'?s wrong|what is wrong)\b|ليه|ازاي غلط/i;
@@ -1215,6 +1219,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
     `Length and style (policy ${LANGUAGE_POLICY_REVISION}): about ${len.targetWords} words, never more than ${len.maxWords} (count only your own words). One step per reply: one idea, one instruction, one task. Plain short lines; no tables, no headings, at most one short list. If more is needed, give the first part and offer to continue.`,
     ...(step && REGISTER[step] ? [`Level: ${REGISTER[step]}`] : []),
     ...(step && LOAD_BUDGET[step] ? [LOAD_BUDGET[step]] : []),
+    ...(!/arabic/i.test(l.targetLanguage?.value ?? '') ? [ENGLISH_ONLY_RULE] : []),
     AGE_REGISTER[band],
     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
     GROUNDING_RULES,
@@ -1387,6 +1392,7 @@ export function finalizeLanguageTurn(
     const len = ctx.length ?? lengthTarget(ctx.learner.ageBand, ctx.learner.proficiency.value);
     for (const f of loadOverBudget(reply, len.maxWords)) flags.push(`load_${f}`);
   }
+  if (!/arabic/i.test(ctx.learner.targetLanguage?.value ?? '') && arabicInReply(reply)) flags.push('arabic_in_reply');
   if (contrastPairClaimMismatch(reply)) flags.push('contrast_pair_claim_mismatch');
   if (learnerQuoteMismatches(reply, input.learnerText).length) flags.push('learner_quote_mismatch');
   const openItem = s.activeLessonItem && !isSuccess(assessment.verdict) ? s.activeLessonItem : undefined;
