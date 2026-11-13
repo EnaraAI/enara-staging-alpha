@@ -2,6 +2,9 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { runExperiment, generateReports, lockPrereg, loadBenchmark, type ExperimentConfig } from './orchestrator/run';
 import { validateBenchmark } from './benchmark/validate';
+import { writeFileSync, mkdirSync } from 'fs';
+import { challengeReport } from './analytics/challenges';
+import { simulatorChecks, renderChecks, loadRaw } from './students/simulatorValidation';
 const ROOT = path.resolve(__dirname, '..');
 const LIMITATIONS = [
   'All learners are AI-simulated. Nothing here is evidence of learning in real humans; it can only guide engineering and prioritise a real classroom study.',
@@ -18,6 +21,9 @@ const [cmd, arg] = process.argv.slice(2);
   if (cmd === 'validate-benchmark') { const e = validateBenchmark(loadBenchmark()); console.log(e.length ? e.join('\n') : '48 outcomes valid'); process.exit(e.length ? 1 : 0); }
   else if (cmd === 'lock-prereg') console.log('locked', lockPrereg());
   else if (cmd === 'run') { const cfg = JSON.parse(readFileSync(path.resolve(arg), 'utf8')) as ExperimentConfig; const r = await runExperiment(cfg, { dry: process.argv.includes('--dry') }); generateReports(r.dir, LIMITATIONS); console.log(JSON.stringify({ dir: r.dir, complete: r.finished.complete, recorded: r.finished.blocksRecorded, planned: r.finished.blocksPlanned, failed: r.finished.blocksFailed, spentUsd: r.finished.ledger.totalUsd, leakage: r.finished.leakageEvents }, null, 1)); }
+  else if (cmd === 'analyze-extra') { const d = path.resolve(arg); const raw = loadRaw(path.join(d, 'raw/blocks.jsonl')); const audit = readFileSync(path.join(d, 'raw/audit.jsonl'), 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)); mkdirSync(path.join(d, 'reports'), { recursive: true });
+    writeFileSync(path.join(d, 'reports/8_challenge_tests.md'), challengeReport(raw.map((r) => r.result)));
+    const cs = simulatorChecks(raw, audit); writeFileSync(path.join(d, 'reports/9_simulator_validation.md'), `# Simulator validation (independent of tutor quality)\n\nSimulation only. These checks test the simulator's internal sanity, not its realism against real learners.\n\n${renderChecks(cs)}\n`); console.log(renderChecks(cs)); }
   else if (cmd === 'report') { generateReports(path.resolve(arg), LIMITATIONS); console.log('reports regenerated from raw results'); }
   else { console.log('commands: validate-benchmark | lock-prereg | run <config.json> [--dry] | report <run-dir>'); process.exit(2); }
 })().catch((e) => { console.error('ERR', (e as Error).message); process.exit(1); });

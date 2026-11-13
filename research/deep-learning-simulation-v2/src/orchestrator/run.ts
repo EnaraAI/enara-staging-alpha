@@ -35,8 +35,8 @@ export function checkPrereg(requireLock: boolean): { prereg: Prereg; sha256: str
   return { prereg, sha256: h, locked };
 }
 
-export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean } = {}) {
-  const runId = `${cfg.experimentId}-${new Date().toISOString().replace(/[:.]/g, '-')}`; const dir = path.join(ROOT, 'runs', cfg.experimentId); mkdirSync(path.join(dir, 'raw'), { recursive: true });
+export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean; fetchImpl?: typeof fetch; runsDir?: string } = {}) {
+  const runId = `${cfg.experimentId}-${new Date().toISOString().replace(/[:.]/g, '-')}`; const dir = path.join(opts.runsDir ?? path.join(ROOT, 'runs'), cfg.experimentId); mkdirSync(path.join(dir, 'raw'), { recursive: true });
   const outcomes = loadBenchmark(); const bErr = validateBenchmark(outcomes); if (bErr.length) throw new Error(`benchmark invalid: ${bErr[0]}`);
   const byId = new Map(outcomes.map((o) => [o.id, o])); const outcomesByArea = Object.fromEntries(AREAS.map((a) => [a, outcomes.filter((o) => o.area === a).map((o) => o.id)])) as Record<Area, string[]>;
   const pr = checkPrereg(cfg.kind === 'full_experiment');
@@ -54,10 +54,10 @@ export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean
   writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify(manifest, null, 2));
   const ledger = new Ledger(dir, runId, cfg.budgetCapUsd); const rawFile = path.join(dir, 'raw/blocks.jsonl'); const auditFile = path.join(dir, 'raw/audit.jsonl'); const judgeFile = path.join(dir, 'raw/judge.jsonl');
   const done = new Set<string>(existsSync(rawFile) ? readFileSync(rawFile, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l).result.blockId) : []);
-  const phrases = outcomes.flatMap((o) => allItems(o).flatMap((it) => [it.prompt, it.material ?? '', ...(it.scoring.type === 'key' ? it.scoring.accepted : [])]));
+  const phrases = outcomes.flatMap((o) => allItems(o).flatMap((it) => [it.prompt, it.material ?? '', ...(it.scoring.type === 'key' ? it.scoring.accepted.filter((a) => a.trim().split(/\s+/).length >= 6) : [])])); // short accepted answers are generic phrases ("what does it mean"): only prompts, materials and long accepted answers are leak signals
   const scanner = new OutgoingScanner(phrases); const leaks: string[] = []; const als = new AsyncLocalStorage<CallCtx>();
   const stub = (async () => new Response(JSON.stringify({ content: [{ type: 'text', text: 'ANSWER: dry-run\nCONFIDENCE: 50' }], usage: { input_tokens: 100, output_tokens: 10 } }), { status: 200 })) as unknown as typeof fetch;
-  const realFetch = opts.dry ? stub : globalThis.fetch; let key = ''; let restore = () => {};
+  const realFetch = opts.fetchImpl ?? (opts.dry ? stub : globalThis.fetch); let key = ''; let restore = () => {};
   const runtime = new EnaraRuntime();
   const needsEnara = !opts.dry && cfg.conditions.some((c) => c === 'A' || c === 'E');
   if (!opts.dry) { key = readKey(); restore = installFetchGuard(ledger, () => als.getStore() ?? { campaign: cfg.experimentId, studentId: null, blockId: null, role: 'tutor' }, scanner, leaks); }
@@ -116,7 +116,7 @@ export async function runExperiment(cfg: ExperimentConfig, opts: { dry?: boolean
   writeFileSync(path.join(dir, 'finished.json'), JSON.stringify(finished, null, 2)); writeFileSync(path.join(dir, 'disagreements_for_human_review.json'), JSON.stringify(disagreementSample(judgeRecs), null, 2));
   return { dir, manifest, finished, results, attempts, prereg: pr.prereg };
 }
-export function generateReports(dir: string, limitations: string[]) {
+export function generateReports(dir: string, limitations: string[]) { // reads ONLY recorded raw results + ledger
   const manifest = JSON.parse(readFileSync(path.join(dir, 'manifest.json'), 'utf8')); const results: BlockResult[] = readFileSync(path.join(dir, 'raw/blocks.jsonl'), 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l).result);
   const attempts = Ledger.read(path.join(dir, 'provider_attempts.jsonl')); const { prereg } = checkPrereg(false); mkdirSync(path.join(dir, 'reports'), { recursive: true });
   const reps = buildReports({ results, attempts, prereg, runId: manifest.runId, experimentId: manifest.experimentId, simulatedOnly: true, limitations });

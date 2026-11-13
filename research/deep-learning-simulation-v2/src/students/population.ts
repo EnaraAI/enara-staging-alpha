@@ -29,7 +29,7 @@ export function makeStudent(index: number, masterSeed: string, opts: { adversari
     strategyResponse: { explanation: r.clamp01Normal(0.6, 0.2), hints: r.clamp01Normal(0.6, 0.2), examples: r.clamp01Normal(0.6, 0.2), practice: r.clamp01Normal(0.6, 0.2) }, tags: [],
   };
   if (opts.adversarial) { s.misconceptionStrength = Math.max(s.misconceptionStrength, 0.9); s.learningRate = Math.min(s.learningRate, 0.25); s.guessRate = Math.max(s.guessRate, 0.35); }
-  const t = s.tags;
+  const t = s.tags; if (opts.adversarial) t.push('adversarial');
   t.push(s.learningRate >= 0.6 ? 'fast_learner' : s.learningRate <= 0.4 ? 'slow_learner' : 'mid_learner');
   if (s.confidenceBias > 0.3) t.push('overconfident'); else if (s.confidenceBias < -0.3) t.push('underconfident');
   if (s.misconceptionStrength >= 0.7) t.push('persistent_misconceptions');
