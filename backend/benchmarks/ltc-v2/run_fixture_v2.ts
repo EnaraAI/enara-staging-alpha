@@ -194,12 +194,22 @@ async function simLearnerTurn(persona: string, model: string, convo: { learner: 
   const messages: { role: 'user' | 'assistant'; content: string }[] = [];
   for (const c of convo) { messages.push({ role: 'assistant', content: c.learner }, { role: 'user', content: c.reply ?? '(no reply)' }); }
   messages.unshift({ role: 'user', content: '(The lesson starts. Write your first message.)' });
-  const res = await realFetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY ?? '', 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model, max_tokens: 1500, output_config: { effort: 'low' }, system: persona, messages }),
-  });
-  const j = await res.json() as { content?: { type: string; text?: string }[]; usage?: Record<string, number>; model?: string };
+  // retry transient API/network failures (non-200 or non-JSON bodies) with backoff before giving up
+  let j: { content?: { type: string; text?: string }[]; usage?: Record<string, number>; model?: string } | null = null;
+  for (let attempt = 1; attempt <= 10 && !j; attempt += 1) {
+    try {
+      const res = await realFetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY ?? '', 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model, max_tokens: 1500, output_config: { effort: 'low' }, system: persona, messages }),
+      });
+      const body = await res.text();
+      if (res.ok) j = JSON.parse(body);
+      else if (res.status === 400 || res.status === 404) throw Object.assign(new Error(`api ${res.status}`), { fatal: true });
+    } catch (e) { if ((e as { fatal?: boolean }).fatal) throw e; }
+    if (!j) await new Promise((r) => setTimeout(r, Math.min(120000, 3000 * 2 ** attempt)));
+  }
+  if (!j) throw new Error('API unavailable after 10 attempts');
   if (j.usage) { const { usd } = costOf(j.model ?? model, j.usage); learnerUsd += usd; meteredUsd += usd; }
   const text = (j.content ?? []).filter((b) => b.type === 'text').map((b) => b.text ?? '').join('').trim();
   if (!text) throw new Error('simulated learner returned no text');
