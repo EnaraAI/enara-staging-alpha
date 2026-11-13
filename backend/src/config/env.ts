@@ -39,6 +39,10 @@ export interface AppConfig {
   /** Claude is the tutor backup when the orchestrator is unavailable. */
   anthropicApiKey?: string;
   anthropicTutorModel: string;
+  // r4.4 #4: pronunciation assessment (supplier trial). Off unless the flag, a key, a region and a price entry are all present.
+  azureSpeechKey?: string;
+  azureSpeechRegion?: string;
+  pronunciationAssessmentEnabled: boolean;
   // P9 analytics question routing (intent only): a small, priced model.
   anthropicIntentModel: string;
   // AI assessment drafts and question regeneration (owner decision 2026-11-01:
@@ -412,6 +416,9 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     enaraDefaultCourseId: readString(source, "ENARA_DEFAULT_COURSE_ID") || readString(source, "DEFAULT_COURSE_ID"),
     anthropicApiKey: readString(source, "ANTHROPIC_API_KEY"),
     anthropicTutorModel: readString(source, "ANTHROPIC_TUTOR_MODEL") || "claude-opus-5-5",
+    azureSpeechKey: readString(source, "AZURE_SPEECH_KEY"),
+    azureSpeechRegion: readString(source, "AZURE_SPEECH_REGION"),
+    pronunciationAssessmentEnabled: readBoolean(source, "PRONUNCIATION_ASSESSMENT_ENABLED", false),
     anthropicIntentModel: readString(source, "ANTHROPIC_INTENT_MODEL") || "claude-haiku-5-5",
     anthropicDraftModel: readString(source, "ANTHROPIC_DRAFT_MODEL") || "claude-sonnet-5-5",
     anthropicVisualModel: readString(source, "ANTHROPIC_VISUAL_MODEL") || "claude-haiku-5-5",
