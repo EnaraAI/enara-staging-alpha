@@ -261,6 +261,120 @@
               "i like my best friend a lot."
             ],
             "misconceptionId": "WR-01-M2"
+          },
+          {
+            "id": "WR-01-PRE3",
+            "stage": "pre",
+            "prompt": "Write ONE sentence about what you do after school. Use the word I.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with . ! or ?",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?][\"')]?\\s*$"
+                  }
+                },
+                {
+                  "id": "i",
+                  "description": "No lowercase i used alone",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "(^|[\\s\"(])i($|[\\s.,!?'\"])",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 4 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 4
+                  }
+                }
+              ]
+            },
+            "right": [
+              "I do my homework and then I play outside."
+            ],
+            "wrong": [
+              "i do my homework and then play outside.",
+              "I do my homework after school",
+              "do homework after school"
+            ],
+            "misconceptionId": "WR-01-M1"
+          },
+          {
+            "id": "WR-01-PRE4",
+            "stage": "pre",
+            "prompt": "Write ONE sentence about a sport or game you play. Use the word I.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with . ! or ?",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?][\"')]?\\s*$"
+                  }
+                },
+                {
+                  "id": "i",
+                  "description": "No lowercase i used alone",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "(^|[\\s\"(])i($|[\\s.,!?'\"])",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 4 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 4
+                  }
+                }
+              ]
+            },
+            "right": [
+              "I play chess with my cousin on Sundays.",
+              "Sometimes I play table tennis!"
+            ],
+            "wrong": [
+              "I play chess with my cousin on Sundays",
+              "i play chess with my cousin on Sundays."
+            ],
+            "misconceptionId": "WR-01-M2"
           }
         ],
         "post": [
@@ -375,6 +489,118 @@
               "i live in a small town near the sea"
             ],
             "misconceptionId": "WR-01-M2"
+          },
+          {
+            "id": "WR-01-POST3",
+            "stage": "post",
+            "prompt": "Write ONE sentence about a place where you relax. Use the word I.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with . ! or ?",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?][\"')]?\\s*$"
+                  }
+                },
+                {
+                  "id": "i",
+                  "description": "No lowercase i used alone",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "(^|[\\s\"(])i($|[\\s.,!?'\"])",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 4 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 4
+                  }
+                }
+              ]
+            },
+            "right": [
+              "I relax in the garden behind our house."
+            ],
+            "wrong": [
+              "i relax in the garden behind our house.",
+              "On warm days i relax in the garden."
+            ],
+            "misconceptionId": "WR-01-M1"
+          },
+          {
+            "id": "WR-01-POST4",
+            "stage": "post",
+            "prompt": "Write ONE sentence about something you would like to buy. Use the word I.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with . ! or ?",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?][\"')]?\\s*$"
+                  }
+                },
+                {
+                  "id": "i",
+                  "description": "No lowercase i used alone",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "(^|[\\s\"(])i($|[\\s.,!?'\"])",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 4 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 4
+                  }
+                }
+              ]
+            },
+            "right": [
+              "I would like to buy a red bicycle."
+            ],
+            "wrong": [
+              "I would like to buy a red bicycle",
+              "i would like to buy a red bicycle"
+            ],
+            "misconceptionId": "WR-01-M2"
           }
         ],
         "transfer": [
@@ -472,6 +698,102 @@
               "I have a new game. please come to my house today.",
               "I have a new game please come to my house today"
             ]
+          },
+          {
+            "id": "WR-01-TR3",
+            "stage": "transfer",
+            "prompt": "Write a diary entry of THREE short sentences about last night. Start each one with a capital letter, end each one with a full stop, and use the word I once.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "two",
+                  "description": "Three sentences, each with a capital letter and a full stop",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]\\s*$",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "i",
+                  "description": "No lowercase i used alone",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "(^|[\\s\"(])i($|[\\s.,!?'\"])",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 5 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 7
+                  }
+                }
+              ]
+            },
+            "right": [
+              "I cooked soup. It was hot. I went to bed early."
+            ],
+            "wrong": [
+              "I cooked soup. it was hot. I went to bed early.",
+              "I cooked soup. It was hot. I went to bed early",
+              "i cooked soup. It was hot. It was late."
+            ],
+            "misconceptionId": "WR-01-M1"
+          },
+          {
+            "id": "WR-01-TR4",
+            "stage": "transfer",
+            "prompt": "Write a note for the fridge in TWO sentences. Ask your brother to wash the dishes tonight. Use the word I once.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "two",
+                  "description": "Two sentences, each with a capital and a closing mark",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]\\s*$",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "i",
+                  "description": "No lowercase i used alone",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "(^|[\\s\"(])i($|[\\s.,!?'\"])",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 5 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 5
+                  }
+                }
+              ]
+            },
+            "right": [
+              "I am at work today. Please wash the dishes tonight."
+            ],
+            "wrong": [
+              "i am at work today. Please wash the dishes tonight.",
+              "I am at work today. please wash the dishes tonight.",
+              "I am at work today please wash the dishes tonight"
+            ],
+            "misconceptionId": "WR-01-M2"
           }
         ],
         "delayed": [
@@ -986,6 +1308,156 @@
               "Tom stayed at home. Because he had a cold."
             ],
             "misconceptionId": "WR-02-M2"
+          },
+          {
+            "id": "WR-02-PRE3",
+            "stage": "pre",
+            "prompt": "Join the two ideas into ONE sentence using and, but or because: \"The hotel was expensive. The room was tiny.\"",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with . ! or ?",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?][\"')]?\\s*$"
+                  }
+                },
+                {
+                  "id": "one",
+                  "description": "One sentence: no full stop before the linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "[.!?]\\s+\\S",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "but",
+                  "description": "Uses \"but\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\bbut\\b"
+                  }
+                },
+                {
+                  "id": "bad",
+                  "description": "Does not use a wrong linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(and|because)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 6 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 6
+                  }
+                }
+              ]
+            },
+            "right": [
+              "The hotel was expensive but the room was tiny.",
+              "The hotel was expensive, but the room was tiny."
+            ],
+            "wrong": [
+              "The hotel was expensive and the room was tiny.",
+              "The hotel was expensive. But the room was tiny.",
+              "The hotel was expensive because the room was tiny."
+            ],
+            "misconceptionId": "WR-02-M1"
+          },
+          {
+            "id": "WR-02-PRE4",
+            "stage": "pre",
+            "prompt": "Join the two ideas into ONE sentence using and, but or because: \"Karim missed the bus. He woke up late.\"",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with . ! or ?",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?][\"')]?\\s*$"
+                  }
+                },
+                {
+                  "id": "one",
+                  "description": "One sentence: no full stop before the linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "[.!?]\\s+\\S",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "because",
+                  "description": "Uses \"because\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\bbecause\\b"
+                  }
+                },
+                {
+                  "id": "bad",
+                  "description": "Does not use a wrong linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(and|but)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 6 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 6
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Karim missed the bus because he woke up late."
+            ],
+            "wrong": [
+              "Karim missed the bus and he woke up late.",
+              "Karim missed the bus. Because he woke up late."
+            ],
+            "misconceptionId": "WR-02-M2"
           }
         ],
         "post": [
@@ -1134,6 +1606,154 @@
             "wrong": [
               "The cafe is cheap and it is not very clean.",
               "The cafe is cheap. But it is not very clean."
+            ],
+            "misconceptionId": "WR-02-M1"
+          },
+          {
+            "id": "WR-02-POST3",
+            "stage": "post",
+            "prompt": "Join the two ideas into ONE sentence using and, but or because: \"The shop closed early. The owner was ill.\"",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with . ! or ?",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?][\"')]?\\s*$"
+                  }
+                },
+                {
+                  "id": "one",
+                  "description": "One sentence: no full stop before the linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "[.!?]\\s+\\S",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "because",
+                  "description": "Uses \"because\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\bbecause\\b"
+                  }
+                },
+                {
+                  "id": "bad",
+                  "description": "Does not use a wrong linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(and|but)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 6 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 6
+                  }
+                }
+              ]
+            },
+            "right": [
+              "The shop closed early because the owner was ill."
+            ],
+            "wrong": [
+              "The shop closed early and the owner was ill.",
+              "The shop closed early. Because the owner was ill."
+            ],
+            "misconceptionId": "WR-02-M2"
+          },
+          {
+            "id": "WR-02-POST4",
+            "stage": "post",
+            "prompt": "Join the two ideas into ONE sentence using and, but or because: \"Yuki trained hard. She lost the race.\"",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with . ! or ?",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?][\"')]?\\s*$"
+                  }
+                },
+                {
+                  "id": "one",
+                  "description": "One sentence: no full stop before the linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "[.!?]\\s+\\S",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "but",
+                  "description": "Uses \"but\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\bbut\\b"
+                  }
+                },
+                {
+                  "id": "bad",
+                  "description": "Does not use a wrong linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(and|because)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 6 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 6
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Yuki trained hard but she lost the race."
+            ],
+            "wrong": [
+              "Yuki trained hard and she lost the race.",
+              "Yuki trained hard. But she lost the race."
             ],
             "misconceptionId": "WR-02-M1"
           }
@@ -1285,6 +1905,155 @@
             "wrong": [
               "I study English. Because I want a better job.",
               "I study English and I want a better job."
+            ],
+            "misconceptionId": "WR-02-M2"
+          },
+          {
+            "id": "WR-02-TR3",
+            "stage": "transfer",
+            "prompt": "Write ONE sentence for a restaurant review. Say one good thing and one bad thing about the meal. Use but.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with . ! or ?",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?][\"')]?\\s*$"
+                  }
+                },
+                {
+                  "id": "one",
+                  "description": "One sentence: no full stop before the linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "[.!?]\\s+\\S",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "but",
+                  "description": "Uses \"but\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\bbut\\b"
+                  }
+                },
+                {
+                  "id": "bad",
+                  "description": "Does not use a wrong linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(and|because)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 6 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 6
+                  }
+                }
+              ]
+            },
+            "right": [
+              "The pasta was tasty but the service was slow.",
+              "The soup was lovely, but the dessert was cold."
+            ],
+            "wrong": [
+              "The pasta was tasty and the service was slow.",
+              "The pasta was tasty. But the service was slow."
+            ],
+            "misconceptionId": "WR-02-M1"
+          },
+          {
+            "id": "WR-02-TR4",
+            "stage": "transfer",
+            "prompt": "Write ONE sentence for a note to your teacher that explains why you are late today. Use because.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with . ! or ?",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?][\"')]?\\s*$"
+                  }
+                },
+                {
+                  "id": "one",
+                  "description": "One sentence: no full stop before the linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "[.!?]\\s+\\S",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "because",
+                  "description": "Uses \"because\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\bbecause\\b"
+                  }
+                },
+                {
+                  "id": "bad",
+                  "description": "Does not use a wrong linking word",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(and|but)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 6 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 6
+                  }
+                }
+              ]
+            },
+            "right": [
+              "I am late because my bus broke down."
+            ],
+            "wrong": [
+              "I am late. Because my bus broke down.",
+              "I am late and my bus broke down."
             ],
             "misconceptionId": "WR-02-M2"
           }
@@ -1775,6 +2544,50 @@
               "My uncle coffee never drinks."
             ],
             "misconceptionId": "WR-03-M2"
+          },
+          {
+            "id": "WR-03-PRE3",
+            "stage": "pre",
+            "prompt": "Put the words in the correct order to make a sentence: visits / Ravi / his grandmother / on Sundays",
+            "scoring": {
+              "type": "key",
+              "accepted": [
+                "ravi visits his grandmother on sundays",
+                "on sundays ravi visits his grandmother"
+              ],
+              "mode": "exact"
+            },
+            "right": [
+              "Ravi visits his grandmother on Sundays.",
+              "On Sundays Ravi visits his grandmother."
+            ],
+            "wrong": [
+              "Visits Ravi his grandmother on Sundays.",
+              "Ravi his grandmother visits on Sundays."
+            ],
+            "misconceptionId": "WR-03-M1"
+          },
+          {
+            "id": "WR-03-PRE4",
+            "stage": "pre",
+            "prompt": "Put the words in the correct order to make a sentence: rarely / my father / television / watches",
+            "scoring": {
+              "type": "key",
+              "accepted": [
+                "my father rarely watches television",
+                "rarely my father watches television",
+                "my father watches television rarely"
+              ],
+              "mode": "exact"
+            },
+            "right": [
+              "My father rarely watches television."
+            ],
+            "wrong": [
+              "My father watches rarely television.",
+              "My father television rarely watches."
+            ],
+            "misconceptionId": "WR-03-M2"
           }
         ],
         "post": [
@@ -1820,6 +2633,48 @@
               "Writes Mr Lee a letter on Mondays."
             ],
             "misconceptionId": "WR-03-M1"
+          },
+          {
+            "id": "WR-03-POST3",
+            "stage": "post",
+            "prompt": "Put the words in the correct order to make a sentence: cleans / the caretaker / the hall / every evening",
+            "scoring": {
+              "type": "key",
+              "accepted": [
+                "the caretaker cleans the hall every evening",
+                "every evening the caretaker cleans the hall"
+              ],
+              "mode": "exact"
+            },
+            "right": [
+              "The caretaker cleans the hall every evening."
+            ],
+            "wrong": [
+              "The caretaker the hall cleans every evening.",
+              "Cleans the caretaker the hall every evening."
+            ],
+            "misconceptionId": "WR-03-M1"
+          },
+          {
+            "id": "WR-03-POST4",
+            "stage": "post",
+            "prompt": "Put the words in the correct order to make a sentence: usually / Hana / to work / rides / her bike",
+            "scoring": {
+              "type": "key",
+              "accepted": [
+                "hana usually rides her bike to work",
+                "usually hana rides her bike to work"
+              ],
+              "mode": "exact"
+            },
+            "right": [
+              "Hana usually rides her bike to work."
+            ],
+            "wrong": [
+              "Hana rides usually her bike to work.",
+              "Hana her bike usually rides to work."
+            ],
+            "misconceptionId": "WR-03-M2"
           }
         ],
         "transfer": [
@@ -1864,6 +2719,91 @@
               "My mother bakes sometimes bread on Saturdays.",
               "My mother bread bakes on Saturdays sometimes."
             ]
+          },
+          {
+            "id": "WR-03-TR3",
+            "stage": "transfer",
+            "prompt": "This sentence has a word-order mistake. Rewrite it correctly: \"Tara drinks never tea in the evening.\"",
+            "scoring": {
+              "type": "key",
+              "accepted": [
+                "tara never drinks tea in the evening",
+                "in the evening tara never drinks tea"
+              ],
+              "mode": "exact"
+            },
+            "right": [
+              "Tara never drinks tea in the evening."
+            ],
+            "wrong": [
+              "Tara drinks never tea in the evening.",
+              "Tara never tea drinks in the evening."
+            ],
+            "misconceptionId": "WR-03-M2"
+          },
+          {
+            "id": "WR-03-TR4",
+            "stage": "transfer",
+            "prompt": "Answer the question in ONE full sentence. Use the word usually. Question: What do you do after dinner?",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "freq",
+                  "description": "Puts usually before the main verb",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(I|we)\\s+usually\\s+[a-z]+|\\bUsually,?\\s+(I|we)\\s+[a-z]+"
+                  }
+                },
+                {
+                  "id": "be",
+                  "description": "Does not misplace usually around am/is/are",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\busually\\s+(am|is|are)\\b|\\b(am|is|are)\\s+usually\\b"
+                  }
+                },
+                {
+                  "id": "wrong",
+                  "description": "Does not put usually after the verb",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(I|we)\\s+(?!usually\\b)[a-z]+\\s+usually\\b"
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Ends with a full stop",
+                  "required": false,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s*$"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 5 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 5
+                  }
+                }
+              ]
+            },
+            "right": [
+              "I usually watch television after dinner.",
+              "After dinner I usually read a book."
+            ],
+            "wrong": [
+              "I watch usually television after dinner.",
+              "I television usually watch after dinner."
+            ],
+            "misconceptionId": "WR-03-M2"
           }
         ],
         "delayed": [
@@ -2176,6 +3116,96 @@
               "Thanks for the help with my project. Omar"
             ],
             "misconceptionId": "WR-04-M2"
+          },
+          {
+            "id": "WR-04-PRE3",
+            "stage": "pre",
+            "prompt": "You are Rita. Write a short email (2-3 sentences) to your friend Sam to ask if he can study with you on Thursday. Begin and end the email in the correct way.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "greet",
+                  "description": "Opens with Dear/Hi/Hello + name + comma",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*(Dear|Hi|Hello)\\s+Sam\\s*,"
+                  }
+                },
+                {
+                  "id": "close",
+                  "description": "Closes with a closing phrase, comma and sender name",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(best wishes|kind regards|best regards|regards|all the best|see you soon|take care|love|cheers)\\s*,\\s*Rita\\s*[.!]?\\s*$"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 12 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 12
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Hi Sam,\nCan you study with me on Thursday? We can use the library.\nSee you soon,\nRita"
+            ],
+            "wrong": [
+              "Sam, can you study with me on Thursday? Rita",
+              "Hi Sam,\nCan you study with me on Thursday? We can use the library.\nBye, Rita"
+            ],
+            "misconceptionId": "WR-04-M1"
+          },
+          {
+            "id": "WR-04-PRE4",
+            "stage": "pre",
+            "prompt": "You are Hugo. Write a short FORMAL email (2-3 sentences) to Mr Davis to ask if there is a weekend job at his cafe. Begin and end the email in the correct way.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "greet",
+                  "description": "Opens with Dear + name + comma",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*(Dear)\\s+Mr\\.?\\s+Davis\\s*,"
+                  }
+                },
+                {
+                  "id": "close",
+                  "description": "Closes with a closing phrase, comma and sender name",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(kind regards|best regards|regards|yours sincerely|yours faithfully|best wishes)\\s*,\\s*Hugo\\s*[.!]?\\s*$"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 12 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 12
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Dear Mr Davis,\nI would like to ask if you have a weekend job at your cafe. I am free on Saturdays and Sundays.\nYours sincerely,\nHugo"
+            ],
+            "wrong": [
+              "Dear Mr Davis,\nI would like to ask if you have a weekend job at your cafe.\nThanks, Hugo",
+              "Hey Mr Davis, do you have a weekend job? Hugo"
+            ],
+            "misconceptionId": "WR-04-M2"
           }
         ],
         "post": [
@@ -2270,6 +3300,96 @@
               "Dear Mr Hill\nI would like to know the price of your course.\nKind regards\nSara"
             ],
             "misconceptionId": "WR-04-M2"
+          },
+          {
+            "id": "WR-04-POST3",
+            "stage": "post",
+            "prompt": "You are Jack. Write a short email (2-3 sentences) to your friend Lily to say you will be late for the cinema tonight. Begin and end the email in the correct way.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "greet",
+                  "description": "Opens with Dear/Hi/Hello + name + comma",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*(Dear|Hi|Hello)\\s+Lily\\s*,"
+                  }
+                },
+                {
+                  "id": "close",
+                  "description": "Closes with a closing phrase, comma and sender name",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(best wishes|kind regards|best regards|regards|all the best|see you soon|take care|love|cheers)\\s*,\\s*Jack\\s*[.!]?\\s*$"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 12 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 12
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Hello Lily,\nI will be late for the cinema tonight. Please start without me.\nTake care,\nJack"
+            ],
+            "wrong": [
+              "Lily, I will be late for the cinema tonight. Jack",
+              "Hello Lily,\nI will be late for the cinema tonight. Please start without me.\nBye, Jack"
+            ],
+            "misconceptionId": "WR-04-M1"
+          },
+          {
+            "id": "WR-04-POST4",
+            "stage": "post",
+            "prompt": "You are Mei. Write a short FORMAL email (2-3 sentences) to Dr Stone to ask to move your appointment from Tuesday to Thursday. Begin and end the email in the correct way.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "greet",
+                  "description": "Opens with Dear + name + comma",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*(Dear)\\s+Dr\\.?\\s+Stone\\s*,"
+                  }
+                },
+                {
+                  "id": "close",
+                  "description": "Closes with a closing phrase, comma and sender name",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(kind regards|best regards|regards|yours sincerely|yours faithfully|best wishes)\\s*,\\s*Mei\\s*[.!]?\\s*$"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 12 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 12
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Dear Dr Stone,\nI would like to move my appointment from Tuesday to Thursday. Would that be possible?\nBest regards,\nMei"
+            ],
+            "wrong": [
+              "Hi Dr Stone,\nI would like to move my appointment from Tuesday to Thursday.\nBest regards,\nMei",
+              "Dear Dr Stone,\nI would like to move my appointment to Thursday.\nThanks, Mei"
+            ],
+            "misconceptionId": "WR-04-M2"
           }
         ],
         "transfer": [
@@ -2360,6 +3480,96 @@
             "wrong": [
               "Here are the photos from our trip. I hope you like them. Paul",
               "Hi Mia,\nHere are the photos from our trip. I hope you like them.\nThanks, Paul"
+            ],
+            "misconceptionId": "WR-04-M2"
+          },
+          {
+            "id": "WR-04-TR3",
+            "stage": "transfer",
+            "prompt": "You are Ben. Your friend Ella wrote: \"Hi Ben, can you send me the notes from class? Best wishes, Ella\". Write your reply (2-3 sentences). Begin and end the email in the correct way.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "greet",
+                  "description": "Opens with Dear/Hi/Hello + name + comma",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*(Dear|Hi|Hello)\\s+Ella\\s*,"
+                  }
+                },
+                {
+                  "id": "close",
+                  "description": "Closes with a closing phrase, comma and sender name",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(best wishes|kind regards|best regards|regards|all the best|see you soon|take care|love|cheers)\\s*,\\s*Ben\\s*[.!]?\\s*$"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 12 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 12
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Hi Ella,\nSure, I will send you the notes tonight. They are in a blue folder.\nAll the best,\nBen"
+            ],
+            "wrong": [
+              "Sure, I will send you the notes tonight. Ben",
+              "Hi Ella,\nSure, I will send you the notes tonight.\nThanks, Ben"
+            ],
+            "misconceptionId": "WR-04-M1"
+          },
+          {
+            "id": "WR-04-TR4",
+            "stage": "transfer",
+            "prompt": "You are Isa. Ms Wood wrote: \"Dear Isa, please confirm that you can attend the interview on Monday at ten. Kind regards, Ms Wood\". Write your FORMAL reply (2-3 sentences). Begin and end the email in the correct way.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "greet",
+                  "description": "Opens with Dear + name + comma",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*(Dear)\\s+Ms\\.?\\s+Wood\\s*,"
+                  }
+                },
+                {
+                  "id": "close",
+                  "description": "Closes with a closing phrase, comma and sender name",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(kind regards|best regards|regards|yours sincerely|yours faithfully|best wishes)\\s*,\\s*Isa\\s*[.!]?\\s*$"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 12 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 12
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Dear Ms Wood,\nI can confirm that I will attend the interview on Monday at ten. Thank you for the invitation.\nKind regards,\nIsa"
+            ],
+            "wrong": [
+              "Hi Ms Wood,\nI can confirm that I will attend the interview on Monday at ten.\nKind regards,\nIsa",
+              "Dear Ms Wood,\nI can confirm that I will attend the interview on Monday at ten.\nBye, Isa"
             ],
             "misconceptionId": "WR-04-M2"
           }
@@ -2771,6 +3981,99 @@
               "We need milk eggs, flour and sugar."
             ],
             "misconceptionId": "WR-05-M2"
+          },
+          {
+            "id": "WR-05-PRE3",
+            "stage": "pre",
+            "prompt": "Rewrite the sentence adding commas where they are needed: \"The backpack holds a laptop a charger a notebook and a pen.\"",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "list",
+                  "description": "Commas separate the list items",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "a laptop,\\s+a charger,\\s+a notebook,?\\s+and a pen"
+                  }
+                },
+                {
+                  "id": "andc",
+                  "description": "No comma straight after and",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\band\\s*,"
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Keeps a full stop at the end",
+                  "required": false,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s*$"
+                  }
+                }
+              ]
+            },
+            "right": [
+              "The backpack holds a laptop, a charger, a notebook and a pen.",
+              "The backpack holds a laptop, a charger, a notebook, and a pen."
+            ],
+            "wrong": [
+              "The backpack holds a laptop a charger a notebook and a pen.",
+              "The backpack holds a laptop, a charger, a notebook, and, a pen.",
+              "The backpack holds a, laptop, a charger, a notebook and a pen."
+            ],
+            "misconceptionId": "WR-05-M1"
+          },
+          {
+            "id": "WR-05-PRE4",
+            "stage": "pre",
+            "prompt": "Rewrite the sentence adding commas where they are needed: \"Our class visited Rome Paris Berlin and Vienna.\"",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "list",
+                  "description": "Commas separate the list items",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "Rome,\\s+Paris,\\s+Berlin,?\\s+and Vienna"
+                  }
+                },
+                {
+                  "id": "andc",
+                  "description": "No comma straight after and",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\band\\s*,"
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Keeps a full stop at the end",
+                  "required": false,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s*$"
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Our class visited Rome, Paris, Berlin and Vienna.",
+              "Our class visited Rome, Paris, Berlin, and Vienna."
+            ],
+            "wrong": [
+              "Our class visited Rome Paris Berlin and Vienna.",
+              "Our class visited Rome, Paris, Berlin, and, Vienna."
+            ],
+            "misconceptionId": "WR-05-M2"
           }
         ],
         "post": [
@@ -2864,6 +4167,97 @@
               "Lina speaks Arabic, French, English, and, Spanish."
             ],
             "misconceptionId": "WR-05-M2"
+          },
+          {
+            "id": "WR-05-POST3",
+            "stage": "post",
+            "prompt": "Rewrite the sentence adding commas where they are needed: \"The recipe needs onions garlic tomatoes and basil.\"",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "list",
+                  "description": "Commas separate the list items",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "onions,\\s+garlic,\\s+tomatoes,?\\s+and basil"
+                  }
+                },
+                {
+                  "id": "andc",
+                  "description": "No comma straight after and",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\band\\s*,"
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Keeps a full stop at the end",
+                  "required": false,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s*$"
+                  }
+                }
+              ]
+            },
+            "right": [
+              "The recipe needs onions, garlic, tomatoes and basil."
+            ],
+            "wrong": [
+              "The recipe needs onions garlic tomatoes and basil.",
+              "The recipe needs onions, garlic, tomatoes, and, basil."
+            ],
+            "misconceptionId": "WR-05-M1"
+          },
+          {
+            "id": "WR-05-POST4",
+            "stage": "post",
+            "prompt": "Rewrite the sentence adding commas where they are needed: \"Tariq plays chess tennis squash and golf.\"",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "list",
+                  "description": "Commas separate the list items",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "chess,\\s+tennis,\\s+squash,?\\s+and golf"
+                  }
+                },
+                {
+                  "id": "andc",
+                  "description": "No comma straight after and",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\band\\s*,"
+                  }
+                },
+                {
+                  "id": "end",
+                  "description": "Keeps a full stop at the end",
+                  "required": false,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s*$"
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Tariq plays chess, tennis, squash and golf.",
+              "Tariq plays chess, tennis, squash, and golf."
+            ],
+            "wrong": [
+              "Tariq plays chess tennis squash and golf.",
+              "Tariq plays chess, tennis, squash, and, golf."
+            ],
+            "misconceptionId": "WR-05-M2"
           }
         ],
         "transfer": [
@@ -2955,6 +4349,97 @@
             "wrong": [
               "I am free on Monday Wednesday and Friday.",
               "I am free on Monday, Wednesday, and, Friday."
+            ],
+            "misconceptionId": "WR-05-M2"
+          },
+          {
+            "id": "WR-05-TR3",
+            "stage": "transfer",
+            "prompt": "You are at the supermarket. Write ONE sentence to text your mother that says you bought these four things, in this order: eggs, rice, tomatoes, soap. Use commas correctly.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "list",
+                  "description": "Commas separate eggs, rice, tomatoes and soap",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "eggs,\\s+rice,\\s+tomatoes,?\\s+and soap"
+                  }
+                },
+                {
+                  "id": "andc",
+                  "description": "No comma straight after and",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\band\\s*,"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 6 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 6
+                  }
+                }
+              ]
+            },
+            "right": [
+              "I bought eggs, rice, tomatoes and soap.",
+              "I got eggs, rice, tomatoes, and soap."
+            ],
+            "wrong": [
+              "I bought eggs rice tomatoes and soap.",
+              "I bought eggs, rice, tomatoes, and, soap."
+            ],
+            "misconceptionId": "WR-05-M1"
+          },
+          {
+            "id": "WR-05-TR4",
+            "stage": "transfer",
+            "prompt": "Write ONE sentence for a hotel review that lists three good things about the hotel. Use commas correctly.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "list",
+                  "description": "Lists three items with commas and and",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[A-Za-z]+,\\s+[A-Za-z ]+,?\\s+and\\s+[A-Za-z]+"
+                  }
+                },
+                {
+                  "id": "andc",
+                  "description": "No comma straight after and",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\band\\s*,"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 6 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 6
+                  }
+                }
+              ]
+            },
+            "right": [
+              "The hotel has a clean pool, friendly staff and a great breakfast."
+            ],
+            "wrong": [
+              "The hotel has a clean pool friendly staff and a great breakfast.",
+              "The hotel has a clean pool, friendly staff, and, a great breakfast."
             ],
             "misconceptionId": "WR-05-M2"
           }
@@ -3400,6 +4885,134 @@
               "Children should learn to swim."
             ],
             "misconceptionId": "WR-06-M2"
+          },
+          {
+            "id": "WR-06-PRE3",
+            "stage": "pre",
+            "prompt": "Write a paragraph of 3-5 sentences on this topic: Why people should walk to work. Your FIRST sentence must be a topic sentence that contains the word \"walk\".",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "topic",
+                  "description": "First sentence is a topic sentence with \"walk\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[^.!?]*walk[^.!?]*[.!?]"
+                  }
+                },
+                {
+                  "id": "support",
+                  "description": "Uses a supporting-detail marker",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(for example|for instance|because|also|another|in addition)\\b"
+                  }
+                },
+                {
+                  "id": "sent",
+                  "description": "At least three sentences",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "min",
+                  "description": "At least 25 words",
+                  "required": true,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 25
+                  }
+                },
+                {
+                  "id": "max",
+                  "description": "At most 100 words",
+                  "required": false,
+                  "check": {
+                    "kind": "maxWords",
+                    "n": 100
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Walking to work is a healthy choice for many people. It gives you exercise every day because you move for half an hour or more. For example, you can walk part of the way and take a bus for the rest. Also, you save money on petrol and tickets."
+            ],
+            "wrong": [
+              "I leave my flat at eight. The street is busy. For example, I pass a bakery. It smells nice.",
+              "People should walk to work."
+            ],
+            "misconceptionId": "WR-06-M1"
+          },
+          {
+            "id": "WR-06-PRE4",
+            "stage": "pre",
+            "prompt": "Write a paragraph of 3-5 sentences on this topic: Why a garden is good for a family. Your FIRST sentence must be a topic sentence that contains the word \"garden\".",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "topic",
+                  "description": "First sentence is a topic sentence with \"garden\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[^.!?]*garden[^.!?]*[.!?]"
+                  }
+                },
+                {
+                  "id": "support",
+                  "description": "Uses a supporting-detail marker",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(for example|for instance|because|also|another|in addition)\\b"
+                  }
+                },
+                {
+                  "id": "sent",
+                  "description": "At least three sentences",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "min",
+                  "description": "At least 25 words",
+                  "required": true,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 25
+                  }
+                },
+                {
+                  "id": "max",
+                  "description": "At most 100 words",
+                  "required": false,
+                  "check": {
+                    "kind": "maxWords",
+                    "n": 100
+                  }
+                }
+              ]
+            },
+            "right": [
+              "A garden is a great place for a family to spend time together. Children can play outside because there is space to run. For example, parents can have a picnic on the grass at weekends. A garden is also useful for growing fresh vegetables."
+            ],
+            "wrong": [
+              "My grandfather lives in a village. He has three cats. For example, one is white. They are lazy.",
+              "A garden is good for a family."
+            ],
+            "misconceptionId": "WR-06-M2"
           }
         ],
         "post": [
@@ -3530,6 +5143,134 @@
               "A dog is a good pet."
             ],
             "misconceptionId": "WR-06-M2"
+          },
+          {
+            "id": "WR-06-POST3",
+            "stage": "post",
+            "prompt": "Write a paragraph of 3-5 sentences on this topic: Why cycling is good for a city. Your FIRST sentence must be a topic sentence that contains the word \"cycl\".",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "topic",
+                  "description": "First sentence is a topic sentence with \"cycl\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[^.!?]*cycl[^.!?]*[.!?]"
+                  }
+                },
+                {
+                  "id": "support",
+                  "description": "Uses a supporting-detail marker",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(for example|for instance|because|also|another|in addition)\\b"
+                  }
+                },
+                {
+                  "id": "sent",
+                  "description": "At least three sentences",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "min",
+                  "description": "At least 25 words",
+                  "required": true,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 25
+                  }
+                },
+                {
+                  "id": "max",
+                  "description": "At most 100 words",
+                  "required": false,
+                  "check": {
+                    "kind": "maxWords",
+                    "n": 100
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Cycling makes a city cleaner and quieter. Bikes do not make smoke, so the air is fresher for everyone. For example, a street with bike lanes has fewer cars and less noise. Cycling is also cheap for families."
+            ],
+            "wrong": [
+              "I have a blue helmet. It was a present. For example, my sister has a red one. They are new.",
+              "Cycling is good for a city."
+            ],
+            "misconceptionId": "WR-06-M1"
+          },
+          {
+            "id": "WR-06-POST4",
+            "stage": "post",
+            "prompt": "Write a paragraph of 3-5 sentences on this topic: Why museums should be free. Your FIRST sentence must be a topic sentence that contains the word \"museum\".",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "topic",
+                  "description": "First sentence is a topic sentence with \"museum\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[^.!?]*museum[^.!?]*[.!?]"
+                  }
+                },
+                {
+                  "id": "support",
+                  "description": "Uses a supporting-detail marker",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(for example|for instance|because|also|another|in addition)\\b"
+                  }
+                },
+                {
+                  "id": "sent",
+                  "description": "At least three sentences",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "min",
+                  "description": "At least 25 words",
+                  "required": true,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 25
+                  }
+                },
+                {
+                  "id": "max",
+                  "description": "At most 100 words",
+                  "required": false,
+                  "check": {
+                    "kind": "maxWords",
+                    "n": 100
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Museums should be free for everyone who wants to visit them. Free tickets let poor families learn about history because they do not need to pay. For example, a student can come after school to see old tools and maps. Museums also become busier and more lively."
+            ],
+            "wrong": [
+              "Last month I went to the city. The train was late. For example, the station was crowded. It was tiring.",
+              "Museums should be free."
+            ],
+            "misconceptionId": "WR-06-M2"
           }
         ],
         "transfer": [
@@ -3658,6 +5399,134 @@
             "wrong": [
               "There are many cars in the centre. The roads are very busy. For example, the buses are full. It is noisy.",
               "A city needs more parks."
+            ],
+            "misconceptionId": "WR-06-M2"
+          },
+          {
+            "id": "WR-06-TR3",
+            "stage": "transfer",
+            "prompt": "You are writing for your school website. Write a paragraph of 3-5 sentences that tells visitors why your town is worth a trip. Your FIRST sentence must say the main idea and contain the word \"visit\".",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "topic",
+                  "description": "First sentence is a topic sentence with \"visit\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[^.!?]*visit[^.!?]*[.!?]"
+                  }
+                },
+                {
+                  "id": "support",
+                  "description": "Uses a supporting-detail marker",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(for example|for instance|because|also|another|in addition)\\b"
+                  }
+                },
+                {
+                  "id": "sent",
+                  "description": "At least three sentences",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "min",
+                  "description": "At least 25 words",
+                  "required": true,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 25
+                  }
+                },
+                {
+                  "id": "max",
+                  "description": "At most 100 words",
+                  "required": false,
+                  "check": {
+                    "kind": "maxWords",
+                    "n": 100
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Visitors will enjoy a trip to my town for many reasons. The old market sells fresh food because local farmers bring it every morning. For example, you can taste cheese and bread there. Also, the river path is lovely to walk along."
+            ],
+            "wrong": [
+              "I live near the sea. The streets are small. For example, my house is blue. It is nice.",
+              "Visitors will love my town."
+            ],
+            "misconceptionId": "WR-06-M1"
+          },
+          {
+            "id": "WR-06-TR4",
+            "stage": "transfer",
+            "prompt": "A new student asks you for advice. Write a paragraph of 3-5 sentences that explains how to prepare for an exam. Your FIRST sentence must say the main idea and contain the word \"exam\".",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "topic",
+                  "description": "First sentence is a topic sentence with \"exam\"",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[^.!?]*exam[^.!?]*[.!?]"
+                  }
+                },
+                {
+                  "id": "support",
+                  "description": "Uses a supporting-detail marker",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(for example|for instance|because|also|another|in addition)\\b"
+                  }
+                },
+                {
+                  "id": "sent",
+                  "description": "At least three sentences",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "min",
+                  "description": "At least 25 words",
+                  "required": true,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 25
+                  }
+                },
+                {
+                  "id": "max",
+                  "description": "At most 100 words",
+                  "required": false,
+                  "check": {
+                    "kind": "maxWords",
+                    "n": 100
+                  }
+                }
+              ]
+            },
+            "right": [
+              "A good plan helps you prepare well for an exam. Start early because you need time to repeat difficult topics. For example, you can study one subject each evening. It is also wise to rest the night before."
+            ],
+            "wrong": [
+              "Last week my friend had a test. He felt nervous. For example, he could not eat. It was a long day.",
+              "Prepare well for an exam."
             ],
             "misconceptionId": "WR-06-M2"
           }
@@ -4179,6 +6048,134 @@
               "She is green eyes and she has patient."
             ],
             "misconceptionId": "WR-07-M2"
+          },
+          {
+            "id": "WR-07-PRE3",
+            "stage": "pre",
+            "prompt": "Describe a classmate in TWO sentences. In one sentence write about hair or eyes, and in the other write about the personality.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "has",
+                  "description": "Uses has / has got with a feature (hair, eyes...)",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bhas\\b|\\bhas got\\b|'s got)[^.!?]*\\b(hair|eyes|beard|moustache|glasses|freckles)\\b"
+                  }
+                },
+                {
+                  "id": "is",
+                  "description": "Uses is / is with an adjective",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bis\\b|'s\\b)[^.!?]*\\b(tall|short|kind|funny|friendly|young|old|quiet|clever|shy|thin|slim|strong|cheerful|serious|polite|gentle|helpful|patient|lazy|brave|smart|nice)\\b"
+                  }
+                },
+                {
+                  "id": "err",
+                  "description": "No have/are/am error with he, she or it",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(he|she|it) (have|are|am)\\b|\\bis (hair|eyes|a beard)\\b|\\b(has|have) (is|are)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "My classmate has dark curly hair. She is clever and shy."
+            ],
+            "wrong": [
+              "My classmate have dark curly hair. She is clever.",
+              "She is dark curly hair. She has shy."
+            ],
+            "misconceptionId": "WR-07-M1"
+          },
+          {
+            "id": "WR-07-PRE4",
+            "stage": "pre",
+            "prompt": "Describe a football coach in TWO sentences. In one sentence write about hair or eyes, and in the other write about the personality.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "has",
+                  "description": "Uses has / has got with a feature (hair, eyes...)",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bhas\\b|\\bhas got\\b|'s got)[^.!?]*\\b(hair|eyes|beard|moustache|glasses|freckles)\\b"
+                  }
+                },
+                {
+                  "id": "is",
+                  "description": "Uses is / is with an adjective",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bis\\b|'s\\b)[^.!?]*\\b(tall|short|kind|funny|friendly|young|old|quiet|clever|shy|thin|slim|strong|cheerful|serious|polite|gentle|helpful|patient|lazy|brave|smart|nice)\\b"
+                  }
+                },
+                {
+                  "id": "err",
+                  "description": "No have/are/am error with he, she or it",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(he|she|it) (have|are|am)\\b|\\bis (hair|eyes|a beard)\\b|\\b(has|have) (is|are)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "The coach has blue eyes. He is strict but friendly."
+            ],
+            "wrong": [
+              "The coach have blue eyes. He is strict.",
+              "He is blue eyes. He has friendly."
+            ],
+            "misconceptionId": "WR-07-M2"
           }
         ],
         "post": [
@@ -4309,6 +6306,134 @@
               "She is curly hair. She has cheerful."
             ],
             "misconceptionId": "WR-07-M2"
+          },
+          {
+            "id": "WR-07-POST3",
+            "stage": "post",
+            "prompt": "Describe a postman in TWO sentences. In one sentence write about hair or eyes, and in the other write about the personality.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "has",
+                  "description": "Uses has / has got with a feature (hair, eyes...)",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bhas\\b|\\bhas got\\b|'s got)[^.!?]*\\b(hair|eyes|beard|moustache|glasses|freckles)\\b"
+                  }
+                },
+                {
+                  "id": "is",
+                  "description": "Uses is / is with an adjective",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bis\\b|'s\\b)[^.!?]*\\b(tall|short|kind|funny|friendly|young|old|quiet|clever|shy|thin|slim|strong|cheerful|serious|polite|gentle|helpful|patient|lazy|brave|smart|nice)\\b"
+                  }
+                },
+                {
+                  "id": "err",
+                  "description": "No have/are/am error with he, she or it",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(he|she|it) (have|are|am)\\b|\\bis (hair|eyes|a beard)\\b|\\b(has|have) (is|are)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "The postman has a grey moustache. He is polite and cheerful."
+            ],
+            "wrong": [
+              "The postman have a grey moustache. He is polite.",
+              "He is a grey moustache. He has polite."
+            ],
+            "misconceptionId": "WR-07-M1"
+          },
+          {
+            "id": "WR-07-POST4",
+            "stage": "post",
+            "prompt": "Describe a younger sister in TWO sentences. In one sentence write about hair or eyes, and in the other write about the personality.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "has",
+                  "description": "Uses has / has got with a feature (hair, eyes...)",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bhas\\b|\\bhas got\\b|'s got)[^.!?]*\\b(hair|eyes|beard|moustache|glasses|freckles)\\b"
+                  }
+                },
+                {
+                  "id": "is",
+                  "description": "Uses is / is with an adjective",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bis\\b|'s\\b)[^.!?]*\\b(tall|short|kind|funny|friendly|young|old|quiet|clever|shy|thin|slim|strong|cheerful|serious|polite|gentle|helpful|patient|lazy|brave|smart|nice)\\b"
+                  }
+                },
+                {
+                  "id": "err",
+                  "description": "No have/are/am error with he, she or it",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(he|she|it) (have|are|am)\\b|\\bis (hair|eyes|a beard)\\b|\\b(has|have) (is|are)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "My sister has big brown eyes. She is funny and brave."
+            ],
+            "wrong": [
+              "My sister have big brown eyes. She is funny.",
+              "She is big brown eyes. She has funny."
+            ],
+            "misconceptionId": "WR-07-M2"
           }
         ],
         "transfer": [
@@ -4437,6 +6562,134 @@
             "wrong": [
               "The shop assistant have glasses. She is polite.",
               "She is glasses and she are polite."
+            ],
+            "misconceptionId": "WR-07-M2"
+          },
+          {
+            "id": "WR-07-TR3",
+            "stage": "transfer",
+            "prompt": "A child is lost in a shopping centre. Write TWO sentences for the announcement: one about the child's hair or eyes, and one about height or age.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "has",
+                  "description": "Uses has / has got with a feature (hair, eyes...)",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bhas\\b|\\bhas got\\b|'s got)[^.!?]*\\b(hair|eyes|beard|moustache|glasses|freckles)\\b"
+                  }
+                },
+                {
+                  "id": "is",
+                  "description": "Uses is / is with an adjective",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bis\\b|'s\\b)[^.!?]*\\b(tall|short|kind|funny|friendly|young|old|quiet|clever|shy|thin|slim|strong|cheerful|serious|polite|gentle|helpful|patient|lazy|brave|smart|nice)\\b"
+                  }
+                },
+                {
+                  "id": "err",
+                  "description": "No have/are/am error with he, she or it",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(he|she|it) (have|are|am)\\b|\\bis (hair|eyes|a beard)\\b|\\b(has|have) (is|are)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "The boy has red hair. He is short and very young."
+            ],
+            "wrong": [
+              "The boy have red hair. He is short.",
+              "He is red hair. He has young."
+            ],
+            "misconceptionId": "WR-07-M1"
+          },
+          {
+            "id": "WR-07-TR4",
+            "stage": "transfer",
+            "prompt": "Your cousin is arriving at the airport and your friend will meet him or her. Write TWO sentences to help your friend recognise your cousin: one about hair or glasses, and one about height or character.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "cap",
+                  "description": "Starts with a capital letter",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "^\\s*[A-Z]",
+                    "flags": ""
+                  }
+                },
+                {
+                  "id": "has",
+                  "description": "Uses has / has got with a feature (hair, eyes...)",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bhas\\b|\\bhas got\\b|'s got)[^.!?]*\\b(hair|eyes|beard|moustache|glasses|freckles)\\b"
+                  }
+                },
+                {
+                  "id": "is",
+                  "description": "Uses is / is with an adjective",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "(\\bis\\b|'s\\b)[^.!?]*\\b(tall|short|kind|funny|friendly|young|old|quiet|clever|shy|thin|slim|strong|cheerful|serious|polite|gentle|helpful|patient|lazy|brave|smart|nice)\\b"
+                  }
+                },
+                {
+                  "id": "err",
+                  "description": "No have/are/am error with he, she or it",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(he|she|it) (have|are|am)\\b|\\bis (hair|eyes|a beard)\\b|\\b(has|have) (is|are)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "My cousin has short brown hair and glasses. He is tall and quiet."
+            ],
+            "wrong": [
+              "My cousin have short brown hair. He is tall.",
+              "She is short brown hair. She has tall."
             ],
             "misconceptionId": "WR-07-M2"
           }
@@ -4958,6 +7211,114 @@
               "I want a job at your shop."
             ],
             "misconceptionId": "WR-08-M2"
+          },
+          {
+            "id": "WR-08-PRE3",
+            "stage": "pre",
+            "prompt": "Rewrite this message in formal English for an email: \"Hi, u forgot to pay me for last week! Can u check pls?\" (to your employer)",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "formal",
+                  "description": "Contains a polite formal phrase",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(could|would|may) (you|I)\\b|\\bI (would|should) (be grateful|appreciate|like to)\\b|\\bI am (writing to|interested in)\\b|\\bI wish to\\b"
+                  }
+                },
+                {
+                  "id": "slang",
+                  "description": "No slang, abbreviations or exclamation marks",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(hey|hi|yo|u|ur|pls|thx|thanks|asap|gonna|wanna|gotta|gimme|guys|mate|cheers|ok|okay|rubbish|sorry|mum)\\b|!"
+                  }
+                },
+                {
+                  "id": "contr",
+                  "description": "No contractions",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b\\w+['’](t|ll|d|m|re|ve)\\b|\\b(it|that|there|here|what|he|she|let)['’]s\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Dear Mr Evans, I am writing to ask about my payment for last week. Could you please check it?"
+            ],
+            "wrong": [
+              "Hi, u forgot to pay me for last week! Can u check pls?",
+              "I want my money for last week."
+            ],
+            "misconceptionId": "WR-08-M1"
+          },
+          {
+            "id": "WR-08-PRE4",
+            "stage": "pre",
+            "prompt": "Rewrite this message in formal English for an email: \"Gonna be late tmrw, got a dentist thing. Is that ok?\" (to your manager)",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "formal",
+                  "description": "Contains a polite formal phrase",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(could|would|may) (you|I)\\b|\\bI (would|should) (be grateful|appreciate|like to)\\b|\\bI am (writing to|interested in)\\b|\\bI wish to\\b"
+                  }
+                },
+                {
+                  "id": "slang",
+                  "description": "No slang, abbreviations or exclamation marks",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(hey|hi|yo|u|ur|pls|thx|thanks|asap|gonna|wanna|gotta|gimme|guys|mate|cheers|ok|okay|rubbish|sorry|mum)\\b|!"
+                  }
+                },
+                {
+                  "id": "contr",
+                  "description": "No contractions",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b\\w+['’](t|ll|d|m|re|ve)\\b|\\b(it|that|there|here|what|he|she|let)['’]s\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Dear Ms Hart, I would like to inform you that I will arrive late tomorrow because of a dental appointment. Would that be acceptable?"
+            ],
+            "wrong": [
+              "Gonna be late tmrw, got a dentist thing. Is that ok?",
+              "I will be late tomorrow."
+            ],
+            "misconceptionId": "WR-08-M2"
           }
         ],
         "post": [
@@ -5068,6 +7429,114 @@
               "I will not come. I am ill."
             ],
             "misconceptionId": "WR-08-M2"
+          },
+          {
+            "id": "WR-08-POST3",
+            "stage": "post",
+            "prompt": "Rewrite this message in formal English for an email: \"Mate, the wifi in my room is broken. Fix it asap!\" (to hotel reception)",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "formal",
+                  "description": "Contains a polite formal phrase",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(could|would|may) (you|I)\\b|\\bI (would|should) (be grateful|appreciate|like to)\\b|\\bI am (writing to|interested in)\\b|\\bI wish to\\b"
+                  }
+                },
+                {
+                  "id": "slang",
+                  "description": "No slang, abbreviations or exclamation marks",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(hey|hi|yo|u|ur|pls|thx|thanks|asap|gonna|wanna|gotta|gimme|guys|mate|cheers|ok|okay|rubbish|sorry|mum)\\b|!"
+                  }
+                },
+                {
+                  "id": "contr",
+                  "description": "No contractions",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b\\w+['’](t|ll|d|m|re|ve)\\b|\\b(it|that|there|here|what|he|she|let)['’]s\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Dear Sir or Madam, I am writing to report that the wifi in my room is not working. Could you please repair it?"
+            ],
+            "wrong": [
+              "Mate, the wifi in my room is broken. Fix it asap!",
+              "Fix the wifi in my room."
+            ],
+            "misconceptionId": "WR-08-M1"
+          },
+          {
+            "id": "WR-08-POST4",
+            "stage": "post",
+            "prompt": "Rewrite this message in formal English for an email: \"Hey, we wanna book a table for six on Friday. Is 8 ok?\" (to a restaurant)",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "formal",
+                  "description": "Contains a polite formal phrase",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(could|would|may) (you|I)\\b|\\bI (would|should) (be grateful|appreciate|like to)\\b|\\bI am (writing to|interested in)\\b|\\bI wish to\\b"
+                  }
+                },
+                {
+                  "id": "slang",
+                  "description": "No slang, abbreviations or exclamation marks",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(hey|hi|yo|u|ur|pls|thx|thanks|asap|gonna|wanna|gotta|gimme|guys|mate|cheers|ok|okay|rubbish|sorry|mum)\\b|!"
+                  }
+                },
+                {
+                  "id": "contr",
+                  "description": "No contractions",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b\\w+['’](t|ll|d|m|re|ve)\\b|\\b(it|that|there|here|what|he|she|let)['’]s\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Dear Sir or Madam, I would like to reserve a table for six on Friday evening. Would eight oclock be possible?"
+            ],
+            "wrong": [
+              "Hey, we wanna book a table for six on Friday. Is 8 ok?",
+              "I want a table for six on Friday."
+            ],
+            "misconceptionId": "WR-08-M2"
           }
         ],
         "transfer": [
@@ -5168,6 +7637,105 @@
             "wrong": [
               "The food was rubbish and the waiter was rude. I want a refund now!",
               "I want a refund."
+            ],
+            "misconceptionId": "WR-08-M2"
+          },
+          {
+            "id": "WR-08-TR3",
+            "stage": "transfer",
+            "prompt": "Write a FORMAL message of 2 sentences to your new manager. Ask if you can start work half an hour later on Mondays.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "formal",
+                  "description": "Contains a polite formal phrase",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(could|would|may) (you|I)\\b|\\bI (would|should) (be grateful|appreciate|like to)\\b|\\bI am (writing to|interested in)\\b|\\bI wish to\\b"
+                  }
+                },
+                {
+                  "id": "slang",
+                  "description": "No slang, abbreviations or exclamation marks",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(hey|hi|yo|u|ur|pls|thx|thanks|asap|gonna|wanna|gotta|gimme|guys|mate|cheers|ok|okay|rubbish|sorry|mum)\\b|!"
+                  }
+                },
+                {
+                  "id": "contr",
+                  "description": "No contractions",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b\\w+['’](t|ll|d|m|re|ve)\\b|\\b(it|that|there|here|what|he|she|let)['’]s\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 8 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 8
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Dear Mr Khan, I would like to ask whether I could start work later on Mondays. Would half past nine be possible?"
+            ],
+            "wrong": [
+              "Hi Mr Khan, can I start later on Mondays? Thx!",
+              "I want to start later on Mondays."
+            ],
+            "misconceptionId": "WR-08-M1"
+          },
+          {
+            "id": "WR-08-TR4",
+            "stage": "transfer",
+            "prompt": "Write a short INFORMAL text message to a friend. Invite the friend to the cinema tonight.",
+            "scoring": {
+              "type": "rubric",
+              "checks": [
+                {
+                  "id": "inf",
+                  "description": "Contains an informal marker (can I/can you, thanks, hey, a contraction or !)",
+                  "required": true,
+                  "check": {
+                    "kind": "regex",
+                    "pattern": "\\b(can you|can I|thanks|thx|cheers|hey|hi|pls|sorry|gonna)\\b|!|\\b\\w+['’](t|ll|d|m|re|ve)\\b"
+                  }
+                },
+                {
+                  "id": "formal",
+                  "description": "No formal phrasing",
+                  "required": true,
+                  "check": {
+                    "kind": "notRegex",
+                    "pattern": "\\b(grateful|appreciate|kindly|regret|inform|shall|unable|attend|if you could|I would)\\b"
+                  }
+                },
+                {
+                  "id": "len",
+                  "description": "At least 5 words",
+                  "required": false,
+                  "check": {
+                    "kind": "minWords",
+                    "n": 5
+                  }
+                }
+              ]
+            },
+            "right": [
+              "Hey, do you want to see a film tonight? It starts at eight!"
+            ],
+            "wrong": [
+              "I would like to invite you to the cinema this evening.",
+              "Dear Sam, would you like to attend the cinema tonight?"
             ],
             "misconceptionId": "WR-08-M2"
           }
