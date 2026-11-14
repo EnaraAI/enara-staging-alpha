@@ -210,6 +210,7 @@ export const AdminSidebar: React.FC<{
     { id: 'outcomes', label: 'Outcomes', icon: Milestone },
     // P5: Workspace Admin only (workspace:billing); hidden for teachers.
     { id: 'people', label: 'People', icon: Users, workspaceAdminOnly: true },
+    { id: 'age-bands', label: 'Learner Age Bands', icon: Users, workspaceAdminOnly: true },
     { id: 'usage', label: 'Usage', icon: Gauge, workspaceAdminOnly: true },
     { id: 'savings', label: 'AI Savings Center', icon: PiggyBank, workspaceAdminOnly: true },
     { id: 'learning-events', label: 'Learning Events', icon: ListChecks },

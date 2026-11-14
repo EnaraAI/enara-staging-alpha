@@ -119,7 +119,34 @@ export const getAiUsage = asyncHandler(async (req: AuthRequest, res: Response) =
       const { costUsd: _c, unpricedCalls: _u, ...rest } = o;
       return rest;
     };
-    res.json({ days, since: since.toISOString(), totals: strip(totals), byFeature: byFeature.map(strip) });
+    // Schools see usage per feature, never which provider model served it:
+    // rows of the same feature are merged.
+    const perFeature = new Map<string, (typeof byFeature)[number]>();
+    for (const g of byFeature) {
+      const had = perFeature.get(g.feature);
+      if (!had) {
+        perFeature.set(g.feature, { ...g });
+        continue;
+      }
+      const calls = had.calls + g.calls;
+      const firstTokenCalls = (had.avgFirstTokenMs == null ? 0 : had.calls) + (g.avgFirstTokenMs == null ? 0 : g.calls);
+      perFeature.set(g.feature, {
+        ...had,
+        calls,
+        errors: had.errors + g.errors,
+        refusals: had.refusals + g.refusals,
+        inputTokens: had.inputTokens + g.inputTokens,
+        outputTokens: had.outputTokens + g.outputTokens,
+        cacheReadTokens: had.cacheReadTokens + g.cacheReadTokens,
+        characters: had.characters + g.characters,
+        avgLatencyMs: Math.round((had.avgLatencyMs * had.calls + g.avgLatencyMs * g.calls) / calls),
+        avgFirstTokenMs: firstTokenCalls
+          ? Math.round(((had.avgFirstTokenMs ?? 0) * (had.avgFirstTokenMs == null ? 0 : had.calls) + (g.avgFirstTokenMs ?? 0) * (g.avgFirstTokenMs == null ? 0 : g.calls)) / firstTokenCalls)
+          : null,
+      });
+    }
+    const schoolRows = [...perFeature.values()].map(({ model: _m, ...row }) => strip(row));
+    res.json({ days, since: since.toISOString(), totals: strip(totals), byFeature: schoolRows });
     return;
   }
   res.json({ days, since: since.toISOString(), totals, byFeature, costIsEstimate: true, costIsComplete: totals.unpricedCalls === 0 });

@@ -1,0 +1,434 @@
+--- ../remed2/languageTeachingContext.ts	2026-11-09 14:23:25.783532609 +0000
++++ backend/src/services/languageTeachingContext.ts	2026-11-09 14:34:56.752439573 +0000
+@@ -4,6 +4,23 @@
+ import { Student } from '../models/Student';
+ import { isLearnerAgeBand } from '../models/learnerAgeBand';
+ import { logger, serializeError } from '../utils/logging';
++import {
++  contrastPairClaimMismatch,
++  deriveLearningState,
++  evaluateAgainstKey,
++  hintInstruction,
++  isFailure,
++  isSuccess,
++  learnerQuoteMismatches,
++  possibleAnswerLeak,
++  selectHintLevel,
++  type ActiveItemRef,
++  type AnswerVerdict,
++  type Assessment,
++  type LearningState,
++  type LessonItem,
++  type StoredLearningFields,
++} from './languageLearningState';
+ 
+ // Language Teaching Context Engine (Phase 1, ltc-v1). For language courses only:
+ // a labelled learner and lesson context, deterministic per-turn teaching moves,
+@@ -23,9 +40,14 @@
+ // only from a trusted runtime source, none of which exists yet), minor-slip and
+ // self-correction triage, progression after confirmed success, evaluation of a
+ // volunteered first sentence (record vs current evidence), revised r2 wording.
+-export const LANGUAGE_POLICY_REVISION = 'ltc-v1-r3-ab1';
+-// Option B adds the trusted student/class age band to the r3 resolver; the
+-// teaching policy (moves, wording, length tables) is unchanged from r3.
++// Option B (ab1) added the trusted student/class age band to the r3 resolver.
++// r4 (LTB diagnostic 2026-11-09, full remediation): structured learning state
++// (answer verdicts from the lesson answer key or a hidden tutor assessment, not
++// from reply prose), item-scoped graduated hints with must-not-reveal rules,
++// answer-class progression (credit what was shown, never re-test it), lesson
++// items delivered to the tutor, corrected strategy-shift wording, and grounding
++// rules for quotes, attribution and rule-example consistency.
++export const LANGUAGE_POLICY_REVISION = 'ltc-v1-r4';
+ 
+ export type KnowledgeStatus = 'known' | 'inferred' | 'not_assessed' | 'unknown';
+ 
+@@ -100,6 +122,9 @@
+   functions?: string[];
+   skills?: string[];
+   examples?: string[];
++  // r4: exercises from the course. Only id and prompt ever reach the model;
++  // accepted answers and target forms stay server-side (answer key, telemetry).
++  items?: LessonItem[];
+ }
+ 
+ export interface LanguageLessonContext {
+@@ -172,6 +197,18 @@
+   confirmedSuccessStreak?: number;
+   // A first message that is the learner's own sentence (not a request): evaluated as an answer.
+   unpromptedSentence?: boolean;
++  // r4: structured state derived from this session's stored turns.
++  learning?: LearningState;
++  exerciseRequest?: boolean;
++  // Deterministic answer-key verdict for this message against the active lesson item.
++  keyVerdict?: AnswerVerdict | null;
++  // Ceiling for support in this reply (1-6), item-scoped.
++  hintLevel?: number;
++  activeLessonItem?: LessonItem;
++  // The lesson item the engine asks the tutor to present in this reply, if any.
++  presentLessonItem?: LessonItem;
++  // The next unsatisfied lesson item after the active one.
++  nextLessonItem?: LessonItem;
+ }
+ 
+ export type MoveId =
+@@ -192,7 +229,9 @@
+   | 'distinct_example'
+   | 'redirect_to_lesson'
+   // r2
+-  | 'general_practice';
++  | 'general_practice'
++  // r4
++  | 'present_lesson_item';
+ 
+ export interface SelectedMove {
+   id: MoveId;
+@@ -247,6 +286,17 @@
+   // r3
+   ageBandStatus?: string;
+   confirmedSuccessStreak?: number;
++  // r4 (pre-reply)
++  hintLevelOffered?: number;
++  activeItemBefore?: ActiveItemRef | null;
++  keyVerdict?: string;
++  presentedLessonItemId?: string;
++  // r4 (post-reply, see finalizeLanguageTurn)
++  assessment?: Assessment;
++  activeItem?: ActiveItemRef | null;
++  hintLevel?: number;
++  qualityFlags?: string[];
++  markerStatus?: 'ok' | 'missing' | 'malformed';
+ }
+ 
+ // ---------------------------------------------------------------------------
+@@ -356,10 +406,36 @@
+     functions: clean(s.functions),
+     skills: clean(s.skills)?.filter((k) => ['listening', 'speaking', 'reading', 'writing', 'integrated'].includes(k)),
+     examples: clean(s.examples),
++    items: cleanItems(s.items),
+   };
+   return Object.values(out).some((v) => v?.length) ? out : undefined;
+ }
+ 
++// r4: lesson items (exercises). Ids are short tokens; prompts and answers capped.
++const ITEM_ID = /^[A-Za-z0-9_-]{1,40}$/;
++function cleanItems(list: unknown): LessonItem[] | undefined {
++  if (!Array.isArray(list)) return undefined;
++  const out: LessonItem[] = [];
++  const seen = new Set<string>();
++  for (const raw of list.slice(0, LIST_LIMIT)) {
++    if (!raw || typeof raw !== 'object') continue;
++    const r = raw as Record<string, unknown>;
++    const id = typeof r.id === 'string' ? r.id.trim() : '';
++    const prompt = typeof r.prompt === 'string' ? r.prompt.trim().slice(0, 300) : '';
++    if (!ITEM_ID.test(id) || !prompt || seen.has(id)) continue;
++    seen.add(id);
++    const criteria = Array.isArray(r.criteria) ? [...new Set(r.criteria.filter((n): n is number => Number.isInteger(n) && n >= 1 && n <= 20))] : [];
++    out.push({
++      id,
++      prompt,
++      ...(clean(r.acceptedAnswers) ? { acceptedAnswers: clean(r.acceptedAnswers)!.slice(0, 10) } : {}),
++      ...(clean(r.targetForms) ? { targetForms: clean(r.targetForms)!.map((f) => f.slice(0, 40)).slice(0, 10) } : {}),
++      ...(criteria.length ? { criteria } : {}),
++    });
++  }
++  return out.length ? out : undefined;
++}
++
+ export function deriveLessonContext(chapter: { id: string; title?: string; description?: string; languageSpec?: unknown } | undefined, courseTitle?: string): LanguageLessonContext {
+   if (!chapter) return { status: 'none', courseTitle };
+   const spec = sanitizeLanguageSpec(chapter.languageSpec);
+@@ -449,7 +525,7 @@
+   return undefined;
+ }
+ 
+-type Turn = { role: 'user' | 'assistant'; content: string };
++type Turn = { role: 'user' | 'assistant'; content: string; languageTurn?: StoredLearningFields | null };
+ 
+ // Classify a learner message against the task the tutor left open, if any.
+ export function classifyLearnerResponse(text: string, pending: InvitationKind | undefined, offTopic?: OffTopicKind): LearnerResponseKind {
+@@ -605,6 +681,9 @@
+ // Words that make a first message a request about language, not a sentence to evaluate.
+ const META_REQUEST = /\b(know|word|words|say|mean|meaning|help|explain|example|exercise|practi[cs]e|learn|teach|lesson|answer|question|homework)\b/i;
+ 
++// r4: the learner asks for an exercise or the next item (only when it isn't an answer).
++const EXERCISE_REQUEST = /\b(exercise|practice question|quiz me|test me)\b|\b(give me|can i have|i want|let'?s (do|try)|another|one more|next)\b[^.?!]{0,30}\b(exercise|question|task|item|one)\b|تمرين|سؤال/i;
++
+ export function detectTurnSignals(message: string, history: Turn[], lesson?: { title?: string; spec?: LanguageSpec }): TurnSignals {
+   const text = message.trim();
+   const learner = [...history.filter((h) => h.role === 'user').map((h) => h.content), text].slice(-3);
+@@ -612,7 +691,10 @@
+   // The learner's first message (a tutor greeting before it doesn't count).
+   const firstTurn = !history.some((h) => h.role === 'user');
+   // A session greeting before the learner's first message is not a task.
+-  const pendingTask = firstTurn ? undefined : taskInvitation(lastAssistant);
++  // r4: when the previous reply's stored state says a task is still open (an
++  // active item), that counts even if its wording has no recognisable invitation.
++  const lastStored = [...history].reverse().find((h) => h.role === 'assistant')?.languageTurn;
++  const pendingTask = firstTurn ? undefined : taskInvitation(lastAssistant) ?? (lastStored?.activeItem ? 'instruction' : undefined);
+   const offTopic = offTopicKind(text, lesson);
+   const learnerResponse = classifyLearnerResponse(text, pendingTask, offTopic);
+   return {
+@@ -632,9 +714,35 @@
+     exampleRequest: learnerResponse === 'example_request',
+     offTopic,
+     ...r2Signals(text, history, learnerResponse, lesson, firstTurn, offTopic),
++    ...r4Signals(text, history, learnerResponse, lesson),
+   };
+ }
+ 
++// r4: structured learning state, lesson items and the hint ceiling for this turn.
++function r4Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined): Partial<TurnSignals> {
++  const learning = deriveLearningState(history);
++  const items = lesson?.spec?.items ?? [];
++  const activeLessonItem = learning.activeItem?.lessonItemId ? items.find((i) => i.id === learning.activeItem!.lessonItemId) : undefined;
++  const unsatisfied = items.filter((i) => !learning.satisfiedLessonItems.includes(i.id));
++  const nextLessonItem = unsatisfied.find((i) => i.id !== activeLessonItem?.id);
++  const exerciseRequest = learnerResponse !== 'answer' && learnerResponse !== 'answer_request' && EXERCISE_REQUEST.test(text);
++  // Asked for an exercise: the open lesson item if one is still unanswered, else the next one.
++  const presentLessonItem = exerciseRequest ? (activeLessonItem && unsatisfied.includes(activeLessonItem) ? activeLessonItem : nextLessonItem) : undefined;
++  const attempts = attemptsOnCurrentTask(history);
++  const hintLevel = selectHintLevel(learning, {
++    answerRequestBeforeAttempt: learnerResponse === 'answer_request' && attempts === 0,
++    dontKnowOrConfused: learnerResponse === 'dont_know' || learnerResponse === 'confusion',
++    newItem: !learning.activeItem,
++  });
++  const out: Partial<TurnSignals> = { learning, exerciseRequest, hintLevel, keyVerdict: learnerResponse === 'answer' ? evaluateAgainstKey(text, activeLessonItem) : null };
++  if (activeLessonItem) out.activeLessonItem = activeLessonItem;
++  if (presentLessonItem) out.presentLessonItem = presentLessonItem;
++  if (nextLessonItem) out.nextLessonItem = nextLessonItem;
++  // Structured success state replaces the prose reading whenever it exists.
++  if (learnerResponse === 'answer' && learning.previousStructured) out.confirmedSuccessStreak = learning.successStreak;
++  return out;
++}
++
+ function r2Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, firstTurn: boolean, offTopic?: OffTopicKind): Partial<TurnSignals> {
+   const out: Partial<TurnSignals> = {};
+   if (learnerResponse === 'answer') {
+@@ -699,6 +807,7 @@
+   const missing = missingContext({ targetLanguage: input.targetLanguage, lessonStatus: input.lessonStatus, signals: s });
+   const clarifying = s.offTopic !== 'unrelated' && missing.length > 0 && !s.goalAsked && (s.firstTurn || s.vague);
+   if (clarifying) add('clarify_goal', [`missing_${missing[0]}`], ['LTC-D13']);
++  else if (s.presentLessonItem && s.offTopic !== 'unrelated') add('present_lesson_item', [`lesson_item_${s.presentLessonItem.id}`, s.firstTurn ? 'exercise_requested_first_turn' : 'exercise_requested'], ['LTC-D5']);
+   else if (s.firstTurn && !s.unpromptedSentence && (input.lessonStatus === 'structured' || (input.lessonStatus === 'unstructured' && s.vague)) && !s.helpRequest && !s.answerRequest && !s.exampleRequest && s.offTopic !== 'unrelated') add('activate_prior_knowledge', [s.vague ? 'vague_message_lesson_known' : 'first_turn_with_lesson_spec'], ['LTC-D3']);
+   if (input.lessonStatus === 'none' && s.goalAsked && s.goalAmbiguous && s.offTopic !== 'unrelated' && !s.helpRequest) add('general_practice', ['goal_answer_ambiguous'], ['LTC-D13']);
+ 
+@@ -749,7 +858,7 @@
+   // open, an example request is an ordinary request for a model and explanation.
+   if (s.exampleRequest && s.pendingTask) add('distinct_example', ['example_requested_task_open'], ['LTC-D3']);
+   const exampleNoTask = Boolean(s.exampleRequest && !s.pendingTask);
+-  const supportOnly = hintFirst || s.dontKnow || s.hintRequest || s.repeatRequest || offTopic || clarifying || s.unpromptedSentence;
++  const supportOnly = hintFirst || s.dontKnow || s.hintRequest || s.repeatRequest || offTopic || clarifying || s.unpromptedSentence || Boolean(s.presentLessonItem);
+   if (s.helpRequest || exampleNoTask || (novice && !s.answeringCheck && !s.vague && !supportOnly)) add('short_explanation', [s.helpRequest ? 'help_requested' : exampleNoTask ? 'example_requested' : 'novice_level'], ['LTC-D3']);
+   if (s.confusionCount === 1 || (input.hintsOnly && !s.answerRequest)) add('scaffold_hint', [s.confusionCount === 1 ? 'confusion_signal' : 'hints_only_policy'], ['LTC-D6']);
+   const feedbackTurn = moves.some((m) => ['corrective_feedback_retry', 'reteach_simpler'].includes(m.id) && m.reasons.some((r) => r.startsWith('answer_to_') || r.startsWith('repeated_') || r === 'unprompted_learner_sentence'));
+@@ -786,7 +895,7 @@
+   short_explanation: 'Give a short, direct explanation with one example in context. Do not answer with only questions.',
+   comprehension_check: 'End with one short, focused check (a question or a mini task) tied to the lesson objective.',
+   corrective_feedback_retry:
+-    'They are answering your task: say specifically what is right and what is wrong in their answer (quote the part). First decide whether it is essentially correct: if the only issues are small surface slips (a capital letter, punctuation, spelling of a word that is not the lesson target) or they already corrected themselves, confirm it clearly, mention the slip in a few words at most, and move on to the next step, with no reteaching and no retry. Otherwise keep what is correct; if there are several errors, focus on the one that matters most for meaning and for this lesson\'s target, and mention small slips briefly or not at all; if something is wrong, give one hint aimed only at the gap and ask them to try again before you show the correct form; for strong learners a brief correct reformulation is enough. Never call one correct answer mastery.',
++    'They are answering a task. Classify their answer against the lesson objective, not only the exact wording of your task: correct; correct in different but valid words (accept it); correct but for a different item (credit what it shows, and ask only about a part of the objective it does not show yet, once); correct but unrelated to the task (acknowledge it briefly and restate the task once; it is not evidence for the objective); partly correct; incorrect; or unclear (ask one short question instead of guessing). First decide whether it is essentially correct: if the only issues are small surface slips (a capital letter, punctuation, spelling of a word that is not the lesson target) or they already corrected themselves, confirm it clearly, mention the slip in a few words at most, and move on to the next step, with no reteaching and no retry. Never ask them to redo something they have already shown correctly. Otherwise keep what is correct and quote it exactly; if there are several errors, focus on the one that matters most for meaning and for this lesson\'s target, and mention small slips briefly or not at all; if something is wrong, give one hint aimed only at the gap, at the support level stated below, and ask them to try again before you show the correct form; for strong learners a brief correct reformulation is enough. Never call one correct answer mastery.',
+   scaffold_hint: 'Give a hint matched to their last reply (one step), not the full answer.',
+   restate_task: 'They did not understand the task: restate it in one simpler line and show the format with a different example (not the answer). Then ask them to try.',
+   distinct_example: 'They asked for an example: give a new example of the same pattern that is different from their current exercise, so the exercise answer stays theirs to find.',
+@@ -797,6 +906,8 @@
+   answer_with_reasoning: 'They asked for the answer: give it with the reason in one or two sentences, then one similar item for them to try.',
+   fade_support: 'They are strong: answer directly at their level with precise terms; no beginner tables, basic definitions or step-by-step scaffolds unless they ask; use fewer hints and offer a harder variant or a nuance instead.',
+   independent_practice: 'Offer a short independent task (e.g. write two sentences using the target form) rather than more explanation.',
++  present_lesson_item:
++    'They asked for an exercise: present the lesson item given below exactly as written (you may add one short line of instruction or a reminder of the pattern using a different example, never this item\'s answer). Don\'t write your own exercise instead, and don\'t answer it for them.',
+ };
+ 
+ // r1: variants of the hint move by why it was chosen.
+@@ -819,7 +930,7 @@
+       return 'Ask one short question to find out what they want to practise (a topic or a skill), offering at most three short options in a few words each. Don\'t start a task, give a model sentence or explain anything yet, and don\'t name any chapter or lesson from the course outline as theirs.';
+   }
+   if (m.id === 'reteach_simpler' && m.reasons.includes('repeated_misconception_strategy_shift')) {
+-    return 'They made the same mistake again after your feedback. Don\'t repeat your earlier explanation and don\'t give the corrected sentence. Change approach: a contrasting pair on a different example that differs only in the point they keep missing, or one smaller step, or one question that pinpoints the confusion. Then ask them to try their own sentence again.';
++    return 'They made the same mistake again after your feedback. Don\'t repeat your earlier explanation and don\'t give the corrected sentence. Change approach: a contrasting pair on a different example (never one whose second line is the answer to their item), saying accurately what changes between the two lines (don\'t claim that only one thing changes unless that is literally true); or one smaller step; or one question that pinpoints the confusion. Then ask them to try their own sentence again.';
+   }
+   if (m.id === 'answer_with_reasoning' && m.reasons.includes('repeated_after_strategy_shift_model_then_transfer')) {
+     return 'The same mistake survived a change of approach. Now show the correct form of their sentence with a one-line reason, then give one fresh similar item (a different sentence) for them to try.';
+@@ -899,6 +1010,53 @@
+ const factLine = (label: string, f: Fact<string>) =>
+   `- ${label}: ${f.value ?? '(not known)'} [${f.status}${f.status === 'known' ? '' : `; source: ${f.source}`}]`;
+ 
++// r4: grounding, quoting and rule-example consistency (diagnostic B3/B4).
++export const GROUNDING_RULES =
++  'Grounding: keep three things apart: the course content above, what the learner actually wrote in this chat, and your own examples (present yours as examples). Quote the learner\'s words exactly or not at all, and never say they wrote, answered, did or already know something that is not in their own messages. Every example you give for a rule must follow that rule; don\'t use a negative or a question as an example of an affirmative rule; say "always", "only" or "never" about English only when it is literally true, and say "usually" when you are not sure.';
++
++// r4: the structured verdict the server reads and strips (never shown to the learner).
++export const ASSESSMENT_INSTRUCTION =
++  'Start your reply with one hidden line in exactly this format (the server removes it before the learner sees anything): [[assess verdict=V relevance=R criteria=N,N next=X item=ID]] where V is CORRECT, CORRECT_WITH_EQUIVALENT_FORMULATION, PARTIALLY_CORRECT, INCORRECT, AMBIGUOUS, or NOT_EVALUATED (their message is not an answer); R is ACTIVE_ITEM (answers the open task), OTHER_ITEM (answers a different item of this lesson), UNRELATED, or NO_ACTIVE_ITEM; criteria lists the numbers of the success criteria their own text shows correctly (leave it out if none); X is NEW_ITEM (your reply gives them a new task), SAME_ITEM (asks them to try the same task again) or NONE; item is the lesson item id when you present one (leave it out otherwise). Then write your reply as usual.';
++
++// For hints and when to show answers, the item-scoped support level overrides
++// other tutoring guidance (verified textual conflict: the direct-instruction
++// strategy says "model one complete example", which can reveal an item's answer).
++const SUPPORT_PRECEDENCE = 'For hints and when to show an answer, the support level below takes precedence over any other tutoring guidance you were given.';
++
++function criteriaLines(criteria: string[] | undefined, learning?: LearningState): string[] {
++  if (!criteria?.length) return [];
++  const status = (n: number) => (learning?.criteria[n] === 'independent' ? ' (shown on their own)' : learning?.criteria[n] === 'assisted' ? ' (shown with help)' : '');
++  return [`  Success criteria: ${criteria.map((c, i) => `${i + 1}. ${c}${status(i + 1)}`).join('; ')}`];
++}
++
++const SUPPORT_MOVES: MoveId[] = ['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning'];
++
++// r4: what the engine knows about the open task, its answer and the next step.
++function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
++  const s = ctx.signals;
++  const L = s.learning;
++  const out: string[] = [];
++  if (s.presentLessonItem) out.push(`- Lesson item to present now: [${s.presentLessonItem.id}] ${s.presentLessonItem.prompt}`);
++  if (s.answeringCheck && s.activeLessonItem) out.push(`- The open task is lesson item [${s.activeLessonItem.id}]: ${s.activeLessonItem.prompt}`);
++  if (s.keyVerdict && isSuccess(s.keyVerdict)) out.push('- Their answer matches the course\'s accepted answer for this item: confirm it as correct (mention a capital-letter or punctuation slip in a few words at most).');
++  if (L && Object.keys(L.criteria).length) out.push('- Don\'t re-test a success criterion they have already shown on their own; work on the ones not shown yet.');
++  if (s.answeringCheck || s.unpromptedSentence) {
++    const assisted = (L?.hintTurnsOnItem ?? 0) > 0;
++    const next = assisted
++      ? 'they had help on this task, so next give one fresh item on the same point for them to do without help (an independent check); a helped answer is not independent evidence'
++      : s.nextLessonItem
++        ? `next present lesson item [${s.nextLessonItem.id}] exactly as written: ${s.nextLessonItem.prompt}`
++        : 'next give a short freer task (e.g. one or two sentences of their own using the point)';
++    out.push(`- If this answer is correct: confirm it, then ${next}.`);
++  }
++  const supports = ctx.moves.some((m) => SUPPORT_MOVES.includes(m.id)) || Boolean(s.unpromptedSentence);
++  if (supports && s.hintLevel) {
++    const level = ctx.moves.some((m) => m.id === 'answer_with_reasoning') ? 6 : s.hintLevel;
++    out.push(`- ${hintInstruction(level)}`, `- ${SUPPORT_PRECEDENCE}`);
++  }
++  return out;
++}
++
+ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, 'prompt'>): string {
+   const { learner: l, lesson } = ctx;
+   const lines = [
+@@ -914,12 +1072,15 @@
+     lines.push(
+       `Current lesson (from the course): "${lesson.title ?? ''}"`,
+       ...list('Objectives', lesson.spec.objectives),
+-      ...list('Success criteria', lesson.spec.successCriteria),
++      ...criteriaLines(lesson.spec.successCriteria, ctx.signals.learning),
+       ...list('Target vocabulary', lesson.spec.vocabulary),
+       ...list('Target grammar', lesson.spec.grammar),
+       ...list('Language functions', lesson.spec.functions),
+       ...list('Skill focus', lesson.spec.skills),
+       ...list('Course examples', lesson.spec.examples),
++      ...(lesson.spec.items?.length
++        ? [`  Lesson items (exercises from the course; when they ask for an exercise, present one exactly as written; never show an answer before they try): ${lesson.spec.items.map((i) => `[${i.id}] ${i.prompt}`).join(' | ')}`]
++        : []),
+       'Stay within this lesson\'s objectives unless they ask about something else. Your own examples are yours; don\'t present them as course content.',
+     );
+   } else if (lesson.status === 'unstructured') {
+@@ -936,10 +1097,13 @@
+   lines.push(
+     'Teaching moves for this reply:',
+     ...ctx.moves.map((m) => `- ${moveText(m)}`),
++    ...stateLines(ctx),
+     `Length and style (policy ${LANGUAGE_POLICY_REVISION}): about ${len.targetWords} words, never more than ${len.maxWords} (count only your own words). One step per reply: one idea, one instruction, one task. Plain short lines; no tables, no headings, at most one short list. If more is needed, give the first part and offer to continue.`,
+     ...(step && REGISTER[step] ? [`Level: ${REGISTER[step]}`] : []),
+     AGE_REGISTER[band],
+     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
++    GROUNDING_RULES,
++    ASSESSMENT_INSTRUCTION,
+     '</language_teaching_context>',
+   );
+   return lines.join('\n');
+@@ -990,10 +1154,89 @@
+     ageBand: ctx.learner.ageBand.status === 'known' ? ctx.learner.ageBand.value : 'unknown',
+     ageBandStatus: ctx.learner.ageBand.status,
+     ageBandSource: ctx.learner.ageBand.source,
++    ...(ctx.signals.confirmedSuccessStreak !== undefined ? { confirmedSuccessStreak: ctx.signals.confirmedSuccessStreak } : {}),
++    // r4 (pre-reply state)
++    ...(ctx.signals.hintLevel ? { hintLevelOffered: ctx.signals.hintLevel } : {}),
++    activeItemBefore: ctx.signals.learning?.activeItem ?? null,
++    ...(ctx.signals.keyVerdict ? { keyVerdict: ctx.signals.keyVerdict } : {}),
++    ...(ctx.signals.presentLessonItem ? { presentedLessonItemId: ctx.signals.presentLessonItem.id } : {}),
+   };
+ }
+ 
+ // ---------------------------------------------------------------------------
++// r4: after the reply. Records the structured verdict (answer key > hidden tutor
++// assessment > prose fallback), the item the learner is now expected to answer,
++// the support level actually used, and deterministic quality flags. Pure.
++
++const normText = (t: string) => t.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
++
++export interface FinalizedLanguageTurn {
++  assessment: Assessment;
++  activeItem: ActiveItemRef | null;
++  hintLevel: number;
++  qualityFlags: string[];
++  markerStatus: 'ok' | 'missing' | 'malformed';
++}
++
++export function finalizeLanguageTurn(
++  ctx: Omit<LanguageTeachingContext, 'prompt'>,
++  input: { reply: string; learnerText: string; messageId: string; parsed: Omit<Assessment, 'source'> | null; malformed?: boolean },
++): FinalizedLanguageTurn {
++  const s = ctx.signals;
++  const L = s.learning;
++  const items = ctx.lesson.spec?.items ?? [];
++  const flags: string[] = [];
++  const { parsed, reply } = input;
++
++  // Which lesson item (if any) this reply presented.
++  const named = parsed?.item ? items.find((i) => i.id === parsed.item) : undefined;
++  const shown = items.find((i) => normText(reply).includes(normText(i.prompt).replace(/^(complete|correct the verb|choose)\s*/, '')));
++  const presented = named ?? (s.presentLessonItem && shown?.id === s.presentLessonItem.id ? s.presentLessonItem : undefined) ?? shown;
++  if (s.presentLessonItem && presented?.id !== s.presentLessonItem.id) flags.push('lesson_item_not_presented');
++
++  const invitation = taskInvitation(reply);
++  const previous = L?.activeItem ?? null;
++  const verdictFromMarker = parsed?.verdict;
++  const fallbackNext = presented ? 'NEW_ITEM' : invitation ? (isSuccess(verdictFromMarker) || !previous ? 'NEW_ITEM' : 'SAME_ITEM') : 'NONE';
++  const next = parsed?.next ?? fallbackNext;
++
++  let assessment: Assessment;
++  if (s.keyVerdict && isSuccess(s.keyVerdict)) {
++    if (parsed && !isSuccess(parsed.verdict) && parsed.verdict !== 'NOT_EVALUATED') flags.push('key_tutor_verdict_disagreement');
++    const criteria = [...new Set([...(parsed?.criteria ?? []), ...(s.activeLessonItem?.criteria ?? [])])];
++    assessment = { verdict: s.keyVerdict, relevance: 'ACTIVE_ITEM', criteria, next, ...(presented ? { item: presented.id } : {}), source: 'answer_key' };
++  } else if (parsed) {
++    // Only an answer can carry a verdict; a request turn is NOT_EVALUATED whatever the marker says.
++    const answerTurn = s.answeringCheck || Boolean(s.unpromptedSentence);
++    assessment = { ...parsed, ...(answerTurn ? {} : { verdict: 'NOT_EVALUATED', criteria: [] }), next, ...(presented ? { item: presented.id } : {}), source: 'tutor_assessment' };
++  } else {
++    const prose = s.answeringCheck && confirmsCorrect(reply);
++    assessment = { verdict: prose ? 'CORRECT' : 'NOT_EVALUATED', relevance: previous ? 'ACTIVE_ITEM' : 'NO_ACTIVE_ITEM', criteria: [], next, ...(presented ? { item: presented.id } : {}), source: s.answeringCheck ? 'prose_fallback' : 'none' };
++  }
++
++  const activeItem: ActiveItemRef | null =
++    next === 'NONE' ? null
++      : next === 'SAME_ITEM' ? previous ?? { id: `msg:${input.messageId}`, source: 'tutor' }
++        : presented ? { id: `lesson:${presented.id}`, source: 'lesson', lessonItemId: presented.id }
++          : { id: `msg:${input.messageId}`, source: 'tutor' };
++
++  // Support actually given on the open item in this reply.
++  const ids = ctx.moves.map((m) => m.id);
++  const supportTurn = ids.some((id) => id === 'scaffold_hint' || id === 'reteach_simpler' || id === 'answer_with_reasoning')
++    || (ids.includes('corrective_feedback_retry') && (isFailure(assessment.verdict) || assessment.verdict === 'AMBIGUOUS'));
++  const hintLevel = supportTurn && next !== 'NEW_ITEM' ? (ids.includes('answer_with_reasoning') ? 6 : s.hintLevel ?? 1) : 0;
++
++  if (contrastPairClaimMismatch(reply)) flags.push('contrast_pair_claim_mismatch');
++  if (learnerQuoteMismatches(reply, input.learnerText).length) flags.push('learner_quote_mismatch');
++  const openItem = s.activeLessonItem && !isSuccess(assessment.verdict) ? s.activeLessonItem : undefined;
++  if (possibleAnswerLeak(reply, openItem, hintLevel || (s.hintLevel ?? 1), assessment.verdict)) flags.push('possible_answer_leak');
++  if (presented && possibleAnswerLeak(reply.replace(presented.prompt, ''), presented, 1)) flags.push('possible_answer_leak_new_item');
++  const markerStatus = parsed ? 'ok' : input.malformed ? 'malformed' : 'missing';
++  if (markerStatus !== 'ok') flags.push(`assessment_marker_${markerStatus}`);
++  return { assessment, activeItem, hintLevel, qualityFlags: [...new Set(flags)], markerStatus };
++}
++
++// ---------------------------------------------------------------------------
+ // Assembly (server-side, tenant-scoped). Null when not a language course or on
+ // any error, so the tutor carries on exactly as before.
+ 
+@@ -1005,7 +1248,7 @@
+   studentId?: string;
+   grade?: string;
+   message: string;
+-  history: { role: 'user' | 'assistant'; content: string }[];
++  history: Turn[];
+   hintsOnly?: boolean;
+   masteryStatus?: string;
+ }): Promise<LanguageTeachingContext | null> {

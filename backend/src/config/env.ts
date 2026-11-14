@@ -39,6 +39,10 @@ export interface AppConfig {
   /** Claude is the tutor backup when the orchestrator is unavailable. */
   anthropicApiKey?: string;
   anthropicTutorModel: string;
+  // r4.4 #4: pronunciation assessment (supplier trial). Off unless the flag, a key, a region and a price entry are all present.
+  azureSpeechKey?: string;
+  azureSpeechRegion?: string;
+  pronunciationAssessmentEnabled: boolean;
   // P9 analytics question routing (intent only): a small, priced model.
   anthropicIntentModel: string;
   // AI assessment drafts and question regeneration (owner decision 2026-11-01:
@@ -96,7 +100,11 @@ export interface AppConfig {
     sttModel: string;
     examSttModel: string;
   };
-  anam?: { apiKey: string; avatarId: string; voiceIdEn: string; voiceIdAr: string };
+  anam?: {
+    apiKey: string; avatarId: string; voiceIdEn: string; voiceIdAr: string;
+    // Optional women's voices for faces that are women (else the voices above).
+    voiceIdEnFemale?: string; voiceIdArFemale?: string;
+  };
   // Owner-approved cost ceilings for services without a catalogue price
   // (P22). Unset = the service refuses to start (fail closed).
   unpricedLimits: {
@@ -311,7 +319,11 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     voiceIdAr: readString(source, "ANAM_VOICE_ID_AR"),
   };
   const anam = Object.values(anamValues).every(Boolean)
-    ? (anamValues as { apiKey: string; avatarId: string; voiceIdEn: string; voiceIdAr: string })
+    ? {
+        ...(anamValues as { apiKey: string; avatarId: string; voiceIdEn: string; voiceIdAr: string }),
+        voiceIdEnFemale: readString(source, "ANAM_VOICE_ID_EN_FEMALE") || undefined,
+        voiceIdArFemale: readString(source, "ANAM_VOICE_ID_AR_FEMALE") || undefined,
+      }
     : undefined;
 
   // ElevenLabs voice for the live avatar: real-time transcription in the browser
@@ -404,6 +416,9 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     enaraDefaultCourseId: readString(source, "ENARA_DEFAULT_COURSE_ID") || readString(source, "DEFAULT_COURSE_ID"),
     anthropicApiKey: readString(source, "ANTHROPIC_API_KEY"),
     anthropicTutorModel: readString(source, "ANTHROPIC_TUTOR_MODEL") || "claude-opus-5-5",
+    azureSpeechKey: readString(source, "AZURE_SPEECH_KEY"),
+    azureSpeechRegion: readString(source, "AZURE_SPEECH_REGION"),
+    pronunciationAssessmentEnabled: readBoolean(source, "PRONUNCIATION_ASSESSMENT_ENABLED", false),
     anthropicIntentModel: readString(source, "ANTHROPIC_INTENT_MODEL") || "claude-haiku-5-5",
     anthropicDraftModel: readString(source, "ANTHROPIC_DRAFT_MODEL") || "claude-sonnet-5-5",
     anthropicVisualModel: readString(source, "ANTHROPIC_VISUAL_MODEL") || "claude-haiku-5-5",

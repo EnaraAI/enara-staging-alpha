@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, AtSign, CircleAlert, Eye, EyeOff, Info, KeyRound, Lock } from 'lucide-react';
-import { clearSession, login, requestPasswordReset, SessionUser } from '../services/apiService';
+import { ArrowRight, AtSign, BookOpen, CircleAlert, Eye, EyeOff, GraduationCap, Info, KeyRound, LayoutDashboard, Lock } from 'lucide-react';
+import { clearSession, fetchDemoStatus, login, requestPasswordReset, SessionUser, startDemo, type DemoRole } from '../services/apiService';
 import { uiRoleFor, UiRole, LoginChoice } from '../services/roleRouting';
 import './Login.css';
 import { EnaraLogo } from '../components/brand/EnaraLogo';
@@ -39,6 +39,9 @@ const TEXT = {
     wrongPortal: (chosen: string, right: string) => `This account can't sign in as ${chosen}. Choose "${right}" instead.`,
     progressLabel: 'Adding fractions', progressNote: 'Practising with your tutor',
     lang: 'Language',
+    demoTitle: 'New to Enara? Try the demo', demoSub: 'One click opens your own demo school. No sign-up.',
+    demoRoles: { student: 'Student', teacher: 'Teacher', admin: 'School admin' } as Record<DemoRole, string>,
+    demoStarting: 'Opening…', demoFailed: 'The demo could not start. Please try again.',
   },
   ar: {
     heroA: 'تعلّم ', heroB: 'بيتحرك', heroC: ' معاك.',
@@ -59,6 +62,9 @@ const TEXT = {
     wrongPortal: (chosen: string, right: string) => `الحساب ده مينفعش يدخل كـ«${chosen}». اختار «${right}».`,
     progressLabel: 'جمع الكسور', progressNote: 'بتتدرّب مع المدرّس',
     lang: 'اللغة',
+    demoTitle: 'جديد على إنارة؟ جرّب النسخة التجريبية', demoSub: 'بضغطة واحدة تفتح مدرسة تجريبية خاصة بيك. من غير تسجيل.',
+    demoRoles: { student: 'طالب', teacher: 'مدرّس', admin: 'مسؤول المدرسة' } as Record<DemoRole, string>,
+    demoStarting: 'جاري الفتح…', demoFailed: 'مقدرناش نفتح النسخة التجريبية. جرّب تاني.',
   },
 };
 
@@ -79,6 +85,27 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
   const [fieldError, setFieldError] = useState<{ field: 'email' | 'password'; text: string } | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  // One-click partner demo, shown only while the demo is open.
+  const [demoOpen, setDemoOpen] = useState(false);
+  const [demoBusy, setDemoBusy] = useState<DemoRole | null>(null);
+  useEffect(() => {
+    if (isSharedCourse || isSharedAssessment) return;
+    fetchDemoStatus().then((s) => setDemoOpen(s.available)).catch(() => setDemoOpen(false));
+  }, [isSharedCourse, isSharedAssessment]);
+  const tryDemo = async (role: DemoRole) => {
+    if (demoBusy) return;
+    setDemoBusy(role);
+    setAuthError(null);
+    try {
+      const user = await startDemo(role);
+      const ui = uiRoleFor(user.role, role === 'student' ? 'student' : 'admin');
+      if (!ui) throw new Error();
+      onLogin(ui, user);
+    } catch (e: any) {
+      setAuthError((lang === 'en' && e?.message) || t.demoFailed);
+      setDemoBusy(null);
+    }
+  };
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const t = TEXT[lang];
@@ -229,6 +256,21 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
           {isLoading ? <><span className="si-spin" />{t.loading}</> : <>{t.submit}<ArrowRight size={18} /></>}
         </button>
         <p className="si-hint"><Lock size={14} />{t.managed}</p>
+
+        {demoOpen && (
+          <div className="si-demo" role="group" aria-labelledby="si-demo-title">
+            <p className="si-demo-title" id="si-demo-title">{t.demoTitle}</p>
+            <p className="si-demo-sub">{t.demoSub}</p>
+            <div className="si-demo-roles">
+              {(['student', 'teacher', 'admin'] as DemoRole[]).map((r) => (
+                <button key={r} type="button" disabled={!!demoBusy} onClick={() => tryDemo(r)}>
+                  {r === 'student' ? <GraduationCap size={16} /> : r === 'teacher' ? <BookOpen size={16} /> : <LayoutDashboard size={16} />}
+                  {demoBusy === r ? t.demoStarting : t.demoRoles[r]}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

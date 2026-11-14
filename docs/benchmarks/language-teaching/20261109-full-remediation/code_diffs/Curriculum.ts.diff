@@ -1,0 +1,23 @@
+--- ../remed2/Curriculum.ts	2026-11-09 14:23:25.783760070 +0000
++++ backend/src/models/Curriculum.ts	2026-11-09 14:47:34.514018434 +0000
+@@ -16,6 +16,9 @@
+     functions?: string[];
+     skills?: string[];
+     examples?: string[];
++    // r4: exercises from the course (id + prompt reach the tutor; accepted answers
++    // and target forms stay server-side). Optional; absent on existing lessons.
++    items?: { id: string; prompt: string; acceptedAnswers?: string[]; targetForms?: string[]; criteria?: number[] }[];
+   };
+ }
+ 
+@@ -58,6 +61,10 @@
+         functions: { type: [String], default: undefined },
+         skills: { type: [String], default: undefined },
+         examples: { type: [String], default: undefined },
++        items: {
++          type: [{ id: String, prompt: String, acceptedAnswers: { type: [String], default: undefined }, targetForms: { type: [String], default: undefined }, criteria: { type: [Number], default: undefined }, _id: false }],
++          default: undefined,
++        },
+         _id: false,
+       },
+       default: undefined,

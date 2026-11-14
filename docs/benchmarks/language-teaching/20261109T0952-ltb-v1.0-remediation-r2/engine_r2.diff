@@ -1,0 +1,373 @@
+--- docs/benchmarks/language-teaching/20261109T0952-ltb-v1.0-remediation-r2/pre_edit_code_snapshot/languageTeachingContext.ts	2026-11-09 09:53:12.686922408 +0000
++++ backend/src/services/languageTeachingContext.ts	2026-11-09 10:00:48.231254741 +0000
+@@ -12,7 +12,11 @@
+ // Policy revision of ltc-v1 (extended in place, same context version and block).
+ // r1 (LTB v1.0 remediation): hint-first answer requests, pending-task answer
+ // detection, length/register targets by age band and CEFR step, off-topic redirect.
+-export const LANGUAGE_POLICY_REVISION = 'ltc-v1-r1';
++// r2 (LTB v1.0 r1 follow-up): repeated-misconception strategy shift with a
++// bounded exit, targeted clarification of missing context (no stacked teaching,
++// no placeholder lessons), feedback that models on a different example and
++// handles one error at a time, and age-band observability.
++export const LANGUAGE_POLICY_REVISION = 'ltc-v1-r2';
+ 
+ export type KnowledgeStatus = 'known' | 'inferred' | 'not_assessed' | 'unknown';
+ 
+@@ -78,6 +82,11 @@
+ 
+ export type OffTopicKind = 'unrelated' | 'adjacent' | 'social';
+ 
++// r2: does this answer repeat the error the tutor flagged in the learner's
++// previous answer? 'unknown' when the previous feedback flagged nothing that
++// can be matched; the prompt then states the conditional policy.
++export type ErrorRecurrence = 'repeated' | 'changed' | 'unknown';
++
+ export interface TurnSignals {
+   firstTurn: boolean;
+   helpRequest: boolean;
+@@ -98,6 +107,15 @@
+   repeatRequest?: boolean;
+   exampleRequest?: boolean;
+   offTopic?: OffTopicKind;
++  // r2
++  errorRecurrence?: ErrorRecurrence;
++  // Earlier answers in this task chain that already repeated a flagged error
++  // (each one got a change of approach).
++  priorStrategyShifts?: number;
++  // The learner's own words saying what they want to practise (no lesson case).
++  learnerGoal?: string;
++  goalAmbiguous?: boolean;
++  goalAsked?: boolean;
+ }
+ 
+ export type MoveId =
+@@ -116,7 +134,9 @@
+   // r1
+   | 'restate_task'
+   | 'distinct_example'
+-  | 'redirect_to_lesson';
++  | 'redirect_to_lesson'
++  // r2
++  | 'general_practice';
+ 
+ export interface SelectedMove {
+   id: MoveId;
+@@ -163,6 +183,11 @@
+   attemptsOnTask?: number;
+   offTopic?: string;
+   lengthTarget?: { targetWords: number; maxWords: number; basis: string };
++  // r2
++  errorRecurrence?: string;
++  missingContext?: string[];
++  ageBand?: string;
++  ageBandSource?: string;
+ }
+ 
+ // ---------------------------------------------------------------------------
+@@ -400,6 +425,92 @@
+   return attempts;
+ }
+ 
++// r2: error recurrence. Learner-side words or short phrases that the tutor's
++// feedback marked as wrong (emphasised, in a sentence with an error cue, and
++// present in the learner's previous answer), then checked in the new answer.
++const ERROR_CUE = /\b(fix|wrong|missing|not quite|needs?|change|careful|almost|still|error|mistakes?|instead|should be|look again|problem|incorrect|not right|isn'?t right)\b|❌|✗/i;
++const PRAISE = /\b(correct|right|good|great|well done|perfect|nice|yes)\b|✅|✓/i;
++const SPAN = /\*\*\s*["“']?([^*"”]{1,40}?)["”']?\s*\*\*|["“]([^"”]{1,40})["”]/g;
++const norm = (t: string) => t.toLowerCase().replace(/[^\p{L}\p{N}\s'-]/gu, ' ').replace(/\s+/g, ' ').trim();
++const hasPhrase = (text: string, phrase: string) => new RegExp(`(^|[^\\p{L}])${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^\\p{L}]|$)`, 'iu').test(norm(text));
++
++const OPENS_WITH_PRAISE = /^\W*(correct|that'?s (correct|right)|yes|well done|perfect|great( job)?|excellent|exactly)\b/i;
++
++export function flaggedErrorSpans(tutorFeedback: string, previousAnswer: string): string[] {
++  const out = new Set<string>();
++  // Feedback that opens by confirming the answer flags nothing.
++  if (OPENS_WITH_PRAISE.test(tutorFeedback.trim())) return [];
++  for (const sentence of tutorFeedback.split(/(?<=[.!?])\s+|\n+/)) {
++    if (!ERROR_CUE.test(sentence)) continue;
++    for (const m of sentence.matchAll(SPAN)) {
++      const phrase = norm(m[1] ?? m[2] ?? '');
++      if (!phrase || phrase.split(' ').length > 3) continue;
++      // A span followed closely by praise ("**up at six** is correct") is not an error.
++      const after = sentence.slice((m.index ?? 0) + m[0].length, (m.index ?? 0) + m[0].length + 30);
++      if (PRAISE.test(after) && !ERROR_CUE.test(after)) continue;
++      if (hasPhrase(previousAnswer, phrase)) out.add(phrase);
++    }
++  }
++  return [...out];
++}
++
++// A flagged span recurs if the new answer contains it, or, for a multi-word
++// span, all its words except the last (the head that carries the error stays;
++// trailing content may change with the new sentence: "He is nine" → "He is a nurse").
++function spanRecurs(answer: string, span: string): boolean {
++  if (hasPhrase(answer, span)) return true;
++  const words = span.split(' ');
++  return words.length > 1 && hasPhrase(answer, words.slice(0, -1).join(' '));
++}
++
++const wordSet = (t: string) => new Set(norm(t).split(' ').filter(Boolean));
++function overlap(a: string, b: string): number {
++  const A = wordSet(a); const B = wordSet(b);
++  const inter = [...A].filter((w) => B.has(w)).length;
++  return inter / Math.max(1, new Set([...A, ...B]).size);
++}
++
++export function errorRecurrenceFor(previousAnswer: string, tutorFeedback: string, answer: string): ErrorRecurrence {
++  const flagged = flaggedErrorSpans(tutorFeedback, previousAnswer);
++  if (!flagged.length) return 'unknown';
++  const recurring = flagged.filter((p) => spanRecurs(answer, p));
++  if (!recurring.length) return 'changed';
++  if (norm(answer) === norm(previousAnswer)) return 'repeated';
++  // A retry of the same sentence that changed something but kept a flagged
++  // span can't be judged from text alone (the flagged span may be context).
++  if (overlap(answer, previousAnswer) >= 0.6) return 'unknown';
++  return 'repeated';
++}
++
++// Recurrence for each answer in the current task chain (oldest first), given
++// the answers' preceding feedback; the first answer has none.
++function chainRecurrences(history: Turn[], current: string): ErrorRecurrence[] {
++  const answers: { text: string; feedbackAfter?: string }[] = [];
++  for (let i = history.length - 1; i >= 1; i -= 1) {
++    const h = history[i];
++    if (h.role !== 'user') continue;
++    const prev = [...history.slice(0, i)].reverse().find((x) => x.role === 'assistant');
++    if (classifyLearnerResponse(h.content, prev ? taskInvitation(prev.content) : undefined) !== 'answer') break;
++    const next = history.slice(i + 1).find((x) => x.role === 'assistant');
++    answers.unshift({ text: h.content, feedbackAfter: next?.content });
++  }
++  const seq = [...answers.map((a) => a.text), current];
++  const out: ErrorRecurrence[] = [];
++  for (let k = 1; k < seq.length; k += 1) out.push(errorRecurrenceFor(seq[k - 1], answers[k - 1].feedbackAfter ?? '', seq[k]));
++  return out;
++}
++
++// r2: what a learner says they want to practise. Greetings and generic words
++// ("help me with English") are not a goal.
++const GOAL_STOP = new Set(['hi', 'hello', 'hey', 'please', 'help', 'me', 'with', 'my', 'english', 'learn', 'learning', 'want', 'wanna', 'to', 'i', 'can', 'you', 'could', 'practise', 'practice', 'improve', 'the', 'a', 'an', 'some', 'today', 'and', 'in', 'on', 'for', 'lesson', 'study', 'teach', 'good', 'morning', 'evening', 'there', 'thanks', 'thank', 'would', 'like', 'do', 'something', 'let', 'us', "let's", 'lets', 'start', 'ok', 'okay', 'please.']);
++const AMBIGUOUS_GOAL = /^(anything|whatever|idk|i\s*(don'?t|dont) know|not sure|everything|you choose|any|dunno|no idea|doesn'?t matter|up to you)\b/i;
++
++export function goalFromText(text: string): string | undefined {
++  const words = norm(text).split(' ').filter((w) => w && !GOAL_STOP.has(w));
++  const content = words.filter((w) => w.length >= 3);
++  return content.length ? text.trim().replace(/\s+/g, ' ').slice(0, 120) : undefined;
++}
++
+ export function detectTurnSignals(message: string, history: Turn[], lesson?: { title?: string; spec?: LanguageSpec }): TurnSignals {
+   const text = message.trim();
+   const learner = [...history.filter((h) => h.role === 'user').map((h) => h.content), text].slice(-3);
+@@ -426,9 +537,42 @@
+     repeatRequest: learnerResponse === 'repeat_request',
+     exampleRequest: learnerResponse === 'example_request',
+     offTopic,
++    ...r2Signals(text, history, learnerResponse, lesson, firstTurn, offTopic),
+   };
+ }
+ 
++function r2Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, firstTurn: boolean, offTopic?: OffTopicKind): Partial<TurnSignals> {
++  const out: Partial<TurnSignals> = {};
++  if (learnerResponse === 'answer') {
++    const rec = chainRecurrences(history, text);
++    if (rec.length) {
++      out.errorRecurrence = rec[rec.length - 1];
++      out.priorStrategyShifts = rec.slice(0, -1).filter((r) => r === 'repeated').length;
++    }
++  }
++  // No lesson: the goal is the essential missing field. It was asked on the
++  // learner's first message if that message stated none; the next learner
++  // message is the answer, used from then on (never asked again).
++  if (!lesson) {
++    const learnerMsgs = history.filter((h) => h.role === 'user').map((h) => h.content);
++    const stated = goalFromText(text);
++    if (firstTurn) {
++      if (stated && offTopic !== 'unrelated' && !GREETING.test(text)) out.learnerGoal = stated;
++    } else {
++      const firstGoal = goalFromText(learnerMsgs[0]);
++      if (firstGoal) out.learnerGoal = firstGoal;
++      else {
++        out.goalAsked = true;
++        const answer = learnerMsgs.length >= 2 ? learnerMsgs[1] : text;
++        const g = goalFromText(answer);
++        if (g && !AMBIGUOUS_GOAL.test(answer.trim())) out.learnerGoal = g;
++        else out.goalAmbiguous = true;
++      }
++    }
++  }
++  return out;
++}
++
+ // ---------------------------------------------------------------------------
+ // Move selection: a pure, inspectable function. No fixed sequence.
+ 
+@@ -448,8 +592,13 @@
+   const novice = band === 'beginner' || band === 'unknown';
+   const strong = band === 'advanced' || input.masteryStatus === 'proficient' || input.masteryStatus === 'mastered';
+ 
+-  if (s.offTopic !== 'unrelated' && (s.vague || (s.firstTurn && input.lessonStatus === 'none'))) add('clarify_goal', [s.vague ? 'vague_message' : 'no_lesson'], ['LTC-D13']);
+-  else if (s.firstTurn && input.lessonStatus === 'structured' && !s.helpRequest && !s.answerRequest && !s.exampleRequest && s.offTopic !== 'unrelated') add('activate_prior_knowledge', ['first_turn_with_lesson_spec'], ['LTC-D3']);
++  // r2: ask only for context that is essential and missing, once, with a target.
++  // A known lesson makes a vague message no reason to ask: start the lesson.
++  const missing = missingContext({ targetLanguage: input.targetLanguage, lessonStatus: input.lessonStatus, signals: s });
++  const clarifying = s.offTopic !== 'unrelated' && missing.length > 0 && !s.goalAsked && (s.firstTurn || s.vague);
++  if (clarifying) add('clarify_goal', [`missing_${missing[0]}`], ['LTC-D13']);
++  else if (s.firstTurn && (input.lessonStatus === 'structured' || (input.lessonStatus === 'unstructured' && s.vague)) && !s.helpRequest && !s.answerRequest && !s.exampleRequest && s.offTopic !== 'unrelated') add('activate_prior_knowledge', [s.vague ? 'vague_message_lesson_known' : 'first_turn_with_lesson_spec'], ['LTC-D3']);
++  if (input.lessonStatus === 'none' && s.goalAsked && s.goalAmbiguous && s.offTopic !== 'unrelated' && !s.helpRequest) add('general_practice', ['goal_answer_ambiguous'], ['LTC-D13']);
+ 
+   // r1: an unrelated request (another subject's homework, a finished text for
+   // them) is redirected, not done; no mini-lesson is stacked on top of it.
+@@ -459,11 +608,20 @@
+   if (s.confusionCount >= 2) add('reteach_simpler', [`confusion_signals_${s.confusionCount}`], ['LTC-D7']);
+   if (s.answeringCheck && !s.answerRequest) {
+     const n = (s.attemptsOnTask ?? 0) + 1;
+-    add('corrective_feedback_retry', [
+-      `answer_to_${s.pendingTask ?? 'check'}`,
+-      novice ? 'level_novice_prompt_first' : 'level_strong_reformulation_ok',
+-      ...(n >= 2 ? ['attempt_2_plus_show_model_if_still_wrong'] : []),
+-    ], ['LTC-D4']);
++    // r2 (replaces r1's "show the correct form on attempt 2"): a repeated
++    // flagged error gets a change of approach first; only if the same error
++    // survives that change does the tutor show the model and give a fresh item.
++    if (n >= 2 && s.errorRecurrence === 'repeated' && (s.priorStrategyShifts ?? 0) === 0) {
++      add('reteach_simpler', ['repeated_misconception_strategy_shift'], ['LTC-D7']);
++    } else if (n >= 2 && s.errorRecurrence === 'repeated') {
++      add('answer_with_reasoning', ['repeated_after_strategy_shift_model_then_transfer'], ['LTC-D7']);
++    } else {
++      add('corrective_feedback_retry', [
++        `answer_to_${s.pendingTask ?? 'check'}`,
++        novice ? 'level_novice_prompt_first' : 'level_strong_reformulation_ok',
++        ...(n >= 2 ? [s.errorRecurrence === 'changed' ? 'flagged_error_not_repeated' : (s.priorStrategyShifts ?? 0) > 0 ? 'recurrence_unknown_after_shift' : 'recurrence_unknown'] : []),
++      ], ['LTC-D4']);
++    }
+   }
+   // r1 hint-first (LTC-D6 revised): an answer request before any attempt on the
+   // task gets a hint and an invitation to try; after an attempt, the answer with
+@@ -481,31 +639,44 @@
+   // open, an example request is an ordinary request for a model and explanation.
+   if (s.exampleRequest && s.pendingTask) add('distinct_example', ['example_requested_task_open'], ['LTC-D3']);
+   const exampleNoTask = Boolean(s.exampleRequest && !s.pendingTask);
+-  const supportOnly = hintFirst || s.dontKnow || s.hintRequest || s.repeatRequest || offTopic;
++  const supportOnly = hintFirst || s.dontKnow || s.hintRequest || s.repeatRequest || offTopic || clarifying;
+   if (s.helpRequest || exampleNoTask || (novice && !s.answeringCheck && !s.vague && !supportOnly)) add('short_explanation', [s.helpRequest ? 'help_requested' : exampleNoTask ? 'example_requested' : 'novice_level'], ['LTC-D3']);
+   if (s.confusionCount === 1 || (input.hintsOnly && !s.answerRequest)) add('scaffold_hint', [s.confusionCount === 1 ? 'confusion_signal' : 'hints_only_policy'], ['LTC-D6']);
+-  if (novice) add('comprehensible_model', [band === 'unknown' ? 'level_unknown_start_simple' : 'level_beginner'], ['LTC-D2']);
++  const feedbackTurn = moves.some((m) => ['corrective_feedback_retry', 'reteach_simpler'].includes(m.id) && m.reasons.some((r) => r.startsWith('answer_to_') || r.startsWith('repeated_')));
++  if (novice && !clarifying) add('comprehensible_model', [band === 'unknown' ? 'level_unknown_start_simple' : 'level_beginner', ...(feedbackTurn ? ['during_feedback'] : [])], ['LTC-D2']);
+   if (novice && s.writesInArabicScript && !/arabic/i.test(input.targetLanguage ?? '')) add('l1_support', ['learner_writes_arabic_script', 'novice_level'], ['LTC-D8']);
+   if (strong && s.confusionCount === 0 && !offTopic) {
+     add('fade_support', [band === 'advanced' ? 'level_advanced' : `mastery_${input.masteryStatus}`], ['LTC-D3']);
+     if (!s.answeringCheck && !hintFirst) add('independent_practice', ['strong_and_not_confused'], ['LTC-D3']);
+   }
+   const explained = moves.some((m) => m.id === 'short_explanation' || m.id === 'reteach_simpler' || m.id === 'answer_with_reasoning');
+-  if (explained && !(strong && s.helpRequest)) add('comprehension_check', ['after_explanation'], ['LTC-D5']);
++  if (explained && !(strong && s.helpRequest) && !clarifying) add('comprehension_check', ['after_explanation'], ['LTC-D5']);
+   return moves;
+ }
+ 
++// r2: essential context that is missing, most important first. Proficiency is
++// never asked (the tutor calibrates from replies); the lesson or goal is needed
++// to choose what to practise; the target language before everything else.
++export function missingContext(input: { targetLanguage?: string; lessonStatus: LanguageLessonContext['status']; signals: TurnSignals }): string[] {
++  const out: string[] = [];
++  // With a lesson, the course and lesson already fix the language being taught.
++  if (!input.targetLanguage && input.lessonStatus === 'none') out.push('target_language');
++  if (input.lessonStatus === 'none' && !input.signals.learnerGoal) out.push('lesson_or_goal');
++  return out;
++}
++
+ // ---------------------------------------------------------------------------
+ // Prompt (versioned; the only place these instructions live)
+ 
+ const MOVE_TEXT: Record<MoveId, string> = {
+   clarify_goal: 'First find out what the learner wants to do today (one short question), unless their message already says.',
++  general_practice: 'No lesson is selected and their answer did not name a goal. Start one short general practice task suited to their level, and say plainly that it is general practice, not a lesson from their course.',
+   activate_prior_knowledge: 'Start by briefly connecting to what they already know about this lesson\'s topic (one quick question or reminder).',
+   comprehensible_model: 'Use short sentences and common words; introduce at most 2-3 new words or forms per reply, each with a short gloss; show a model sentence in a meaningful context.',
+   short_explanation: 'Give a short, direct explanation with one example in context. Do not answer with only questions.',
+   comprehension_check: 'End with one short, focused check (a question or a mini task) tied to the lesson objective.',
+   corrective_feedback_retry:
+-    'They are answering your task: say specifically what is right and what is wrong in their answer (quote the part). Keep what is correct; if something is wrong, give one hint aimed only at the gap and ask them to try again before you show the correct form; for strong learners a brief correct reformulation is enough. Never call one correct answer mastery.',
++    'They are answering your task: say specifically what is right and what is wrong in their answer (quote the part). Keep what is correct; if there are several errors, deal only with the most important one now; if something is wrong, give one hint aimed only at the gap and ask them to try again before you show the correct form; for strong learners a brief correct reformulation is enough. Never call one correct answer mastery.',
+   scaffold_hint: 'Give a hint matched to their last reply (one step), not the full answer.',
+   restate_task: 'They did not understand the task: restate it in one simpler line and show the format with a different example (not the answer). Then ask them to try.',
+   distinct_example: 'They asked for an example: give a new example of the same pattern that is different from their current exercise, so the exercise answer stays theirs to find.',
+@@ -531,12 +702,30 @@
+     const r = m.reasons.find((x) => HINT_VARIANT[x]);
+     if (r) return HINT_VARIANT[r];
+   }
++  if (m.id === 'clarify_goal') {
++    const field = m.reasons.find((r) => r.startsWith('missing_'));
++    if (field === 'missing_target_language') return 'Ask one short question: which language do they want to practise? Don\'t start teaching yet.';
++    if (field === 'missing_lesson_or_goal')
++      return 'Ask one short question to find out what they want to practise (a topic or a skill), offering at most three short options in a few words each. Don\'t start a task, give a model sentence or explain anything yet, and don\'t name any chapter or lesson from the course outline as theirs.';
++  }
++  if (m.id === 'reteach_simpler' && m.reasons.includes('repeated_misconception_strategy_shift')) {
++    return 'They made the same mistake again after your feedback. Don\'t repeat your earlier explanation and don\'t give the corrected sentence. Change approach: a contrasting pair on a different example that differs only in the point they keep missing, or one smaller step, or one question that pinpoints the confusion. Then ask them to try their own sentence again.';
++  }
++  if (m.id === 'answer_with_reasoning' && m.reasons.includes('repeated_after_strategy_shift_model_then_transfer')) {
++    return 'The same mistake survived a change of approach. Now show the correct form of their sentence with a one-line reason, then give one fresh similar item (a different sentence) for them to try.';
++  }
++  if (m.id === 'comprehensible_model' && m.reasons.includes('during_feedback')) {
++    return 'Use short sentences and common words. Any model sentence must use a different example, never the corrected version of their own answer.';
++  }
++  if (m.id === 'corrective_feedback_retry' && m.reasons.includes('recurrence_unknown')) {
++    return `${MOVE_TEXT.corrective_feedback_retry} If this repeats the same mistake as their last answer, don't repeat your explanation or give the corrected sentence: change approach (a contrasting pair on a different example, or a smaller step) and ask them to try again.`;
++  }
++  if (m.id === 'corrective_feedback_retry' && m.reasons.includes('recurrence_unknown_after_shift')) {
++    return `${MOVE_TEXT.corrective_feedback_retry} They already had a change of approach on this task: if it is still the same mistake, show the correct form with a one-line reason, then give one fresh similar item.`;
++  }
+   if (m.id === 'answer_with_reasoning' && m.reasons.some((r) => r.startsWith('answer_requested_after_'))) {
+     return 'They have already tried: now give the correct answer with the reason in one or two sentences, then one similar item for them to try.';
+   }
+-  if (m.id === 'corrective_feedback_retry' && m.reasons.includes('attempt_2_plus_show_model_if_still_wrong')) {
+-    return `${MOVE_TEXT.corrective_feedback_retry} They have tried before on this task: if it is still wrong, show the correct form with a one-line reason, then give one fresh similar item.`;
+-  }
+   return MOVE_TEXT[m.id];
+ }
+ 
+@@ -600,7 +789,8 @@
+       `Current lesson: "${lesson.title ?? ''}". The course gives no structured objectives or word lists for it; don't claim it covered specific items. Use the lesson description in the curriculum.`,
+     );
+   } else {
+-    lines.push('No current lesson is known: ask what they want to practise.');
++    lines.push('No lesson is selected for this session. The course outline may list chapter titles: none of them is this learner\'s current or next lesson, so don\'t name one as theirs or invent lesson content.');
++    if (ctx.signals.learnerGoal) lines.push(`What the learner said they want to practise (their words, not a course lesson): "${ctx.signals.learnerGoal.replace(/["<>]/g, '')}". Work on that; don't ask again.`);
+   }
+   const len = ctx.length ?? lengthTarget(l.ageBand, l.proficiency.value);
+   const adult = len.basis.startsWith('adult');
+@@ -622,6 +812,7 @@
+ export function nextStepFor(moves: SelectedMove[]): string | undefined {
+   const ids = new Set(moves.map((m) => m.id));
+   if (ids.has('redirect_to_lesson')) return 'return_to_lesson';
++  if (ids.has('general_practice')) return 'general_practice_task';
+   if (ids.has('reteach_simpler')) return 'reteach_with_simpler_step';
+   if (ids.has('scaffold_hint') && moves.some((m) => m.reasons.includes('answer_requested_before_attempt'))) return 'learner_attempt_after_hint';
+   if (ids.has('corrective_feedback_retry')) return 'learner_retry';
+@@ -653,6 +844,15 @@
+     ...(ctx.signals.attemptsOnTask !== undefined ? { attemptsOnTask: ctx.signals.attemptsOnTask } : {}),
+     ...(ctx.signals.offTopic ? { offTopic: ctx.signals.offTopic } : {}),
+     ...(ctx.length ? { lengthTarget: ctx.length } : {}),
++    ...(ctx.signals.errorRecurrence ? { errorRecurrence: ctx.signals.errorRecurrence } : {}),
++    ...(() => {
++      const missing = missingContext({ targetLanguage: ctx.learner.targetLanguage.value, lessonStatus: ctx.lesson.status, signals: ctx.signals });
++      return missing.length ? { missingContext: missing } : {};
++    })(),
++    // Observability (non-identifying category only): the age band that reached
++    // the engine and where it came from.
++    ageBand: ctx.learner.ageBand.status === 'known' ? ctx.learner.ageBand.value : 'unknown',
++    ageBandSource: ctx.learner.ageBand.source,
+   };
+ }
+ 
+@@ -697,7 +897,10 @@
+       hintsOnly: params.hintsOnly,
+       masteryStatus: params.masteryStatus,
+     });
+-    const length = lengthTarget(learner.ageBand, learner.proficiency.value);
++    const base0 = lengthTarget(learner.ageBand, learner.proficiency.value);
++    // r2: a clarification-only turn is one short question, so a tighter target.
++    const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
++    const length = clarifyOnly ? { targetWords: Math.min(base0.targetWords, 40), maxWords: Math.min(base0.maxWords, 60), basis: `${base0.basis}:clarify` } : base0;
+     const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length } as const;
+     return { ...base, prompt: renderLanguageContextPrompt(base) };
+   } catch (error) {

@@ -1,0 +1,93 @@
+--- docs/benchmarks/language-teaching/20261109T1211-ltb-v1.0-ageband/pre_edit_code_snapshot/languageTeachingContext.ts	2026-11-09 12:11:00.631090061 +0000
++++ backend/src/services/languageTeachingContext.ts	2026-11-09 12:12:07.622443219 +0000
+@@ -1,5 +1,8 @@
+ import { Curriculum } from '../models/Curriculum';
+ import { Institution } from '../models/Institution';
++import { Batch } from '../models/Batch';
++import { Student } from '../models/Student';
++import { isLearnerAgeBand } from '../models/learnerAgeBand';
+ import { logger, serializeError } from '../utils/logging';
+ 
+ // Language Teaching Context Engine (Phase 1, ltc-v1). For language courses only:
+@@ -20,7 +23,9 @@
+ // only from a trusted runtime source, none of which exists yet), minor-slip and
+ // self-correction triage, progression after confirmed success, evaluation of a
+ // volunteered first sentence (record vs current evidence), revised r2 wording.
+-export const LANGUAGE_POLICY_REVISION = 'ltc-v1-r3';
++export const LANGUAGE_POLICY_REVISION = 'ltc-v1-r3-ab1';
++// Option B adds the trusted student/class age band to the r3 resolver; the
++// teaching policy (moves, wording, length tables) is unchanged from r3.
+ 
+ export type KnowledgeStatus = 'known' | 'inferred' | 'not_assessed' | 'unknown';
+ 
+@@ -49,24 +54,42 @@
+ // r3: coarse age band. Only resolveTrustedAgeBand() produces it, from server-side
+ // records; never from grade, CEFR, writing, names, client input or benchmark labels.
+ export type AgeBand = 'child' | 'teen' | 'adult' | 'unknown';
+-export type AgeBandSource = 'school_setting_adult_learners' | 'no_trusted_learner_age_source' | 'invalid_school_setting';
++export type AgeBandSource = 'school_setting_adult_learners' | 'student_age_band' | 'class_age_band' | 'no_trusted_learner_age_source' | 'invalid_school_setting';
+ export interface TrustedAgeBand {
+   band: AgeBand;
+   status: 'known' | 'unknown';
+   source: AgeBandSource;
+ }
+ 
+-// The only trusted runtime source today is the school-level adult-learners
+-// setting, whose documented policy (models/Institution.ts) is that every
+-// student of such a school is taught as an adult. ENARA stores no learner-level
+-// age, date of birth or age band, so child and teen cannot be resolved: they
+-// stay 'unknown' (BLOCKED pending a product decision; see r3 report). A
+-// non-boolean setting is treated as invalid, never as adult.
+-export function resolveTrustedAgeBand(learningSettings: unknown): TrustedAgeBand {
++// One authoritative resolver (Option B, approved 9 Nov 2026). Precedence:
++//   1. school setting adultLearners === true → adult (documented policy in
++//      models/Institution.ts: every student of such a school is taught as an adult);
++//   2. a valid staff-set student band (Student.learnerAgeBand);
++//   3. a valid staff-set class band (the student's Batch.learnerAgeBand);
++//   4. otherwise unknown. Never inferred from grade, CEFR, writing, names, client
++//      input or benchmark labels. Only exact enum values count; an invalid
++//      student value falls through to a valid class value. A malformed
++//      adultLearners is never treated as true.
++export function resolveTrustedAgeBand(learningSettings: unknown, studentBand?: unknown, classBand?: unknown): TrustedAgeBand {
+   const raw = learningSettings && typeof learningSettings === 'object' ? (learningSettings as Record<string, unknown>).adultLearners : undefined;
+   if (raw === true) return { band: 'adult', status: 'known', source: 'school_setting_adult_learners' };
+-  if (raw !== undefined && raw !== null && typeof raw !== 'boolean') return { band: 'unknown', status: 'unknown', source: 'invalid_school_setting' };
+-  return { band: 'unknown', status: 'unknown', source: 'no_trusted_learner_age_source' };
++  if (isLearnerAgeBand(studentBand)) return { band: studentBand, status: 'known', source: 'student_age_band' };
++  if (isLearnerAgeBand(classBand)) return { band: classBand, status: 'known', source: 'class_age_band' };
++  const malformed = raw !== undefined && raw !== null && typeof raw !== 'boolean';
++  return { band: 'unknown', status: 'unknown', source: malformed ? 'invalid_school_setting' : 'no_trusted_learner_age_source' };
++}
++
++// Server-side load of the inputs, all scoped to the session's institution:
++// the student must belong to it, and the class is the student's own batch in it.
++export async function loadTrustedAgeBand(params: { institutionId?: string; studentId?: string; learningSettings?: unknown }): Promise<TrustedAgeBand> {
++  if (!params.institutionId) return resolveTrustedAgeBand(params.learningSettings);
++  const student = params.studentId
++    ? await Student.findOne({ id: params.studentId, institutionId: params.institutionId }).select('+learnerAgeBand batchId').lean()
++    : null;
++  const batch = student?.batchId
++    ? await Batch.findOne({ id: student.batchId, institutionId: params.institutionId }).select('+learnerAgeBand').lean()
++    : null;
++  return resolveTrustedAgeBand(params.learningSettings, student?.learnerAgeBand, batch?.learnerAgeBand);
+ }
+ 
+ export interface LanguageSpec {
+@@ -978,6 +1001,8 @@
+   institutionId?: string;
+   curriculumId?: string;
+   lessonId?: string;
++  // Option B: the session owner's id (server-derived), used only to resolve the trusted age band.
++  studentId?: string;
+   grade?: string;
+   message: string;
+   history: { role: 'user' | 'assistant'; content: string }[];
+@@ -997,7 +1022,7 @@
+       courseLanguages: curriculum.languages,
+       adultSchool: false,
+       // r3: tenant-scoped server read (institutionId from the owner-checked session).
+-      trustedAgeBand: resolveTrustedAgeBand((institution as { learningSettings?: unknown } | null)?.learningSettings),
++      trustedAgeBand: await loadTrustedAgeBand({ institutionId: params.institutionId, studentId: params.studentId, learningSettings: (institution as { learningSettings?: unknown } | null)?.learningSettings }),
+       grade: params.grade,
+       learnerMessages,
+       objectiveStatus: params.masteryStatus,

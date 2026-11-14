@@ -6,6 +6,20 @@ export interface IChapter {
   uploads: string[];
   description?: string;
   enaraSectionId?: string;
+  // Language courses (Phase 1, ltc-v1): optional structured lesson facts the
+  // tutor teaches from. Absent on every existing lesson; no migration needed.
+  languageSpec?: {
+    objectives?: string[];
+    successCriteria?: string[];
+    vocabulary?: string[];
+    grammar?: string[];
+    functions?: string[];
+    skills?: string[];
+    examples?: string[];
+    // r4: exercises from the course (id + prompt reach the tutor; accepted answers
+    // and target forms stay server-side). Optional; absent on existing lessons.
+    items?: { id: string; prompt: string; acceptedAnswers?: string[]; targetForms?: string[]; criteria?: number[] }[];
+  };
 }
 
 export interface ICurriculum extends Document {
@@ -38,6 +52,23 @@ const chapterSchema = new Schema<IChapter>(
     uploads: { type: [String], default: [] },
     description: { type: String, default: '' },
     enaraSectionId: { type: String },
+    languageSpec: {
+      type: {
+        objectives: { type: [String], default: undefined },
+        successCriteria: { type: [String], default: undefined },
+        vocabulary: { type: [String], default: undefined },
+        grammar: { type: [String], default: undefined },
+        functions: { type: [String], default: undefined },
+        skills: { type: [String], default: undefined },
+        examples: { type: [String], default: undefined },
+        items: {
+          type: [{ id: String, prompt: String, acceptedAnswers: { type: [String], default: undefined }, targetForms: { type: [String], default: undefined }, criteria: { type: [Number], default: undefined }, _id: false }],
+          default: undefined,
+        },
+        _id: false,
+      },
+      default: undefined,
+    },
   },
   { _id: false }
 );

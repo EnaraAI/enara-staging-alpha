@@ -509,7 +509,7 @@ console.log((await status.json()).data.status);`;
               <div className={card}>
                 <CardHeader
                   title="Course ingestion API"
-                  subtitle="Partners upload course files with their API key. The backend stores the file in S3 and sends it to the AI engine, which indexes it for the tutor."
+                  subtitle="Partners upload course files with their API key. Enara stores the file securely and indexes it for the tutor."
                 />
                 <div className="grid sm:grid-cols-2 gap-3 text-sm">
                   <div className="p-3 rounded-md border border-slate-200">
@@ -563,7 +563,7 @@ console.log((await status.json()).data.status);`;
               <div className={`${card} space-y-4`}>
                 <CardHeader
                   title="Ingestion API tester"
-                  subtitle="Sends a real upload to the backend. It needs S3 and the AI engine to be configured there."
+                  subtitle="Sends a real upload to the backend. It needs Enara file storage and course indexing to be set up."
                 />
 
                 <div className="grid sm:grid-cols-2 gap-4">

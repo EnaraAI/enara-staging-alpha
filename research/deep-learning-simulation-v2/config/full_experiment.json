@@ -1,0 +1,34 @@
+{
+ "experimentId": "full-experiment-2",
+ "kind": "full_experiment",
+ "seed": "enara-dls-v2-main",
+ "students": 50,
+ "replications": 3,
+ "maxTurns": 6,
+ "adversarialShare": 0.1,
+ "models": {
+  "student": "claude-haiku-5-5",
+  "genericTutor": "claude-opus-5-5",
+  "judge": "claude-haiku-5-5"
+ },
+ "budgetCapUsd": 120,
+ "concurrency": 24,
+ "judgeRate": 0.1,
+ "ablate": [
+  "diagnosis",
+  "hint_ladder",
+  "teach_rule",
+  "rule_check",
+  "learner_history",
+  "transfer_check"
+ ],
+ "conditions": [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F"
+ ],
+ "samples": 3
+}

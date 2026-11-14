@@ -1,0 +1,2035 @@
+{
+ "note": "Frozen BEFORE the new sessions of the clarity study. These are the benchmark post-stage items (4 per outcome), written before any tutoring run and never shown to any tutor prompt (tutors see lesson practice items only). Scored deterministically with benchmark/scoring.ts.",
+ "items": [
+  {
+   "studentIdx": 0,
+   "outcome": "GR-02",
+   "area": "grammar",
+   "rule": "Articles a, an and the",
+   "objective": "Choose a, an or the correctly before singular nouns.",
+   "post": [
+    {
+     "id": "GR-02-POST1",
+     "prompt": "Complete with a, an or the: \"He wants ___ orange.\"",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "an"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "GR-02-POST2",
+     "prompt": "Complete with a, an or the: \"There is a cat on the roof. ___ cat is black.\"",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "the"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "GR-02-POST3",
+     "prompt": "Complete with a, an or the: \"He found ___ envelope under the door.\"",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "an"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "GR-02-POST4",
+     "prompt": "Complete with a, an or the: \"I bought a lamp and a rug. ___ lamp was cheap.\"",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "the"
+      ],
+      "mode": "exact"
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 1,
+   "outcome": "WR-02",
+   "area": "writing",
+   "rule": "Linking ideas with and, but, because",
+   "objective": "Join two ideas in one written sentence using and (addition), but (contrast) and because (reason).",
+   "post": [
+    {
+     "id": "WR-02-POST1",
+     "prompt": "Join the two ideas into ONE sentence using and, but or because: \"Mia bought a new phone. Her old phone was broken.\"",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "cap",
+        "description": "Starts with a capital letter",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[A-Z]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "end",
+        "description": "Ends with . ! or ?",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?][\"')]?\\s*$"
+        }
+       },
+       {
+        "id": "one",
+        "description": "One sentence: no full stop before the linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "[.!?]\\s+\\S",
+         "flags": ""
+        }
+       },
+       {
+        "id": "because",
+        "description": "Uses \"because\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bbecause\\b"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "Does not use a wrong linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(and|but)\\b"
+        }
+       },
+       {
+        "id": "len",
+        "description": "At least 6 words",
+        "required": false,
+        "check": {
+         "kind": "minWords",
+         "n": 6
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "WR-02-POST2",
+     "prompt": "Join the two ideas into ONE sentence using and, but or because: \"The cafe is cheap. It is not very clean.\"",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "cap",
+        "description": "Starts with a capital letter",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[A-Z]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "end",
+        "description": "Ends with . ! or ?",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?][\"')]?\\s*$"
+        }
+       },
+       {
+        "id": "one",
+        "description": "One sentence: no full stop before the linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "[.!?]\\s+\\S",
+         "flags": ""
+        }
+       },
+       {
+        "id": "but",
+        "description": "Uses \"but\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bbut\\b"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "Does not use a wrong linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(and|because)\\b"
+        }
+       },
+       {
+        "id": "len",
+        "description": "At least 6 words",
+        "required": false,
+        "check": {
+         "kind": "minWords",
+         "n": 6
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "WR-02-POST3",
+     "prompt": "Join the two ideas into ONE sentence using and, but or because: \"The shop closed early. The owner was ill.\"",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "cap",
+        "description": "Starts with a capital letter",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[A-Z]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "end",
+        "description": "Ends with . ! or ?",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?][\"')]?\\s*$"
+        }
+       },
+       {
+        "id": "one",
+        "description": "One sentence: no full stop before the linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "[.!?]\\s+\\S",
+         "flags": ""
+        }
+       },
+       {
+        "id": "because",
+        "description": "Uses \"because\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bbecause\\b"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "Does not use a wrong linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(and|but)\\b"
+        }
+       },
+       {
+        "id": "len",
+        "description": "At least 6 words",
+        "required": false,
+        "check": {
+         "kind": "minWords",
+         "n": 6
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "WR-02-POST4",
+     "prompt": "Join the two ideas into ONE sentence using and, but or because: \"Yuki trained hard. She lost the race.\"",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "cap",
+        "description": "Starts with a capital letter",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[A-Z]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "end",
+        "description": "Ends with . ! or ?",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?][\"')]?\\s*$"
+        }
+       },
+       {
+        "id": "one",
+        "description": "One sentence: no full stop before the linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "[.!?]\\s+\\S",
+         "flags": ""
+        }
+       },
+       {
+        "id": "but",
+        "description": "Uses \"but\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bbut\\b"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "Does not use a wrong linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(and|because)\\b"
+        }
+       },
+       {
+        "id": "len",
+        "description": "At least 6 words",
+        "required": false,
+        "check": {
+         "kind": "minWords",
+         "n": 6
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 2,
+   "outcome": "RD-06",
+   "area": "reading",
+   "rule": "Vocabulary from context",
+   "objective": "Work out the meaning of an unknown or multi-meaning word from the words and sentences around it.",
+   "post": [
+    {
+     "id": "RD-06-POST1",
+     "prompt": "What does \"strike\" mean here? A) hit with the hand B) hit a ball C) stop working in protest Reply with the letter only.",
+     "material": "The workers decided to strike, so the factory stopped and nobody went to work for a week.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "c"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "RD-06-POST2",
+     "prompt": "What does \"frail\" mean here? A) weak and thin B) rich C) angry Reply with the letter only.",
+     "material": "The old man was frail. He needed a stick and a helping arm just to cross the road.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "a"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "RD-06-POST3",
+     "prompt": "What does \"fair\" mean here? A) light-haired B) a fun event with rides C) just and equal Reply with the letter only.",
+     "material": "It was a fair game. Both teams had the same chances, and the referee treated everyone the same.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "c"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "RD-06-POST4",
+     "prompt": "What does \"scarce\" mean here? A) plentiful B) hard to find C) hot Reply with the letter only.",
+     "material": "Water is scarce in the desert village. People walk for miles to find a little, and every drop is saved.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "b"
+      ],
+      "mode": "exact"
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 3,
+   "outcome": "LS-02",
+   "area": "listening",
+   "rule": "Understanding numbers and prices in dialogues",
+   "objective": "Pick out prices and quantities in a short written dialogue, telling apart pairs such as 13/30 and 15/50.",
+   "post": [
+    {
+     "id": "LS-02-POST1",
+     "prompt": "How much is the ticket? Answer in one or two words.",
+     "material": "A: One ticket, please. B: That is fifteen pounds. A: Fifteen? OK.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "15",
+       "fifteen"
+      ]
+     }
+    },
+    {
+     "id": "LS-02-POST2",
+     "prompt": "How much does the jacket cost today? Answer in one or two words.",
+     "material": "A: The jacket was forty dollars. B: Today it is thirty dollars.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "30",
+       "thirty"
+      ]
+     }
+    },
+    {
+     "id": "LS-02-POST3",
+     "prompt": "How much is the bag now? Answer in one or two words.",
+     "material": "A: The bag was twenty-five euros. B: Now it is eighteen euros. A: Eighteen? Good.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "18",
+       "eighteen"
+      ]
+     }
+    },
+    {
+     "id": "LS-02-POST4",
+     "prompt": "How many people come to the party? Answer in one or two words.",
+     "material": "A: How many people are coming? B: Seventeen. A: Seventeen? Not seventy? B: No, seventeen.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "17",
+       "seventeen"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 4,
+   "outcome": "VO-02",
+   "area": "vocabulary",
+   "rule": "Opposites: hot/cold, early/late, cheap/expensive, easy/difficult",
+   "objective": "Give the opposite of common adjectives and use opposites in sentences.",
+   "post": [
+    {
+     "id": "VO-02-POST1",
+     "prompt": "What is the opposite of \"expensive\"? Write one word.",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "cheap"
+      ]
+     }
+    },
+    {
+     "id": "VO-02-POST2",
+     "prompt": "What is the opposite of \"cold\"? Write one word.",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "hot"
+      ]
+     }
+    },
+    {
+     "id": "VO-02-POST3",
+     "prompt": "Which word is the opposite of \"hot\": cold, warm or ice? Write one word.",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "cold"
+      ]
+     }
+    },
+    {
+     "id": "VO-02-POST4",
+     "prompt": "Which word is the opposite of \"cheap\": expensive, uncheap or low? Write one word.",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "expensive"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 5,
+   "outcome": "FN-04",
+   "area": "functional",
+   "rule": "Making suggestions",
+   "objective": "Suggest an activity with \"How about + -ing\", \"Let's + verb\" or \"Why don't we + verb\" without sounding like an order.",
+   "post": [
+    {
+     "id": "FN-04-POST1",
+     "prompt": "Your friend wants to eat out tonight. Suggest an Italian restaurant.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "mark",
+        "description": "uses a suggestion phrase",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(why don't we|why not|how about|what about|let's|shall we|we could|we can|i suggest|perhaps we could|maybe we could|what if we)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "form",
+        "description": "no wrong form after how about / why we / let's to",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(how|what) about (to |go\\b|eat\\b|watch\\b|play\\b|have\\b|visit\\b|see\\b|study\\b|meet\\b|take\\b|try\\b|do\\b|make\\b|start\\b|begin\\b|launch\\b|run\\b|cook\\b|invite\\b)|\\bwhy (we|not to)\\b|\\blet's to\\b|\\bwhy don't we (go|\\w+)ing\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "cmd",
+        "description": "no order such as You must",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(you must|you have to|you need to)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "len",
+        "description": "long enough to be a real sentence",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 4
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "FN-04-POST2",
+     "prompt": "Your cousin is visiting for one day. Suggest a visit to the museum.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "mark",
+        "description": "uses a suggestion phrase",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(why don't we|why not|how about|what about|let's|shall we|we could|we can|i suggest|perhaps we could|maybe we could|what if we)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "form",
+        "description": "no wrong form after how about / why we / let's to",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(how|what) about (to |go\\b|eat\\b|watch\\b|play\\b|have\\b|visit\\b|see\\b|study\\b|meet\\b|take\\b|try\\b|do\\b|make\\b|start\\b|begin\\b|launch\\b|run\\b|cook\\b|invite\\b)|\\bwhy (we|not to)\\b|\\blet's to\\b|\\bwhy don't we (go|\\w+)ing\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "cmd",
+        "description": "no order such as You must",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(you must|you have to|you need to)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "len",
+        "description": "long enough to be a real sentence",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 4
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "FN-04-POST3",
+     "prompt": "You and your classmates want to thank a teacher. Suggest buying her some flowers.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "mark",
+        "description": "uses a suggestion phrase",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(why don't we|why not|how about|what about|let's|shall we|we could|we can|i suggest|perhaps we could|maybe we could|what if we)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "form",
+        "description": "no wrong form after how about / why we / let's to",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(how|what) about (to |go\\b|eat\\b|watch\\b|play\\b|have\\b|visit\\b|see\\b|study\\b|meet\\b|take\\b|try\\b|do\\b|make\\b|start\\b|begin\\b|launch\\b|run\\b|cook\\b|invite\\b)|\\bwhy (we|not to)\\b|\\blet's to\\b|\\bwhy don't we (go|\\w+)ing\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "cmd",
+        "description": "no order such as You must",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(you must|you have to|you need to)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "len",
+        "description": "long enough to be a real sentence",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 4
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "FN-04-POST4",
+     "prompt": "Your classmate is stuck on a maths problem. Suggest asking the teacher for help.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "mark",
+        "description": "uses a suggestion phrase",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(why don't we|why not|how about|what about|let's|shall we|we could|we can|i suggest|perhaps we could|maybe we could|what if we)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "form",
+        "description": "no wrong form after how about / why we / let's to",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(how|what) about (to |go\\b|eat\\b|watch\\b|play\\b|have\\b|visit\\b|see\\b|study\\b|meet\\b|take\\b|try\\b|do\\b|make\\b|start\\b|begin\\b|launch\\b|run\\b|cook\\b|invite\\b)|\\bwhy (we|not to)\\b|\\blet's to\\b|\\bwhy don't we (go|\\w+)ing\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "cmd",
+        "description": "no order such as You must",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(you must|you have to|you need to)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "len",
+        "description": "long enough to be a real sentence",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 4
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 6,
+   "outcome": "FN-06",
+   "area": "functional",
+   "rule": "Giving advice",
+   "objective": "Give friendly advice with \"You should + verb\", \"If I were you, I'd ...\" or \"Why don't you ...?\" instead of orders.",
+   "post": [
+    {
+     "id": "FN-06-POST1",
+     "prompt": "Your colleague is very stressed at work. Give advice.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "adv",
+        "description": "uses an advice phrase",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(you should|you ought to|you'd better|you had better|if i were you|why don't you|you could|you might want to|i'd|i would|it might be a good idea|i recommend|i would recommend)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "no must/have to or wrong should forms",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(must|have to|should to|should (to|being|going|taking)|should (goes|takes|has|does|talks|sees|gets|makes|asks|eats|drinks|sleeps|rests|stays)|if i was)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "len",
+        "description": "long enough to be a real sentence",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 5
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "FN-06-POST2",
+     "prompt": "Your neighbour has a very loud dog. Give advice to the owner.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "adv",
+        "description": "uses an advice phrase",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(you should|you ought to|you'd better|you had better|if i were you|why don't you|you could|you might want to|i'd|i would|it might be a good idea|i recommend|i would recommend)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "no must/have to or wrong should forms",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(must|have to|should to|should (to|being|going|taking)|should (goes|takes|has|does|talks|sees|gets|makes|asks|eats|drinks|sleeps|rests|stays)|if i was)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "len",
+        "description": "long enough to be a real sentence",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 5
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "FN-06-POST3",
+     "prompt": "Your brother wants to get fit. Give him advice.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "adv",
+        "description": "uses an advice phrase",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(you should|you ought to|you'd better|you had better|if i were you|why don't you|you could|you might want to|i'd|i would|it might be a good idea|i recommend|i would recommend)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "no must/have to or wrong should forms",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(must|have to|should to|should (to|being|going|taking)|should (goes|takes|has|does|talks|sees|gets|makes|asks|eats|drinks|sleeps|rests|stays)|if i was)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "len",
+        "description": "long enough to be a real sentence",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 5
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "FN-06-POST4",
+     "prompt": "Your classmate is nervous before a speaking test. Give advice.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "adv",
+        "description": "uses an advice phrase",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(you should|you ought to|you'd better|you had better|if i were you|why don't you|you could|you might want to|i'd|i would|it might be a good idea|i recommend|i would recommend)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "no must/have to or wrong should forms",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(must|have to|should to|should (to|being|going|taking)|should (goes|takes|has|does|talks|sees|gets|makes|asks|eats|drinks|sleeps|rests|stays)|if i was)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "len",
+        "description": "long enough to be a real sentence",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 5
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 7,
+   "outcome": "FN-08",
+   "area": "functional",
+   "rule": "Shopping: price and size questions",
+   "objective": "Ask the price with \"How much is/are ...?\" and ask for a size or colour with \"Do you have this in ...?\".",
+   "post": [
+    {
+     "id": "FN-08-POST1",
+     "prompt": "You are in a shop. Ask the price of a watch.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "noun",
+        "description": "mentions the item",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bwatch\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "how",
+        "description": "asks the price with how much is/are/does/do or what is the price",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(how much (is|are|does|do)|what('s| is) the price|could you tell me (the price|how much))\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "gen",
+        "description": "no how much cost / how many",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\bhow much (cost|costs)\\b|\\bhow many (is|are|does|do)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "agr",
+        "description": "agreement: singular noun",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\bhow much (are|do) [\\w ]{0,15}\\bwatch\\b",
+         "flags": "i"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "FN-08-POST2",
+     "prompt": "You are in a shop. Ask the price of a pair of gloves.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "noun",
+        "description": "mentions the item",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bgloves\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "how",
+        "description": "asks the price with how much is/are/does/do or what is the price",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(how much (is|are|does|do)|what('s| is) the price|could you tell me (the price|how much))\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "gen",
+        "description": "no how much cost / how many",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\bhow much (cost|costs)\\b|\\bhow many (is|are|does|do)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "agr",
+        "description": "agreement: plural noun",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\bhow much (is|does) [\\w ]{0,15}\\bgloves\\b",
+         "flags": "i"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "FN-08-POST3",
+     "prompt": "You are in a shop. Ask the price of a notebook.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "noun",
+        "description": "mentions the item",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bnotebook\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "how",
+        "description": "asks the price with how much is/are/does/do or what is the price",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(how much (is|are|does|do)|what('s| is) the price|could you tell me (the price|how much))\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "gen",
+        "description": "no how much cost / how many",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\bhow much (cost|costs)\\b|\\bhow many (is|are|does|do)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "agr",
+        "description": "agreement: singular noun",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\bhow much (are|do) [\\w ]{0,15}\\bnotebook\\b",
+         "flags": "i"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "FN-08-POST4",
+     "prompt": "You are in a shop. Ask the price of a pair of sunglasses.",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "noun",
+        "description": "mentions the item",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bsunglasses\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "how",
+        "description": "asks the price with how much is/are/does/do or what is the price",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(how much (is|are|does|do)|what('s| is) the price|could you tell me (the price|how much))\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "gen",
+        "description": "no how much cost / how many",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\bhow much (cost|costs)\\b|\\bhow many (is|are|does|do)\\b",
+         "flags": "i"
+        }
+       },
+       {
+        "id": "agr",
+        "description": "agreement: plural noun",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\bhow much (is|does) [\\w ]{0,15}\\bsunglasses\\b",
+         "flags": "i"
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 8,
+   "outcome": "GR-04",
+   "area": "grammar",
+   "rule": "Present perfect versus past simple",
+   "objective": "Choose present perfect for unfinished periods and past simple for finished times.",
+   "post": [
+    {
+     "id": "GR-04-POST1",
+     "prompt": "Complete: \"They ___ (visit) Spain in 2015.\" Write the verb.",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "visited"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "GR-04-POST2",
+     "prompt": "Complete: \"I ___ (know) my neighbour for ten years.\" Write the verb phrase.",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "have known"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "GR-04-POST3",
+     "prompt": "Complete: \"We ___ (arrive) at the hotel two hours ago.\" Write the verb.",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "arrived"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "GR-04-POST4",
+     "prompt": "Complete: \"They ___ (be) married for thirty years.\" Write the verb phrase.",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "have been"
+      ],
+      "mode": "exact"
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 9,
+   "outcome": "GR-06",
+   "area": "grammar",
+   "rule": "Must, mustn't and don't have to",
+   "objective": "Choose must, mustn't or don't have to to express obligation, prohibition and lack of necessity.",
+   "post": [
+    {
+     "id": "GR-06-POST1",
+     "prompt": "Complete with a modal: \"Visitors ___ touch the paintings.\" (forbidden)",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "mustn't",
+       "must not"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "GR-06-POST2",
+     "prompt": "Complete with a modal: \"You ___ bring a pen; the exam office gives you one.\" (not necessary)",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "don't have",
+       "not have"
+      ],
+      "mode": "contains"
+     }
+    },
+    {
+     "id": "GR-06-POST3",
+     "prompt": "Complete with a modal: \"Cyclists ___ ride on the pavement here.\" (forbidden)",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "mustn't",
+       "must not"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "GR-06-POST4",
+     "prompt": "Complete with a modal: \"It is a free concert, so you ___ buy a ticket.\" (not necessary)",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "don't have",
+       "not have"
+      ],
+      "mode": "contains"
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 10,
+   "outcome": "LS-05",
+   "area": "listening",
+   "rule": "Identifying the topic of a dialogue",
+   "objective": "Name the general topic of a short written dialogue from key words, without relying on one word alone.",
+   "post": [
+    {
+     "id": "LS-05-POST1",
+     "prompt": "What is the topic: food, travel or health?  Answer in one or two words.",
+     "material": "A: Is breakfast included in the price? B: Yes, and the room has a sea view. A: Good, I would like to book two nights.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "travel"
+      ]
+     }
+    },
+    {
+     "id": "LS-05-POST2",
+     "prompt": "What is the topic: weather, work or sport? Answer in one or two words.",
+     "material": "A: The match was cancelled because of the rain. B: Typical. The team trained all week.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "sport"
+      ]
+     }
+    },
+    {
+     "id": "LS-05-POST3",
+     "prompt": "What is the topic: shopping, health or travel? Answer in one or two words.",
+     "material": "A: This shirt is too big. Do you have a smaller size? B: Yes, and it is on sale today. A: Good, I will take it.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "shopping"
+      ]
+     }
+    },
+    {
+     "id": "LS-05-POST4",
+     "prompt": "What is the topic: school, work or weather? Answer in one or two words.",
+     "material": "A: The teacher gave us a lot of homework. B: Yes, and the exam is on Monday. It is cold in the library too.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "school"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 11,
+   "outcome": "LS-08",
+   "area": "listening",
+   "rule": "Reading attitude and tone from word choice",
+   "objective": "Infer a speaker's attitude (annoyed, pleased, reluctant, sarcastic, worried) from word choice in a short written dialogue.",
+   "post": [
+    {
+     "id": "LS-08-POST1",
+     "prompt": "How does the man feel: eager, reluctant or angry? Answer in one or two words.",
+     "material": "A: Will you come to the meeting on Saturday? B: Well... I suppose I could, if you really need me.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "reluctant"
+      ]
+     }
+    },
+    {
+     "id": "LS-08-POST2",
+     "prompt": "How does she feel: pleased, sarcastic or shy? Answer in one or two words.",
+     "material": "A: I have to work late again. B: Fantastic. That is the third time this week.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "sarcastic"
+      ]
+     }
+    },
+    {
+     "id": "LS-08-POST3",
+     "prompt": "How does the woman feel: eager, reluctant or angry? Answer in one or two words.",
+     "material": "A: Can you help me move house? B: Er... I guess so. If nobody else can.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "reluctant"
+      ]
+     }
+    },
+    {
+     "id": "LS-08-POST4",
+     "prompt": "How does he feel: pleased, sarcastic or shy? Answer in one or two words.",
+     "material": "A: It is raining on our picnic day. B: Lovely weather. Just what we wanted.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "sarcastic"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 12,
+   "outcome": "RD-07",
+   "area": "reading",
+   "rule": "Making inferences from clues",
+   "objective": "Work out what a text suggests but does not say, using clues in the text and avoiding guesses that have no support.",
+   "post": [
+    {
+     "id": "RD-07-POST1",
+     "prompt": "How does Dev probably feel about the results? Reply with one word: nervous, proud or bored?",
+     "material": "When the results came, Dev did not open the envelope. He put it in a drawer, picked up his guitar, and played until it was dark.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "nervous"
+      ],
+      "mode": "contains"
+     }
+    },
+    {
+     "id": "RD-07-POST2",
+     "prompt": "How did the fans feel about the match? Reply with one word: pleased or disappointed?",
+     "material": "Despite the heavy rain, the stadium was full, and fans sang loudly until the final whistle. Many were still smiling as they left, with wet scarves.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "pleased"
+      ],
+      "mode": "contains"
+     }
+    },
+    {
+     "id": "RD-07-POST3",
+     "prompt": "How does Kim probably feel? Reply with one word: relieved, angry or lonely?",
+     "material": "Kim read the message from the hospital twice. Then she sat down, smiled, and let out a long breath. \"He is fine,\" she whispered.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "relieved"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "RD-07-POST4",
+     "prompt": "Did Rob enjoy the meal? Reply yes or no.",
+     "material": "Rob thanked the cook politely. He moved the fish around his plate, drank two glasses of water, and asked if there was any bread left.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "no"
+      ],
+      "mode": "exact"
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 13,
+   "outcome": "RD-08",
+   "area": "reading",
+   "rule": "Author purpose and tone",
+   "objective": "Decide why an author wrote a text (inform, persuade, warn, complain) and what tone it has, using the language the writer chooses.",
+   "post": [
+    {
+     "id": "RD-08-POST1",
+     "prompt": "What is the writer's main purpose? Reply with one word: inform, persuade, warn or complain?",
+     "material": "I have waited three weeks for my refund, and I have called your helpline six times. Nobody has explained the delay. This is unacceptable.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "complain"
+      ],
+      "mode": "contains"
+     }
+    },
+    {
+     "id": "RD-08-POST2",
+     "prompt": "What is the writer's main purpose? Reply with one word: inform, persuade, warn or complain?",
+     "material": "Last Tuesday, the council opened a new library on Mill Street. It has 20,000 books and a children's area, and is open from nine until six.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "inform"
+      ],
+      "mode": "contains"
+     }
+    },
+    {
+     "id": "RD-08-POST3",
+     "prompt": "What is the writer's main purpose? Reply with one word: inform, persuade, warn or complain?",
+     "material": "Our new phone is faster, lighter and cheaper than ever. Buy yours this week and get a free case. You deserve the best.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "persuade"
+      ],
+      "mode": "contains"
+     }
+    },
+    {
+     "id": "RD-08-POST4",
+     "prompt": "What is the writer's main purpose? Reply with one word: inform, persuade, warn or complain?",
+     "material": "The soup was cold and the waiter was rude. We asked for a clean fork and waited twenty minutes. I expect an apology and my money back.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "complain"
+      ],
+      "mode": "contains"
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 14,
+   "outcome": "VO-04",
+   "area": "vocabulary",
+   "rule": "Collocations with make and do",
+   "objective": "Choose make or do correctly with common nouns (do homework, make a mistake).",
+   "post": [
+    {
+     "id": "VO-04-POST1",
+     "prompt": "Complete with make or do: \"Grandma will ___ a cake for the party.\"",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "make"
+      ]
+     }
+    },
+    {
+     "id": "VO-04-POST2",
+     "prompt": "Complete with make or do: \"I must ___ the laundry on Sunday.\"",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "do"
+      ]
+     }
+    },
+    {
+     "id": "VO-04-POST3",
+     "prompt": "Complete with make or do: \"My sister will ___ a speech at the wedding.\"",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "make"
+      ]
+     }
+    },
+    {
+     "id": "VO-04-POST4",
+     "prompt": "Complete with make or do: \"We always ___ the gardening on Saturday.\"",
+     "material": null,
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "do"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 15,
+   "outcome": "WR-06",
+   "area": "writing",
+   "rule": "Paragraph with a topic sentence",
+   "objective": "Write a short paragraph that starts with a topic sentence and continues with supporting reasons and examples.",
+   "post": [
+    {
+     "id": "WR-06-POST1",
+     "prompt": "Write a paragraph of 3-5 sentences on this topic: Why people should recycle. Your FIRST sentence must be a topic sentence that contains the word \"recycl\".",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "topic",
+        "description": "First sentence is a topic sentence with \"recycl\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[^.!?]*recycl[^.!?]*[.!?]"
+        }
+       },
+       {
+        "id": "support",
+        "description": "Uses a supporting-detail marker",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(for example|for instance|because|also|another|in addition)\\b"
+        }
+       },
+       {
+        "id": "sent",
+        "description": "At least three sentences",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "min",
+        "description": "At least 25 words",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 25
+        }
+       },
+       {
+        "id": "max",
+        "description": "At most 100 words",
+        "required": false,
+        "check": {
+         "kind": "maxWords",
+         "n": 100
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "WR-06-POST2",
+     "prompt": "Write a paragraph of 3-5 sentences on this topic: Why a dog can be a good pet. Your FIRST sentence must be a topic sentence that contains the word \"dog\".",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "topic",
+        "description": "First sentence is a topic sentence with \"dog\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[^.!?]*dog[^.!?]*[.!?]"
+        }
+       },
+       {
+        "id": "support",
+        "description": "Uses a supporting-detail marker",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(for example|for instance|because|also|another|in addition)\\b"
+        }
+       },
+       {
+        "id": "sent",
+        "description": "At least three sentences",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "min",
+        "description": "At least 25 words",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 25
+        }
+       },
+       {
+        "id": "max",
+        "description": "At most 100 words",
+        "required": false,
+        "check": {
+         "kind": "maxWords",
+         "n": 100
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "WR-06-POST3",
+     "prompt": "Write a paragraph of 3-5 sentences on this topic: Why cycling is good for a city. Your FIRST sentence must be a topic sentence that contains the word \"cycl\".",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "topic",
+        "description": "First sentence is a topic sentence with \"cycl\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[^.!?]*cycl[^.!?]*[.!?]"
+        }
+       },
+       {
+        "id": "support",
+        "description": "Uses a supporting-detail marker",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(for example|for instance|because|also|another|in addition)\\b"
+        }
+       },
+       {
+        "id": "sent",
+        "description": "At least three sentences",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "min",
+        "description": "At least 25 words",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 25
+        }
+       },
+       {
+        "id": "max",
+        "description": "At most 100 words",
+        "required": false,
+        "check": {
+         "kind": "maxWords",
+         "n": 100
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "WR-06-POST4",
+     "prompt": "Write a paragraph of 3-5 sentences on this topic: Why museums should be free. Your FIRST sentence must be a topic sentence that contains the word \"museum\".",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "topic",
+        "description": "First sentence is a topic sentence with \"museum\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[^.!?]*museum[^.!?]*[.!?]"
+        }
+       },
+       {
+        "id": "support",
+        "description": "Uses a supporting-detail marker",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\b(for example|for instance|because|also|another|in addition)\\b"
+        }
+       },
+       {
+        "id": "sent",
+        "description": "At least three sentences",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?]\\s+[A-Z][^.!?]*[.!?]\\s+[A-Z][^.!?]*[.!?]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "min",
+        "description": "At least 25 words",
+        "required": true,
+        "check": {
+         "kind": "minWords",
+         "n": 25
+        }
+       },
+       {
+        "id": "max",
+        "description": "At most 100 words",
+        "required": false,
+        "check": {
+         "kind": "maxWords",
+         "n": 100
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 16,
+   "outcome": "WR-02",
+   "area": "writing",
+   "rule": "Linking ideas with and, but, because",
+   "objective": "Join two ideas in one written sentence using and (addition), but (contrast) and because (reason).",
+   "post": [
+    {
+     "id": "WR-02-POST1",
+     "prompt": "Join the two ideas into ONE sentence using and, but or because: \"Mia bought a new phone. Her old phone was broken.\"",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "cap",
+        "description": "Starts with a capital letter",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[A-Z]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "end",
+        "description": "Ends with . ! or ?",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?][\"')]?\\s*$"
+        }
+       },
+       {
+        "id": "one",
+        "description": "One sentence: no full stop before the linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "[.!?]\\s+\\S",
+         "flags": ""
+        }
+       },
+       {
+        "id": "because",
+        "description": "Uses \"because\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bbecause\\b"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "Does not use a wrong linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(and|but)\\b"
+        }
+       },
+       {
+        "id": "len",
+        "description": "At least 6 words",
+        "required": false,
+        "check": {
+         "kind": "minWords",
+         "n": 6
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "WR-02-POST2",
+     "prompt": "Join the two ideas into ONE sentence using and, but or because: \"The cafe is cheap. It is not very clean.\"",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "cap",
+        "description": "Starts with a capital letter",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[A-Z]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "end",
+        "description": "Ends with . ! or ?",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?][\"')]?\\s*$"
+        }
+       },
+       {
+        "id": "one",
+        "description": "One sentence: no full stop before the linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "[.!?]\\s+\\S",
+         "flags": ""
+        }
+       },
+       {
+        "id": "but",
+        "description": "Uses \"but\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bbut\\b"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "Does not use a wrong linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(and|because)\\b"
+        }
+       },
+       {
+        "id": "len",
+        "description": "At least 6 words",
+        "required": false,
+        "check": {
+         "kind": "minWords",
+         "n": 6
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "WR-02-POST3",
+     "prompt": "Join the two ideas into ONE sentence using and, but or because: \"The shop closed early. The owner was ill.\"",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "cap",
+        "description": "Starts with a capital letter",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[A-Z]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "end",
+        "description": "Ends with . ! or ?",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?][\"')]?\\s*$"
+        }
+       },
+       {
+        "id": "one",
+        "description": "One sentence: no full stop before the linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "[.!?]\\s+\\S",
+         "flags": ""
+        }
+       },
+       {
+        "id": "because",
+        "description": "Uses \"because\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bbecause\\b"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "Does not use a wrong linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(and|but)\\b"
+        }
+       },
+       {
+        "id": "len",
+        "description": "At least 6 words",
+        "required": false,
+        "check": {
+         "kind": "minWords",
+         "n": 6
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "WR-02-POST4",
+     "prompt": "Join the two ideas into ONE sentence using and, but or because: \"Yuki trained hard. She lost the race.\"",
+     "material": null,
+     "scoring": {
+      "type": "rubric",
+      "checks": [
+       {
+        "id": "cap",
+        "description": "Starts with a capital letter",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "^\\s*[A-Z]",
+         "flags": ""
+        }
+       },
+       {
+        "id": "end",
+        "description": "Ends with . ! or ?",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "[.!?][\"')]?\\s*$"
+        }
+       },
+       {
+        "id": "one",
+        "description": "One sentence: no full stop before the linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "[.!?]\\s+\\S",
+         "flags": ""
+        }
+       },
+       {
+        "id": "but",
+        "description": "Uses \"but\"",
+        "required": true,
+        "check": {
+         "kind": "regex",
+         "pattern": "\\bbut\\b"
+        }
+       },
+       {
+        "id": "bad",
+        "description": "Does not use a wrong linking word",
+        "required": true,
+        "check": {
+         "kind": "notRegex",
+         "pattern": "\\b(and|because)\\b"
+        }
+       },
+       {
+        "id": "len",
+        "description": "At least 6 words",
+        "required": false,
+        "check": {
+         "kind": "minWords",
+         "n": 6
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "studentIdx": 17,
+   "outcome": "RD-06",
+   "area": "reading",
+   "rule": "Vocabulary from context",
+   "objective": "Work out the meaning of an unknown or multi-meaning word from the words and sentences around it.",
+   "post": [
+    {
+     "id": "RD-06-POST1",
+     "prompt": "What does \"strike\" mean here? A) hit with the hand B) hit a ball C) stop working in protest Reply with the letter only.",
+     "material": "The workers decided to strike, so the factory stopped and nobody went to work for a week.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "c"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "RD-06-POST2",
+     "prompt": "What does \"frail\" mean here? A) weak and thin B) rich C) angry Reply with the letter only.",
+     "material": "The old man was frail. He needed a stick and a helping arm just to cross the road.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "a"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "RD-06-POST3",
+     "prompt": "What does \"fair\" mean here? A) light-haired B) a fun event with rides C) just and equal Reply with the letter only.",
+     "material": "It was a fair game. Both teams had the same chances, and the referee treated everyone the same.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "c"
+      ],
+      "mode": "exact"
+     }
+    },
+    {
+     "id": "RD-06-POST4",
+     "prompt": "What does \"scarce\" mean here? A) plentiful B) hard to find C) hot Reply with the letter only.",
+     "material": "Water is scarce in the desert village. People walk for miles to find a little, and every drop is saved.",
+     "scoring": {
+      "type": "key",
+      "accepted": [
+       "b"
+      ],
+      "mode": "exact"
+     }
+    }
+   ]
+  }
+ ]
+}

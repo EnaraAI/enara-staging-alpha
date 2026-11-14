@@ -491,7 +491,7 @@ export interface LiveAvatar {
   name: string;
   title: string;
   subject: string;
-  provider: 'enara-webrtc' | 'tavus' | 'elevenlabs-did' | 'custom-webrtc';
+  provider: 'enara-webrtc' | 'custom-webrtc';
   avatarModelId: string;
   voiceId: string;
   avatarUrl: string;
@@ -508,7 +508,7 @@ export interface LiveAvatar {
 }
 
 export interface AvatarConfig {
-  provider: 'enara-webrtc' | 'tavus' | 'elevenlabs-did' | 'custom-webrtc';
+  provider: 'enara-webrtc' | 'custom-webrtc';
   apiKey: string;
   apiEndpoint: string;
   apiKeyMasked?: string;
@@ -541,8 +541,8 @@ export interface AvatarStreamAnalytics {
   tokenExpenditureMonthly: number;
   providerStatus: {
     enaraAvatar: 'operational' | 'degraded' | 'offline';
-    elevenlabs: 'operational' | 'degraded' | 'offline';
-    tavus: 'operational' | 'degraded' | 'offline';
+    enaraVoice: 'operational' | 'degraded' | 'offline';
+    enaraVideo: 'operational' | 'degraded' | 'offline';
   };
   recentSessions: AvatarSession[];
 }

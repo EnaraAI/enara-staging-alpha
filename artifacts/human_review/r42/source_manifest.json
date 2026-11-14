@@ -1,0 +1,221 @@
+{
+ "extractionTimestampUtc": "2026-11-10T08:08:19+00:00",
+ "extractor": "artifacts/human_review/r42/tools/hr_build.py (+ hr_decisions.py, hr_xlsx.py); read-only on all sources",
+ "git": {
+  "commit": "fc6a487d287762a5f17ceadaf451f6c990347215",
+  "branch": "claude/codebase-review-kbxqan",
+  "uncommittedTrackedDiff": {
+   "file": "source_uncommitted_diff.patch",
+   "sha256": "2d569f1050aa1181a0601cb774f7876367b5a896d1626e21b7c539dacddb8872",
+   "filesChanged": 18
+  },
+  "statusFile": "source_git_status.txt",
+  "statusLines": 40,
+  "untrackedPaths": [
+   "artifacts/\n",
+   "backend/benchmarks/\n",
+   "backend/localdemo.tmp.ts\n",
+   "backend/src/controllers/learnerAgeBand.controller.ts\n",
+   "backend/src/models/learnerAgeBand.ts\n",
+   "backend/src/routes/learnerAgeBand.routes.ts\n",
+   "backend/src/services/languageLearningState.ts\n",
+   "backend/src/services/languageTeachingContext.ts\n",
+   "backend/test/audit-post-remediation/\n",
+   "backend/test/benchmarkFixtureV2.test.ts\n",
+   "backend/test/languageTeachingContext.test.ts\n",
+   "backend/test/languageTeachingR2.test.ts\n",
+   "backend/test/languageTeachingR3.test.ts\n",
+   "backend/test/languageTeachingR4.test.ts\n",
+   "backend/test/languageTeachingRemediation.test.ts\n",
+   "backend/test/learnerAgeBand.test.ts\n",
+   "docs/architecture/language-teaching-context-engine.md\n",
+   "docs/benchmarks/language-teaching/\n",
+   "docs/teaching/phase-1-evidence-ledger.md\n",
+   "docs/teaching/phase-1-implementation-summary.md\n",
+   "docs/teaching/phase-1-validation-report.md\n",
+   "frontend/pages/workspace/LearnerAgeBands.tsx\n"
+  ],
+  "note": "r4.1 code is an uncommitted working tree on top of the commit (frozen and hash-verified; see r42_baseline.json). Untracked files are not in the patch; their hashes are in the r4.1/r4.2 manifests where relevant."
+ },
+ "baselineIntegrity": {
+  "checkedFiles": 15,
+  "changed": []
+ },
+ "sources": {
+  "docs/benchmarks/language-teaching/20261109-full-remediation/fixture_v2/fixture_v2_cases.jsonl": {
+   "sha256": "e72d2a6d3c083240efc0513055c1670a2dea5f12c5e17d3a832746a86713c0c2",
+   "bytes": 578594
+  },
+  "docs/benchmarks/language-teaching/20261109-full-remediation/rubric_v2_draft.md": {
+   "sha256": "bcfa2eb5c335351b396dc46ae256904cbac7331316cb955d8a2cb3bac1298fd7",
+   "bytes": 12397
+  },
+  "docs/benchmarks/language-teaching/20261109-full-remediation/rubric_v2_draft.json": {
+   "sha256": "6f314120295d0755c2ba1863437f744ac4fcd91a8f5bfc109d85d79bbce2b9ba",
+   "bytes": 2733
+  },
+  "docs/benchmarks/language-teaching/20261109-post-remediation-final/rubric_v2_machine.json": {
+   "sha256": "2f60cf7ffad38a6aaaecea25013231d335b338eb67aa004374291879561e0e07",
+   "bytes": 12637
+  },
+  "docs/benchmarks/language-teaching/20261109-post-remediation-final/manifest.json": {
+   "sha256": "72203c079e0de6c0b2da838c205b177541bdac3095f22ee9cd2cc00eaef0399d",
+   "bytes": 18440
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/r42_baseline.json": {
+   "sha256": "e6d750296925dc3559e0af132aa31e944125747e9571cb4ffec44271905acb71",
+   "bytes": 3014
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/r42_human_adjudication_queue.md": {
+   "sha256": "1e99bf9575cf3547a119a526c826b0f54144b593787bdd863368891d9800fce0",
+   "bytes": 14562
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/adjudication_package/SEALED_case_key.json": {
+   "sha256": "ff79fd0567936c859c5d9dfa2be18ec0ee20d0aa9d21e2a1fd037b7bfab92428",
+   "bytes": 20078
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/adjudication_package/queue_summary.json": {
+   "sha256": "78ade6dc61685a9b1f2f72bf3386f95070ebfddf69fd9aee71872ee16b200c48",
+   "bytes": 22581
+  },
+  "backend/benchmarks/ltc-v2/judge_v2_core.ts": {
+   "sha256": "07efd01edaff84389c76c631359561f4d4b4dab19571cff751aa071ab898aaed",
+   "bytes": 14478
+  },
+  "backend/benchmarks/ltc-v2/judge_v2.ts": {
+   "sha256": "44a26743f477509b4bbd084716d74d9e92c66450d473fa6ab61bdc329263b52d",
+   "bytes": 8127
+  },
+  "backend/benchmarks/ltc-v2/run_fixture_v2.ts": {
+   "sha256": "8470a60a25819df590a705dcc28ceb25241625c37524ecc68f48f1abaf31b48a",
+   "bytes": 25996
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_1/live/raw_results.jsonl": {
+   "sha256": "ff0593e04e492285a5d4b692551329824e19d27fefc7a49169bbdbaa5488e1fa",
+   "bytes": 587046
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_1/live/provider_attempts.jsonl": {
+   "sha256": "91b59445b2af74e5908a0013ed3be00bcfef871c6ca08a6702a09a8a80d812b3",
+   "bytes": 231480
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_1/eval_v2/judge_v2_official.jsonl": {
+   "sha256": "313ef686b6b88653e5cb31bc2bc2862eda9fd537683f27f0a060a9bfdb5f6c12",
+   "bytes": 202114
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_1/eval_v2/judge_v2_independent.jsonl": {
+   "sha256": "0be83ff21c66e49fad6bb3572227f269e8455fa36d4238c101e675a8909bd2e7",
+   "bytes": 188662
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_1/summary.json": {
+   "sha256": "1301862dbf0c29d8219be07d2f825d3a02e69c257a53e743b7a4b99f8fd5e563",
+   "bytes": 93363
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_2/live/raw_results.jsonl": {
+   "sha256": "f3b3af3833965ecd2b4d15e3b488e1aef1ba32020d305cd9a96290de96a29dbc",
+   "bytes": 587993
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_2/live/provider_attempts.jsonl": {
+   "sha256": "2e67f01090ec80ea5978e2babc692a67410ba53239e51b8c7c6ffb61cc4bdeae",
+   "bytes": 231477
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_2/eval_v2/judge_v2_official.jsonl": {
+   "sha256": "4b63c49344ac5538abef5bea1e68268d214a82e6e6f634cde37db11412aa6e83",
+   "bytes": 197551
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_2/eval_v2/judge_v2_independent.jsonl": {
+   "sha256": "e74f0fa32174eb95906cd1fb328bb78cccb005c97da1dea62153ec62c214dab3",
+   "bytes": 188514
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_2/summary.json": {
+   "sha256": "5d6bfa6c40d19df67a92b2ad7c7e38e1fdced1ccbac92e2510c0d6c28bc12b07",
+   "bytes": 93542
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_3/live/raw_results.jsonl": {
+   "sha256": "e8b6d4d90185432323c0b192b974e666567238f643f26e4a349d211927f0488f",
+   "bytes": 587919
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_3/live/provider_attempts.jsonl": {
+   "sha256": "ec63dc27ffc1e8640c4e098a5550a7dddadebfc38a0eb2399a610c8fbb1b364c",
+   "bytes": 231472
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_3/eval_v2/judge_v2_official.jsonl": {
+   "sha256": "739581bc94e28b4465a8519eb456b9323d23cd87732c566aee084c73337e5dcb",
+   "bytes": 202559
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_3/eval_v2/judge_v2_independent.jsonl": {
+   "sha256": "6963aedeabe881ea37512b8f3542169c844ad69ff1afc5ce946d01b4a73f71be",
+   "bytes": 198245
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_3/summary.json": {
+   "sha256": "d00528eff6d9d5d7218f968ce83f793cdaf5ca87a598880b1bce0df4bcdfd0fe",
+   "bytes": 93548
+  },
+  "docs/benchmarks/language-teaching/20261109-r42-controlled-validation/run_1/eval_v2_retest/judge_v2_official.jsonl": {
+   "sha256": "96124564ebc875df071da27c581b918b58c8c9bca01ad0c7bca1e8a7ee445e40",
+   "bytes": 128562
+  }
+ },
+ "caseSelection": {
+  "tier1Count": 31,
+  "calibrationCount": 9,
+  "reserveCount": 80,
+  "rule": "exact Tier 1 (31) and Tier 3 calibration controls (9) from r42_human_adjudication_queue.md, mapped through SEALED_case_key.json; no replacement cases",
+  "tier1CaseIds": [
+   "LTB-AA2-T05",
+   "LTB-AA2-T07",
+   "LTB-CA1-T01",
+   "LTB-CA1-T07",
+   "LTB-CA1-T13",
+   "LTB-CB1-T03",
+   "LTB-CB1-T13",
+   "LTB-TA1-T03",
+   "LTB-TA1-T13",
+   "LTB-TA2-T13",
+   "LTB-TB1-T01",
+   "LTB-TB1-T04",
+   "LTB-TB1-T12",
+   "LTB-AA1-T08",
+   "LTB-AA2-T04",
+   "LTB-AA2-T06",
+   "LTB-AB1-T04",
+   "LTB-AB1-T06",
+   "LTB-AB1-T08",
+   "LTB-CA1-T02",
+   "LTB-CA2-T05",
+   "LTB-CA2-T08",
+   "LTB-CB1-T02",
+   "LTB-TA1-T07",
+   "LTB-TA2-T04",
+   "LTB-TA2-T08",
+   "LTB-TB1-T08",
+   "LTB-CA2-T03",
+   "LTB-TA2-T01",
+   "LTB-AA1-T02",
+   "LTB-CA1-T09"
+  ],
+  "calibrationCaseIds": "restricted: see 9_hidden_calibration_cases.json"
+ },
+ "perRecordTraceability": "every turn carries turnId <caseId>#run<n>#turn<k>, the raw_results.jsonl file and line, and provider attempt ids; every automated result carries its evaluator file and line",
+ "missingOrUnavailable": [
+  {
+   "artifact": "CEFR descriptor text",
+   "scope": "all cases",
+   "status": "NOT PRESENT in any original artifact (fixture, rubric draft, transcripts). Only the CEFR level estimate (A1/A2/B1) exists. Not reconstructed."
+  },
+  {
+   "artifact": "Stored message timestamps",
+   "scope": "all turns",
+   "status": "The harness raw results do not store message timestamps. Each tutor turn carries the provider attempt start time (startedAt) and latency from provider_attempts.jsonl; learner-message times are not recorded. Turn order is exact (learnerScript order)."
+  },
+  {
+   "artifact": "Explicit \"assessment type\" field",
+   "scope": "all cases",
+   "status": "Not a field in the fixture. Package shows the fixture situation type (caseType) and per-turn learner-script targets instead; nothing inferred beyond those labels."
+  },
+  {
+   "artifact": "Evaluator test-retest",
+   "scope": "run 1 only",
+   "status": "Partial: 74/120 cases (container restart). Present only for cases in that subset."
+  }
+ ]
+}

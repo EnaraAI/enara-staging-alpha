@@ -6,12 +6,14 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 const mocks = vi.hoisted(() => ({
   stream: vi.fn(),
   visual: vi.fn(),
-  voice: { configured: false },
+  voice: { configured: false, refused: false },
   synth: vi.fn(),
 }));
 
 vi.mock('../src/services/elevenlabsVoice', () => ({
   isElevenLabsVoiceConfigured: () => mocks.voice.configured,
+  isElevenLabsVoiceUsable: async () => mocks.voice.configured && !mocks.voice.refused,
+  isVoiceRefusal: (e: { statusCode?: number }) => [401, 402, 403].includes(e?.statusCode ?? 0),
   elevenLabsSttModel: () => 'scribe_v2_realtime',
   createTranscriptionToken: async () => 'scribe-token',
   synthesizeSpeech: mocks.synth,
@@ -76,6 +78,7 @@ afterAll(async () => {
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.voice.configured = false;
+  mocks.voice.refused = false;
   anamFetch.mockImplementation(async (url: string) =>
     String(url).includes('/v1/avatars')
       ? new Response(
@@ -98,7 +101,7 @@ beforeEach(() => {
 });
 
 const users = new Map<string, string>();
-async function token(name: string, role: 'admin' | 'student' = 'admin') {
+async function token(name: string, role: 'admin' | 'student' | 'enara-admin' = 'admin') {
   if (!users.has(name)) {
     const { User } = await import('../src/models/User');
     const user = await User.create({
@@ -129,7 +132,7 @@ describe('live avatar', () => {
       .send({ preferred_language: 'arabic', lesson_title: 'Algebra' });
 
     expect(res.status, JSON.stringify(res.body)).toBe(200);
-    expect(res.body).toMatchObject({ provider: 'anam', session_token: 'anam-token' });
+    expect(res.body).toMatchObject({ provider: 'video', speech: 'avatar', session_token: 'anam-token' });
     const sent = JSON.parse(anamFetch.mock.calls[0][1].body);
     expect(sent.personaConfig).toMatchObject({ voiceId: 'voice-ar', llmId: 'CUSTOMER_CLIENT_V1', languageCode: 'ar' });
   });
@@ -458,7 +461,7 @@ describe('live avatar', () => {
     );
     const auth = await token('voice');
     const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
-    expect(start.body.speech).toBe('elevenlabs');
+    expect(start.body.speech).toBe('server');
     const persona = JSON.parse(anamFetch.mock.calls[0][1].body).personaConfig;
     expect(persona).toMatchObject({ enableAudioPassthrough: true });
     expect(persona.llmId).toBeUndefined();
@@ -646,6 +649,44 @@ describe('live avatar', () => {
     expect((await sessionFor('MATH')).persona.avatarId).toBe('face-leo');
   });
 
+  it('serves tutor face pictures from ENARA, never the video provider\'s address', async () => {
+    const admin = await token('faces-neutral');
+    const list = await request(app).get('/api/tutor-faces').set('Authorization', admin);
+    expect(list.status).toBe(200);
+    expect(list.body.avatars.map((a: { imageUrl: string }) => a.imageUrl)).toEqual(['/api/tutor-faces/image/face-leo', '/api/tutor-faces/image/face-layla']);
+    expect(JSON.stringify(list.body)).not.toContain('https://img/');
+    await request(app).put('/api/tutor-faces').set('Authorization', admin).send({ avatarId: 'face-leo' });
+    expect((await request(app).get('/api/tutor-faces').set('Authorization', admin)).body.default.imageUrl).toBe('/api/tutor-faces/image/face-leo');
+
+    // The picture itself: no sign-in needed (an <img> sends no token), fetched from the provider.
+    const wrapped = globalThis.fetch;
+    globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) =>
+      String(url) === 'https://img/leo' ? new Response(new Uint8Array([137, 80, 78, 71]), { status: 200, headers: { 'Content-Type': 'image/png' } }) : wrapped(url, init)) as typeof fetch;
+    try {
+      const img = await request(app).get('/api/tutor-faces/image/face-leo').buffer(true);
+      expect(img.status).toBe(200);
+      expect(img.headers['content-type']).toBe('image/png');
+      expect((await request(app).get('/api/tutor-faces/image/nobody')).status).toBe(404);
+    } finally {
+      globalThis.fetch = wrapped;
+    }
+  });
+
+  it('shows schools AI usage per feature without the provider model', async () => {
+    const { AiCall } = await import('../src/models/AiCall');
+    await AiCall.create([
+      { feature: 'tutor_chat', provider: 'anthropic', modelName: 'claude-opus-5-5', status: 'ok', latencyMs: 4000, institutionId: 'inst' },
+      { feature: 'tutor_chat', provider: 'anthropic', modelName: 'claude-sonnet-5-5', status: 'ok', latencyMs: 2000, institutionId: 'inst' },
+    ]);
+    const admin = await token('usage-neutral');
+    const res = await request(app).get('/api/analytics/ai-usage?days=1').set('Authorization', admin);
+    expect(res.status).toBe(200);
+    const chat = res.body.byFeature.filter((r: { feature: string }) => r.feature === 'tutor_chat');
+    expect(chat).toHaveLength(1);
+    expect(chat[0]).toMatchObject({ calls: 2, avgLatencyMs: 3000 });
+    expect(JSON.stringify(res.body)).not.toMatch(/claude|anthropic|model/i);
+  });
+
   it('lets students choose their own tutor from the faces the school offers', async () => {
     const admin = await token('options-admin');
     const student = await token('chooser', 'student');
@@ -721,5 +762,96 @@ describe('live avatar', () => {
       '<div onclick="steal()">ok<script>alert(1)</script><img src="javascript:x" onerror=x><iframe src="https://e.vil"></iframe></div>',
     );
     expect(html).toBe('<div>ok<img src=""></div>');
+  });
+});
+
+describe('voice fallback to the video tutor (Egyptian learners)', () => {
+  const refusal = Object.assign(new Error('Free Tier access has been disabled'), { statusCode: 401 });
+
+  it('uses the video tutor’s voice and Arabic listening, tuned for learners, when ENARA’s voice is refused', async () => {
+    mocks.voice.configured = true;
+    mocks.voice.refused = true;
+    const res = await request(app).post('/api/avatar/session').set('Authorization', await token('refused-ar')).send({ preferred_language: 'arabic' });
+    expect(res.status, JSON.stringify(res.body)).toBe(200);
+    expect(res.body.speech).toBe('avatar');
+    const persona = JSON.parse(anamFetch.mock.calls.find((c) => String(c[0]).includes('session-token'))![1].body).personaConfig;
+    expect(persona).toMatchObject({
+      voiceId: 'voice-ar',
+      languageCode: 'ar',
+      llmId: 'CUSTOMER_CLIENT_V1',
+      voiceDetectionOptions: { sttProvider: 'anam', endOfSpeechSensitivity: 0.35, silenceBeforeSessionEndSeconds: 0 },
+    });
+    expect(persona.enableAudioPassthrough).toBeUndefined();
+  });
+
+  it('starts the call without the listening settings if they are rejected', async () => {
+    let calls = 0;
+    anamFetch.mockImplementation(async (url: string, init: { body: string }) => {
+      if (!String(url).includes('session-token')) return new Response('{}', { status: 404 });
+      calls += 1;
+      const persona = JSON.parse(init.body).personaConfig;
+      return persona.voiceDetectionOptions
+        ? new Response('{"message":"bad option"}', { status: 400 })
+        : new Response(JSON.stringify({ sessionToken: 'anam-token' }), { status: 200 });
+    });
+    const res = await request(app).post('/api/avatar/session').set('Authorization', await token('retry-opts')).send({});
+    expect(res.status, JSON.stringify(res.body)).toBe(200);
+    expect(res.body.session_token).toBe('anam-token');
+    expect(calls).toBe(2);
+  });
+
+  it('tells the browser to switch voice when speech is refused during a call', async () => {
+    mocks.voice.configured = true;
+    mocks.synth.mockRejectedValue(refusal);
+    const auth = await token('refused-mid', 'student');
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+    expect(start.body.speech).toBe('server');
+
+    const speak = await request(app).post('/api/avatar/speak').set('Authorization', auth).send({ session_id: start.body.session_id, text: 'Hello', language: 'english' });
+    expect(speak.status).toBe(503);
+    expect(speak.body.error.code).toBe('AVATAR_VOICE_UNAVAILABLE');
+
+    mocks.stream.mockImplementation(async function* () {
+      yield 'First sentence here. ';
+      yield 'And a second one.';
+    });
+    const res = await request(app)
+      .post('/api/avatar/query-stream')
+      .set('Authorization', auth)
+      .send({ session_id: start.body.session_id, language: 'english', speak: true, messages: [{ role: 'user', content: 'hi' }] });
+    const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
+    expect(lines.filter((l) => l.voice === 'unavailable')).toHaveLength(1);
+    // The text still arrives, so nothing the tutor said is lost.
+    expect(lines.filter((l) => 'say' in l).map((l) => l.say).join(' ')).toContain('First sentence here.');
+  });
+
+  it('picks a woman’s Egyptian voice for faces that are women when one is set', async () => {
+    const { anamPersonaConfig } = await import('../src/controllers/avatar.controller');
+    const anam = { voiceIdEn: 'en-m', voiceIdAr: 'ar-eg-m', voiceIdArFemale: 'ar-eg-f' };
+    expect(anamPersonaConfig({ serverVoice: false, language: 'arabic', avatarId: 'a', gender: 'woman', anam }).voiceId).toBe('ar-eg-f');
+    expect(anamPersonaConfig({ serverVoice: false, language: 'arabic', avatarId: 'a', gender: 'man', anam }).voiceId).toBe('ar-eg-m');
+    // No English woman's voice configured: the English voice is used.
+    expect(anamPersonaConfig({ serverVoice: false, language: 'english', avatarId: 'a', gender: 'woman', anam }).voiceId).toBe('en-m');
+    expect(anamPersonaConfig({ serverVoice: true, language: 'arabic', avatarId: 'a', anam })).toEqual({ name: 'Enara', avatarId: 'a', enableAudioPassthrough: true });
+  });
+
+  it('lists the video tutor’s voices for Enara admins only, filtered by accent', async () => {
+    anamFetch.mockImplementation(async (url: string) =>
+      String(url).includes('/v1/voices')
+        ? new Response(JSON.stringify({ data: [
+            { id: 'v-eg', displayName: 'Salma', gender: 'FEMALE', country: 'EG' },
+            { id: 'v-gb', displayName: 'Lucy', gender: 'FEMALE', country: 'GB' },
+            { id: 'voice-ar', displayName: 'Current Arabic', gender: 'MALE', country: 'SA' },
+          ], meta: { lastPage: 1 } }), { status: 200 })
+        : new Response('{}', { status: 404 }),
+    );
+    const staff = await request(app).get('/api/avatar/admin/voices?country=eg').set('Authorization', await token('school-admin', 'admin'));
+    expect(staff.status).toBe(403);
+    const res = await request(app).get('/api/avatar/admin/voices?country=eg').set('Authorization', await token('ops', 'enara-admin'));
+    expect(res.status, JSON.stringify(res.body)).toBe(200);
+    expect(res.body.voices.map((v: { id: string }) => v.id)).toEqual(['v-eg']);
+    expect(res.body.current).toMatchObject({ voiceIdAr: 'voice-ar', voiceIdEn: 'voice-en' });
+    expect(res.body.inUse).toEqual([expect.objectContaining({ use: 'arabic', id: 'voice-ar', country: 'SA' })]);
+    expect(res.body.listening.arabic).toMatchObject({ languageCode: 'ar', voiceDetectionOptions: { sttProvider: 'anam' } });
   });
 });

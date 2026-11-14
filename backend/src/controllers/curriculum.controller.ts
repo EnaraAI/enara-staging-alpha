@@ -1,4 +1,5 @@
 import { queueCurriculumProcessing } from '../services/curriculumExtraction';
+import { sanitizeLanguageSpec } from '../services/languageTeachingContext';
 import { unsignUploadPath } from '../utils/uploadSigning';
 import { ownerFromName, ownUploadsOnly, resolveUpload, schoolSlug, storedUploadName } from '../services/uploadAccess';
 import { Response } from 'express';
@@ -53,7 +54,11 @@ import {
 } from '../services/uploadStorage';
 
 function toCurriculumResponse(doc: InstanceType<typeof Curriculum>) {
-  return toPlainObject(doc);
+  const plain = toPlainObject(doc) as Record<string, unknown>;
+  // The saved link holds the address the site had when the course was
+  // published (once a hosting address): always give the current one.
+  if (plain.deploymentLink) plain.deploymentLink = buildDeploymentLink(String(plain.id));
+  return plain;
 }
 
 // Who may see or change a curriculum (P1). School content managers (admins)
@@ -141,6 +146,8 @@ export const createCurriculum = asyncHandler(async (req: AuthRequest, res: Respo
           uploads: getOptionalStringArray(ch, 'uploads', { maxItems: 100, maxLength: 512 }) || [],
           description: getOptionalString(ch, 'description', { max: 4000 }) || '',
           enaraSectionId: getOptionalId(ch, 'enaraSectionId'),
+          // Language courses: optional structured lesson facts (ltc-v1), cleaned and capped.
+          languageSpec: sanitizeLanguageSpec(ch.languageSpec),
         };
       })
     : [];
@@ -196,6 +203,14 @@ export const updateCurriculum = asyncHandler(async (req: AuthRequest, res: Respo
       if (raw && typeof raw === 'object' && Array.isArray((raw as { uploads?: unknown }).uploads)) {
         const ch = raw as { uploads: unknown[] };
         ch.uploads = await ownUploadsOnly(curriculum.institutionId, ch.uploads.filter((u): u is string => typeof u === 'string'), listed);
+      }
+    }
+  }
+  // Language lesson specs are cleaned and capped like on create (ltc-v1).
+  if (Array.isArray(body.chapters)) {
+    for (const raw of body.chapters as unknown[]) {
+      if (raw && typeof raw === 'object' && 'languageSpec' in raw) {
+        (raw as { languageSpec?: unknown }).languageSpec = sanitizeLanguageSpec((raw as { languageSpec?: unknown }).languageSpec);
       }
     }
   }

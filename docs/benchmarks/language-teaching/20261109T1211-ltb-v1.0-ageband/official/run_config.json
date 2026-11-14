@@ -1,0 +1,22 @@
+{
+  "benchmarkVersion": "ltb-v1.0",
+  "harness": "backend/benchmarks/ltc-v1/run_trusted_age.ts (run.ts + trusted-age fixtures)",
+  "mode": "live",
+  "startedAt": "2026-11-09T12:38:14.033Z",
+  "route": "POST /api/me/tutor/sessions/:id/messages (real controller, in-process)",
+  "tutorModel": "claude-opus-5-5",
+  "tutorEffort": "low",
+  "intentModel": "claude-haiku-5-5",
+  "maxOutputTokensTutor": 4000,
+  "sdkTimeoutMs": 25000,
+  "gatewayMaxAttempts": 2,
+  "sdkMaxRetries": 0,
+  "concurrency": 1,
+  "harnessCapUsd": 100,
+  "localTestSpendCapUsd": 110,
+  "casesFile": "benchmark_cases.jsonl",
+  "casesSha256": "725edb2bcabeb316a388b702b2baba6dc35ed178c80f8de7727c9768c356a2bb",
+  "caseCount": 120,
+  "turnCount": 219,
+  "database": "mongodb-memory-server (throwaway, in-process)"
+}

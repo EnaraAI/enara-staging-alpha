@@ -1,0 +1,306 @@
+[
+ {
+  "id": "ISO-01",
+  "area": "isolation",
+  "input": "same learner, new session",
+  "expected": "activeItemBefore=null",
+  "actual": "null",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ISO-02",
+  "area": "isolation",
+  "input": "learner b, same class as a",
+  "expected": "activeItemBefore=null, no hint state",
+  "actual": "[null,1]",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ISO-03",
+  "area": "isolation",
+  "input": "learner c (class 2) sends context courseId=aud-crs1 lessonId=lsnA",
+  "expected": "no lesson-A items in prompt",
+  "actual": "absent",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ISO-04",
+  "area": "isolation",
+  "input": "school-2 learner sends school-1 course/lesson ids",
+  "expected": "no school-1 lesson-B items in prompt",
+  "actual": "absent",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ISO-05",
+  "area": "isolation",
+  "input": "lesson A ex1 completed, then switch to lesson B (both have id ex1) in the same session and ask for an exercise",
+  "expected": "lesson B ex1 presented (B not started)",
+  "actual": "Lesson item to present now: [ex2] Complete: ",
+  "severityIfFail": "P1",
+  "note": "satisfiedLessonItems / ActiveItemRef are not namespaced by lesson (languageLearningState.ts deriveLearningState; languageTeachingContext.ts:725-730)",
+  "pass": false,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ISO-06",
+  "area": "isolation",
+  "input": "lesson-A ex1 open, learner answers it with context lesson B",
+  "expected": "no lesson-B item shown as the open task",
+  "actual": "lesson-B ex1 shown as the open task",
+  "severityIfFail": "P1",
+  "pass": false,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ISO-07",
+  "area": "isolation",
+  "input": "new app instance, same DB",
+  "expected": "activeItemBefore lesson:ex1",
+  "actual": "{\"id\":\"lesson:ex1\",\"source\":\"lesson\",\"lessonItemId\":\"ex1\"}",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ISO-08",
+  "area": "isolation",
+  "input": "model fails twice (fallback reply), then next turn",
+  "expected": "fallback has no languageTurn; active item still ex1",
+  "actual": "[null,{\"id\":\"lesson:ex1\",\"source\":\"lesson\",\"lessonItemId\":\"ex1\"}]",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ISO-09",
+  "area": "isolation",
+  "input": "Promise.all of two identical answers",
+  "expected": "both stored; state derived from history counts each reply once (no lock: requests are not serialised)",
+  "actual": "2 CORRECT replies stored",
+  "severityIfFail": "P2",
+  "note": "no per-session serialisation; duplicate progression is possible when requests overlap (observed 2)",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ST-01",
+  "area": "streaming",
+  "input": "1-char chunks",
+  "expected": "tokens == \"Good try. Look at the verb.\"",
+  "actual": "\"Good try. Look at the verb.\"",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ST-02",
+  "area": "streaming",
+  "input": "marker with a line break, chunk boundary after it",
+  "expected": "tokens == \"Well done!\"",
+  "actual": "tokens=\"verdict=CORRECT\\nrelevance=ACTIVE_ITEM next=NEW_ITEM]]\\nWell done!\" stored=\"verdict=CORRECT\\nrelevance=ACTIVE_ITEM next=NEW_ITEM]]\\nWell done!\" marker=malformed",
+  "severityIfFail": "P1",
+  "pass": false,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ST-03",
+  "area": "streaming",
+  "input": "same multi-line marker output via /messages and /messages/stream",
+  "expected": "identical visible text",
+  "actual": "json=\"Well done!\" sse=\"verdict=CORRECT\\nrelevance=ACTIVE_ITEM next=NEW_ITEM]]\\nWell done!\"",
+  "severityIfFail": "P1",
+  "pass": false,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ST-04",
+  "area": "streaming",
+  "input": "stream throws after 2 chunks",
+  "expected": "replace event; no languageTurn",
+  "actual": "types=[\"user\",\"token\",\"replace\",\"done\"] lt=null",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ST-05",
+  "area": "streaming",
+  "input": "first attempt 529, retry succeeds",
+  "expected": "1",
+  "actual": "1",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ST-06",
+  "area": "streaming",
+  "input": "client closes the SSE connection after the first event",
+  "expected": "no new messages (before=3)",
+  "actual": "after=3",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ST-07",
+  "area": "streaming",
+  "input": "requests in this test",
+  "expected": "no acceptedAnswers/targetForms fields",
+  "actual": "[]",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "ST-08",
+  "area": "streaming",
+  "input": "provider payload",
+  "expected": "[]",
+  "actual": "[]",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "PI-R1",
+  "area": "prompt_injection",
+  "input": "model complies with a learner request to append a CORRECT marker",
+  "expected": "stored verdict INCORRECT (tutor's leading marker)",
+  "actual": "stored verdict CORRECT, activeItem {\"id\":\"msg:msg-1794237586444-xj5k\",\"source\":\"tutor\"}",
+  "severityIfFail": "P1",
+  "note": "last-marker-wins (languageLearningState.ts:166-173); markers are model output, never independently trusted",
+  "pass": false,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-01",
+  "area": "curriculum_api",
+  "input": "GET /api/me/courses (enrolled student)",
+  "expected": "200, no secrets",
+  "actual": "200, leaked=[]",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-02",
+  "area": "curriculum_api",
+  "input": "GET /api/me/courses/aud-crs1 (enrolled student)",
+  "expected": "200, no secrets",
+  "actual": "200, leaked=[]",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-03",
+  "area": "curriculum_api",
+  "input": "GET /api/me/courses/aud-crs1/curriculum (enrolled student)",
+  "expected": "200, no secrets",
+  "actual": "200, leaked=[]",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-04",
+  "area": "curriculum_api",
+  "input": "GET /api/me/courses/aud-crs1/lessons/lsnA (enrolled student)",
+  "expected": "200, no secrets",
+  "actual": "200, leaked=[]",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-05",
+  "area": "curriculum_api",
+  "input": "student GET /api/curriculums/:id",
+  "expected": "403",
+  "actual": "403",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-06",
+  "area": "curriculum_api",
+  "input": "learner c (class 2) GET course 1 and its curriculum",
+  "expected": "both 4xx",
+  "actual": "404/404",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-07",
+  "area": "curriculum_api",
+  "input": "school-2 learner GET school-1 curriculum context",
+  "expected": "4xx",
+  "actual": "404",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-08",
+  "area": "curriculum_api",
+  "input": "author teacher GET",
+  "expected": "200 with acceptedAnswers",
+  "actual": "200 true",
+  "severityIfFail": "P2",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-09",
+  "area": "curriculum_api",
+  "input": "school-2 teacher GET school-1 curriculum",
+  "expected": "404",
+  "actual": "404",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-10",
+  "area": "curriculum_api",
+  "input": "school-2 teacher PATCH school-1 curriculum",
+  "expected": "404",
+  "actual": "404",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-11",
+  "area": "curriculum_api",
+  "input": "non-downloadable upload on lesson A",
+  "expected": "withheld from both endpoints",
+  "actual": "courseTree=withheld curriculumContext=listed",
+  "severityIfFail": "P2",
+  "note": "PRE-EXISTING (me.controller.ts getMyCurriculumContext returns raw chapter uploads); not introduced by the remediation",
+  "pass": false,
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ },
+ {
+  "id": "CA-12",
+  "area": "curriculum_api",
+  "input": "GET /api/me/courses/:id/curriculum chapter fields",
+  "expected": "inventory",
+  "actual": "chapter=[\"description\",\"id\",\"languageSpec\",\"title\",\"uploads\"] languageSpec=[\"items\",\"objectives\",\"successCriteria\"] item=[\"id\",\"prompt\"]",
+  "pass": true,
+  "severityIfFail": "INFO",
+  "ref": "backend/test/audit-post-remediation/route.audit.ts"
+ }
+]

@@ -1,0 +1,254 @@
+{
+ "hardLimitUsd": 10,
+ "pricing": "backend/src/services/priceCatalog.ts (list estimates per million tokens): opus-5-5 in 4 / out 20 / cache read 0.2; sonnet-5-5 in 2 / out 10 / cache read 0.2; haiku-5-5 in 0.1 / out 0.5 / cache read 0.01",
+ "metering": "provider-reported usage per attempt (harness fetch interception for the tutor route, SDK usage for evaluators), priced with the repo catalog; unpriced usage aborts the evaluator",
+ "plannedStages": [
+  {
+   "stage": "A",
+   "what": "targeted tutor scenarios on the real route (10 cases, 28 turns; 2 cases over SSE)",
+   "estimateUsd": 0.55,
+   "harnessCapUsd": 1.2,
+   "suggestedMaxUsd": 3
+  },
+  {
+   "stage": "A-eval",
+   "what": "official rubric v2 evaluator on the 10 Stage A transcripts (Sonnet)",
+   "estimateUsd": 0.15,
+   "capUsd": 0.4
+  },
+  {
+   "stage": "B",
+   "what": "independent evaluator (Haiku, separate model, same provider) on the Stage A transcripts",
+   "estimateUsd": 0.03,
+   "capUsd": 0.3,
+   "suggestedMaxUsd": 3
+  },
+  {
+   "stage": "C",
+   "what": "frozen fixture v2 re-benchmark, 120 cases / 219 turns, real route",
+   "estimateUsd": 3.5,
+   "harnessCapUsd": 3.9,
+   "suggestedMaxUsd": 4
+  },
+  {
+   "stage": "C-eval",
+   "what": "official v2 evaluator (Sonnet) on 120 + independent (Haiku) on 120",
+   "estimateUsd": 1.6,
+   "capUsd": 2.2,
+   "note": "counted against the Stage B envelope (evaluation), disclosed; total stays under the hard limit"
+  },
+  {
+   "stage": "stability",
+   "what": "repeat of a small Stage C subset if budget remains",
+   "estimateUsd": 0.6,
+   "capUsd": 0.8
+  }
+ ],
+ "actual": [
+  {
+   "stage": "A",
+   "kind": "tutor",
+   "what": "Stage A targeted tutor (10 cases, 28 turns)",
+   "model": "claude-opus-5-5",
+   "calls": 28,
+   "input": 72891,
+   "output": 10119,
+   "cacheRead": 7710,
+   "cacheWrite": 514,
+   "usd": 0.498059,
+   "non200": 0,
+   "unpriced": 0
+  },
+  {
+   "stage": "A",
+   "kind": "eval-official",
+   "what": "Stage A official v2 evaluator",
+   "model": "claude-sonnet-5-5",
+   "calls": 10,
+   "input": 12663,
+   "output": 5753,
+   "cacheRead": 36459,
+   "cacheWrite": 4051,
+   "usd": 0.100274,
+   "non200": 0
+  },
+  {
+   "stage": "B",
+   "kind": "eval-independent",
+   "what": "Stage B independent v2 evaluator on Stage A",
+   "model": "claude-haiku-5-5",
+   "calls": 10,
+   "input": 12663,
+   "output": 13984,
+   "cacheRead": 36459,
+   "cacheWrite": 4051,
+   "usd": 0.00913,
+   "non200": 0
+  },
+  {
+   "stage": "A",
+   "kind": "tutor-recheck",
+   "what": "Stage A re-check after hint-policy fix (5 cases, 15 turns)",
+   "model": "claude-opus-5-5",
+   "calls": 15,
+   "input": 39239,
+   "output": 5843,
+   "cacheRead": 3084,
+   "cacheWrite": 514,
+   "usd": 0.277004,
+   "non200": 0,
+   "unpriced": 0
+  },
+  {
+   "stage": "A",
+   "kind": "eval-official-recheck",
+   "what": "re-check official",
+   "model": "claude-sonnet-5-5",
+   "calls": 5,
+   "input": 6299,
+   "output": 2286,
+   "cacheRead": 20255,
+   "cacheWrite": 0,
+   "usd": 0.039508,
+   "non200": 0
+  },
+  {
+   "stage": "B",
+   "kind": "eval-independent-recheck",
+   "what": "re-check independent",
+   "model": "claude-haiku-5-5",
+   "calls": 6,
+   "input": 8018,
+   "output": 8152,
+   "cacheRead": 24306,
+   "cacheWrite": 0,
+   "usd": 0.00512,
+   "non200": 0
+  },
+  {
+   "stage": "C",
+   "kind": "tutor",
+   "what": "Stage C frozen re-benchmark (118 cases, cap reached)",
+   "model": "claude-opus-5-5",
+   "calls": 216,
+   "input": 601151,
+   "output": 77221,
+   "cacheRead": 35466,
+   "cacheWrite": 0,
+   "usd": 3.956131,
+   "non200": 0,
+   "unpriced": 0
+  },
+  {
+   "stage": "C",
+   "kind": "tutor-continuation",
+   "what": "Stage C last 2 cases (completion)",
+   "model": "claude-opus-5-5",
+   "calls": 3,
+   "input": 8693,
+   "output": 1064,
+   "cacheRead": 0,
+   "cacheWrite": 0,
+   "usd": 0.056052,
+   "non200": 0,
+   "unpriced": 0
+  },
+  {
+   "stage": "C-eval",
+   "kind": "eval-official",
+   "what": "Stage C official v2 evaluator (120)",
+   "model": "claude-sonnet-5-5",
+   "calls": 120,
+   "input": 133021,
+   "output": 43723,
+   "cacheRead": 482069,
+   "cacheWrite": 4051,
+   "usd": 0.80979,
+   "non200": 0
+  },
+  {
+   "stage": "C-eval",
+   "kind": "eval-independent",
+   "what": "Stage C independent v2 evaluator (120)",
+   "model": "claude-haiku-5-5",
+   "calls": 124,
+   "input": 137678,
+   "output": 122011,
+   "cacheRead": 498273,
+   "cacheWrite": 4051,
+   "usd": 0.08027,
+   "non200": 0
+  },
+  {
+   "stage": "C-eval",
+   "kind": "v1-compat-judge",
+   "what": "frozen v1 judge on Stage C transcripts (comparability)",
+   "model": "claude-sonnet-5-5",
+   "calls": 132,
+   "input": 465351,
+   "output": 71881,
+   "cacheRead": 0,
+   "cacheWrite": 0,
+   "usd": 1.649512,
+   "non200": 0
+  },
+  {
+   "stage": "stability",
+   "kind": "tutor",
+   "what": "12-case repeat",
+   "model": "claude-opus-5-5",
+   "calls": 24,
+   "input": 67007,
+   "output": 7976,
+   "cacheRead": 5654,
+   "cacheWrite": 514,
+   "usd": 0.431251,
+   "non200": 0,
+   "unpriced": 0
+  },
+  {
+   "stage": "stability",
+   "kind": "eval-official",
+   "what": "repeat official",
+   "model": "claude-sonnet-5-5",
+   "calls": 12,
+   "input": 13838,
+   "output": 4782,
+   "cacheRead": 44561,
+   "cacheWrite": 4051,
+   "usd": 0.094534,
+   "non200": 0
+  },
+  {
+   "stage": "stability",
+   "kind": "eval-independent",
+   "what": "repeat independent",
+   "model": "claude-haiku-5-5",
+   "calls": 12,
+   "input": 13838,
+   "output": 9266,
+   "cacheRead": 48612,
+   "cacheWrite": 0,
+   "usd": 0.006503,
+   "non200": 0
+  }
+ ],
+ "totals": {
+  "byStage": {
+   "A": 0.914845,
+   "B": 0.01425,
+   "C": 4.012183,
+   "C-eval": 2.539572,
+   "stability": 0.532288
+  },
+  "totalUsd": 8.013138,
+  "unusedUsd": 1.986862,
+  "providerNon200": 0,
+  "unpricedTutorAttempts": 0
+ },
+ "notes": [
+  "Stage C tutor generation reached its harness cap ($3.95) after 118/120 cases; the last 2 cases were completed separately for $0.056, so Stage C = $4.012, $0.012 above the suggested $4 stage maximum (disclosed).",
+  "Evaluation of Stage C (official + independent + v1 comparability) is counted under the evaluation envelope, not Stage C tutor generation (disclosed in advance).",
+  "Format re-asks by the evaluator (invalid JSON) are counted as calls; there were no provider retries."
+ ]
+}

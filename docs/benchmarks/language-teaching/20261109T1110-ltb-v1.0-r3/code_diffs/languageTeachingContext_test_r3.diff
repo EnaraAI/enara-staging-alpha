@@ -1,0 +1,11 @@
+--- docs/benchmarks/language-teaching/20261109T1110-ltb-v1.0-r3/pre_edit_code_snapshot/languageTeachingContext.test.ts	2026-11-09 11:11:48.177125657 +0000
++++ backend/test/languageTeachingContext.test.ts	2026-11-09 11:15:40.290053791 +0000
+@@ -304,7 +304,7 @@
+     expect(sys).toContain('<language_teaching_context version="ltc-v1">');
+     expect(sys).toContain('Learner level: A2 [inferred; source: course_level]');
+     expect(sys).toContain('Target vocabulary: coffee; sandwich');
+-    expect(sys).toContain('Learners: adults.');
++    expect(sys).toContain('Learner age band: adult [known; source: school_setting_adult_learners].'); // r3 wording
+     const msgs = await mongoose.connection.collection('tutor_messages').find({ role: 'ai' }).sort({ timestamp: -1 }).limit(1).toArray();
+     expect(msgs[0].meta.languageTurn).toMatchObject({ version: 'ltc-v1', lessonId: 'LSN-CAFE', skill: 'written_interaction', masteryClaim: false, confidence: 'low' });
+     expect(msgs[0].meta.languageTurn.moves).toContain('short_explanation');
