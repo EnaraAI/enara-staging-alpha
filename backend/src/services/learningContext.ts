@@ -21,7 +21,7 @@ export const ADULT_GRADE_LEVEL = 18;
 
 const MET = new Set(['proficient', 'mastered']);
 const INDEPENDENT = new Set(['independent_assessment', 'diagnostic', 'retention_review', 'teacher_verified']);
-const STATUS_WORDS: Record<string, string> = {
+export const STATUS_WORDS: Record<string, string> = {
   not_assessed: 'not assessed yet',
   emerging: 'emerging (little understanding shown so far)',
   developing: 'developing (partly understood)',
@@ -253,7 +253,7 @@ export async function buildObjectiveContext(params: {
 // The plan as tutor instructions: the primary method's full instructions; one
 // line per supporting / reinforcement method; readiness for differentiation; the
 // rule that resolves conflicts between methods (the primary's rules win).
-function planLines(plan: TeachingPlan, prerequisite: string | undefined, status: string, compact?: boolean): string[] {
+export function planLines(plan: TeachingPlan, prerequisite: string | undefined, status: string, compact?: boolean): string[] {
   const p = STRATEGY_BY_ID.get(plan.primary)!;
   const brief = (id: string) => {
     const m = STRATEGY_BY_ID.get(id)!;
