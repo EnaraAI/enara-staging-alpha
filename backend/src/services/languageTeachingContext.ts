@@ -6,7 +6,7 @@ import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
 import { isLearnerAgeBand } from '../models/learnerAgeBand';
 import { loadProfileLines } from './learnerLanguageProfile';
-import { engineV2 } from './engineV2';
+import { engineV2, arbitrationForced } from './engineV2';
 import { logger, serializeError } from '../utils/logging';
 import {
   contrastPairClaimMismatch,
@@ -284,6 +284,8 @@ export interface LanguageTeachingContext {
   prevMoves?: string[];
   // v2 (ruleFirst): rules (success criteria) that this reply must introduce, computed from history; recorded in the turn evidence once the reply is stored.
   ruleFirst?: { criteria: number[]; texts: string[] };
+  // v2 (levelExplicit): this learner is explicit-first for this objective (A1-A2 course, or objective record not_assessed/emerging). Set only when the switch is on.
+  explicitFirst?: boolean;
   // v2 (arbitration): primary method of the active teaching plan.
   planPrimary?: string;
   prompt: string;
@@ -301,6 +303,9 @@ export interface LanguageTurnEvidence {
   // strandLog (tags only): Nation strand of the turn's main move, and the practice stage (empty until change D exists).
   strand?: 'input' | 'output' | 'language_focused' | 'fluency';
   stage?: 'rule' | 'guided' | 'unguided' | 'free' | 'return';
+  // levelExplicit (tags only): whether this learner was explicit-first for the objective, and whether arbitration was turned on by levelExplicit.
+  explicitFirst?: boolean;
+  arbitrationForced?: true;
   rulesIntroduced?: number[];
   // closing / shortRecap (tag only): whether the engine added, deferred or folded the closing ask on this reply.
   closingAsk?: 'added' | 'deferred' | 'folded';
@@ -1017,7 +1022,7 @@ const HINT_VARIANT: Record<string, string> = {
   hint_requested: 'They asked for a hint: give one hint (one step, not the answer), then ask them to try.',
 };
 
-export function moveText(m: SelectedMove): string {
+export function moveText(m: SelectedMove, opts: { ruleBeforeFirstTry?: boolean } = {}): string {
   if (m.id === 'scaffold_hint') {
     const r = m.reasons.find((x) => HINT_VARIANT[x]);
     if (r) return HINT_VARIANT[r];
@@ -1055,6 +1060,7 @@ export function moveText(m: SelectedMove): string {
   if (m.id === 'answer_with_reasoning' && m.reasons.some((r) => r.startsWith('answer_requested_after_'))) {
     return 'They have already tried: now give the correct answer with the reason in one or two sentences, then one similar item for them to try.';
   }
+  if (m.id === 'present_lesson_item' && opts.ruleBeforeFirstTry) return MOVE_TEXT.present_lesson_item.replace(/ No rule, no reminder and no example before their first try \(not even with a different word\): their first try shows what they already know\./, ' The rule line below comes before the exercise, so the rule is stated first; do not show the exercise\'s answer or its target form.');
   if (m.id === 'present_lesson_item' && engineV2('socraticOff')) return MOVE_TEXT.present_lesson_item.replace(/ No rule, no reminder and no example before their first try \(not even with a different word\): their first try shows what they already know\./, ' Do not show the exercise\'s answer or its target form.');
   return MOVE_TEXT[m.id];
 }
@@ -1132,13 +1138,17 @@ export const askedNewExample = (t: string) => /\bone (?:new |more )?example (?:o
 export const SHORT_RECAP = 'This is the point to close the lesson unit. This overrides the "next task" instructions above: (1) answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) state the rule in ONE plain line of 20 words or fewer; (3) end by asking: "Now write one new example of your own." Do not set a new exercise this turn and never write a completed answer to an open exercise.';
 export const EXAMPLE_CHECK = 'They have just written their own example. If it follows the rule, confirm it in one line starting "Remember:" and then give the next task. If it is wrong or incomplete, correct only the wrong part in one short sentence and ask for one more example (no new exercise yet).';
 // v2 (ruleFirst): which rules (success criteria) the focus item needs that this session has not introduced yet.
-export function rulesToIntroduce(history: { role: string; languageTurn?: unknown }[], s: { presentLessonItem?: { criteria?: number[] }; activeLessonItem?: { criteria?: number[] }; answeringCheck?: boolean; hintRequest?: boolean; dontKnow?: boolean; whyAfterAttempt?: boolean }, spec: { successCriteria?: string[] } | undefined): { criteria: number[]; texts: string[] } | undefined {
+export function rulesToIntroduce(history: { role: string; languageTurn?: unknown }[], s: { presentLessonItem?: { criteria?: number[] }; activeLessonItem?: { criteria?: number[] }; answeringCheck?: boolean; hintRequest?: boolean; dontKnow?: boolean; whyAfterAttempt?: boolean; learning?: { criteria?: Record<string, unknown> } }, spec: { successCriteria?: string[] } | undefined, opts: { beforeFirstTry?: boolean } = {}): { criteria: number[]; texts: string[] } | undefined {
   // First exposure = the reply to the learner's first attempt, request for a hint, "I don't know" or "why" on an item (never the turn that only presents the exercise: their first try stays unassisted).
-  if (!(s.answeringCheck || s.hintRequest || s.dontKnow || s.whyAfterAttempt)) return undefined;
+  // levelExplicit (explicit-first learners) also counts the reply that presents the exercise: the rule comes before the first try.
+  const presenting = Boolean(opts.beforeFirstTry && s.presentLessonItem && !s.answeringCheck);
+  if (!(s.answeringCheck || s.hintRequest || s.dontKnow || s.whyAfterAttempt || presenting)) return undefined;
   const item = s.activeLessonItem ?? s.presentLessonItem; const crit = spec?.successCriteria ?? [];
   if (!item?.criteria?.length || !crit.length) return undefined;
   const done = new Set<number>(); for (const h of history) for (const c of ((h.languageTurn as { rulesIntroduced?: number[] } | null | undefined)?.rulesIntroduced ?? [])) done.add(c);
-  const todo = item.criteria.filter((c) => c >= 1 && c <= crit.length && !done.has(c)).slice(0, 2);
+  // levelExplicit decides per form: a criterion the learner has already shown in this session needs no rule statement.
+  const shown = opts.beforeFirstTry ? new Set(Object.keys(s.learning?.criteria ?? {}).map(Number)) : new Set<number>();
+  const todo = item.criteria.filter((c) => c >= 1 && c <= crit.length && !done.has(c) && !shown.has(c)).slice(0, 2);
   return todo.length ? { criteria: todo, texts: todo.map((c) => crit[c - 1]) } : undefined;
 }
 const RULE_STYLE: Record<string, string> = {
@@ -1150,6 +1160,17 @@ const RULE_STYLE: Record<string, string> = {
 };
 export const ruleFirstLine = (rf: { texts: string[] }, planPrimary?: string, hasNext?: boolean) =>
   `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). In this reply, inside the teaching method above: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) ask them to apply the rule to a new item${hasNext ? ' (if their answer was right, present the next lesson item given below exactly as written; otherwise one short new item)' : ': one short new item you write'} made of words that appear in no lesson exercise. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule, and the hint-level limits on stating the rule. Never write the answer to the exercise you are asking about or any part of it, never show its target form, never model on the learner's own answer.`;
+/** The explicit-first decision and the rule to state this turn (levelExplicit and ruleFirst). Pure: used by buildLanguageTeachingContext and by the tests. */
+export function ruleFirstDecision(i: { band: LevelBand; masteryStatus?: string; history: { role: string; languageTurn?: unknown }[]; signals: Parameters<typeof rulesToIntroduce>[1]; spec: { successCriteria?: string[] } | undefined }): { explicit?: boolean; ruleFirst?: { criteria: number[]; texts: string[] } } {
+  const explicit = engineV2('levelExplicit') ? explicitFirst(i.band, i.masteryStatus) : undefined;
+  const ruleFirst = explicit ? rulesToIntroduce(i.history, i.signals, i.spec, { beforeFirstTry: true }) : engineV2('ruleFirst') ? rulesToIntroduce(i.history, i.signals, i.spec) : undefined;
+  return { ...(explicit !== undefined ? { explicit } : {}), ...(ruleFirst ? { ruleFirst } : {}) };
+}
+/** levelExplicit, the reply that presents the exercise to an explicit-first learner: the rule first, then the item for the first try. Replaces the "no rule before the first try" rule for this reply only. */
+export const ruleBeforeFirstTryLine = (rf: { texts: string[] }, planPrimary?: string) =>
+  `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). This learner needs the rule before the first try. In this reply, inside the teaching method above, before the exercise: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) then present the lesson item to present now (named in this block) exactly as written, with one short line saying what to do, and let them try it. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule. Never write the answer to the exercise, never show its target form, never model on the learner's own answer.`;
+/** levelExplicit: explicit-first = the course band is A1-A2 (beginner), or the learner's record for this objective is not_assessed or emerging. Everyone else is questioning-first. */
+export const explicitFirst = (band: LevelBand, masteryStatus?: string): boolean => band === 'beginner' || masteryStatus === 'not_assessed' || masteryStatus === 'emerging';
 export function supportStage(s: { answeringCheck?: boolean; keyVerdict?: string | null; whyAfterAttempt?: boolean; hintRequest?: boolean; activeLessonItem?: unknown; learning?: { attemptsOnItem?: number; lastAssessment?: { verdict?: string }; activeItem?: unknown } }): 'teach_rule' | 'summarise' | null {
   const v2 = engineV2('wrongAnswer');
   // v2: a tutor-invented follow-up task (no lesson item id) also gets the support stages.
@@ -1267,6 +1288,10 @@ export function researchSignals(history: { role: string; content: string; langua
 }
 
 // r4: what the engine knows about the open task, its answer and the next step.
+/** levelExplicit: the rule line for the reply that presents the exercise is due (explicit-first learner, rule not yet introduced). */
+function ruleBeforeFirstTryOn(ctx: Omit<LanguageTeachingContext, 'prompt'>): boolean {
+  return Boolean(engineV2('levelExplicit') && ctx.explicitFirst && ctx.ruleFirst?.criteria.length && ctx.signals.presentLessonItem && !ctx.signals.answeringCheck);
+}
 function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   const s = ctx.signals;
   const L = s.learning;
@@ -1277,7 +1302,10 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (supportStage(s) === 'summarise') out.push(`- ${RULE_SUMMARY}`);
   if (s.ruleStatement && !researchAblated('rule_check')) out.push(`- ${RULE_CHECK}`);
   if (s.exampleStatement && engineV2('shortRecap')) out.push(`- ${EXAMPLE_CHECK}`);
-  if (ctx.ruleFirst?.criteria.length && engineV2('ruleFirst')) out.push(`- ${ruleFirstLine(ctx.ruleFirst, ctx.planPrimary, Boolean(s.nextLessonItem))}`);
+  if (ctx.ruleFirst?.criteria.length) {
+    if (ruleBeforeFirstTryOn(ctx)) out.push(`- ${ruleBeforeFirstTryLine(ctx.ruleFirst, ctx.planPrimary)}`);
+    else if (engineV2('ruleFirst') || (engineV2('levelExplicit') && ctx.explicitFirst)) out.push(`- ${ruleFirstLine(ctx.ruleFirst, ctx.planPrimary, Boolean(s.nextLessonItem))}`);
+  }
   if (engineV2('belief')) {
     out.push(`- ${HOLD_LINE}`);
     const rep = L?.beliefs?.find((b) => b.count >= 2);
@@ -1305,12 +1333,12 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     const level = ctx.moves.some((m) => m.id === 'answer_with_reasoning') ? 6 : stage === 'teach_rule' ? Math.max(5, s.hintLevel) : s.hintLevel;
     if (stage === 'teach_rule' && !researchAblated('teach_rule')) out.push(`- ${engineV2('wrongAnswer') ? TEACH_RULE_V2 : TEACH_RULE}`);
     else if (stage !== 'teach_rule' && s.whyAfterAttempt) out.push(`- ${WHY_AFTER_ATTEMPT}`);
-    if (!researchAblated('hint_ladder')) out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? '') })}`, `- ${SUPPORT_PRECEDENCE}`);
+    if (!researchAblated('hint_ladder')) out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? ''), explicit: Boolean(engineV2('levelExplicit') && ctx.explicitFirst) })}`, `- ${SUPPORT_PRECEDENCE}`);
   }
   if (engineV2('clarity') && s.activeLessonItem && needsClarity(s, supportStage(s))) out.push(`- ${CLARITY_LINE}`);
   if (engineV2('arbitration') && ctx.planPrimary) {
     out.push(`- ${ARBITRATION_LINE}`);
-    if (EXPLICIT_METHODS.includes(ctx.planPrimary) && ctx.moves.some((m) => m.id === 'present_lesson_item')) out.push(`- ${EXPLICIT_FIRST_LINE}`);
+    if (EXPLICIT_METHODS.includes(ctx.planPrimary) && ctx.moves.some((m) => m.id === 'present_lesson_item') && !ruleBeforeFirstTryOn(ctx)) out.push(`- ${EXPLICIT_FIRST_LINE}`); // levelExplicit's own rule line replaces it
   }
   if (ctx.research) {
     const r = ctx.research;
@@ -1383,7 +1411,7 @@ export function renderLanguageContextParts(ctx: Omit<LanguageTeachingContext, 'p
     ...(lesson.status === 'structured' && lesson.spec ? criteriaLines(lesson.spec.successCriteria?.map(untrusted), ctx.signals.learning) : []),
     ...(ctx.history?.length ? [...ctx.history.map(untrusted)] : []),
     'Teaching moves for this reply:',
-    ...ctx.moves.map((m) => `- ${moveText(m)}`),
+    ...ctx.moves.map((m) => `- ${moveText(m, { ruleBeforeFirstTry: ruleBeforeFirstTryOn(ctx) })}`),
     ...stateLines(ctx),
     lengthStyleLine(len),
     '</language_teaching_context>',
@@ -1409,7 +1437,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
   lines.push(
     ...(ctx.history?.length ? [...ctx.history.map(untrusted)] : []),
     'Teaching moves for this reply:',
-    ...ctx.moves.map((m) => `- ${moveText(m)}`),
+    ...ctx.moves.map((m) => `- ${moveText(m, { ruleBeforeFirstTry: ruleBeforeFirstTryOn(ctx) })}`),
     ...stateLines(ctx),
     lengthStyleLine(len),
     ...(step && REGISTER[step] ? [`Level: ${REGISTER[step]}`] : []),
@@ -1441,6 +1469,7 @@ export function turnEvidence(ctx: LanguageTeachingContext, objectiveId?: string)
   return {
     version: ctx.version,
     ...strandTags(ctx.moves), // strandLog (off: nothing)
+    ...(engineV2('levelExplicit') ? { explicitFirst: Boolean(ctx.explicitFirst), ...(arbitrationForced() ? { arbitrationForced: true as const } : {}) } : {}), // levelExplicit tags (off: nothing)
     ...(ctx.ruleFirst?.criteria.length ? { rulesIntroduced: ctx.ruleFirst.criteria } : {}),
     lessonId: ctx.lesson.lessonId,
     ...(objectiveId ? { objectiveId } : {}),
@@ -1677,8 +1706,9 @@ export async function buildLanguageTeachingContext(params: {
     const history = researchAblated('learner_history') ? [] : await loadProfileLines(params.institutionId, params.studentId, { opening: !params.history.some((h) => h.role === 'user') });
     const research = closingOn() || engineV2('hints') || researchImproved('strategy') || researchImproved('coverage') ? researchSignals(params.history, signals, lesson.spec) : undefined;
     const prevTurn = [...params.history].reverse().find((h) => h.role === 'assistant')?.languageTurn as { moves?: string[] } | null | undefined;
-    const ruleFirst = engineV2('ruleFirst') ? rulesToIntroduce(params.history, signals, lesson.spec) : undefined;
-    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}) } as const;
+    // levelExplicit: decided per learner and objective; explicit-first learners get the rule before their first try (rulesToIntroduce, once per rule per session).
+    const { explicit, ruleFirst } = ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec });
+    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}) } as const;
     const parts = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
     return { ...base, ...(parts ? { parts } : {}), prompt: renderLanguageContextPrompt(base) };
   } catch (error) {

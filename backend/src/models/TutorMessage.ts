@@ -132,6 +132,8 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           closingAsk: String,
           strand: String, // strandLog tag
           stage: String,  // practice stage tag (change D; empty until it exists)
+          explicitFirst: Boolean, // levelExplicit tags
+          arbitrationForced: Boolean,
           diagnosis: String,
           _id: false,
         },

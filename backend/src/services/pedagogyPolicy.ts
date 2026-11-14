@@ -18,6 +18,7 @@
 // remains), try the second (STRATEGY_CHANGED).
 // requiresReassessment is true unless the objective is mastered.
 
+import { engineV2 } from './engineV2';
 import { REGISTRY_VERSION, STRATEGY_BY_ID, validateComposition, type MethodComposition, type SwitchSignal } from './strategyRegistry';
 
 export const PEDAGOGY_DECISION_VERSION = 'ped-v1';
@@ -125,6 +126,8 @@ export interface PlanInput {
   // Subject name (from the assessed questions or the curriculum), classified by
   // subjectProfile into procedural / discussion / applied (P21 follow-up).
   subject?: string;
+  // Language courses (levelExplicit): the course level is below B1 (A1, A2 or pre-A1). Absent for other courses and when the level is unknown.
+  belowB1?: boolean;
 }
 
 // Kind of subject, from its name (English and Arabic keywords). A heuristic:
@@ -156,6 +159,10 @@ export interface TeachingPlan extends MethodComposition {
   registryVersion: string;
 }
 
+/** Course level below B1 (pre-A1, A1, A2), read from a level label such as "A2" or "A2 Elementary". Anything else, including no label, is false. */
+export const belowB1 = (level?: string): boolean => /\b(pre-?a1|a1|a2)\b/i.test(level ?? '');
+/** levelExplicit: open-ended methods are not the primary method below B1 (they never state the rule, or need the learner to explain what they have not met yet). */
+export const LEVEL_GATED_METHODS = ['socratic_questioning', 'inquiry_based', 'problem_based', 'case_based', 'project_based', 'blooms_guided'];
 const BASE_MODIFIERS = ['adaptive_pathways', 'differentiated_instruction', 'formative_feedback'];
 
 export function selectTeachingPlan(input: PlanInput): TeachingPlan {
@@ -170,7 +177,9 @@ export function selectTeachingPlan(input: PlanInput): TeachingPlan {
   const set = (primary: string, supporting: string[] = [], reinforcement?: string) => {
     c = { primary, supporting, reinforcement, modifiers: [] };
   };
+  const levelGated = (id: string) => Boolean(input.belowB1) && engineV2('levelExplicit') && LEVEL_GATED_METHODS.includes(id);
   const usable = (id: string) =>
+    !levelGated(id) &&
     !input.triedWithoutImprovement.includes(id) &&
     (input.gradeLevel === undefined || (STRATEGY_BY_ID.get(id)?.minGrade ?? 0) <= input.gradeLevel) &&
     !(novice && STRATEGY_BY_ID.get(id)?.withholdsAnswer);
@@ -220,7 +229,7 @@ export function selectTeachingPlan(input: PlanInput): TeachingPlan {
       set('error_analysis', ['think_aloud']);
       reasons.push('MISINTERPRETATION');
       gap = 'Misreads the task or reasoning is incomplete.';
-    } else if (input.applicationGap && RANK[status] >= 2) {
+    } else if (input.applicationGap && RANK[status] >= 2 && !levelGated('blooms_guided')) {
       set('blooms_guided', usable('inquiry_based') ? ['inquiry_based'] : []);
       reasons.push('APPLICATION_GAP');
       gap = 'Recall is right but application is not.';

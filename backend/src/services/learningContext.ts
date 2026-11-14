@@ -12,7 +12,8 @@ import type { TeachingMeta } from '../models/TutorMessage';
 import { logger, serializeError } from '../utils/logging';
 import { applicationGapFrom, examContextFor } from './assessmentEvidenceContext';
 import { isAdultSchool, isFeatureEnabled, isShadowMode } from './featureFlags';
-import { PEDAGOGY_PLAN_VERSION, selectTeachingPlan, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
+import { engineV2 } from './engineV2';
+import { PEDAGOGY_PLAN_VERSION, selectTeachingPlan, belowB1, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { REGISTRY_VERSION, STRATEGY_BY_ID } from './strategyRegistry';
 
 // The level used for adult learners: above every method's minimum grade, and
@@ -158,6 +159,7 @@ export async function buildObjectiveContext(params: {
       gradeLevel: adult ? ADULT_GRADE_LEVEL : gradeMatch ? Number(gradeMatch[1]) : undefined,
       disengaged: lastActivity ? Date.now() - new Date(lastActivity.at).getTime() > DISENGAGED_DAYS * 86_400_000 : false,
       subject,
+      ...(engineV2('levelExplicit') && objective.curriculumId && belowB1((await Curriculum.findOne({ id: objective.curriculumId }).select('level').lean())?.level) ? { belowB1: true } : {}),
       relatedSecureObjectives: relatedObjectives.length
         ? await StudentObjectiveMastery.countDocuments({ studentId: params.studentId, objectiveId: { $in: relatedObjectives.map((o) => o.id) }, masteryStatus: { $in: [...MET] } })
         : 0,

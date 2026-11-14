@@ -13,10 +13,18 @@
 //  shortRecap  - replaces the closing "tell me the rule in your own words" ask with: the rule in one line, then one new example from the learner; once per session; named-only, NOT part of "all"
 //  socraticOff - RESEARCH ONLY, ignored when NODE_ENV=production: removes the two "no rule before the first try" instructions of the language engine (exercise presentation, hint level 1) and nothing else; answer-hiding stays
 //  strandLog   - tag every language turn with its Nation strand (input, output, language_focused, fluency) so the split can be reported per learner and per course; tags and counts only, never learner text; named-only, NOT part of "all"
+//  levelExplicit - level-based explicitness: learners who are A1-A2, or whose record for the objective is not_assessed/emerging, get the rule stated plainly BEFORE their first try (once per rule per session), a hint ladder whose level 1 states the rule in general terms and level 2 shows a right/wrong pair, and below B1 the open-ended methods (Socratic, inquiry, problem, case, project, Bloom's) are not the primary method; everyone else is unchanged. Always runs with arbitration (turned on automatically, recorded in the turn evidence); named-only, NOT part of "all"
 //  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
-export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog';
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit';
 export const engineV2 = (feature: EngineV2Feature): boolean => {
   if (feature === 'socraticOff' && process.env.NODE_ENV === 'production') return false; // research-only
   const v = (process.env.ENARA_ENGINE_V2 ?? '').split(',').map((x) => x.trim());
-  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog'].includes(feature));
+  if (feature === 'arbitration' && v.includes('levelExplicit')) return true; // levelExplicit always runs with arbitration
+  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit'].includes(feature));
+};
+
+/** True when `arbitration` is on only because `levelExplicit` forced it (recorded in the turn evidence). */
+export const arbitrationForced = (): boolean => {
+  const v = (process.env.ENARA_ENGINE_V2 ?? '').split(',').map((x) => x.trim());
+  return v.includes('levelExplicit') && !v.includes('arbitration');
 };

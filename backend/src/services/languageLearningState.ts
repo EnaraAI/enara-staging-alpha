@@ -452,13 +452,20 @@ const KIND_LIMIT: Record<string, [number, string]> = {
   word: [5, 'For this word item, never give letters, the first letter, the spelling or the word itself; give a meaning clue or a situation instead.'],
   open: [5, 'For this open task, never give a sentence starter or frame that already contains what they should say; ask one question about what they want to say.'],
 };
-export function hintInstruction(level: number, opts: { binary?: boolean; beginner?: boolean; kind?: string } = {}): string {
+export function hintInstruction(level: number, opts: { binary?: boolean; beginner?: boolean; kind?: string; explicit?: boolean } = {}): string {
   const lim = opts.kind ? KIND_LIMIT[opts.kind] : undefined;
   const extra = lim && level < lim[0] ? ` ${lim[1]}` : '';
   return hintInstructionBase(level, opts) + extra;
 }
-function hintInstructionBase(level: number, opts: { binary?: boolean; beginner?: boolean } = {}): string {
+// levelExplicit: for explicit-first learners level 1 states the rule in general terms (today's level 2) and level 2 gives the right/wrong contrast pair (made of words from
+// no exercise). The answer to the item stays hidden at both. Two-option items keep their own early-hint rules (any pointer settles the choice), so they are not changed.
+export const EXPLICIT_HINT_LADDER: Record<1 | 2, HintLadderLevel> = {
+  1: { ...HINT_LADDER[1], level: 1 },
+  2: { level: 2, name: 'right/wrong contrast', mayReveal: 'a short right-versus-wrong contrast pair made of words that are in no exercise, saying what makes the wrong one wrong', mustNotReveal: 'the rule applied to this item, the fact that decides this item, or the correct form', learnerAction: 'compare the pair with their own answer and retry' },
+};
+function hintInstructionBase(level: number, opts: { binary?: boolean; beginner?: boolean; explicit?: boolean } = {}): string {
   let l = HINT_LADDER[Math.max(1, Math.min(6, level)) - 1];
+  if (opts.explicit && !opts.binary && (l.level === 1 || l.level === 2)) l = EXPLICIT_HINT_LADDER[l.level];
   // research-only ablation (socraticOff): the attention cue may also state the rule in general terms; the correct form and the choice stay hidden.
   if (engineV2('socraticOff') && l.level === 1) l = { ...l, mayReveal: 'where to look (the word or part to check) and the rule in general terms', mustNotReveal: 'the correct form, or which option fits' };
   if (opts.binary && BINARY_EARLY[l.level]) {
