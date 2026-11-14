@@ -58,7 +58,8 @@ if (cmd) {
     const frozen = JSON.parse(readFileSync(path.join(CONFIG, 'POSTTEST_ITEMS.json'), 'utf8')).items as any[];
     const TUT: Record<string, string> = { A0: 'D', A: 'E', B: 'F', C: 'G', P: 'C' }; // study arm -> session file suffix
     const jobs: any[] = [];
-    for (const f of frozen) for (const arm of Object.keys(TUT)) {
+    const N = Number(process.env.STUDY_N ?? 18); // study size (students 0..N-1)
+    for (const f of frozen.filter((x) => x.studentIdx < N)) for (const arm of Object.keys(TUT)) {
       const file = path.join(sessDir, `s${f.studentIdx}_${TUT[arm]}.json`); if (!existsSync(file)) continue;
       const sess = JSON.parse(readFileSync(file, 'utf8')); const turns = sess.turns.slice(0, 6).filter((t: any) => t.tutor !== undefined);
       const o = bm.find((x) => x.id === f.outcome)!; const st = makeStudent(f.studentIdx, SEED); const blockId = `${f.studentIdx}-${f.outcome}`;
