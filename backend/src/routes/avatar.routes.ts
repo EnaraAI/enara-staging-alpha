@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { checkVoiceNow } from '../services/elevenlabsVoice';
 import { authMiddleware, requireRole } from '../middleware/auth.middleware';
 import {
   avatarFallback,
@@ -17,6 +18,10 @@ const router = Router();
 
 router.use(authMiddleware);
 
+// Voice test: does the ElevenLabs key speak and transcribe right now? Returns pass or fail only.
+router.get('/voice-check', async (_req, res, next) => {
+  try { res.json(await checkVoiceNow()); } catch (e) { next(e); }
+});
 router.post('/session', startAvatarSession);
 router.post('/query-stream', streamAvatarAnswer);
 router.post('/session/:id/language', switchAvatarLanguage);
