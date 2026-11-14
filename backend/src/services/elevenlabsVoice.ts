@@ -101,6 +101,5 @@ export async function checkVoiceNow(): Promise<VoiceCheck> {
   } catch (error) {
     out.stt = { ok: false, status: statusOf(error), ms: Date.now() - t };
   }
-  voiceState = { ok: out.tts.ok || !(out.tts.status && isVoiceRefusal({ statusCode: out.tts.status })), at: Date.now() };
   return out;
 }
