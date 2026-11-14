@@ -14,7 +14,7 @@ for f in sorted(glob.glob(os.path.join(rd, '*.json'))):
         if k is None: print('NO KEY', b, r['triplet']); continue
         sc = {k[l]: r['scores'][l] for l in 'XYZ'}; rk = [k[l] for l in r['ranking']]
         R[r['triplet']][ps] = dict(scores=sc, rank=rk)
-NP = max(len(v) for v in R.values()); T = sorted(t for t in R if len(R[t]) == NP); print('passes:', NP, 'triplets:', len(T))
+PS = sorted({p for v in R.values() for p in v}); NP = max(len(v) for v in R.values()); T = sorted(t for t in R if len(R[t]) == NP); print('passes:', NP, 'triplets:', len(T))
 def tm(c, crit):  # per-triplet mean across both passes (ignoring nulls)
     out = []
     for t in T:
@@ -39,16 +39,16 @@ for t in T:
         for i, c in enumerate(rk): pts[c].append(3 - i)
         for a, b in (('A','C'), ('B','C'), ('B','A')): pair[(a, b, rk.index(a) < rk.index(b))] += 1
 # agreement between passes on overall ranking and overall score
-agree = (np.mean([R[t]['p1']['rank'][0] == R[t]['p2']['rank'][0] for t in T]) if NP==2 else float('nan'))
+agree = (np.mean([R[t][PS[0]]['rank'][0] == R[t][PS[1]]['rank'][0] for t in T]) if NP==2 else float('nan'))
 from itertools import combinations
 conc = [True]
 for t in (T if NP==2 else []):
     for a, b in combinations('ABC', 2):
-        x = R[t]['p1']['rank'].index(a) < R[t]['p1']['rank'].index(b); y = R[t]['p2']['rank'].index(a) < R[t]['p2']['rank'].index(b); conc.append(x == y)
+        x = R[t][PS[0]]['rank'].index(a) < R[t][PS[0]]['rank'].index(b); y = R[t][PS[1]]['rank'].index(a) < R[t][PS[1]]['rank'].index(b); conc.append(x == y)
 rho = float('nan')
 if NP==2:
-    ov = {p: np.array([R[t][p]['scores'][c]['overall'] for t in T for c in 'ABC'], float) for p in ('p1', 'p2')}
-    rho = float(np.corrcoef(ov['p1'], ov['p2'])[0, 1])
+    ov = {p: np.array([R[t][p]['scores'][c]['overall'] for t in T for c in 'ABC'], float) for p in PS}
+    rho = float(np.corrcoef(ov[PS[0]], ov[PS[1]])[0, 1])
 # per-triplet win rate (mean of both passes): who is rated best
 wins = collections.Counter()
 for t in T:
