@@ -67,3 +67,40 @@ export async function synthesizeSpeech(
   recordAiCall({ feature: 'tts', provider: 'elevenlabs', modelName: el.config.ttsModel, status: 'ok', startedAt, characters: text.length, firstTokenMs });
   return audio;
 }
+
+// Live check for the voice test endpoint: one two-character speech request and
+// one transcription token, ignoring the 10-minute cache. Reports pass or fail
+// and the provider's status code only, never the key or the audio.
+export type VoiceCheck = {
+  configured: boolean;
+  tts: { ok: boolean; status?: number; ms?: number };
+  stt: { ok: boolean; status?: number; ms?: number };
+};
+
+const statusOf = (error: unknown): number | undefined => {
+  const e = error as { statusCode?: unknown; status?: unknown };
+  return typeof e?.statusCode === 'number' ? e.statusCode : typeof e?.status === 'number' ? e.status : undefined;
+};
+
+export async function checkVoiceNow(): Promise<VoiceCheck> {
+  const el = getElevenLabs();
+  if (!el) return { configured: false, tts: { ok: false }, stt: { ok: false } };
+  const out: VoiceCheck = { configured: true, tts: { ok: false }, stt: { ok: false } };
+  let t = Date.now();
+  try {
+    const audio = await el.client.textToSpeech.convert(el.config.voiceIdEn, { text: 'Hi', modelId: el.config.ttsModel, outputFormat: 'pcm_16000' });
+    for await (const _ of audio as unknown as AsyncIterable<unknown>) void _;
+    out.tts = { ok: true, ms: Date.now() - t };
+  } catch (error) {
+    out.tts = { ok: false, status: statusOf(error), ms: Date.now() - t };
+  }
+  t = Date.now();
+  try {
+    await el.client.tokens.singleUse.create('realtime_scribe');
+    out.stt = { ok: true, ms: Date.now() - t };
+  } catch (error) {
+    out.stt = { ok: false, status: statusOf(error), ms: Date.now() - t };
+  }
+  voiceState = { ok: out.tts.ok || !(out.tts.status && isVoiceRefusal({ statusCode: out.tts.status })), at: Date.now() };
+  return out;
+}
