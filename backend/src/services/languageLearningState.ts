@@ -55,6 +55,8 @@ export interface StoredLearningFields {
   stateScope?: string;
   // r4.1 (POST-12): the item whose answer this reply disclosed (L6), if any.
   revealedItemId?: string;
+  // v2 (ruleFirst): the success criteria (1-based) whose rule this reply introduced; read back from history so a rule is introduced once per session.
+  rulesIntroduced?: number[];
 }
 export type HistoryTurn = { role: 'user' | 'assistant'; content: string; languageTurn?: StoredLearningFields | null };
 
@@ -454,7 +456,9 @@ export function hintInstruction(level: number, opts: { binary?: boolean; beginne
   return hintInstructionBase(level, opts) + extra;
 }
 function hintInstructionBase(level: number, opts: { binary?: boolean; beginner?: boolean } = {}): string {
-  const l = HINT_LADDER[Math.max(1, Math.min(6, level)) - 1];
+  let l = HINT_LADDER[Math.max(1, Math.min(6, level)) - 1];
+  // research-only ablation (socraticOff): the attention cue may also state the rule in general terms; the correct form and the choice stay hidden.
+  if (engineV2('socraticOff') && l.level === 1) l = { ...l, mayReveal: 'where to look (the word or part to check) and the rule in general terms', mustNotReveal: 'the correct form, or which option fits' };
   if (opts.binary && BINARY_EARLY[l.level]) {
     const move = (opts.beginner ? BINARY_EARLY_BEGINNER : BINARY_EARLY)[l.level];
     return `Support level ${l.level} of 6 (two-option item): this item is a choice between two words, so any pointer settles it. Do not point to the word to change, the word that decides it, or the rule; do not restate the rule. Instead ${move}, then let them retry. Start with the smallest hint that could work.`;

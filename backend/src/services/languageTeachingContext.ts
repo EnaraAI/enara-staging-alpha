@@ -198,6 +198,8 @@ export interface TurnSignals {
   whyAfterAttempt?: boolean;
   // Fix 7: the tutor's last message asked for the rule in their own words.
   ruleStatement?: boolean;
+  // v2 (shortRecap): the tutor's last message asked for one new example of their own.
+  exampleStatement?: boolean;
   // r4.4 #1: likely cause of a wrong answer to the open item (never the answer).
   diagnosis?: Diagnosis;
   dontKnow?: boolean;
@@ -279,6 +281,8 @@ export interface LanguageTeachingContext {
   parts?: { stable: string; dynamic: string };
   // v2 (memory): the moves of the previous tutor turn, so a later independent success can be credited to the explanation style that preceded it.
   prevMoves?: string[];
+  // v2 (ruleFirst): rules (success criteria) that this reply must introduce, computed from history; recorded in the turn evidence once the reply is stored.
+  ruleFirst?: { criteria: number[]; texts: string[] };
   // v2 (arbitration): primary method of the active teaching plan.
   planPrimary?: string;
   prompt: string;
@@ -293,6 +297,7 @@ export interface LengthTarget {
 // The record stored on the tutor's reply: minimal, low-confidence, never mastery.
 export interface LanguageTurnEvidence {
   version: string;
+  rulesIntroduced?: number[];
   lessonId?: string;
   objectiveId?: string;
   skill: 'written_interaction';
@@ -820,7 +825,7 @@ function r4Signals(text: string, history: Turn[], learnerResponse: LearnerRespon
   });
   const out: Partial<TurnSignals> = { learning, exerciseRequest, hintLevel, keyVerdict: learnerResponse === 'answer' ? evaluateAgainstKey(text, activeLessonItem) : null };
   if (activeLessonItem && learnerResponse !== 'answer' && learning.attemptsOnItem > 0 && WHY_ASK.test(text)) out.whyAfterAttempt = true;
-  if (askedForRule([...history].reverse().find((h) => h.role === 'assistant')?.content ?? '')) out.ruleStatement = true;
+  { const lastAsst = [...history].reverse().find((h) => h.role === 'assistant')?.content ?? ''; if (askedForRule(lastAsst)) out.ruleStatement = true; if (askedNewExample(lastAsst)) out.exampleStatement = true; }
   if (learnerResponse === 'answer' && activeLessonItem) { const d = diagnoseError(text, activeLessonItem); if (d) out.diagnosis = d; }
   if (activeLessonItem) out.activeLessonItem = activeLessonItem;
   if (presentLessonItem) out.presentLessonItem = presentLessonItem;
@@ -1043,6 +1048,7 @@ export function moveText(m: SelectedMove): string {
   if (m.id === 'answer_with_reasoning' && m.reasons.some((r) => r.startsWith('answer_requested_after_'))) {
     return 'They have already tried: now give the correct answer with the reason in one or two sentences, then one similar item for them to try.';
   }
+  if (m.id === 'present_lesson_item' && engineV2('socraticOff')) return MOVE_TEXT.present_lesson_item.replace(/ No rule, no reminder and no example before their first try \(not even with a different word\): their first try shows what they already know\./, ' Do not show the exercise\'s answer or its target form.');
   return MOVE_TEXT[m.id];
 }
 
@@ -1114,6 +1120,29 @@ export const RULE_SUMMARY = 'They got it right after a mistake: praise it in a f
 export const diagnosisLine = (d: Diagnosis) => `Likely cause of their error (${d.code.replace(/_/g, ' ')}): ${d.cue}. Aim your hint at this cause; don't name the correct form.`;
 export const RULE_CHECK = 'They have just tried to say the rule in their own words. If it is right, confirm it in one line starting "Remember:" and then give the next task. If it is wrong or incomplete, correct only the wrong part in one short sentence and ask them to say it again (no new exercise yet).';
 export const askedForRule = (t: string) => /\b(?:rule|it)\b[^.?!\n]{0,30}\bin your own words\b|\bin your own words\b[^.?!\n]{0,40}\brule\b|tell me the rule/i.test(t);
+// v2 (shortRecap): the closing ask is "one new example of your own"; once it has been asked the recap is done and the example check takes over.
+export const askedNewExample = (t: string) => /\bone (?:new |more )?example (?:of your own|sentence of your own)\b|\bwrite one (?:new )?example\b/i.test(t);
+export const SHORT_RECAP = 'This is the point to close the lesson unit. This overrides the "next task" instructions above: (1) answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) state the rule in ONE plain line of 20 words or fewer; (3) end by asking: "Now write one new example of your own." Do not set a new exercise this turn and never write a completed answer to an open exercise.';
+export const EXAMPLE_CHECK = 'They have just written their own example. If it follows the rule, confirm it in one line starting "Remember:" and then give the next task. If it is wrong or incomplete, correct only the wrong part in one short sentence and ask for one more example (no new exercise yet).';
+// v2 (ruleFirst): which rules (success criteria) the focus item needs that this session has not introduced yet.
+export function rulesToIntroduce(history: { role: string; languageTurn?: unknown }[], s: { presentLessonItem?: { criteria?: number[] }; activeLessonItem?: { criteria?: number[] }; answeringCheck?: boolean; hintRequest?: boolean; dontKnow?: boolean; whyAfterAttempt?: boolean }, spec: { successCriteria?: string[] } | undefined): { criteria: number[]; texts: string[] } | undefined {
+  // First exposure = the reply to the learner's first attempt, request for a hint, "I don't know" or "why" on an item (never the turn that only presents the exercise: their first try stays unassisted).
+  if (!(s.answeringCheck || s.hintRequest || s.dontKnow || s.whyAfterAttempt)) return undefined;
+  const item = s.activeLessonItem ?? s.presentLessonItem; const crit = spec?.successCriteria ?? [];
+  if (!item?.criteria?.length || !crit.length) return undefined;
+  const done = new Set<number>(); for (const h of history) for (const c of ((h.languageTurn as { rulesIntroduced?: number[] } | null | undefined)?.rulesIntroduced ?? [])) done.add(c);
+  const todo = item.criteria.filter((c) => c >= 1 && c <= crit.length && !done.has(c)).slice(0, 2);
+  return todo.length ? { criteria: todo, texts: todo.map((c) => crit[c - 1]) } : undefined;
+}
+const RULE_STYLE: Record<string, string> = {
+  worked_example: 'say it through one fully worked example: show the example first, then the rule as the one sentence that sums it up',
+  direct_instruction: 'say it through one fully worked example: show the example first, then the rule as the one sentence that sums it up',
+  think_aloud: 'say it through one example, narrating in the first person why the right one is right',
+  analogy: 'say it through one everyday comparison that has the same shape as the rule, then the right/wrong pair',
+  visual_explanation: 'say it through a simple table or two-column picture, then the right/wrong pair',
+};
+export const ruleFirstLine = (rf: { texts: string[] }, planPrimary?: string, hasNext?: boolean) =>
+  `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). In this reply, inside the teaching method above: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) ask them to apply the rule to a new item${hasNext ? ' (if their answer was right, present the next lesson item given below exactly as written; otherwise one short new item)' : ': one short new item you write'} made of words that appear in no lesson exercise. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule, and the hint-level limits on stating the rule. Never write the answer to the exercise you are asking about or any part of it, never show its target form, never model on the learner's own answer.`;
 export function supportStage(s: { answeringCheck?: boolean; keyVerdict?: string | null; whyAfterAttempt?: boolean; hintRequest?: boolean; activeLessonItem?: unknown; learning?: { attemptsOnItem?: number; lastAssessment?: { verdict?: string }; activeItem?: unknown } }): 'teach_rule' | 'summarise' | null {
   const v2 = engineV2('wrongAnswer');
   // v2: a tutor-invented follow-up task (no lesson item id) also gets the support stages.
@@ -1203,7 +1232,7 @@ export const researchAblated = (feature: string): boolean => process.env.NODE_EN
 // same difficulty, and explicit coverage of every success criterion. Nothing here relaxes a guard: the pre-attempt answer guards and try-first rules are unchanged.
 export const researchImproved = (feature: 'closing' | 'strategy' | 'coverage'): boolean => process.env.NODE_ENV !== 'production' && (process.env.ENARA_RESEARCH_IMPROVE ?? '').split(',').map((x) => x.trim()).includes(feature);
 /** Closing recap is on for the research flag or the production-capable engine switch. */
-export const closingOn = (): boolean => engineV2('closing') || researchImproved('closing');
+export const closingOn = (): boolean => engineV2('closing') || engineV2('shortRecap') || researchImproved('closing');
 export interface ResearchSignals { turnNo: number; stuck: boolean; uncovered: string[]; allShown: boolean; closingDone?: boolean; hintRepeat?: boolean; }
 export const RESEARCH_CLOSING_TURN = 5;
 export const STRATEGY_SHIFT = 'They have now met the same difficulty in more than one turn, so stop asking the same kind of hint question. In one or two short sentences state the general rule for this difficulty (when it applies and when it does not) and give one contrast example that uses words not in any open exercise; then ask them to apply it to their own open task in their own words. Never write the corrected form of the open task.';
@@ -1222,7 +1251,7 @@ export function researchSignals(history: { role: string; content: string; langua
   const shown = new Set(Object.keys(s.learning?.criteria ?? {}).map(Number));
   const uncovered = criteria.filter((_, i) => !shown.has(i + 1)).slice(0, 4);
   const asst = history.filter((h) => h.role === 'assistant').map((h) => h.content ?? '');
-  const closingDone = asst.some((t) => askedForRule(t));
+  const closingDone = asst.some((t) => askedForRule(t) || askedNewExample(t));
   const hintRepeat = asst.length >= 2 && asst.slice(-2).every((t) => HINT_SHAPE.test(t) && t.includes('?'));
   return { turnNo, stuck, uncovered, allShown: criteria.length > 0 && uncovered.length === 0, closingDone, hintRepeat };
 }
@@ -1237,6 +1266,8 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (s.keyVerdict && isSuccess(s.keyVerdict)) out.push('- Their answer matches the course\'s accepted answer for this item: confirm it as correct (mention a capital-letter or punctuation slip in a few words at most).');
   if (supportStage(s) === 'summarise') out.push(`- ${RULE_SUMMARY}`);
   if (s.ruleStatement && !researchAblated('rule_check')) out.push(`- ${RULE_CHECK}`);
+  if (s.exampleStatement && engineV2('shortRecap')) out.push(`- ${EXAMPLE_CHECK}`);
+  if (ctx.ruleFirst?.criteria.length && engineV2('ruleFirst')) out.push(`- ${ruleFirstLine(ctx.ruleFirst, ctx.planPrimary, Boolean(s.nextLessonItem))}`);
   if (engineV2('belief')) {
     out.push(`- ${HOLD_LINE}`);
     const rep = L?.beliefs?.find((b) => b.count >= 2);
@@ -1276,7 +1307,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     if (r.stuck && researchImproved('strategy')) out.push(`- ${STRATEGY_SHIFT}`);
     if (r.hintRepeat && engineV2('hints') && s.activeLessonItem && !(isClosingTurn(r) && closingOn())) out.push(`- ${HINT_VARY}`);
     if (r.uncovered.length && r.turnNo >= 2 && researchImproved('coverage')) out.push(`- ${coverageRule(r.uncovered)}`);
-    if (isClosingTurn(r) && closingOn()) out.push(`- ${CLOSING_RECAP}`);
+    if (isClosingTurn(r) && closingOn()) out.push(`- ${engineV2('shortRecap') ? SHORT_RECAP : CLOSING_RECAP}`);
   }
   return out;
 }
@@ -1399,6 +1430,7 @@ export function nextStepFor(moves: SelectedMove[]): string | undefined {
 export function turnEvidence(ctx: LanguageTeachingContext, objectiveId?: string): LanguageTurnEvidence {
   return {
     version: ctx.version,
+    ...(ctx.ruleFirst?.criteria.length ? { rulesIntroduced: ctx.ruleFirst.criteria } : {}),
     lessonId: ctx.lesson.lessonId,
     ...(objectiveId ? { objectiveId } : {}),
     skill: 'written_interaction',
@@ -1634,7 +1666,8 @@ export async function buildLanguageTeachingContext(params: {
     const history = researchAblated('learner_history') ? [] : await loadProfileLines(params.institutionId, params.studentId, { opening: !params.history.some((h) => h.role === 'user') });
     const research = closingOn() || engineV2('hints') || researchImproved('strategy') || researchImproved('coverage') ? researchSignals(params.history, signals, lesson.spec) : undefined;
     const prevTurn = [...params.history].reverse().find((h) => h.role === 'assistant')?.languageTurn as { moves?: string[] } | null | undefined;
-    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}) } as const;
+    const ruleFirst = engineV2('ruleFirst') ? rulesToIntroduce(params.history, signals, lesson.spec) : undefined;
+    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}) } as const;
     const parts = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
     return { ...base, ...(parts ? { parts } : {}), prompt: renderLanguageContextPrompt(base) };
   } catch (error) {

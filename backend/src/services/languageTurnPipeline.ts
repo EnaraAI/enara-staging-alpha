@@ -4,7 +4,7 @@
 // channel stops using the shared functions or if the policy version differs between them.
 import {
   buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, independentSuccessItem, turnEvidence, LANGUAGE_CONTEXT_VERSION,
-  isClosingTurn, askedForRule,
+  isClosingTurn, askedForRule, askedNewExample,
   type LanguageTeachingContext, type LanguageTurnEvidence,
 } from './languageTeachingContext';
 import { recordProfileTurn } from './learnerLanguageProfile';
@@ -37,7 +37,11 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
   const copy = stripCopyReadyModels(text, learnerText);
   if (copy.removed.length) { text = copy.text; removed += copy.removed.length; }
   // v2 (closing): on the closing turn the "own words" ask is guaranteed by the engine, not left to the model.
-  if (engineV2('closing') && language.research && isClosingTurn(language.research) && !askedForRule(text)) text = `${text.trimEnd()}\n\nTell me the rule in your own words.`;
+  // v2 (closing / shortRecap): on the closing turn the learner ask is guaranteed by the engine, not left to the model (once only: isClosingTurn is false after it was asked).
+  if (language.research && isClosingTurn(language.research) && (engineV2('closing') || engineV2('shortRecap'))) {
+    if (engineV2('shortRecap')) { if (!askedNewExample(text)) text = `${text.trimEnd()}\n\nNow write one new example of your own.`; }
+    else if (!askedForRule(text)) text = `${text.trimEnd()}\n\nTell me the rule in your own words.`;
+  }
   return { text, removed };
 }
 
