@@ -30,24 +30,42 @@ export async function prepareLanguageContext(input: PrepareInput, channel: Langu
 }
 
 /** Reply guards (fixes 1 and 2A): applied to every language reply, chat or voice, before anything is stored, shown or spoken. */
-export function applyReplyGuards(language: LanguageTeachingContext, answer: string, learnerText: string): { text: string; removed: number } {
-  let text = answer; let removed = 0;
+export type ClosingAskStatus = 'added' | 'deferred' | 'folded';
+/** After this many replies that set a task (closing turn included) with no task-free reply, the recap is folded into the task reply. */
+export const CLOSING_FOLD_AFTER = 3;
+const FOLDED = /^Rule in one line:/;
+const ruleLineFor = (language: LanguageTeachingContext): string | undefined => {
+  const spec = language.lesson.spec; const crit = spec?.successCriteria ?? [];
+  const own = (language.signals.activeLessonItem?.criteria ?? []).filter((c) => c >= 1 && c <= crit.length).map((c) => crit[c - 1]);
+  const texts = (own.length ? own : crit.length ? crit : spec?.objectives ?? []).slice(0, 2).map((t) => t.replace(/["<>]/g, '').replace(/[\s.]+$/, '').trim()).filter(Boolean);
+  return texts.length ? `${texts.join('; ')}.` : undefined;
+};
+
+export function applyReplyGuards(language: LanguageTeachingContext, answer: string, learnerText: string): { text: string; removed: number; closingAsk?: ClosingAskStatus } {
+  let text = answer; let removed = 0; let closingAsk: ClosingAskStatus | undefined;
   const guarded = stripPreAttemptModels(text, guardedItems(language), learnerText, [...(language.lesson.spec?.vocabulary ?? []), ...(language.lesson.spec?.examples ?? [])]);
   if (guarded.removed.length) { text = guarded.text; removed += guarded.removed.length; }
   const copy = stripCopyReadyModels(text, learnerText);
   if (copy.removed.length) { text = copy.text; removed += copy.removed.length; }
-  // v2 (closing): on the closing turn the "own words" ask is guaranteed by the engine, not left to the model.
   // v2 (closing / shortRecap): on the closing turn the learner ask is guaranteed by the engine, not left to the model (once only: isClosingTurn is false after it was asked).
+  // The ask is never stacked on a reply that already sets a task (two asks at once): it is deferred to the next task-free reply, and after CLOSING_FOLD_AFTER deferrals
+  // the recap is folded into the task reply as one message ("Rule in one line, then your task"), so it is never skipped for good.
   if (language.research && isClosingTurn(language.research) && (engineV2('closing') || engineV2('shortRecap'))) {
-    if (engineV2('shortRecap')) { if (!askedNewExample(text) && !taskInvitation(text)) text = `${text.trimEnd()}\n\nNow write one new example of your own.`; } // not added to a reply that already sets a task (two asks at once)
-    else if (!askedForRule(text)) text = `${text.trimEnd()}\n\nTell me the rule in your own words.`;
+    const shortRecap = engineV2('shortRecap');
+    if (!(shortRecap ? askedNewExample(text) : askedForRule(text)) && !FOLDED.test(text)) {
+      if (!taskInvitation(text)) {
+        text = `${text.trimEnd()}\n\n${shortRecap ? 'Now write one new example of your own.' : 'Tell me the rule in your own words.'}`; closingAsk = 'added';
+      } else if ((language.research.closingDeferred ?? 0) >= CLOSING_FOLD_AFTER && ruleLineFor(language)) {
+        text = `Rule in one line: ${ruleLineFor(language)}\n\nThen your task:\n${text.trimStart()}`; closingAsk = 'folded';
+      } else closingAsk = 'deferred';
+    }
   }
-  return { text, removed };
+  return { text, removed, ...(closingAsk ? { closingAsk } : {}) };
 }
 
 /** Evidence stored with the reply and used by the next turn's engine state; also records the cross-session learner profile. */
 export async function completeLanguageTurn(opts: {
-  language: LanguageTeachingContext; objectiveId?: string; reply: string; learnerText: string; messageId: string; marker?: StrippedReply; removed: number;
+  language: LanguageTeachingContext; objectiveId?: string; reply: string; learnerText: string; messageId: string; marker?: StrippedReply; removed: number; closingAsk?: ClosingAskStatus;
   institutionId: string; studentId: string;
 }): Promise<LanguageTurnEvidence> {
   const { language, marker } = opts;
@@ -58,6 +76,7 @@ export async function completeLanguageTurn(opts: {
       untrustedMarkers: marker?.untrustedMarkers, firstMarkerNotLeading: marker?.firstMarkerNotLeading,
     }),
     ...(opts.removed ? { preAttemptModelsRemoved: opts.removed } : {}),
+    ...(opts.closingAsk ? { closingAsk: opts.closingAsk } : {}),
   };
   const belief = (lt as { assessment?: { belief?: string } }).assessment?.belief;
   await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt), ...(belief ? { belief } : {}), lessonId: language.lesson.lessonId, lessonTitle: language.lesson.title, style: styleFromMoves(language.prevMoves) });

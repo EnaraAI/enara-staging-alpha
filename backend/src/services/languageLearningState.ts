@@ -57,6 +57,8 @@ export interface StoredLearningFields {
   revealedItemId?: string;
   // v2 (ruleFirst): the success criteria (1-based) whose rule this reply introduced; read back from history so a rule is introduced once per session.
   rulesIntroduced?: number[];
+  // closing / shortRecap: 'added' | 'folded' end the closing; 'deferred' counts towards the fold deadline. Tag only.
+  closingAsk?: 'added' | 'deferred' | 'folded';
 }
 export type HistoryTurn = { role: 'user' | 'assistant'; content: string; languageTurn?: StoredLearningFields | null };
 

@@ -5,7 +5,7 @@ import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSo
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
 import { type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
 import { engineV2 } from '../services/engineV2';
-import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy } from '../services/languageTurnPipeline'; // shared with the live avatar
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
 import {
   curriculumFromCourse,
@@ -382,15 +382,17 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
   turn.reservation = undefined;
   // Fix 1: before the learner's first attempt, example lines that show the tested
   // form are removed (stored and sent text alike; the stream gets a replace event).
-  let preAttemptRemoved = 0;
+  let preAttemptRemoved = 0; let closingAsk: ClosingAskStatus | undefined;
   if (turn.language && reply) {
     const g = applyReplyGuards(turn.language, aiResult.answer, turn.text);
-    if (g.removed) { aiResult = { ...aiResult, answer: g.text }; preAttemptRemoved = g.removed; }
+    // g.text also changes when the engine adds the closing ask (closing / shortRecap) without removing anything.
+    if (g.removed || g.text !== aiResult.answer) { aiResult = { ...aiResult, answer: g.text }; preAttemptRemoved = g.removed; }
+    closingAsk = g.closingAsk;
   }
   const citations = citationsIn(aiResult.answer, turn.sources);
   const assistantId = generateMessageId();
   const languageTurn = turn.language && reply
-    ? await completeLanguageTurn({ language: turn.language, objectiveId: turn.plan?.teaching.objectiveId, reply: aiResult.answer, learnerText: turn.text, messageId: assistantId, marker: turn.languageMarker, removed: preAttemptRemoved, institutionId: turn.session.institutionId as string, studentId: turn.studentId })
+    ? await completeLanguageTurn({ language: turn.language, objectiveId: turn.plan?.teaching.objectiveId, reply: aiResult.answer, learnerText: turn.text, messageId: assistantId, marker: turn.languageMarker, removed: preAttemptRemoved, closingAsk, institutionId: turn.session.institutionId as string, studentId: turn.studentId })
     : undefined;
   const assistantMessage = {
     id: assistantId,

@@ -4,6 +4,7 @@ import {
   turnEvidence, ruleFirstLine, CLOSING_RECAP, SHORT_RECAP, EXAMPLE_CHECK, type LanguageSpec, type LanguageTeachingContext,
 } from '../src/services/languageTeachingContext';
 import { applyReplyGuards } from '../src/services/languageTurnPipeline';
+import { taskInvitation } from '../src/services/languageTeachingContext';
 import { engineV2 } from '../src/services/engineV2';
 import { hintInstruction, type HistoryTurn } from '../src/services/languageLearningState';
 import { selectTeachingPlan } from '../src/services/pedagogyPolicy';
@@ -165,5 +166,44 @@ describe('none of the new switches leak the answer to the item being asked', () 
     expect(signals.presentLessonItem?.id).toBe('q1');
     const out = applyReplyGuards(ctx, 'Here is your exercise.\n\n- I **go** → She **goes**\n\nCorrect the verb: "My cousin ___ (go) to the gym on Fridays."', 'Give me an exercise');
     expect(out.removed).toBeGreaterThan(0); expect(out.text).not.toMatch(/\bgoes\b/);
+  });
+});
+
+describe('shortRecap: ask never stacks on a task (defer, then fold)', () => {
+  const late = [...presented, u('on April'), a('Think about the month.', wrong), u('at April'), a('Look at the word.', wrong), u('on April'), a('Still the month.', wrong), u('at April'), a('Again.', wrong)];
+  const TASK = 'The rule: months take in.\n\nNow a new one. Write in, on or at: They were born ___ May.';
+  const deferred = (n: number): HistoryTurn[] => Array.from({ length: n }, () => [u('in May'), a(TASK, { closingAsk: 'deferred' })]).flat();
+  const run = (history: HistoryTurn[], reply: string) => {
+    process.env.ENARA_ENGINE_V2 = 'shortRecap';
+    const l = build('on April', history); const lang = { ...l.ctx, prompt: l.prompt } as LanguageTeachingContext;
+    return { lang, ...applyReplyGuards(lang, reply, 'on April') };
+  };
+  const asks = (t: string) => (t.match(/new example of your own/g) ?? []).length;
+  it('a reply that sets a task gets no appended ask, and is tagged deferred', () => {
+    const r = run(late, TASK); expect(r.text).toBe(TASK); expect(r.closingAsk).toBe('deferred'); expect(asks(r.text)).toBe(0);
+  });
+  it('a deferred ask is added on the next task-free reply, and tagged added', () => {
+    const r = run([...late, ...deferred(1)], 'The rule: months take in.'); expect(r.text).toMatch(/Now write one new example of your own\.$/); expect(r.closingAsk).toBe('added'); expect(asks(r.text)).toBe(1);
+  });
+  it('still deferred after 2 task replies; folded into the task reply after 3', () => {
+    expect(run([...late, ...deferred(2)], TASK).closingAsk).toBe('deferred');
+    const r = run([...late, ...deferred(3)], TASK);
+    expect(r.closingAsk).toBe('folded'); expect(r.text).toMatch(/^Rule in one line: /); expect(r.text).toContain('Then your task:'); expect(r.text).toContain('Write in, on or at: They were born ___ May.');
+    expect(asks(r.text)).toBe(0); expect(r.text).toContain('Uses in with months');
+    expect(applyReplyGuards(r.lang, r.text, 'on April').text).toBe(r.text); // idempotent: no second fold
+  });
+  it('once per session: after an added or folded ask the closing is over (prompt and guard)', () => {
+    for (const tag of ['added', 'folded'] as const) {
+      const h = [...late, u('in May'), a(TASK, { closingAsk: tag })];
+      const r = run(h, 'Good. Another one: write in, on or at: We met ___ June.'); expect(r.closingAsk).toBeUndefined(); expect(r.text).toBe('Good. Another one: write in, on or at: We met ___ June.');
+    }
+  });
+  it('no reply ever contains an appended ask and a task: across every history and reply shape', () => {
+    const replies = [TASK, 'The rule: months take in.', 'Try again: in or on?', 'Good.\n\nYour turn: write a sentence with in.'];
+    for (const n of [0, 1, 2, 3, 4]) for (const rep of replies) {
+      const r = run([...late, ...deferred(n)], rep); const added = r.text !== rep && r.closingAsk === 'added';
+      if (added) expect(taskInvitation(rep)).toBeUndefined(); // an ask is only appended to a task-free reply
+      if (r.closingAsk === 'folded') expect(asks(r.text)).toBe(0);
+    }
   });
 });

@@ -3,7 +3,7 @@ import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandof
 import { SentenceSplitter } from '../services/sentenceSplitter';
 import { TutorSession } from '../models/TutorSession';
 import { appendTutorMessages, loadTutorMessages } from '../services/tutorMessages';
-import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, LANGUAGE_POLICY_VERSION } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, LANGUAGE_POLICY_VERSION, type ClosingAskStatus } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
 import { AssessmentMarkerFilter, filterSummary, type StrippedReply } from '../services/languageLearningState';
 import { generateMessageId } from '../utils/idGenerator';
 import { randomUUID } from 'crypto';
@@ -739,7 +739,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     .join('\n');
 
   let languageMarker: StrippedReply | undefined;
-  let guardedRemoved = 0;
+  let guardedRemoved = 0; let guardedClosingAsk: ClosingAskStatus | undefined;
   let spoken = '';
   // The reply may open with the hidden marker: hold the first characters until
   // it's clear whether it does.
@@ -774,7 +774,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       if (tail) answer += tail;
       languageMarker = filterSummary(filter, answer);
       const g = applyReplyGuards(languagePrep.context, answer.trim(), last?.content ?? '');
-      guardedRemoved = g.removed;
+      guardedRemoved = g.removed; guardedClosingAsk = g.closingAsk;
       if (g.text) yield g.text;
     }
     for await (const chunk of chunks()) {
@@ -822,7 +822,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   }
   const aiMessageId = generateMessageId();
   const languageTurn = spoken && session.studentId && languagePrep
-    ? await completeLanguageTurn({ language: languagePrep.context, objectiveId: plan?.teaching.objectiveId, reply: spoken.trim(), learnerText: last?.content ?? '', messageId: aiMessageId, marker: languageMarker, removed: guardedRemoved, institutionId: session.institutionId as string, studentId: session.studentId }).catch((error) => { logger.warn('avatar_language_turn_failed', { error: serializeError(error) }); return undefined; })
+    ? await completeLanguageTurn({ language: languagePrep.context, objectiveId: plan?.teaching.objectiveId, reply: spoken.trim(), learnerText: last?.content ?? '', messageId: aiMessageId, marker: languageMarker, removed: guardedRemoved, closingAsk: guardedClosingAsk, institutionId: session.institutionId as string, studentId: session.studentId }).catch((error) => { logger.warn('avatar_language_turn_failed', { error: serializeError(error) }); return undefined; })
     : undefined;
   if (spoken && session.studentId) {
     const now = Date.now();

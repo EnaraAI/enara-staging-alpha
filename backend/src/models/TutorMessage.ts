@@ -127,6 +127,9 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           learnerIntent: String,
           revealedItemId: String,
           preAttemptModelsRemoved: Number,
+          // v2 tags (codes and numbers only, never learner text): ruleFirst's once-per-rule memory and the closing-ask outcome.
+          rulesIntroduced: { type: [Number], default: undefined },
+          closingAsk: String,
           diagnosis: String,
           _id: false,
         },

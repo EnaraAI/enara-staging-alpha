@@ -298,6 +298,8 @@ export interface LengthTarget {
 export interface LanguageTurnEvidence {
   version: string;
   rulesIntroduced?: number[];
+  // closing / shortRecap (tag only): whether the engine added, deferred or folded the closing ask on this reply.
+  closingAsk?: 'added' | 'deferred' | 'folded';
   lessonId?: string;
   objectiveId?: string;
   skill: 'written_interaction';
@@ -1233,7 +1235,7 @@ export const researchAblated = (feature: string): boolean => process.env.NODE_EN
 export const researchImproved = (feature: 'closing' | 'strategy' | 'coverage'): boolean => process.env.NODE_ENV !== 'production' && (process.env.ENARA_RESEARCH_IMPROVE ?? '').split(',').map((x) => x.trim()).includes(feature);
 /** Closing recap is on for the research flag or the production-capable engine switch. */
 export const closingOn = (): boolean => engineV2('closing') || engineV2('shortRecap') || researchImproved('closing');
-export interface ResearchSignals { turnNo: number; stuck: boolean; uncovered: string[]; allShown: boolean; closingDone?: boolean; hintRepeat?: boolean; }
+export interface ResearchSignals { turnNo: number; stuck: boolean; uncovered: string[]; allShown: boolean; closingDone?: boolean; hintRepeat?: boolean; closingDeferred?: number; }
 export const RESEARCH_CLOSING_TURN = 5;
 export const STRATEGY_SHIFT = 'They have now met the same difficulty in more than one turn, so stop asking the same kind of hint question. In one or two short sentences state the general rule for this difficulty (when it applies and when it does not) and give one contrast example that uses words not in any open exercise; then ask them to apply it to their own open task in their own words. Never write the corrected form of the open task.';
 export const coverageRule = (uncovered: string[]) => `Success criteria they have not shown yet: ${uncovered.map((c, i) => `(${i + 1}) ${c}`).join('; ')}. When you next explain a rule, state the whole family once in one short line (every form the lesson covers, not only the one they got wrong), so no criterion is left untaught; keep asking them to try before you reveal anything for an open task.`;
@@ -1251,9 +1253,12 @@ export function researchSignals(history: { role: string; content: string; langua
   const shown = new Set(Object.keys(s.learning?.criteria ?? {}).map(Number));
   const uncovered = criteria.filter((_, i) => !shown.has(i + 1)).slice(0, 4);
   const asst = history.filter((h) => h.role === 'assistant').map((h) => h.content ?? '');
-  const closingDone = asst.some((t) => askedForRule(t) || askedNewExample(t));
+  // closingAsk (turn evidence, tag only): 'added' and 'folded' end the closing; each 'deferred' counts towards the fold deadline (applyReplyGuards).
+  const askTags = history.filter((h) => h.role === 'assistant').map((h) => (h.languageTurn as { closingAsk?: string } | null | undefined)?.closingAsk);
+  const closingDone = asst.some((t) => askedForRule(t) || askedNewExample(t)) || askTags.some((t) => t === 'added' || t === 'folded');
+  const closingDeferred = askTags.filter((t) => t === 'deferred').length;
   const hintRepeat = asst.length >= 2 && asst.slice(-2).every((t) => HINT_SHAPE.test(t) && t.includes('?'));
-  return { turnNo, stuck, uncovered, allShown: criteria.length > 0 && uncovered.length === 0, closingDone, hintRepeat };
+  return { turnNo, stuck, uncovered, allShown: criteria.length > 0 && uncovered.length === 0, closingDone, hintRepeat, closingDeferred };
 }
 
 // r4: what the engine knows about the open task, its answer and the next step.

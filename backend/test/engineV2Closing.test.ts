@@ -1,6 +1,9 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('../src/services/learnerLanguageProfile', async (orig) => ({ ...(await orig<object>()), recordProfileTurn: vi.fn(async () => undefined) }));
 import { detectTurnSignals, deriveLearnerContext, levelBand, renderLanguageContextPrompt, selectLanguageMoves, finalizeLanguageTurn, researchSignals, isClosingTurn, CLOSING_RECAP, type LanguageSpec, type LanguageTeachingContext } from '../src/services/languageTeachingContext';
-import { applyReplyGuards } from '../src/services/languageTurnPipeline';
+import { applyReplyGuards, completeLanguageTurn } from '../src/services/languageTurnPipeline';
+import { taskInvitation } from '../src/services/languageTeachingContext';
 import { engineV2 } from '../src/services/engineV2';
 import type { HistoryTurn } from '../src/services/languageLearningState';
 
@@ -103,5 +106,58 @@ describe('hints: explain after the first recorded miss', () => {
     const oneMiss = [u('Give me an exercise'), a('Write in, on or at: They get married ___ April.', open), u('on April'), a('Which month is it?', wrong)];
     process.env.ENARA_ENGINE_V2 = 'clarity'; expect(build('at April', oneMiss).prompt).not.toContain(CLARITY_LINE);
     process.env.ENARA_ENGINE_V2 = 'clarity,hints'; expect(build('at April', oneMiss).prompt).toContain(CLARITY_LINE);
+  });
+});
+
+describe('closing: ask never stacks on a task (defer, then fold)', () => {
+  const TASK = 'The rule: months take in.\n\nNow a new one. Write in, on or at: They were born ___ May.';
+  const deferred = (n: number): HistoryTurn[] => Array.from({ length: n }, () => [u('in May'), a(TASK, { closingAsk: 'deferred' })]).flat();
+  const run = (history: HistoryTurn[], reply: string) => {
+    process.env.ENARA_ENGINE_V2 = 'closing';
+    const l = build('on April', history, true); const lang = { ...l.ctx, prompt: l.prompt } as LanguageTeachingContext;
+    return { lang, ...applyReplyGuards(lang, reply, 'on April') };
+  };
+  const asks = (t: string) => (t.match(/in your own words/g) ?? []).length;
+  it('a reply that sets a task gets no appended ask, and is tagged deferred', () => {
+    const r = run(late, TASK); expect(r.text).toBe(TASK); expect(r.closingAsk).toBe('deferred'); expect(asks(r.text)).toBe(0);
+  });
+  it('a deferred ask is added on the next task-free reply, and tagged added', () => {
+    const r = run([...late, ...deferred(1)], 'The rule: months take in.'); expect(r.text).toMatch(/Tell me the rule in your own words\.$/); expect(r.closingAsk).toBe('added'); expect(asks(r.text)).toBe(1);
+  });
+  it('still deferred after 2 task replies; folded into the task reply after 3', () => {
+    expect(run([...late, ...deferred(2)], TASK).closingAsk).toBe('deferred');
+    const r = run([...late, ...deferred(3)], TASK);
+    expect(r.closingAsk).toBe('folded'); expect(r.text).toMatch(/^Rule in one line: /); expect(r.text).toContain('Then your task:'); expect(r.text).toContain('Write in, on or at: They were born ___ May.');
+    expect(asks(r.text)).toBe(0); expect(r.text).toContain('Uses in with months');
+    expect(applyReplyGuards(r.lang, r.text, 'on April').text).toBe(r.text); // idempotent: no second fold
+  });
+  it('once per session: after an added or folded ask the closing is over (prompt and guard)', () => {
+    for (const tag of ['added', 'folded'] as const) {
+      const h = [...late, u('in May'), a(TASK, { closingAsk: tag })];
+      const r = run(h, 'Good. Another one: write in, on or at: We met ___ June.'); expect(r.closingAsk).toBeUndefined(); expect(r.text).toBe('Good. Another one: write in, on or at: We met ___ June.');
+    }
+  });
+  it('no reply ever contains an appended ask and a task: across every history and reply shape', () => {
+    const replies = [TASK, 'The rule: months take in.', 'Try again: in or on?', 'Good.\n\nYour turn: write a sentence with in.'];
+    for (const n of [0, 1, 2, 3, 4]) for (const rep of replies) {
+      const r = run([...late, ...deferred(n)], rep); const added = r.text !== rep && r.closingAsk === 'added';
+      if (added) expect(taskInvitation(rep)).toBeUndefined(); // an ask is only appended to a task-free reply
+      if (r.closingAsk === 'folded') expect(asks(r.text)).toBe(0);
+    }
+  });
+});
+
+describe('closing ask evidence', () => {
+  it('completeLanguageTurn stores the closingAsk tag (and nothing when there is none)', async () => {
+    process.env.ENARA_ENGINE_V2 = 'closing';
+    const l = build('on April', late, true); const lang = { ...l.ctx, prompt: l.prompt } as LanguageTeachingContext;
+    const base = { language: lang, reply: 'Recap.', learnerText: 'on April', messageId: 'm1', removed: 0, institutionId: 'i', studentId: 's' };
+    for (const tag of ['added', 'deferred', 'folded'] as const) expect((await completeLanguageTurn({ ...base, closingAsk: tag }) as { closingAsk?: string }).closingAsk).toBe(tag);
+    expect('closingAsk' in (await completeLanguageTurn(base))).toBe(false);
+  });
+  it('the tag is part of the stored message schema, so the database keeps it', async () => {
+    const { TutorMessage } = await import('../src/models/TutorMessage');
+    const lt = (TutorMessage.schema.path('meta.languageTurn') as unknown as { schema: { path(p: string): unknown } }).schema;
+    expect(lt.path('closingAsk')).toBeTruthy(); expect(lt.path('rulesIntroduced')).toBeTruthy();
   });
 });
