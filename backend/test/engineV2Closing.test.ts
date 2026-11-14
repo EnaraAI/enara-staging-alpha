@@ -78,3 +78,30 @@ describe('clarity (explain plainly when stuck)', () => {
     expect(CLARITY_LINE).toMatch(/Never write the corrected form of the open task/);
   });
 });
+
+describe('closing happens once; hint variety', () => {
+  const asked = [...late, u('Months take in.'), a('Remember: months take in. Tell me the rule in your own words.')];
+  it('after the tutor asked for the rule, no second recap and no appended ask', () => {
+    process.env.ENARA_ENGINE_V2 = 'closing';
+    const l = build('Months take in, days take on.', asked, true);
+    expect(isClosingTurn(l.research!)).toBe(false); expect(l.prompt).not.toContain(CLOSING_RECAP);
+    expect(applyReplyGuards({ ...l.ctx, prompt: l.prompt } as LanguageTeachingContext, 'Remember: in for months, on for days.', 'Months take in, days take on.').text).not.toMatch(/own words/);
+  });
+  it('hints switch: two hint-shaped questions in a row get the change-the-form line; off by default; not on a first/mixed turn', async () => {
+    const { HINT_VARY } = await import('../src/services/languageTeachingContext');
+    const hinty = [u('Give me an exercise'), a('Write in, on or at: They get married ___ April.', open), u('on April'), a('Think about the word April. Which word fits?', wrong), u('at April'), a('Have another look at the month. Which one is it?', wrong), u('on April')];
+    delete process.env.ENARA_ENGINE_V2; expect(build('on April', hinty, true).prompt).not.toContain(HINT_VARY);
+    process.env.ENARA_ENGINE_V2 = 'hints'; expect(build('on April', hinty, true).prompt).toContain(HINT_VARY);
+    expect(build('on April', hinty.slice(0, 4), true).prompt).not.toContain(HINT_VARY);
+    process.env.ENARA_ENGINE_V2 = 'all'; expect(build('on April', hinty, true).prompt).not.toContain(HINT_VARY);
+  });
+});
+
+describe('hints: explain after the first recorded miss', () => {
+  it('clarity line appears after one miss only with hints on', async () => {
+    const { CLARITY_LINE } = await import('../src/services/languageTeachingContext');
+    const oneMiss = [u('Give me an exercise'), a('Write in, on or at: They get married ___ April.', open), u('on April'), a('Which month is it?', wrong)];
+    process.env.ENARA_ENGINE_V2 = 'clarity'; expect(build('at April', oneMiss).prompt).not.toContain(CLARITY_LINE);
+    process.env.ENARA_ENGINE_V2 = 'clarity,hints'; expect(build('at April', oneMiss).prompt).toContain(CLARITY_LINE);
+  });
+});

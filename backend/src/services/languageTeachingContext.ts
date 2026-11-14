@@ -1106,8 +1106,8 @@ export const beliefShift = (belief: string) => `They have now shown the same mis
 export const TEACH_RULE_V2 = 'Their earlier attempt on this item was wrong. If this new answer is still wrong, stop hinting: name their idea in one short line (e.g. "You are using X here"), state the rule clearly in one or two short sentences, show one worked example with a different word (not this item\'s answer), then ask them to try this item again. If this new answer is right, confirm it and do not teach the rule.';
 export const CLARITY_LINE = 'Make this explanation easy to follow: use everyday words at the learner\'s level, one idea per sentence, and no grammar labels they have not met. State the rule first in one plain sentence, then give a short contrast (a right use and a wrong use side by side) with words that are not in any open exercise, then ask them to apply it themselves. Never write the corrected form of the open task.';
 /** v2 (clarity): the learner is stuck, confused or asking why, so the reply should explain rather than only ask. */
-export const needsClarity = (s: { learning?: { hintTurnsOnItem?: number; attemptsOnItem?: number }; whyAfterAttempt?: boolean; hintRequest?: boolean; errorRecurrence?: unknown }, stage: string | null): boolean =>
-  stage === 'teach_rule' || Boolean(s.whyAfterAttempt || s.hintRequest || s.errorRecurrence) || (s.learning?.hintTurnsOnItem ?? 0) >= 2 || (s.learning?.attemptsOnItem ?? 0) >= 2;
+export const needsClarity = (s: { learning?: { hintTurnsOnItem?: number; attemptsOnItem?: number }; whyAfterAttempt?: boolean; hintRequest?: boolean; errorRecurrence?: string }, stage: string | null): boolean =>
+  stage === 'teach_rule' || Boolean(s.whyAfterAttempt || s.hintRequest) || s.errorRecurrence === 'repeated' || (s.learning?.hintTurnsOnItem ?? 0) >= 2 || (s.learning?.attemptsOnItem ?? 0) >= (engineV2('hints') ? 1 : 2); // hints: explain after the first recorded miss, not the second
 export const TEACH_RULE = 'They have now missed this item twice, so stop hinting: name their belief in one short line (e.g. "You are using X here"), state the rule clearly in one or two short sentences, show one worked example with a different word (not this item\'s answer), then ask them to try this item again.';
 export const RULE_SUMMARY = 'They got it right after a mistake: praise it in a few words, then ask them to say the rule in your own words in one short sentence (e.g. "Tell me the rule in your own words."). Do not give the next exercise in this reply.';
 // Fix 7: the turn after asking for the rule.
@@ -1204,12 +1204,15 @@ export const researchAblated = (feature: string): boolean => process.env.NODE_EN
 export const researchImproved = (feature: 'closing' | 'strategy' | 'coverage'): boolean => process.env.NODE_ENV !== 'production' && (process.env.ENARA_RESEARCH_IMPROVE ?? '').split(',').map((x) => x.trim()).includes(feature);
 /** Closing recap is on for the research flag or the production-capable engine switch. */
 export const closingOn = (): boolean => engineV2('closing') || researchImproved('closing');
-export interface ResearchSignals { turnNo: number; stuck: boolean; uncovered: string[]; allShown: boolean; }
+export interface ResearchSignals { turnNo: number; stuck: boolean; uncovered: string[]; allShown: boolean; closingDone?: boolean; hintRepeat?: boolean; }
 export const RESEARCH_CLOSING_TURN = 5;
 export const STRATEGY_SHIFT = 'They have now met the same difficulty in more than one turn, so stop asking the same kind of hint question. In one or two short sentences state the general rule for this difficulty (when it applies and when it does not) and give one contrast example that uses words not in any open exercise; then ask them to apply it to their own open task in their own words. Never write the corrected form of the open task.';
 export const coverageRule = (uncovered: string[]) => `Success criteria they have not shown yet: ${uncovered.map((c, i) => `(${i + 1}) ${c}`).join('; ')}. When you next explain a rule, state the whole family once in one short line (every form the lesson covers, not only the one they got wrong), so no criterion is left untaught; keep asking them to try before you reveal anything for an open task.`;
 export const CLOSING_RECAP = 'This is the point to close the lesson unit. This overrides the "next task" instructions above: (1) answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) in two short lines recap the rule, using their own earlier words where you can; (3) end by asking: "Tell me the rule in your own words." Do not set a new exercise this turn and never write a completed answer to an open exercise.';
-export const isClosingTurn = (r: ResearchSignals): boolean => r.turnNo >= RESEARCH_CLOSING_TURN || r.allShown;
+// The closing recap happens once: after the tutor has asked for the rule in the learner's own words, the rule check takes over (no second recap loop).
+export const isClosingTurn = (r: ResearchSignals): boolean => !r.closingDone && (r.turnNo >= RESEARCH_CLOSING_TURN || r.allShown);
+const HINT_SHAPE = /\b(hint|clue|think about|look at|which (one|word)|try again|have another look|check the)\b/i;
+export const HINT_VARY = 'Your last two replies were the same kind of hint question and it has not worked. Change the form now: in one plain sentence state the rule or the difference, give a short right-versus-wrong contrast with words that are not in any open exercise, then ask them to try the open task again themselves. Never write the corrected form of the open task.';
 export function researchSignals(history: { role: string; content: string; languageTurn?: unknown }[], s: TurnSignals, spec: { successCriteria?: string[] } | undefined): ResearchSignals {
   const turnNo = history.filter((h) => h.role === 'user').length + 1;
   const prior = history.filter((h) => h.role === 'assistant').map((h) => h.languageTurn as { assessment?: { verdict?: string } } | null | undefined).filter(Boolean) as { assessment?: { verdict?: string } }[];
@@ -1218,7 +1221,10 @@ export function researchSignals(history: { role: string; content: string; langua
   const criteria = spec?.successCriteria ?? [];
   const shown = new Set(Object.keys(s.learning?.criteria ?? {}).map(Number));
   const uncovered = criteria.filter((_, i) => !shown.has(i + 1)).slice(0, 4);
-  return { turnNo, stuck, uncovered, allShown: criteria.length > 0 && uncovered.length === 0 };
+  const asst = history.filter((h) => h.role === 'assistant').map((h) => h.content ?? '');
+  const closingDone = asst.some((t) => askedForRule(t));
+  const hintRepeat = asst.length >= 2 && asst.slice(-2).every((t) => HINT_SHAPE.test(t) && t.includes('?'));
+  return { turnNo, stuck, uncovered, allShown: criteria.length > 0 && uncovered.length === 0, closingDone, hintRepeat };
 }
 
 // r4: what the engine knows about the open task, its answer and the next step.
@@ -1268,6 +1274,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (ctx.research) {
     const r = ctx.research;
     if (r.stuck && researchImproved('strategy')) out.push(`- ${STRATEGY_SHIFT}`);
+    if (r.hintRepeat && engineV2('hints') && s.activeLessonItem && !(isClosingTurn(r) && closingOn())) out.push(`- ${HINT_VARY}`);
     if (r.uncovered.length && r.turnNo >= 2 && researchImproved('coverage')) out.push(`- ${coverageRule(r.uncovered)}`);
     if (isClosingTurn(r) && closingOn()) out.push(`- ${CLOSING_RECAP}`);
   }
@@ -1625,7 +1632,7 @@ export async function buildLanguageTeachingContext(params: {
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
     const length = clarifyOnly ? { targetWords: Math.min(base0.targetWords, 40), maxWords: Math.min(base0.maxWords, 60), basis: `${base0.basis}:clarify` } : base0;
     const history = researchAblated('learner_history') ? [] : await loadProfileLines(params.institutionId, params.studentId, { opening: !params.history.some((h) => h.role === 'user') });
-    const research = closingOn() || researchImproved('strategy') || researchImproved('coverage') ? researchSignals(params.history, signals, lesson.spec) : undefined;
+    const research = closingOn() || engineV2('hints') || researchImproved('strategy') || researchImproved('coverage') ? researchSignals(params.history, signals, lesson.spec) : undefined;
     const prevTurn = [...params.history].reverse().find((h) => h.role === 'assistant')?.languageTurn as { moves?: string[] } | null | undefined;
     const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}) } as const;
     const parts = engineV2('cache') ? renderLanguageContextParts(base) : undefined;

@@ -8,9 +8,10 @@
 //  closing     - production version of the closing recap: from the learner's 5th message (or when every success criterion has been shown) recap the rule, ask for it in their own words, and the engine appends that ask if the model left it out; named-only, NOT part of "all"
 //  selfCheck   - an independent check on the tutor's own CORRECT grade for closed items: if the learner's answer contains none of the item's target forms, the grade is held back (no credit) instead of trusted; named-only, NOT part of "all"
 //  clarity     - when the learner is stuck or asks why, explain plainly: the rule first in one everyday sentence, then a right/wrong contrast example with other words, then ask them to apply it; named-only, NOT part of "all"
+//  hints       - when the tutor's last two replies were the same kind of hint question, change the form (state the rule + contrast, then ask them to try again); named-only, NOT part of "all"
 //  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
-export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity';
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints';
 export const engineV2 = (feature: EngineV2Feature): boolean => {
   const v = (process.env.ENARA_ENGINE_V2 ?? '').split(',').map((x) => x.trim());
-  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity'].includes(feature));
+  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints'].includes(feature));
 };

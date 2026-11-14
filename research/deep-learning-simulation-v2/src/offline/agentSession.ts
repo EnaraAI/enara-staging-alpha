@@ -11,6 +11,7 @@ import { makeStudent, blockStart, studentPersona } from '../students/population'
 import { lessonText, practiceList } from '../conditions/types';
 
 const ENV_B = 'all,closing,selfCheck,clarity';
+const ENV_D = `${ENV_B},hints`; // D = B plus the hint-variety / early-explanation fixes (closing loop fix is in the engine for B and D alike)
 const norm = (t: string) => t.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
 const [cmd, file, a3, a4, a5] = process.argv.slice(2);
 const load = () => JSON.parse(readFileSync(file, 'utf8')); const save = (s: unknown) => writeFileSync(file, JSON.stringify(s, null, 1));
@@ -28,7 +29,7 @@ function history(turns: { learner: string; tutor?: string }[], items: { id: stri
   return hist;
 }
 function langCtx(s: any, o: any) {
-  process.env.ENARA_ENGINE_V2 = s.cond === 'B' ? ENV_B : '';
+  process.env.ENARA_ENGINE_V2 = s.cond === 'B' ? ENV_B : s.cond === 'D' ? ENV_D : '';
   const last = s.turns[s.turns.length - 1]; const message = last.learner; const prior = s.turns.slice(0, -1);
   const hist = history(prior, o.lesson.spec.items, o); const lesson = { title: o.lesson.title, spec: o.lesson.spec };
   const signals = detectTurnSignals(message, hist, lesson);
@@ -39,7 +40,7 @@ function langCtx(s: any, o: any) {
   return { ...(base as object), prompt: renderLanguageContextPrompt(base) } as never as { prompt: string; research?: unknown };
 }
 if (cmd === 'init') {
-  const idx = Number(a3); const o = bm.find((x) => x.id === a4)!; const cond = a5 as 'A' | 'B' | 'C';
+  const idx = Number(a3); const o = bm.find((x) => x.id === a4)!; const cond = a5 as 'A' | 'B' | 'C' | 'D';
   const st = makeStudent(idx, 'enara-agent-sim-1'); const start = blockStart(st, o.area, o.id, o.misconceptions.length, o.difficulty); const mis = o.misconceptions[start.heldMisconceptionIdx] ?? null;
   save({ cond, studentIdx: idx, outcomeId: o.id, persona: studentPersona(st, { cefr: o.cefr, area: o.area, heldMisconception: mis, knowsAlready: start.knowsAlready }), turns: [] }); console.log('ok');
 } else {
