@@ -12,10 +12,11 @@
 //  ruleFirst   - first exposure to a rule (once per rule per session), inside whichever teaching method is selected: the rule in one plain sentence (<=20 words), one right and one wrong example, then apply it to a new item; never the answer; named-only, NOT part of "all"
 //  shortRecap  - replaces the closing "tell me the rule in your own words" ask with: the rule in one line, then one new example from the learner; once per session; named-only, NOT part of "all"
 //  socraticOff - RESEARCH ONLY, ignored when NODE_ENV=production: removes the two "no rule before the first try" instructions of the language engine (exercise presentation, hint level 1) and nothing else; answer-hiding stays
+//  strandLog   - tag every language turn with its Nation strand (input, output, language_focused, fluency) so the split can be reported per learner and per course; tags and counts only, never learner text; named-only, NOT part of "all"
 //  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
-export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff';
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog';
 export const engineV2 = (feature: EngineV2Feature): boolean => {
   if (feature === 'socraticOff' && process.env.NODE_ENV === 'production') return false; // research-only
   const v = (process.env.ENARA_ENGINE_V2 ?? '').split(',').map((x) => x.trim());
-  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff'].includes(feature));
+  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog'].includes(feature));
 };

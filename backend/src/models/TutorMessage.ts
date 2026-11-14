@@ -130,6 +130,8 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           // v2 tags (codes and numbers only, never learner text): ruleFirst's once-per-rule memory and the closing-ask outcome.
           rulesIntroduced: { type: [Number], default: undefined },
           closingAsk: String,
+          strand: String, // strandLog tag
+          stage: String,  // practice stage tag (change D; empty until it exists)
           diagnosis: String,
           _id: false,
         },

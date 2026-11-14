@@ -1,3 +1,4 @@
+import { strandTags } from './strandLog';
 import { createHash } from 'crypto';
 import { Curriculum } from '../models/Curriculum';
 import { Institution } from '../models/Institution';
@@ -297,6 +298,9 @@ export interface LengthTarget {
 // The record stored on the tutor's reply: minimal, low-confidence, never mastery.
 export interface LanguageTurnEvidence {
   version: string;
+  // strandLog (tags only): Nation strand of the turn's main move, and the practice stage (empty until change D exists).
+  strand?: 'input' | 'output' | 'language_focused' | 'fluency';
+  stage?: 'rule' | 'guided' | 'unguided' | 'free' | 'return';
   rulesIntroduced?: number[];
   // closing / shortRecap (tag only): whether the engine added, deferred or folded the closing ask on this reply.
   closingAsk?: 'added' | 'deferred' | 'folded';
@@ -981,6 +985,7 @@ export function missingContext(input: { targetLanguage?: string; lessonStatus: L
 // ---------------------------------------------------------------------------
 // Prompt (versioned; the only place these instructions live)
 
+export const MOVE_IDS = (): MoveId[] => Object.keys(MOVE_TEXT) as MoveId[];
 const MOVE_TEXT: Record<MoveId, string> = {
   clarify_goal: 'First find out what the learner wants to do today (one short question), unless their message already says.',
   general_practice: 'No lesson is selected and their answer did not name a goal. Start one short general practice task suited to their level, and say plainly that it is general practice, not a lesson from their course.',
@@ -1435,6 +1440,7 @@ export function nextStepFor(moves: SelectedMove[]): string | undefined {
 export function turnEvidence(ctx: LanguageTeachingContext, objectiveId?: string): LanguageTurnEvidence {
   return {
     version: ctx.version,
+    ...strandTags(ctx.moves), // strandLog (off: nothing)
     ...(ctx.ruleFirst?.criteria.length ? { rulesIntroduced: ctx.ruleFirst.criteria } : {}),
     lessonId: ctx.lesson.lessonId,
     ...(objectiveId ? { objectiveId } : {}),
