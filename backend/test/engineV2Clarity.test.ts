@@ -108,6 +108,13 @@ describe('shortRecap', () => {
     expect(applyReplyGuards(l2, 'Remember: in May is right.', 'I was born in May.').text).not.toMatch(/new example of your own/);
     const e = build('on April', presented); expect(applyReplyGuards({ ...e.ctx, prompt: e.prompt } as LanguageTeachingContext, 'Try again.', 'on April').text).toBe('Try again.');
   });
+  it('does not add the ask to a closing reply that already sets a task (two asks at once)', () => {
+    process.env.ENARA_ENGINE_V2 = 'shortRecap';
+    const l = build('on April', late); const lang = { ...l.ctx, prompt: l.prompt } as LanguageTeachingContext;
+    const withTask = applyReplyGuards(lang, 'The rule: months take in.\n\nNow a new one. Write in, on or at: They were born ___ May.', 'on April').text;
+    expect(withTask).not.toMatch(/new example of your own/);
+    expect(applyReplyGuards(lang, 'The rule: months take in.', 'on April').text).toMatch(/new example of your own\.$/);
+  });
 });
 
 describe('socraticOff (research only)', () => {

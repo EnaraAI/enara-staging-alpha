@@ -4,7 +4,7 @@
 // channel stops using the shared functions or if the policy version differs between them.
 import {
   buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, independentSuccessItem, turnEvidence, LANGUAGE_CONTEXT_VERSION,
-  isClosingTurn, askedForRule, askedNewExample,
+  isClosingTurn, askedForRule, askedNewExample, taskInvitation,
   type LanguageTeachingContext, type LanguageTurnEvidence,
 } from './languageTeachingContext';
 import { recordProfileTurn } from './learnerLanguageProfile';
@@ -39,7 +39,7 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
   // v2 (closing): on the closing turn the "own words" ask is guaranteed by the engine, not left to the model.
   // v2 (closing / shortRecap): on the closing turn the learner ask is guaranteed by the engine, not left to the model (once only: isClosingTurn is false after it was asked).
   if (language.research && isClosingTurn(language.research) && (engineV2('closing') || engineV2('shortRecap'))) {
-    if (engineV2('shortRecap')) { if (!askedNewExample(text)) text = `${text.trimEnd()}\n\nNow write one new example of your own.`; }
+    if (engineV2('shortRecap')) { if (!askedNewExample(text) && !taskInvitation(text)) text = `${text.trimEnd()}\n\nNow write one new example of your own.`; } // not added to a reply that already sets a task (two asks at once)
     else if (!askedForRule(text)) text = `${text.trimEnd()}\n\nTell me the rule in your own words.`;
   }
   return { text, removed };
