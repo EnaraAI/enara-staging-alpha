@@ -47,3 +47,8 @@ Per student and target form, 8 items: **4 controlled** (missing word, exact matc
 
 ## Limits stated in advance
 One model family plays student, tutor, post-test taker, scorer and rater; seeded L1 errors are instructions, not real transfer; no real delay (the consistency check is not memory); 6 turns; 18 students; one replication per student; engine history is reconstructed from the dialogue; a tutor agent handles 9 sessions per call (different students, same arm); AI raters and scorers (moderate agreement expected).
+
+## Addendum (14 Nov 2026, before any session ran): definitions fixed while testing the harness
+- **Answer-before-try detector** (`leakIn` in `eslStudy.ts`; independent of the engine's own guard, which skips one-word answers such as a/an/the/is/are): a tutor reply leaks when it contains the *completed sentence* of a lesson exercise the learner has not yet tried (the exercise's sentence with the blank filled by an accepted answer, compared after normalising case and punctuation), or says "the answer is X" with X an accepted answer of such an exercise. The learner's message in the same turn counts as a try at the exercise left open by the previous tutor reply. `leakRaw` is measured on the reply as the tutor wrote it; `leakFinal` on the reply after the real guards (what reaches the student). Guard (ii) uses `leakFinal`.
+- **Agent roles**: students and tutors run as fresh agents per phase with no memory; each agent sees only the prompts printed by the harness. Student first message: ask for an exercise on the lesson topic.
+- **Models**: every agent role uses the same model setting (`sonnet`).

@@ -26,6 +26,7 @@ const BASE = 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog';
 const ENV_OF: Record<Arm, string> = { P: '', A0: BASE, ARB: `${BASE},arbitration`, LE: `${BASE},levelExplicit` };
 const WITH_PLAN = new Set<Arm>(['ARB', 'LE']);
 const norm = (t: string) => t.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
+const coreOf = (prompt: string) => prompt.replace(/\s*\(answer with only the (missing word|verb)\)\s*$/i, '').replace(/^[^:]*:\s*/, ''); // the sentence of an exercise, without the instruction and the format hint
 const sha = (s: string) => createHash('sha256').update(s).digest('hex');
 const rngShuffle = <T>(arr: T[], seed: string): T[] => { // deterministic shuffle (seeded hash sort)
   return [...arr].map((x, i) => ({ x, k: sha(`${seed}|${i}`) })).sort((a, b) => (a.k < b.k ? -1 : 1)).map((o) => o.x);
@@ -76,7 +77,7 @@ function history(turns: Turn[], items: { id: string; prompt: string; acceptedAns
     const prev = items.find((x) => x.id === active);
     const ok = prev ? Boolean(evaluateAgainstKey(t.learner, prev as never)) : false;
     const verdict = prev ? (ok ? 'CORRECT' : 'INCORRECT') : 'NOT_EVALUATED'; if (verdict === 'INCORRECT') misses++;
-    const shown = [...items].reverse().find((it) => norm(t.tutor!).includes(norm(it.prompt).replace(/\s*answer with only the (missing word|verb)\s*$/, '').slice(0, 40)));
+    const shown = [...items].reverse().find((it) => norm(t.tutor!).includes(norm(coreOf(it.prompt)).slice(0, 30)));
     if (shown) active = shown.id;
     hist.push({
       role: 'assistant', content: t.tutor,
@@ -116,15 +117,35 @@ function tutorPrompt(s: Session): string {
   return `You are the ENARA English tutor. Follow these teaching instructions exactly for this turn (they decide what you may reveal and what to do next). Do NOT write an [[assess ...]] marker.\n\n${plan}${langCtx(s).prompt}\n\nCONVERSATION SO FAR:\n${dlg(s)}\n\nWrite the tutor's next reply only.`;
 }
 
+// Answer-before-try detector (independent of the engine's guard, which skips one-word answers such as a/an/the/is/are): the reply contains the COMPLETED sentence of a
+// lesson exercise the learner has not yet tried, or says "the answer is X" with X an accepted answer of such an exercise. The current learner message counts as a try at the open exercise.
+function leakIn(s: Session, text: string): number {
+  const items = LESSONS[s.form].spec.items; const tried = new Set<string>(); let active: string | undefined;
+  s.turns.forEach((t, k) => {
+    if (k >= 1 && active) tried.add(active); // learner message k answers the exercise left open by tutor reply k-1
+    if (t.tutor !== undefined && k < s.turns.length - 1) { const shown = [...items].reverse().find((it) => norm(t.tutor!).includes(norm(coreOf(it.prompt)).slice(0, 30))); if (shown) active = shown.id; }
+  });
+  if (s.turns.length >= 1 && active) tried.add(active);
+  const nt = ` ${norm(text)} `; let n = 0;
+  for (const it of items) {
+    if (tried.has(it.id)) continue; const core = coreOf(it.prompt);
+    for (const a of it.acceptedAnswers) {
+      const filled = core.includes('___') ? core.replace('___', a) : a; const nf = norm(filled);
+      if (nf.length >= 8 && nt.includes(` ${nf} `)) { n++; break; }
+      if (new RegExp(`\\b(the answer is|answer:|correct answer is)\\s*[\"'“]?${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(text)) { n++; break; }
+    }
+  }
+  return n;
+}
 // ------------------------------------------------------------------------------------------------------------------------------------------ tutor reply: guards + tags (tags only; the turn also keeps the synthetic dialogue text)
 function applyTutorReply(s: Session, raw: string) {
   const last = s.turns[s.turns.length - 1]; const learnerText = last.learner; const text = raw.trim();
-  const neutral = langCtx(s, ''); const leakRaw = applyReplyGuards(neutral, text, learnerText).removed; // answer-before-try detector on the raw reply (no switches)
+  const neutral = langCtx(s, ''); const leakRaw = leakIn(s, text); const engineStripRaw = applyReplyGuards(neutral, text, learnerText).removed;
   let final = text; let removed = 0; let closingAsk: string | undefined; let ctx: LanguageTeachingContext | undefined;
   if (s.arm !== 'P') { ctx = langCtx(s); const g = applyReplyGuards(ctx, text, learnerText); final = g.text; removed = g.removed; closingAsk = g.closingAsk; }
-  const leakFinal = applyReplyGuards(neutral, final, learnerText).removed; // what still reaches the student
+  const leakFinal = leakIn(s, final); // what still reaches the student
   last.tutor = final; if (final !== text) last.raw = text;
-  last.leakRaw = leakRaw; last.leakFinal = leakFinal; if (removed) last.guardRemoved = removed;
+  last.leakRaw = leakRaw; last.leakFinal = leakFinal; last.engineStripRaw = engineStripRaw; if (removed) last.guardRemoved = removed;
   if (ctx) {
     process.env.ENARA_ENGINE_V2 = ENV_OF[s.arm];
     last.moves = ctx.moves.map((m) => m.id); last.strand = strandOfMoves(ctx.moves) ?? null;
