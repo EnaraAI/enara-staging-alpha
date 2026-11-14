@@ -28,3 +28,6 @@ Status `proficient` if the student's hidden state says they already know the poi
 - Paired differences over the 18 students, bootstrap 95% CI over students: **A − A0, B − P, B − A, C − B**. Holm correction over these four contrasts, separately for clarity and for post-test accuracy.
 - Breakdown by teaching method (primary method of the session) for clarity and post-test accuracy; weakest methods on clarity listed. Only methods with at least 2 sessions are shown.
 - Reported honestly: a result whose interval includes zero is not called a win.
+
+## Addendum (14 Nov 2026, during the run)
+By user instruction the study was cut to students 0 to 7 (8 students), run with at most 3 agents at a time, and then stopped after arm A and one arm-B session. Post-tests and ratings were not run. See `reports/exp4/AGENT_SIM_CLARITY.md`.
