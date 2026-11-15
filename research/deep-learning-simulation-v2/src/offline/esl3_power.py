@@ -28,6 +28,6 @@ def power(n, half=False, B=2000, seed=11):
         if signflip(x) < 0.05 and sum(x) > 0: hit += 1
     return hit / B
 k = ((vt + nv / 2) / sd ** 2) ** 0.5
-out = {'esl2_n': len(d), 'mean': round(m, 3), 'sd': round(sd, 3), 'postTestNoiseVar': round(nv, 4), 'note': 'conservative: one replication per learner as in ESL2; averaging two replications can only lower the post-test noise part of the spread',
+out = {'_label': 'SIMULATION ONLY', 'esl2_n': len(d), 'mean': round(m, 3), 'sd': round(sd, 3), 'postTestNoiseVar': round(nv, 4), 'note': 'conservative: one replication per learner as in ESL2; averaging two replications can only lower the post-test noise part of the spread',
        'power_n48_esl2Effect': power(48), 'power_n48_halfEffect': power(48, True), 'power_n24_esl2Effect': power(24)}
 print(json.dumps(out, indent=1)); json.dump(out, open('config/agent_sim_esl3/POWER.json', 'w'), indent=1)
