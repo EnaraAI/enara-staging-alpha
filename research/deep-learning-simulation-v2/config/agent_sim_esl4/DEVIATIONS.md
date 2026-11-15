@@ -1,0 +1,1 @@
+1. **Round 3, cell LE10: one reply missing.** The tutor agent returned 17 of 18 replies (s390_LE_r1 missing). Its file is kept as `PARTIAL_LE10_r3.json` in the scratch answers folder. A new agent wrote the one missing reply, which was then applied. No session was dropped.
