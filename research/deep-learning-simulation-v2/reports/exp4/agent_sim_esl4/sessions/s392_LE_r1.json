@@ -11,11 +11,11 @@
    "W1": 0,
    "W2": 0,
    "C1": 3,
-   "C2": 1
+   "C2": 3
   },
   "indep": {
    "C1": 3,
-   "C2": 0
+   "C2": 1
   }
  },
  "start": {
@@ -600,7 +600,72 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 1: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect, \"plays\" is right. The subject \"My sister\" is one person, so the verb takes an ending.\nNow one on your own. Look at the subject, and look closely at how the verb ends.\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect, \"watches\" is right. You looked at how the verb ends.\nHere is my thinking for \"hurry\": it ends in y, and r comes before y, so I change y to -ies: He hurries to work.\nAfter sh, ch, s, x or o, add -es; when y comes after a letter like r, change y to -ies.\nRight: \"She fixes the lamp.\" Wrong: \"She fixs the lamp.\"\nNow this one:\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 1: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect, \"plays\" is right. The subject \"My sister\" is one person, so the verb takes an ending.\nNow one on your own. Look at the subject, and look closely at how the verb ends.\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect, \"watches\" is right. You looked at how the verb ends.\nHere is my thinking for \"hurry\": it ends in y, and r comes before y, so I change y to -ies: He hurries to work.\nAfter sh, ch, s, x or o, add -es; when y comes after a letter like r, change y to -ies.\nRight: \"She fixes the lamp.\" Wrong: \"She fixs the lamp.\"\nNow this one:\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct, \"watches\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct, \"watches\" is right."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "After sh, ch, s, x or o, add -es"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: \"She fixes the lamp.\" Wrong: \"She fixs the lamp.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "cries",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "cries"
+   }
   }
  ],
  "stateAfterS1": {

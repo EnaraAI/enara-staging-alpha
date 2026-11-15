@@ -8,7 +8,7 @@
   "band": "A1",
   "primary": "W2",
   "s": {
-   "W2": 3,
+   "W2": 2,
    "W1": 0,
    "C1": 3,
    "C2": 0
@@ -591,7 +591,55 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is right. \"My sister\" is like \"she\", so you added -s.\nNow one on your own. Look at the end of the verb. Write the verb only:\nShe ___ (brush) her hair every morning.\n\nLEARNER'S LAST MESSAGE:\nbrushs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nYou added an ending after \"She\". That part is right.\nCompare these:\nRight: \"He passes the ball.\" Wrong: \"He passs the ball.\"\nThe wrong one adds only \"s\", and that is hard to say.\nLook at the end of \"brush\" and try again. Write the verb only:\nShe ___ (brush) her hair every morning."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is right. \"My sister\" is like \"she\", so you added -s.\nNow one on your own. Look at the end of the verb. Write the verb only:\nShe ___ (brush) her hair every morning.\n\nLEARNER'S LAST MESSAGE:\nbrushs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nYou added an ending after \"She\". That part is right.\nCompare these:\nRight: \"He passes the ball.\" Wrong: \"He passs the ball.\"\nThe wrong one adds only \"s\", and that is hard to say.\nLook at the end of \"brush\" and try again. Write the verb only:\nShe ___ (brush) her hair every morning.",
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: \"He passes the ball.\" Wrong: \"He passs the ball.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "brushes",
+    "errors": {
+     "W1": "brush",
+     "W2": "brushs"
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "brushs",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W2",
+    "text": "brushs"
+   }
   }
  ],
  "stateAfterS1": {

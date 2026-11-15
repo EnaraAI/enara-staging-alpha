@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 2,
-   "C2": 3
+   "C2": 4
   }
  },
  "start": {
@@ -563,7 +563,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"an orange\", since orange begins with a vowel sound.\nNow one on your own, with a trap in the spelling. Write a or an:\nHe is ___ honest man, and he works at ___ university.\nGive both missing words, in order.\n\nLEARNER'S LAST MESSAGE:\nan, a\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nBoth correct: 'an honest man' follows the silent h, and 'a university' follows the 'y' sound.\nNow a different use of the. No earlier mention here: the situation decides.\nWe are in a room with one window, and it is hot. Write a, an or the:\nCould you open ___ window, please? (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"an orange\", since orange begins with a vowel sound.\nNow one on your own, with a trap in the spelling. Write a or an:\nHe is ___ honest man, and he works at ___ university.\nGive both missing words, in order.\n\nLEARNER'S LAST MESSAGE:\nan, a\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nBoth correct: 'an honest man' follows the silent h, and 'a university' follows the 'y' sound.\nNow a different use of the. No earlier mention here: the situation decides.\nWe are in a room with one window, and it is hot. Write a, an or the:\nCould you open ___ window, please? (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Both correct: 'an honest man' ... 'a university'"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Both correct: 'an honest man' ... 'a university'"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "the",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "the",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "the"
+   }
   }
  ],
  "stateAfterS1": {

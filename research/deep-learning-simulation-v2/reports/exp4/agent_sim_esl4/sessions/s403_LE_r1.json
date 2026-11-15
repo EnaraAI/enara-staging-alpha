@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 5
+   "C2": 6
   }
  },
  "start": {
@@ -557,7 +557,58 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"am\" is the form that agrees with I.\n\nNext, an independent check with a plural pronoun subject; then we can return to your \"as well as\" sentence.\n\nWrite am, is or are: They ___ happy. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nare\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"are\" agrees with the plural pronoun they.\n\nThe pronoun forms are secure, so let's go back to the open part of your task. Write one sentence using \"as well as\" between two subjects, for example a singular noun followed by \"as well as\" and a plural one. Remember the nuance: the phrase after \"as well as\" usually does not change the subject, so the verb agrees with the first noun.\n\nThen, in one line, explain why your verb form is correct, and add one line for your \"There\" sentence too."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"am\" is the form that agrees with I.\n\nNext, an independent check with a plural pronoun subject; then we can return to your \"as well as\" sentence.\n\nWrite am, is or are: They ___ happy. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nare\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"are\" agrees with the plural pronoun they.\n\nThe pronoun forms are secure, so let's go back to the open part of your task. Write one sentence using \"as well as\" between two subjects, for example a singular noun followed by \"as well as\" and a plural one. Remember the nuance: the phrase after \"as well as\" usually does not change the subject, so the verb agrees with the first noun.\n\nThen, in one line, explain why your verb form is correct, and add one line for your \"There\" sentence too.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"are\" agrees with the plural pronoun they."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"are\" agrees with the plural pronoun they."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother as well as my parents is at home.",
+    "errors": {
+     "W1": "My brother as well as my parents at home."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 6
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brother as well as my parents is at home.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother as well as my parents is at home."
+   }
   }
  ],
  "stateAfterS1": {

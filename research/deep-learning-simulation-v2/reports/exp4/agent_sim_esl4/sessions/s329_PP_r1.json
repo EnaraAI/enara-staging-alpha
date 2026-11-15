@@ -11,11 +11,11 @@
    "W2": 0,
    "W1": 0,
    "C1": 3,
-   "C2": 2
+   "C2": 3
   },
   "indep": {
    "C1": 3,
-   "C2": 1
+   "C2": 2
   }
  },
  "start": {
@@ -512,7 +512,66 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 2: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExcellent! \"Watch\" ends in -ch, so we add -es: watches. Next: The baby ___ (cry) at night. Write only the verb. Careful: look at the y.\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nVery good! \"Cry\" ends in a consonant (r) + y, so the y becomes -ies: cries. Next: My brother ___ (go) to the gym on Fridays. Write only the verb. Hint: this verb ends in -o."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 2: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExcellent! \"Watch\" ends in -ch, so we add -es: watches. Next: The baby ___ (cry) at night. Write only the verb. Careful: look at the y.\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nVery good! \"Cry\" ends in a consonant (r) + y, so the y becomes -ies: cries. Next: My brother ___ (go) to the gym on Fridays. Write only the verb. Hint: this verb ends in -o.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Very good!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Very good!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the y becomes -ies: cries"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "goes",
+    "errors": {
+     "W1": "go",
+     "W2": "gos"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "goes",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "goes"
+   }
   }
  ],
  "stateAfterS1": {

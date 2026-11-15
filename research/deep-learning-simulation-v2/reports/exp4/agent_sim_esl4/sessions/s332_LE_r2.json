@@ -14,7 +14,7 @@
    "C2": 2
   },
   "indep": {
-   "C1": 4,
+   "C1": 5,
    "C2": 0
   }
  },
@@ -610,7 +610,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 2: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nRight: \"plays\". My sister is \"she\", so play gets -s.\nNow one on your own.\nWrite the correct form: Our teacher ___ (live) near the school. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nlives\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nRight: \"lives\". Our teacher is one person, so the verb gets -s.\nNow write one sentence of your own. Look at the end of the verb first.\nUse he and the verb watch.\nFrame: He ___ TV ___."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 2: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nRight: \"plays\". My sister is \"she\", so play gets -s.\nNow one on your own.\nWrite the correct form: Our teacher ___ (live) near the school. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nlives\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nRight: \"lives\". Our teacher is one person, so the verb gets -s.\nNow write one sentence of your own. Look at the end of the verb first.\nUse he and the verb watch.\nFrame: He ___ TV ___.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Right: \"lives\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "lives"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "He watches TV every day.",
+    "errors": {
+     "W1": "He watch TV every day.",
+     "W2": "He watchs TV every day."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "He watches TV every day.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "He watches TV every day."
+   }
   }
  ],
  "stateAfterS1": {
