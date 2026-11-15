@@ -34,8 +34,21 @@
   }
  },
  "rec": {
-  "entries": [],
-  "liveErrors": {},
+  "entries": [
+   {
+    "code": "article_omitted",
+    "occurrences": 1,
+    "lastSeenAt": "2027-01-12T09:09:00.000Z",
+    "independentStreak": 0,
+    "nextReviewAt": "2027-01-13T09:09:00.000Z"
+   }
+  ],
+  "liveErrors": {
+   "article_omitted": {
+    "seen": 1,
+    "lastCorrect": false
+   }
+  },
   "knownPoints": {}
  },
  "turns": [
@@ -767,7 +780,29 @@
     "correct": false,
     "fired": "W1",
     "text": "My brother is engineer."
-   }
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "ev5": {
+    "liveError": "article_omitted"
+   },
+   "engineVerdict": "INCORRECT",
+   "recordLive": [],
+   "tutor": "Your sentence \"My brother is engineer.\" needs one more small word.\n\nIn English, we put a small word (a, an or the) before one thing we can count.\n\nRight: \"We have a garden.\" Wrong: \"We have garden.\"\n\nNow fix this sentence and write it again in full:\n\nMy cousin works in shop.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false
   }
  ],
  "stateAfterS1": {
