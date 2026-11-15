@@ -159,7 +159,7 @@ if (cmd === 'init') {
   for (const f of readdirSync(path.join(dir, 'sessions'))) { const s = load(dir, f.replace(/\.json$/, '')); const l = L_OF(s.learnerIdx); rows.push({ learner: l.idx, rep: s.rep, band: l.band, form: l.form, arm: s.arm, explicitFirst: l.band !== 'B2', ...postTest(s.state, s.seed), final: s.state.s, afterS1: s.stateAfterS1?.s ?? null, start: s.start.s }); }
   writeFileSync(path.join(dir, 'POST.json'), JSON.stringify(rows, null, 1)); console.log('post rows', rows.length);
 } else if (cmd === 'rateprep') {
-  const dir = a1; const out = a2; mkdirSync(out, { recursive: true }); const labels = ['V', 'W']; // pre-registered: one rater pass on replication 1, two tutors per case, 10 learners per batch const key: Record<string, any> = {};
+  const dir = a1; const out = a2; mkdirSync(out, { recursive: true }); const labels = ['V', 'W']; /* pre-registered: one rater pass on replication 1, two tutors per case, 10 learners per batch */ const key: Record<string, any> = {};
   const order = [...LEARNERS].sort((a, b) => (sha(`esl3r|${a.idx}`) < sha(`esl3r|${b.idx}`) ? -1 : 1));
   for (let n = 0; n * 10 < order.length; n++) {
     const id = `rt${String(n + 1).padStart(2, '0')}`; let t = `Batch ${id}. Rate every case as described in the rater instructions (two tutors per case) and write the JSON to the file named in your task.\n`; key[id] = {};
