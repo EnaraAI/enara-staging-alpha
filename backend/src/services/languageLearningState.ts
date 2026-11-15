@@ -61,6 +61,8 @@ export interface StoredLearningFields {
   closingAsk?: 'added' | 'deferred' | 'folded';
   // liveError (ESL5, code only): the expected L1 error type this reply targeted.
   liveError?: string;
+  // reviewOpen (ESL5, codes only): the recall error types an opening reply used.
+  reviewOpen?: string[];
 }
 export type HistoryTurn = { role: 'user' | 'assistant'; content: string; languageTurn?: StoredLearningFields | null };
 

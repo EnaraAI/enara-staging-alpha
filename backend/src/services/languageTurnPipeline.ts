@@ -4,7 +4,7 @@
 // channel stops using the shared functions or if the policy version differs between them.
 import {
   buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, independentSuccessItem, turnEvidence, LANGUAGE_CONTEXT_VERSION,
-  isClosingTurn, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk,
+  isClosingTurn, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk, learnerAsks, CLOSING_ASK_SENTENCE,
   type LanguageTeachingContext, type LanguageTurnEvidence,
 } from './languageTeachingContext';
 import { recordProfileTurn } from './learnerLanguageProfile';
@@ -33,6 +33,8 @@ export async function prepareLanguageContext(input: PrepareInput, channel: Langu
 export type ClosingAskStatus = 'added' | 'deferred' | 'folded';
 /** After this many replies that set a task (closing turn included) with no task-free reply, the recap is folded into the task reply. */
 export const CLOSING_FOLD_AFTER = 3;
+/** reviewOpen: the closing item asked when the model set no task at all (new situation, same point; one task). */
+export const REVIEW_CLOSE_FALLBACK = 'Now write one new sentence about a place you visited, using the same point in this new situation.';
 const FOLDED = /^Rule in one line:/;
 const ruleLineFor = (language: LanguageTeachingContext): string | undefined => {
   const spec = language.lesson.spec; const crit = spec?.successCriteria ?? [];
@@ -50,7 +52,16 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
   // v2 (closing / shortRecap): on the closing turn the learner ask is guaranteed by the engine, not left to the model (once only: isClosingTurn is false after it was asked).
   // The ask is never stacked on a reply that already sets a task (two asks at once): it is deferred to the next task-free reply, and after CLOSING_FOLD_AFTER deferrals
   // the recap is folded into the task reply as one message ("Rule in one line, then your task"), so it is never skipped for good.
-  if (language.research && isClosingTurn(language.research) && (engineV2('closing') || engineV2('shortRecap'))) {
+  // reviewOpen (ESL5, framework §7): the closing is one new item in a new context, not a rule recap: no rule ask is appended, a rule ask written next to
+  // the item is removed (one task), and the closing counts as done once the reply sets a task (once only). A task-free reply gets one short item ask.
+  if (language.research && isClosingTurn(language.research) && (engineV2('closing') || engineV2('shortRecap')) && engineV2('reviewOpen')) {
+    const one = enforceSingleAsk(text);
+    if (one.droppedClosing) text = one.text;
+    const asks = learnerAsks(text);
+    if (asks.length && asks.every((x) => x.kind === 'closing')) text = text.replace(CLOSING_ASK_SENTENCE, '').replace(/\n{3,}/g, '\n\n').trim();
+    if (!learnerAsks(text).length) text = `${text.trimEnd()}\n\n${REVIEW_CLOSE_FALLBACK}`;
+    closingAsk = 'added';
+  } else if (language.research && isClosingTurn(language.research) && (engineV2('closing') || engineV2('shortRecap'))) {
     const shortRecap = engineV2('shortRecap');
     if (!(shortRecap ? askedNewExample(text) : askedForRule(text)) && !FOLDED.test(text)) {
       if (!taskInvitation(text)) {

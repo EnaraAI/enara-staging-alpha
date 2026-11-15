@@ -1,6 +1,7 @@
 // Shared fixtures for the ESL5 switch tests (not a test file itself).
-import { detectTurnSignals, deriveLearnerContext, levelBand, renderLanguageContextPrompt, selectLanguageMoves, researchSignals, ruleFirstDecision, turnEvidence, type LanguageSpec, type LanguageTeachingContext } from '../src/services/languageTeachingContext';
+import { esl5Adjust, detectTurnSignals, deriveLearnerContext, levelBand, renderLanguageContextPrompt, selectLanguageMoves, researchSignals, ruleFirstDecision, turnEvidence, type LanguageSpec, type LanguageTeachingContext } from '../src/services/languageTeachingContext';
 import type { HistoryTurn } from '../src/services/languageLearningState';
+import type { Esl5Record } from '../src/services/learnerLanguageProfile';
 
 export const SPEC: LanguageSpec = { objectives: ['Articles a/an'], successCriteria: ['Uses a before a consonant sound', 'Uses an before a vowel sound'], items: [
   { id: 'a1', prompt: 'Complete: I saw ___ apple.', acceptedAnswers: ['an', 'I saw an apple', 'I saw an apple.'], targetForms: ['an'], criteria: [2] },
@@ -21,14 +22,15 @@ export function withEnv<T>(env: string, f: () => T): T {
 }
 
 /** Builds the language context the way buildLanguageTeachingContext does, without the database. */
-export function build(msg: string, hist: HistoryTurn[], o: { level?: string; masteryStatus?: string; history?: string[] } = {}): LanguageTeachingContext {
-  const signals = detectTurnSignals(msg, hist, LESSON);
+export function build(msg: string, hist: HistoryTurn[], o: { level?: string; masteryStatus?: string; history?: string[]; record?: Esl5Record } = {}): LanguageTeachingContext {
+  const signals0 = detectTurnSignals(msg, hist, LESSON);
   const band = levelBand(o.level ?? 'A1');
-  const moves = selectLanguageMoves({ band, targetLanguage: 'English', lessonStatus: 'structured', signals, masteryStatus: o.masteryStatus });
+  const moves0 = selectLanguageMoves({ band, targetLanguage: 'English', lessonStatus: 'structured', signals: signals0, masteryStatus: o.masteryStatus });
+  const { signals, moves } = esl5Adjust({ signals: signals0, moves: moves0, record: o.record });
   const learner = deriveLearnerContext({ courseLevel: o.level ?? 'A1', courseLanguages: ['English'], adultSchool: false, learnerMessages: [msg], objectiveStatus: o.masteryStatus });
   const research = researchSignals(hist, signals, SPEC);
   const { explicit, ruleFirst } = ruleFirstDecision({ band, masteryStatus: o.masteryStatus, history: hist, signals, spec: SPEC, moves });
-  const ctx = { version: 'ltc-v1', learner, lesson: { status: 'structured', lessonId: 'lsn', title: LESSON.title, spec: SPEC }, signals, moves, research, ...(o.history?.length ? { history: o.history } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}) } as Omit<LanguageTeachingContext, 'prompt'>;
+  const ctx = { version: 'ltc-v1', learner, lesson: { status: 'structured', lessonId: 'lsn', title: LESSON.title, spec: SPEC }, signals, moves, research, ...(o.history?.length ? { history: o.history } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(o.record ? { record: o.record } : {}) } as Omit<LanguageTeachingContext, 'prompt'>;
   return { ...ctx, prompt: renderLanguageContextPrompt(ctx) } as LanguageTeachingContext;
 }
 export const evidence = (c: LanguageTeachingContext) => turnEvidence(c, 'o');

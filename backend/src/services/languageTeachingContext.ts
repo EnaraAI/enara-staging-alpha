@@ -5,7 +5,7 @@ import { Institution } from '../models/Institution';
 import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
 import { isLearnerAgeBand } from '../models/learnerAgeBand';
-import { loadProfileLines } from './learnerLanguageProfile';
+import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
 import { engineV2, arbitrationForced } from './engineV2';
 import { logger, serializeError } from '../utils/logging';
 import {
@@ -244,6 +244,8 @@ export interface TurnSignals {
   liveTarget?: string;
   // releaseAfterTwo (ESL5): genuine failed attempts on the open item, this message included (empty, "I don't know" and copies of the prompt don't count).
   genuineFailedAttempts?: number;
+  // reviewOpen (ESL5): the recall error types the previous reply opened with (read back from its stored evidence).
+  prevReview?: string[];
 }
 
 export type MoveId =
@@ -295,6 +297,8 @@ export interface LanguageTeachingContext {
   explicitFirst?: boolean;
   // v2 (arbitration): primary method of the active teaching plan.
   planPrimary?: string;
+  // ESL5 (reviewOpen, fadeKnown): ENARA's own stored learner record (error types still live, independent successes per point). Loaded only when one of those switches is on.
+  record?: Esl5Record;
   prompt: string;
 }
 
@@ -364,6 +368,8 @@ export interface LanguageTurnEvidence {
   liveError?: string;
   // releaseAfterTwo (ESL5): this reply was told to give the answer after two genuine failed attempts.
   answerReleased?: true;
+  // reviewOpen (ESL5, codes only): the error types this opening reply recalls (1-2).
+  reviewOpen?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -886,6 +892,7 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
     const prevLive = lastStored && inScope(lastStored, scope) ? lastStored.liveError : undefined;
     if (prevLive) sig.liveTarget = prevLive;
   }
+  if (engineV2('reviewOpen') && lastStored?.reviewOpen?.length && inScope(lastStored, scope)) sig.prevReview = lastStored.reviewOpen;
   if (engineV2('releaseAfterTwo') && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope);
   return sig;
 }
@@ -1432,13 +1439,37 @@ export function researchSignals(history: { role: string; content: string; langua
 function ruleBeforeFirstTryOn(ctx: Omit<LanguageTeachingContext, 'prompt'>): boolean {
   return Boolean(engineV2('levelExplicit') && ctx.explicitFirst && ctx.ruleFirst?.criteria.length && ctx.signals.presentLessonItem && !ctx.signals.answeringCheck);
 }
+// reviewOpen (ESL5, framework §7: spaced retrieval as recall ATTEMPTS, not re-explanation).
+/** A later session: ENARA's record (from earlier sessions) holds live error types and the learner has not written yet in this session. At most two recall items. */
+export function reviewOpening(ctx: Pick<LanguageTeachingContext, 'signals' | 'record'>): string[] {
+  if (!engineV2('reviewOpen') || !ctx.signals.firstTurn || !ctx.record?.live.length) return [];
+  return ctx.record.live.slice(0, 2);
+}
+/** The second recall item is due when the previous reply opened with two. */
+const reviewSecond = (ctx: Pick<LanguageTeachingContext, 'signals'>): string | undefined => (engineV2('reviewOpen') && ctx.signals.prevReview?.length === 2 ? ctx.signals.prevReview[1] : undefined);
+/** ESL5: turn-level adjustments that need ENARA's stored learner record (pure; the identity when the switches are off or there is no record).
+ *  reviewOpen: the opening reply of a later session gives a recall item instead of today's first lesson item. */
+export function esl5Adjust(i: { signals: TurnSignals; moves: SelectedMove[]; record?: Esl5Record }): { signals: TurnSignals; moves: SelectedMove[] } {
+  if (!reviewOpening({ signals: i.signals, record: i.record }).length || !i.signals.presentLessonItem) return { signals: i.signals, moves: i.moves };
+  const { presentLessonItem: _skip, ...signals } = i.signals;
+  return { signals, moves: i.moves.filter((m) => m.id !== 'present_lesson_item') };
+}
+export const REVIEW_OPEN_LINE = (codes: string[]) => `This is a later session and their record from earlier sessions shows these error types still live: ${codes.map((c, k) => `(${k + 1}) ${errorTypeLabel(c)}`).join('; ')}. Open with recall, not re-teaching: greet them in a few words, then give ONE short recall item on (1) for them to answer from memory: a new sentence to complete or correct, made of words that appear in no lesson exercise. No rule, no explanation and no example before it; no exercise from today's lesson in this reply (it comes after the recall).${codes.length > 1 ? ' The second recall item comes in your next reply.' : ''} This replaces the opening question about what they already know.`;
+export const REVIEW_SECOND_LINE = (code: string) => `They have just answered the first recall item. Give feedback in one line (if it is wrong, show the right form with a one-line reason; no rule lecture), then give the second and last recall item, on ${errorTypeLabel(code)}: one new sentence to complete or correct, answered from memory, with no rule or example before it. Today's lesson continues after it.`;
+export const REVIEW_CLOSE_LINE = (code?: string) => `This is the point to close the lesson unit. This overrides the "next task" instructions above and replaces the usual rule recap: do NOT ask them to tell you the rule in their own words and do not recap the rule. (1) Answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) give ONE new item in a new situation (new words, a different topic from today's exercises) on ${code ? errorTypeLabel(code) : 'the point they found hardest today'}, for them to answer without help. One task only; never write a completed answer to an open exercise.`;
+/** reviewOpen: the error type the closing item targets (this session's live error first, then the record). */
+export const reviewCloseCode = (ctx: Pick<LanguageTeachingContext, 'signals' | 'record'>): string | undefined => ctx.signals.liveError?.code ?? ctx.signals.liveTarget ?? ctx.record?.live[0];
 /** releaseAfterTwo: this reply gives the answer after two genuine failed attempts. */
 export const releasing = (ctx: Pick<LanguageTeachingContext, 'moves'>): boolean => engineV2('releaseAfterTwo') && ctx.moves.some((m) => m.reasons.includes('release_after_two_genuine_attempts'));
 function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   const s = ctx.signals;
   const L = s.learning;
   const out: string[] = [];
-  if (s.presentLessonItem) out.push(`- Lesson item to present now: [${s.presentLessonItem.id}] ${untrusted(s.presentLessonItem.prompt)}`);
+  const review = reviewOpening(ctx);
+  if (review.length) out.push(`- ${REVIEW_OPEN_LINE(review)}`);
+  const second = reviewSecond(ctx);
+  if (second) out.push(`- ${REVIEW_SECOND_LINE(second)}`);
+  if (s.presentLessonItem && !review.length) out.push(`- Lesson item to present now: [${s.presentLessonItem.id}] ${untrusted(s.presentLessonItem.prompt)}`);
   if (s.answeringCheck && s.activeLessonItem) out.push(`- The open task is lesson item [${s.activeLessonItem.id}]: ${untrusted(s.activeLessonItem.prompt)}`);
   if (s.keyVerdict && isSuccess(s.keyVerdict)) out.push('- Their answer matches the course\'s accepted answer for this item: confirm it as correct (mention a capital-letter or punctuation slip in a few words at most).');
   if (supportStage(s) === 'summarise') out.push(`- ${RULE_SUMMARY}`);
@@ -1491,7 +1522,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     if (r.stuck && researchImproved('strategy')) out.push(`- ${STRATEGY_SHIFT}`);
     if (r.hintRepeat && engineV2('hints') && s.activeLessonItem && !(isClosingTurn(r) && closingOn())) out.push(`- ${HINT_VARY}`);
     if (r.uncovered.length && r.turnNo >= 2 && researchImproved('coverage')) out.push(`- ${coverageRule(r.uncovered)}`);
-    if (isClosingTurn(r) && closingOn()) out.push(`- ${engineV2('shortRecap') ? SHORT_RECAP : CLOSING_RECAP}`);
+    if (isClosingTurn(r) && closingOn()) out.push(`- ${engineV2('reviewOpen') ? REVIEW_CLOSE_LINE(reviewCloseCode(ctx)) : engineV2('shortRecap') ? SHORT_RECAP : CLOSING_RECAP}`);
   }
   return out;
 }
@@ -1640,6 +1671,7 @@ export function turnEvidence(ctx: LanguageTeachingContext, objectiveId?: string)
     ...(ctx.signals.diagnosis ? { diagnosis: ctx.signals.diagnosis.code } : {}),
     ...(engineV2('liveError') && ctx.signals.liveError ? { liveError: ctx.signals.liveError.code } : {}), // liveError (off: nothing)
     ...(releasing(ctx) ? { answerReleased: true as const } : {}), // releaseAfterTwo (off: nothing)
+    ...(reviewOpening(ctx).length ? { reviewOpen: reviewOpening(ctx) } : {}), // reviewOpen (off: nothing)
     ...(ctx.length ? { lengthTarget: ctx.length } : {}),
     ...(ctx.signals.errorRecurrence ? { errorRecurrence: ctx.signals.errorRecurrence } : {}),
     ...(() => {
@@ -1838,15 +1870,18 @@ export async function buildLanguageTeachingContext(params: {
     const chapter = (curriculum.chapters ?? []).find((c) => c.id === params.lessonId);
     const lesson = deriveLessonContext(chapter as never, curriculum.courseName || curriculum.name);
     const scope = languageStateScope({ institutionId: params.institutionId, studentId: params.studentId, sessionId: params.sessionId, courseId: params.courseId, curriculumId: params.curriculumId, lessonId: lesson.lessonId ?? params.lessonId });
-    const signals = detectTurnSignals(params.message, params.history, lesson.status === 'none' ? undefined : { title: lesson.title, spec: lesson.spec }, scope);
-    const moves = selectLanguageMoves({
+    const signals0 = detectTurnSignals(params.message, params.history, lesson.status === 'none' ? undefined : { title: lesson.title, spec: lesson.spec }, scope);
+    const moves0 = selectLanguageMoves({
       band: learner.proficiency.band,
       targetLanguage: learner.targetLanguage.value,
       lessonStatus: lesson.status,
-      signals,
+      signals: signals0,
       hintsOnly: params.hintsOnly,
       masteryStatus: params.masteryStatus,
     });
+    // ESL5 (reviewOpen, fadeKnown): ENARA's own stored learner record, read only when one of those switches is on.
+    const record = engineV2('reviewOpen') || engineV2('fadeKnown') ? (await loadEsl5Record(params.institutionId, params.studentId)) ?? undefined : undefined;
+    const { signals, moves } = esl5Adjust({ signals: signals0, moves: moves0, record });
     const base0 = lengthTarget(learner.ageBand, learner.proficiency.value);
     // r2: a clarification-only turn is one short question, so a tighter target.
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
@@ -1856,7 +1891,7 @@ export async function buildLanguageTeachingContext(params: {
     const prevTurn = [...params.history].reverse().find((h) => h.role === 'assistant')?.languageTurn as { moves?: string[] } | null | undefined;
     // levelExplicit: decided per learner and objective; explicit-first learners get the rule before their first try (rulesToIntroduce, once per rule per session).
     const { explicit, ruleFirst } = ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves });
-    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}) } as const;
+    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}) } as const;
     const parts = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
     return { ...base, ...(parts ? { parts } : {}), prompt: renderLanguageContextPrompt(base) };
   } catch (error) {

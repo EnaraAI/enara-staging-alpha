@@ -159,3 +159,27 @@ export async function recordProfileTurn(institutionId: string | undefined, stude
     logger.warn('learner_profile_record_failed', { error: serializeError(error) });
   }
 }
+
+// ---------------------------------------------------------------------------
+// ESL5 (reviewOpen, fadeKnown): the structured part of ENARA's own learner record the engine reads (codes and counts only, never learner text).
+export interface Esl5Record { live: string[]; knownPoints: Record<string, number> }
+const NOT_A_TYPE = new Set(['unknown', 'unchanged_from_prompt']);
+/** Error types still live: a liveError type not yet answered correctly since it was last seen, then a recorded error type without two independent successes (most seen first). */
+export function liveErrorTypes(p: { entries?: ILanguageErrorEntry[]; liveErrors?: Record<string, ILiveErrorEntry> }): string[] {
+  const live = Object.entries(p.liveErrors ?? {}).filter(([, v]) => v.lastCorrect !== true).sort((x, y) => y[1].seen - x[1].seen).map(([k]) => k);
+  const rec = (p.entries ?? []).filter((e) => !NOT_A_TYPE.has(e.code) && e.independentStreak < 2 && LABEL[e.code]).sort((x, y) => y.occurrences - x.occurrences).map((e) => e.code);
+  return [...new Set([...live, ...rec])];
+}
+export const errorTypeLabel = (code: string): string => LABEL[code] ?? code.replace(/_/g, ' ');
+/** Loaded only when reviewOpen or fadeKnown is on (switches off: no read). Null when there is no record. */
+export async function loadEsl5Record(institutionId: string | undefined, studentId: string | undefined): Promise<Esl5Record | null> {
+  if (!institutionId || !studentId) return null;
+  try {
+    const p = await LearnerLanguageProfile.findOne({ institutionId, studentId }).lean();
+    if (!p) return null;
+    return { live: liveErrorTypes({ entries: p.entries as ILanguageErrorEntry[], liveErrors: p.liveErrors as Record<string, ILiveErrorEntry> | undefined }), knownPoints: { ...((p.knownPoints as Record<string, number> | undefined) ?? {}) } };
+  } catch (error) {
+    logger.warn('learner_profile_load_failed', { error: serializeError(error) });
+    return null;
+  }
+}

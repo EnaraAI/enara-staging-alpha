@@ -34,6 +34,8 @@ export interface ILearnerLanguageProfile extends Document {
   worked?: IWorkedEntry[];
   // liveError (ESL5): expected-L1 error types seen in this learner's own sentences (codes and counts only, never learner text).
   liveErrors?: Record<string, ILiveErrorEntry>;
+  // fadeKnown (ESL5): independent correct answers per point ("<lessonId>:<criterion>" -> count). Counts only.
+  knownPoints?: Record<string, number>;
   // Optimistic concurrency token: chat and voice turns can overlap.
   version?: number;
   createdAt: Date;
@@ -69,6 +71,7 @@ const LearnerLanguageProfileSchema = new Schema<ILearnerLanguageProfile>({
   beliefs: { type: [BeliefSchema], default: [] },
   worked: { type: [WorkedSchema], default: [] },
   liveErrors: { type: Schema.Types.Mixed, default: undefined },
+  knownPoints: { type: Schema.Types.Mixed, default: undefined },
   version: { type: Number, default: 0 },
 }, { timestamps: true, collection: 'learner_language_profiles' });
 LearnerLanguageProfileSchema.index({ institutionId: 1, studentId: 1 }, { unique: true });
