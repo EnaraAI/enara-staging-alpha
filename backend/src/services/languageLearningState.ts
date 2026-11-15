@@ -59,6 +59,8 @@ export interface StoredLearningFields {
   rulesIntroduced?: number[];
   // closing / shortRecap: 'added' | 'folded' end the closing; 'deferred' counts towards the fold deadline. Tag only.
   closingAsk?: 'added' | 'deferred' | 'folded';
+  // liveError (ESL5, code only): the expected L1 error type this reply targeted.
+  liveError?: string;
 }
 export type HistoryTurn = { role: 'user' | 'assistant'; content: string; languageTurn?: StoredLearningFields | null };
 
@@ -679,6 +681,8 @@ export function loadOverBudget(reply: string, maxWords: number): string[] {
 export const ERROR_CODES = [
   'missing_third_person_s', 'wrong_third_person_ending', 'past_form_for_routine', 'pronoun_gender_swap', 'pronoun_omitted',
   'perfect_with_finished_time', 'past_for_life_experience', 'wrong_participle', 'unchanged_from_prompt', 'unknown',
+  // liveError (ESL5): expected Arabic-L1 errors (framework §9), detected only when the switch is on.
+  'article_omitted', 'copula_omitted',
 ] as const;
 export type ErrorCode = (typeof ERROR_CODES)[number];
 export interface Diagnosis { code: ErrorCode; cue: string; evidence: string }
@@ -694,7 +698,46 @@ const CUES: Record<ErrorCode, string> = {
   wrong_participle: 'the helper word is right but the verb form after it is not: ask them to think about the form we use after have/has',
   unchanged_from_prompt: 'they copied the sentence without changing anything: ask them what in the sentence needs to change',
   unknown: 'the cause is not clear: ask them to say in their own words what they were thinking',
+  // liveError (ESL5): written so that no cue contains an item's answer word (no a/an/the/is/am/are in the text).
+  article_omitted: 'they named one person or thing with nothing in front of it, and English needs one small word before one countable noun: contrast their pattern with that pattern plus this word, using other nouns, and ask them to put it in',
+  copula_omitted: 'they joined who-or-what straight to its description with no linking verb, and English needs one form of be between them (Arabic does not): contrast their pattern with that pattern plus that verb, using other words, and ask them to put it in',
 };
+
+// liveError (ESL5, framework §9: library of expected errors for Arabic speakers; §3: correction tied to this learner's own error).
+// Conservative, lexicon-based detection in the learner's own sentence: it fires only on a clear pattern and stays silent otherwise.
+//  article_omitted: a verb (is/was/saw/have/...) directly followed by an optional adjective and a singular countable noun from a fixed list, with no determiner ("He is doctor", "I saw apple").
+//  copula_omitted:  a subject (pronoun, or my/the/this + noun) directly followed by a noun phrase or describing word from a fixed list, with no be-verb ("She teacher", "He very tall").
+const COUNT_NOUNS = new Set(['doctor', 'teacher', 'student', 'engineer', 'nurse', 'driver', 'farmer', 'pilot', 'lawyer', 'actor', 'singer', 'writer', 'artist', 'dentist', 'policeman', 'waiter', 'manager', 'boy', 'girl', 'man', 'woman', 'child', 'baby', 'friend', 'brother', 'sister', 'cousin', 'son', 'daughter', 'apple', 'orange', 'banana', 'egg', 'umbrella', 'book', 'pen', 'pencil', 'bag', 'car', 'bike', 'bus', 'house', 'flat', 'room', 'dog', 'cat', 'bird', 'horse', 'phone', 'computer', 'chair', 'table', 'cup', 'ticket', 'job', 'idea', 'question', 'problem', 'letter', 'island', 'hour', 'animal', 'cake', 'sandwich', 'film', 'movie', 'shop', 'school', 'hospital', 'camera', 'ball', 'box']);
+const ART_VERBS = new Set(['is', 'was', "'s", 'saw', 'see', 'have', 'has', 'had', 'bought', 'buy', 'need', 'needs', 'want', 'wants', 'got', 'ate', 'eat', 'found', 'met', 'am', 'are', 'were', 'became', 'own', 'owns', 'drew', 'made', 'wrote', 'read', 'took', 'gave', 'sent']);
+const ADJ = new Set(['tall', 'short', 'big', 'small', 'old', 'young', 'new', 'good', 'bad', 'happy', 'sad', 'hot', 'cold', 'tired', 'hungry', 'busy', 'kind', 'nice', 'beautiful', 'ugly', 'rich', 'poor', 'clever', 'smart', 'funny', 'angry', 'late', 'early', 'ready', 'sick', 'ill', 'fine', 'red', 'blue', 'green', 'long', 'fast', 'slow', 'strong', 'weak', 'heavy', 'easy', 'difficult', 'hard', 'expensive', 'cheap', 'friendly', 'quiet', 'noisy', 'clean', 'dirty', 'famous', 'great', 'interesting', 'boring', 'married', 'free', 'warm', 'nervous', 'excited', 'afraid', 'sleepy']);
+const INTENS = new Set(['very', 'so', 'too', 'really']);
+const DETS = new Set(['a', 'an', 'the', 'my', 'your', 'his', 'her', 'our', 'their', 'its', 'this', 'that', 'one', 'some', 'any', 'no', 'every', 'each']);
+const SUBJ_PRON = new Set(['i', 'he', 'she', 'it', 'you', 'we', 'they']);
+const POSS_DET = new Set(['my', 'your', 'his', 'her', 'our', 'their', 'the', 'this', 'that']);
+const liveToks = (t: string) => t.toLowerCase().replace(/[’]/g, "'").replace(/([a-z])'s\b/g, "$1 's").replace(/[^a-z'\s]/g, ' ').split(/\s+/).filter(Boolean);
+export function detectLiveError(text: string): Diagnosis | null {
+  for (const sentence of text.split(/[.!?\n;]+/)) {
+    const w = liveToks(sentence);
+    if (w.length < 2 || w.length > 14) continue;
+    // copula omission: the subject is the first one or two words of the sentence
+    const subjLen = SUBJ_PRON.has(w[0]) ? 1 : POSS_DET.has(w[0]) && w.length >= 3 && !ART_VERBS.has(w[1]) && !SUBJ_PRON.has(w[1]) ? 2 : 0;
+    if (subjLen) {
+      const r = w.slice(subjLen);
+      const nounPhrase = (r[0] === 'a' || r[0] === 'an') ? (COUNT_NOUNS.has(r[1] ?? '') || (ADJ.has(r[1] ?? '') && COUNT_NOUNS.has(r[2] ?? ''))) : COUNT_NOUNS.has(r[0] ?? '') && r.length <= 3;
+      const describing = (INTENS.has(r[0] ?? '') && ADJ.has(r[1] ?? '')) || (ADJ.has(r[0] ?? '') && r.length <= 3 && !COUNT_NOUNS.has(r[1] ?? ''));
+      if (r.length && (nounPhrase || describing)) return { code: 'copula_omitted', cue: CUES.copula_omitted, evidence: w.slice(0, subjLen + 2).join(' ') };
+    }
+    // article omission: verb + (adjective) + singular countable noun with no determiner
+    for (let i = 1; i < w.length; i += 1) {
+      if (!ART_VERBS.has(w[i])) continue;
+      let j = i + 1;
+      if (ADJ.has(w[j] ?? '') || INTENS.has(w[j] ?? '')) j += INTENS.has(w[j] ?? '') && ADJ.has(w[j + 1] ?? '') ? 2 : 1;
+      if (j > i + 1 && !COUNT_NOUNS.has(w[j] ?? '')) continue; // "He is very tall": no noun after the describing word
+      if (COUNT_NOUNS.has(w[j] ?? '') && !DETS.has(w[i + 1]) && w[j + 1] !== "'s") return { code: 'article_omitted', cue: CUES.article_omitted, evidence: w.slice(i, j + 1).join(' ') };
+    }
+  }
+  return null;
+}
 
 const toks = (t: string) => normAnswer(t).split(' ').filter(Boolean);
 const DIRECT_PRONOUNS = new Set(['he', 'she']);
@@ -707,6 +750,8 @@ export function diagnoseError(answer: string, item: LessonItem | undefined): Dia
   const forms = (item.targetForms ?? []).map((f) => f.toLowerCase());
   const mk = (code: ErrorCode, evidence: string): Diagnosis => ({ code, cue: CUES[code], evidence });
   if (promptBody.length > 2 && a.join(' ') === promptBody.join(' ')) return mk('unchanged_from_prompt', a.join(' '));
+  // liveError (ESL5): an expected L1 error in their own sentence is named before the item-specific checks (switch off: unchanged).
+  if (engineV2('liveError')) { const live = detectLiveError(answer.split(SELF_CORRECTION_SPLIT).filter((p) => p.trim()).pop() ?? answer); if (live) return live; }
   if (forms.length && forms.every((f) => DIRECT_PRONOUNS.has(f))) {
     const want = forms[0];
     if (a.includes(want === 'he' ? 'she' : 'he')) return mk('pronoun_gender_swap', want === 'he' ? 'she' : 'he');

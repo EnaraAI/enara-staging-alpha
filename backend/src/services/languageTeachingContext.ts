@@ -21,6 +21,7 @@ import {
   learnerQuoteMismatches,
   possibleAnswerLeak,
   diagnoseError,
+  detectLiveError,
   type Diagnosis,
   isBinaryItem,
   loadOverBudget,
@@ -237,6 +238,10 @@ export interface TurnSignals {
   // r4.1
   learnerIntent?: LearnerIntent;
   stateScope?: string;
+  // liveError (ESL5): an expected L1 error type (article_omitted / copula_omitted) in the learner's latest message; and the error type the
+  // previous tutor reply targeted (read back from its stored evidence). Set only when the switch is on.
+  liveError?: Diagnosis;
+  liveTarget?: string;
 }
 
 export type MoveId =
@@ -353,6 +358,8 @@ export interface LanguageTurnEvidence {
   stateScope?: string;
   learnerIntent?: string;
   revealedItemId?: string;
+  // liveError (ESL5, code only): the expected L1 error type seen in the learner's message, which this reply targets.
+  liveError?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -846,7 +853,7 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
   const offTopic = offTopicKind(text, lesson);
   const learnerResponse = classifyLearnerResponse(text, pendingTask, offTopic);
   const attemptsOnTask = attemptsOnCurrentTask(history, scope);
-  return {
+  const sig: TurnSignals = {
     firstTurn,
     helpRequest: HELP.test(text),
     answerRequest: learnerResponse === 'answer_request',
@@ -867,7 +874,24 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
     ...r2Signals(text, history, learnerResponse, lesson, firstTurn, offTopic),
     ...r4Signals(text, history, learnerResponse, lesson, scope),
   };
+  if (engineV2('liveError')) {
+    // liveError (ESL5): only the learner's own sentence is read (an answer, or a first unprompted sentence), never a question or request.
+    const fromItem = sig.diagnosis && LIVE_CODES.includes(sig.diagnosis.code) ? sig.diagnosis : undefined;
+    const live = fromItem ?? (learnerResponse === 'answer' || sig.unpromptedSentence ? detectLiveError(text) : null);
+    if (live) sig.liveError = live;
+    const prevLive = lastStored && inScope(lastStored, scope) ? lastStored.liveError : undefined;
+    if (prevLive) sig.liveTarget = prevLive;
+  }
+  return sig;
 }
+/** liveError (ESL5): the expected Arabic-L1 error types (framework §9) this switch adds. */
+export const LIVE_CODES: string[] = ['article_omitted', 'copula_omitted'];
+const LIVE_RULE: Record<string, string> = {
+  article_omitted: 'Their sentence leaves out the article: one countable thing (like "doctor" or "apple") with no a, an or the in front of it. This is an OMISSION, not a choice between a and an: do not explain when to use a or an in this reply. (1) Say in one plain line that English puts a small word (a, an or the) before one countable thing; (2) give one right/wrong pair that differs ONLY by that missing word, with nouns that appear in no lesson exercise (for example right: "She has a cat." wrong: "She has cat."); (3) make the next item one where they must put the missing word in themselves (a new sentence with one countable thing), not the lesson\'s next sub-rule.',
+  copula_omitted: 'Their sentence leaves out the verb be: the subject goes straight to a noun or describing word ("She teacher", "He very tall"). Arabic does not need this verb, English does. (1) Say in one plain line that English needs am, is or are between the subject and what it says about them; (2) give one right/wrong pair that differs ONLY by that verb, with words that appear in no lesson exercise (for example right: "My bag is heavy." wrong: "My bag heavy."); (3) make the next item one where they must put the verb in themselves (a new sentence about a person or thing), not the lesson\'s next sub-rule.',
+};
+/** liveError (ESL5, framework §3 explicit correction tied to this learner's own error; §9 expected L1 errors): the rule line, the contrast and the next item target the error type in their latest message. */
+export const LIVE_ERROR_LINE = (code: string) => `${LIVE_RULE[code] ?? ''} This takes the place of any rule line for the lesson's next sub-rule in this reply. Never write the answer to an open lesson exercise.`;
 
 // r4: structured learning state, lesson items and the hint ceiling for this turn.
 function r4Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, scope?: string): Partial<TurnSignals> {
@@ -1217,6 +1241,8 @@ export const ruleFirstLine = (rf: { texts: string[] }, planPrimary?: string, has
 export function ruleFirstDecision(i: { band: LevelBand; masteryStatus?: string; history: { role: string; languageTurn?: unknown }[]; signals: Parameters<typeof rulesToIntroduce>[1]; spec: { successCriteria?: string[] } | undefined; moves?: { id: string }[] }): { explicit?: boolean; ruleFirst?: { criteria: number[]; texts: string[] } } {
   const explicit = engineV2('levelExplicit') ? explicitFirst(i.band, i.masteryStatus) : undefined;
   let ruleFirst = explicit ? rulesToIntroduce(i.history, i.signals, i.spec, { beforeFirstTry: true }) : engineV2('ruleFirst') ? rulesToIntroduce(i.history, i.signals, i.spec) : undefined;
+  // liveError (ESL5): when their latest message shows an expected L1 error, the rule line targets that error (LIVE_ERROR_LINE), not the lesson's next sub-rule.
+  if (engineV2('liveError') && (i.signals as { liveError?: unknown }).liveError) return { ...(explicit !== undefined ? { explicit } : {}) };
   // levelExplicit: the rule line also fires on the first explanation turn (a short explanation before any exercise), once: the first success criterion, only if no rule was introduced yet this session.
   if (explicit && !ruleFirst && i.moves?.some((m) => m.id === 'short_explanation') && (i.spec?.successCriteria?.length ?? 0) > 0) {
     const anyDone = i.history.some((h) => ((h.languageTurn as { rulesIntroduced?: number[] } | null | undefined)?.rulesIntroduced ?? []).length > 0);
@@ -1369,12 +1395,16 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     const rep = L?.beliefs?.find((b) => b.count >= 2);
     if (rep) out.push(`- ${beliefShift(rep.text)}`);
   }
-  if (s.diagnosis && !researchAblated('diagnosis')) out.push(`- ${diagnosisLine(s.diagnosis)}`);
+  const live = engineV2('liveError') ? s.liveError : undefined;
+  if (live) out.push(`- ${LIVE_ERROR_LINE(live.code)}`);
+  else if (s.diagnosis && !researchAblated('diagnosis')) out.push(`- ${diagnosisLine(s.diagnosis)}`);
   if (L && Object.keys(L.criteria).length && !researchAblated('transfer_check')) out.push('- Don\'t re-test a success criterion they have already shown on their own in two different tasks; work on the ones not shown yet. A criterion shown on their own only once needs one more unaided check in a new context (a different word or situation, with no model of the answer next to it).');
   if (s.learnerIntent === 'PARTIAL_ANSWER_ATTEMPT' && s.answeringCheck) out.push(`- ${WHY_PROBE}`);
   if (s.answeringCheck || s.unpromptedSentence) {
     const assisted = (L?.hintTurnsOnItem ?? 0) > 0;
-    const next = assisted
+    const next = live
+      ? 'give one new item that tests the error type named above (not the next lesson item)'
+      : assisted
       ? 'they had help on this task, so next give one fresh item on the same point for them to do without help (an independent check); a helped answer is not independent evidence'
       : s.nextLessonItem
         ? `next present lesson item [${s.nextLessonItem.id}] exactly as written: ${untrusted(s.nextLessonItem.prompt)} (no rule recap first, and never write example forms that answer it)`
@@ -1550,6 +1580,7 @@ export function turnEvidence(ctx: LanguageTeachingContext, objectiveId?: string)
     ...(ctx.signals.attemptsOnTask !== undefined ? { attemptsOnTask: ctx.signals.attemptsOnTask } : {}),
     ...(ctx.signals.offTopic ? { offTopic: ctx.signals.offTopic } : {}),
     ...(ctx.signals.diagnosis ? { diagnosis: ctx.signals.diagnosis.code } : {}),
+    ...(engineV2('liveError') && ctx.signals.liveError ? { liveError: ctx.signals.liveError.code } : {}), // liveError (off: nothing)
     ...(ctx.length ? { lengthTarget: ctx.length } : {}),
     ...(ctx.signals.errorRecurrence ? { errorRecurrence: ctx.signals.errorRecurrence } : {}),
     ...(() => {

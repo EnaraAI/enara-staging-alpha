@@ -9,7 +9,7 @@ import {
 } from './languageTeachingContext';
 import { recordProfileTurn } from './learnerLanguageProfile';
 import { engineV2 } from './engineV2';
-import { stripPreAttemptModels, stripCopyReadyModels, type StrippedReply } from './languageLearningState';
+import { stripPreAttemptModels, stripCopyReadyModels, isSuccess, type StrippedReply } from './languageLearningState';
 
 export type LanguageChannel = 'chat' | 'voice';
 /** The single policy version both channels report. */
@@ -85,7 +85,9 @@ export async function completeLanguageTurn(opts: {
     ...(opts.closingAsk ? { closingAsk: opts.closingAsk } : {}),
   };
   const belief = (lt as { assessment?: { belief?: string } }).assessment?.belief;
-  await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt), ...(belief ? { belief } : {}), lessonId: language.lesson.lessonId, lessonTitle: language.lesson.title, style: styleFromMoves(language.prevMoves) });
+  // liveError (ESL5): the error type seen now, and the one the previous reply targeted when this answer got it right (codes only).
+  const live = engineV2('liveError') ? { ...(language.signals.liveError ? { liveError: language.signals.liveError.code } : {}), ...(language.signals.liveTarget && isSuccess(lt.assessment.verdict) ? { liveCorrect: language.signals.liveTarget } : {}) } : {};
+  await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt), ...(belief ? { belief } : {}), lessonId: language.lesson.lessonId, lessonTitle: language.lesson.title, style: styleFromMoves(language.prevMoves), ...live });
   return lt as unknown as LanguageTurnEvidence;
 }
 

@@ -1,4 +1,4 @@
-import { LearnerLanguageProfile, type ILanguageErrorEntry, type IBeliefEntry, type IWorkedEntry } from '../models/LearnerLanguageProfile';
+import { LearnerLanguageProfile, type ILanguageErrorEntry, type IBeliefEntry, type IWorkedEntry, type ILiveErrorEntry } from '../models/LearnerLanguageProfile';
 import { ERROR_CODES, sameBelief, type LessonItem } from './languageLearningState';
 import { engineV2 } from './engineV2';
 import { logger, serializeError } from '../utils/logging';
@@ -18,7 +18,18 @@ export function codesForItem(item: LessonItem | undefined): string[] {
   return [];
 }
 
-export interface TurnOutcome { errorCode?: string; independentSuccessOn?: LessonItem; now?: Date; belief?: string; lessonId?: string; lessonTitle?: string; style?: string }
+export interface TurnOutcome { errorCode?: string; independentSuccessOn?: LessonItem; now?: Date; belief?: string; lessonId?: string; lessonTitle?: string; style?: string;
+  // liveError (ESL5): the expected-L1 error type seen in this message, and the one the previous reply targeted that this answer got right (codes only).
+  liveError?: string; liveCorrect?: string }
+
+/** liveError (ESL5): pure update of the learner's live error types: seen counts up and marks the type not yet right; a correct answer on an item that targeted it marks lastCorrect. Codes only. */
+export function applyLiveErrors(rec: Record<string, ILiveErrorEntry> | undefined, o: Pick<TurnOutcome, 'liveError' | 'liveCorrect'>): Record<string, ILiveErrorEntry> {
+  const out: Record<string, ILiveErrorEntry> = {};
+  for (const [k, v] of Object.entries(rec ?? {})) out[k] = { ...v };
+  if (o.liveCorrect && out[o.liveCorrect] && o.liveCorrect !== o.liveError) out[o.liveCorrect].lastCorrect = true;
+  if (o.liveError) out[o.liveError] = { seen: (out[o.liveError]?.seen ?? 0) + 1, lastCorrect: false };
+  return out;
+}
 export interface ProfileV2 { beliefs: IBeliefEntry[]; worked: IWorkedEntry[] }
 
 /** v2 (memory): pure update of beliefs and what-worked counters. Beliefs are resolved only by an independent success in the same lesson, and are then reviewed at spaced intervals. */
@@ -87,10 +98,11 @@ export function applyTurn(entries: ILanguageErrorEntry[], o: TurnOutcome): ILang
   return out;
 }
 
-const LABEL: Record<string, string> = {
+export const LABEL: Record<string, string> = {
   missing_third_person_s: 'leaving out -s/-es after he/she/it', wrong_third_person_ending: 'choosing the wrong -s/-es ending', past_form_for_routine: 'using a past form for routines',
   pronoun_gender_swap: 'mixing up he and she', pronoun_omitted: 'leaving out the pronoun', perfect_with_finished_time: 'using the present perfect with a finished time',
   past_for_life_experience: 'using the past simple for life experiences', wrong_participle: 'the verb form after have/has',
+  article_omitted: 'leaving out a/an/the before one countable thing', copula_omitted: 'leaving out am/is/are',
 };
 
 export function summarizeProfile(entries: ILanguageErrorEntry[], now = new Date()): string[] {
@@ -128,13 +140,14 @@ export async function loadDueReviews(institutionId: string, studentId: string) {
 /** Writes are optimistic: chat and voice turns can overlap, so a stale write is retried on fresh data instead of overwriting the other turn. */
 export async function recordProfileTurn(institutionId: string | undefined, studentId: string | undefined, o: TurnOutcome): Promise<void> {
   const v2 = engineV2('memory') && Boolean(o.belief || o.independentSuccessOn);
-  if (!institutionId || !studentId || (!o.errorCode && !o.independentSuccessOn && !v2)) return;
+  const live = engineV2('liveError') && Boolean(o.liveError || o.liveCorrect);
+  if (!institutionId || !studentId || (!o.errorCode && !o.independentSuccessOn && !v2 && !live)) return;
   try {
     for (let attempt = 0; attempt < 4; attempt += 1) {
       const p = await LearnerLanguageProfile.findOne({ institutionId, studentId }).lean();
       const entries = applyTurn((p?.entries ?? []) as ILanguageErrorEntry[], o);
       const next = engineV2('memory') ? applyTurnV2({ beliefs: (p?.beliefs ?? []) as IBeliefEntry[], worked: (p?.worked ?? []) as IWorkedEntry[] }, o) : null;
-      const set = { entries, ...(next ? { beliefs: next.beliefs, worked: next.worked } : {}) };
+      const set = { entries, ...(next ? { beliefs: next.beliefs, worked: next.worked } : {}), ...(live ? { liveErrors: applyLiveErrors(p?.liveErrors as Record<string, ILiveErrorEntry> | undefined, o) } : {}) };
       if (!p) {
         try { await LearnerLanguageProfile.create({ institutionId, studentId, ...set, version: 1 }); return; } catch { continue; } // lost the race to create: retry on the new document
       }

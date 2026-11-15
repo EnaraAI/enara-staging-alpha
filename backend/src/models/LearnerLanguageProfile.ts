@@ -24,6 +24,7 @@ export interface IBeliefEntry {
   nextReviewAt?: Date;
 }
 export interface IWorkedEntry { style: string; count: number }
+export interface ILiveErrorEntry { seen: number; lastCorrect?: boolean }
 
 export interface ILearnerLanguageProfile extends Document {
   institutionId: string;
@@ -31,6 +32,8 @@ export interface ILearnerLanguageProfile extends Document {
   entries: ILanguageErrorEntry[];
   beliefs?: IBeliefEntry[];
   worked?: IWorkedEntry[];
+  // liveError (ESL5): expected-L1 error types seen in this learner's own sentences (codes and counts only, never learner text).
+  liveErrors?: Record<string, ILiveErrorEntry>;
   // Optimistic concurrency token: chat and voice turns can overlap.
   version?: number;
   createdAt: Date;
@@ -65,6 +68,7 @@ const LearnerLanguageProfileSchema = new Schema<ILearnerLanguageProfile>({
   entries: { type: [EntrySchema], default: [] },
   beliefs: { type: [BeliefSchema], default: [] },
   worked: { type: [WorkedSchema], default: [] },
+  liveErrors: { type: Schema.Types.Mixed, default: undefined },
   version: { type: Number, default: 0 },
 }, { timestamps: true, collection: 'learner_language_profiles' });
 LearnerLanguageProfileSchema.index({ institutionId: 1, studentId: 1 }, { unique: true });
