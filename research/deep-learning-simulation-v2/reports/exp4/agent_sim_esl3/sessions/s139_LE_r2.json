@@ -130,7 +130,55 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThinking aloud: We have ___ cat at home.\nStep 1: say \"cat\" and hear the first sound.\nStep 2: \"cat\" starts with a \"k\" sound. That is not a vowel sound, so I choose \"a\".\nAnswer: We have a cat at home.\nSo the rule is: use \"an\" before a vowel sound, and \"a\" before other sounds.\nThis is right: He eats an egg every day. This is wrong: He eats a egg every day.\nYour turn. Write a or an:\nShe has ___ orange in her bag. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"a\". That does not fit this gap yet. Here is a new pair.\nRight: We saw an owl in the tree. Wrong: We saw a owl in the tree.\nThe second one is wrong because \"a\" comes before a vowel sound.\nCompare the pair with your answer. Say the noun's first sound, then write the missing word again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThinking aloud: We have ___ cat at home.\nStep 1: say \"cat\" and hear the first sound.\nStep 2: \"cat\" starts with a \"k\" sound. That is not a vowel sound, so I choose \"a\".\nAnswer: We have a cat at home.\nSo the rule is: use \"an\" before a vowel sound, and \"a\" before other sounds.\nThis is right: He eats an egg every day. This is wrong: He eats a egg every day.\nYour turn. Write a or an:\nShe has ___ orange in her bag. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"a\". That does not fit this gap yet. Here is a new pair.\nRight: We saw an owl in the tree. Wrong: We saw a owl in the tree.\nThe second one is wrong because \"a\" comes before a vowel sound.\nCompare the pair with your answer. Say the noun's first sound, then write the missing word again.",
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: We saw an owl in the tree. Wrong: We saw a owl in the tree."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "(I leave it empty, no word)",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "(I leave it empty, no word)"
+   }
   }
  ]
 }

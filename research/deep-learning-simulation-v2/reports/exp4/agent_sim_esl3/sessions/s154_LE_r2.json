@@ -114,7 +114,54 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure. Here's one from the lesson. Write a or an:\nShe has ___ orange in her bag. (answer with only the missing word)\n\nWhen you're done, a follow-up task: write two original sentences, one needing \"a\" and one needing \"an\", using tricky nouns where spelling and sound disagree. Be ready to say what the choice depends on.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nNo answer yet, so let's sharpen one part. Here is the general idea: the choice between \"a\" and \"an\" depends on the first sound you hear in the next word, not on how that word is spelled. That is why \"an hour\" and \"a university\" both look surprising on paper but sound natural.\n\nTry recalling it yourself: say the noun in the gap aloud, notice its first sound, and then fill in the gap:\n\nShe has ___ orange in her bag. (answer with only the missing word)\n\nThe follow-up task with your own sentences can wait until this one is done."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure. Here's one from the lesson. Write a or an:\nShe has ___ orange in her bag. (answer with only the missing word)\n\nWhen you're done, a follow-up task: write two original sentences, one needing \"a\" and one needing \"an\", using tricky nouns where spelling and sound disagree. Be ready to say what the choice depends on.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nNo answer yet, so let's sharpen one part. Here is the general idea: the choice between \"a\" and \"an\" depends on the first sound you hear in the next word, not on how that word is spelled. That is why \"an hour\" and \"a university\" both look surprising on paper but sound natural.\n\nTry recalling it yourself: say the noun in the gap aloud, notice its first sound, and then fill in the gap:\n\nShe has ___ orange in her bag. (answer with only the missing word)\n\nThe follow-up task with your own sentences can wait until this one is done.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the choice between \"a\" and \"an\" depends on the first sound you hear in the next word"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   }
   }
  ]
 }
