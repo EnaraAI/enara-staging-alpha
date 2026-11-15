@@ -8,13 +8,13 @@
   "band": "A2",
   "primary": "W2",
   "s": {
-   "W2": 2,
+   "W2": 1,
    "W1": 0,
    "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   }
  },
@@ -192,7 +192,66 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect, \"plays\" is the right form. \"My sister\" works like \"she\", so -s goes on the verb.\n\nHere is a new sentence to do on your own this time. Write only the verb:\nWrite the correct form: He ___ (drink) tea in the morning. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ndrinks\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect, \"drinks\" is the right form, and this time you had no example to copy.\n\nLet's move to a harder case. I'll show my thinking:\n\"They kiss their kids.\" Now I use \"she\". \"Kiss\" ends in -ss, so I add -es: \"She kisses her kids.\"\n\nYour turn. Write one sentence about someone you know, using the verb \"brush\". Say which ending you used and why in a few words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect, \"plays\" is the right form. \"My sister\" works like \"she\", so -s goes on the verb.\n\nHere is a new sentence to do on your own this time. Write only the verb:\nWrite the correct form: He ___ (drink) tea in the morning. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ndrinks\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect, \"drinks\" is the right form, and this time you had no example to copy.\n\nLet's move to a harder case. I'll show my thinking:\n\"They kiss their kids.\" Now I use \"she\". \"Kiss\" ends in -ss, so I add -es: \"She kisses her kids.\"\n\nYour turn. Write one sentence about someone you know, using the verb \"brush\". Say which ending you used and why in a few words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct, \"drinks\" is the right form"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "this time you had no example to copy"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Kiss\" ends in -ss, so I add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My sister brushes her hair.",
+    "errors": {
+     "W1": "My sister brush her hair.",
+     "W2": "My sister brushs her hair."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 1,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister brushes her hair.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister brushes her hair."
+   }
   }
  ]
 }

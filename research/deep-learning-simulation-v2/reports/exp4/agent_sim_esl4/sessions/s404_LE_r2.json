@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 0
+   "C2": 1
   }
  },
  "start": {
@@ -178,7 +178,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"plays\" is correct: a vowel before the y, so the verb just takes -s.\n\nNow one of the less obvious cases, where the ending changes. Try it without hints:\n\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"cries\" is correct: consonant plus y, so the y becomes -ies.\n\nYou have now handled plain -s and the -ies spelling. Next, a freer task that mixes the cases.\n\nWrite two or three sentences about the weekly routine of someone you know, using he or she. Include at least one verb ending in -sh, -ch, -x or -o (for example \"finish\" or \"do\") and one ordinary verb. I'll check each verb form."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"plays\" is correct: a vowel before the y, so the verb just takes -s.\n\nNow one of the less obvious cases, where the ending changes. Try it without hints:\n\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"cries\" is correct: consonant plus y, so the y becomes -ies.\n\nYou have now handled plain -s and the -ies spelling. Next, a freer task that mixes the cases.\n\nWrite two or three sentences about the weekly routine of someone you know, using he or she. Include at least one verb ending in -sh, -ch, -x or -o (for example \"finish\" or \"do\") and one ordinary verb. I'll check each verb form.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"cries\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"cries\" is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "She finishes work at five and plays tennis.",
+    "errors": {
+     "W1": "She finish work at five and play tennis.",
+     "W2": "She finishs work at five and plays tennis."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "She finishes work at five and plays tennis.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She finishes work at five and plays tennis."
+   }
   }
  ]
 }

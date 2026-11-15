@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 0
+   "C2": 1
   }
  },
  "start": {
@@ -184,7 +184,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"plays\" is the right form. With a he, she or it subject like \"my sister\", the present simple verb takes -s.\n\nNext, a trickier one. Here the spelling of the ending matters, so look closely at how the verb ends before you add anything. Answer on your own, then tell me in one sentence why you chose that ending.\n\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: 'watches' is the right form. You didn't add the one-sentence reason I asked for, so keep that in mind for this next one.\n\nHere is a different spelling pattern to try without help. Look at the letters at the end of the verb, and at the letter just before them, before you decide.\n\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nAfter your answer, add one sentence explaining the spelling change."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"plays\" is the right form. With a he, she or it subject like \"my sister\", the present simple verb takes -s.\n\nNext, a trickier one. Here the spelling of the ending matters, so look closely at how the verb ends before you add anything. Answer on your own, then tell me in one sentence why you chose that ending.\n\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: 'watches' is the right form. You didn't add the one-sentence reason I asked for, so keep that in mind for this next one.\n\nHere is a different spelling pattern to try without help. Look at the letters at the end of the verb, and at the letter just before them, before you decide.\n\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nAfter your answer, add one sentence explaining the spelling change.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: 'watches' is the right form."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: 'watches' is the right form."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "cries",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "cries"
+   }
   }
  ]
 }

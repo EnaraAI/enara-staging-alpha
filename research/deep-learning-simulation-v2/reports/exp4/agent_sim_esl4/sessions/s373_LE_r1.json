@@ -8,7 +8,7 @@
   "band": "A2",
   "primary": "W1",
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -192,7 +192,54 @@
    "leakFinal": 1,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNo problem. Let us think about it together with a new pair.\nRight: She is a doctor. Wrong: She a doctor. The wrong one leaves the word out, so the sentence is not complete.\nYour sentence needs one word too. Look at the first word and try again. Then tell me, in one word, which word in the sentence helped you choose.\nWrite am, is or are: I ___ a student. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nYou are leaving the gap empty.\nThe rule: this sentence always needs one word in the gap. The first word decides it.\nExample, thinking aloud: \"They ___ happy.\" Who? They. They goes with are. So: They are happy.\nNow think the same way about your first word. Write one word.\nWrite am, is or are: I ___ a student."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNo problem. Let us think about it together with a new pair.\nRight: She is a doctor. Wrong: She a doctor. The wrong one leaves the word out, so the sentence is not complete.\nYour sentence needs one word too. Look at the first word and try again. Then tell me, in one word, which word in the sentence helped you choose.\nWrite am, is or are: I ___ a student. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nYou are leaving the gap empty.\nThe rule: this sentence always needs one word in the gap. The first word decides it.\nExample, thinking aloud: \"They ___ happy.\" Who? They. They goes with are. So: They are happy.\nNow think the same way about your first word. Write one word.\nWrite am, is or are: I ___ a student.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The rule: this sentence always needs one word in the gap."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "am",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "am"
+   }
   }
  ]
 }

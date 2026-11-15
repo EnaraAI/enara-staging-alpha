@@ -8,13 +8,13 @@
   "band": "A2",
   "primary": "W2",
   "s": {
-   "W2": 2,
+   "W2": 1,
    "W1": 0,
    "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   }
  },
@@ -198,7 +198,67 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's right: \"plays\". The subject \"my sister\" is one person, like \"she\", so the verb takes -s.\n\nNow try a new one with no example to help. Write only the verb:\nWrite the correct form: He ___ (drink) tea in the morning. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ndrinks\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's right: \"drinks\". You added -s after \"he\" on your own.\n\nNow a harder type. Here is my thinking with a new verb:\n\"We brush our teeth.\" I change \"we\" to \"he\". \"Brush\" ends in -sh, so I add -es: \"He brushes his teeth.\"\n\nNow you. Write one sentence about what your sister or brother does every day, using the verb \"fix\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's right: \"plays\". The subject \"my sister\" is one person, like \"she\", so the verb takes -s.\n\nNow try a new one with no example to help. Write only the verb:\nWrite the correct form: He ___ (drink) tea in the morning. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ndrinks\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's right: \"drinks\". You added -s after \"he\" on your own.\n\nNow a harder type. Here is my thinking with a new verb:\n\"We brush our teeth.\" I change \"we\" to \"he\". \"Brush\" ends in -sh, so I add -es: \"He brushes his teeth.\"\n\nNow you. Write one sentence about what your sister or brother does every day, using the verb \"fix\".",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "That's right: \"drinks\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "You added -s after \"he\" on your own."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Brush\" ends in -sh, so I add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother fixes his bike every day.",
+    "errors": {
+     "W1": "My brother fix his bike every day.",
+     "W2": "My brother fixs his bike every day."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 1,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother fixs his bike every day.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "My brother fixs his bike every day."
+   }
   }
  ]
 }
