@@ -589,7 +589,54 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Plays\" is correct: vowel plus y just adds -s, so that covers your vowel-plus-y form too.\nNow one on your own, with an -es verb:\nWrite the correct form: My friend ___ (watch) the news every night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatch\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\n\"Watch\" is not right yet. You have most of it; let us sharpen one part.\nThe subject \"my friend\" is like \"he\" or \"she\", so the verb must change. Then the spelling of the ending depends on how the base verb ends, as in the patterns from the start (the -sh, -ch, -s, -x and -o group).\nLook at the last letters of the verb and try again:\nMy friend ___ (watch) the news every night."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Plays\" is correct: vowel plus y just adds -s, so that covers your vowel-plus-y form too.\nNow one on your own, with an -es verb:\nWrite the correct form: My friend ___ (watch) the news every night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatch\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\n\"Watch\" is not right yet. You have most of it; let us sharpen one part.\nThe subject \"my friend\" is like \"he\" or \"she\", so the verb must change. Then the spelling of the ending depends on how the base verb ends, as in the patterns from the start (the -sh, -ch, -s, -x and -o group).\nLook at the last letters of the verb and try again:\nMy friend ___ (watch) the news every night.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The subject \"my friend\" is like \"he\" or \"she\", so the verb must change."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "watches",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "watches"
+   }
   }
  ],
  "stateAfterS1": {
