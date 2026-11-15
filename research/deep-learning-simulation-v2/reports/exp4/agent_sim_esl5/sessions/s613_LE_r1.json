@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 4,
-   "C2": 3
+   "C1": 5,
+   "C2": 4
   }
  },
  "start": {
@@ -657,7 +657,93 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nAbsolutely. You know the core pattern: third person singular adds -s (works), -es after sibilants and -o (fixes, echoes), and consonant + y becomes -ies (studies).\n\nHere's a nuance worth sharpening: vowel + y just takes -s (plays, enjoys), and \"have\" is irregular (has). Also watch subjects that look plural but take a singular verb, like \"Everyone\" or \"The news\".\n\nYour task: write two sentences about someone's daily routine. In the first, use a verb ending in -ch, -sh or -x. In the second, use a subject like \"Everyone\" or \"Nobody\" with a verb ending in -y.\n\nThen tell me in a few words what made you choose each ending.\n\nLEARNER'S LAST MESSAGE:\nShe watches the news every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She watches the news every evening.\" is correct: -es after the -ch ending.\n\nThat covers the first sentence. Now the second: use a subject like \"Everyone\" or \"Nobody\" with a verb ending in -y, and say briefly what decided the ending."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nAbsolutely. You know the core pattern: third person singular adds -s (works), -es after sibilants and -o (fixes, echoes), and consonant + y becomes -ies (studies).\n\nHere's a nuance worth sharpening: vowel + y just takes -s (plays, enjoys), and \"have\" is irregular (has). Also watch subjects that look plural but take a singular verb, like \"Everyone\" or \"The news\".\n\nYour task: write two sentences about someone's daily routine. In the first, use a verb ending in -ch, -sh or -x. In the second, use a subject like \"Everyone\" or \"Nobody\" with a verb ending in -y.\n\nThen tell me in a few words what made you choose each ending.\n\nLEARNER'S LAST MESSAGE:\nShe watches the news every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She watches the news every evening.\" is correct: -es after the -ch ending.\n\nThat covers the first sentence. Now the second: use a subject like \"Everyone\" or \"Nobody\" with a verb ending in -y, and say briefly what decided the ending.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "is correct: -es after the -ch ending"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "-es after the -ch ending"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Everyone studies on Sunday.",
+    "errors": {
+     "W1": "Everyone study on Sunday.",
+     "W2": "Everyone studys on Sunday."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Everyone studies on Sunday.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Everyone studies on Sunday."
+   }
   }
  ],
  "stateAfterS1": {

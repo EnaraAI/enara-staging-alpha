@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 4,
-   "C2": 3
+   "C1": 5,
+   "C2": 4
   }
  },
  "start": {
@@ -663,7 +663,93 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure, happy to. Quick recall first: you already know that he, she and it take the -s form in the present simple.\n\nLet's push it a bit further. The tricky parts are usually the spelling: -es after -sh, -ch, -s, -x and -o, -ies after a consonant plus y, but plain -s after a vowel plus y. Subjects like \"my family\" or \"each student\" also count as \"it\" or \"he/she\".\n\nYour task: write two sentences describing a colleague's or classmate's weekly routine. Use one verb that needs -es and one that needs -ies, and make one subject a phrase such as \"Each student\".\n\nAfterwards, briefly explain the spelling choice in one of them.\n\nLEARNER'S LAST MESSAGE:\nEach student studies on Mondays.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Each student studies on Mondays.\" is correct: singular subject phrase, and consonant + y gives -ies.\n\nOne part is still open: write the second sentence with a verb that needs -es, then briefly explain the spelling choice in one of your sentences."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure, happy to. Quick recall first: you already know that he, she and it take the -s form in the present simple.\n\nLet's push it a bit further. The tricky parts are usually the spelling: -es after -sh, -ch, -s, -x and -o, -ies after a consonant plus y, but plain -s after a vowel plus y. Subjects like \"my family\" or \"each student\" also count as \"it\" or \"he/she\".\n\nYour task: write two sentences describing a colleague's or classmate's weekly routine. Use one verb that needs -es and one that needs -ies, and make one subject a phrase such as \"Each student\".\n\nAfterwards, briefly explain the spelling choice in one of them.\n\nLEARNER'S LAST MESSAGE:\nEach student studies on Mondays.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Each student studies on Mondays.\" is correct: singular subject phrase, and consonant + y gives -ies.\n\nOne part is still open: write the second sentence with a verb that needs -es, then briefly explain the spelling choice in one of your sentences.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Each student studies on Mondays.\" is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Each student studies on Mondays.\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "consonant + y gives -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "She washes the dishes every evening.",
+    "errors": {
+     "W1": "She wash the dishes every evening.",
+     "W2": "She washs the dishes every evening."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "She washes the dishes every evening.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She washes the dishes every evening."
+   }
   }
  ],
  "stateAfterS1": {

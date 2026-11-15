@@ -581,7 +581,61 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. You already have the basics, so let's go to the tricky part: the choice between a and an depends on the first sound, not the first letter.\n\nA few cases where spelling misleads: an hour (silent h), a university (it starts with a \"y\" sound), an MBA (\"em\" sound), a one-way street (\"w\" sound).\n\nThe also has a nuance: we use it for something both people can identify, not only for something mentioned before, as in \"Can you pass me the salt?\"\n\nYour task: write two sentences of your own. In the first, use a or an before a word where the spelling and the sound don't match. In the second, use the for something your reader already knows about without an earlier mention.\n\nLEARNER'S LAST MESSAGE:\nI waited a hour for the bus.\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\nGood choice of word: \"hour\" is exactly the kind of case where spelling and sound differ. But check the article in front of it. Say \"hour\" aloud in your head and notice what you actually hear first.\n\nThen rewrite that first sentence. We can do the second sentence, with the, right after."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. You already have the basics, so let's go to the tricky part: the choice between a and an depends on the first sound, not the first letter.\n\nA few cases where spelling misleads: an hour (silent h), a university (it starts with a \"y\" sound), an MBA (\"em\" sound), a one-way street (\"w\" sound).\n\nThe also has a nuance: we use it for something both people can identify, not only for something mentioned before, as in \"Can you pass me the salt?\"\n\nYour task: write two sentences of your own. In the first, use a or an before a word where the spelling and the sound don't match. In the second, use the for something your reader already knows about without an earlier mention.\n\nLEARNER'S LAST MESSAGE:\nI waited a hour for the bus.\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\nGood choice of word: \"hour\" is exactly the kind of case where spelling and sound differ. But check the article in front of it. Say \"hour\" aloud in your head and notice what you actually hear first.\n\nThen rewrite that first sentence. We can do the second sentence, with the, right after.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   },
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I waited an hour for the bus.",
+    "errors": {
+     "W1": "I waited hour for the bus.",
+     "W2": "I waited a hour for the bus."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I waited an hour for the bus.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I waited an hour for the bus."
+   }
   }
  ],
  "stateAfterS1": {

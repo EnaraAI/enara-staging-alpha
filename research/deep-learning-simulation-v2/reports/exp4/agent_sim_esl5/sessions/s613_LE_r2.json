@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 4,
-   "C2": 3
+   "C1": 5,
+   "C2": 4
   }
  },
  "start": {
@@ -653,7 +653,93 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to! Quick recall first: you know the basic -s after he, she and it, so let's go for the trickier endings.\n\nThe spelling of the third-person form depends on how the verb ends. Verbs ending in a hissing sound or -o take -es, and verbs ending in a consonant plus y change to -ies, while a vowel plus y just adds -s.\n\nHere is an independent task. Write two sentences about the daily routine of someone you know, using he or she. Use the verb \"fix\" in one sentence and \"carry\" in the other.\n\nWhen you have written them, tell me in one line how you chose each ending.\n\nLEARNER'S LAST MESSAGE:\nHe fixes his bike every morning.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"He fixes his bike every morning.\" is accurate: \"fix\" ends in -x, so -es is the right choice.\n\nThat covers one of the two spelling patterns. Please add the second sentence with \"carry\", plus your one-line note on how you chose each ending."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to! Quick recall first: you know the basic -s after he, she and it, so let's go for the trickier endings.\n\nThe spelling of the third-person form depends on how the verb ends. Verbs ending in a hissing sound or -o take -es, and verbs ending in a consonant plus y change to -ies, while a vowel plus y just adds -s.\n\nHere is an independent task. Write two sentences about the daily routine of someone you know, using he or she. Use the verb \"fix\" in one sentence and \"carry\" in the other.\n\nWhen you have written them, tell me in one line how you chose each ending.\n\nLEARNER'S LAST MESSAGE:\nHe fixes his bike every morning.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"He fixes his bike every morning.\" is accurate: \"fix\" ends in -x, so -es is the right choice.\n\nThat covers one of the two spelling patterns. Please add the second sentence with \"carry\", plus your one-line note on how you chose each ending.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "is accurate"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "is accurate"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "is accurate"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "is accurate"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"fix\" ends in -x, so -es is the right choice"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "She carries her bag to work.",
+    "errors": {
+     "W1": "She carry her bag to work.",
+     "W2": "She carrys her bag to work."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "She carries her bag to work.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She carries her bag to work."
+   }
   }
  ],
  "stateAfterS1": {
