@@ -8,7 +8,7 @@
   "band": "A1",
   "primary": "W2",
   "s": {
-   "W2": 2,
+   "W2": 1,
    "W1": 0,
    "C1": 0,
    "C2": 0
@@ -195,7 +195,73 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNice try! But \"a orange\" is not correct. Say \"orange\" slowly. The first sound is /o/. Is /o/ a vowel sound or a consonant sound? Remember my example: an apple.\n\nTry again: She has ___ orange in her bag.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\nThat's okay, let me explain. The answer is \"an\": She has an orange in her bag. \"Orange\" starts with /o/, and o is a vowel sound (a, e, i, o, u). Before a vowel sound we use \"an\", like \"an apple\" and \"an orange\". \"A orange\" is hard to say, so English uses \"an\".\n\nLet's practise this again. Write a or an: He wants ___ umbrella.\n\nWrite only the missing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNice try! But \"a orange\" is not correct. Say \"orange\" slowly. The first sound is /o/. Is /o/ a vowel sound or a consonant sound? Remember my example: an apple.\n\nTry again: She has ___ orange in her bag.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\nThat's okay, let me explain. The answer is \"an\": She has an orange in her bag. \"Orange\" starts with /o/, and o is a vowel sound (a, e, i, o, u). Before a vowel sound we use \"an\", like \"an apple\" and \"an orange\". \"A orange\" is hard to say, so English uses \"an\".\n\nLet's practise this again. Write a or an: He wants ___ umbrella.\n\nWrite only the missing word.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is \"an\": She has an orange in her bag."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Before a vowel sound we use \"an\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 1,
+     "W1": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   }
   }
  ]
 }

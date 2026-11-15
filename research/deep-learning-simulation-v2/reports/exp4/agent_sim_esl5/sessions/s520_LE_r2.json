@@ -252,7 +252,79 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 0: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot quite. You wrote \"play\".\nHere is a new pair:\nRight: It sleeps on the bed. Wrong: It sleep on the bed.\nThe wrong one keeps the verb with no -s after \"it\".\nLook at \"My sister\". Is that he, she or it?\nCompare and try again. Write only the verb:\nMy sister ___ (play) tennis on Sundays.\n\nLEARNER'S LAST MESSAGE:\nplay\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"plays\". \"My sister\" is like \"she\", and after she the verb gets -s.\nRight: He eats rice. Wrong: He eat rice.\nNow a new one. Do it on your own. Write only the verb:\nWrite the correct form: Our teacher ___ (live) near the school. (answer with only the verb)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 0: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot quite. You wrote \"play\".\nHere is a new pair:\nRight: It sleeps on the bed. Wrong: It sleep on the bed.\nThe wrong one keeps the verb with no -s after \"it\".\nLook at \"My sister\". Is that he, she or it?\nCompare and try again. Write only the verb:\nMy sister ___ (play) tennis on Sundays.\n\nLEARNER'S LAST MESSAGE:\nplay\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"plays\". \"My sister\" is like \"she\", and after she the verb gets -s.\nRight: He eats rice. Wrong: He eat rice.\nNow a new one. Do it on your own. Write only the verb:\nWrite the correct form: Our teacher ___ (live) near the school. (answer with only the verb)",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"plays\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after she the verb gets -s"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: He eats rice. Wrong: He eat rice."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "lives",
+    "errors": {
+     "W1": "live"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "lives",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "lives"
+   }
   }
  ]
 }

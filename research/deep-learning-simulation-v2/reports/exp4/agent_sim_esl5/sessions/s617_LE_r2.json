@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 0,
-   "C2": 1
+   "C2": 2
   }
  },
  "start": {
@@ -225,7 +225,75 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat is correct: \"an\". Your reason is missing, though, so I cannot yet tell whether you went by the letter or the sound. Please add a few words with your next answer.\nHere is a new item for you to do alone.\nWrite a or an: My uncle is ___ doctor. (answer with only the missing word)\nAfter your answer, write one short line explaining your choice. Then we can move on to \"the\".\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"a\" is right. Your explanation is still missing, though, so I cannot see what guided the choice. In this item the first letter and the first sound give the same result, so it does not separate the two ideas.\nBefore we move on to \"the\", let us switch to free production.\nWrite one sentence about a person you know, using \"a\" or \"an\" before a singular noun. If you can, pick a noun where the spelling and the sound start differently, since that is where the rule really matters. Then add one short line saying whether you chose by letter or by sound."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat is correct: \"an\". Your reason is missing, though, so I cannot yet tell whether you went by the letter or the sound. Please add a few words with your next answer.\nHere is a new item for you to do alone.\nWrite a or an: My uncle is ___ doctor. (answer with only the missing word)\nAfter your answer, write one short line explaining your choice. Then we can move on to \"the\".\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"a\" is right. Your explanation is still missing, though, so I cannot see what guided the choice. In this item the first letter and the first sound give the same result, so it does not separate the two ideas.\nBefore we move on to \"the\", let us switch to free production.\nWrite one sentence about a person you know, using \"a\" or \"an\" before a singular noun. If you can, pick a noun where the spelling and the sound start differently, since that is where the rule really matters. Then add one short line saying whether you chose by letter or by sound.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"a\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "a"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother is an engineer.",
+    "errors": {
+     "W1": "My brother is engineer.",
+     "W2": "My brother is a engineer."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother is an engineer.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother is an engineer."
+   }
   }
  ]
 }
