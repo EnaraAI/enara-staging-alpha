@@ -5,7 +5,7 @@ import type { HistoryTurn } from '../src/services/languageLearningState';
 export const SPEC: LanguageSpec = { objectives: ['Articles a/an'], successCriteria: ['Uses a before a consonant sound', 'Uses an before a vowel sound'], items: [
   { id: 'a1', prompt: 'Complete: I saw ___ apple.', acceptedAnswers: ['an', 'I saw an apple', 'I saw an apple.'], targetForms: ['an'], criteria: [2] },
   { id: 'a2', prompt: 'Complete: He is ___ doctor.', acceptedAnswers: ['a', 'He is a doctor', 'He is a doctor.'], targetForms: ['a'], criteria: [1] },
-  { id: 'a3', prompt: 'Complete: She has ___ umbrella.', acceptedAnswers: ['an'], targetForms: ['an'], criteria: [2] }] };
+  { id: 'a3', prompt: 'Complete: They ___ (be) happy.', acceptedAnswers: ['are'], targetForms: ['are'], criteria: [1] }] };
 export const LESSON = { title: 'Articles', spec: SPEC };
 export const li = (id: string) => ({ id: `lesson:${id}`, source: 'lesson' as const, lessonItemId: id });
 export const u = (content: string): HistoryTurn => ({ role: 'user', content });

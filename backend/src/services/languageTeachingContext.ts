@@ -242,6 +242,8 @@ export interface TurnSignals {
   // previous tutor reply targeted (read back from its stored evidence). Set only when the switch is on.
   liveError?: Diagnosis;
   liveTarget?: string;
+  // releaseAfterTwo (ESL5): genuine failed attempts on the open item, this message included (empty, "I don't know" and copies of the prompt don't count).
+  genuineFailedAttempts?: number;
 }
 
 export type MoveId =
@@ -360,6 +362,8 @@ export interface LanguageTurnEvidence {
   revealedItemId?: string;
   // liveError (ESL5, code only): the expected L1 error type seen in the learner's message, which this reply targets.
   liveError?: string;
+  // releaseAfterTwo (ESL5): this reply was told to give the answer after two genuine failed attempts.
+  answerReleased?: true;
 }
 
 // ---------------------------------------------------------------------------
@@ -882,8 +886,46 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
     const prevLive = lastStored && inScope(lastStored, scope) ? lastStored.liveError : undefined;
     if (prevLive) sig.liveTarget = prevLive;
   }
+  if (engineV2('releaseAfterTwo') && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope);
   return sig;
 }
+
+// releaseAfterTwo (ESL5, framework §3 and §4): a genuine attempt is a non-empty answer that is not "I don't know" and not a copy of the task.
+function genuineAttempt(text: string, prevTutor: string, item: LessonItem | undefined, kind: LearnerResponseKind): boolean {
+  const t = text.trim();
+  if (!t || kind !== 'answer' || classifyLearnerIntent(t, kind) === 'DONT_KNOW' || DONT_KNOW.test(t)) return false;
+  if (item && diagnoseError(t, item)?.code === 'unchanged_from_prompt') return false;
+  const n = norm(t.replace(/_+/g, ' '));
+  if (n.split(' ').length < 3) return true;
+  return !prevTutor.split(/\n+|(?<=[.!?:])\s+/).map((line) => norm(line.replace(/_+/g, ' '))).some((l) => l.split(' ').length >= 3 && (l === n || l.endsWith(` ${n}`) || n.endsWith(` ${l}`)));
+}
+/** releaseAfterTwo: genuine failed attempts on the open item, counted from the stored verdicts of earlier replies, plus this message if it is a genuine answer the key does not accept. */
+export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<TurnSignals, 'learning' | 'learnerResponse' | 'keyVerdict' | 'activeLessonItem'>, items: LessonItem[], scope?: string): number {
+  const target = s.learning?.activeItem?.id;
+  if (!target) return 0;
+  let active: string | undefined; let prevTutor = ''; let n = 0;
+  for (let i = 0; i < history.length; i += 1) {
+    const h = history[i];
+    if (h.role === 'assistant') {
+      prevTutor = h.content;
+      const lt = inScope(h.languageTurn, scope) ? h.languageTurn : undefined;
+      if (lt?.activeItem !== undefined) active = lt.activeItem?.id;
+      continue;
+    }
+    if (active !== target) continue;
+    const next = history.slice(i + 1).find((x) => x.role === 'assistant');
+    const verdict = next && inScope(next.languageTurn, scope) ? next.languageTurn?.assessment?.verdict : undefined;
+    const item = items.find((x) => `lesson:${x.id}` === active);
+    const kind = classifyLearnerResponse(h.content, taskInvitation(prevTutor) ?? 'instruction');
+    if (isFailure(verdict) && genuineAttempt(h.content, prevTutor, item, kind)) n += 1;
+  }
+  const ok = s.keyVerdict === 'CORRECT' || s.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
+  if (!ok && genuineAttempt(text, prevTutor, s.activeLessonItem, s.learnerResponse ?? 'no_pending_task')) n += 1;
+  return n;
+}
+/** releaseAfterTwo: the reply after two genuine failed attempts gives the answer (never earlier). */
+export const RELEASE_AFTER = 2;
+export const RELEASE_TEXT = 'They have now made two real attempts on this item and it is still not right. If this answer is right after all, just confirm it and give the next item. Otherwise stop hinting: (1) state the answer to this item with a one-line reason; (2) give one right/wrong pair on the same point as plain sentences (right: ..., wrong: ...); (3) then give ONE new item on the same point, with different words, for them to do without help. Do not ask them to retry this item.';
 /** liveError (ESL5): the expected Arabic-L1 error types (framework §9) this switch adds. */
 export const LIVE_CODES: string[] = ['article_omitted', 'copula_omitted'];
 const LIVE_RULE: Record<string, string> = {
@@ -1048,6 +1090,19 @@ export function selectLanguageMoves(input: {
     add('fade_support', [band === 'advanced' ? 'level_advanced' : `mastery_${input.masteryStatus}`], ['LTC-D3']);
     if (!s.answeringCheck && !hintFirst) add('independent_practice', ['strong_and_not_confused'], ['LTC-D3']);
   }
+  // releaseAfterTwo (ESL5, framework §3: explicit correction; §4: practice continues on a new item): after RELEASE_AFTER genuine failed attempts on the
+  // open item the answer is given with its reason and a right/wrong pair, then a new item on the same point. Never earlier: any other answer move
+  // becomes a hint until then (the leak guards keep hiding the open item's answer, see guardedItems). A hints-only policy never releases.
+  if (engineV2('releaseAfterTwo') && !input.hintsOnly) {
+    const engaged = s.answeringCheck || s.dontKnow || s.answerRequest || s.hintRequest || s.whyAfterAttempt;
+    if ((s.genuineFailedAttempts ?? 0) >= RELEASE_AFTER && engaged) {
+      for (let k = moves.length - 1; k >= 0; k -= 1) if (['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning'].includes(moves[k].id)) moves.splice(k, 1);
+      moves.unshift({ id: 'answer_with_reasoning', reasons: ['release_after_two_genuine_attempts'], ledger: ['LTC-D6'] });
+    } else {
+      const k = moves.findIndex((m) => m.id === 'answer_with_reasoning');
+      if (k >= 0) { moves.splice(k, 1); add('scaffold_hint', ['release_held_until_two_genuine_attempts'], ['LTC-D6']); }
+    }
+  }
   const explained = moves.some((m) => m.id === 'short_explanation' || m.id === 'reteach_simpler' || m.id === 'answer_with_reasoning');
   if (explained && !(strong && s.helpRequest) && !clarifying) add('comprehension_check', ['after_explanation'], ['LTC-D5']);
   return moves;
@@ -1134,6 +1189,7 @@ export function moveText(m: SelectedMove, opts: { ruleBeforeFirstTry?: boolean }
   if (m.id === 'corrective_feedback_retry' && m.reasons.includes('recurrence_unknown_after_shift')) {
     return `${MOVE_TEXT.corrective_feedback_retry} They already had a change of approach on this task: if it is still the same mistake, show the correct form with a one-line reason, then give one fresh similar item.`;
   }
+  if (m.id === 'answer_with_reasoning' && m.reasons.includes('release_after_two_genuine_attempts')) return RELEASE_TEXT;
   if (m.id === 'answer_with_reasoning' && m.reasons.some((r) => r.startsWith('answer_requested_after_'))) {
     return 'They have already tried: now give the correct answer with the reason in one or two sentences, then one similar item for them to try.';
   }
@@ -1376,6 +1432,8 @@ export function researchSignals(history: { role: string; content: string; langua
 function ruleBeforeFirstTryOn(ctx: Omit<LanguageTeachingContext, 'prompt'>): boolean {
   return Boolean(engineV2('levelExplicit') && ctx.explicitFirst && ctx.ruleFirst?.criteria.length && ctx.signals.presentLessonItem && !ctx.signals.answeringCheck);
 }
+/** releaseAfterTwo: this reply gives the answer after two genuine failed attempts. */
+export const releasing = (ctx: Pick<LanguageTeachingContext, 'moves'>): boolean => engineV2('releaseAfterTwo') && ctx.moves.some((m) => m.reasons.includes('release_after_two_genuine_attempts'));
 function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   const s = ctx.signals;
   const L = s.learning;
@@ -1419,7 +1477,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     const stage = supportStage(s);
     // Fix 5: teaching the rule after two misses is the worked-example level (item answer still hidden).
     const level = ctx.moves.some((m) => m.id === 'answer_with_reasoning') ? 6 : stage === 'teach_rule' ? Math.max(5, s.hintLevel) : s.hintLevel;
-    if (stage === 'teach_rule' && !researchAblated('teach_rule')) out.push(`- ${engineV2('wrongAnswer') ? TEACH_RULE_V2 : TEACH_RULE}`);
+    if (stage === 'teach_rule' && !researchAblated('teach_rule') && !releasing(ctx)) out.push(`- ${engineV2('wrongAnswer') ? TEACH_RULE_V2 : TEACH_RULE}`);
     else if (stage !== 'teach_rule' && s.whyAfterAttempt) out.push(`- ${WHY_AFTER_ATTEMPT}`);
     if (!researchAblated('hint_ladder')) out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? ''), explicit: Boolean(engineV2('levelExplicit') && ctx.explicitFirst) })}`, `- ${SUPPORT_PRECEDENCE}`);
   }
@@ -1581,6 +1639,7 @@ export function turnEvidence(ctx: LanguageTeachingContext, objectiveId?: string)
     ...(ctx.signals.offTopic ? { offTopic: ctx.signals.offTopic } : {}),
     ...(ctx.signals.diagnosis ? { diagnosis: ctx.signals.diagnosis.code } : {}),
     ...(engineV2('liveError') && ctx.signals.liveError ? { liveError: ctx.signals.liveError.code } : {}), // liveError (off: nothing)
+    ...(releasing(ctx) ? { answerReleased: true as const } : {}), // releaseAfterTwo (off: nothing)
     ...(ctx.length ? { lengthTarget: ctx.length } : {}),
     ...(ctx.signals.errorRecurrence ? { errorRecurrence: ctx.signals.errorRecurrence } : {}),
     ...(() => {

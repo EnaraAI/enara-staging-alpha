@@ -136,6 +136,7 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           arbitrationForced: Boolean,
           diagnosis: String,
           liveError: String, // liveError (ESL5): error-type code only
+          answerReleased: Boolean, // releaseAfterTwo (ESL5)
           _id: false,
         },
         default: undefined,
