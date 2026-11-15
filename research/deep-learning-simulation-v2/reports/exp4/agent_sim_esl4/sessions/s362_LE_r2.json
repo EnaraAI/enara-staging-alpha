@@ -415,7 +415,64 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHappy to! Remember, with I, you, we and they the verb stays the same: I read.\nWorked example: Sofia reads before bed. Step 1: Sofia = she. Step 2: after she, add -s, so read becomes reads.\nThe rule: after he, she or it, the verb gets -s or -es.\nRight: Paul runs in the park every evening. Wrong: Paul run in the park every evening.\nNow you. Write only the verb:\nMy neighbour ___ (cook) a big meal on Fridays."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHappy to! Remember, with I, you, we and they the verb stays the same: I read.\nWorked example: Sofia reads before bed. Step 1: Sofia = she. Step 2: after she, add -s, so read becomes reads.\nThe rule: after he, she or it, the verb gets -s or -es.\nRight: Paul runs in the park every evening. Wrong: Paul run in the park every evening.\nNow you. Write only the verb:\nMy neighbour ___ (cook) a big meal on Fridays.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after he, she or it, the verb gets -s or -es"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "with I, you, we and they the verb stays the same"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Paul runs in the park every evening. Wrong: Paul run in the park every evening."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "cooks",
+    "errors": {
+     "W1": "cook"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "cooks",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "cooks"
+   }
   }
  ],
  "stateAfterS1": {

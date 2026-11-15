@@ -388,7 +388,54 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello again! Sure, let's sharpen it with something a bit harder than the basics.\n\nQuick retrieval first: you already know a/an depends on sound, not spelling, and the marks something both speaker and listener can identify. The tricky cases are where spelling and sound disagree (an hour, a university, an MBA, a one-way street) and where \"the\" is licensed by shared knowledge rather than prior mention (Please close the door, said in a room with one door).\n\nYour task: write two sentences of your own. In the first, use a or an before a word whose spelling would mislead you. In the second, use the for something that was never mentioned but both people know. Then add one line explaining why each article is correct."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello again! Sure, let's sharpen it with something a bit harder than the basics.\n\nQuick retrieval first: you already know a/an depends on sound, not spelling, and the marks something both speaker and listener can identify. The tricky cases are where spelling and sound disagree (an hour, a university, an MBA, a one-way street) and where \"the\" is licensed by shared knowledge rather than prior mention (Please close the door, said in a room with one door).\n\nYour task: write two sentences of your own. In the first, use a or an before a word whose spelling would mislead you. In the second, use the for something that was never mentioned but both people know. Then add one line explaining why each article is correct.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "a/an depends on sound, not spelling"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I waited for an hour.",
+    "errors": {
+     "W1": "I waited for hour.",
+     "W2": "I waited for a hour."
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I waited for an hour.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I waited for an hour."
+   }
   }
  ],
  "stateAfterS1": {

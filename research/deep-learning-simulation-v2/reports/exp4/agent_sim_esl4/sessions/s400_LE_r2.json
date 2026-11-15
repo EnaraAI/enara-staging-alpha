@@ -365,7 +365,46 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello again! Gladly - since you already handle the basics, let's push past the easy cases.\nThink about the subject, not just the pronoun.\nHere is the nuance worth sharpening. Agreement follows the real head of the subject, which is easy to lose when words come in between: \"The list of names is on the desk\" (the list, not the names), and \"Neither the teacher nor the students are ready\" (the verb usually agrees with the nearer noun).\nYour task: write two sentences of your own with a long subject where the noun next to the verb is NOT the one that decides am, is or are. Then tell me which word controls the verb in each, and why."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello again! Gladly - since you already handle the basics, let's push past the easy cases.\nThink about the subject, not just the pronoun.\nHere is the nuance worth sharpening. Agreement follows the real head of the subject, which is easy to lose when words come in between: \"The list of names is on the desk\" (the list, not the names), and \"Neither the teacher nor the students are ready\" (the verb usually agrees with the nearer noun).\nYour task: write two sentences of your own with a long subject where the noun next to the verb is NOT the one that decides am, is or are. Then tell me which word controls the verb in each, and why.",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The books on the table are new.",
+    "errors": {
+     "W1": "The books on the table new.",
+     "W2": "The books on the table is new."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The books on the table are new.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "The books on the table are new."
+   }
   }
  ],
  "stateAfterS1": {

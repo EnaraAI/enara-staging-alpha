@@ -368,7 +368,54 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nGladly. You likely have the basics: a/an for a first mention or any one item, the once both people know which one.\n\nA nuance worth practising: the choice between a and an follows sound, not spelling. So we say \"an hour\" and \"an honest answer\" (silent h), but \"a university\" and \"a one-way ticket\" (they start with a \"y\" or \"w\" sound). And the second mention switches to the: \"We rented a flat. The flat had a view of the river.\"\n\nYour task: write two short connected sentences. In the first, introduce something with a or an before a word whose spelling could mislead you (like a silent h or a \"u\" that sounds like \"you\"). In the second, refer back to it with the."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nGladly. You likely have the basics: a/an for a first mention or any one item, the once both people know which one.\n\nA nuance worth practising: the choice between a and an follows sound, not spelling. So we say \"an hour\" and \"an honest answer\" (silent h), but \"a university\" and \"a one-way ticket\" (they start with a \"y\" or \"w\" sound). And the second mention switches to the: \"We rented a flat. The flat had a view of the river.\"\n\nYour task: write two short connected sentences. In the first, introduce something with a or an before a word whose spelling could mislead you (like a silent h or a \"u\" that sounds like \"you\"). In the second, refer back to it with the.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the choice between a and an follows sound, not spelling"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I waited an hour. The hour felt long.",
+    "errors": {
+     "W1": "I waited hour. The hour felt long.",
+     "W2": "I waited a hour. The hour felt long."
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I waited an hour. The hour felt long.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I waited an hour. The hour felt long."
+   }
   }
  ],
  "stateAfterS1": {

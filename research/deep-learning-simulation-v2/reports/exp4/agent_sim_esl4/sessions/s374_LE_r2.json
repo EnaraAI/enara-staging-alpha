@@ -409,7 +409,64 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure! Quick reminder: \"I cook\" and \"they cook\" have no ending.\nFull example: Ahmed cooks for his family. Step 1: Ahmed = he. Step 2: after he, add -s, so cook becomes cooks.\nThe rule: after he, she or it, the verb takes -s or -es.\nRight: Clara writes a letter every week. Wrong: Clara write a letter every week.\nNow you. Write only the verb:\nMy grandfather ___ (read) in the garden."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure! Quick reminder: \"I cook\" and \"they cook\" have no ending.\nFull example: Ahmed cooks for his family. Step 1: Ahmed = he. Step 2: after he, add -s, so cook becomes cooks.\nThe rule: after he, she or it, the verb takes -s or -es.\nRight: Clara writes a letter every week. Wrong: Clara write a letter every week.\nNow you. Write only the verb:\nMy grandfather ___ (read) in the garden.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after he, she or it, the verb takes -s or -es"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"I cook\" and \"they cook\" have no ending"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Clara writes a letter every week. Wrong: Clara write a letter every week."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "reads",
+    "errors": {
+     "W1": "read"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "reads",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "reads"
+   }
   }
  ],
  "stateAfterS1": {

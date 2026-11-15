@@ -370,7 +370,46 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure, let's go a step further. You know the basics, so here is a nuance: the verb agrees with the real subject, even when other words get in the way.\n\nWatch out for sentences starting with \"There\", where the noun after the verb decides the form, and for phrases like \"together with\" or \"as well as\", which usually do not change the subject. For instance, \"The manager, together with her team, is in the meeting.\"\n\nYour task: write two sentences of your own, one beginning with \"There\" and one using \"as well as\". Afterwards, explain briefly why each verb form is correct."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure, let's go a step further. You know the basics, so here is a nuance: the verb agrees with the real subject, even when other words get in the way.\n\nWatch out for sentences starting with \"There\", where the noun after the verb decides the form, and for phrases like \"together with\" or \"as well as\", which usually do not change the subject. For instance, \"The manager, together with her team, is in the meeting.\"\n\nYour task: write two sentences of your own, one beginning with \"There\" and one using \"as well as\". Afterwards, explain briefly why each verb form is correct.",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "There are two cats in the garden.",
+    "errors": {
+     "W1": "There two cats in the garden.",
+     "W2": "There is two cats in the garden."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "There are two cats in the garden.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "There are two cats in the garden."
+   }
   }
  ],
  "stateAfterS1": {
