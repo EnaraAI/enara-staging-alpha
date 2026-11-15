@@ -130,7 +130,54 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 2: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nOf course. I'll do the first one so you can see my thinking.\n\"We stayed in ___ hotel.\" \"Hotel\" starts with the sound \"h\", not a vowel sound, so I use a: We stayed in a hotel.\nRule: a before most sounds, an before a vowel sound.\nRight: We ate an egg. Wrong: We ate a egg.\n\nNow try it. Write a or an:\nShe has ___ orange in her bag.\n(answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nNo word yet. That's fine. Let's take one small step.\nHere is one more pair:\nRight: I see an owl. Wrong: I see a owl.\n\"a owl\" is wrong. \"owl\" starts with a vowel sound.\nNow say the word right after the gap. Is its first sound a vowel? Yes or no?\nThen write a or an:\nShe has ___ orange in her bag."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 2: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nOf course. I'll do the first one so you can see my thinking.\n\"We stayed in ___ hotel.\" \"Hotel\" starts with the sound \"h\", not a vowel sound, so I use a: We stayed in a hotel.\nRule: a before most sounds, an before a vowel sound.\nRight: We ate an egg. Wrong: We ate a egg.\n\nNow try it. Write a or an:\nShe has ___ orange in her bag.\n(answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nNo word yet. That's fine. Let's take one small step.\nHere is one more pair:\nRight: I see an owl. Wrong: I see a owl.\n\"a owl\" is wrong. \"owl\" starts with a vowel sound.\nNow say the word right after the gap. Is its first sound a vowel? Yes or no?\nThen write a or an:\nShe has ___ orange in her bag.",
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: I see an owl. Wrong: I see a owl."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   }
   }
  ]
 }
