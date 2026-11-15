@@ -7,3 +7,4 @@
 7. **Round 7, cell LE23: one reply missing.** The agent applied 17 of 18 replies. Its answer file is kept as `PARTIAL_LE23_r7.json`, and a new agent wrote the missing reply.
 8. **Round 9, cell LE14:** the agent missed 1 of its 18 replies on its first apply, then wrote that reply itself and applied it in a second file. All 18 replies came from the same agent.
 9. **Round 10, cell LE10: one reply missing.** The answer file held only 17 replies, despite the agent reporting 18. It is kept as `PARTIAL_LE10_r10.json`, and a new agent wrote the missing reply.
+10. **Round 10, cell LE20: one reply missing.** The answer file is kept as `PARTIAL_LE20_r10.json`, and a new agent wrote the missing reply.
