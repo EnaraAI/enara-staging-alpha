@@ -595,7 +595,42 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat part is right: a present sentence like \"She is a teacher\" does need am, is or are, and the gap can't stay empty.\n\nBefore we go further, one short question about your thinking: in the gap sentence, which word decides the form, and what makes it decide? Tell me in a line, then write the one word that fills the gap: I ___ a student.\n\nLEARNER'S LAST MESSAGE:\nI think: a present sentence like \"She is a teacher\" needs am/is/are.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour note is accurate: a present sentence like \"She is a teacher\" needs am, is or are, and you have now stated that point twice. Let's close this unit there rather than repeat the same gap.\n\nTwo lines to pull it together:\nIn your words, a present sentence needs am, is or are; the form can't be dropped, so \"My sister a nurse\" is incomplete.\nThe form is decided by the real subject, not the nearest noun: \"We are happy today\" takes \"are\" because of plural \"we\".\n\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat part is right: a present sentence like \"She is a teacher\" does need am, is or are, and the gap can't stay empty.\n\nBefore we go further, one short question about your thinking: in the gap sentence, which word decides the form, and what makes it decide? Tell me in a line, then write the one word that fills the gap: I ___ a student.\n\nLEARNER'S LAST MESSAGE:\nI think: a present sentence like \"She is a teacher\" needs am/is/are.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour note is accurate: a present sentence like \"She is a teacher\" needs am, is or are, and you have now stated that point twice. Let's close this unit there rather than repeat the same gap.\n\nTwo lines to pull it together:\nIn your words, a present sentence needs am, is or are; the form can't be dropped, so \"My sister a nurse\" is incomplete.\nThe form is decided by the real subject, not the nearest noun: \"We are happy today\" takes \"are\" because of plural \"we\".\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "the form can't be dropped, so \"My sister a nurse\" is incomplete"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"We are happy today\" takes \"are\" because of plural \"we\""
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
   }
  ],
  "stateAfterS1": {

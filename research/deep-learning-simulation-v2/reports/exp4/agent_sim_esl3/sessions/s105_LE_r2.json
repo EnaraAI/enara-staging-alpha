@@ -705,7 +705,48 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"watches\". Watch ends in ch, so -es fits.\nNow a new ending. My example: I carry a bag. Now it is Omar. Carry ends in r and y, so y goes and I add -ies: Omar carries a bag.\nRule: after one person, a verb ending in a letter like r + y changes y to -ies.\nRight: Omar carries a bag. Wrong: Omar carrys a bag.\nYour turn, verb only:\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"cries\" is correct. Cry ends in r + y, so the y changes.\nLet's stop here and look back.\nYou wrote \"washes\" and \"watches\": -es after sh or ch. You wrote \"plays\": just -s.\nAnd \"cries\": a letter like r + y changes to -ies.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"watches\". Watch ends in ch, so -es fits.\nNow a new ending. My example: I carry a bag. Now it is Omar. Carry ends in r and y, so y goes and I add -ies: Omar carries a bag.\nRule: after one person, a verb ending in a letter like r + y changes y to -ies.\nRight: Omar carries a bag. Wrong: Omar carrys a bag.\nYour turn, verb only:\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"cries\" is correct. Cry ends in r + y, so the y changes.\nLet's stop here and look back.\nYou wrote \"washes\" and \"watches\": -es after sh or ch. You wrote \"plays\": just -s.\nAnd \"cries\": a letter like r + y changes to -ies.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"cries\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"cries\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "-es after sh or ch ... a letter like r + y changes to -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 2
+    }
+   }
   }
  ],
  "stateAfterS1": {

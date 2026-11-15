@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 4,
-   "C2": 4
+   "C2": 5
   }
  },
  "start": {
@@ -650,7 +650,54 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"cries\" is correct.\nNow an independent check on the other half of your original task, with no model: write one sentence about your friend's weekly routine using the verb \"reach\" or \"echo\" with a singular subject.\n\nLEARNER'S LAST MESSAGE:\nMy friend reaches the office at nine.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My friend reaches the office at nine.\" is correct: reach ends in -ch, so it takes -es, and \"My friend\" is singular.\nLet's close the unit here and pull it together.\nAny singular subject, a pronoun or a phrase like \"My friend\", takes the -s form in the present simple.\nThe ending depends on the verb: -es after -sh, -ch, -s, -x or -o, as in your \"reaches\"; consonant + y becomes -ies, as in your \"studies\"; vowel + y keeps the y, as in \"plays\".\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"cries\" is correct.\nNow an independent check on the other half of your original task, with no model: write one sentence about your friend's weekly routine using the verb \"reach\" or \"echo\" with a singular subject.\n\nLEARNER'S LAST MESSAGE:\nMy friend reaches the office at nine.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My friend reaches the office at nine.\" is correct: reach ends in -ch, so it takes -es, and \"My friend\" is singular.\nLet's close the unit here and pull it together.\nAny singular subject, a pronoun or a phrase like \"My friend\", takes the -s form in the present simple.\nThe ending depends on the verb: -es after -sh, -ch, -s, -x or -o, as in your \"reaches\"; consonant + y becomes -ies, as in your \"studies\"; vowel + y keeps the y, as in \"plays\".\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"My friend reaches the office at nine.\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My friend reaches the office at nine."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Any singular subject ... takes the -s form in the present simple."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "-es after -sh, -ch, -s, -x or -o ... consonant + y becomes -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 5
+    }
+   }
   }
  ],
  "stateAfterS1": {

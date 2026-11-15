@@ -691,7 +691,48 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot yet: \"go\" has no ending. Look at the subject, \"My brother\". It is one person, so what happens to the verb? We will come back to this one.\nFirst, one more ending. My example: I carry. Now it is Ken. Carry ends in r + y, so I take away the y and add -ies: Ken carries.\nRule: when a verb ends in a consonant + y, change the y to -ies.\nRight: Ken carries a bag. Wrong: Ken carrys a bag.\nNow you. Verb only:\nLucy ___ (hurry) to work.\n\nLEARNER'S LAST MESSAGE:\nhurries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"hurries\" is correct. Hurry ends in r + y, so the y changes to -ies.\nLet's stop here and look back at today.\nYou wrote \"washes\": -es after sh. You wrote \"plays\": just -s. And \"hurries\": consonant + y changes to -ies.\nAfter he, she or one person like \"My brother\", the verb always needs one of these endings.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot yet: \"go\" has no ending. Look at the subject, \"My brother\". It is one person, so what happens to the verb? We will come back to this one.\nFirst, one more ending. My example: I carry. Now it is Ken. Carry ends in r + y, so I take away the y and add -ies: Ken carries.\nRule: when a verb ends in a consonant + y, change the y to -ies.\nRight: Ken carries a bag. Wrong: Ken carrys a bag.\nNow you. Verb only:\nLucy ___ (hurry) to work.\n\nLEARNER'S LAST MESSAGE:\nhurries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"hurries\" is correct. Hurry ends in r + y, so the y changes to -ies.\nLet's stop here and look back at today.\nYou wrote \"washes\": -es after sh. You wrote \"plays\": just -s. And \"hurries\": consonant + y changes to -ies.\nAfter he, she or one person like \"My brother\", the verb always needs one of these endings.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"hurries\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or one person like \"My brother\", the verb always needs one of these endings."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "consonant + y changes to -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 1
+    }
+   }
   }
  ],
  "stateAfterS1": {

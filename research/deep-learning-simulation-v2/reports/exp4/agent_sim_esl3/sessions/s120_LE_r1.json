@@ -14,7 +14,7 @@
    "C2": 3
   },
   "indep": {
-   "C1": 5,
+   "C1": 6,
    "C2": 1
   }
  },
@@ -675,7 +675,48 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"lives\". \"Our teacher\" is one person, so the verb has -s.\nNow a new one for you to do alone.\nWrite only the verb:\nHe ___ (sleep) at ten.\n\nLEARNER'S LAST MESSAGE:\nsleeps\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"sleeps\". After \"he\", you put -s on the verb by yourself.\nLet's sum up.\nAfter he, she or it, put -s on the verb: \"He reads.\"\nOne person, like \"our teacher\", works the same way.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"lives\". \"Our teacher\" is one person, so the verb has -s.\nNow a new one for you to do alone.\nWrite only the verb:\nHe ___ (sleep) at ten.\n\nLEARNER'S LAST MESSAGE:\nsleeps\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"sleeps\". After \"he\", you put -s on the verb by yourself.\nLet's sum up.\nAfter he, she or it, put -s on the verb: \"He reads.\"\nOne person, like \"our teacher\", works the same way.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"sleeps\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "you put -s on the verb by yourself"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, put -s on the verb"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 1
+    }
+   }
   }
  ],
  "stateAfterS1": {

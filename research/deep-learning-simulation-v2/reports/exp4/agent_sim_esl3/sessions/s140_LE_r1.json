@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 3
+   "C1": 3,
+   "C2": 4
   }
  },
  "start": {
@@ -648,7 +648,66 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect. The person is \"We\", and \"We\" goes with \"are\".\n\nNow a new one, with no help. Find the person, then choose the word. Write am, is or are: My father ___ a pilot. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect. \"My father\" is one person, like \"he\", so \"is\" fits.\n\nHere is the rule from today:\nStep one: find the person. Step two: choose the word. I takes am; he, she and it take is; you, we and they take are.\nDon't leave the word out: \"They at school\" is wrong.\n\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect. The person is \"We\", and \"We\" goes with \"are\".\n\nNow a new one, with no help. Find the person, then choose the word. Write am, is or are: My father ___ a pilot. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect. \"My father\" is one person, like \"he\", so \"is\" fits.\n\nHere is the rule from today:\nStep one: find the person. Step two: choose the word. I takes am; he, she and it take is; you, we and they take are.\nDon't leave the word out: \"They at school\" is wrong.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"is\" fits / is right"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"is\" fits / is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"is\" fits / is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"is\" fits / is right"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I takes am; he, she, it take is; you, we, they take are."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"They at school\" is wrong / keep the word"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 4
+    }
+   }
   }
  ],
  "stateAfterS1": {

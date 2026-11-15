@@ -8,7 +8,7 @@
   "band": "A2",
   "primary": "W2",
   "s": {
-   "W2": 2,
+   "W2": 1,
    "W1": 0,
    "C1": 3,
    "C2": 0
@@ -639,7 +639,42 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"drinks\" is right. \"He\" is one person, so the verb gets -s.\nNow a new sentence, all on your own. Think about the person first, then about the end of the verb.\nWrite only the verb:\nMy aunt ___ (teach) music at a small school.\n\nLEARNER'S LAST MESSAGE:\nteachs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\n\"teachs\" has the ending after one person, which is right. Look again at the last two letters of \"teach\": they change the ending.\nLet's sum up.\nWith he, she or it, add -s: \"It opens.\"\nAfter sh, ch, s, x or o, add -es.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"drinks\" is right. \"He\" is one person, so the verb gets -s.\nNow a new sentence, all on your own. Think about the person first, then about the end of the verb.\nWrite only the verb:\nMy aunt ___ (teach) music at a small school.\n\nLEARNER'S LAST MESSAGE:\nteachs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\n\"teachs\" has the ending after one person, which is right. Look again at the last two letters of \"teach\": they change the ending.\nLet's sum up.\nWith he, she or it, add -s: \"It opens.\"\nAfter sh, ch, s, x or o, add -es.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "With he, she or it, add -s"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "After sh, ch, s, x or o, add -es."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 1,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    }
+   }
   }
  ],
  "stateAfterS1": {
