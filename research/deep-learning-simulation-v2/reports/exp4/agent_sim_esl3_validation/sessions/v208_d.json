@@ -10,11 +10,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   }
  },
@@ -101,7 +101,61 @@
     "text": "My father drinks coffee every morning."
    },
    "tutor": "Yes, that is correct. Well done.\n\nWrite one more new sentence of your own about what your best friend likes.",
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHere is the rule. After he, she or it, the verb takes -s: \"She likes tea\", not \"She like tea\". Add -es after sh, ch, s, x and o (watches, goes) and change consonant + y to -ies (studies). Do not add -s after I, you, we or they.\n\nLook at this pair. Right: \"He plays football.\" Wrong: \"He play football.\"\n\nNow write one sentence of your own about what your father or mother does every morning.\n\nLEARNER'S LAST MESSAGE:\nMy father drinks coffee every morning.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that is correct. Well done.\n\nWrite one more new sentence of your own about what your best friend likes."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHere is the rule. After he, she or it, the verb takes -s: \"She likes tea\", not \"She like tea\". Add -es after sh, ch, s, x and o (watches, goes) and change consonant + y to -ies (studies). Do not add -s after I, you, we or they.\n\nLook at this pair. Right: \"He plays football.\" Wrong: \"He play football.\"\n\nNow write one sentence of your own about what your father or mother does every morning.\n\nLEARNER'S LAST MESSAGE:\nMy father drinks coffee every morning.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that is correct. Well done.\n\nWrite one more new sentence of your own about what your best friend likes.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, that is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, that is correct."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My best friend watches films.",
+    "errors": {
+     "W1": "My best friend watch films.",
+     "W2": "My best friend watchs films."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "learner": "My best friend watches films.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My best friend watches films."
+   },
+   "tutor": "Yes, that is correct. Well done.\n\nOne more: write a new sentence about what your teacher does every day.",
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, that is correct. Well done.\n\nWrite one more new sentence of your own about what your best friend likes.\n\nLEARNER'S LAST MESSAGE:\nMy best friend watches films.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that is correct. Well done.\n\nOne more: write a new sentence about what your teacher does every day."
   }
  ]
 }
