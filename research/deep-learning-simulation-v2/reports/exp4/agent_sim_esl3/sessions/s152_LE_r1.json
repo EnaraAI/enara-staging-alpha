@@ -378,7 +378,46 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure. You have used am, is and are before, so let's work on a harder case: agreement when the subject is long.\n\nWhen a phrase comes between the subject and the verb, the verb still agrees with the main noun. \"The teacher with the two new students is at school\" uses \"is\" because the subject is \"the teacher\", not \"students\". A common slip is to match the nearest noun instead.\n\nYour task: write two sentences of your own. In each one, put a phrase between the subject and am, is or are (for example, \"with ...\" or \"from ...\"). Make one subject singular and one plural, and check that the verb agrees with the main noun."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure. You have used am, is and are before, so let's work on a harder case: agreement when the subject is long.\n\nWhen a phrase comes between the subject and the verb, the verb still agrees with the main noun. \"The teacher with the two new students is at school\" uses \"is\" because the subject is \"the teacher\", not \"students\". A common slip is to match the nearest noun instead.\n\nYour task: write two sentences of your own. In each one, put a phrase between the subject and am, is or are (for example, \"with ...\" or \"from ...\"). Make one subject singular and one plural, and check that the verb agrees with the main noun.",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The boys from my school are tall.",
+    "errors": {
+     "W1": "The boys from my school tall.",
+     "W2": "The boys from my school is tall."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The boys from my school are tall.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "The boys from my school are tall."
+   }
   }
  ],
  "stateAfterS1": {

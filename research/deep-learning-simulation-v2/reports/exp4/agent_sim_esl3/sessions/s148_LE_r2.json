@@ -355,7 +355,44 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nGladly. Before I add anything, a quick recall: what two things decide whether you write a, an or the? Keep that in mind, because today we sharpen a trickier corner.\nThe a/an choice follows sound, not spelling. So we say \"an hour\" (silent h) but \"a university\" (it starts with a y sound), and \"an MP\" but \"a UFO\".\nThe is about shared knowledge: the listener can identify which one, either because it was mentioned or because the context makes it unique.\nYour task: write two sentences of your own. The first should use a or an before a word where spelling and sound disagree. The second should use the for something both people know without it being mentioned before. Then tell me, in a few words, why each article fits."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nGladly. Before I add anything, a quick recall: what two things decide whether you write a, an or the? Keep that in mind, because today we sharpen a trickier corner.\nThe a/an choice follows sound, not spelling. So we say \"an hour\" (silent h) but \"a university\" (it starts with a y sound), and \"an MP\" but \"a UFO\".\nThe is about shared knowledge: the listener can identify which one, either because it was mentioned or because the context makes it unique.\nYour task: write two sentences of your own. The first should use a or an before a word where spelling and sound disagree. The second should use the for something both people know without it being mentioned before. Then tell me, in a few words, why each article fits.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "The a/an choice follows sound, not spelling."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   }
   }
  ],
  "stateAfterS1": {
