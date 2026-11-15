@@ -637,7 +637,36 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"An\" is correct, and well spotted: the spelling starts with h, but the sound does not.\nBefore we go on, tell me the rule in your own words in one short sentence. Try to cover the case where spelling and sound disagree.\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat part is right: a singular countable noun needs a determiner such as a, an or the.\nBut it does not cover the choice you just made twice. Why did you choose \"an\" before \"honest\", even though it is spelled with a consonant letter?\nTell me the rule again in one short sentence, and include how you decide between \"a\" and \"an\" when spelling and sound disagree."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"An\" is correct, and well spotted: the spelling starts with h, but the sound does not.\nBefore we go on, tell me the rule in your own words in one short sentence. Try to cover the case where spelling and sound disagree.\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat part is right: a singular countable noun needs a determiner such as a, an or the.\nBut it does not cover the choice you just made twice. Why did you choose \"an\" before \"honest\", even though it is spelled with a consonant letter?\nTell me the rule again in one short sentence, and include how you decide between \"a\" and \"an\" when spelling and sound disagree.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a singular countable noun needs a determiner such as a, an or the"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 4
+    }
+   }
   }
  ],
  "stateAfterS1": {

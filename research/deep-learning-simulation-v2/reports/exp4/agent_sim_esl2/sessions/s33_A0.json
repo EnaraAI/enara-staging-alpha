@@ -13,8 +13,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 4,
-   "C2": 3
+   "C1": 5,
+   "C2": 4
   }
  },
  "start": {
@@ -629,7 +629,60 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 4.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"an\" is correct: He wants an umbrella.\nA harder variant: Write a or an: It was ___ hour late, and she used ___ unusual map. (answer with only the two words)\n\nLEARNER'S LAST MESSAGE:\nan, an\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"an, an\" is correct: hour starts with a vowel sound because the h is silent, and unusual starts with a vowel sound too.\nTo pull today together:\nA or an introduces something new, and the choice follows the first sound, not the first letter, as in your \"I bought an orange.\"\nThe points to something both of you can identify, mentioned before (\"The orange was sweet.\") or clear from the situation (\"The shop was busy.\").\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 4.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"an\" is correct: He wants an umbrella.\nA harder variant: Write a or an: It was ___ hour late, and she used ___ unusual map. (answer with only the two words)\n\nLEARNER'S LAST MESSAGE:\nan, an\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"an, an\" is correct: hour starts with a vowel sound because the h is silent, and unusual starts with a vowel sound too.\nTo pull today together:\nA or an introduces something new, and the choice follows the first sound, not the first letter, as in your \"I bought an orange.\"\nThe points to something both of you can identify, mentioned before (\"The orange was sweet.\") or clear from the situation (\"The shop was busy.\").\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"an, an\" is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"an, an\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"an, an\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"an, an\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the choice follows the first sound, not the first letter"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 4
+    }
+   }
   }
  ],
  "stateAfterS1": {

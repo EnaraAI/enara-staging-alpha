@@ -649,7 +649,54 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Watch\" is not right yet. You have most of it; let us sharpen one part.\nThe subject \"my friend\" is like \"he\" or \"she\", so the verb must change. Then the spelling of the ending depends on how the base verb ends, as in the patterns from the start (the -sh, -ch, -s, -x and -o group).\nLook at the last letters of the verb and try again:\nMy friend ___ (watch) the news every night.\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Watches\" is correct: \"watch\" ends in -ch, so it takes -es.\nTo recap: with a third person singular subject such as \"my friend\", the present simple verb changes. Most verbs add -s. Verbs ending in -sh, -ch, -s, -x or -o add -es, and a consonant plus y becomes -ies.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Watch\" is not right yet. You have most of it; let us sharpen one part.\nThe subject \"my friend\" is like \"he\" or \"she\", so the verb must change. Then the spelling of the ending depends on how the base verb ends, as in the patterns from the start (the -sh, -ch, -s, -x and -o group).\nLook at the last letters of the verb and try again:\nMy friend ___ (watch) the news every night.\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Watches\" is correct: \"watch\" ends in -ch, so it takes -es.\nTo recap: with a third person singular subject such as \"my friend\", the present simple verb changes. Most verbs add -s. Verbs ending in -sh, -ch, -s, -x or -o add -es, and a consonant plus y becomes -ies.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Watches\" is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Watches\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "with a third person singular subject ... the present simple verb changes"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Verbs ending in -sh, -ch, -s, -x or -o add -es, and a consonant plus y becomes -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 3
+    }
+   }
   }
  ],
  "stateAfterS1": {

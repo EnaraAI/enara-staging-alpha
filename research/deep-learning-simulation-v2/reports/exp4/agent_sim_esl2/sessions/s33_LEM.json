@@ -627,7 +627,48 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"an\" is correct: orange begins with a vowel sound.\n\nYour sentence \"I have an umbrella.\" introduced something new. The second part is still open: write one more sentence that mentions the same umbrella again, and choose the article that shows we both know which one.\n\nLEARNER'S LAST MESSAGE:\nThe umbrella is red.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The umbrella is red.\" is correct: the refers back to the umbrella you already introduced.\n\nRecap: as you said, a singular countable noun needs a/an (or the).\nA or an depends on the first sound; the is for something already mentioned or known to both of us.\n\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"an\" is correct: orange begins with a vowel sound.\n\nYour sentence \"I have an umbrella.\" introduced something new. The second part is still open: write one more sentence that mentions the same umbrella again, and choose the article that shows we both know which one.\n\nLEARNER'S LAST MESSAGE:\nThe umbrella is red.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The umbrella is red.\" is correct: the refers back to the umbrella you already introduced.\n\nRecap: as you said, a singular countable noun needs a/an (or the).\nA or an depends on the first sound; the is for something already mentioned or known to both of us.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"The umbrella is red.\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a singular countable noun needs a/an (or the)"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A or an depends on the first sound"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 4
+    }
+   }
   }
  ],
  "stateAfterS1": {

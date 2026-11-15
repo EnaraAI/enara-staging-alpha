@@ -13,7 +13,7 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 5
   }
  },
@@ -650,7 +650,54 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Is\" is correct: the head of the subject is \"the woman\", which is singular, so \"with the two dogs\" does not change the verb. That covers the long-subject \"is\".\nNow the other common slip, a missing verb. Find the gap and fix it:\nWrite the sentence again with the missing word: Ahmed tired.\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Is\" is the right word to add, though the task asked for the whole sentence; next time write it out in full.\nTo recap: a present sentence with an adjective or noun after the subject still needs a form of \"be\". English does not let you drop it.\nThe form follows the head of the subject, as you showed with \"the woman with the two dogs\": singular takes \"is\", plural takes \"are\", \"I\" takes \"am\".\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Is\" is correct: the head of the subject is \"the woman\", which is singular, so \"with the two dogs\" does not change the verb. That covers the long-subject \"is\".\nNow the other common slip, a missing verb. Find the gap and fix it:\nWrite the sentence again with the missing word: Ahmed tired.\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Is\" is the right word to add, though the task asked for the whole sentence; next time write it out in full.\nTo recap: a present sentence with an adjective or noun after the subject still needs a form of \"be\". English does not let you drop it.\nThe form follows the head of the subject, as you showed with \"the woman with the two dogs\": singular takes \"is\", plural takes \"are\", \"I\" takes \"am\".\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Is\" is the right word to add"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"Is\" is the right word to add"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "still needs a form of \"be\". English does not let you drop it"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "singular takes \"is\", plural takes \"are\", \"I\" takes \"am\""
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 5
+    }
+   }
   }
  ],
  "stateAfterS1": {

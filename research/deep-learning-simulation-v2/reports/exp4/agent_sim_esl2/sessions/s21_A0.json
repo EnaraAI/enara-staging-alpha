@@ -13,7 +13,7 @@
    "C2": 2
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 1
   }
  },
@@ -600,7 +600,54 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a\" is correct: My uncle is a doctor.\nNow a new one on your own. Write a, an or the: It is cold. Please close ___ door. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nthe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"the\" is correct. In a room, we both know which door.\nLet's look back at today.\nFirst time we talk about a thing, we use a or an: a before most sounds, an before a vowel sound, like your \"an orange\".\nWhen we both know which thing, or we said it before, we use the, like your \"The\" for the book.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a\" is correct: My uncle is a doctor.\nNow a new one on your own. Write a, an or the: It is cold. Please close ___ door. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nthe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"the\" is correct. In a room, we both know which door.\nLet's look back at today.\nFirst time we talk about a thing, we use a or an: a before most sounds, an before a vowel sound, like your \"an orange\".\nWhen we both know which thing, or we said it before, we use the, like your \"The\" for the book.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"the\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"the\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "First time we talk about a thing, we use a or an"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "a before most sounds, an before a vowel sound"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 1
+    }
+   }
   }
  ],
  "stateAfterS1": {

@@ -643,7 +643,54 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"an\" is correct: orange begins with a vowel sound.\n\nHere is a harder variant. Write two connected sentences where a and an pull against the spelling: one noun that starts with a vowel letter but a consonant sound (like \"university\" or \"one-way street\"), introduced with a or an, and a second sentence that refers back to it.\n\nLEARNER'S LAST MESSAGE:\nShe goes to a university. The university is big.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nBoth articles are correct. \"a university\" starts with a \"y\" consonant sound, so a fits, and \"The university\" refers back to it.\n\nRecap: as you said, a singular countable noun needs a/an (or the).\nA or an follows the first sound, not the letter; the is for something already mentioned or known.\n\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"an\" is correct: orange begins with a vowel sound.\n\nHere is a harder variant. Write two connected sentences where a and an pull against the spelling: one noun that starts with a vowel letter but a consonant sound (like \"university\" or \"one-way street\"), introduced with a or an, and a second sentence that refers back to it.\n\nLEARNER'S LAST MESSAGE:\nShe goes to a university. The university is big.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nBoth articles are correct. \"a university\" starts with a \"y\" consonant sound, so a fits, and \"The university\" refers back to it.\n\nRecap: as you said, a singular countable noun needs a/an (or the).\nA or an follows the first sound, not the letter; the is for something already mentioned or known.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Both articles are correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Both articles are correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a singular countable noun needs a/an (or the)"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A or an follows the first sound, not the letter"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R3:C1",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 5
+    }
+   }
   }
  ],
  "stateAfterS1": {

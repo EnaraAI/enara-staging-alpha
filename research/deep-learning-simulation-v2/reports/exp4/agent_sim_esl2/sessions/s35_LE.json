@@ -13,8 +13,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 5,
-   "C2": 5
+   "C1": 6,
+   "C2": 6
   }
  },
  "start": {
@@ -665,7 +665,66 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"plays\". Vowel + y just adds -s.\nNow a harder one on your own. Write the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"cries\". Consonant + y becomes -ies.\nTo recap, using your sentences: \"My friend fixes his bike.\" shows -es after -x, and \"My friend carries a heavy bag.\" shows consonant + y becoming -ies, while \"plays\" keeps the y because a vowel comes before it.\nAfter he, she and it, add -s; add -es after -sh, -ch, -s, -x or -o.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"plays\". Vowel + y just adds -s.\nNow a harder one on your own. Write the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"cries\". Consonant + y becomes -ies.\nTo recap, using your sentences: \"My friend fixes his bike.\" shows -es after -x, and \"My friend carries a heavy bag.\" shows consonant + y becoming -ies, while \"plays\" keeps the y because a vowel comes before it.\nAfter he, she and it, add -s; add -es after -sh, -ch, -s, -x or -o.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"cries\""
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"cries\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"cries\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"cries\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Consonant + y becomes -ies"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she and it, add -s"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 6
+    }
+   }
   }
  ],
  "stateAfterS1": {
