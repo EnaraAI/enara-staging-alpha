@@ -570,7 +570,69 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHappy to! Quick recall first: you know the basic -s after he, she and it, so let's go for the trickier endings.\n\nThe spelling of the third-person form depends on how the verb ends. Verbs ending in a hissing sound or -o take -es, and verbs ending in a consonant plus y change to -ies, while a vowel plus y just adds -s.\n\nHere is an independent task. Write two sentences about the daily routine of someone you know, using he or she. Use the verb \"fix\" in one sentence and \"carry\" in the other.\n\nWhen you have written them, tell me in one line how you chose each ending."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHappy to! Quick recall first: you know the basic -s after he, she and it, so let's go for the trickier endings.\n\nThe spelling of the third-person form depends on how the verb ends. Verbs ending in a hissing sound or -o take -es, and verbs ending in a consonant plus y change to -ies, while a vowel plus y just adds -s.\n\nHere is an independent task. Write two sentences about the daily routine of someone you know, using he or she. Use the verb \"fix\" in one sentence and \"carry\" in the other.\n\nWhen you have written them, tell me in one line how you chose each ending.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Verbs ending in a hissing sound or -o take -es, and verbs ending in a consonant plus y change to -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "He fixes his bike every morning.",
+    "errors": {
+     "W1": "He fix his bike every morning.",
+     "W2": "He fixs his bike every morning."
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "He fixes his bike every morning.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "He fixes his bike every morning."
+   }
   }
  ],
  "stateAfterS1": {

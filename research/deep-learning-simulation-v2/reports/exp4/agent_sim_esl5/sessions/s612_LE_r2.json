@@ -530,7 +530,69 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHappy to. Since you know the basic pattern, let's work on the tricky subjects, where learners most often slip.\nHere is one worked through: \"Everyone in my family ___ tall.\" The subject is \"everyone\", which looks like a group but is grammatically singular, so it takes \"is\": \"Everyone in my family is tall.\"\nThe rule in one line: match the verb to the real subject, not the nearest noun; I takes am, singular subjects take is, you and plural subjects take are.\nRight: \"The keys on the table are mine.\" Wrong: \"The keys on the table is mine.\"\nNow a harder one, and tell me in one phrase what you matched it to. Fill in am, is or are: The price of these shoes ___ too high."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHappy to. Since you know the basic pattern, let's work on the tricky subjects, where learners most often slip.\nHere is one worked through: \"Everyone in my family ___ tall.\" The subject is \"everyone\", which looks like a group but is grammatically singular, so it takes \"is\": \"Everyone in my family is tall.\"\nThe rule in one line: match the verb to the real subject, not the nearest noun; I takes am, singular subjects take is, you and plural subjects take are.\nRight: \"The keys on the table are mine.\" Wrong: \"The keys on the table is mine.\"\nNow a harder one, and tell me in one phrase what you matched it to. Fill in am, is or are: The price of these shoes ___ too high.",
+   "stateBefore": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I takes am, singular subjects take is, you and plural subjects take are"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: \"The keys on the table are mine.\" Wrong: \"The keys on the table is mine.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "is",
+    "errors": {}
+   },
+   "applied": [
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "is",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "is"
+   }
   }
  ],
  "stateAfterS1": {

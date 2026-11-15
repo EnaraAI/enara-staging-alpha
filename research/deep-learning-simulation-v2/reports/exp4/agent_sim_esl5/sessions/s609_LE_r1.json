@@ -534,7 +534,70 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nAbsolutely. You already handle the basic pairings (I am, she is, they are) well, so let's push into the trickier spots.\n\nQuick recall first: what form of be follows \"Everyone\"? Keep that in mind, because subject agreement gets harder when the subject is long, collective or separated from the verb.\n\nNuance worth noticing: in \"The keys to the cupboard are missing\", the verb agrees with \"keys\", not \"cupboard\". With \"There\" sentences, the noun after the verb decides: \"There is a problem\" but \"There are two problems.\"\n\nYour task: write two sentences of your own using am, is or are, one with a long subject (such as \"The list of ...\") and one starting with \"There\". I'll check the agreement in both."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nAbsolutely. You already handle the basic pairings (I am, she is, they are) well, so let's push into the trickier spots.\n\nQuick recall first: what form of be follows \"Everyone\"? Keep that in mind, because subject agreement gets harder when the subject is long, collective or separated from the verb.\n\nNuance worth noticing: in \"The keys to the cupboard are missing\", the verb agrees with \"keys\", not \"cupboard\". With \"There\" sentences, the noun after the verb decides: \"There is a problem\" but \"There are two problems.\"\n\nYour task: write two sentences of your own using am, is or are, one with a long subject (such as \"The list of ...\") and one starting with \"There\". I'll check the agreement in both.",
+   "stateBefore": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "With \"There\" sentences, the noun after the verb decides: \"There is a problem\" but \"There are two problems.\""
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The keys to my car are on the table.",
+    "errors": {
+     "W1": "The keys to my car on the table.",
+     "W2": "The keys to my car is on the table."
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The keys to my car is on the table.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "The keys to my car is on the table."
+   }
   }
  ],
  "stateAfterS1": {

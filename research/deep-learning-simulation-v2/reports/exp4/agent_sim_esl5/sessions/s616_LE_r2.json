@@ -547,7 +547,69 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi again! Good to pick this up.\n\nLet's start from what you remember rather than from me explaining. Most third-person verbs just take -s, but the spelling changes for some endings, and some subjects are easy to miss, such as \"each student\" or \"the company\".\n\nHere is a short independent task. Write two sentences about a colleague's or friend's weekly routine:\n- one with a verb that ends in a consonant + y or in -o,\n- one where the subject comes after a phrase, e.g. a sentence beginning \"On Mondays, ...\".\n\nAfterwards, tell me in a few words why the verb in your first sentence is spelled the way it is. Then we can try a quick check."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi again! Good to pick this up.\n\nLet's start from what you remember rather than from me explaining. Most third-person verbs just take -s, but the spelling changes for some endings, and some subjects are easy to miss, such as \"each student\" or \"the company\".\n\nHere is a short independent task. Write two sentences about a colleague's or friend's weekly routine:\n- one with a verb that ends in a consonant + y or in -o,\n- one where the subject comes after a phrase, e.g. a sentence beginning \"On Mondays, ...\".\n\nAfterwards, tell me in a few words why the verb in your first sentence is spelled the way it is. Then we can try a quick check.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 2
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Most third-person verbs just take -s"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My friend studies French every week.",
+    "errors": {
+     "W1": "My friend study French every week.",
+     "W2": "My friend studys French every week."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My friend studies French every week.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My friend studies French every week."
+   }
   }
  ],
  "stateAfterS1": {

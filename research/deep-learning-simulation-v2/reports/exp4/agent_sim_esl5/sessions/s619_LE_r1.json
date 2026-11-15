@@ -574,7 +574,75 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure, happy to. Quick recall first: you already know that he, she and it take the -s form in the present simple.\n\nLet's push it a bit further. The tricky parts are usually the spelling: -es after -sh, -ch, -s, -x and -o, -ies after a consonant plus y, but plain -s after a vowel plus y. Subjects like \"my family\" or \"each student\" also count as \"it\" or \"he/she\".\n\nYour task: write two sentences describing a colleague's or classmate's weekly routine. Use one verb that needs -es and one that needs -ies, and make one subject a phrase such as \"Each student\".\n\nAfterwards, briefly explain the spelling choice in one of them."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure, happy to. Quick recall first: you already know that he, she and it take the -s form in the present simple.\n\nLet's push it a bit further. The tricky parts are usually the spelling: -es after -sh, -ch, -s, -x and -o, -ies after a consonant plus y, but plain -s after a vowel plus y. Subjects like \"my family\" or \"each student\" also count as \"it\" or \"he/she\".\n\nYour task: write two sentences describing a colleague's or classmate's weekly routine. Use one verb that needs -es and one that needs -ies, and make one subject a phrase such as \"Each student\".\n\nAfterwards, briefly explain the spelling choice in one of them.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "he, she and it take the -s form in the present simple"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "-es after -sh, -ch, -s, -x and -o, -ies after a consonant plus y"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Each student studies on Mondays.",
+    "errors": {
+     "W1": "Each student study on Mondays.",
+     "W2": "Each student studys on Mondays."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Each student studies on Mondays.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Each student studies on Mondays."
+   }
   }
  ],
  "stateAfterS1": {

@@ -508,7 +508,69 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure. Since the basic a/an choice is familiar ground, let's push into the harder cases.\n\nOne nuance: a/an follows sound, so we write an honest person but a European city, because \"honest\" starts with a vowel sound and \"European\" with a \"y\" sound.\n\nAnother: we often use the the first time we mention something if the context makes it clear which one we mean. For example, \"I got off the bus and the driver smiled\": the driver hasn't been mentioned, but we know which driver.\n\nHere is your task: write a short pair of sentences about a recent trip. Introduce something new with a or an, then refer to a related thing with the even though you haven't mentioned it before."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure. Since the basic a/an choice is familiar ground, let's push into the harder cases.\n\nOne nuance: a/an follows sound, so we write an honest person but a European city, because \"honest\" starts with a vowel sound and \"European\" with a \"y\" sound.\n\nAnother: we often use the the first time we mention something if the context makes it clear which one we mean. For example, \"I got off the bus and the driver smiled\": the driver hasn't been mentioned, but we know which driver.\n\nHere is your task: write a short pair of sentences about a recent trip. Introduce something new with a or an, then refer to a related thing with the even though you haven't mentioned it before.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "a/an follows sound, so we write an honest person but a European city"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "We stayed in an old hotel, and the owner was kind.",
+    "errors": {
+     "W1": "We stayed in old hotel, and the owner was kind.",
+     "W2": "We stayed in a old hotel, and the owner was kind."
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "We stayed in an old hotel, and the owner was kind.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "We stayed in an old hotel, and the owner was kind."
+   }
   }
  ],
  "stateAfterS1": {
