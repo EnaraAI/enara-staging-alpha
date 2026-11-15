@@ -545,10 +545,56 @@ const GAP = /_{2,}|\.{3}\s*[.?!]?\s*$|…|\[\s*\]|\(\s*\)/m;
 
 /** The learner ask of a closing recap ("Tell me the rule in your own words", "Now write one new example of your own"), as sentences. */
 export const CLOSING_ASK_SENTENCE = /[^.?!\n]*\b(?:tell me the rule in your own words|in your own words|write one (?:new )?example of your own)\b[^.?!\n]*[.?!]?/gi;
-/** Two asks in one reply: a closing ask AND a separate task. The closing ask itself is not counted as the task (it starts with "tell me" / "write"). */
+// One-task rule (ESL stage 3, step 1): a reply sets exactly one task. learnerAsks() reads a reply sentence by sentence and returns its tasks.
+// Not tasks: a feedback label ("Correct: ..."), a rule statement in the imperative ("Use am with I ...", "add -es after -sh ..."), and a sentence that only
+// restates the closing ask's format ("Write one short sentence: which word goes with I?"), which belongs to the closing ask (one task, not two).
+const CLOSING_ONE = /\b(?:tell me the rule\b|in your own words|write one (?:new )?example of your own)/i;
+const ASK_VERB = /^(?:(?:now|please|then|and|so|next)[,\s]+)?(write|complete|fill( in)?|choose|pick|circle|try|tell me|make|correct|fix|rewrite|change|put|answer|translate|use|say|describe|order|match|add|send me|type|give me|finish|listen|look at)\b/i;
+const FEEDBACK_LABEL = /^(?:correct|right|yes|good|well done|not quite)\s*[:!.,-]/i;
+const POINTER = /^(?:(?:now|so|first)[,\s]+)?(?:look at|listen to|think about|remember)\b/i;
+const RULE_IMPERATIVE = /^(?:use|add|choose|put|change)\b[^?_…]*\b(?:with|before|after|by|when|for)\b/i;
+const CLOSING_FORMAT = /^(?:(?:you can )?start (?:it )?like this\b|write (?:it in )?(?:one|a) (?:short )?sentence\b|(?:which|what|when|how)\b[^?]{0,60}\?$|try to (?:cover|include|mention)\b|one (?:short )?sentence\b)/i;
+const sentencesOf = (reply: string): string[][] => reply.split(/\n+/).map((l) => l.trim().replace(/^[-•*>\d.)\s]+/, '')).filter(Boolean).map((l) => l.split(/(?<=[.!?])\s+(?=\S)/).map((s) => s.trim()).filter(Boolean));
+/** The tasks a reply sets for the learner, in order. The closing ask and the sentences that only restate its format count as ONE task ('closing'). */
+export function learnerAsks(reply: string): Array<{ kind: 'closing' | 'question' | 'gap' | 'instruction'; text: string }> {
+  type Ask = { kind: 'closing' | 'question' | 'gap' | 'instruction'; text: string };
+  // Sentences that ask for something, in order; a sentence that asks nothing breaks a run. Adjacent asking sentences are ONE task (an exercise item and
+  // its question or instruction: "So we say ___ orange. Which word goes there: a or an?"). The closing ask and its format note are one task of their own.
+  const out: Ask[] = []; let open: Ask | undefined; let inClosing = false;
+  for (const line of sentencesOf(reply)) {
+    for (const s of line) {
+      if (CLOSING_ONE.test(s)) { if (!inClosing) out.push({ kind: 'closing', text: s }); else out[out.length - 1].text += ` ${s}`; inClosing = true; open = undefined; continue; }
+      if (inClosing && CLOSING_FORMAT.test(s)) { out[out.length - 1].text += ` ${s}`; continue; }
+      inClosing = false;
+      let kind: Ask['kind'] | undefined;
+      if (FEEDBACK_LABEL.test(s) && !/[?]$/.test(s) && !GAP.test(s)) kind = undefined;
+      else if (GAP.test(s)) kind = 'gap';
+      else if (/[?؟]\s*$/.test(s)) kind = 'question';
+      else if (ASK_VERB.test(s) && !RULE_IMPERATIVE.test(s) && !POINTER.test(s)) kind = 'instruction';
+      if (!kind) { if (!POINTER.test(s)) open = undefined; continue; }
+      if (open) { open.text += ` ${s}`; if (kind === 'gap') open.kind = 'gap'; continue; }
+      open = { kind, text: s }; out.push(open);
+    }
+  }
+  return out;
+}
+/** Two asks in one reply: the closing ask (with its format note, one task) AND another task in the same reply. A reply without the closing ask is one
+ *  exercise turn: its item, worked example and question about that item are the one task the turn sets, and the engine's other guards cover it. */
 export function hasTwoAsks(reply: string): boolean {
-  if (!(askedForRule(reply) || askedNewExample(reply))) return false;
-  return Boolean(taskInvitation(reply.replace(CLOSING_ASK_SENTENCE, ' ')));
+  const a = learnerAsks(reply);
+  return a.some((x) => x.kind === 'closing') && a.some((x) => x.kind !== 'closing');
+}
+/** levelExplicit one-task guard: when a reply carries the closing ask AND another task, the closing ask (with its format note) is removed; the task stays and the ask is deferred. */
+export function enforceSingleAsk(reply: string): { text: string; droppedClosing: boolean } {
+  const asks = learnerAsks(reply);
+  if (!hasTwoAsks(reply)) return { text: reply, droppedClosing: false };
+  const lines = reply.split('\n').map((line) => {
+    const parts = line.split(/(?<=[.!?])\s+(?=\S)/); let inC = false;
+    const kept = parts.filter((p) => { const s = p.trim().replace(/^[-•*>\d.)\s]+/, ''); if (CLOSING_ONE.test(s)) { inC = true; return false; } if (inC && CLOSING_FORMAT.test(s)) return false; inC = false; return true; });
+    return { line: kept.join(' '), dropped: kept.length < parts.length };
+  });
+  const text = lines.filter((l) => !(l.dropped && !l.line.trim())).map((l) => l.line).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  return { text, droppedClosing: true };
 }
 export function taskInvitation(reply: string): InvitationKind | undefined {
   const tail = reply.trim().slice(-400);

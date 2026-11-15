@@ -4,7 +4,7 @@
 // channel stops using the shared functions or if the policy version differs between them.
 import {
   buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, independentSuccessItem, turnEvidence, LANGUAGE_CONTEXT_VERSION,
-  isClosingTurn, askedForRule, askedNewExample, taskInvitation,
+  isClosingTurn, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk,
   type LanguageTeachingContext, type LanguageTurnEvidence,
 } from './languageTeachingContext';
 import { recordProfileTurn } from './learnerLanguageProfile';
@@ -59,6 +59,12 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
         text = `Rule in one line: ${ruleLineFor(language)}\n\nThen your task:\n${text.trimStart()}`; closingAsk = 'folded';
       } else closingAsk = 'deferred';
     }
+  }
+  // levelExplicit one-task rule: a reply sets exactly one task. If the model wrote the closing ask next to another task, the ask is removed and deferred
+  // (it comes back on the next task-free reply, or folded, as above). The folded form ("Rule in one line ... Then your task") holds no ask and is left alone.
+  if (engineV2('levelExplicit') && !FOLDED.test(text)) {
+    const one = enforceSingleAsk(text);
+    if (one.droppedClosing) { text = one.text; closingAsk = 'deferred'; }
   }
   return { text, removed, ...(closingAsk ? { closingAsk } : {}) };
 }
