@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 2,
-   "C2": 2
+   "C2": 3
   }
  },
  "start": {
@@ -416,7 +416,64 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure.\nSince this is mostly secure for you, let's push it a bit further with an independent task.\nWrite two sentences about a colleague's or friend's daily routine. One should use a verb ending in -o or -ss (for example, do or miss); the other should use a verb ending in a vowel + y (for example, enjoy or stay).\nThen explain briefly: why does the vowel + y verb keep its y, unlike study?\n\nLEARNER'S LAST MESSAGE:\nShe does her homework every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She does her homework every evening\" is correct: do ends in -o, so it takes -es.\nThat covers the first part. The second sentence is still missing: write one about the same person's routine using a verb that ends in a vowel + y (enjoy or stay are the type I mean, but choose your own).\nThen add a short explanation of why that verb keeps its y, while a verb like study does not."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure.\nSince this is mostly secure for you, let's push it a bit further with an independent task.\nWrite two sentences about a colleague's or friend's daily routine. One should use a verb ending in -o or -ss (for example, do or miss); the other should use a verb ending in a vowel + y (for example, enjoy or stay).\nThen explain briefly: why does the vowel + y verb keep its y, unlike study?\n\nLEARNER'S LAST MESSAGE:\nShe does her homework every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She does her homework every evening\" is correct: do ends in -o, so it takes -es.\nThat covers the first part. The second sentence is still missing: write one about the same person's routine using a verb that ends in a vowel + y (enjoy or stay are the type I mean, but choose your own).\nThen add a short explanation of why that verb keeps its y, while a verb like study does not.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"She does her homework every evening\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"She does her homework every evening\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "do ends in -o, so it takes -es"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "She enjoys her job.",
+    "errors": {
+     "W1": "She enjoy her job."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "She enjoys her job.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She enjoys her job."
+   }
   }
  ],
  "stateAfterS1": {

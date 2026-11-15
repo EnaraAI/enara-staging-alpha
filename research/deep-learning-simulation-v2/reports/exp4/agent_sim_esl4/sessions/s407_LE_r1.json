@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 2
+   "C2": 3
   }
  },
  "start": {
@@ -427,7 +427,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nOf course. Let's start with recall: you clearly know the basic -s after he, she and it, so today let's sharpen the trickier spellings.\nThe -s ending has three forms. Plain -s covers most verbs (reads, plays). Verbs ending in -sh, -ch, -s, -x or -o take -es, because the extra vowel makes the ending pronounceable (pushes, does). Consonant + y becomes -ies (carries), while vowel + y simply adds -s (enjoys).\nYour task: write two sentences about a friend's weekly habits. Use one verb that needs -es and one that needs -ies, choosing verbs we have not mentioned. Then tell me in one line why \"enjoy\" does not change its y.\n\nLEARNER'S LAST MESSAGE:\nMy friend washes her car every Sunday.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My friend washes her car every Sunday.\" is correct: \"wash\" ends in -sh, so -es is the right spelling, and \"every Sunday\" fits a weekly habit well.\nThat covers the -es part. Two parts of the task are still open, so let's do them one at a time.\nNext: write one sentence about your friend's weekly habits with a verb that needs -ies (consonant + y). Choose a verb we haven't mentioned, so not \"carry\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nOf course. Let's start with recall: you clearly know the basic -s after he, she and it, so today let's sharpen the trickier spellings.\nThe -s ending has three forms. Plain -s covers most verbs (reads, plays). Verbs ending in -sh, -ch, -s, -x or -o take -es, because the extra vowel makes the ending pronounceable (pushes, does). Consonant + y becomes -ies (carries), while vowel + y simply adds -s (enjoys).\nYour task: write two sentences about a friend's weekly habits. Use one verb that needs -es and one that needs -ies, choosing verbs we have not mentioned. Then tell me in one line why \"enjoy\" does not change its y.\n\nLEARNER'S LAST MESSAGE:\nMy friend washes her car every Sunday.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My friend washes her car every Sunday.\" is correct: \"wash\" ends in -sh, so -es is the right spelling, and \"every Sunday\" fits a weekly habit well.\nThat covers the -es part. Two parts of the task are still open, so let's do them one at a time.\nNext: write one sentence about your friend's weekly habits with a verb that needs -ies (consonant + y). Choose a verb we haven't mentioned, so not \"carry\".",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "is correct: \"wash\" ends in -sh, so -es is the right spelling"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My friend studies English every Monday.",
+    "errors": {
+     "W1": "My friend study English every Monday.",
+     "W2": "My friend studys English every Monday."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My friend studies English every Monday.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My friend studies English every Monday."
+   }
   }
  ],
  "stateAfterS1": {

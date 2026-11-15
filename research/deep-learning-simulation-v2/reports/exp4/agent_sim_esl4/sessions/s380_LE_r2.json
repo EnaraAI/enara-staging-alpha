@@ -14,7 +14,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   }
  },
@@ -433,7 +433,59 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! You already know \"I eat\" and \"we eat\".\nStep by step: Tariq eats lunch at one. Step 1: Tariq = he. Step 2: after he, the verb needs -s, so eat becomes eats.\nThe rule: after he, she or it, add -s or -es to the verb.\nRight: Elena sleeps after lunch. Wrong: Elena sleep after lunch.\nYour turn. Write only the verb:\nMy boss ___ (work) late every Monday.\n\nLEARNER'S LAST MESSAGE:\nworks\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's correct: \"works\". My boss is one person (he or she), so work gets -s.\nNow try this sentence from the course. Subject first, then the verb.\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! You already know \"I eat\" and \"we eat\".\nStep by step: Tariq eats lunch at one. Step 1: Tariq = he. Step 2: after he, the verb needs -s, so eat becomes eats.\nThe rule: after he, she or it, add -s or -es to the verb.\nRight: Elena sleeps after lunch. Wrong: Elena sleep after lunch.\nYour turn. Write only the verb:\nMy boss ___ (work) late every Monday.\n\nLEARNER'S LAST MESSAGE:\nworks\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's correct: \"works\". My boss is one person (he or she), so work gets -s.\nNow try this sentence from the course. Subject first, then the verb.\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "That's correct: \"works\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "That's correct: \"works\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "play",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "play"
+   }
   }
  ],
  "stateAfterS1": {

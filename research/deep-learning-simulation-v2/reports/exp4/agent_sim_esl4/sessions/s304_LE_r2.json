@@ -421,7 +421,54 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 1: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, we can practise today.\nYou know \"I am\" from \"I am ...\" sentences. Let me think aloud with one example.\n\"He is a teacher.\" I look at the first word: \"He\". \"He\" goes with \"is\".\nThe rule: I takes am; he, she and it take is; you, we and they take are.\nRight: He is a teacher. Wrong: He a teacher.\nNow you: You ___ a teacher. Write the missing word.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nThat is fine. Let's look at it together.\nThis sentence needs one word between \"You\" and \"a teacher\". It cannot be empty.\nLook at the first word, \"You\". Then check the rule: which word goes with you?\nNow try again. Write the missing word:\nYou ___ a teacher."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 1: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, we can practise today.\nYou know \"I am\" from \"I am ...\" sentences. Let me think aloud with one example.\n\"He is a teacher.\" I look at the first word: \"He\". \"He\" goes with \"is\".\nThe rule: I takes am; he, she and it take is; you, we and they take are.\nRight: He is a teacher. Wrong: He a teacher.\nNow you: You ___ a teacher. Write the missing word.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nThat is fine. Let's look at it together.\nThis sentence needs one word between \"You\" and \"a teacher\". It cannot be empty.\nLook at the first word, \"You\". Then check the rule: which word goes with you?\nNow try again. Write the missing word:\nYou ___ a teacher.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "This sentence needs one word between \"You\" and \"a teacher\". It cannot be empty."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 0,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "are",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "are"
+   }
   }
  ],
  "stateAfterS1": {

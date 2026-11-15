@@ -446,7 +446,47 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, let's practise! You know \"I work.\" Look at this:\nI work. → She works.\nI see \"she\", so I add -s to the verb.\nRule: after he, she or it, add -s to the verb.\nRight: \"He reads a book.\" Wrong: \"He read a book.\"\nNow you. Write the verb only:\nMy dad ___ (teach) English.\n\nLEARNER'S LAST MESSAGE:\nteachs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nGood: you added an ending after \"My dad\". That part is right.\nNow look at the last letters of \"teach\".\nSome verbs end in letters that make \"s\" hard to say. These verbs need one more letter before the \"s\".\nTry again. Write the verb only:\nMy dad ___ (teach) English."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, let's practise! You know \"I work.\" Look at this:\nI work. → She works.\nI see \"she\", so I add -s to the verb.\nRule: after he, she or it, add -s to the verb.\nRight: \"He reads a book.\" Wrong: \"He read a book.\"\nNow you. Write the verb only:\nMy dad ___ (teach) English.\n\nLEARNER'S LAST MESSAGE:\nteachs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nGood: you added an ending after \"My dad\". That part is right.\nNow look at the last letters of \"teach\".\nSome verbs end in letters that make \"s\" hard to say. These verbs need one more letter before the \"s\".\nTry again. Write the verb only:\nMy dad ___ (teach) English.",
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "teaches",
+    "errors": {
+     "W1": "teach",
+     "W2": "teachs"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 3,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "teachs",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W2",
+    "text": "teachs"
+   }
   }
  ],
  "stateAfterS1": {

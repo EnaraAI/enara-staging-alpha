@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 2
+   "C2": 3
   }
  },
  "start": {
@@ -425,7 +425,64 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. Before we start, a quick recall: what are the spelling changes for the third person singular beyond simply adding -s? Keep them in mind for the task below.\nYou clearly have the basic pattern, so let's sharpen the trickier part: the -es and -ies spellings, plus irregular forms like \"have\" and \"do\".\nHere is a short independent task. Write three sentences about the daily routine of someone you know (a friend, a colleague or a neighbour), using he or she. Use at least one verb ending in -sh or -ch, one ending in a consonant + y, and one of \"have\", \"do\" or \"go\".\nAfter you write them, tell me in one line why the consonant + y verb changes its spelling while a verb like \"enjoy\" does not.\n\nLEARNER'S LAST MESSAGE:\nShe watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She watches TV every evening.\" is correct: \"watch\" ends in -ch, so it takes -es, and the sentence describes a routine clearly.\nLet's switch to a focused item next, to check a different ending.\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. Before we start, a quick recall: what are the spelling changes for the third person singular beyond simply adding -s? Keep them in mind for the task below.\nYou clearly have the basic pattern, so let's sharpen the trickier part: the -es and -ies spellings, plus irregular forms like \"have\" and \"do\".\nHere is a short independent task. Write three sentences about the daily routine of someone you know (a friend, a colleague or a neighbour), using he or she. Use at least one verb ending in -sh or -ch, one ending in a consonant + y, and one of \"have\", \"do\" or \"go\".\nAfter you write them, tell me in one line why the consonant + y verb changes its spelling while a verb like \"enjoy\" does not.\n\nLEARNER'S LAST MESSAGE:\nShe watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She watches TV every evening.\" is correct: \"watch\" ends in -ch, so it takes -es, and the sentence describes a routine clearly.\nLet's switch to a focused item next, to check a different ending.\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"She watches TV every evening.\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "She watches TV every evening."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"watch\" ends in -ch, so it takes -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "plays",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "plays"
+   }
   }
  ],
  "stateAfterS1": {

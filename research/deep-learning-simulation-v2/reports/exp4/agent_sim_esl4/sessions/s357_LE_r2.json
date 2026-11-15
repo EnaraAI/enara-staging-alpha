@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 0,
-   "C2": 1
+   "C2": 2
   }
  },
  "start": {
@@ -433,7 +433,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, let's practise. We begin with a and an.\n\nWatch my steps: I had ___ egg for breakfast. First, I say the word: \"egg\". Next, I hear the first sound. It is a vowel sound. So I write \"an egg\".\n\nRule: use an before a vowel sound and a before other sounds.\n\nRight: I have a bike. Wrong: I have an bike.\n\nYour turn. Write a or an: My sister has ___ cat.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's right: \"a\". The word \"cat\" begins with a consonant sound, so a is the correct choice.\n\nHere is the next one:\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, let's practise. We begin with a and an.\n\nWatch my steps: I had ___ egg for breakfast. First, I say the word: \"egg\". Next, I hear the first sound. It is a vowel sound. So I write \"an egg\".\n\nRule: use an before a vowel sound and a before other sounds.\n\nRight: I have a bike. Wrong: I have an bike.\n\nYour turn. Write a or an: My sister has ___ cat.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's right: \"a\". The word \"cat\" begins with a consonant sound, so a is the correct choice.\n\nHere is the next one:\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "That's right: \"a\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "That's right: \"a\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   }
   }
  ],
  "stateAfterS1": {

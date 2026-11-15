@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 2
+   "C2": 3
   }
  },
  "start": {
@@ -433,7 +433,66 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. Quick recall first, without looking anything up: you already handle the basic -s after he, she and it, so let's push into the spelling edges.\nThe third-person -s has three spellings. Most verbs take plain -s (works, plays). Verbs ending in a sibilant sound or in -o take -es (fixes, goes). Verbs ending in consonant + y switch to -ies (studies), but vowel + y keeps the y (stays). Two irregulars sit outside the pattern: have becomes has, and be becomes is.\nYour task: write two sentences about someone's daily routine, using one verb from the -es group and one from the -ies group. Then add one line explaining why \"pays\" keeps its y.\n\nLEARNER'S LAST MESSAGE:\nShe fixes her bike every morning.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She fixes her bike every morning.\" is correct: \"fix\" ends in -x, so it takes -es, and you used it naturally in a routine.\nThat covers the -es group. The task had two more parts, so let's take them one at a time.\nNext: write one sentence about the same person's routine using a verb from the -ies group (consonant + y). Pick a verb we haven't used so far, so not \"study\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. Quick recall first, without looking anything up: you already handle the basic -s after he, she and it, so let's push into the spelling edges.\nThe third-person -s has three spellings. Most verbs take plain -s (works, plays). Verbs ending in a sibilant sound or in -o take -es (fixes, goes). Verbs ending in consonant + y switch to -ies (studies), but vowel + y keeps the y (stays). Two irregulars sit outside the pattern: have becomes has, and be becomes is.\nYour task: write two sentences about someone's daily routine, using one verb from the -es group and one from the -ies group. Then add one line explaining why \"pays\" keeps its y.\n\nLEARNER'S LAST MESSAGE:\nShe fixes her bike every morning.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She fixes her bike every morning.\" is correct: \"fix\" ends in -x, so it takes -es, and you used it naturally in a routine.\nThat covers the -es group. The task had two more parts, so let's take them one at a time.\nNext: write one sentence about the same person's routine using a verb from the -ies group (consonant + y). Pick a verb we haven't used so far, so not \"study\".",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"fix\" ends in -x, so it takes -es"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "She fixes her bike every morning."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "She tries to run every morning.",
+    "errors": {
+     "W1": "She try to run every morning.",
+     "W2": "She trys to run every morning."
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "She tries to run every morning.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She tries to run every morning."
+   }
   }
  ],
  "stateAfterS1": {

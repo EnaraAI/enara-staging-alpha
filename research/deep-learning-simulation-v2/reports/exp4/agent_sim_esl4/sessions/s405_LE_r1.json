@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 0,
-   "C2": 0
+   "C2": 1
   }
  },
  "start": {
@@ -372,7 +372,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure. Let's start with recall: how do you decide between \"a\" and \"an\" - by spelling or by sound?\n\nA useful test case: \"a European city\" versus \"an MBA student\". \"European\" starts with a vowel letter but a /j/ sound, so it takes \"a\". \"MBA\" starts with a consonant letter, but we say \"em\", a vowel sound, so it takes \"an\". In short, the article follows the first sound you hear, not the first letter you see. So \"an one-way ticket\" is wrong, while \"a one-way ticket\" is right, because \"one\" begins with a /w/ sound.\n\nYour task: write two original sentences - one with \"a\" before a vowel letter, one with \"an\" before a consonant letter - and explain in a phrase why each article is correct.\n\nLEARNER'S LAST MESSAGE:\nShe wears a uniform.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She wears a uniform.\" is accurate: a vowel letter at the start, but the article is still \"a\". That covers the first half of the task.\n\nThe other half is still missing: a sentence with \"an\" before a word whose first letter is a consonant. My example used an abbreviation, so try to find a different kind of word, ideally one with a silent first letter.\n\nWrite that one sentence. Then add a short phrase that explains the article choice in both sentences."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure. Let's start with recall: how do you decide between \"a\" and \"an\" - by spelling or by sound?\n\nA useful test case: \"a European city\" versus \"an MBA student\". \"European\" starts with a vowel letter but a /j/ sound, so it takes \"a\". \"MBA\" starts with a consonant letter, but we say \"em\", a vowel sound, so it takes \"an\". In short, the article follows the first sound you hear, not the first letter you see. So \"an one-way ticket\" is wrong, while \"a one-way ticket\" is right, because \"one\" begins with a /w/ sound.\n\nYour task: write two original sentences - one with \"a\" before a vowel letter, one with \"an\" before a consonant letter - and explain in a phrase why each article is correct.\n\nLEARNER'S LAST MESSAGE:\nShe wears a uniform.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She wears a uniform.\" is accurate: a vowel letter at the start, but the article is still \"a\". That covers the first half of the task.\n\nThe other half is still missing: a sentence with \"an\" before a word whose first letter is a consonant. My example used an abbreviation, so try to find a different kind of word, ideally one with a silent first letter.\n\nWrite that one sentence. Then add a short phrase that explains the article choice in both sentences.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"She wears a uniform.\" is accurate"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "is accurate"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "He is an honest man.",
+    "errors": {
+     "W1": "He is honest man.",
+     "W2": "He is a honest man."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "He is an honest man.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "He is an honest man."
+   }
   }
  ],
  "stateAfterS1": {
