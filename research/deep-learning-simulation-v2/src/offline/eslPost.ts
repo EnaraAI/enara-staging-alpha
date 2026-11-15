@@ -13,9 +13,10 @@ const shuffle = <T>(arr: T[], seed: string): T[] => [...arr].map((x, i) => ({ x,
 const [cmd, a1, a2, a3] = process.argv.slice(2);
 interface Turn { learner: string; tutor?: string; [k: string]: unknown }
 interface Session { arm: Arm; studentIdx: number; band: string; form: Form; status: string; persona: string; turns: Turn[] }
+const TURNS = Number(process.env.ESL_TURNS ?? 4); // sessions are cut to 4 tutor turns (PROTOCOL.md addendum 2)
 const loadSession = (dir: string, idx: number, arm: Arm): Session => {
   const f = path.join(dir, 'sessions', `s${idx}_${arm}.json`); const s = JSON.parse(readFileSync(f, 'utf8')) as Session;
-  if (s.turns.length < 6 || s.turns.some((t) => t.tutor === undefined)) throw new Error(`session ${f} is not complete (${s.turns.length} turns)`); return s;
+  if (s.turns.length < TURNS || s.turns.slice(0, TURNS).some((t) => t.tutor === undefined)) throw new Error(`session ${f} is not complete (${s.turns.length} turns)`); s.turns = s.turns.slice(0, TURNS); return s;
 };
 const dlg = (s: Session) => s.turns.map((t) => `STUDENT: ${t.learner}\nTUTOR: ${t.tutor}`).join('\n');
 const FILLER = 'Unrelated task (do it as the learner would, then go on): write three numbers between 1 and 100 and say which one is the biggest.';
@@ -25,8 +26,8 @@ if (cmd === 'postprep') {
   const dir = a1; const out = a2; mkdirSync(out, { recursive: true });
   const jobs = STUDENTS.flatMap((es) => ARMS.map((arm) => ({ es, arm, s: loadSession(dir, es.idx, arm) })));
   // 3 cases per agent, from 3 different students (an agent never sees two lessons of the same student), arms mixed.
-  const order = shuffle(jobs, 'esl1-post-order'); const groups: typeof jobs[] = [];
-  for (const j of order) { let g = groups.find((x) => x.length < 3 && !x.some((y) => y.es.idx === j.es.idx)); if (!g) { g = []; groups.push(g); } g.push(j); }
+  const PER_POST = Number(process.env.ESL_POST_PER ?? 6); const order = shuffle(jobs, 'esl1-post-order'); const groups: typeof jobs[] = [];
+  for (const j of order) { let g = groups.find((x) => x.length < PER_POST && !x.some((y) => y.es.idx === j.es.idx)); if (!g) { g = []; groups.push(g); } g.push(j); }
   const flagsFor = (idx: number, blockId: string, itemId: string, stage: string) => {
     const b = itemBehaviour(makeStudent(idx, SEED), blockId, itemId, stage, 3);
     return [b.lapse ? 'Right now you are distracted: answer quickly and carelessly, without checking.' : '', b.guess ? 'You are not sure and you just guess (or repeat a pattern you memorised without understanding).' : '', b.slip ? 'This point is hard for you: in this answer you slip and make a typical error.' : ''].filter(Boolean).join(' ');
@@ -34,7 +35,7 @@ if (cmd === 'postprep') {
   const fmtItems = (es: typeof STUDENTS[number], version: 'v1' | 'v2', stage: string) => postItems(es.form, es.band, version).map((it, k) => { const d = flagsFor(es.idx, es.blockId, it.id, stage); return `Q${k + 1} [${it.id}]${d ? ` (directive: ${d})` : ''}\n${it.prompt}`; }).join('\n\n');
   groups.forEach((g, n) => {
     const id = `pt${String(n + 1).padStart(2, '0')}`;
-    let t = 'You will answer short English-language questions as three different learners, one after the other. Treat each CASE as completely separate: use only that learner\'s card and that learner\'s own lesson conversation. Answer every question as that learner would: use what the lesson taught to the extent the learner would have learned and kept it, keep the typical mistake if the lesson did not convince the learner, and follow the directive for a question if there is one. For "answer with only the missing word" questions write only that word; for "write two sentences" questions write exactly two sentences.\n';
+    let t = 'You will answer short English-language questions as several different learners, one after the other. Treat each CASE as completely separate: use only that learner\'s card and that learner\'s own lesson conversation. Answer every question as that learner would: use what the lesson taught to the extent the learner would have learned and kept it, keep the typical mistake if the lesson did not convince the learner, and follow the directive for a question if there is one. For "answer with only the missing word" questions write only that word; for "write two sentences" questions write exactly two sentences.\n';
     for (const j of g) {
       t += `\n\n=========== CASE ${caseId(j.es.idx, j.arm)} ===========\nLEARNER CARD:\n${j.s.persona}\n\nTHE LEARNER'S RECENT LESSON (this is all the learner remembers being taught):\n${dlg(j.s)}\n\nPART 1: the learner answers 8 questions ALONE (no tutor, no notes, no help).\n\n${fmtItems(j.es, 'v1', 'post')}\n\n${FILLER}\n\nPART 2: 8 more questions, again alone.\n\n${fmtItems(j.es, 'v2', 'cons')}\n`;
     }
@@ -62,7 +63,7 @@ if (cmd === 'postprep') {
 } else if (cmd === 'freeprep') {
   const out = a1; const pass = a2; const free = JSON.parse(readFileSync(path.join(out, 'FREE_RESPONSES.json'), 'utf8')) as any[];
   const withId = free.map((r) => ({ ...r, rid: `r${sha(`${r.case}|${r.version}|${r.itemId}|esl1-free`).slice(0, 8)}` }));
-  const order = shuffle(withId, `esl1-free-order-${pass}`); const per = 24; const key: any[] = [];
+  const order = shuffle(withId, `esl1-free-order-${pass}`); const per = Number(process.env.ESL_FREE_PER ?? 48); const key: any[] = [];
   for (let n = 0; n * per < order.length; n++) {
     const chunk = order.slice(n * per, (n + 1) * per); const id = `fs${String(n + 1).padStart(2, '0')}_p${pass}`;
     let t = `Batch ${id}. Score each response (2 sentences) with the rubric printed above it. Output JSON {"batch":"${id}","scores":{"<response id>":[s1,s2],...}} to the file named in your task.\n`;
@@ -93,8 +94,9 @@ if (cmd === 'postprep') {
     arms.forEach((a, k) => { map[labels[k]] = a; }); return { es, map };
   });
   const order = shuffle(cases, `esl1-rate-order-${pass}`); const key: Record<string, any> = {};
-  for (let n = 0; n * 3 < order.length; n++) {
-    const chunk = order.slice(n * 3, n * 3 + 3); const id = `rt${String(n + 1).padStart(2, '0')}_p${pass}`; let t = `Batch ${id}. Rate every case as described in the rater instructions, and write the JSON to the file named in your task.\n`;
+  const PER_RATE = Number(process.env.ESL_RATE_PER ?? 6);
+  for (let n = 0; n * PER_RATE < order.length; n++) {
+    const chunk = order.slice(n * PER_RATE, (n + 1) * PER_RATE); const id = `rt${String(n + 1).padStart(2, '0')}_p${pass}`; let t = `Batch ${id}. Rate every case as described in the rater instructions, and write the JSON to the file named in your task.\n`;
     key[id] = {};
     for (const c of chunk) {
       const cid = `c${sha(`${c.es.idx}|esl1-case`).slice(0, 6)}`; key[id][cid] = { studentIdx: c.es.idx, labels: c.map };
