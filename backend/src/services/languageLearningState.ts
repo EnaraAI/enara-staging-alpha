@@ -461,7 +461,7 @@ export function hintInstruction(level: number, opts: { binary?: boolean; beginne
 // no exercise). The answer to the item stays hidden at both. Two-option items keep their own early-hint rules (any pointer settles the choice), so they are not changed.
 export const EXPLICIT_HINT_LADDER: Record<1 | 2, HintLadderLevel> = {
   1: { ...HINT_LADDER[1], level: 1 },
-  2: { level: 2, name: 'right/wrong contrast', mayReveal: 'a short right-versus-wrong contrast pair made of words that are in no exercise, saying what makes the wrong one wrong', mustNotReveal: 'the rule applied to this item, the fact that decides this item, or the correct form', learnerAction: 'compare the pair with their own answer and retry' },
+  2: { level: 2, name: 'right/wrong contrast', mayReveal: 'a NEW short right-versus-wrong contrast pair (different from every pair already used in this chat) made of words that are in no exercise, saying what makes the wrong one wrong', mustNotReveal: 'the rule applied to this item, the fact that decides this item, or the correct form', learnerAction: 'compare the pair with their own answer and retry' },
 };
 function hintInstructionBase(level: number, opts: { binary?: boolean; beginner?: boolean; explicit?: boolean } = {}): string {
   let l = HINT_LADDER[Math.max(1, Math.min(6, level)) - 1];

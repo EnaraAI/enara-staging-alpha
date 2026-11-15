@@ -543,6 +543,13 @@ const INVITE_VERB =
 const INVITE_PHRASE = /\b(your turn|now you|over to you|i'?ll check|let me (check|see)|send (me )?your|what do you think|in your own words|have a go|give it a try)\b|دورك|جرب|اكتب|أكمل|اكمل/i;
 const GAP = /_{2,}|\.{3}\s*[.?!]?\s*$|…|\[\s*\]|\(\s*\)/m;
 
+/** The learner ask of a closing recap ("Tell me the rule in your own words", "Now write one new example of your own"), as sentences. */
+export const CLOSING_ASK_SENTENCE = /[^.?!\n]*\b(?:tell me the rule in your own words|in your own words|write one (?:new )?example of your own)\b[^.?!\n]*[.?!]?/gi;
+/** Two asks in one reply: a closing ask AND a separate task. The closing ask itself is not counted as the task (it starts with "tell me" / "write"). */
+export function hasTwoAsks(reply: string): boolean {
+  if (!(askedForRule(reply) || askedNewExample(reply))) return false;
+  return Boolean(taskInvitation(reply.replace(CLOSING_ASK_SENTENCE, ' ')));
+}
 export function taskInvitation(reply: string): InvitationKind | undefined {
   const tail = reply.trim().slice(-400);
   if (!tail) return undefined;
@@ -1161,9 +1168,14 @@ const RULE_STYLE: Record<string, string> = {
 export const ruleFirstLine = (rf: { texts: string[] }, planPrimary?: string, hasNext?: boolean) =>
   `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). In this reply, inside the teaching method above: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) ask them to apply the rule to a new item${hasNext ? ' (if their answer was right, present the next lesson item given below exactly as written; otherwise one short new item)' : ': one short new item you write'} made of words that appear in no lesson exercise. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule, and the hint-level limits on stating the rule. Never write the answer to the exercise you are asking about or any part of it, never show its target form, never model on the learner's own answer.`;
 /** The explicit-first decision and the rule to state this turn (levelExplicit and ruleFirst). Pure: used by buildLanguageTeachingContext and by the tests. */
-export function ruleFirstDecision(i: { band: LevelBand; masteryStatus?: string; history: { role: string; languageTurn?: unknown }[]; signals: Parameters<typeof rulesToIntroduce>[1]; spec: { successCriteria?: string[] } | undefined }): { explicit?: boolean; ruleFirst?: { criteria: number[]; texts: string[] } } {
+export function ruleFirstDecision(i: { band: LevelBand; masteryStatus?: string; history: { role: string; languageTurn?: unknown }[]; signals: Parameters<typeof rulesToIntroduce>[1]; spec: { successCriteria?: string[] } | undefined; moves?: { id: string }[] }): { explicit?: boolean; ruleFirst?: { criteria: number[]; texts: string[] } } {
   const explicit = engineV2('levelExplicit') ? explicitFirst(i.band, i.masteryStatus) : undefined;
-  const ruleFirst = explicit ? rulesToIntroduce(i.history, i.signals, i.spec, { beforeFirstTry: true }) : engineV2('ruleFirst') ? rulesToIntroduce(i.history, i.signals, i.spec) : undefined;
+  let ruleFirst = explicit ? rulesToIntroduce(i.history, i.signals, i.spec, { beforeFirstTry: true }) : engineV2('ruleFirst') ? rulesToIntroduce(i.history, i.signals, i.spec) : undefined;
+  // levelExplicit: the rule line also fires on the first explanation turn (a short explanation before any exercise), once: the first success criterion, only if no rule was introduced yet this session.
+  if (explicit && !ruleFirst && i.moves?.some((m) => m.id === 'short_explanation') && (i.spec?.successCriteria?.length ?? 0) > 0) {
+    const anyDone = i.history.some((h) => ((h.languageTurn as { rulesIntroduced?: number[] } | null | undefined)?.rulesIntroduced ?? []).length > 0);
+    if (!anyDone) ruleFirst = { criteria: [1], texts: [i.spec!.successCriteria![0]] };
+  }
   return { ...(explicit !== undefined ? { explicit } : {}), ...(ruleFirst ? { ruleFirst } : {}) };
 }
 /** levelExplicit, the reply that presents the exercise to an explicit-first learner: the rule first, then the item for the first try. Replaces the "no rule before the first try" rule for this reply only. */
@@ -1707,7 +1719,7 @@ export async function buildLanguageTeachingContext(params: {
     const research = closingOn() || engineV2('hints') || researchImproved('strategy') || researchImproved('coverage') ? researchSignals(params.history, signals, lesson.spec) : undefined;
     const prevTurn = [...params.history].reverse().find((h) => h.role === 'assistant')?.languageTurn as { moves?: string[] } | null | undefined;
     // levelExplicit: decided per learner and objective; explicit-first learners get the rule before their first try (rulesToIntroduce, once per rule per session).
-    const { explicit, ruleFirst } = ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec });
+    const { explicit, ruleFirst } = ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves });
     const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}) } as const;
     const parts = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
     return { ...base, ...(parts ? { parts } : {}), prompt: renderLanguageContextPrompt(base) };

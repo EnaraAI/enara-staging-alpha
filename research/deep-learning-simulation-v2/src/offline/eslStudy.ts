@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import path from 'path';
 import {
   detectTurnSignals, deriveLearnerContext, levelBand, renderLanguageContextPrompt, selectLanguageMoves, researchSignals, closingOn, ruleFirstDecision, explicitFirst,
-  askedForRule, askedNewExample, taskInvitation, type LanguageTeachingContext,
+  askedForRule, askedNewExample, taskInvitation, hasTwoAsks, type LanguageTeachingContext,
 } from '../../../../backend/src/services/languageTeachingContext';
 import { evaluateAgainstKey } from '../../../../backend/src/services/languageLearningState';
 import { applyReplyGuards, arbitratePedagogy } from '../../../../backend/src/services/languageTurnPipeline';
@@ -152,7 +152,7 @@ function applyTutorReply(s: Session, raw: string) {
     last.explicitFirst = explicitFirst(levelBand(s.band), s.status); last.levelExplicit = engineV2('levelExplicit');
     if (ctx.ruleFirst?.criteria.length) last.rulesIntroduced = ctx.ruleFirst.criteria;
     if (closingAsk) last.closingAsk = closingAsk;
-    last.twoAsks = Boolean((askedForRule(final) || askedNewExample(final)) && taskInvitation(final) && closingAsk !== 'folded');
+    last.twoAsks = hasTwoAsks(final) && closingAsk !== 'folded'; // fixed detector: the closing ask itself is not a task
     if (WITH_PLAN.has(s.arm)) last.method = planOf(studentOf(s.studentIdx), s.arm).method;
     last.ruleLine = Boolean(ctx.ruleFirst?.criteria.length);
   } else { last.moves = []; last.strand = null; last.method = 'plain'; }
