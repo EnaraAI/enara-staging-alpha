@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 4
+   "C2": 5
   }
  },
  "start": {
@@ -547,7 +547,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"plays\" is correct: a vowel + y keeps the y and takes -s, which is exactly the case your second sentence will need.\nNow an independent item:\nWrite the correct form: My brother ___ (go) to the gym on Fridays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ngoes\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"goes\" is correct.\nNow the vowel + y half of your task, on your own: write one sentence about someone's habit using the verb \"enjoy\" with a singular subject. Add a few words on whether the y changes."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"plays\" is correct: a vowel + y keeps the y and takes -s, which is exactly the case your second sentence will need.\nNow an independent item:\nWrite the correct form: My brother ___ (go) to the gym on Fridays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ngoes\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"goes\" is correct.\nNow the vowel + y half of your task, on your own: write one sentence about someone's habit using the verb \"enjoy\" with a singular subject. Add a few words on whether the y changes.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"goes\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"goes\""
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother enjoys football.",
+    "errors": {
+     "W1": "My brother enjoy football.",
+     "W2": "My brother enjoies football."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 5
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brother enjoys football.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother enjoys football."
+   }
   }
  ],
  "stateAfterS1": {

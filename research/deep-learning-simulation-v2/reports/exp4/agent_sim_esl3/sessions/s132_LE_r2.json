@@ -624,7 +624,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! \"plays\" is correct. Play does not end in sh, ch, s, x or o, so it takes -s.\nNow one alone. Write the verb only:\nWrite the correct form: My brother ___ (go) to the gym on Fridays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ngo\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nNot yet: \"go\" has no ending. Look at the subject, \"My brother\". It is one person, so what happens to the verb? We will come back to this one.\nFirst, one more ending. My example: I carry. Now it is Ken. Carry ends in r + y, so I take away the y and add -ies: Ken carries.\nRule: when a verb ends in a consonant + y, change the y to -ies.\nRight: Ken carries a bag. Wrong: Ken carrys a bag.\nNow you. Verb only:\nLucy ___ (hurry) to work."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! \"plays\" is correct. Play does not end in sh, ch, s, x or o, so it takes -s.\nNow one alone. Write the verb only:\nWrite the correct form: My brother ___ (go) to the gym on Fridays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ngo\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nNot yet: \"go\" has no ending. Look at the subject, \"My brother\". It is one person, so what happens to the verb? We will come back to this one.\nFirst, one more ending. My example: I carry. Now it is Ken. Carry ends in r + y, so I take away the y and add -ies: Ken carries.\nRule: when a verb ends in a consonant + y, change the y to -ies.\nRight: Ken carries a bag. Wrong: Ken carrys a bag.\nNow you. Verb only:\nLucy ___ (hurry) to work.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Rule: when a verb ends in a consonant + y, change the y to -ies."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: Ken carries a bag. Wrong: Ken carrys a bag."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "hurries",
+    "errors": {
+     "W1": "hurry",
+     "W2": "hurrys"
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "hurries",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "hurries"
+   }
   }
  ],
  "stateAfterS1": {

@@ -544,7 +544,44 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe gap came back empty, so I can't tell yet what you were thinking. Was it unclear what to do, or were you unsure which form fits?\n\nOne point worth sharpening: in standard English the form of \"be\" can't be dropped between a subject and a noun or adjective. Compare:\n\"My sister is a nurse.\" (complete)\n\"My sister a nurse.\" (incomplete: the verb is missing)\n\nTell me in a few words how you read the gap, then fill it with one word: I ___ a student.\n\nLEARNER'S LAST MESSAGE:\nI think: a present sentence like \"She is a teacher\" needs am/is/are.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat part is right: a present sentence like \"She is a teacher\" does need am, is or are, and the gap can't stay empty.\n\nBefore we go further, one short question about your thinking: in the gap sentence, which word decides the form, and what makes it decide? Tell me in a line, then write the one word that fills the gap: I ___ a student."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe gap came back empty, so I can't tell yet what you were thinking. Was it unclear what to do, or were you unsure which form fits?\n\nOne point worth sharpening: in standard English the form of \"be\" can't be dropped between a subject and a noun or adjective. Compare:\n\"My sister is a nurse.\" (complete)\n\"My sister a nurse.\" (incomplete: the verb is missing)\n\nTell me in a few words how you read the gap, then fill it with one word: I ___ a student.\n\nLEARNER'S LAST MESSAGE:\nI think: a present sentence like \"She is a teacher\" needs am/is/are.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat part is right: a present sentence like \"She is a teacher\" does need am, is or are, and the gap can't stay empty.\n\nBefore we go further, one short question about your thinking: in the gap sentence, which word decides the form, and what makes it decide? Tell me in a line, then write the one word that fills the gap: I ___ a student.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a present sentence like \"She is a teacher\" does need am, is or are"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a present sentence like \"She is a teacher\" needs am/is/are.",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a present sentence like \"She is a teacher\" needs am/is/are."
+   }
   }
  ],
  "stateAfterS1": {
