@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 1
+   "C2": 2
   }
  },
  "start": {
@@ -257,7 +257,62 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"watches\". Verbs ending in -ch, -sh, -s, -x or -o take -es after he, she and it, and you applied that without help.\nLet's look at a different spelling pattern now: verbs that end in a consonant plus y. Think about what happens to the end of the verb before you write.\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\nAfter that, you can try writing two sentences of your own with verbs of this type.\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect, \"cries\": consonant plus y turns into -ies.\nSo far: with he, she and it the verb adds -s (\"plays\"), or -es after -ch, -sh, -s, -x and -o (\"watches\"). After a consonant, y changes to -ies.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"watches\". Verbs ending in -ch, -sh, -s, -x or -o take -es after he, she and it, and you applied that without help.\nLet's look at a different spelling pattern now: verbs that end in a consonant plus y. Think about what happens to the end of the verb before you write.\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\nAfter that, you can try writing two sentences of your own with verbs of this type.\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect, \"cries\": consonant plus y turns into -ies.\nSo far: with he, she and it the verb adds -s (\"plays\"), or -es after -ch, -sh, -s, -x and -o (\"watches\"). After a consonant, y changes to -ies.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct, \"cries\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct, \"cries\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "with he, she and it the verb adds -s"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "After a consonant, y changes to -ies."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I think: add -s/-es after he/she/it.",
+   "production": {
+    "kind": "rule",
+    "text": "I think: add -s/-es after he/she/it."
+   }
   }
  ]
 }

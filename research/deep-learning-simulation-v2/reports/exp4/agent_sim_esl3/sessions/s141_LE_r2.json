@@ -8,14 +8,14 @@
   "band": "A2",
   "primary": "W2",
   "s": {
-   "W2": 2,
+   "W2": 0,
    "W1": 0,
    "C1": 3,
-   "C2": 0
+   "C2": 2
   },
   "indep": {
    "C1": 2,
-   "C2": 0
+   "C2": 1
   }
  },
  "start": {
@@ -262,7 +262,72 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"drinks\". You did that one on your own, with the right ending after he.\nNow let's try a new kind. Some verbs change in a different way after he, she or it. Look closely at the end of the verb. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat is right: \"watches\".\nHere is how I think with a new verb: mix. It ends in -x, so I add -es: He mixes the paint before work.\nRule: after he, she or it, verbs ending in -sh, -ch, -s, -x or -o take -es.\nRight: She brushes her teeth. Wrong: She brushs her teeth.\nYour turn, on your own:\nWrite the correct form: My brother ___ (go) to the gym on Fridays. (answer with only the verb)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"drinks\". You did that one on your own, with the right ending after he.\nNow let's try a new kind. Some verbs change in a different way after he, she or it. Look closely at the end of the verb. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat is right: \"watches\".\nHere is how I think with a new verb: mix. It ends in -x, so I add -es: He mixes the paint before work.\nRule: after he, she or it, verbs ending in -sh, -ch, -s, -x or -o take -es.\nRight: She brushes her teeth. Wrong: She brushs her teeth.\nYour turn, on your own:\nWrite the correct form: My brother ___ (go) to the gym on Fridays. (answer with only the verb)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "That is right: \"watches\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "That is right: \"watches\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "verbs ending in -sh, -ch, -s, -x or -o take -es"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: She brushes her teeth. Wrong: She brushs her teeth."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "goes",
+    "errors": {
+     "W1": "go",
+     "W2": "gos"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "goes",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "goes"
+   }
   }
  ]
 }

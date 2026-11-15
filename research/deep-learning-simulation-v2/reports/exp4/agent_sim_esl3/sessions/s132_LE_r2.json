@@ -9,7 +9,7 @@
   "primary": "W1",
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 3,
    "C2": 0
   },
@@ -271,7 +271,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"drinks\". You did that one on your own, with the right ending after he.\nNow let's try a new kind. Some verbs change in a different way after he, she or it. Look closely at the end of the verb. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatchs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nThe ending is not right yet. Think about the last letters of this verb.\nLet me work one through: the verb is push. It ends in -sh, so I add -es: She pushes the door open.\nRule: after he, she or it, verbs ending in -sh, -ch, -s, -x or -o take -es.\nRight: He catches the ball. Wrong: He catchs the ball.\nYour turn. Write only the verb:\nHe ___ (fix) his bike on Saturdays."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"drinks\". You did that one on your own, with the right ending after he.\nNow let's try a new kind. Some verbs change in a different way after he, she or it. Look closely at the end of the verb. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatchs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nThe ending is not right yet. Think about the last letters of this verb.\nLet me work one through: the verb is push. It ends in -sh, so I add -es: She pushes the door open.\nRule: after he, she or it, verbs ending in -sh, -ch, -s, -x or -o take -es.\nRight: He catches the ball. Wrong: He catchs the ball.\nYour turn. Write only the verb:\nHe ___ (fix) his bike on Saturdays.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "after he, she or it, verbs ending in -sh, -ch, -s, -x or -o take -es"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: He catches the ball. Wrong: He catchs the ball."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "fixes",
+    "errors": {
+     "W1": "fix",
+     "W2": "fixs"
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "fixes",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "fixes"
+   }
   }
  ]
 }

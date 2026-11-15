@@ -9,7 +9,7 @@
   "primary": "W1",
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 3,
    "C2": 0
   },
@@ -271,7 +271,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, that is right. \"He\" comes first, so the verb gets -s.\nNext one. No help this time. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatchs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nGood: you added an ending to \"watch\". But \"watchs\" is not the right ending. Look at how the verb is spelled at the end.\nExample: I push the door. He pushes the door. Step 1: \"push\" ends in -sh. Step 2: so we add -es.\nWords ending in -sh, -ch, -s, -x or -o get -es.\nRight: She kisses the cat. Wrong: She kisss the cat.\nNow try this. Write only the verb:\nHe ___ (fix) cars."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, that is right. \"He\" comes first, so the verb gets -s.\nNext one. No help this time. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatchs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nGood: you added an ending to \"watch\". But \"watchs\" is not the right ending. Look at how the verb is spelled at the end.\nExample: I push the door. He pushes the door. Step 1: \"push\" ends in -sh. Step 2: so we add -es.\nWords ending in -sh, -ch, -s, -x or -o get -es.\nRight: She kisses the cat. Wrong: She kisss the cat.\nNow try this. Write only the verb:\nHe ___ (fix) cars.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Words ending in -sh, -ch, -s, -x or -o get -es."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: She kisses the cat. Wrong: She kisss the cat."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "fixes",
+    "errors": {
+     "W1": "fix",
+     "W2": "fixs"
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "fixes",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "fixes"
+   }
   }
  ]
 }

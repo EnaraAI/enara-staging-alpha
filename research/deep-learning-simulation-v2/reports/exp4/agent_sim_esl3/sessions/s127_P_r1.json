@@ -9,12 +9,12 @@
   "primary": "W2",
   "s": {
    "W2": 0,
-   "W1": 1,
+   "W1": 0,
    "C1": 3,
    "C2": 2
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 1
   }
  },
@@ -233,7 +233,58 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, that's right! We say \"an umbrella\" because of the vowel sound \"u\". Nice!\n\nLet's try one more. Write a or an:\nMy uncle is ___ doctor.\n\nAnswer with only the missing word.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"A doctor\", because \"d\" is a consonant sound. Great work!\n\nNow let's learn \"the\". We use \"the\" when we talk about the same thing again.\nExample: I saw a dog. The dog was big.\n\nWrite a, an or the:\nI bought a book. ___ book is very good.\n\nAnswer with only the missing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, that's right! We say \"an umbrella\" because of the vowel sound \"u\". Nice!\n\nLet's try one more. Write a or an:\nMy uncle is ___ doctor.\n\nAnswer with only the missing word.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"A doctor\", because \"d\" is a consonant sound. Great work!\n\nNow let's learn \"the\". We use \"the\" when we talk about the same thing again.\nExample: I saw a dog. The dog was big.\n\nWrite a, an or the:\nI bought a book. ___ book is very good.\n\nAnswer with only the missing word.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! \"A doctor\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "a"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "The",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "The"
+   }
   }
  ]
 }

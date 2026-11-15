@@ -11,7 +11,7 @@
    "W1": 3,
    "W2": 0,
    "C1": 0,
-   "C2": 0
+   "C2": 1
   },
   "indep": {
    "C1": 0,
@@ -216,7 +216,54 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNo worries! The answer is \"an umbrella\", because \"umbrella\" starts with the vowel sound \"u\".\n\nLook at the first sound of the word:\n- a cat, a dog (consonant)\n- an apple, an egg (vowel)\n\nYour turn. Write a or an:\nMy uncle is ___ doctor.\n\n\"Doctor\" starts with \"d\". Answer with only the missing word.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, correct! \"A doctor\", because \"d\" is a consonant sound. Great job!\n\nNow a vowel word. Write a or an:\nWe saw ___ elephant at the zoo.\n\n\"Elephant\" starts with \"e\". Answer with only the missing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNo worries! The answer is \"an umbrella\", because \"umbrella\" starts with the vowel sound \"u\".\n\nLook at the first sound of the word:\n- a cat, a dog (consonant)\n- an apple, an egg (vowel)\n\nYour turn. Write a or an:\nMy uncle is ___ doctor.\n\n\"Doctor\" starts with \"d\". Answer with only the missing word.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, correct! \"A doctor\", because \"d\" is a consonant sound. Great job!\n\nNow a vowel word. Write a or an:\nWe saw ___ elephant at the zoo.\n\n\"Elephant\" starts with \"e\". Answer with only the missing word.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, correct! \"A doctor\", because \"d\" is a consonant sound."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   }
   }
  ]
 }
