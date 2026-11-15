@@ -14,7 +14,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 5
+   "C2": 6
   }
  },
  "start": {
@@ -509,7 +509,60 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My brother and his wife are tired.\" is right. The subject is two people joined by \"and\", so it is plural, and you matched the verb to the whole subject, not to \"wife\" next to it. Nothing is left out.\n\nNow the second sentence. Write one with a long singular subject, such as a noun followed by a phrase with \"on\", \"in\" or \"next to\", and say who or what something is. Watch the noun inside the phrase: it can pull you toward the wrong form.\n\nAdd a one-line reason for your choice.\n\nLEARNER'S LAST MESSAGE:\nThe book on the table is my gift.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The book on the table is my gift.\" is correct. The real subject is \"The book\", which is singular, so is fits; \"table\" inside the phrase does not change it.\n\nNow a quick item:\nWrite am, is or are: I ___ a student. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My brother and his wife are tired.\" is right. The subject is two people joined by \"and\", so it is plural, and you matched the verb to the whole subject, not to \"wife\" next to it. Nothing is left out.\n\nNow the second sentence. Write one with a long singular subject, such as a noun followed by a phrase with \"on\", \"in\" or \"next to\", and say who or what something is. Watch the noun inside the phrase: it can pull you toward the wrong form.\n\nAdd a one-line reason for your choice.\n\nLEARNER'S LAST MESSAGE:\nThe book on the table is my gift.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The book on the table is my gift.\" is correct. The real subject is \"The book\", which is singular, so is fits; \"table\" inside the phrase does not change it.\n\nNow a quick item:\nWrite am, is or are: I ___ a student. (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"The book on the table is my gift.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"The book on the table is my gift.\" is correct."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 6
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "am",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "am"
+   }
   }
  ],
  "stateAfterS1": {

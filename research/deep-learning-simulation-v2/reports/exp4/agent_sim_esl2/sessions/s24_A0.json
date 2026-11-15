@@ -14,7 +14,7 @@
   },
   "indep": {
    "C1": 3,
-   "C2": 2
+   "C2": 3
   }
  },
  "start": {
@@ -493,7 +493,58 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat rule is right: a singular countable noun needs an article. But it doesn't yet show the tricky part, choosing by sound rather than spelling.\nSo, the task once more: write one sentence with 'a' or 'an' before a word whose spelling could mislead you, then a second sentence referring back to it with 'the'.\n\nLEARNER'S LAST MESSAGE:\nI waited for an hour.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n'I waited for an hour.' is right: 'hour' starts with a vowel sound, because the h is silent.\nNow the second part: write one more sentence that refers back to that same hour with 'the'."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat rule is right: a singular countable noun needs an article. But it doesn't yet show the tricky part, choosing by sound rather than spelling.\nSo, the task once more: write one sentence with 'a' or 'an' before a word whose spelling could mislead you, then a second sentence referring back to it with 'the'.\n\nLEARNER'S LAST MESSAGE:\nI waited for an hour.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n'I waited for an hour.' is right: 'hour' starts with a vowel sound, because the h is silent.\nNow the second part: write one more sentence that refers back to that same hour with 'the'.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "'I waited for an hour.' is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "I waited for an hour."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The hour felt very long.",
+    "errors": {
+     "W1": "Hour felt very long."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The hour felt very long.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "The hour felt very long."
+   }
   }
  ],
  "stateAfterS1": {
