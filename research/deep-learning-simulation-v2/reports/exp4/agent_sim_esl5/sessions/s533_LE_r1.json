@@ -34,8 +34,21 @@
   }
  },
  "rec": {
-  "entries": [],
-  "liveErrors": {},
+  "entries": [
+   {
+    "code": "article_omitted",
+    "occurrences": 1,
+    "lastSeenAt": "2027-01-11T09:04:00.000Z",
+    "independentStreak": 0,
+    "nextReviewAt": "2027-01-12T09:04:00.000Z"
+   }
+  ],
+  "liveErrors": {
+   "article_omitted": {
+    "seen": 1,
+    "lastCorrect": false
+   }
+  },
   "knownPoints": {}
  },
  "turns": [
@@ -309,7 +322,31 @@
     "correct": false,
     "fired": "W1",
     "text": "My aunt is engineer."
-   }
+   },
+   "moves": [
+    "answer_with_reasoning",
+    "comprehensible_model",
+    "comprehension_check"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "ev5": {
+    "liveError": "article_omitted",
+    "answerReleased": true
+   },
+   "engineVerdict": "INCORRECT",
+   "recordLive": [],
+   "tutor": "One word is missing in your sentence.\nIn English, one thing (like a job) needs a small word before it: a, an or the.\nRight: He is a pilot. Wrong: He is pilot.\nNow write one new sentence about a friend and their job. Remember the small word.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": true,
+   "twoAsks": false,
+   "twoAsksRaw": false
   }
  ]
 }

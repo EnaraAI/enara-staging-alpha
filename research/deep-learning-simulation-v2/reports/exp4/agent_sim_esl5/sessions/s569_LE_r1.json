@@ -34,8 +34,21 @@
   }
  },
  "rec": {
-  "entries": [],
-  "liveErrors": {},
+  "entries": [
+   {
+    "code": "article_omitted",
+    "occurrences": 1,
+    "lastSeenAt": "2027-01-11T09:04:00.000Z",
+    "independentStreak": 0,
+    "nextReviewAt": "2027-01-12T09:04:00.000Z"
+   }
+  ],
+  "liveErrors": {
+   "article_omitted": {
+    "seen": 1,
+    "lastCorrect": false
+   }
+  },
   "knownPoints": {}
  },
  "turns": [
@@ -306,7 +319,29 @@
     "correct": false,
     "fired": "W1",
     "text": "My sister is engineer."
-   }
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "ev5": {
+    "liveError": "article_omitted"
+   },
+   "engineVerdict": "INCORRECT",
+   "recordLive": [],
+   "tutor": "Your sentence is missing one small word.\nIn English, one thing (like a job) has a, an or the before it.\nRight: My uncle is a farmer. Wrong: My uncle is farmer.\nNow write a new sentence about a friend and their job. Put in the small word.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false
   }
  ]
 }
