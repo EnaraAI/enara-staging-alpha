@@ -1,0 +1,4101 @@
+{
+ "summary": {
+  "a": {
+   "n": 12,
+   "combined": 0.174,
+   "expected": 0.198,
+   "controlled": 0.167,
+   "free": 0.188,
+   "wrongAtZero": 0
+  },
+  "b": {
+   "n": 12,
+   "combined": 0.174,
+   "expected": 0.198,
+   "controlled": 0.167,
+   "free": 0.188,
+   "wrongAtZero": 0
+  },
+  "c": {
+   "n": 12,
+   "combined": 0.632,
+   "expected": 0.579,
+   "controlled": 0.708,
+   "free": 0.479,
+   "wrongAtZero": 1.25
+  },
+  "d": {
+   "n": 12,
+   "combined": 0.903,
+   "expected": 0.897,
+   "controlled": 0.958,
+   "free": 0.792,
+   "wrongAtZero": 1.92
+  },
+  "c2": {
+   "n": 12,
+   "combined": 0.653,
+   "expected": 0.611,
+   "controlled": 0.708,
+   "free": 0.542,
+   "wrongAtZero": 1.25
+  },
+  "d2": {
+   "n": 12,
+   "combined": 0.958,
+   "expected": 0.916,
+   "controlled": 0.979,
+   "free": 0.917,
+   "wrongAtZero": 2
+  }
+ },
+ "orderCheck": {
+  "rule": "expected accuracy d > c > max(a, b) and |a - b| <= 0.05",
+  "pass": true,
+  "sampledOrderAlsoHolds": true
+ },
+ "noise": {
+  "c_vs_c2": {
+   "expected": -0.032,
+   "sampled": -0.021
+  },
+  "d_vs_d2": {
+   "expected": -0.018,
+   "sampled": -0.056
+  }
+ },
+ "rows": [
+  {
+   "id": "v0_a",
+   "tutor": "a",
+   "learner": 0,
+   "combined": 0,
+   "controlled": 0,
+   "free": 0,
+   "expected": 0.14666666666666664,
+   "expectedControlled": 0.15999999999999998,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 3,
+    "W2": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v0_b",
+   "tutor": "b",
+   "learner": 0,
+   "combined": 0,
+   "controlled": 0,
+   "free": 0,
+   "expected": 0.14666666666666664,
+   "expectedControlled": 0.15999999999999998,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 3,
+    "W2": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v0_c",
+   "tutor": "c",
+   "learner": 0,
+   "combined": 0.6666666666666666,
+   "controlled": 0.75,
+   "free": 0.5,
+   "expected": 0.58,
+   "expectedControlled": 0.585,
+   "expectedFree": 0.57,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.57
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    }
+   ],
+   "final": {
+    "W1": 1,
+    "W2": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v0_c2",
+   "tutor": "c2",
+   "learner": 0,
+   "combined": 0.6666666666666666,
+   "controlled": 0.75,
+   "free": 0.5,
+   "expected": 0.58,
+   "expectedControlled": 0.585,
+   "expectedFree": 0.57,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    }
+   ],
+   "final": {
+    "W1": 1,
+    "W2": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v0_d",
+   "tutor": "d",
+   "learner": 0,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v0_d2",
+   "tutor": "d2",
+   "learner": 0,
+   "combined": 0.9166666666666666,
+   "controlled": 1,
+   "free": 0.75,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v10_a",
+   "tutor": "a",
+   "learner": 10,
+   "combined": 0.3333333333333333,
+   "controlled": 0.25,
+   "free": 0.5,
+   "expected": 0.19999999999999996,
+   "expectedControlled": 0.24,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v10_b",
+   "tutor": "b",
+   "learner": 10,
+   "combined": 0.3333333333333333,
+   "controlled": 0.25,
+   "free": 0.5,
+   "expected": 0.19999999999999996,
+   "expectedControlled": 0.24,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v10_c",
+   "tutor": "c",
+   "learner": 10,
+   "combined": 0.9166666666666666,
+   "controlled": 1,
+   "free": 0.75,
+   "expected": 0.6333333333333332,
+   "expectedControlled": 0.6649999999999999,
+   "expectedFree": 0.57,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    }
+   ],
+   "final": {
+    "W2": 1,
+    "W1": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v10_c2",
+   "tutor": "c2",
+   "learner": 10,
+   "combined": 0.5833333333333334,
+   "controlled": 0.75,
+   "free": 0.25,
+   "expected": 0.6333333333333332,
+   "expectedControlled": 0.6649999999999999,
+   "expectedFree": 0.57,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.57
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.57
+    }
+   ],
+   "final": {
+    "W2": 1,
+    "W1": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v10_d",
+   "tutor": "d",
+   "learner": 10,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9104166666666665,
+   "expectedControlled": 0.9143749999999999,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v10_d2",
+   "tutor": "d2",
+   "learner": 10,
+   "combined": 0.75,
+   "controlled": 0.75,
+   "free": 0.75,
+   "expected": 0.9104166666666665,
+   "expectedControlled": 0.9143749999999999,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v11_a",
+   "tutor": "a",
+   "learner": 11,
+   "combined": 0.08333333333333333,
+   "controlled": 0,
+   "free": 0.25,
+   "expected": 0.27999999999999997,
+   "expectedControlled": 0.36,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v11_b",
+   "tutor": "b",
+   "learner": 11,
+   "combined": 0.08333333333333333,
+   "controlled": 0,
+   "free": 0.25,
+   "expected": 0.27999999999999997,
+   "expectedControlled": 0.36,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v11_c",
+   "tutor": "c",
+   "learner": 11,
+   "combined": 0.75,
+   "controlled": 0.75,
+   "free": 0.75,
+   "expected": 0.6966666666666667,
+   "expectedControlled": 0.76,
+   "expectedFree": 0.57,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.57
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.57
+    }
+   ],
+   "final": {
+    "W2": 1,
+    "W1": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v11_c2",
+   "tutor": "c2",
+   "learner": 11,
+   "combined": 0.6666666666666666,
+   "controlled": 0.75,
+   "free": 0.5,
+   "expected": 0.6966666666666667,
+   "expectedControlled": 0.76,
+   "expectedFree": 0.57,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.57
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    }
+   ],
+   "final": {
+    "W2": 1,
+    "W1": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v11_d",
+   "tutor": "d",
+   "learner": 11,
+   "combined": 0.8333333333333334,
+   "controlled": 0.75,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.9025
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v11_d2",
+   "tutor": "d2",
+   "learner": 11,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v1_a",
+   "tutor": "a",
+   "learner": 1,
+   "combined": 0.08333333333333333,
+   "controlled": 0,
+   "free": 0.25,
+   "expected": 0.13333333333333333,
+   "expectedControlled": 0.13999999999999999,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 3,
+    "W2": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v1_b",
+   "tutor": "b",
+   "learner": 1,
+   "combined": 0.08333333333333333,
+   "controlled": 0,
+   "free": 0.25,
+   "expected": 0.13333333333333333,
+   "expectedControlled": 0.13999999999999999,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 3,
+    "W2": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v1_c",
+   "tutor": "c",
+   "learner": 1,
+   "combined": 0.25,
+   "controlled": 0.25,
+   "free": 0.25,
+   "expected": 0.19166666666666662,
+   "expectedControlled": 0.19249999999999995,
+   "expectedFree": 0.18999999999999995,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.18999999999999995
+    }
+   ],
+   "final": {
+    "W1": 2,
+    "W2": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v1_c2",
+   "tutor": "c2",
+   "learner": 1,
+   "combined": 0.08333333333333333,
+   "controlled": 0,
+   "free": 0.25,
+   "expected": 0.19166666666666662,
+   "expectedControlled": 0.19249999999999995,
+   "expectedFree": 0.18999999999999995,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.18999999999999995
+    }
+   ],
+   "final": {
+    "W1": 2,
+    "W2": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v1_d",
+   "tutor": "d",
+   "learner": 1,
+   "combined": 0.9166666666666666,
+   "controlled": 1,
+   "free": 0.75,
+   "expected": 0.9104166666666665,
+   "expectedControlled": 0.9143749999999999,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 2,
+    "C2": 2
+   }
+  },
+  {
+   "id": "v1_d2",
+   "tutor": "d2",
+   "learner": 1,
+   "combined": 0.9166666666666666,
+   "controlled": 1,
+   "free": 0.75,
+   "expected": 0.9104166666666665,
+   "expectedControlled": 0.9143749999999999,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 2,
+    "C2": 2
+   }
+  },
+  {
+   "id": "v2_a",
+   "tutor": "a",
+   "learner": 2,
+   "combined": 0.16666666666666666,
+   "controlled": 0.25,
+   "free": 0,
+   "expected": 0.14666666666666664,
+   "expectedControlled": 0.15999999999999998,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 3,
+    "W2": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v2_b",
+   "tutor": "b",
+   "learner": 2,
+   "combined": 0.16666666666666666,
+   "controlled": 0.25,
+   "free": 0,
+   "expected": 0.14666666666666664,
+   "expectedControlled": 0.15999999999999998,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 3,
+    "W2": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v2_c",
+   "tutor": "c",
+   "learner": 2,
+   "combined": 0.16666666666666666,
+   "controlled": 0.25,
+   "free": 0,
+   "expected": 0.19333333333333327,
+   "expectedControlled": 0.19499999999999995,
+   "expectedFree": 0.18999999999999995,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.18999999999999995
+    }
+   ],
+   "final": {
+    "W1": 2,
+    "W2": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v2_c2",
+   "tutor": "c2",
+   "learner": 2,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.58,
+   "expectedControlled": 0.585,
+   "expectedFree": 0.57,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.57
+    }
+   ],
+   "final": {
+    "W1": 1,
+    "W2": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v2_d",
+   "tutor": "d",
+   "learner": 2,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v2_d2",
+   "tutor": "d2",
+   "learner": 2,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v3_a",
+   "tutor": "a",
+   "learner": 3,
+   "combined": 0.16666666666666666,
+   "controlled": 0.25,
+   "free": 0,
+   "expected": 0.2799999999999999,
+   "expectedControlled": 0.35999999999999993,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 3,
+    "W1": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v3_b",
+   "tutor": "b",
+   "learner": 3,
+   "combined": 0.16666666666666666,
+   "controlled": 0.25,
+   "free": 0,
+   "expected": 0.2799999999999999,
+   "expectedControlled": 0.35999999999999993,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 3,
+    "W1": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v3_c",
+   "tutor": "c",
+   "learner": 3,
+   "combined": 0.4166666666666667,
+   "controlled": 0.5,
+   "free": 0.25,
+   "expected": 0.4433333333333333,
+   "expectedControlled": 0.57,
+   "expectedFree": 0.18999999999999995,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.18999999999999995
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v3_c2",
+   "tutor": "c2",
+   "learner": 3,
+   "combined": 0.4166666666666667,
+   "controlled": 0.5,
+   "free": 0.25,
+   "expected": 0.4433333333333333,
+   "expectedControlled": 0.57,
+   "expectedFree": 0.18999999999999995,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.18999999999999995
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v3_d",
+   "tutor": "d",
+   "learner": 3,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v3_d2",
+   "tutor": "d2",
+   "learner": 3,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v4_a",
+   "tutor": "a",
+   "learner": 4,
+   "combined": 0.25,
+   "controlled": 0.25,
+   "free": 0.25,
+   "expected": 0.19999999999999996,
+   "expectedControlled": 0.24,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 3,
+    "W1": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v4_b",
+   "tutor": "b",
+   "learner": 4,
+   "combined": 0.25,
+   "controlled": 0.25,
+   "free": 0.25,
+   "expected": 0.19999999999999996,
+   "expectedControlled": 0.24,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 3,
+    "W1": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v4_c",
+   "tutor": "c",
+   "learner": 4,
+   "combined": 0.4166666666666667,
+   "controlled": 0.5,
+   "free": 0.25,
+   "expected": 0.3166666666666666,
+   "expectedControlled": 0.37999999999999995,
+   "expectedFree": 0.18999999999999995,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.18999999999999995
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v4_c2",
+   "tutor": "c2",
+   "learner": 4,
+   "combined": 0.3333333333333333,
+   "controlled": 0.5,
+   "free": 0,
+   "expected": 0.3166666666666666,
+   "expectedControlled": 0.37999999999999995,
+   "expectedFree": 0.18999999999999995,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.18999999999999995
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v4_d",
+   "tutor": "d",
+   "learner": 4,
+   "combined": 0.8333333333333334,
+   "controlled": 1,
+   "free": 0.5,
+   "expected": 0.9104166666666665,
+   "expectedControlled": 0.9143749999999999,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v4_d2",
+   "tutor": "d2",
+   "learner": 4,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9104166666666665,
+   "expectedControlled": 0.9143749999999999,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 2,
+    "C2": 2
+   }
+  },
+  {
+   "id": "v5_a",
+   "tutor": "a",
+   "learner": 5,
+   "combined": 0.3333333333333333,
+   "controlled": 0.25,
+   "free": 0.5,
+   "expected": 0.27999999999999997,
+   "expectedControlled": 0.36,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 3,
+    "W1": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v5_b",
+   "tutor": "b",
+   "learner": 5,
+   "combined": 0.3333333333333333,
+   "controlled": 0.25,
+   "free": 0.5,
+   "expected": 0.27999999999999997,
+   "expectedControlled": 0.36,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 3,
+    "W1": 1,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v5_c",
+   "tutor": "c",
+   "learner": 5,
+   "combined": 0.5833333333333334,
+   "controlled": 0.5,
+   "free": 0.75,
+   "expected": 0.4433333333333333,
+   "expectedControlled": 0.57,
+   "expectedFree": 0.18999999999999995,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.18999999999999995
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v5_c2",
+   "tutor": "c2",
+   "learner": 5,
+   "combined": 0.4166666666666667,
+   "controlled": 0.5,
+   "free": 0.25,
+   "expected": 0.4433333333333333,
+   "expectedControlled": 0.57,
+   "expectedFree": 0.18999999999999995,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.18999999999999995
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.18999999999999995
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 0,
+    "C1": 0,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v5_d",
+   "tutor": "d",
+   "learner": 5,
+   "combined": 0.75,
+   "controlled": 0.75,
+   "free": 0.75,
+   "expected": 0.6966666666666667,
+   "expectedControlled": 0.76,
+   "expectedFree": 0.57,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.57
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.57
+    }
+   ],
+   "final": {
+    "W2": 1,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v5_d2",
+   "tutor": "d2",
+   "learner": 5,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v6_a",
+   "tutor": "a",
+   "learner": 6,
+   "combined": 0.16666666666666666,
+   "controlled": 0.25,
+   "free": 0,
+   "expected": 0.14666666666666664,
+   "expectedControlled": 0.15999999999999998,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 2,
+    "W2": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v6_b",
+   "tutor": "b",
+   "learner": 6,
+   "combined": 0.16666666666666666,
+   "controlled": 0.25,
+   "free": 0,
+   "expected": 0.14666666666666664,
+   "expectedControlled": 0.15999999999999998,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 2,
+    "W2": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v6_c",
+   "tutor": "c",
+   "learner": 6,
+   "combined": 0.75,
+   "controlled": 1,
+   "free": 0.25,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v6_c2",
+   "tutor": "c2",
+   "learner": 6,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v6_d",
+   "tutor": "d",
+   "learner": 6,
+   "combined": 0.75,
+   "controlled": 1,
+   "free": 0.25,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v6_d2",
+   "tutor": "d2",
+   "learner": 6,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v7_a",
+   "tutor": "a",
+   "learner": 7,
+   "combined": 0.08333333333333333,
+   "controlled": 0,
+   "free": 0.25,
+   "expected": 0.13333333333333333,
+   "expectedControlled": 0.13999999999999999,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 2,
+    "W2": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v7_b",
+   "tutor": "b",
+   "learner": 7,
+   "combined": 0.08333333333333333,
+   "controlled": 0,
+   "free": 0.25,
+   "expected": 0.13333333333333333,
+   "expectedControlled": 0.13999999999999999,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 2,
+    "W2": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v7_c",
+   "tutor": "c",
+   "learner": 7,
+   "combined": 0.9166666666666666,
+   "controlled": 1,
+   "free": 0.75,
+   "expected": 0.9104166666666665,
+   "expectedControlled": 0.9143749999999999,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v7_c2",
+   "tutor": "c2",
+   "learner": 7,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9104166666666665,
+   "expectedControlled": 0.9143749999999999,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v7_d",
+   "tutor": "d",
+   "learner": 7,
+   "combined": 0.9166666666666666,
+   "controlled": 1,
+   "free": 0.75,
+   "expected": 0.9104166666666665,
+   "expectedControlled": 0.9143749999999999,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v7_d2",
+   "tutor": "d2",
+   "learner": 7,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9104166666666665,
+   "expectedControlled": 0.9143749999999999,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v8_a",
+   "tutor": "a",
+   "learner": 8,
+   "combined": 0.16666666666666666,
+   "controlled": 0.25,
+   "free": 0,
+   "expected": 0.14666666666666664,
+   "expectedControlled": 0.15999999999999998,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 2,
+    "W2": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v8_b",
+   "tutor": "b",
+   "learner": 8,
+   "combined": 0.16666666666666666,
+   "controlled": 0.25,
+   "free": 0,
+   "expected": 0.14666666666666664,
+   "expectedControlled": 0.15999999999999998,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.19999999999999996
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W1": 2,
+    "W2": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v8_c",
+   "tutor": "c",
+   "learner": 8,
+   "combined": 0.8333333333333334,
+   "controlled": 1,
+   "free": 0.5,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v8_c2",
+   "tutor": "c2",
+   "learner": 8,
+   "combined": 0.9166666666666666,
+   "controlled": 1,
+   "free": 0.75,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v8_d",
+   "tutor": "d",
+   "learner": 8,
+   "combined": 0.8333333333333334,
+   "controlled": 1,
+   "free": 0.5,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v8_d2",
+   "tutor": "d2",
+   "learner": 8,
+   "combined": 0.9166666666666666,
+   "controlled": 1,
+   "free": 0.75,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W1": 0,
+    "W2": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v9_a",
+   "tutor": "a",
+   "learner": 9,
+   "combined": 0.25,
+   "controlled": 0.25,
+   "free": 0.25,
+   "expected": 0.2799999999999999,
+   "expectedControlled": 0.35999999999999993,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v9_b",
+   "tutor": "b",
+   "learner": 9,
+   "combined": 0.25,
+   "controlled": 0.25,
+   "free": 0.25,
+   "expected": 0.2799999999999999,
+   "expectedControlled": 0.35999999999999993,
+   "expectedFree": 0.11999999999999997,
+   "wrongAtZero": 0,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.6
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.6
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0,
+     "expected": 0.11999999999999997
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.11999999999999997
+    }
+   ],
+   "final": {
+    "W2": 2,
+    "W1": 1,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v9_c",
+   "tutor": "c",
+   "learner": 9,
+   "combined": 0.9166666666666666,
+   "controlled": 1,
+   "free": 0.75,
+   "expected": 0.6966666666666667,
+   "expectedControlled": 0.7599999999999999,
+   "expectedFree": 0.57,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    }
+   ],
+   "final": {
+    "W2": 1,
+    "W1": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v9_c2",
+   "tutor": "c2",
+   "learner": 9,
+   "combined": 0.75,
+   "controlled": 0.75,
+   "free": 0.75,
+   "expected": 0.6966666666666667,
+   "expectedControlled": 0.7599999999999999,
+   "expectedFree": 0.57,
+   "wrongAtZero": 1,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 0,
+     "expected": 0.57
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.57
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 0.5,
+     "expected": 0.57
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.57
+    }
+   ],
+   "final": {
+    "W2": 1,
+    "W1": 0,
+    "C1": 1,
+    "C2": 0
+   }
+  },
+  {
+   "id": "v9_d",
+   "tutor": "d",
+   "learner": 9,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  },
+  {
+   "id": "v9_d2",
+   "tutor": "d2",
+   "learner": 9,
+   "combined": 1,
+   "controlled": 1,
+   "free": 1,
+   "expected": 0.9183333333333333,
+   "expectedControlled": 0.92625,
+   "expectedFree": 0.9025,
+   "wrongAtZero": 2,
+   "items": [
+    {
+     "id": "c1",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "c2",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c3",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.95
+    },
+    {
+     "id": "c4",
+     "kind": "controlled",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f1",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    },
+    {
+     "id": "f2",
+     "kind": "free",
+     "score": 1,
+     "expected": 0.9025
+    }
+   ],
+   "final": {
+    "W2": 0,
+    "W1": 0,
+    "C1": 3,
+    "C2": 3
+   }
+  }
+ ]
+}
