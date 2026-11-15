@@ -141,6 +141,7 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           fadeCheck: { type: [Number], default: undefined }, // fadeKnown (ESL5): criteria numbers only
           fadeCheckAnswered: { type: [Number], default: undefined },
           fadeFailed: { type: [Number], default: undefined },
+          ownSentence: String, // ownSentence (ESL5): 'asked' | 'feedback' tag only
           _id: false,
         },
         default: undefined,

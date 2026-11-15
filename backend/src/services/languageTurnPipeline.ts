@@ -4,7 +4,7 @@
 // channel stops using the shared functions or if the policy version differs between them.
 import {
   buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, independentSuccessItem, turnEvidence, LANGUAGE_CONTEXT_VERSION,
-  isClosingTurn, knownKey, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk, learnerAsks, CLOSING_ASK_SENTENCE,
+  isClosingTurn, knownKey, ownSentenceNow, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk, learnerAsks, CLOSING_ASK_SENTENCE,
   type LanguageTeachingContext, type LanguageTurnEvidence,
 } from './languageTeachingContext';
 import { recordProfileTurn } from './learnerLanguageProfile';
@@ -33,6 +33,7 @@ export async function prepareLanguageContext(input: PrepareInput, channel: Langu
 export type ClosingAskStatus = 'added' | 'deferred' | 'folded';
 /** After this many replies that set a task (closing turn included) with no task-free reply, the recap is folded into the task reply. */
 export const CLOSING_FOLD_AFTER = 3;
+const OWN_SENTENCE_SET = /\bwrite one sentence about\b/i;
 /** reviewOpen: the closing item asked when the model set no task at all (new situation, same point; one task). */
 export const REVIEW_CLOSE_FALLBACK = 'Now write one new sentence about a place you visited, using the same point in this new situation.';
 const FOLDED = /^Rule in one line:/;
@@ -93,6 +94,8 @@ export async function completeLanguageTurn(opts: {
       untrustedMarkers: marker?.untrustedMarkers, firstMarkerNotLeading: marker?.firstMarkerNotLeading,
     }),
     ...(opts.removed ? { preAttemptModelsRemoved: opts.removed } : {}),
+    // ownSentence (ESL5, tag only): the task counts as set only when the reply actually set it; feedback is tagged on the next turn.
+    ...(ownSentenceNow(language) === 'ask' && OWN_SENTENCE_SET.test(opts.reply) ? { ownSentence: 'asked' as const } : ownSentenceNow(language) === 'feedback' ? { ownSentence: 'feedback' as const } : {}),
     ...(opts.closingAsk ? { closingAsk: opts.closingAsk } : {}),
   };
   // fadeKnown (ESL5): a failed quick check is recorded (support returns for the rest of the session; the record's count for the point restarts).

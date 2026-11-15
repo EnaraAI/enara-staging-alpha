@@ -248,6 +248,8 @@ export interface TurnSignals {
   prevReview?: string[];
   // fadeKnown (ESL5): criteria of this turn's item that the record shows as known (faded: no rule line, quick check), or whose quick check is being answered now.
   fade?: { faded: number[]; checkAnswered: number[] };
+  // ownSentence (ESL5): 'ask' = the own-sentence task may be set in this reply (second half, not yet set this session); 'feedback' = they are answering it now.
+  ownSentence?: 'ask' | 'feedback';
 }
 
 export type MoveId =
@@ -377,6 +379,8 @@ export interface LanguageTurnEvidence {
   fadeCheck?: number[];
   fadeCheckAnswered?: number[];
   fadeFailed?: number[];
+  // ownSentence (ESL5, tag only): 'asked' when this reply set the session's own-sentence task, 'feedback' when it gave feedback on it.
+  ownSentence?: 'asked' | 'feedback';
 }
 
 // ---------------------------------------------------------------------------
@@ -900,6 +904,12 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
     if (prevLive) sig.liveTarget = prevLive;
   }
   if (engineV2('reviewOpen') && lastStored?.reviewOpen?.length && inScope(lastStored, scope)) sig.prevReview = lastStored.reviewOpen;
+  if (engineV2('ownSentence')) {
+    const tags = history.filter((h) => h.role === 'assistant' && inScope(h.languageTurn, scope)).map((h) => (h.languageTurn as { ownSentence?: string } | null | undefined)?.ownSentence);
+    const turnNo = history.filter((h) => h.role === 'user').length + 1;
+    if ((lastStored as { ownSentence?: string } | null | undefined)?.ownSentence === 'asked' && inScope(lastStored, scope) && learnerResponse === 'answer') sig.ownSentence = 'feedback';
+    else if (turnNo >= OWN_SENTENCE_FROM && !tags.includes('asked') && (sig.answeringCheck || sig.unpromptedSentence)) sig.ownSentence = 'ask';
+  }
   if (engineV2('releaseAfterTwo') && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope);
   return sig;
 }
@@ -940,6 +950,12 @@ export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<Tur
 /** releaseAfterTwo: the reply after two genuine failed attempts gives the answer (never earlier). */
 export const RELEASE_AFTER = 2;
 export const RELEASE_TEXT = 'They have now made two real attempts on this item and it is still not right. If this answer is right after all, just confirm it and give the next item. Otherwise stop hinting: (1) state the answer to this item with a one-line reason; (2) give one right/wrong pair on the same point as plain sentences (right: ..., wrong: ...); (3) then give ONE new item on the same point, with different words, for them to do without help. Do not ask them to retry this item.';
+// ownSentence (ESL5, framework §5: focus on form inside the learner's own meaningful sentence; §6: pushed output).
+/** The second half of a session starts at the learner's 3rd message: the closing assumes a 5-message session (RESEARCH_CLOSING_TURN), and 3 = ceil(5/2). */
+export const OWN_SENTENCE_FROM = 3;
+export const OWN_SENTENCE_TOPIC = 'a person you know';
+export const OWN_SENTENCE_ASK = (point: string) => `once this session (now): instead of another exercise, ask them to "Write one sentence about ${OWN_SENTENCE_TOPIC} using ${point.replace(/["<>]/g, '').replace(/[\s.]+$/, '')}." - one real sentence of their own, one task only, with no model sentence next to it`;
+export const OWN_SENTENCE_FEEDBACK = (point: string) => `They have just written their own sentence. Give feedback on the target form only (${point.replace(/["<>]/g, '').replace(/[\s.]+$/, '')}): say in one line whether that form is right; if it is not, show just that part corrected with a one-line reason. Do not correct other slips unless they block the meaning, and do not ask for another own sentence this session.`;
 /** liveError (ESL5): the expected Arabic-L1 error types (framework §9) this switch adds. */
 export const LIVE_CODES: string[] = ['article_omitted', 'copula_omitted'];
 const LIVE_RULE: Record<string, string> = {
@@ -1494,6 +1510,18 @@ export const REVIEW_SECOND_LINE = (code: string) => `They have just answered the
 export const REVIEW_CLOSE_LINE = (code?: string) => `This is the point to close the lesson unit. This overrides the "next task" instructions above and replaces the usual rule recap: do NOT ask them to tell you the rule in their own words and do not recap the rule. (1) Answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) give ONE new item in a new situation (new words, a different topic from today's exercises) on ${code ? errorTypeLabel(code) : 'the point they found hardest today'}, for them to answer without help. One task only; never write a completed answer to an open exercise.`;
 /** reviewOpen: the error type the closing item targets (this session's live error first, then the record). */
 export const reviewCloseCode = (ctx: Pick<LanguageTeachingContext, 'signals' | 'record'>): string | undefined => ctx.signals.liveError?.code ?? ctx.signals.liveTarget ?? ctx.record?.live[0];
+/** ownSentence: what this reply does about the session's one own-sentence task (never on a release, closing or recall turn). */
+export function ownSentenceNow(ctx: Pick<LanguageTeachingContext, 'signals' | 'moves' | 'research' | 'record'>): 'ask' | 'feedback' | undefined {
+  const o = engineV2('ownSentence') ? ctx.signals.ownSentence : undefined;
+  if (o !== 'ask') return o;
+  if (releasing(ctx) || (ctx.research && isClosingTurn(ctx.research) && closingOn()) || ctx.signals.prevReview?.length) return undefined;
+  return 'ask';
+}
+/** The lesson point an own sentence should use: the open item's success criterion, else the lesson's first one. */
+const targetPoint = (ctx: Pick<LanguageTeachingContext, 'signals' | 'lesson'>): string => {
+  const crit = ctx.lesson.spec?.successCriteria ?? []; const c = ctx.signals.activeLessonItem?.criteria?.[0];
+  return (c && crit[c - 1]) || crit[0] || ctx.lesson.spec?.objectives?.[0] || 'today\'s point';
+};
 /** releaseAfterTwo: this reply gives the answer after two genuine failed attempts. */
 export const releasing = (ctx: Pick<LanguageTeachingContext, 'moves'>): boolean => engineV2('releaseAfterTwo') && ctx.moves.some((m) => m.reasons.includes('release_after_two_genuine_attempts'));
 function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
@@ -1528,13 +1556,17 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (s.learnerIntent === 'PARTIAL_ANSWER_ATTEMPT' && s.answeringCheck) out.push(`- ${WHY_PROBE}`);
   if (s.answeringCheck || s.unpromptedSentence) {
     const assisted = (L?.hintTurnsOnItem ?? 0) > 0;
-    const next = live
+    const own = ownSentenceNow(ctx);
+    const next = own === 'ask'
+      ? OWN_SENTENCE_ASK(targetPoint(ctx))
+      : live
       ? 'give one new item that tests the error type named above (not the next lesson item)'
       : assisted
       ? 'they had help on this task, so next give one fresh item on the same point for them to do without help (an independent check); a helped answer is not independent evidence'
       : s.nextLessonItem
         ? `next present lesson item [${s.nextLessonItem.id}] exactly as written: ${untrusted(s.nextLessonItem.prompt)} (no rule recap first, and never write example forms that answer it)`
         : 'next give a short freer task (e.g. one or two sentences of their own using the point)';
+    if (own === 'feedback') out.push(`- ${OWN_SENTENCE_FEEDBACK(targetPoint(ctx))}`);
     out.push(`- If this answer is correct: confirm it, then ${next}.`);
     // r4.3: feedback consistency and formative checks (D9).
     out.push('- Every corrected example you write must itself follow the rule you state, and none may contain the answer to an exercise you are setting. If you are not sure whether their answer is right, say so and ask them to explain, rather than inventing a correction.');
