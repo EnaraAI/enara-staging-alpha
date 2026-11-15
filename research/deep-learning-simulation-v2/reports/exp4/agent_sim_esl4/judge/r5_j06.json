@@ -1,0 +1,749 @@
+{
+ "batch": "r5_j06",
+ "cases": {
+  "cf868b832a9": {
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c481e2d832f": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A singular noun usually needs a word before it, like \"a\" or \"an\""
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "caddada6455": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"are\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"are\" is correct. Good fix."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "am with I, is with he, she or it, are with you, we or they"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like this always needs one of these words"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c147b4437ee": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Is\" is for one person or thing: he, she, it. But \"they\" is plural"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c5dc87973fc": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Great job! \"An elephant\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"An elephant\" is right"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"elephant\" starts with a vowel sound (e), so \"an\", not \"a\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c2426ffbf71": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Vowel sound: 'an', like 'an apple'. Other sounds: 'a'"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c55b4b2a36b": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like this does need am, is or are"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"We are kind.\" Wrong: \"We kind.\""
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c209d4e0fb7": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like \"She is a teacher\" always needs am, is or are"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My parents are kind.",
+    "errors": {
+     "W1": "My parents kind.",
+     "W2": "My parents is kind."
+    }
+   }
+  },
+  "c94db7a7c10": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"the\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "The door is identifiable from the situation"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"a\" or \"an\" introduces something new, chosen by the first sound of the next word"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c2c81d7e7f0": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Is\" goes with he, she and it, but here the word is \"I\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c95c4665598": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great job! \"The book\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "the",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c9338c5c751": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like this always needs am, is or are"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: You are tired. Wrong: You tired."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c93ffa1853e": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct, \"watches\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct, \"watches\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, the verb takes -s."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If the verb ends in -sh, -ch, -ss or -x, it takes -es."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c525768be86": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "we must add am, is or are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c5b7c4153f8": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "He, she and it take \"is\". I has its own word."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like this never leaves the gap empty"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cb148c21572": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right now."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right now."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Use am with I, is with he, she and it, and are with you, we and they."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Do not leave the word out"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"You are a good cook\", not \"You a good cook\""
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cb8f7927be1": {
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c4fe4baeec5": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A sentence like this always needs am, is or are."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"You are kind\" is right. \"You kind\" is wrong."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cae0036288e": {
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "lives",
+    "errors": {
+     "W1": "live"
+    }
+   }
+  },
+  "c13381c36cd": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "When a verb ends in consonant + y, we change the y to i and then add -es."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "c1e52307685": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, the verb ends in -s."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If the verb ends in -sh, -ch, -ss or -x, it ends in -es."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cef4d5d1d52": {
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"We are kind.\" ... \"We kind.\" Something is missing"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cf7ae32db0d": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! ... cries. Very good!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Cry\" has a consonant (r) before y, so y changes to -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "goes",
+    "errors": {
+     "W1": "go",
+     "W2": "gos"
+    }
+   }
+  },
+  "c04a8b19eb7": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is cries."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Cry ends in r + y (consonant + y), so we change y to i and add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "studies",
+    "errors": {
+     "W1": "study",
+     "W2": "studys"
+    }
+   }
+  },
+  "c2b89f12a5b": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Exactly right!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Exactly right!"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "lives",
+    "errors": {
+     "W1": "live"
+    }
+   }
+  },
+  "c96cf746ee8": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "One thing, like one fish, needs a word before it: I see a fish."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c99ea172bde": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great! \"Plays\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"Plays\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"My sister\" = she, so we add -s"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "After -ch, we add -es: teach -> teaches."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c8113dec6ab": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If the verb ends in -sh, -ch, -ss or -x, add -es."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c50f78482ed": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"My brother\" is he, so the verb needs an ending."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"go\" ends in -o, so it takes the same ending as watch - watches"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "goes",
+    "errors": {
+     "W1": "go",
+     "W2": "gos"
+    }
+   }
+  },
+  "c203d595387": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"brushes\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If the verb ends in -sh, -ch, -s, -x or -o, add -es."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "ca9cecc6aa0": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, correct!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Watch\" ends in -ch, so we add -es: she watches."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "cd9c45a4981": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"an\": He wants an umbrella."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Umbrella\" starts with a vowel sound (u, like \"up\"), so we use \"an\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "ce88ab93a2a": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, correct! Well done!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Umbrella\" starts with \"u\", a vowel sound, so we say \"an umbrella\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "",
+     "W2": "A"
+    }
+   }
+  },
+  "c7e51d0fd85": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"brushes\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If the verb ends in -sh, -ch, -s, -x or -o, add -es instead."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c6ec1a46632": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Is\" goes only with he, she and it."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c9a790d1ad1": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Washes\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Excellent sentence!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"wash\" ends in -sh, so the third person takes -es"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother studies every night.",
+    "errors": {
+     "W1": "My brother study every night.",
+     "W2": "My brother studys every night."
+    }
+   }
+  }
+ }
+}
