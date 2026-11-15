@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 3,
-   "C2": 3
+   "C1": 4,
+   "C2": 4
   }
  },
  "start": {
@@ -421,7 +421,112 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nWell done: watch ends in -ch, so we add -es to make watches - the extra syllable makes it easier to pronounce. You've mastered the spelling rules. Now a production task: write two sentences about a friend's daily routine, using he or she. Try to include one verb ending in -es or -ies.\n\nLEARNER'S LAST MESSAGE:\nMy friend watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGreat sentence! \"My friend\" is he or she, and watch ends in -ch, so watches is correct. \"Every evening\" shows a routine - perfect for the present simple. Now please write your second sentence about the same friend. Can you use a verb that ends in -ies this time, like study or cry?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nWell done: watch ends in -ch, so we add -es to make watches - the extra syllable makes it easier to pronounce. You've mastered the spelling rules. Now a production task: write two sentences about a friend's daily routine, using he or she. Try to include one verb ending in -es or -ies.\n\nLEARNER'S LAST MESSAGE:\nMy friend watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGreat sentence! \"My friend\" is he or she, and watch ends in -ch, so watches is correct. \"Every evening\" shows a routine - perfect for the present simple. Now please write your second sentence about the same friend. Can you use a verb that ends in -ies this time, like study or cry?",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great sentence!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Great sentence!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Great sentence!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Great sentence!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "watch ends in -ch, so watches is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "She studies every night.",
+    "errors": {
+     "W1": "She study every night.",
+     "W2": "She studys every night."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise he, she and it with -s again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
- ]
+ ],
+ "stateAfterS1": {
+  "form": "thirdS",
+  "band": "B2",
+  "primary": "W2",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 4,
+   "C2": 4
+  }
+ },
+ "recAfterS1": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
+ }
 }
