@@ -1,0 +1,753 @@
+{
+ "batch": "r5_j04",
+ "cases": {
+  "c93ab7bbc3d": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"a\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "with jobs we always say a/an"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "not \"My uncle is doctor\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "cae0b79a65c": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is \"an\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Orange\" starts with the vowel sound \"o\", so we use \"an\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c05681f8bbe": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "here is the answer: We are in the classroom"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "We is more than one person, so we use are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "ca248f1c308": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, 'are' is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "you did it with no example"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "the gap always needs one word"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "you, we and they take are"
+    }
+   ],
+   "next_task": {
+    "kind": "none"
+   }
+  },
+  "cf57f3832f6": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If the verb ends in -sh, -ch, -s, -x or -o, add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c53b4e8f6d0": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "that one is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"I am a teacher\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My parents are kind.",
+    "errors": {
+     "W1": "My parents kind.",
+     "W2": "My parents is kind."
+    }
+   }
+  },
+  "cca7e34a705": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"She\" needs an ending on the verb"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "After -ch, -sh, -s, -x and -o, we add more than just -s"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "cdd8a74d0fa": {
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c2308adb833": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If the verb ends in -sh, -ch, -ss or -x, add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c892d529c2f": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, well done!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Watch ends in -ch, so we add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "cd6ea69feb0": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Goes\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"Goes\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Go\" ends in -o, so after he we add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "lives",
+    "errors": {
+     "W1": "live"
+    }
+   }
+  },
+  "cdaf3d7c676": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"lives\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"lives\" is right"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c142c5bd6ec": {
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cb92d9c55db": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "one thing usually needs a or an before it"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "vowel sound, an; other sound, a"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "ce91d2723d7": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Plays\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"Plays\" is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "cc4ab7ea6e2": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If the verb ends in -sh, -ch, -ss or -x, add -es, not only -s"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "ca6d5e23173": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"They happy\" has no verb, so it is not correct English"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c040f0dc306": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is \"an\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Orange\" starts with \"o\", a vowel sound, so we use \"an\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "",
+     "W2": "A"
+    }
+   }
+  },
+  "c98107059ca": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A vowel sound takes 'an'... Other sounds take 'a'"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c659fda0c53": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is plays"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After she, we add -s"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "lives",
+    "errors": {
+     "W1": "live"
+    }
+   }
+  },
+  "ca3c6559a42": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is am"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Am is only for I, and is is for he, she and it"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c2f05373de8": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"the\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"the\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"an\" before a vowel sound, \"a\" before other sounds"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "caa72113d4d": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, well done!"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c0c7179011b": {
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   }
+  },
+  "cd33bdcec42": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "here is the answer: They are happy"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "They is more than one person, so we use are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "cd2c934e167": {
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"You are kind.\" ... \"You kind.\" Now the sentence is broken"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "English needs am, is or are here"
+    }
+   ],
+   "next_task": {
+    "kind": "none"
+   }
+  },
+  "c9d573f75d9": {
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"We are kind.\" Now take out \"are\": \"We kind.\" The second one is not a full sentence"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cb270f76a54": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"cries\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"cries\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "-ies after a consonant + y"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cf3525ca23c": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"She fixes the car.\" is correct now"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If the verb ends in -sh, -ch, -ss or -x, add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c9428e46556": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, correct!"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c139eef6332": {
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "the",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "cebe3f64352": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Cries\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"Cries\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "consonant (r) + y, so the y becomes i and we add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "goes",
+    "errors": {
+     "W1": "go",
+     "W2": "gos"
+    }
+   }
+  },
+  "c93df3366ef": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A vowel sound takes \"an\". Other sounds take \"a\""
+    }
+   ],
+   "next_task": {
+    "kind": "none"
+   }
+  },
+  "cd0e6f08264": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"a\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English we need \"a\" before a job"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"He is a doctor\", not \"He is doctor\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c4146ee9c0e": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, well done! \"The door\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "cec7cf74057": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "after a consonant + y, the y changes to -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  }
+ }
+}
