@@ -11,11 +11,11 @@
    "W1": 0,
    "W2": 0,
    "C1": 3,
-   "C2": 0
+   "C2": 2
   },
   "indep": {
    "C1": 2,
-   "C2": 0
+   "C2": 1
   }
  },
  "start": {
@@ -338,7 +338,77 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou added an ending, which is right, but this verb needs a different one. Look at how it is spelled at the end.\nHere is a worked example: the verb is kiss. It ends in -s, so I add -es: She kisses the baby.\nRule: after he, she or it, verbs ending in -sh, -ch, -s, -x or -o take -es.\nRight: He fixes the car. Wrong: He fixs the car.\nNow you. Write only the verb:\nShe ___ (wash) the dishes every evening.\n\nLEARNER'S LAST MESSAGE:\nwashes\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"washes\" is right. Wash ends in -sh, so it takes -es.\nRemember: after he, she or it, most verbs add -s, as in \"plays\" and \"drinks\".\nVerbs ending in -sh, -ch, -s, -x or -o add -es.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou added an ending, which is right, but this verb needs a different one. Look at how it is spelled at the end.\nHere is a worked example: the verb is kiss. It ends in -s, so I add -es: She kisses the baby.\nRule: after he, she or it, verbs ending in -sh, -ch, -s, -x or -o take -es.\nRight: He fixes the car. Wrong: He fixs the car.\nNow you. Write only the verb:\nShe ___ (wash) the dishes every evening.\n\nLEARNER'S LAST MESSAGE:\nwashes\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"washes\" is right. Wash ends in -sh, so it takes -es.\nRemember: after he, she or it, most verbs add -s, as in \"plays\" and \"drinks\".\nVerbs ending in -sh, -ch, -s, -x or -o add -es.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"washes\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "washes"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after he, she or it, most verbs add -s"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Verbs ending in -sh, -ch, -s, -x or -o add -es."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise he, she and it with -s again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
- ]
+ ],
+ "stateAfterS1": {
+  "form": "thirdS",
+  "band": "A2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 2
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 1
+  }
+ }
 }
