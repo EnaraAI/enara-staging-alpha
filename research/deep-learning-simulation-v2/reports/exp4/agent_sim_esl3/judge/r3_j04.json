@@ -1,0 +1,865 @@
+{
+ "batch": "r3_j04",
+ "cases": {
+  "c1dc54cd832": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"an\" is right."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is right."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c55b42b4da3": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If it starts with a vowel sound, write \"an\". If not, write \"a\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c0d70baba58": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"an\" is right for \"honest\"."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is right for \"honest\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"an\" is right for \"honest\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is right for \"honest\"."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c2c721e2cfe": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "But \"is\" goes only with he, she and it."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c60c9bd3545": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"an\": an umbrella."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c6440210315": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"the\": close the door."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c4652041102": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "So: She is at home today."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "ce6a6472b60": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"is\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"is\"."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am a student.",
+    "errors": {
+     "W1": "I a student.",
+     "W2": "I is a student."
+    }
+   }
+  },
+  "cd6e09b520e": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! \"They are happy.\""
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! \"They are happy.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! \"They are happy.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct! \"They are happy.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "cc3db530855": {
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: We are late. Wrong: We late."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c566698bbd5": {
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: We are late. Wrong: We late."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "cb7ca8e4ff9": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, well done! \"He drinks tea in the morning.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, well done! \"He drinks tea in the morning.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "verbs ending in -ch, -sh, -s, -x or -o take -es."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "cec280e16b7": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like this always needs one word after the person"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "ca7742b00bd": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, that's right! She is at home today."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, that's right! She is at home today."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "cb1d0f87624": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great, correct! She is at home today."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Great, correct! She is at home today."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c576f87381b": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"am\" is right."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"am\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cfc3fec53c9": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! \"Close the door\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! \"Close the door\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c4ab157abbb": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"drinks\". You did that one on your own"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"drinks\". You did that one on your own"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c0cc819eda5": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, correct! She is at home today."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, correct! She is at home today."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c63fb9ea286": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"the\": the book."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "the",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "ca702e47179": {
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: an eye. Wrong: a eye."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "cd584eea66b": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"drinks\". You did that one on your own."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"drinks\". You did that one on your own."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "ccccf5e51fe": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Right, \"watches\" is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Right, \"watches\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Right, \"watches\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Right, \"watches\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the -ch ending takes -es, not just -s."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "c747fab31d4": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"plays\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cff631a1784": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! We say \"a doctor\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! We say \"a doctor\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "the",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c89f9ac3cca": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, that's right! \"He drinks tea in the morning.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, that's right! \"He drinks tea in the morning.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "add -es when the verb ends in -sh, -ch, -s, -x or -o."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c88a10078f7": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! She is at home today."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! She is at home today."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c50e4a28a15": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"am\" is right. Good fix!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right. Good fix!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"am\" is right. Good fix!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right. Good fix!"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c16903483c9": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If it starts with a vowel sound, write \"an\". If not, write \"a\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "cb16ca3a5b4": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"am\" is right. Good fix!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right. Good fix!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"am\" is right. Good fix!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right. Good fix!"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c996fbc6851": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"a\": a doctor."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c456f241916": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes! \"He drinks tea in the morning.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes! \"He drinks tea in the morning.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "verbs ending in -sh, -ch, -s, -x or -o get -es."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c663da32225": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"the\": I bought a book. The book is very good."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c11bc1d83bc": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"drinks\". You did that one on your own."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"drinks\". You did that one on your own."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c5883413025": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If it starts with a vowel sound, write \"an\". If not, write \"a\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c9a890693b2": {
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  }
+ }
+}
