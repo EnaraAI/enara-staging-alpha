@@ -1,0 +1,106 @@
+{
+ "id": "v201_d",
+ "tutor": "d",
+ "learnerIdx": 201,
+ "seed": "esl3-val|L201|rep1",
+ "state": {
+  "form": "copula",
+  "band": "A1",
+  "primary": "W1",
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "start": {
+  "form": "copula",
+  "band": "A1",
+  "primary": "W1",
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "turns": [
+  {
+   "learner": "Hello! Can you give me an exercise on am, is and are?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "tutor": "Here is the rule. In English every present sentence needs am, is or are: \"She is a teacher\", not \"She teacher\". Use am with I, is with he, she and it, and are with you, we and they.\n\nLook at this pair. Right: \"My sister is happy.\" Wrong: \"My sister happy.\"\n\nNow write one sentence of your own about a friend: who is your friend and how is he or she today?",
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 1: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on am, is and are?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHere is the rule. In English every present sentence needs am, is or are: \"She is a teacher\", not \"She teacher\". Use am with I, is with he, she and it, and are with you, we and they.\n\nLook at this pair. Right: \"My sister is happy.\" Wrong: \"My sister happy.\"\n\nNow write one sentence of your own about a friend: who is your friend and how is he or she today?",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "every present sentence needs am, is or are"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Use am with I, is with he, she and it, and are with you, we and they"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"She is a teacher\", not \"She teacher\""
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My friend is Ali and he is happy today.",
+    "errors": {
+     "W1": "My friend Ali and he happy today."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "learner": "My friend Ali and he happy today.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My friend Ali and he happy today."
+   },
+   "tutor": "Not quite. Right: \"My sister is happy.\" Wrong: \"My sister happy.\"\n\nWrite one more new sentence of your own about your family. Use am, is or are.",
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHere is the rule. In English every present sentence needs am, is or are: \"She is a teacher\", not \"She teacher\". Use am with I, is with he, she and it, and are with you, we and they.\n\nLook at this pair. Right: \"My sister is happy.\" Wrong: \"My sister happy.\"\n\nNow write one sentence of your own about a friend: who is your friend and how is he or she today?\n\nLEARNER'S LAST MESSAGE:\nMy friend Ali and he happy today.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nNot quite. Right: \"My sister is happy.\" Wrong: \"My sister happy.\"\n\nWrite one more new sentence of your own about your family. Use am, is or are."
+  }
+ ]
+}
