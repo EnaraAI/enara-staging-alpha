@@ -34,7 +34,7 @@ g = defaultdict(lambda: {'turns': 0, 'leakFinal': 0, 'twoAsks': 0, 'twoAsksRaw':
 for t in tags: x = g[t['arm']]; x['turns'] += 1; x['leakFinal'] += t['leakFinal'] > 0; x['twoAsks'] += bool(t['twoAsks']); x['twoAsksRaw'] += bool(t.get('twoAsksRaw'))
 traj = defaultdict(lambda: [[] for _ in range(10)])
 for t in tags:
-    if t.get('stateAfter') and t['band'] != 'B2': traj[t['arm']][t['turn'] - 1].append(t['stateAfter']['W1'] + t['stateAfter']['W2'])
+    if t.get('stateAfter') and t['band'] != 'B2': traj[t['arm']][t['turn'] - 1].append(t['stateAfter']['s']['W1'] + t['stateAfter']['s']['W2'])
 res['trajectory'] = {a: [round(sum(v) / len(v), 3) if v else None for v in traj[a]] for a in traj}
 rate = defaultdict(lambda: defaultdict(list)); RD = os.path.join(D, 'rate')
 if os.path.exists(os.path.join(RD, 'KEY.json')):

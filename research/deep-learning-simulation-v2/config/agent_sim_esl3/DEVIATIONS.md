@@ -12,3 +12,6 @@ Each item is logged when it happened. PROTOCOL.md itself is not edited.
    - Hash before: `24c4b2fd655efe00babd81b5e1c9e656f9c6c2342f1fd285d893806a3bfb4b56`
    - Hash after: `979fc44132cb27c64cb17084f0bbcfd5af8504551c61b6cbe5698d2cc908c38c`
    - Nothing in the sessions, the judging or the analysis was affected.
+6. **esl3_analyze.py, trajectory only (secondary, descriptive):** the script read `stateAfter.W1`, but the field is `stateAfter.s.W1`, so it crashed before writing any output. The fix is that one expression. The primary test, the guards, the ratings and the decision rule are unchanged.
+   - Hash before: `1de8730b8ca3128c72d19c1803a5e676febab385d627abe56142b3ea967262fe`
+   - Hash after: `82956d1950118e33b1e7a99af70c999dfc36470cfdda63ead5e61519fec69863`
