@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 2,
-   "C2": 2
+   "C2": 3
   }
  },
  "start": {
@@ -472,7 +472,58 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's a sound general principle: a singular countable noun usually needs an article. But it restates the baseline rather than tackling the two trickier cases in the task.\nHere is the task once more:\nWrite two sentences of your own. In the first, choose an article before an abbreviation or a word with a tricky first sound. In the second, use the because the thing is unique or shared knowledge, not because it was mentioned.\nThen explain why each choice is right. For the first sentence, pay attention to how the word is pronounced at its start, not how it is spelled.\n\nLEARNER'S LAST MESSAGE:\nI met an FBI agent.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I met an FBI agent.\" handles the abbreviation by sound, so the first part of the task is done.\nThe second sentence is still missing, and so are the reasons.\nWrite a sentence that uses the for something unique or shared world knowledge, not something you mentioned earlier. Then explain both choices briefly. For the first, look at the opening sound when you say the letters aloud in your head; for the second, say what makes the thing identifiable to anyone."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's a sound general principle: a singular countable noun usually needs an article. But it restates the baseline rather than tackling the two trickier cases in the task.\nHere is the task once more:\nWrite two sentences of your own. In the first, choose an article before an abbreviation or a word with a tricky first sound. In the second, use the because the thing is unique or shared knowledge, not because it was mentioned.\nThen explain why each choice is right. For the first sentence, pay attention to how the word is pronounced at its start, not how it is spelled.\n\nLEARNER'S LAST MESSAGE:\nI met an FBI agent.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I met an FBI agent.\" handles the abbreviation by sound, so the first part of the task is done.\nThe second sentence is still missing, and so are the reasons.\nWrite a sentence that uses the for something unique or shared world knowledge, not something you mentioned earlier. Then explain both choices briefly. For the first, look at the opening sound when you say the letters aloud in your head; for the second, say what makes the thing identifiable to anyone.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"I met an FBI agent.\" handles the abbreviation by sound"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"I met an FBI agent.\" handles the abbreviation by sound"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The sun is very hot today.",
+    "errors": {
+     "W1": "Sun is very hot today."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The sun is very hot today.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "The sun is very hot today."
+   }
   }
  ],
  "stateAfterS1": {

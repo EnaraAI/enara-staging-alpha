@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 2
+   "C2": 3
   }
  },
  "start": {
@@ -459,7 +459,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat statement is accurate as far as it goes: a singular countable noun usually needs an article or another determiner. But it is a general rule, not yet the task, so it doesn't show how you choose between the articles in real sentences.\nLet's return to the task once:\nWrite two sentences of your own. In the first, use a or an before a word where spelling and sound disagree. In the second, use the for something both people know without it being mentioned before.\nThen add a few words on why each article fits. When you check your first sentence, look at the first sound of the noun, not its first letter.\n\nLEARNER'S LAST MESSAGE:\nI waited for an hour.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I waited for an hour.\" works for the first part: the article you chose fits a word whose spelling and sound disagree.\nTwo pieces are still missing. You haven't written the second sentence yet, the one with the for something both people know without an earlier mention. And neither sentence has its reason yet.\nPlease add the second sentence now, then a few words on why each article fits. For the second one, think about what makes the thing identifiable to your listener on first mention."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat statement is accurate as far as it goes: a singular countable noun usually needs an article or another determiner. But it is a general rule, not yet the task, so it doesn't show how you choose between the articles in real sentences.\nLet's return to the task once:\nWrite two sentences of your own. In the first, use a or an before a word where spelling and sound disagree. In the second, use the for something both people know without it being mentioned before.\nThen add a few words on why each article fits. When you check your first sentence, look at the first sound of the noun, not its first letter.\n\nLEARNER'S LAST MESSAGE:\nI waited for an hour.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I waited for an hour.\" works for the first part: the article you chose fits a word whose spelling and sound disagree.\nTwo pieces are still missing. You haven't written the second sentence yet, the one with the for something both people know without an earlier mention. And neither sentence has its reason yet.\nPlease add the second sentence now, then a few words on why each article fits. For the second one, think about what makes the thing identifiable to your listener on first mention.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"I waited for an hour.\" works for the first part"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"I waited for an hour.\" works for the first part"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Please close the door.",
+    "errors": {
+     "W1": "Please close door.",
+     "W2": "Please close a door."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Please close the door.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Please close the door."
+   }
   }
  ],
  "stateAfterS1": {

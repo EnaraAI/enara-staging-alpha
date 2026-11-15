@@ -14,7 +14,7 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 2
   }
  },
@@ -460,7 +460,50 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I bought a book. The book is very good.\" Both articles are right: a introduces the book, and the refers back to it once it has been mentioned.\nThat covers the first part. Now look again at the last part of the task: one more sentence where the noun is identifiable from the situation, with no earlier mention, plus one line explaining why the works there. Think of a shared setting like the flat in my example, but use a different object.\n\nLEARNER'S LAST MESSAGE:\nCan you close the window?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Can you close the window?\" works well: no earlier mention, yet the is natural because the setting makes one window identifiable to both speakers.\nThe one-line explanation is still missing. In your own words, why does the listener know which window you mean?\nAfter that, a harder variant: the with a first mention through association, as in \"I bought a car, but the engine is noisy.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I bought a book. The book is very good.\" Both articles are right: a introduces the book, and the refers back to it once it has been mentioned.\nThat covers the first part. Now look again at the last part of the task: one more sentence where the noun is identifiable from the situation, with no earlier mention, plus one line explaining why the works there. Think of a shared setting like the flat in my example, but use a different object.\n\nLEARNER'S LAST MESSAGE:\nCan you close the window?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Can you close the window?\" works well: no earlier mention, yet the is natural because the setting makes one window identifiable to both speakers.\nThe one-line explanation is still missing. In your own words, why does the listener know which window you mean?\nAfter that, a harder variant: the with a first mention through association, as in \"I bought a car, but the engine is noisy.\"",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Can you close the window?\" works well"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"Can you close the window?\" works well"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   }
   }
  ],
  "stateAfterS1": {
