@@ -34,8 +34,21 @@
   }
  },
  "rec": {
-  "entries": [],
-  "liveErrors": {},
+  "entries": [
+   {
+    "code": "article_omitted",
+    "occurrences": 1,
+    "lastSeenAt": "2027-01-11T09:04:00.000Z",
+    "independentStreak": 0,
+    "nextReviewAt": "2027-01-12T09:04:00.000Z"
+   }
+  ],
+  "liveErrors": {
+   "article_omitted": {
+    "seen": 1,
+    "lastCorrect": false
+   }
+  },
   "knownPoints": {}
  },
  "turns": [
@@ -303,7 +316,31 @@
     "correct": false,
     "fired": "W1",
     "text": "My sister is engineer."
-   }
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "ev5": {
+    "liveError": "article_omitted",
+    "ownSentence": "feedback"
+   },
+   "engineVerdict": "INCORRECT",
+   "recordLive": [],
+   "tutor": "There is no small word before \"engineer\" in your sentence.\nEnglish puts a small word, a, an or the, before one thing.\nRight: \"He has a car.\" Wrong: \"He has car.\"\nNow your turn. Write the missing small word:\nMy sister has ___ dog.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 3: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a\" is correct. You found the first sound on your own.\nNow write your own sentence instead of filling a gap.\nWrite one sentence about a person you know, using \"a\" or \"an\".\n\nLEARNER'S LAST MESSAGE:\nMy sister is engineer.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nThere is no small word before \"engineer\" in your sentence.\nEnglish puts a small word, a, an or the, before one thing.\nRight: \"He has a car.\" Wrong: \"He has car.\"\nNow your turn. Write the missing small word:\nMy sister has ___ dog."
   }
  ]
 }
