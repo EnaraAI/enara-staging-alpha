@@ -14,7 +14,7 @@
    "C2": 3
   },
   "indep": {
-   "C1": 5,
+   "C1": 6,
    "C2": 2
   }
  },
@@ -752,7 +752,81 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"sleeps\" is correct. \"The dog\" is \"it\", so the verb takes the ending.\n\nNow complete this one:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"plays\" is correct. \"My sister\" is \"she\", so the verb takes the -s ending.\n\nYou are ready to write a sentence on your own now. Think of a person you know well, such as a friend, a brother or a colleague. Write one sentence about a thing this person does at the weekend. When you finish, read your verb again and check the ending."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"sleeps\" is correct. \"The dog\" is \"it\", so the verb takes the ending.\n\nNow complete this one:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"plays\" is correct. \"My sister\" is \"she\", so the verb takes the -s ending.\n\nYou are ready to write a sentence on your own now. Think of a person you know well, such as a friend, a brother or a colleague. Write one sentence about a thing this person does at the weekend. When you finish, read your verb again and check the ending.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 2
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"plays\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "plays"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"My sister\" is \"she\", so the verb takes the -s ending."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother watches football at the weekend.",
+    "errors": {
+     "W1": "My brother watch football at the weekend.",
+     "W2": "My brother watchs football at the weekend."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brother watches football at the weekend.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother watches football at the weekend."
+   }
   }
  ],
  "stateAfterS1": {

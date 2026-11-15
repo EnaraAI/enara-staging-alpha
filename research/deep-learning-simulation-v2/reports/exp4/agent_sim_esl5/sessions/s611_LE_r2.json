@@ -658,7 +658,75 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood choice of word: \"hour\" is exactly the kind of case where spelling and sound differ. But check the article in front of it. Say \"hour\" aloud in your head and notice what you actually hear first.\n\nThen rewrite that first sentence. We can do the second sentence, with the, right after.\n\nLEARNER'S LAST MESSAGE:\nI waited an hour for the bus.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's right: 'an hour' is correct, since the h is silent and the word begins with a vowel sound. Your sentence now shows exactly the point about sound over spelling.\n\nLet's take this into a different context. Write one sentence about a person you know, choosing a or an by sound. If you like, push yourself with a noun where spelling could mislead, such as a job title or a description beginning with u, h or o."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood choice of word: \"hour\" is exactly the kind of case where spelling and sound differ. But check the article in front of it. Say \"hour\" aloud in your head and notice what you actually hear first.\n\nThen rewrite that first sentence. We can do the second sentence, with the, right after.\n\nLEARNER'S LAST MESSAGE:\nI waited an hour for the bus.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's right: 'an hour' is correct, since the h is silent and the word begins with a vowel sound. Your sentence now shows exactly the point about sound over spelling.\n\nLet's take this into a different context. Write one sentence about a person you know, choosing a or an by sound. If you like, push yourself with a noun where spelling could mislead, such as a job title or a description beginning with u, h or o.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "That's right: 'an hour' is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "That's right: 'an hour' is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My cousin is an honest man.",
+    "errors": {
+     "W1": "My cousin is honest man.",
+     "W2": "My cousin is a honest man."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My cousin is an honest man.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My cousin is an honest man."
+   }
   }
  ],
  "stateAfterS1": {

@@ -14,7 +14,7 @@
    "C2": 3
   },
   "indep": {
-   "C1": 5,
+   "C1": 6,
    "C2": 3
   }
  },
@@ -729,7 +729,81 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Everyone watches TV after dinner.\" is correct on both counts: \"everyone\" is grammatically singular, so it takes the third-person form, and a verb ending in -ch takes -es. One sentence covered both parts of the task, which works.\n\nLet's move to a lesson item next:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"plays\" is correct: a vowel + y verb simply takes -s, unlike consonant + y verbs, which change to -ies. Clearly secure.\n\nSince the gap-fill items are not stretching you, let's switch to free production. Write one sentence about a real person you know, describing a habit or routine of theirs, using the third-person singular present simple. To make it more demanding, try to choose a subject or verb that is easy to get wrong: a collective noun such as \"my family\", a subject separated from its verb by a phrase, or a verb ending in -o, -x or -sh. Just one sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Everyone watches TV after dinner.\" is correct on both counts: \"everyone\" is grammatically singular, so it takes the third-person form, and a verb ending in -ch takes -es. One sentence covered both parts of the task, which works.\n\nLet's move to a lesson item next:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"plays\" is correct: a vowel + y verb simply takes -s, unlike consonant + y verbs, which change to -ies. Clearly secure.\n\nSince the gap-fill items are not stretching you, let's switch to free production. Write one sentence about a real person you know, describing a habit or routine of theirs, using the third-person singular present simple. To make it more demanding, try to choose a subject or verb that is easy to get wrong: a collective noun such as \"my family\", a subject separated from its verb by a phrase, or a verb ending in -o, -x or -sh. Just one sentence.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"plays\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"plays\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "a vowel + y verb simply takes -s, unlike consonant + y verbs, which change to -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My mother watches TV every evening.",
+    "errors": {
+     "W1": "My mother watch TV every evening.",
+     "W2": "My mother watchs TV every evening."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My mother watches TV every evening.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My mother watches TV every evening."
+   }
   }
  ],
  "stateAfterS1": {

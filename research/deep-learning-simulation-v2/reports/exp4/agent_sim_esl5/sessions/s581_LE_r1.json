@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 0,
-   "C2": 4
+   "C2": 5
   }
  },
  "start": {
@@ -684,7 +684,81 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"a\" is right: \"small\" begins with an \"s\" sound, not a vowel sound. Notice you looked at the word right after the gap, not the noun.\nNow try this.\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"an\" is right this time, because the word after the gap begins with a vowel sound. You chose \"a\" before and \"an\" now, so you are checking the sound each time.\nNext, write your own sentence.\nWrite one sentence about a person you know. Use \"a\" before a consonant sound or \"an\" before a vowel sound."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"a\" is right: \"small\" begins with an \"s\" sound, not a vowel sound. Notice you looked at the word right after the gap, not the noun.\nNow try this.\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"an\" is right this time, because the word after the gap begins with a vowel sound. You chose \"a\" before and \"an\" now, so you are checking the sound each time.\nNext, write your own sentence.\nWrite one sentence about a person you know. Use \"a\" before a consonant sound or \"an\" before a vowel sound.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! \"an\" is right this time"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct! \"an\" is right this time"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "because the word after the gap begins with a vowel sound"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My sister is an engineer.",
+    "errors": {
+     "W1": "My sister is engineer.",
+     "W2": "My sister is a engineer."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 5
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My sister is an engineer.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister is an engineer."
+   }
   }
  ],
  "stateAfterS1": {

@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 1,
-   "C2": 3
+   "C1": 2,
+   "C2": 4
   }
  },
  "start": {
@@ -637,7 +637,81 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat general idea is right: a singular countable noun usually needs an article. It doesn't show the task yet, though.\nPlease write the two sentences: first, a or an before a noun whose first letter could mislead you; second, the for something both people already know about.\n\nLEARNER'S LAST MESSAGE:\nI waited an hour.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"an hour\" is right: you went by the vowel sound, not the silent h. That covers the first part of the task.\nThe second part is still missing: a sentence where the refers to something both people can identify, either because it was mentioned before or because there is only one in the situation.\nPlease add that second sentence. It can follow on from your first one or stand alone."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat general idea is right: a singular countable noun usually needs an article. It doesn't show the task yet, though.\nPlease write the two sentences: first, a or an before a noun whose first letter could mislead you; second, the for something both people already know about.\n\nLEARNER'S LAST MESSAGE:\nI waited an hour.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"an hour\" is right: you went by the vowel sound, not the silent h. That covers the first part of the task.\nThe second part is still missing: a sentence where the refers to something both people can identify, either because it was mentioned before or because there is only one in the situation.\nPlease add that second sentence. It can follow on from your first one or stand alone.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"an hour\" is right"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"an hour\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"an hour\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"an hour\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "The hour felt very long.",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The hour felt very long.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "The hour felt very long."
+   }
   }
  ],
  "stateAfterS1": {

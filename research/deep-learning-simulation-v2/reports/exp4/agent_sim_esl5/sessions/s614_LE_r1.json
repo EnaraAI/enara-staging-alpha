@@ -665,7 +665,61 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I found an old key in the park.\" is correct: an fits the vowel sound of \"old\", and the park works because the place is clear from context.\n\nThe task had a second part. Add one more sentence that mentions the key again, and say in one line how you chose its article.\n\nLEARNER'S LAST MESSAGE:\nThe key was very old.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The key was very old.\" is correct: the refers back to the key you already introduced, so both of you know which one.\n\nNext, write one sentence about a person you know, choosing a or an by the sound of the next word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I found an old key in the park.\" is correct: an fits the vowel sound of \"old\", and the park works because the place is clear from context.\n\nThe task had a second part. Add one more sentence that mentions the key again, and say in one line how you chose its article.\n\nLEARNER'S LAST MESSAGE:\nThe key was very old.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The key was very old.\" is correct: the refers back to the key you already introduced, so both of you know which one.\n\nNext, write one sentence about a person you know, choosing a or an by the sound of the next word.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   },
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My uncle is an engineer.",
+    "errors": {
+     "W1": "My uncle is engineer.",
+     "W2": "My uncle is a engineer."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My uncle is an engineer.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My uncle is an engineer."
+   }
   }
  ],
  "stateAfterS1": {
