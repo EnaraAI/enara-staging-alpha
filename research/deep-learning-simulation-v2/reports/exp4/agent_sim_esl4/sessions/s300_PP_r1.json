@@ -10,12 +10,12 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 0,
+   "C1": 2,
    "C2": 3
   },
   "indep": {
-   "C1": 0,
-   "C2": 1
+   "C1": 1,
+   "C2": 2
   }
  },
  "start": {
@@ -542,7 +542,63 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"Doctor\" starts with the consonant sound \"d\", so we say \"a doctor\". And remember, we need the article: \"My uncle is a doctor\", not \"My uncle is doctor\". Next: Write a, an or the: We saw ___ elephant at the zoo. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect, well done! \"Elephant\" starts with the vowel sound \"e\", and it is the first time we talk about it, so we say \"an elephant\". Next: Write a, an or the: I bought a book. ___ book is very good. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"Doctor\" starts with the consonant sound \"d\", so we say \"a doctor\". And remember, we need the article: \"My uncle is a doctor\", not \"My uncle is doctor\". Next: Write a, an or the: We saw ___ elephant at the zoo. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect, well done! \"Elephant\" starts with the vowel sound \"e\", and it is the first time we talk about it, so we say \"an elephant\". Next: Write a, an or the: I bought a book. ___ book is very good. (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct, well done!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct, well done!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct, well done!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct, well done!"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "",
+     "W2": "A"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
   }
  ],
  "stateAfterS1": {

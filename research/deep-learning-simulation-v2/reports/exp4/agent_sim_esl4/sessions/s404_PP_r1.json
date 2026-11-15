@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 3,
-   "C2": 6
+   "C2": 7
   }
  },
  "start": {
@@ -613,7 +613,51 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGreat sentence! \"Watches\" is spelled correctly because \"watch\" ends in -ch, and \"every evening\" shows a habit. Now try one with a verb ending in consonant + y, like study or carry. Write one sentence about someone else.\n\nLEARNER'S LAST MESSAGE:\nMy brother studies every night.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nPerfect! \"Study\" has a consonant (d) before the y, so it becomes \"studies\". Now a trickier contrast: write one sentence using a verb ending in vowel + y, like play or enjoy, about he or she. How does the spelling change, or does it?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGreat sentence! \"Watches\" is spelled correctly because \"watch\" ends in -ch, and \"every evening\" shows a habit. Now try one with a verb ending in consonant + y, like study or carry. Write one sentence about someone else.\n\nLEARNER'S LAST MESSAGE:\nMy brother studies every night.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nPerfect! \"Study\" has a consonant (d) before the y, so it becomes \"studies\". Now a trickier contrast: write one sentence using a verb ending in vowel + y, like play or enjoy, about he or she. How does the spelling change, or does it?",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Perfect! \"Study\" has a consonant (d) before the y, so it becomes \"studies\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My brother studies every night."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "He plays football on Sundays.",
+    "errors": {
+     "W1": "He play football on Sundays.",
+     "W2": "He plaies football on Sundays."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 7
+    }
+   }
   }
  ],
  "stateAfterS1": {

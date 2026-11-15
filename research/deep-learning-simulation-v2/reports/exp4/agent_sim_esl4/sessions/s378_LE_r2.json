@@ -8,7 +8,7 @@
   "band": "A2",
   "primary": "W1",
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 3
@@ -607,7 +607,42 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 2: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are leaving the gap empty here, but one thing needs a or an.\nRule: an before a vowel sound (a, e, i, o, u), a before other sounds.\nExample: 'I see a bus.' Bus starts with a b sound. That is not a vowel sound, so I write a.\nNow do the same steps with the word after the gap.\nWrite a or an:\nShe has ___ orange in her bag.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nThat's okay. Let's stop the exercises here and look back at what we practised.\nOne thing needs a or an in front of it, so the gap should not stay empty.\nWe use an before a vowel sound, as in \"There is an egg in the box\", and a before other sounds, as in \"I see a bus.\"\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 2: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are leaving the gap empty here, but one thing needs a or an.\nRule: an before a vowel sound (a, e, i, o, u), a before other sounds.\nExample: 'I see a bus.' Bus starts with a b sound. That is not a vowel sound, so I write a.\nNow do the same steps with the word after the gap.\nWrite a or an:\nShe has ___ orange in her bag.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nThat's okay. Let's stop the exercises here and look back at what we practised.\nOne thing needs a or an in front of it, so the gap should not stay empty.\nWe use an before a vowel sound, as in \"There is an egg in the box\", and a before other sounds, as in \"I see a bus.\"\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "One thing needs a or an in front of it, so the gap should not stay empty."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "We use an before a vowel sound ... and a before other sounds"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
   }
  ],
  "stateAfterS1": {

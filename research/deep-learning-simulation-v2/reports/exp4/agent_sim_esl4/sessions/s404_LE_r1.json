@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 2,
-   "C2": 2
+   "C2": 3
   }
  },
  "start": {
@@ -580,7 +580,48 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe rule you keep giving is correct as far as it goes: he, she and it take -s or -es.\nLet's test it on one word rather than in general. Look only at the last two letters of \"hurry\": r and y.\nOne thing to do: complete \"He usually ___ to the station.\" with \"hurry\" in the right form, and nothing else.\n\nLEARNER'S LAST MESSAGE:\nhurries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Hurries\" is correct. The letter before the y is r, a consonant, so the y becomes i and the verb takes -es.\nThis is the part your rule did not show yet, so let's put the full picture together.\nYou said \"add -s/-es after he/she/it\", and that is the base for every verb in this lesson.\nThe ending depends on the last letters: -es after sh, ch, s, x or o; -ies when a consonant comes before a final y; plain -s otherwise, so a vowel before y keeps it, as in \"says\".\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe rule you keep giving is correct as far as it goes: he, she and it take -s or -es.\nLet's test it on one word rather than in general. Look only at the last two letters of \"hurry\": r and y.\nOne thing to do: complete \"He usually ___ to the station.\" with \"hurry\" in the right form, and nothing else.\n\nLEARNER'S LAST MESSAGE:\nhurries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Hurries\" is correct. The letter before the y is r, a consonant, so the y becomes i and the verb takes -es.\nThis is the part your rule did not show yet, so let's put the full picture together.\nYou said \"add -s/-es after he/she/it\", and that is the base for every verb in this lesson.\nThe ending depends on the last letters: -es after sh, ch, s, x or o; -ies when a consonant comes before a final y; plain -s otherwise, so a vowel before y keeps it, as in \"says\".\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Hurries\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "hurries"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "-es after sh, ch, s, x or o; -ies when a consonant comes before a final y"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
   }
  ],
  "stateAfterS1": {

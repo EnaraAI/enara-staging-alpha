@@ -10,12 +10,12 @@
   "s": {
    "W2": 0,
    "W1": 0,
-   "C1": 0,
+   "C1": 2,
    "C2": 3
   },
   "indep": {
-   "C1": 0,
-   "C2": 3
+   "C1": 1,
+   "C2": 4
   }
  },
  "start": {
@@ -617,7 +617,66 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"is\" is correct, and the sentence is complete.\nNow a new kind of task. Write one full sentence of your own about you and your friends. Start with \"We\" and use a word from today, like happy, tired or in the classroom.\n\nLEARNER'S LAST MESSAGE:\nWe are happy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"We are happy.\" is correct. \"We\" has its word, and nothing is left out.\nLet's close today's practice with a short recap.\nI goes with am; he, she and it go with is; you, we and they go with are.\nA sentence like \"You are a teacher\" needs that word.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"is\" is correct, and the sentence is complete.\nNow a new kind of task. Write one full sentence of your own about you and your friends. Start with \"We\" and use a word from today, like happy, tired or in the classroom.\n\nLEARNER'S LAST MESSAGE:\nWe are happy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"We are happy.\" is correct. \"We\" has its word, and nothing is left out.\nLet's close today's practice with a short recap.\nI goes with am; he, she and it go with is; you, we and they go with are.\nA sentence like \"You are a teacher\" needs that word.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"We are happy.\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "nothing is left out"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"We are happy.\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "nothing is left out"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I goes with am; he, she and it go with is; you, we and they go with are."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A sentence like \"You are a teacher\" needs that word."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R3:C1",
+    "R4:C2",
+    "R4:C1",
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   }
   }
  ],
  "stateAfterS1": {

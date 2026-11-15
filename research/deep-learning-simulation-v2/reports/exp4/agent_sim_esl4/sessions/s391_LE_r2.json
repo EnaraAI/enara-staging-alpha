@@ -624,7 +624,51 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe space is empty, so the sentence is not finished yet.\n\nCompare this pair. Right: \"The window is open.\" Wrong: \"The window open.\" The wrong one leaves out the small word in the middle.\n\nIn a few words, tell me what made this one hard, or try again:\nWe ___ in the classroom.\n\nLEARNER'S LAST MESSAGE:\nOK. Can I have an exercise, please?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYes. Your exercise is still open: We ___ in the classroom. Look at the first word for a clue.\nLet's stop here for today and look back.\nI goes with am, he, she or it with is, and you, we or they with are.\nA sentence like \"The phone is on the table.\" always needs that word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe space is empty, so the sentence is not finished yet.\n\nCompare this pair. Right: \"The window is open.\" Wrong: \"The window open.\" The wrong one leaves out the small word in the middle.\n\nIn a few words, tell me what made this one hard, or try again:\nWe ___ in the classroom.\n\nLEARNER'S LAST MESSAGE:\nOK. Can I have an exercise, please?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYes. Your exercise is still open: We ___ in the classroom. Look at the first word for a clue.\nLet's stop here for today and look back.\nI goes with am, he, she or it with is, and you, we or they with are.\nA sentence like \"The phone is on the table.\" always needs that word.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I goes with am, he, she or it with is, and you, we or they with are."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "always needs that word"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
   }
  ],
  "stateAfterS1": {

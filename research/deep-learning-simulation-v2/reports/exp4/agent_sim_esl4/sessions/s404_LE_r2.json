@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 3,
-   "C2": 4
+   "C2": 5
   }
  },
  "start": {
@@ -619,7 +619,54 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"plays\" is correct: play ends in a vowel + y, so it keeps its y and simply takes -s, just like enjoy.\nHere is the contrast case, with no help this time.\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\nIf you like, add one short line on what makes cry behave differently from play.\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"cries\" is correct: cry ends in a consonant + y, so the y changes to i and takes -es.\nThat is the contrast with play and enjoy: a vowel before the y keeps the y, and the verb simply takes -s.\nRecap: after he, she or it, the verb takes -s or -es; -o, -ss, -sh, -ch and -x verbs take -es, as in \"does\".\nA y verb depends on the letter before the y: vowel + y keeps it, consonant + y becomes -ies.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"plays\" is correct: play ends in a vowel + y, so it keeps its y and simply takes -s, just like enjoy.\nHere is the contrast case, with no help this time.\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\nIf you like, add one short line on what makes cry behave differently from play.\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"cries\" is correct: cry ends in a consonant + y, so the y changes to i and takes -es.\nThat is the contrast with play and enjoy: a vowel before the y keeps the y, and the verb simply takes -s.\nRecap: after he, she or it, the verb takes -s or -es; -o, -ss, -sh, -ch and -x verbs take -es, as in \"does\".\nA y verb depends on the letter before the y: vowel + y keeps it, consonant + y becomes -ies.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"cries\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "cries"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after he, she or it, the verb takes -s or -es"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "-o, -ss, -sh, -ch and -x verbs take -es... consonant + y becomes -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 5
+    }
+   }
   }
  ],
  "stateAfterS1": {

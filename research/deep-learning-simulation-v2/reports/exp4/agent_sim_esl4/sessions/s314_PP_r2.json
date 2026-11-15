@@ -9,7 +9,7 @@
   "primary": "W1",
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 3,
    "C2": 0
   },
@@ -568,7 +568,51 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nVery good! \"Our teacher\" is he or she, so live gets -s: lives. Now a harder one: She ___ (watch) TV after dinner. Watch ends in -ch. Just the verb, please.\n\nLEARNER'S LAST MESSAGE:\nwatch\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nGood try! \"Watch\" is the right verb, but the subject is \"She\", so the verb must change. And watch ends in -ch, so it needs more than just -s. Think: I teach, he teaches. So: I watch, she ___? Try again!"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nVery good! \"Our teacher\" is he or she, so live gets -s: lives. Now a harder one: She ___ (watch) TV after dinner. Watch ends in -ch. Just the verb, please.\n\nLEARNER'S LAST MESSAGE:\nwatch\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nGood try! \"Watch\" is the right verb, but the subject is \"She\", so the verb must change. And watch ends in -ch, so it needs more than just -s. Think: I teach, he teaches. So: I watch, she ___? Try again!",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "the subject is \"She\", so the verb must change"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "watch ends in -ch, so it needs more than just -s"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    }
+   }
   }
  ],
  "stateAfterS1": {

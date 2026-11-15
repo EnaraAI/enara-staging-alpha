@@ -534,7 +534,42 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Please close the door\" is correct now. It fits the task: there is no earlier mention, but in the room both people know which door is meant.\n\nOne part is still open. Write your two one-line reasons: why the fits in the door sentence, and why an fits in \"He waited for an hour\".\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat is a fair general principle: a singular countable noun does need a determiner, which is why \"Please close door\" did not work. It does not yet say which article to choose, though.\n\nLet's close the unit here and pull it together.\n\nA or an follows pronunciation, not spelling: \"an hour\" because the h is silent.\nThe signals shared knowledge: in \"Please close the door\", both people can see which door is meant, even with no earlier mention.\n\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Please close the door\" is correct now. It fits the task: there is no earlier mention, but in the room both people know which door is meant.\n\nOne part is still open. Write your two one-line reasons: why the fits in the door sentence, and why an fits in \"He waited for an hour\".\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat is a fair general principle: a singular countable noun does need a determiner, which is why \"Please close door\" did not work. It does not yet say which article to choose, though.\n\nLet's close the unit here and pull it together.\n\nA or an follows pronunciation, not spelling: \"an hour\" because the h is silent.\nThe signals shared knowledge: in \"Please close the door\", both people can see which door is meant, even with no earlier mention.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a singular countable noun does need a determiner"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A or an follows pronunciation, not spelling"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   }
   }
  ],
  "stateAfterS1": {

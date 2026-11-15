@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 2,
-   "C2": 5
+   "C2": 6
   }
  },
  "start": {
@@ -662,7 +662,48 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's right: \"an\". You did this one on your own, and the first sound of \"umbrella\" is a vowel sound.\n\nNow a new kind of gap, with three choices: a, an or the. Read the whole sentence, then choose.\n\nWrite a, an or the: We saw ___ elephant at the zoo. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's right: \"an\". \"Elephant\" begins with a vowel sound, and this is its first mention, so the listener does not know which one yet.\n\nLet's stop here and look back at today.\nThe first sound decides: an before a vowel sound, a before a consonant sound.\nUse the when both people know which thing, or it was mentioned before.\n\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's right: \"an\". You did this one on your own, and the first sound of \"umbrella\" is a vowel sound.\n\nNow a new kind of gap, with three choices: a, an or the. Read the whole sentence, then choose.\n\nWrite a, an or the: We saw ___ elephant at the zoo. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's right: \"an\". \"Elephant\" begins with a vowel sound, and this is its first mention, so the listener does not know which one yet.\n\nLet's stop here and look back at today.\nThe first sound decides: an before a vowel sound, a before a consonant sound.\nUse the when both people know which thing, or it was mentioned before.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "That's right: \"an\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"an\" elephant"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "an before a vowel sound, a before a consonant sound"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 6
+    }
+   }
   }
  ],
  "stateAfterS1": {

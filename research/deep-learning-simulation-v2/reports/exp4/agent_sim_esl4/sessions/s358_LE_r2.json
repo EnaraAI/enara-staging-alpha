@@ -615,7 +615,48 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are thinking that a present sentence needs no am, is or are. In English it needs one.\nRule: I takes am; he, she, it take is; you, we, they take are.\nExample: \"She ___ a teacher.\" Who? \"She\". She takes is. So: She is a teacher.\nNow you. Write am, is or are: I ___ a student. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nam\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"am\" is correct now, and the sentence has its verb.\nLet's close today's practice with a short recap.\nI goes with am; he, she and it go with is; you, we and they go with are.\nA present sentence like \"The bus is late\" needs one of these words.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are thinking that a present sentence needs no am, is or are. In English it needs one.\nRule: I takes am; he, she, it take is; you, we, they take are.\nExample: \"She ___ a teacher.\" Who? \"She\". She takes is. So: She is a teacher.\nNow you. Write am, is or are: I ___ a student. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nam\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"am\" is correct now, and the sentence has its verb.\nLet's close today's practice with a short recap.\nI goes with am; he, she and it go with is; you, we and they go with are.\nA present sentence like \"The bus is late\" needs one of these words.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is correct now"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I goes with am; he, she and it go with is; you, we and they go with are."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A present sentence like \"The bus is late\" needs one of these words."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
   }
  ],
  "stateAfterS1": {

@@ -10,7 +10,7 @@
   "s": {
    "W2": 0,
    "W1": 0,
-   "C1": 2,
+   "C1": 3,
    "C2": 3
   },
   "indep": {
@@ -644,7 +644,42 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 2: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe gap is still empty, so the sentence is not complete yet.\n\nLook at this pair.\nRight: \"She is a student.\" Wrong: \"She a student.\" The wrong one has no word after she.\n\nNow try again. Write the missing word: He ___ happy.\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"is\" is correct. The sentence is complete now.\n\nHere is a short recap.\nYou used \"are\" with we, \"am\" with I and \"is\" with he.\nThe gap is never empty: a sentence like this always needs am, is or are.\n\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 2: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe gap is still empty, so the sentence is not complete yet.\n\nLook at this pair.\nRight: \"She is a student.\" Wrong: \"She a student.\" The wrong one has no word after she.\n\nNow try again. Write the missing word: He ___ happy.\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"is\" is correct. The sentence is complete now.\n\nHere is a short recap.\nYou used \"are\" with we, \"am\" with I and \"is\" with he.\nThe gap is never empty: a sentence like this always needs am, is or are.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"is\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like this always needs am, is or are"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   }
   }
  ],
  "stateAfterS1": {

@@ -11,11 +11,11 @@
    "W1": 0,
    "W2": 0,
    "C1": 1,
-   "C2": 2
+   "C2": 3
   },
   "indep": {
    "C1": 0,
-   "C2": 1
+   "C2": 2
   }
  },
  "start": {
@@ -586,7 +586,54 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are using no word before one thing here.\nIn English, one thing usually needs a or an before it.\nExample: 'I have a car.' Not: 'I have car.' Car starts with a c sound, so it takes a.\nNow use this idea. Look at the first sound of the word after the gap.\nTry again. Write a or an:\nShe has ___ orange in her bag.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"an\" is correct. Well done fixing it after the first try.\nLet's sum up what we practised today.\nOne thing needs a or an in front of it, not an empty gap.\nWe use an before a vowel sound, as in \"My brother is an engineer\", and a before other sounds, as in \"They have a car.\"\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are using no word before one thing here.\nIn English, one thing usually needs a or an before it.\nExample: 'I have a car.' Not: 'I have car.' Car starts with a c sound, so it takes a.\nNow use this idea. Look at the first sound of the word after the gap.\nTry again. Write a or an:\nShe has ___ orange in her bag.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"an\" is correct. Well done fixing it after the first try.\nLet's sum up what we practised today.\nOne thing needs a or an in front of it, not an empty gap.\nWe use an before a vowel sound, as in \"My brother is an engineer\", and a before other sounds, as in \"They have a car.\"\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "One thing needs a or an in front of it, not an empty gap."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "We use an before a vowel sound ... and a before other sounds"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
   }
  ],
  "stateAfterS1": {
