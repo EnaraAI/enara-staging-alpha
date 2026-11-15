@@ -246,6 +246,8 @@ export interface TurnSignals {
   genuineFailedAttempts?: number;
   // reviewOpen (ESL5): the recall error types the previous reply opened with (read back from its stored evidence).
   prevReview?: string[];
+  // fadeKnown (ESL5): criteria of this turn's item that the record shows as known (faded: no rule line, quick check), or whose quick check is being answered now.
+  fade?: { faded: number[]; checkAnswered: number[] };
 }
 
 export type MoveId =
@@ -370,6 +372,11 @@ export interface LanguageTurnEvidence {
   answerReleased?: true;
   // reviewOpen (ESL5, codes only): the error types this opening reply recalls (1-2).
   reviewOpen?: string[];
+  // fadeKnown (ESL5, criteria numbers only): this reply skipped the rule for known points and set a quick check; the quick check was answered in this turn;
+  // the quick check failed (support returns for the rest of the session).
+  fadeCheck?: number[];
+  fadeCheckAnswered?: number[];
+  fadeFailed?: number[];
 }
 
 // ---------------------------------------------------------------------------
@@ -1306,6 +1313,8 @@ export function ruleFirstDecision(i: { band: LevelBand; masteryStatus?: string; 
   let ruleFirst = explicit ? rulesToIntroduce(i.history, i.signals, i.spec, { beforeFirstTry: true }) : engineV2('ruleFirst') ? rulesToIntroduce(i.history, i.signals, i.spec) : undefined;
   // liveError (ESL5): when their latest message shows an expected L1 error, the rule line targets that error (LIVE_ERROR_LINE), not the lesson's next sub-rule.
   if (engineV2('liveError') && (i.signals as { liveError?: unknown }).liveError) return { ...(explicit !== undefined ? { explicit } : {}) };
+  // fadeKnown (ESL5): a point the record shows as known gets no rule line (FADE_LINE instead).
+  if (engineV2('fadeKnown') && ((i.signals as { fade?: { faded: number[] } }).fade?.faded.length ?? 0) > 0) return { ...(explicit !== undefined ? { explicit } : {}) };
   // levelExplicit: the rule line also fires on the first explanation turn (a short explanation before any exercise), once: the first success criterion, only if no rule was introduced yet this session.
   if (explicit && !ruleFirst && i.moves?.some((m) => m.id === 'short_explanation') && (i.spec?.successCriteria?.length ?? 0) > 0) {
     const anyDone = i.history.some((h) => ((h.languageTurn as { rulesIntroduced?: number[] } | null | undefined)?.rulesIntroduced ?? []).length > 0);
@@ -1449,11 +1458,37 @@ export function reviewOpening(ctx: Pick<LanguageTeachingContext, 'signals' | 're
 const reviewSecond = (ctx: Pick<LanguageTeachingContext, 'signals'>): string | undefined => (engineV2('reviewOpen') && ctx.signals.prevReview?.length === 2 ? ctx.signals.prevReview[1] : undefined);
 /** ESL5: turn-level adjustments that need ENARA's stored learner record (pure; the identity when the switches are off or there is no record).
  *  reviewOpen: the opening reply of a later session gives a recall item instead of today's first lesson item. */
-export function esl5Adjust(i: { signals: TurnSignals; moves: SelectedMove[]; record?: Esl5Record }): { signals: TurnSignals; moves: SelectedMove[] } {
-  if (!reviewOpening({ signals: i.signals, record: i.record }).length || !i.signals.presentLessonItem) return { signals: i.signals, moves: i.moves };
-  const { presentLessonItem: _skip, ...signals } = i.signals;
-  return { signals, moves: i.moves.filter((m) => m.id !== 'present_lesson_item') };
+export function esl5Adjust(i: { signals: TurnSignals; moves: SelectedMove[]; record?: Esl5Record; history?: Turn[]; lessonId?: string; scope?: string }): { signals: TurnSignals; moves: SelectedMove[] } {
+  let signals = i.signals; let moves = i.moves;
+  if (reviewOpening({ signals, record: i.record }).length && signals.presentLessonItem) {
+    const { presentLessonItem: _skip, ...rest } = signals;
+    signals = rest; moves = moves.filter((m) => m.id !== 'present_lesson_item');
+  }
+  if (engineV2('fadeKnown')) { const fade = fadeDecision(signals, i.record, i.history ?? [], i.lessonId, i.scope); if (fade) signals = { ...signals, fade }; }
+  return { signals, moves };
 }
+// fadeKnown (ESL5, framework §2: explicit instruction for novices, faded for learners who already know the point).
+/** The criterion: at least this many independent correct answers on a point (this session's distinct tasks, or ENARA's record across sessions). */
+export const FADE_CRITERION = 2;
+export const knownKey = (lessonId: string | undefined, c: number) => `${lessonId ?? '-'}:${c}`;
+export function fadeDecision(s: TurnSignals, record: Esl5Record | undefined, history: Turn[], lessonId?: string, scope?: string): TurnSignals['fade'] | undefined {
+  const item = s.activeLessonItem ?? s.presentLessonItem;
+  const crit = item?.criteria ?? [];
+  if (!crit.length) return undefined;
+  const stored = history.filter((h) => h.role === 'assistant' && inScope(h.languageTurn, scope)).map((h) => h.languageTurn as (StoredLearningFields & { fadeFailed?: number[]; fadeCheck?: number[] }) | null | undefined);
+  const failed = new Set(stored.flatMap((lt) => lt?.fadeFailed ?? []));
+  const prevCheck = stored.length ? stored[stored.length - 1]?.fadeCheck ?? [] : [];
+  const keyOk = s.keyVerdict === 'CORRECT' || s.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
+  const checkAnswered = s.answeringCheck ? crit.filter((c) => prevCheck.includes(c)) : [];
+  const known = (c: number) => Math.max(s.learning?.independentEvidence?.[c]?.length ?? 0, record?.knownPoints?.[knownKey(lessonId, c)] ?? 0) >= FADE_CRITERION;
+  // A quick check answered now and not accepted by the key returns to explicit support in this reply (the rule line is allowed again).
+  const returning = checkAnswered.length > 0 && !keyOk;
+  const faded = !returning && crit.every((c) => known(c) && !failed.has(c)) ? crit : [];
+  return faded.length || checkAnswered.length ? { faded, checkAnswered } : undefined;
+}
+export const FADE_LINE = (texts: string[]) => `Their record shows they have already answered this point correctly on their own at least ${FADE_CRITERION} times (${texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). Fade the support: no rule statement and no worked example for it. Any item you set on it is a quick check with no support (no hint, no model next to it); once they pass it, move on to harder or mixed items (this point together with others, less familiar words).`;
+export const FADE_RETURN_LINE = 'This answer is to the quick check on a point their record showed as known. If it is wrong, go back to explicit support now: state the rule in one plain sentence, give one right/wrong pair with other words, then one new item on the same point. If it is right, confirm it in a few words and give a harder or mixed item.';
+const fadedNow = (s: TurnSignals): number[] => (engineV2('fadeKnown') ? s.fade?.faded ?? [] : []);
 export const REVIEW_OPEN_LINE = (codes: string[]) => `This is a later session and their record from earlier sessions shows these error types still live: ${codes.map((c, k) => `(${k + 1}) ${errorTypeLabel(c)}`).join('; ')}. Open with recall, not re-teaching: greet them in a few words, then give ONE short recall item on (1) for them to answer from memory: a new sentence to complete or correct, made of words that appear in no lesson exercise. No rule, no explanation and no example before it; no exercise from today's lesson in this reply (it comes after the recall).${codes.length > 1 ? ' The second recall item comes in your next reply.' : ''} This replaces the opening question about what they already know.`;
 export const REVIEW_SECOND_LINE = (code: string) => `They have just answered the first recall item. Give feedback in one line (if it is wrong, show the right form with a one-line reason; no rule lecture), then give the second and last recall item, on ${errorTypeLabel(code)}: one new sentence to complete or correct, answered from memory, with no rule or example before it. Today's lesson continues after it.`;
 export const REVIEW_CLOSE_LINE = (code?: string) => `This is the point to close the lesson unit. This overrides the "next task" instructions above and replaces the usual rule recap: do NOT ask them to tell you the rule in their own words and do not recap the rule. (1) Answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) give ONE new item in a new situation (new words, a different topic from today's exercises) on ${code ? errorTypeLabel(code) : 'the point they found hardest today'}, for them to answer without help. One task only; never write a completed answer to an open exercise.`;
@@ -1479,6 +1514,8 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     if (ruleBeforeFirstTryOn(ctx)) out.push(`- ${ruleBeforeFirstTryLine(ctx.ruleFirst, ctx.planPrimary)}`);
     else if (engineV2('ruleFirst') || (engineV2('levelExplicit') && ctx.explicitFirst)) out.push(`- ${ruleFirstLine(ctx.ruleFirst, ctx.planPrimary, Boolean(s.nextLessonItem))}`);
   }
+  if (fadedNow(s).length) out.push(`- ${FADE_LINE(fadedNow(s).map((c) => ctx.lesson.spec?.successCriteria?.[c - 1] ?? `point ${c}`))}`);
+  if (engineV2('fadeKnown') && s.fade?.checkAnswered.length && !fadedNow(s).length) out.push(`- ${FADE_RETURN_LINE}`);
   if (engineV2('belief')) {
     out.push(`- ${HOLD_LINE}`);
     const rep = L?.beliefs?.find((b) => b.count >= 2);
@@ -1515,7 +1552,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (engineV2('clarity') && s.activeLessonItem && needsClarity(s, supportStage(s))) out.push(`- ${CLARITY_LINE}`);
   if (engineV2('arbitration') && ctx.planPrimary) {
     out.push(`- ${ARBITRATION_LINE}`);
-    if (EXPLICIT_METHODS.includes(ctx.planPrimary) && ctx.moves.some((m) => m.id === 'present_lesson_item') && !ruleBeforeFirstTryOn(ctx)) out.push(`- ${EXPLICIT_FIRST_LINE}`); // levelExplicit's own rule line replaces it
+    if (EXPLICIT_METHODS.includes(ctx.planPrimary) && ctx.moves.some((m) => m.id === 'present_lesson_item') && !ruleBeforeFirstTryOn(ctx) && !fadedNow(s).length) out.push(`- ${EXPLICIT_FIRST_LINE}`); // levelExplicit's own rule line replaces it
   }
   if (ctx.research) {
     const r = ctx.research;
@@ -1672,6 +1709,8 @@ export function turnEvidence(ctx: LanguageTeachingContext, objectiveId?: string)
     ...(engineV2('liveError') && ctx.signals.liveError ? { liveError: ctx.signals.liveError.code } : {}), // liveError (off: nothing)
     ...(releasing(ctx) ? { answerReleased: true as const } : {}), // releaseAfterTwo (off: nothing)
     ...(reviewOpening(ctx).length ? { reviewOpen: reviewOpening(ctx) } : {}), // reviewOpen (off: nothing)
+    ...(fadedNow(ctx.signals).length ? { fadeCheck: fadedNow(ctx.signals) } : {}), // fadeKnown (off: nothing)
+    ...(engineV2('fadeKnown') && ctx.signals.fade?.checkAnswered.length ? { fadeCheckAnswered: ctx.signals.fade.checkAnswered } : {}),
     ...(ctx.length ? { lengthTarget: ctx.length } : {}),
     ...(ctx.signals.errorRecurrence ? { errorRecurrence: ctx.signals.errorRecurrence } : {}),
     ...(() => {
@@ -1881,7 +1920,7 @@ export async function buildLanguageTeachingContext(params: {
     });
     // ESL5 (reviewOpen, fadeKnown): ENARA's own stored learner record, read only when one of those switches is on.
     const record = engineV2('reviewOpen') || engineV2('fadeKnown') ? (await loadEsl5Record(params.institutionId, params.studentId)) ?? undefined : undefined;
-    const { signals, moves } = esl5Adjust({ signals: signals0, moves: moves0, record });
+    const { signals, moves } = esl5Adjust({ signals: signals0, moves: moves0, record, history: params.history, lessonId: lesson.lessonId, scope });
     const base0 = lengthTarget(learner.ageBand, learner.proficiency.value);
     // r2: a clarification-only turn is one short question, so a tighter target.
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));

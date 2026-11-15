@@ -138,6 +138,9 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           liveError: String, // liveError (ESL5): error-type code only
           answerReleased: Boolean, // releaseAfterTwo (ESL5)
           reviewOpen: { type: [String], default: undefined }, // reviewOpen (ESL5): codes only
+          fadeCheck: { type: [Number], default: undefined }, // fadeKnown (ESL5): criteria numbers only
+          fadeCheckAnswered: { type: [Number], default: undefined },
+          fadeFailed: { type: [Number], default: undefined },
           _id: false,
         },
         default: undefined,

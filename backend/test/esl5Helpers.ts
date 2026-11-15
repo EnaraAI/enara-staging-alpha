@@ -26,7 +26,7 @@ export function build(msg: string, hist: HistoryTurn[], o: { level?: string; mas
   const signals0 = detectTurnSignals(msg, hist, LESSON);
   const band = levelBand(o.level ?? 'A1');
   const moves0 = selectLanguageMoves({ band, targetLanguage: 'English', lessonStatus: 'structured', signals: signals0, masteryStatus: o.masteryStatus });
-  const { signals, moves } = esl5Adjust({ signals: signals0, moves: moves0, record: o.record });
+  const { signals, moves } = esl5Adjust({ signals: signals0, moves: moves0, record: o.record, history: hist, lessonId: 'lsn' });
   const learner = deriveLearnerContext({ courseLevel: o.level ?? 'A1', courseLanguages: ['English'], adultSchool: false, learnerMessages: [msg], objectiveStatus: o.masteryStatus });
   const research = researchSignals(hist, signals, SPEC);
   const { explicit, ruleFirst } = ruleFirstDecision({ band, masteryStatus: o.masteryStatus, history: hist, signals, spec: SPEC, moves });

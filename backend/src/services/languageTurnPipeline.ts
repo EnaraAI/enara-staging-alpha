@@ -4,12 +4,12 @@
 // channel stops using the shared functions or if the policy version differs between them.
 import {
   buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, independentSuccessItem, turnEvidence, LANGUAGE_CONTEXT_VERSION,
-  isClosingTurn, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk, learnerAsks, CLOSING_ASK_SENTENCE,
+  isClosingTurn, knownKey, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk, learnerAsks, CLOSING_ASK_SENTENCE,
   type LanguageTeachingContext, type LanguageTurnEvidence,
 } from './languageTeachingContext';
 import { recordProfileTurn } from './learnerLanguageProfile';
 import { engineV2 } from './engineV2';
-import { stripPreAttemptModels, stripCopyReadyModels, isSuccess, type StrippedReply } from './languageLearningState';
+import { stripPreAttemptModels, stripCopyReadyModels, isSuccess, isFailure, type StrippedReply } from './languageLearningState';
 
 export type LanguageChannel = 'chat' | 'voice';
 /** The single policy version both channels report. */
@@ -95,10 +95,14 @@ export async function completeLanguageTurn(opts: {
     ...(opts.removed ? { preAttemptModelsRemoved: opts.removed } : {}),
     ...(opts.closingAsk ? { closingAsk: opts.closingAsk } : {}),
   };
+  // fadeKnown (ESL5): a failed quick check is recorded (support returns for the rest of the session; the record's count for the point restarts).
+  const fadeFailed = engineV2('fadeKnown') && lt.fadeCheckAnswered?.length && isFailure(lt.assessment.verdict) ? lt.fadeCheckAnswered : undefined;
+  if (fadeFailed) (lt as { fadeFailed?: number[] }).fadeFailed = fadeFailed;
+  const known = engineV2('fadeKnown') ? { knownInc: (independentSuccessItem(language, lt)?.criteria ?? []).map((c) => knownKey(language.lesson.lessonId, c)), knownReset: (fadeFailed ?? []).map((c) => knownKey(language.lesson.lessonId, c)) } : {};
   const belief = (lt as { assessment?: { belief?: string } }).assessment?.belief;
   // liveError (ESL5): the error type seen now, and the one the previous reply targeted when this answer got it right (codes only).
   const live = engineV2('liveError') ? { ...(language.signals.liveError ? { liveError: language.signals.liveError.code } : {}), ...(language.signals.liveTarget && isSuccess(lt.assessment.verdict) ? { liveCorrect: language.signals.liveTarget } : {}) } : {};
-  await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt), ...(belief ? { belief } : {}), lessonId: language.lesson.lessonId, lessonTitle: language.lesson.title, style: styleFromMoves(language.prevMoves), ...live });
+  await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt), ...(belief ? { belief } : {}), lessonId: language.lesson.lessonId, lessonTitle: language.lesson.title, style: styleFromMoves(language.prevMoves), ...live, ...known });
   return lt as unknown as LanguageTurnEvidence;
 }
 

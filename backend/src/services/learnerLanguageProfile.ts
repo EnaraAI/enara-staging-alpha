@@ -20,7 +20,17 @@ export function codesForItem(item: LessonItem | undefined): string[] {
 
 export interface TurnOutcome { errorCode?: string; independentSuccessOn?: LessonItem; now?: Date; belief?: string; lessonId?: string; lessonTitle?: string; style?: string;
   // liveError (ESL5): the expected-L1 error type seen in this message, and the one the previous reply targeted that this answer got right (codes only).
-  liveError?: string; liveCorrect?: string }
+  liveError?: string; liveCorrect?: string;
+  // fadeKnown (ESL5): points ("<lessonId>:<criterion>") answered correctly without help now, and points whose quick check failed (count restarts).
+  knownInc?: string[]; knownReset?: string[] }
+
+/** fadeKnown (ESL5): pure update of independent-success counts per point. Counts only. */
+export function applyKnownPoints(rec: Record<string, number> | undefined, o: Pick<TurnOutcome, 'knownInc' | 'knownReset'>): Record<string, number> {
+  const out: Record<string, number> = { ...(rec ?? {}) };
+  for (const k of o.knownInc ?? []) out[k] = (out[k] ?? 0) + 1;
+  for (const k of o.knownReset ?? []) out[k] = 0;
+  return out;
+}
 
 /** liveError (ESL5): pure update of the learner's live error types: seen counts up and marks the type not yet right; a correct answer on an item that targeted it marks lastCorrect. Codes only. */
 export function applyLiveErrors(rec: Record<string, ILiveErrorEntry> | undefined, o: Pick<TurnOutcome, 'liveError' | 'liveCorrect'>): Record<string, ILiveErrorEntry> {
@@ -141,13 +151,14 @@ export async function loadDueReviews(institutionId: string, studentId: string) {
 export async function recordProfileTurn(institutionId: string | undefined, studentId: string | undefined, o: TurnOutcome): Promise<void> {
   const v2 = engineV2('memory') && Boolean(o.belief || o.independentSuccessOn);
   const live = engineV2('liveError') && Boolean(o.liveError || o.liveCorrect);
-  if (!institutionId || !studentId || (!o.errorCode && !o.independentSuccessOn && !v2 && !live)) return;
+  const known = engineV2('fadeKnown') && Boolean(o.knownInc?.length || o.knownReset?.length);
+  if (!institutionId || !studentId || (!o.errorCode && !o.independentSuccessOn && !v2 && !live && !known)) return;
   try {
     for (let attempt = 0; attempt < 4; attempt += 1) {
       const p = await LearnerLanguageProfile.findOne({ institutionId, studentId }).lean();
       const entries = applyTurn((p?.entries ?? []) as ILanguageErrorEntry[], o);
       const next = engineV2('memory') ? applyTurnV2({ beliefs: (p?.beliefs ?? []) as IBeliefEntry[], worked: (p?.worked ?? []) as IWorkedEntry[] }, o) : null;
-      const set = { entries, ...(next ? { beliefs: next.beliefs, worked: next.worked } : {}), ...(live ? { liveErrors: applyLiveErrors(p?.liveErrors as Record<string, ILiveErrorEntry> | undefined, o) } : {}) };
+      const set = { entries, ...(next ? { beliefs: next.beliefs, worked: next.worked } : {}), ...(live ? { liveErrors: applyLiveErrors(p?.liveErrors as Record<string, ILiveErrorEntry> | undefined, o) } : {}), ...(known ? { knownPoints: applyKnownPoints(p?.knownPoints as Record<string, number> | undefined, o) } : {}) };
       if (!p) {
         try { await LearnerLanguageProfile.create({ institutionId, studentId, ...set, version: 1 }); return; } catch { continue; } // lost the race to create: retry on the new document
       }
