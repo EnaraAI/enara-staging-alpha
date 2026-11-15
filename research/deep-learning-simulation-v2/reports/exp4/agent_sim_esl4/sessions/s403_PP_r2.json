@@ -282,7 +282,68 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 3.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSpot on! \"My father\" is singular, so it takes is, and \"we\" takes are. You didn't drop either verb.\n\nNext challenge: this text has three missing verbs. Rewrite it correctly:\nI a student. My sister tired today. My parents at home.\n\nLEARNER'S LAST MESSAGE:\nI a student. My sister tired today. My parents at home.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nIt looks like the verbs are still missing. In Arabic these sentences are fine, but English needs am, is or are in each one. Hint: look at the subjects. \"I\" takes am, \"my sister\" is one person (she), and \"my parents\" is more than one person (they). Please rewrite all three sentences again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 3.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSpot on! \"My father\" is singular, so it takes is, and \"we\" takes are. You didn't drop either verb.\n\nNext challenge: this text has three missing verbs. Rewrite it correctly:\nI a student. My sister tired today. My parents at home.\n\nLEARNER'S LAST MESSAGE:\nI a student. My sister tired today. My parents at home.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nIt looks like the verbs are still missing. In Arabic these sentences are fine, but English needs am, is or are in each one. Hint: look at the subjects. \"I\" takes am, \"my sister\" is one person (she), and \"my parents\" is more than one person (they). Please rewrite all three sentences again.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "English needs am, is or are in each one"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am a student.",
+    "errors": {
+     "W1": "I a student.",
+     "W2": "I is a student."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise am, is and are again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
- ]
+ ],
+ "stateAfterS1": {
+  "form": "copula",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 1
+  }
+ }
 }

@@ -345,7 +345,65 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"watchs\". Adding an ending is right, but look at the last letters.\nMy example: I wash the car. He washes the car.\n\"Wash\" ends in -sh, so I add -es.\nRule: if a verb ends in -sh, -ch, -s, -x or -o, add -es.\nRight: She fixes bikes. Wrong: She fixs bikes.\n\nWhich ending? Write only the verb:\nHe ___ (brush) his hair.\n\nLEARNER'S LAST MESSAGE:\nbrush\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"brush\". Look at the start: \"He\" is before the verb, so the verb needs an ending.\n\nLet's stop and look back.\nAfter he, she or it, add -s to the verb, like your \"plays\" and \"drinks\".\nIf the verb ends in -sh, -ch, -s, -x or -o, add -es.\n\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"watchs\". Adding an ending is right, but look at the last letters.\nMy example: I wash the car. He washes the car.\n\"Wash\" ends in -sh, so I add -es.\nRule: if a verb ends in -sh, -ch, -s, -x or -o, add -es.\nRight: She fixes bikes. Wrong: She fixs bikes.\n\nWhich ending? Write only the verb:\nHe ___ (brush) his hair.\n\nLEARNER'S LAST MESSAGE:\nbrush\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"brush\". Look at the start: \"He\" is before the verb, so the verb needs an ending.\n\nLet's stop and look back.\nAfter he, she or it, add -s to the verb, like your \"plays\" and \"drinks\".\nIf the verb ends in -sh, -ch, -s, -x or -o, add -es.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If the verb ends in -sh, -ch, -s, -x or -o, add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise he, she and it with -s again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
- ]
+ ],
+ "stateAfterS1": {
+  "form": "thirdS",
+  "band": "A2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  }
+ }
 }

@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 2
+   "C2": 3
   }
  },
  "start": {
@@ -281,7 +281,74 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExcellent, both are correct! \"My father\" is singular, so it takes is, and \"we\" is plural, so it takes are. You put the verb in both places.\n\nNext challenge: write two sentences of your own about yourself and your family, using am in one and are in the other. For example, say what someone's job is or how they feel.\n\nLEARNER'S LAST MESSAGE:\nI am a teacher.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGreat, that one is correct: \"I\" always takes am, so \"I am a teacher\" is right. But the task asked for two sentences, and the second one needs are. Can you add a sentence about your family or friends with are? For example, think about your parents or your brothers."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExcellent, both are correct! \"My father\" is singular, so it takes is, and \"we\" is plural, so it takes are. You put the verb in both places.\n\nNext challenge: write two sentences of your own about yourself and your family, using am in one and are in the other. For example, say what someone's job is or how they feel.\n\nLEARNER'S LAST MESSAGE:\nI am a teacher.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGreat, that one is correct: \"I\" always takes am, so \"I am a teacher\" is right. But the task asked for two sentences, and the second one needs are. Can you add a sentence about your family or friends with are? For example, think about your parents or your brothers.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "that one is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"I am a teacher\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My parents are kind.",
+    "errors": {
+     "W1": "My parents kind.",
+     "W2": "My parents is kind."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise am, is and are again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
- ]
+ ],
+ "stateAfterS1": {
+  "form": "copula",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 3
+  }
+ }
 }

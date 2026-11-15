@@ -14,7 +14,7 @@
    "C2": 3
   },
   "indep": {
-   "C1": 3,
+   "C1": 4,
    "C2": 2
   }
  },
@@ -338,7 +338,71 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"The\" is right. The second sentence points back to a book already introduced, so the reference is definite.\nYou still haven't added the note on what decided your choice, so try to include it this time.\nNow a different kind of definite reference. Here nothing has been mentioned before; the question is whether speaker and listener can both identify the thing from the situation.\n\nWrite a, an or the: It is cold. Please close ___ door. (answer with only the missing word)\n\nAfter the word, add one short sentence on what makes the noun identifiable here.\n\nLEARNER'S LAST MESSAGE:\nthe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"the\" is right. The door is identifiable from the situation, so the reference is definite.\nTo pull the lesson together: \"a\" or \"an\" introduces something new, chosen by the first sound of the next word.\n\"The\" marks something both people can identify, from context or earlier mention.\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"The\" is right. The second sentence points back to a book already introduced, so the reference is definite.\nYou still haven't added the note on what decided your choice, so try to include it this time.\nNow a different kind of definite reference. Here nothing has been mentioned before; the question is whether speaker and listener can both identify the thing from the situation.\n\nWrite a, an or the: It is cold. Please close ___ door. (answer with only the missing word)\n\nAfter the word, add one short sentence on what makes the noun identifiable here.\n\nLEARNER'S LAST MESSAGE:\nthe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"the\" is right. The door is identifiable from the situation, so the reference is definite.\nTo pull the lesson together: \"a\" or \"an\" introduces something new, chosen by the first sound of the next word.\n\"The\" marks something both people can identify, from context or earlier mention.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"the\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "The door is identifiable from the situation"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"a\" or \"an\" introduces something new, chosen by the first sound of the next word"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise a, an and the again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
- ]
+ ],
+ "stateAfterS1": {
+  "form": "articles",
+  "band": "B2",
+  "primary": "W2",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 4,
+   "C2": 2
+  }
+ }
 }
