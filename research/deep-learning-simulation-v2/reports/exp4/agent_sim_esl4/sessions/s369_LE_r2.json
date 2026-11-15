@@ -10,11 +10,11 @@
   "s": {
    "W2": 0,
    "W1": 1,
-   "C1": 1,
+   "C1": 3,
    "C2": 3
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 2
   }
  },
@@ -258,7 +258,73 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a\" is correct.\nNow a new kind of task. Here you can also use \"the\". Read the first sentence, then write one word.\nWrite a, an or the: I bought a book. ___ book is very good. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nThe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"The\" is correct.\nHere is why. I have a cat. The cat is black. In the second sentence, we know which cat.\nRule: use the when we already said the thing, or both people know which one.\nRight: I saw a bus. The bus was red.\nWrong: I saw a bus. A bus was red.\nNow one alone. Write the missing word:\nWrite a, an or the: It is cold. Please close ___ door. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a\" is correct.\nNow a new kind of task. Here you can also use \"the\". Read the first sentence, then write one word.\nWrite a, an or the: I bought a book. ___ book is very good. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nThe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"The\" is correct.\nHere is why. I have a cat. The cat is black. In the second sentence, we know which cat.\nRule: use the when we already said the thing, or both people know which one.\nRight: I saw a bus. The bus was red.\nWrong: I saw a bus. A bus was red.\nNow one alone. Write the missing word:\nWrite a, an or the: It is cold. Please close ___ door. (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"The\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "The"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "use the when we already said the thing, or both people know which one"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: I saw a bus. The bus was red. Wrong: I saw a bus. A bus was red."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "the",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "(I leave it empty, no word)",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "(I leave it empty, no word)"
+   }
   }
  ]
 }

@@ -11,11 +11,11 @@
    "W1": 0,
    "W2": 0,
    "C1": 3,
-   "C2": 0
+   "C2": 2
   },
   "indep": {
-   "C1": 1,
-   "C2": 0
+   "C1": 2,
+   "C2": 1
   }
  },
  "start": {
@@ -262,7 +262,84 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"drinks\" is right. You found \"he\" and added -s.\n\nNow a harder kind. Here is how I think:\nHe teaches English.\nFirst: the person is \"he\".\nThen: \"teach\" ends in -ch, so I add -es: teaches.\n\nYour turn. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"watches\" is right. \"watch\" ends in -ch, so -es.\n\nHere is how I think about one more kind:\nI fly home. My brother flies home.\nFirst: the person is \"he\". Then: \"fly\" ends in l plus y, so y goes and I add -ies.\nRule: after -sh, -ch, -x or -o add -es; after a letter like l plus y, write -ies.\nRight: She mixes the paint. Wrong: She mixs the paint.\n\nYour turn. Write only the verb:\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"drinks\" is right. You found \"he\" and added -s.\n\nNow a harder kind. Here is how I think:\nHe teaches English.\nFirst: the person is \"he\".\nThen: \"teach\" ends in -ch, so I add -es: teaches.\n\nYour turn. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"watches\" is right. \"watch\" ends in -ch, so -es.\n\nHere is how I think about one more kind:\nI fly home. My brother flies home.\nFirst: the person is \"he\". Then: \"fly\" ends in l plus y, so y goes and I add -ies.\nRule: after -sh, -ch, -x or -o add -es; after a letter like l plus y, write -ies.\nRight: She mixes the paint. Wrong: She mixs the paint.\n\nYour turn. Write only the verb:\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"watches\" is right."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"watches\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"watches\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"watches\" is right."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Rule: after -sh, -ch, -x or -o add -es; after a letter like l plus y, write -ies."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: She mixes the paint. Wrong: She mixs the paint."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "cries",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "cries"
+   }
   }
  ]
 }

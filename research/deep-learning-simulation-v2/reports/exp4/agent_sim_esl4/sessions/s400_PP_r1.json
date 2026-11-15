@@ -225,7 +225,46 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"We\" is a plural subject, so it takes are: We are in the classroom. Next, a slightly harder one. Rewrite this sentence correctly, adding the missing word: \"My brother and I happy at home.\"\n\nLEARNER'S LAST MESSAGE:\nMy brother and I is happy at home.\nFACT: the last learner message contained the error of W2 (uses \"is\" with every subject (\"They is happy\")).\n\nTUTOR TURN TO JUDGE:\nGood, you remembered to add the verb! But \"is\" isn't right here. \"My brother and I\" is two people, so the subject is plural, like \"we\". Hint: which verb goes with we? Try again: rewrite \"My brother and I happy at home.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"We\" is a plural subject, so it takes are: We are in the classroom. Next, a slightly harder one. Rewrite this sentence correctly, adding the missing word: \"My brother and I happy at home.\"\n\nLEARNER'S LAST MESSAGE:\nMy brother and I is happy at home.\nFACT: the last learner message contained the error of W2 (uses \"is\" with every subject (\"They is happy\")).\n\nTUTOR TURN TO JUDGE:\nGood, you remembered to add the verb! But \"is\" isn't right here. \"My brother and I\" is two people, so the subject is plural, like \"we\". Hint: which verb goes with we? Try again: rewrite \"My brother and I happy at home.\"",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother and I are happy at home.",
+    "errors": {
+     "W1": "My brother and I happy at home.",
+     "W2": "My brother and I is happy at home."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother and I are happy at home.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother and I are happy at home."
+   }
   }
  ]
 }

@@ -14,7 +14,7 @@
    "C2": 3
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 2
   }
  },
@@ -243,7 +243,61 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: She is at home today.\nNow a different kind of task. This sentence is missing a word. Write the full sentence again with the missing word:\nWrite the sentence again with the missing word: Ahmed tired.\n\nLEARNER'S LAST MESSAGE:\nAhmed is tired.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"Ahmed is tired.\" You restored the missing form of be, and you chose the right one for a third-person singular subject.\nSo far you have filled single gaps and repaired one sentence. Now let's see if you can use these forms freely.\nWrite three short sentences of your own about people you know. Use a different subject in each one: one with I, one with he or she, and one with we or they. You can describe how someone feels (happy, tired) or where they are (at home, in the classroom).\nDon't look back at the examples above; try it from memory."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: She is at home today.\nNow a different kind of task. This sentence is missing a word. Write the full sentence again with the missing word:\nWrite the sentence again with the missing word: Ahmed tired.\n\nLEARNER'S LAST MESSAGE:\nAhmed is tired.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"Ahmed is tired.\" You restored the missing form of be, and you chose the right one for a third-person singular subject.\nSo far you have filled single gaps and repaired one sentence. Now let's see if you can use these forms freely.\nWrite three short sentences of your own about people you know. Use a different subject in each one: one with I, one with he or she, and one with we or they. You can describe how someone feels (happy, tired) or where they are (at home, in the classroom).\nDon't look back at the examples above; try it from memory.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"Ahmed is tired.\" You restored the missing form of be"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "You restored the missing form of be"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am happy.",
+    "errors": {
+     "W1": "I happy.",
+     "W2": "I is happy."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I is happy.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "I is happy."
+   }
   }
  ]
 }

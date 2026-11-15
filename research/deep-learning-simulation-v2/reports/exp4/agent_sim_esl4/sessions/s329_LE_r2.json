@@ -8,7 +8,7 @@
   "band": "A1",
   "primary": "W2",
   "s": {
-   "W2": 3,
+   "W2": 2,
    "W1": 0,
    "C1": 3,
    "C2": 0
@@ -266,7 +266,54 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat is correct: \"drinks\". With \"he\", the verb takes -s.\n\nNow something a bit harder. My example:\nI wash the cups. My brother washes the cups.\nThe verb ends in -sh, so it gets -es.\n\nYour turn. Write one sentence about your sister. Use the verb \"brush\".\n\nLEARNER'S LAST MESSAGE:\nMy sister brushs her hair every morning.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nGood start: \"My sister\" and \"her hair every morning\" are right. The verb ending is not right yet.\n\nLook at this pair:\nRight: He fixes the door.\nWrong: He fixs the door.\nThe wrong one puts only -s on a verb that ends in -x.\n\nNow look at the end of \"brush\". Write your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat is correct: \"drinks\". With \"he\", the verb takes -s.\n\nNow something a bit harder. My example:\nI wash the cups. My brother washes the cups.\nThe verb ends in -sh, so it gets -es.\n\nYour turn. Write one sentence about your sister. Use the verb \"brush\".\n\nLEARNER'S LAST MESSAGE:\nMy sister brushs her hair every morning.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nGood start: \"My sister\" and \"her hair every morning\" are right. The verb ending is not right yet.\n\nLook at this pair:\nRight: He fixes the door.\nWrong: He fixs the door.\nThe wrong one puts only -s on a verb that ends in -x.\n\nNow look at the end of \"brush\". Write your sentence again.",
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: He fixes the door. Wrong: He fixs the door."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My sister brushes her hair every morning.",
+    "errors": {
+     "W1": "My sister brush her hair every morning.",
+     "W2": "My sister brushs her hair every morning."
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister brushes her hair every morning.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister brushes her hair every morning."
+   }
   }
  ]
 }

@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 1,
-   "C2": 1
+   "C1": 2,
+   "C2": 2
   }
  },
  "start": {
@@ -246,7 +246,62 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"cries\" is correct: consonant plus y, so the y becomes -ies.\n\nYou have now handled plain -s and the -ies spelling. Next, a freer task that mixes the cases.\n\nWrite two or three sentences about the weekly routine of someone you know, using he or she. Include at least one verb ending in -sh, -ch, -x or -o (for example \"finish\" or \"do\") and one ordinary verb. I'll check each verb form.\n\nLEARNER'S LAST MESSAGE:\nShe finishes work at five and plays tennis.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nBoth verb forms are correct. \"finishes\": \"finish\" ends in -sh, so -es. \"plays\": vowel plus y, so just -s.\n\nYou have now used -s, -es and -ies correctly in different tasks. You seem ready for a quick check to confirm this on your own. Would you like to try it now?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"cries\" is correct: consonant plus y, so the y becomes -ies.\n\nYou have now handled plain -s and the -ies spelling. Next, a freer task that mixes the cases.\n\nWrite two or three sentences about the weekly routine of someone you know, using he or she. Include at least one verb ending in -sh, -ch, -x or -o (for example \"finish\" or \"do\") and one ordinary verb. I'll check each verb form.\n\nLEARNER'S LAST MESSAGE:\nShe finishes work at five and plays tennis.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nBoth verb forms are correct. \"finishes\": \"finish\" ends in -sh, so -es. \"plays\": vowel plus y, so just -s.\n\nYou have now used -s, -es and -ies correctly in different tasks. You seem ready for a quick check to confirm this on your own. Would you like to try it now?",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Both verb forms are correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Both verb forms are correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Both verb forms are correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Both verb forms are correct."
+    }
+   ],
+   "next_task": {
+    "kind": "none"
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "OK. Can I have an exercise, please?",
+   "production": {
+    "kind": "none",
+    "text": "OK. Can I have an exercise, please?"
+   }
   }
  ]
 }
