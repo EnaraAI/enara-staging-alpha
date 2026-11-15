@@ -31,3 +31,12 @@ Run every command from `backend/`, using `T="npx tsx ../research/deep-learning-s
 
 - **Round 3 is the interim look**, archived in `interim_r3/`.
 - **Current round:** see the git log.
+
+## Clean stop (usage limit, round 5)
+
+- **Round 5 tutor cells:** 21 of 24 applied.
+- **Not finished:** LE23, LE24 and LE25. Their agents hit the usage limit. Rerun each with a new agent; `tprompts` shows only the sessions that still need a reply.
+- **Next steps:**
+  1. `jprep 5`, then judges r5_j01–j12, then `japply 5`.
+  2. Rounds 6–10, including the agreement recheck in round 7.
+  3. The final analysis.
