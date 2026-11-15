@@ -13,8 +13,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 1
+   "C1": 3,
+   "C2": 2
   }
  },
  "start": {
@@ -258,7 +258,74 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"watches\". Verbs ending in -ch take -es.\n\nNow a freer task: write two sentences about a friend's routine. Use at least one verb that takes -es or -ies, like cry.\n\nLEARNER'S LAST MESSAGE:\nMy friend watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"My friend watches TV every evening.\" The subject is one person, and watch ends in -ch, so it takes -es.\n\nRecap:\nAfter he, she, it or one person like \"my friend\", the verb takes -s.\nVerbs ending in -ch, -sh, -s, -x or -o take -es; consonant + y becomes -ies.\n\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"watches\". Verbs ending in -ch take -es.\n\nNow a freer task: write two sentences about a friend's routine. Use at least one verb that takes -es or -ies, like cry.\n\nLEARNER'S LAST MESSAGE:\nMy friend watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"My friend watches TV every evening.\" The subject is one person, and watch ends in -ch, so it takes -es.\n\nRecap:\nAfter he, she, it or one person like \"my friend\", the verb takes -s.\nVerbs ending in -ch, -sh, -s, -x or -o take -es; consonant + y becomes -ies.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"My friend watches TV every evening.\""
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "watch ends in -ch, so it takes -es"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My friend watches TV every evening."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My friend watches TV every evening."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she, it or one person like \"my friend\", the verb takes -s."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Verbs ending in -ch, -sh, -s, -x or -o take -es; consonant + y becomes -ies."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I think: add -s/-es after he/she/it.",
+   "production": {
+    "kind": "rule",
+    "text": "I think: add -s/-es after he/she/it."
+   }
   }
  ]
 }

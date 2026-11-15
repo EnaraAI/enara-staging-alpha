@@ -7,7 +7,7 @@
   "band": "A1",
   "primary": "W2",
   "s": {
-   "W2": 3,
+   "W2": 2,
    "W1": 0,
    "C1": 3,
    "C2": 0
@@ -212,7 +212,61 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGreat job! Yes: He drinks tea in the morning. After he, we add -s.\n\nNext one. Write the correct form: She ___ (watch) TV after dinner.\n\nAnswer with only the verb.\n\nLEARNER'S LAST MESSAGE:\nwatchs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nGood try, but not quite. Watch ends in -ch, so we add -es: She watches TV after dinner.\n\nNow try this one. Write the correct form: The baby ___ (cry) at night.\n\nAnswer with only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGreat job! Yes: He drinks tea in the morning. After he, we add -s.\n\nNext one. Write the correct form: She ___ (watch) TV after dinner.\n\nAnswer with only the verb.\n\nLEARNER'S LAST MESSAGE:\nwatchs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nGood try, but not quite. Watch ends in -ch, so we add -es: She watches TV after dinner.\n\nNow try this one. Write the correct form: The baby ___ (cry) at night.\n\nAnswer with only the verb.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Watch ends in -ch, so we add -es"
+    },
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "She watches TV after dinner."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "crys",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W2",
+    "text": "crys"
+   }
   }
  ]
 }

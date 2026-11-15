@@ -221,7 +221,55 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's okay! Doctor starts with a consonant sound, so we use a: My uncle is a doctor.\n\nNow try this one. Write a, an or the: I bought a book. ___ book is very good.\n\nAnswer with only the missing word.\n\nLEARNER'S LAST MESSAGE:\nA\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\nGood try, but not quite. We already said a book, so now we use the: The book is very good.\n\nNow try this one. Write a, an or the: We saw ___ elephant at the zoo.\n\nAnswer with only the missing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's okay! Doctor starts with a consonant sound, so we use a: My uncle is a doctor.\n\nNow try this one. Write a, an or the: I bought a book. ___ book is very good.\n\nAnswer with only the missing word.\n\nLEARNER'S LAST MESSAGE:\nA\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\nGood try, but not quite. We already said a book, so now we use the: The book is very good.\n\nNow try this one. Write a, an or the: We saw ___ elephant at the zoo.\n\nAnswer with only the missing word.",
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "now we use the: The book is very good."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 1,
+     "C1": 2,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W2",
+    "text": "a"
+   }
   }
  ]
 }

@@ -7,7 +7,7 @@
   "band": "A2",
   "primary": "W2",
   "s": {
-   "W2": 2,
+   "W2": 1,
    "W1": 0,
    "C1": 3,
    "C2": 0
@@ -261,7 +261,44 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"drinks\" is correct. After he, the verb gets -s.\n\nNow a freer task. Write one sentence of your own about what your sister does on Fridays.\n\nLEARNER'S LAST MESSAGE:\nMy sister watchs TV on Fridays.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nGood: \"My sister\" with -s on the verb is the right idea, and the sentence is clear. One word needs a change: \"watchs\".\n\nLook at this pair:\nRight: She fixes the car.\nWrong: She fixs the car.\nThe wrong one is wrong because \"fix\" ends in x, and the ending is not right.\n\nWhat were you thinking when you wrote \"watchs\"? Then write your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"drinks\" is correct. After he, the verb gets -s.\n\nNow a freer task. Write one sentence of your own about what your sister does on Fridays.\n\nLEARNER'S LAST MESSAGE:\nMy sister watchs TV on Fridays.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nGood: \"My sister\" with -s on the verb is the right idea, and the sentence is clear. One word needs a change: \"watchs\".\n\nLook at this pair:\nRight: She fixes the car.\nWrong: She fixs the car.\nThe wrong one is wrong because \"fix\" ends in x, and the ending is not right.\n\nWhat were you thinking when you wrote \"watchs\"? Then write your sentence again.",
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: She fixes the car. Wrong: She fixs the car."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 1,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I think: add -s/-es after he/she/it.",
+   "production": {
+    "kind": "rule",
+    "text": "I think: add -s/-es after he/she/it."
+   }
   }
  ]
 }
