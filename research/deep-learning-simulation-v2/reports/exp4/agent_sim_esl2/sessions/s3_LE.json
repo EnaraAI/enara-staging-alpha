@@ -7,7 +7,7 @@
   "band": "A1",
   "primary": "W2",
   "s": {
-   "W2": 2,
+   "W2": 1,
    "W1": 1,
    "C1": 0,
    "C2": 0
@@ -121,7 +121,55 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLet's start with an example: \"an egg\". \"Egg\" starts with the sound \"e\", so we use \"an\".\nThe rule: use a before a consonant sound and an before a vowel sound (a, e, i, o, u).\nRight: \"I see a dog.\" Wrong: \"I see an dog.\"\n\nNow you try. Fill the gap:\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\nNot yet. Your answer \"a\" does not fit here.\nRight: \"an ice cream\". Wrong: \"a ice cream\". \"Ice\" starts with a vowel sound, so \"a\" is wrong.\n\nLook at the first sound of \"orange\" and compare. Please try again:\nWrite a or an: She has ___ orange in her bag."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLet's start with an example: \"an egg\". \"Egg\" starts with the sound \"e\", so we use \"an\".\nThe rule: use a before a consonant sound and an before a vowel sound (a, e, i, o, u).\nRight: \"I see a dog.\" Wrong: \"I see an dog.\"\n\nNow you try. Fill the gap:\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\nNot yet. Your answer \"a\" does not fit here.\nRight: \"an ice cream\". Wrong: \"a ice cream\". \"Ice\" starts with a vowel sound, so \"a\" is wrong.\n\nLook at the first sound of \"orange\" and compare. Please try again:\nWrite a or an: She has ___ orange in her bag.",
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: \"an ice cream\". Wrong: \"a ice cream\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 1,
+     "W1": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W2",
+    "text": "a"
+   }
   }
  ]
 }
