@@ -445,7 +445,54 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. Since am, is and are are mostly familiar ground, let's sharpen the harder part: keeping be in the sentence when the subject is long or the complement is not a noun.\nA quick reminder first: be links a subject to a description, a place or a state. It must agree with the real subject, not the nearest noun.\nExample of my own: The students in my classroom are happy today. The subject is \"the students\", so are, even though \"classroom\" sits right before it.\nYour task: write two sentences of your own. In one, use a long subject that ends with a singular noun but is plural overall. In the other, describe where someone is (home, the classroom). Then tell me which word decides am, is or are in each.\n\nLEARNER'S LAST MESSAGE:\nThe students in my class are happy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The students in my class are happy.\" is correct: are agrees with \"students\", not with \"class\". That covers the long-subject sentence.\nTwo parts are still open: write your second sentence saying where someone is (at home, in the classroom), and tell me which word decides the verb in each sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. Since am, is and are are mostly familiar ground, let's sharpen the harder part: keeping be in the sentence when the subject is long or the complement is not a noun.\nA quick reminder first: be links a subject to a description, a place or a state. It must agree with the real subject, not the nearest noun.\nExample of my own: The students in my classroom are happy today. The subject is \"the students\", so are, even though \"classroom\" sits right before it.\nYour task: write two sentences of your own. In one, use a long subject that ends with a singular noun but is plural overall. In the other, describe where someone is (home, the classroom). Then tell me which word decides am, is or are in each.\n\nLEARNER'S LAST MESSAGE:\nThe students in my class are happy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The students in my class are happy.\" is correct: are agrees with \"students\", not with \"class\". That covers the long-subject sentence.\nTwo parts are still open: write your second sentence saying where someone is (at home, in the classroom), and tell me which word decides the verb in each sentence.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"The students in my class are happy.\" is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My parents are at home.",
+    "errors": {
+     "W1": "My parents at home.",
+     "W2": "My parents is at home."
+    }
+   },
+   "applied": [
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My parents are at home.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My parents are at home."
+   }
   }
  ],
  "stateAfterS1": {

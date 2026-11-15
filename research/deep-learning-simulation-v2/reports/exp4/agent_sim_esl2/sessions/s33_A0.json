@@ -13,8 +13,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 3,
-   "C2": 1
+   "C1": 4,
+   "C2": 2
   }
  },
  "start": {
@@ -425,7 +425,72 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. Let's go past the basics and focus on the choice that causes most slips: a/an versus the.\nA quick reminder: a or an introduces something new to the reader; the points to something both of you can identify, because it was mentioned or is unique in the situation. And a or an follows the sound, not the letter.\nExample of my own: A doctor came in with an umbrella. The doctor put the umbrella by the door. \"The door\" works even on first mention, because the room has only one obvious door.\nYour task: write a short text of three sentences about an object (an orange, a book, an elephant...). Introduce it, then refer back to it, and include one \"the\" that is used because the thing is unique in context. Then explain each article choice in a few words.\n\nLEARNER'S LAST MESSAGE:\nI bought an orange. The orange was sweet. The shop was busy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nAll three articles work: \"an orange\" introduces it (vowel sound), \"The orange\" refers back to it, and \"The shop\" is identifiable because buying implies one particular shop.\nLet's check the basics on a fresh item. Write a or an: She has ___ orange in her bag. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. Let's go past the basics and focus on the choice that causes most slips: a/an versus the.\nA quick reminder: a or an introduces something new to the reader; the points to something both of you can identify, because it was mentioned or is unique in the situation. And a or an follows the sound, not the letter.\nExample of my own: A doctor came in with an umbrella. The doctor put the umbrella by the door. \"The door\" works even on first mention, because the room has only one obvious door.\nYour task: write a short text of three sentences about an object (an orange, a book, an elephant...). Introduce it, then refer back to it, and include one \"the\" that is used because the thing is unique in context. Then explain each article choice in a few words.\n\nLEARNER'S LAST MESSAGE:\nI bought an orange. The orange was sweet. The shop was busy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nAll three articles work: \"an orange\" introduces it (vowel sound), \"The orange\" refers back to it, and \"The shop\" is identifiable because buying implies one particular shop.\nLet's check the basics on a fresh item. Write a or an: She has ___ orange in her bag. (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "All three articles work"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "All three articles work"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"an orange\" introduces it (vowel sound)"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"an orange\" introduces it (vowel sound)"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   }
   }
  ],
  "stateAfterS1": {

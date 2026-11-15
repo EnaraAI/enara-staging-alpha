@@ -13,8 +13,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 1,
-   "C2": 1
+   "C1": 2,
+   "C2": 2
   }
  },
  "start": {
@@ -413,7 +413,72 @@
    "leakRaw": 1,
    "leakFinal": 1,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure! You use am, is and are well. One harder point: two people joined by \"and\" take are, even if each one alone takes is.\nYour task: write two sentences about your family. Use am in one, and \"and\" with are in the other.\n\nLEARNER'S LAST MESSAGE:\nI am a student.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I am a student.\" is correct: I goes with am.\nThat is the first sentence. Now write the second one: two people from your family joined by \"and\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure! You use am, is and are well. One harder point: two people joined by \"and\" take are, even if each one alone takes is.\nYour task: write two sentences about your family. Use am in one, and \"and\" with are in the other.\n\nLEARNER'S LAST MESSAGE:\nI am a student.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I am a student.\" is correct: I goes with am.\nThat is the first sentence. Now write the second one: two people from your family joined by \"and\".",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"I am a student.\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"I am a student.\" is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "I goes with am"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "I goes with am"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My mother and father are kind.",
+    "errors": {
+     "W1": "My mother and father kind.",
+     "W2": "My mother and father is kind."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My mother and father are kind.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My mother and father are kind."
+   }
   }
  ],
  "stateAfterS1": {
