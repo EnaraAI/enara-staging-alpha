@@ -383,7 +383,44 @@
    "leakRaw": 1,
    "leakFinal": 1,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHappy to. Quick recall first: what decides a or an, the spelling or the sound?\nYou have most of this, so let's sharpen the trickier part: sound, not letter. My examples: 'an hour' (silent h), 'a university' (starts with a 'y' sound), 'an MP3 player' ('em' sound). And 'the' marks something both people can identify: 'I bought a book. The book is very good.'\nYour task: write two sentences of your own. In the first, use 'a' or 'an' before a word where the spelling could mislead you. In the second, refer back to that same thing with 'the'."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 3.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHappy to. Quick recall first: what decides a or an, the spelling or the sound?\nYou have most of this, so let's sharpen the trickier part: sound, not letter. My examples: 'an hour' (silent h), 'a university' (starts with a 'y' sound), 'an MP3 player' ('em' sound). And 'the' marks something both people can identify: 'I bought a book. The book is very good.'\nYour task: write two sentences of your own. In the first, use 'a' or 'an' before a word where the spelling could mislead you. In the second, refer back to that same thing with 'the'.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "sound, not letter ... 'an hour' (silent h), 'a university'"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   }
   }
  ],
  "stateAfterS1": {
