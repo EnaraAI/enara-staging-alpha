@@ -34,8 +34,21 @@
   }
  },
  "rec": {
-  "entries": [],
-  "liveErrors": {},
+  "entries": [
+   {
+    "code": "article_omitted",
+    "occurrences": 1,
+    "lastSeenAt": "2027-01-11T09:04:00.000Z",
+    "independentStreak": 0,
+    "nextReviewAt": "2027-01-12T09:04:00.000Z"
+   }
+  ],
+  "liveErrors": {
+   "article_omitted": {
+    "seen": 1,
+    "lastCorrect": false
+   }
+  },
   "knownPoints": {}
  },
  "turns": [
@@ -314,7 +327,30 @@
     "correct": false,
     "fired": "W1",
     "text": "My aunt is engineer."
-   }
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "ev5": {
+    "liveError": "article_omitted",
+    "ownSentence": "feedback"
+   },
+   "engineVerdict": "INCORRECT",
+   "recordLive": [],
+   "tutor": "Your sentence needs one more small word before \"engineer\".\nIn English, we put a, an or the before one thing we can count.\nRight: \"I have a key.\" Wrong: \"I have key.\"\nNow write this sentence again and put the missing small word in:\nHe eats egg.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false
   }
  ]
 }
