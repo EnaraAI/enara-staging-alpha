@@ -321,7 +321,79 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"an\" is right. You left out your note again, so I still cannot tell whether you went by the letter or the sound. Here the two agree, so this item cannot show the difference.\nInstead of another gap-fill, let us move to free production, where you control the nouns yourself.\nWrite one sentence about a person you know, using \"a\" or \"an\" before a singular noun. To make it a real test of the rule, try to choose a noun whose first letter and first sound do not match. After the sentence, add one short line saying what decided your article: the letter or the sound.\n\nLEARNER'S LAST MESSAGE:\nMy uncle is honest man.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nThe article is missing: it should be \"an honest man\". The \"h\" in \"honest\" is silent, so the noun phrase starts with a vowel sound, and singular countable nouns need an article.\nThat noun was a good choice: letter and sound really do differ there. You skipped the note again, so I still cannot see your reasoning.\nHere is one on your own, then name what decided it:\nWrite a or an: She is ___ university student. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"an\" is right. You left out your note again, so I still cannot tell whether you went by the letter or the sound. Here the two agree, so this item cannot show the difference.\nInstead of another gap-fill, let us move to free production, where you control the nouns yourself.\nWrite one sentence about a person you know, using \"a\" or \"an\" before a singular noun. To make it a real test of the rule, try to choose a noun whose first letter and first sound do not match. After the sentence, add one short line saying what decided your article: the letter or the sound.\n\nLEARNER'S LAST MESSAGE:\nMy uncle is honest man.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nThe article is missing: it should be \"an honest man\". The \"h\" in \"honest\" is silent, so the noun phrase starts with a vowel sound, and singular countable nouns need an article.\nThat noun was a good choice: letter and sound really do differ there. You skipped the note again, so I still cannot see your reasoning.\nHere is one on your own, then name what decided it:\nWrite a or an: She is ___ university student. (answer with only the missing word)",
+   "stateBefore": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "it should be \"an honest man\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "singular countable nouns need an article."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "The \"h\" in \"honest\" is silent, so the noun phrase starts with a vowel sound"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "a",
+    "errors": {
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "a"
+   }
   }
  ]
 }

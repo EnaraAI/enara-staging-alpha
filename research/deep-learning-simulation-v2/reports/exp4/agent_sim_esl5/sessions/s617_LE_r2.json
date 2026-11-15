@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 0,
-   "C2": 2
+   "C1": 1,
+   "C2": 3
   }
  },
  "start": {
@@ -316,7 +316,85 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"a\" is right. Your explanation is still missing, though, so I cannot see what guided the choice. In this item the first letter and the first sound give the same result, so it does not separate the two ideas.\nBefore we move on to \"the\", let us switch to free production.\nWrite one sentence about a person you know, using \"a\" or \"an\" before a singular noun. If you can, pick a noun where the spelling and the sound start differently, since that is where the rule really matters. Then add one short line saying whether you chose by letter or by sound.\n\nLEARNER'S LAST MESSAGE:\nMy brother is an engineer.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"an engineer\" is right, since \"engineer\" starts with a vowel sound. As before, though, letter and sound agree here, and your line about how you chose is still missing.\nSo here is an independent check where they do not agree. Do it alone, then add one line saying what decided it: letter or sound.\nWrite a or an: He waited for ___ hour. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"a\" is right. Your explanation is still missing, though, so I cannot see what guided the choice. In this item the first letter and the first sound give the same result, so it does not separate the two ideas.\nBefore we move on to \"the\", let us switch to free production.\nWrite one sentence about a person you know, using \"a\" or \"an\" before a singular noun. If you can, pick a noun where the spelling and the sound start differently, since that is where the rule really matters. Then add one short line saying whether you chose by letter or by sound.\n\nLEARNER'S LAST MESSAGE:\nMy brother is an engineer.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"an engineer\" is right, since \"engineer\" starts with a vowel sound. As before, though, letter and sound agree here, and your line about how you chose is still missing.\nSo here is an independent check where they do not agree. Do it alone, then add one line saying what decided it: letter or sound.\nWrite a or an: He waited for ___ hour. (answer with only the missing word)",
+   "stateBefore": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"an engineer\" is right"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"an engineer\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"an engineer\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"an engineer\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   }
   }
  ]
 }

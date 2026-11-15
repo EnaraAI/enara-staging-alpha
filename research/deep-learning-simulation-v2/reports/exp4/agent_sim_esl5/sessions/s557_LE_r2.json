@@ -9,7 +9,7 @@
   "primary": "W2",
   "s": {
    "W2": 2,
-   "W1": 1,
+   "W1": 0,
    "C1": 1,
    "C2": 2
   },
@@ -340,7 +340,73 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat is correct: \"a\" is the right word here, and this time you did it without my example.\nNow let us move from gaps to your own writing. Think of a person you know, like a friend or someone in your family.\nWrite one sentence about that person. Use \"a\" or \"an\" in your sentence, and choose it by the first sound of the next word.\n\nLEARNER'S LAST MESSAGE:\nMy aunt is engineer.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nIn your sentence, \"engineer\" has no small word in front of it.\nIn English, one countable thing usually needs a small word before it: a, an or the.\nRight: \"My friend has a bike.\" Wrong: \"My friend has bike.\"\nThe only difference is that small word.\nNow try this sentence. Write the missing small word:\nMy aunt has ___ cat at home."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat is correct: \"a\" is the right word here, and this time you did it without my example.\nNow let us move from gaps to your own writing. Think of a person you know, like a friend or someone in your family.\nWrite one sentence about that person. Use \"a\" or \"an\" in your sentence, and choose it by the first sound of the next word.\n\nLEARNER'S LAST MESSAGE:\nMy aunt is engineer.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nIn your sentence, \"engineer\" has no small word in front of it.\nIn English, one countable thing usually needs a small word before it: a, an or the.\nRight: \"My friend has a bike.\" Wrong: \"My friend has bike.\"\nThe only difference is that small word.\nNow try this sentence. Write the missing small word:\nMy aunt has ___ cat at home.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 1,
+     "C1": 1,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "one countable thing usually needs a small word before it: a, an or the."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"My friend has a bike.\" Wrong: \"My friend has bike.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 0,
+     "C1": 1,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "a"
+   }
   }
  ]
 }

@@ -8,7 +8,7 @@
   "band": "A2",
   "primary": "W2",
   "s": {
-   "W2": 2,
+   "W2": 0,
    "W1": 0,
    "C1": 3,
    "C2": 0
@@ -345,7 +345,75 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"drinks\" is correct. You did both steps: the subject is \"He\", one person, so the verb gets -s.\n\nNow let's go one step further. Instead of filling a gap, write one sentence of your own about a person you know, like a friend or someone in your family. Use he or she, and add -s or -es to the verb.\n\nLEARNER'S LAST MESSAGE:\nMy brother watchs TV.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"watchs\". The -s idea is right, but the ending needs a look.\n\nCompare these two:\nRight: He fixes cars.\nWrong: He fixs cars.\nThe wrong one has only -s. A verb that ends in -x needs -es.\n\nNow look at the end of \"watch\". Write your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"drinks\" is correct. You did both steps: the subject is \"He\", one person, so the verb gets -s.\n\nNow let's go one step further. Instead of filling a gap, write one sentence of your own about a person you know, like a friend or someone in your family. Use he or she, and add -s or -es to the verb.\n\nLEARNER'S LAST MESSAGE:\nMy brother watchs TV.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"watchs\". The -s idea is right, but the ending needs a look.\n\nCompare these two:\nRight: He fixes cars.\nWrong: He fixs cars.\nThe wrong one has only -s. A verb that ends in -x needs -es.\n\nNow look at the end of \"watch\". Write your sentence again.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: He fixes cars. Wrong: He fixs cars."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A verb that ends in -x needs -es."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother watches TV.",
+    "errors": {
+     "W1": "My brother watch TV.",
+     "W2": "My brother watchs TV."
+    }
+   },
+   "applied": [
+    "R2:W2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother watches TV.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother watches TV."
+   }
   }
  ]
 }

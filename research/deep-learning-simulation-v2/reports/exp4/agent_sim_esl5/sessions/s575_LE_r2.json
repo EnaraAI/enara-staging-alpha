@@ -9,7 +9,7 @@
   "primary": "W2",
   "s": {
    "W2": 0,
-   "W1": 1,
+   "W1": 0,
    "C1": 1,
    "C2": 2
   },
@@ -314,7 +314,85 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot yet. First, tell me in a few words: what did you look at to choose \"a\"?\nThen compare this new pair:\nRight: He eats an egg. Wrong: He eats a egg.\nThe wrong one puts \"a\" before a word that starts with a vowel sound.\nNow ask the same question as before: what is the first sound of the word after the gap? Then try again:\nHe wants ___ umbrella. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nI think no a/an is needed before a singular noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"an\": He wants an umbrella. \"Umbrella\" starts with a vowel sound, so it takes \"an\".\nAlso, one thing usually needs a small word before it, so we do not leave it out.\nRight: She has an idea. Wrong: She has idea.\nNow a new one for you to do alone.\nWrite a or an:\nI read ___ email. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot yet. First, tell me in a few words: what did you look at to choose \"a\"?\nThen compare this new pair:\nRight: He eats an egg. Wrong: He eats a egg.\nThe wrong one puts \"a\" before a word that starts with a vowel sound.\nNow ask the same question as before: what is the first sound of the word after the gap? Then try again:\nHe wants ___ umbrella. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nI think no a/an is needed before a singular noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"an\": He wants an umbrella. \"Umbrella\" starts with a vowel sound, so it takes \"an\".\nAlso, one thing usually needs a small word before it, so we do not leave it out.\nRight: She has an idea. Wrong: She has idea.\nNow a new one for you to do alone.\nWrite a or an:\nI read ___ email. (answer with only the missing word)",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 1,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is \"an\": He wants an umbrella."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Umbrella\" starts with a vowel sound, so it takes \"an\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "one thing usually needs a small word before it, so we do not leave it out."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: She has an idea. Wrong: She has idea."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W2",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 1,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   }
   }
  ]
 }
