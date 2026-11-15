@@ -38,3 +38,24 @@ In stage 1 the student agents decided for themselves when to stop making their e
 - **Contrasts** (Holm over the four): (A0+LE) − P; (A0+LE+M) − P; (A0+LE) − A0; (A0+LE+M) − (A0+LE). Each is reported for all learners and for explicit-first learners (A1 + A2), with paired bootstrap intervals over learners (replications pooled within a learner) and exact sign-flip tests.
 - A result whose interval includes zero is not called a win.
 - If resource limits make the full Part 3 impossible, any reduction is written as an addendum here **before** Part 3 starts.
+
+## Addendum 1 (15 Nov 2026, after validation passed, before Part 3 started)
+**Validation results** (`reports/exp4/agent_sim_esl2_validation/`):
+- **Order check: passed.** Expected post-test accuracy: d 0.897 > c 0.579 > a 0.198 = b 0.198. The sampled scores have the same order.
+- **Judge agreement: 0.88** on 50 re-judged turns (threshold 0.85). The disagreements were about R3/R4 credited to both correct beliefs, and about a contrast phrase inside the rule.
+- **Noise:** repeated tutor (c) differed by −0.03 (expected) / −0.02 (sampled); repeated tutor (d) by −0.02 / −0.06.
+
+**Part 3 reduced by owner decision** (asked before Part 3; the full design needs about 560 agent runs). The reduced design:
+- 36 learners, all 4 arms;
+- **1 replication** (not 2);
+- 2 sessions × **5** tutor turns (not 10), the second session one simulated day later.
+
+The contrasts, outcomes and analysis are unchanged; the "pool the replications" step is moot with one replication.
+
+**Design details fixed now:**
+1. **Plan in every ENARA arm.** A0, A0+LE and A0+LE+M all receive the 23-method teaching plan from the fixed record (as when adaptive pedagogy is on). So (A0+LE) − A0 isolates `levelExplicit` (with the `arbitration` it forces on). P receives the plain prompt.
+2. **Memory carried as production records it.** The cross-session profile is carried in every ENARA arm the way production records it: the error-code profile always; mistaken ideas, what-worked and the opening review only with `memory`. The pure functions `applyTurn`, `summarizeProfile`, `applyTurnV2` and `summarizeProfileV2` are used. The error code comes from the engine's diagnosis; independent success is a key-correct first answer with no hint.
+   - **Known before running:** the engine has no error codes for articles or copula, and mistaken ideas are only recorded from the hidden assessment marker (`belief`), which tutors do not write here and which the specified arms do not switch on. So `memory` can carry little in this study.
+3. **Session 2.** It starts a new chat (engine history resets), and the learner opens it.
+4. **Agents.** Tutor agents handle 18 sessions of one arm per call. Judge agents handle 36 cases mixed across arms, with opaque ids.
+5. **Ratings.** **One** blind rater pass (not two), 6 cases per agent, four tutors per case.
