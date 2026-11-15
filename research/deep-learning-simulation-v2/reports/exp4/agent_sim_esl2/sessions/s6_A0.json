@@ -296,7 +296,73 @@
    "leakRaw": 0,
    "leakFinal": 0,
    "twoAsks": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are leaving the gap empty, and that is okay.\nRule: look at the first sound of the next word. A vowel sound (a, e, i, o, u) takes one word. Other sounds take \"a\".\nExample: I see ___ door. \"Door\" starts with a \"d\" sound. So: I see a door.\n\nNow you. Write one word: He wants ___ umbrella.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nThat is okay. Let's stop the practice here for now.\nRule: look at the first sound of the next word.\nYou wrote \"an\" before \"orange\" because it starts with a vowel sound. Other sounds take \"a\": a door.\n\nTell me the rule in your own words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are leaving the gap empty, and that is okay.\nRule: look at the first sound of the next word. A vowel sound (a, e, i, o, u) takes one word. Other sounds take \"a\".\nExample: I see ___ door. \"Door\" starts with a \"d\" sound. So: I see a door.\n\nNow you. Write one word: He wants ___ umbrella.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nThat is okay. Let's stop the practice here for now.\nRule: look at the first sound of the next word.\nYou wrote \"an\" before \"orange\" because it starts with a vowel sound. Other sounds take \"a\": a door.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R6",
+     "belief": "W2",
+     "quote": "You wrote \"an\" before \"orange\""
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R6"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise a, an and the again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "activate_prior_knowledge",
+    "short_explanation",
+    "comprehensible_model",
+    "comprehension_check"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Sure, let's practise! Think of 'She eats an apple.'\nMy example, step by step: 'I see ___ elephant.'\nStep 1: 'elephant' starts with an 'e' sound. That is a vowel sound (a, e, i, o, u).\nStep 2: before a vowel sound, we write 'an'. So: 'I see an elephant.'\nYour turn: 'He is ___ doctor.' The first sound of 'doctor' is 'd'. Write a or an.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false
   }
- ]
+ ],
+ "stateAfterS1": {
+  "form": "articles",
+  "band": "A1",
+  "primary": "W1",
+  "s": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 2
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 1
+  }
+ }
 }
