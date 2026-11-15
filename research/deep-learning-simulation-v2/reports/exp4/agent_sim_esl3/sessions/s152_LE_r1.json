@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 2,
-   "C2": 2
+   "C2": 3
   }
  },
  "start": {
@@ -431,7 +431,60 @@
    "leakFinal": 0,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure. You have used am, is and are before, so let's work on a harder case: agreement when the subject is long.\n\nWhen a phrase comes between the subject and the verb, the verb still agrees with the main noun. \"The teacher with the two new students is at school\" uses \"is\" because the subject is \"the teacher\", not \"students\". A common slip is to match the nearest noun instead.\n\nYour task: write two sentences of your own. In each one, put a phrase between the subject and am, is or are (for example, \"with ...\" or \"from ...\"). Make one subject singular and one plural, and check that the verb agrees with the main noun.\n\nLEARNER'S LAST MESSAGE:\nThe boys from my school are tall.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"The boys from my school are tall.\" The verb agrees with the main noun \"boys\", not with \"school\", which sits right before it.\n\nNow a quick one. Write am, is or are: I ___ a student. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure. You have used am, is and are before, so let's work on a harder case: agreement when the subject is long.\n\nWhen a phrase comes between the subject and the verb, the verb still agrees with the main noun. \"The teacher with the two new students is at school\" uses \"is\" because the subject is \"the teacher\", not \"students\". A common slip is to match the nearest noun instead.\n\nYour task: write two sentences of your own. In each one, put a phrase between the subject and am, is or are (for example, \"with ...\" or \"from ...\"). Make one subject singular and one plural, and check that the verb agrees with the main noun.\n\nLEARNER'S LAST MESSAGE:\nThe boys from my school are tall.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"The boys from my school are tall.\" The verb agrees with the main noun \"boys\", not with \"school\", which sits right before it.\n\nNow a quick one. Write am, is or are: I ___ a student. (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"The boys from my school are tall.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"The boys from my school are tall.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "am",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "am"
+   }
   }
  ],
  "stateAfterS1": {
