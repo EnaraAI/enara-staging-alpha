@@ -12,6 +12,7 @@ import { ParentProfile } from '../models/ParentProfile';
 import { Student } from '../models/Student';
 import { User } from '../models/User';
 import { initialsFromName } from '../utils/idGenerator';
+import { ALL_FLAGS, forgetFeatureFlags } from '../services/featureFlags';
 
 // FAKE data for the LMS test site (lms-test.enara.app) only. Every person,
 // email and school here is invented. Shapes mirror real data: students in
@@ -110,7 +111,13 @@ export async function seedLmsTest(password: string): Promise<SeedResult> {
   if (typeof password !== 'string' || password.length < 12) throw new Error('A test password of at least 12 characters is required');
   const hash = await bcrypt.hash(password, 10);
 
-  for (const s of SCHOOLS) await Institution.updateOne({ id: s.id }, { $set: { name: s.name } }, { upsert: true });
+  // Every feature on, like the demo school, so all screens can be tested.
+  // AI stays off for the whole test site (AI_PAUSED, no provider keys).
+  const features = Object.fromEntries(ALL_FLAGS.map((f) => [f, true]));
+  for (const s of SCHOOLS) {
+    await Institution.updateOne({ id: s.id }, { $set: { name: s.name, features } }, { upsert: true });
+    forgetFeatureFlags(s.id);
+  }
   for (const g of GROUPS) {
     const members = STUDENTS.filter((s) => s.group === g.id).length;
     await Batch.updateOne({ id: g.id }, { $set: { name: g.name, institutionId: g.school, academicYear: YEAR, studentCount: members, origin: 'live' } }, { upsert: true });

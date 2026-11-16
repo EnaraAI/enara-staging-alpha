@@ -108,6 +108,10 @@ describe('migrate and seed through the route', () => {
     // Not every course is a language course.
     expect((await Curriculum.findOne({ id: 'LT-CUR-MATH-A' }).lean())?.chapters.every((c: any) => !c.languageSpec?.objectives?.length)).toBe(true);
     expect((await Curriculum.findOne({ id: 'LT-CUR-ENG-A' }).lean())?.chapters[0].languageSpec?.objectives?.length).toBeGreaterThan(0);
+    const { Institution } = await import('../src/models/Institution');
+    const school = await Institution.findOne({ id: 'LT-SCHOOL-A' }).lean();
+    expect(Object.values(school!.features as unknown as Record<string, boolean>).length).toBeGreaterThan(5);
+    expect(Object.values(school!.features as unknown as Record<string, boolean>).every(Boolean)).toBe(true);
     // A seeded teacher can log in with the given password.
     const login = await request(a).post('/api/auth/login').send({ email: 'teacher.a1@lms-test.example', password: pw });
     expect(login.status).toBe(200);
