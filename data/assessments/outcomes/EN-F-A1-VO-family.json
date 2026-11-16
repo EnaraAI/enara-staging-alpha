@@ -2,7 +2,7 @@
   "status": "DRAFT",
   "outcomeId": "EN-F-A1-VO-family",
   "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic-L1 vowel spelling slip on a kin word in a natural sentence; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 now contain a wrong kin word that must be replaced (uncle/aunt/cousin/grandmother/grandfather, all A1); C-4 now aunt. Review round 3: all items 7-8 use the 'VOCABULARY variant, named word' rubric (as C-7 already did), since each prompt names the kin word. Review round 4: the kin-word swaps (my mother's mother is my aunt ...) were factual absurdities, not learner errors. Slots 5-6 are now vowel slips on an A1 kin word: doughter/hasband (A), parints/brather (B), grandmather/nece (C). outcomes.json l1ErrorTypes = [spelling_vowel]. Review round 5: C-6 'nece' (niece, EVP A2) -> 'childrin' (children, A1, not used elsewhere in form C); 'niece' distractor removed from A-4. No item's answer word is shown elsewhere in its form: gap-fill definitions, slot 3-4 options and slot 7-8 named kin words use only words not keyed in that form; C-9 no longer shows 'son'.",
+  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic-L1 vowel spelling slip on a kin word in a natural sentence; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 now contain a wrong kin word that must be replaced (uncle/aunt/cousin/grandmother/grandfather, all A1); C-4 now aunt. Review round 3: all items 7-8 use the 'VOCABULARY variant, named word' rubric (as C-7 already did), since each prompt names the kin word. Review round 4: the kin-word swaps (my mother's mother is my aunt ...) were factual absurdities, not learner errors. Slots 5-6 are now vowel slips on an A1 kin word: doughter/hasband (A), parints/brather (B), grandmather/nece (C). outcomes.json l1ErrorTypes = [spelling_vowel]. Review round 5: C-6 'nece' (niece, EVP A2) -> 'childrin' (children, A1, not used elsewhere in form C); 'niece' distractor removed from A-4. No item's answer word is shown elsewhere in its form: gap-fill definitions, slot 3-4 options and slot 7-8 named kin words use only words not keyed in that form; C-9 no longer shows 'son'. User decisions (A1-A2): vocabulary validity - each form keeps one spelling error-correction item (slot 5); slot 6 is now a meaning error (Arabic-L1 polysemy or calque on an A1 word), with exactly one correct fix and the answer word not shown elsewhere in the form.",
   "forms": {
     "A": [
       {
@@ -86,18 +86,19 @@
       {
         "id": "EN-F-A1-VO-family-A-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My hasband works in a big bank.",
-        "answerKey": "My husband works in a big bank.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My brother is married. His woman is a teacher.",
+        "answerKey": "My brother is married. His wife is a teacher.",
         "acceptedAnswers": [
-          "My husband works in a big bank."
+          "My brother is married. His wife is a teacher.",
+          "My brother's married. His wife is a teacher."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My husband works in a big bank.",
+        "targetForm": "My brother is married. His wife is a teacher.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: hasband for husband)"
+        "l1ErrorType": "lexical_l1_polysemy (Arabic imra'a = woman/wife: woman for wife)"
       },
       {
         "id": "EN-F-A1-VO-family-A-7",
@@ -236,18 +237,19 @@
       {
         "id": "EN-F-A1-VO-family-B-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My little brather goes to school by bus.",
-        "answerKey": "My little brother goes to school by bus.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My aunt has three sons: two girls, one boy.",
+        "answerKey": "My aunt has three children: two girls, one boy.",
         "acceptedAnswers": [
-          "My little brother goes to school by bus."
+          "My aunt has three children: two girls, one boy.",
+          "My aunt has three kids: two girls, one boy."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My little brother goes to school by bus.",
+        "targetForm": "My aunt has three children: two girls, one boy.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: brather for brother)"
+        "l1ErrorType": "lexical_l1_polysemy (Arabic awlad = sons/children: sons for children)"
       },
       {
         "id": "EN-F-A1-VO-family-B-7",
@@ -383,18 +385,18 @@
       {
         "id": "EN-F-A1-VO-family-C-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My childrin go to school near our house.",
-        "answerKey": "My children go to school near our house.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My aunt's man is a doctor at the hospital.",
+        "answerKey": "My aunt's husband is a doctor at the hospital.",
         "acceptedAnswers": [
-          "My children go to school near our house."
+          "My aunt's husband is a doctor at the hospital."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My children go to school near our house.",
+        "targetForm": "My aunt's husband is a doctor at the hospital.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: childrin for children)"
+        "l1ErrorType": "lexical_l1_polysemy (Egyptian Arabic ragil = man/husband: man for husband)"
       },
       {
         "id": "EN-F-A1-VO-family-C-7",

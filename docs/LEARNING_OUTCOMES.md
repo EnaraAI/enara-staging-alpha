@@ -38,7 +38,14 @@ Each lesson outcome links up to a course outcome; each form outcome links up to 
 **Banned verbs (not observable):** understand, know, learn, appreciate, be aware of, be familiar with, grasp, feel confident, master, internalise, think about.
 
 **Arabic-L1 error types (framework §9; hypotheses, check against real errors):**
-`article_indef_omission`, `article_def_misuse`, `copula_omission`, `verb_subject_order`, `adj_noun_order`, `resumptive_pronoun`, `run_on_and`, `present_perfect_avoidance`, `tense_aspect`, `agreement_3s`, `plural_s`, `spelling_vowel` (typed text), and audio-only `phon_p_b`, `phon_vowel`, `phon_cluster`, `phon_th` (NOT MEASURABLE YET).
+`article_indef_omission`, `article_def_misuse`, `copula_omission`, `verb_subject_order`, `adj_noun_order`, `resumptive_pronoun`, `run_on_and`, `present_perfect_avoidance`, `tense_aspect`, `agreement_3s`, `plural_s`, `spelling_vowel` (typed text), `spelling_consonant`, `prep_place_transfer`, `lexical_eat_drink`, `noun_for_adjective`, `quantifier_countability` (typed text; defined below), and audio-only `phon_p_b`, `phon_vowel`, `phon_cluster`, `phon_th` (NOT MEASURABLE YET).
+
+Typed error types added by user decision (A1–A2, DRAFT):
+- `prep_place_transfer`: preposition chosen by transfer from Arabic *fi* / *ʿala* (one word for in/on/at); used for place, and as nearest value for time phrases. Example: "He is in the bus." → on the bus; "The lesson is in 9 o'clock." → at.
+- `spelling_consonant`: typed consonant slip from Arabic sound transfer (p/b, f/v; Arabic has no /p/ or /v/). Example: "bencil" → pencil; "fivteen" → fifteen.
+- `lexical_eat_drink`: *drink* used for soup or spoon food (Arabic *shariba* covers soup). Example: "I drink my soup." → eat.
+- `noun_for_adjective`: weather (or other) noun used where an adjective is needed. Example: "It is rain today." → rainy; "It is sun." → sunny.
+- `quantifier_countability`: quantifier not matched to a countable/uncountable noun (or to polarity, nearest value for some/any); Arabic *kathir* covers much/many. Example: "How much books?" → many; "many water" → much.
 
 **Evidence types:** `controlled_item` (exact / accepted answers), `guided_production` (sentence with a target), `free_production` (paragraph or longer, rubric), `reading_item`, `transcript_speaking` (speaking exam transcript; content only), `audio` (not available).
 
@@ -72,7 +79,7 @@ Note: the research "listening" lessons (`RS-*-LS-*` below) are text-based stand-
 ## PART 6. Example records
 
 ```json
-{ "id": "EN-F-A2-GR-third-person-s", "level": "form", "cefr": "A2", "skill": "grammar",
+{ "id": "EN-F-A2-GR-third-person-s", "level": "form", "cefr": "A1", "skill": "grammar",
   "statement": "Can add -s or -es to the verb after he, she and it in the present simple.",
   "verb": "complete", "condition": "Gap-fill sentences, no help, base verb given",
   "criterion": "8 of 10 correct", "lessonIds": ["LTB-A2-my-daily-routine"],

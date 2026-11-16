@@ -2,7 +2,7 @@
   "status": "DRAFT",
   "outcomeId": "EN-F-A1-VO-classroom-objects",
   "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-  "matching": "Items 1-2 gap-fill naming an object from its use; 3-4 choice of object in context; EC = wrong classroom noun for its use (I [verb] ... with my X); FP = one sentence naming an object on your desk/in your bag; transfer = a teacher's list instruction. All nouns EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 are now wrong-object errors (wrong classroom noun for its use), not article omission. Re-review round 2: B-6 and C-6 replaced (notebook/pencil case and close the board were not certain errors); all six EC items now follow one pattern; l1ErrorTypes in outcomes.json cleared because lexical object confusion has no schema enum value. Review round 3: slots 5-6 rewritten as realistic Arabic-L1 spelling slips on a classroom noun (slot 5 = phon_p_b, p written as b: bencil/ben/baper; slot 6 = spelling_vowel, vowel omitted: calculter/dictionry/notbook); the earlier wrong-object swaps were not real learner errors. The corrected noun is not shown elsewhere in the same form. l1ErrorTypes in outcomes.json set to phon_p_b, spelling_vowel. Review round 4: phon_p_b is an audio-only type in docs/LEARNING_OUTCOMES.md, so the typed slot-5 slips (bencil/ben/baper) are now tagged spelling_vowel, the only typed-spelling enum value; outcomes.json l1ErrorTypes = [spelling_vowel]. A consonant-spelling enum value is a user decision. C-6 now also accepts 'in a notebook', like the other slot 5-6 items.",
+  "matching": "Items 1-2 gap-fill naming an object from its use; 3-4 choice of object in context; EC = wrong classroom noun for its use (I [verb] ... with my X); FP = one sentence naming an object on your desk/in your bag; transfer = a teacher's list instruction. All nouns EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 are now wrong-object errors (wrong classroom noun for its use), not article omission. Re-review round 2: B-6 and C-6 replaced (notebook/pencil case and close the board were not certain errors); all six EC items now follow one pattern; l1ErrorTypes in outcomes.json cleared because lexical object confusion has no schema enum value. Review round 3: slots 5-6 rewritten as realistic Arabic-L1 spelling slips on a classroom noun (slot 5 = phon_p_b, p written as b: bencil/ben/baper; slot 6 = spelling_vowel, vowel omitted: calculter/dictionry/notbook); the earlier wrong-object swaps were not real learner errors. The corrected noun is not shown elsewhere in the same form. l1ErrorTypes in outcomes.json set to phon_p_b, spelling_vowel. Review round 4: phon_p_b is an audio-only type in docs/LEARNING_OUTCOMES.md, so the typed slot-5 slips (bencil/ben/baper) are now tagged spelling_vowel, the only typed-spelling enum value; outcomes.json l1ErrorTypes = [spelling_vowel]. A consonant-spelling enum value is a user decision. C-6 now also accepts 'in a notebook', like the other slot 5-6 items. User decisions (A1-A2): vocabulary validity - each form keeps one spelling error-correction item (slot 5); slot 6 is now a meaning error (Arabic-L1 polysemy or calque on an A1 word), with exactly one correct fix and the answer word not shown elsewhere in the form.",
   "forms": {
     "A": [
       {
@@ -83,24 +83,23 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "spelling_vowel (nearest typed-spelling enum value; the slip is a consonant spelling slip, p written as b: bencil for pencil)"
+        "l1ErrorType": "spelling_consonant (p written as b: bencil for pencil)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-A-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: I do my maths sums with my calculter.",
-        "answerKey": "I do my maths sums with my calculator.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Open your books at paper ten, please.",
+        "answerKey": "Open your books at page ten, please.",
         "acceptedAnswers": [
-          "I do my maths sums with my calculator.",
-          "I do my maths sums with a calculator."
+          "Open your books at page ten, please."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "I do my maths sums with my calculator.",
+        "targetForm": "Open your books at page ten, please.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "spelling_vowel (vowel omitted: calculter for calculator)"
+        "l1ErrorType": "lexical_l1_polysemy (Arabic waraqa = paper/page: paper for page)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-A-7",
@@ -240,24 +239,23 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "spelling_vowel (nearest typed-spelling enum value; the slip is a consonant spelling slip, p written as b: ben for pen)"
+        "l1ErrorType": "spelling_consonant (p written as b: ben for pen)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-B-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: I look up the word in my dictionry.",
-        "answerKey": "I look up the word in my dictionary.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I always wear my clock on my arm.",
+        "answerKey": "I always wear my watch on my arm.",
         "acceptedAnswers": [
-          "I look up the word in my dictionary.",
-          "I look up the word in a dictionary."
+          "I always wear my watch on my arm."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "I look up the word in my dictionary.",
+        "targetForm": "I always wear my watch on my arm.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "spelling_vowel (vowel omitted: dictionry for dictionary)"
+        "l1ErrorType": "lexical_l1_polysemy (Arabic saa'a = clock/watch: clock for watch)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-B-7",
@@ -399,24 +397,23 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "spelling_vowel (nearest typed-spelling enum value; the slip is a consonant spelling slip, p written as b: baper for paper)"
+        "l1ErrorType": "spelling_consonant (p written as b: baper for paper)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-C-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: I do my homework in my notbook.",
-        "answerKey": "I do my homework in my notebook.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I borrow books from the school bookshop every week.",
+        "answerKey": "I borrow books from the school library every week.",
         "acceptedAnswers": [
-          "I do my homework in my notebook.",
-          "I do my homework in a notebook."
+          "I borrow books from the school library every week."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "I do my homework in my notebook.",
+        "targetForm": "I borrow books from the school library every week.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "spelling_vowel (vowel omitted: notbook for notebook)"
+        "l1ErrorType": "lexical_l1_polysemy (Arabic maktaba = library/bookshop: bookshop for library)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-C-7",

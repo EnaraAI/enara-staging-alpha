@@ -557,3 +557,90 @@ Rule used for cueing: no item's answer word (gap-fill, choice, error-correction 
 ### Tests
 
 `cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. Prompt-length (±2 words) failures in home-rooms slots 3/4/5/9 and family slot 9 came up during the pass and were fixed in the data, not the tests.
+
+## User decisions (A1–A2)
+
+Status: DRAFT. Task: `research/assessment-review/a1a2/DECISIONS_TASK.md`. Revised targets: `REVISED_TARGETS6.json` (186: the 48 round-5 targets, not yet re-reviewed, merged with these changes, no duplicates).
+
+### CEFR level moves
+
+- `cefr` A2 → A1 (EGP basis): EN-F-A2-GR-third-person-s, EN-F-A2-GR-present-continuous, EN-F-A2-FN-polite-requests, EN-F-A2-GR-imperatives; also EN-F-A2-GR-was-were (below). Item `level` fields in the three existing form files set to A1.
+- Ids not changed: the `schema.json` id pattern allows A1|A2 independently of `cefr`, and no test requires the id level to match `cefr` (`assessmentForms.test.ts` reads the level from the file name only for item count and the vocabLevel ceiling; A1 and A2 both have 9 items). So no references (outcomes.json links, file names, placement.json, docs, tests, research inputs) needed updating; the LEARNING_OUTCOMES.md PART 6 example record now shows `cefr` A1.
+- Not moved: the lesson outcomes EN-L-A2-GR-third-person-s / EN-L-A2-GR-present-continuous and the A2 course parents (the task named the form outcomes only). Follow-up: many items in the moved forms keep vocabLevel A1-A2 / A2, now above the outcome level; not re-rated here.
+
+### was/were
+
+- Evidence (EGP, from memory, not re-checked against the live EGP site): past simple of *be* (was/were) is listed at A1; the record's own reference already said "past simple of be, A1". Decision: `cefr` A1.
+- `l1ErrorTypes` [copula_omission, agreement_3s] → [agreement_3s, tense_aspect]. Arabic marks past *be* with *kaana*, so omission is less typical in the past than in the present; the expected Arabic-L1 errors are subject agreement (*they was*, *he were*) and present for past (*Yesterday I am at home*).
+
+### Enum additions
+
+`schema.json` l1ErrorTypes: prep_place_transfer, spelling_consonant, lexical_eat_drink, noun_for_adjective, quantifier_countability. Definitions with Arabic-L1 examples are in `docs/LEARNING_OUTCOMES.md` PART 2 (error types); the schema description points there.
+
+### Outcome l1ErrorTypes
+
+- classroom-objects [spelling_consonant]; numbers-time [spelling_consonant, spelling_vowel]; weather [spelling_vowel, noun_for_adjective]; food-drink [lexical_eat_drink]; much-many and some-any [quantifier_countability]; prepositions-place, prepositions-time, EN-L-A1-GR-time-prepositions, transport-travel [prep_place_transfer]; home-rooms [spelling_consonant]; capitals-full-stops and EN-L-A1-WR-sentence-mechanics [run_on_and]; clothes-shopping [adj_noun_order]; imperatives [copula_omission] (*Don't late*).
+- Still empty (no enum value fits): possessive-adjectives, common-adjectives, make-do, polite-requests (form), and several lesson/reading outcomes. possessive-s is left as article_def_misuse (no new value fits).
+
+### Item retags (31)
+
+| Item | Old | New |
+|---|---|---|
+| EN-F-A1-GR-prepositions-time-A-5 | in_for_on_day | prep_place_transfer (in_for_on_day; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-GR-prepositions-time-A-6 | in_for_at_clock | prep_place_transfer (in_for_at_clock; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-GR-prepositions-time-B-5 | in_for_on_day | prep_place_transfer (in_for_on_day; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-GR-prepositions-time-B-6 | in_for_at_clock | prep_place_transfer (in_for_at_clock; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-GR-prepositions-time-C-5 | in_for_on_day | prep_place_transfer (in_for_on_day; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-GR-prepositions-time-C-6 | in_for_at_clock | prep_place_transfer (in_for_at_clock; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-VO-classroom-objects-A-5 | spelling_vowel (nearest typed-spelling enum value; the slip is a consonant spelling slip, p written as b: bencil for pencil) | spelling_consonant (p written as b: bencil for pencil) |
+| EN-F-A1-VO-classroom-objects-B-5 | spelling_vowel (nearest typed-spelling enum value; the slip is a consonant spelling slip, p written as b: ben for pen) | spelling_consonant (p written as b: ben for pen) |
+| EN-F-A1-VO-classroom-objects-C-5 | spelling_vowel (nearest typed-spelling enum value; the slip is a consonant spelling slip, p written as b: baper for paper) | spelling_consonant (p written as b: baper for paper) |
+| EN-F-A1-VO-food-drink-A-6 | lexical_eat_drink (Arabic shariba is used for soup and soft spoon food; English uses eat with a spoon) | lexical_eat_drink |
+| EN-F-A1-VO-food-drink-B-6 | lexical_eat_drink (Arabic shariba is used for soup and soft spoon food; English uses eat with a spoon) | lexical_eat_drink |
+| EN-F-A1-VO-food-drink-C-6 | lexical_eat_drink (Arabic shariba is used for soup and soft spoon food; English uses eat with a spoon) | lexical_eat_drink |
+| EN-F-A1-VO-home-rooms-B-6 | lexical_room_label | spelling_consonant (b written as p: path room for bathroom) |
+| EN-F-A1-VO-home-rooms-C-5 | lexical_room_label | spelling_consonant (b written as p: path room for bathroom) |
+| EN-F-A1-VO-numbers-time-A-5 | spelling_consonant_f_v | spelling_consonant (f/v: fivteen for fifteen) |
+| EN-F-A1-VO-numbers-time-B-6 | spelling_consonant_f_v | spelling_consonant (f/v: fivty for fifty) |
+| EN-F-A2-GR-much-many-A-5 | much_with_countable (countability) | quantifier_countability (much_with_countable) |
+| EN-F-A2-GR-much-many-A-6 | many_with_uncountable (countability) | quantifier_countability (many_with_uncountable) |
+| EN-F-A2-GR-much-many-B-5 | much_with_countable (countability) | quantifier_countability (much_with_countable) |
+| EN-F-A2-GR-much-many-B-6 | many_with_uncountable (countability) | quantifier_countability (many_with_uncountable) |
+| EN-F-A2-GR-much-many-C-5 | much_with_countable (countability) | quantifier_countability (much_with_countable) |
+| EN-F-A2-GR-much-many-C-6 | many_with_uncountable (countability) | quantifier_countability (many_with_uncountable) |
+| EN-F-A2-GR-some-any-A-5 | some_in_negative (Arabic single quantifier) | quantifier_countability (some_in_negative; nearest enum value) |
+| EN-F-A2-GR-some-any-A-6 | any_in_positive | quantifier_countability (any_in_positive; nearest enum value) |
+| EN-F-A2-GR-some-any-B-5 | some_in_negative (Arabic single quantifier) | quantifier_countability (some_in_negative; nearest enum value) |
+| EN-F-A2-GR-some-any-B-6 | any_in_positive | quantifier_countability (any_in_positive; nearest enum value) |
+| EN-F-A2-GR-some-any-C-5 | some_in_negative (Arabic single quantifier) | quantifier_countability (some_in_negative; nearest enum value) |
+| EN-F-A2-GR-some-any-C-6 | any_in_positive | quantifier_countability (any_in_positive; nearest enum value) |
+| EN-F-A2-VO-weather-A-6 | noun_for_adj (no schema enum value: weather noun used for the adjective) | noun_for_adjective |
+| EN-F-A2-VO-weather-B-6 | noun_for_adj (no schema enum value: weather noun used for the adjective) | noun_for_adjective |
+| EN-F-A2-VO-weather-C-6 | noun_for_adj (no schema enum value: weather noun used for the adjective) | noun_for_adjective |
+
+### Vocabulary validity: items changed (12)
+
+Each vocabulary form now has at most one spelling error-correction item (slot 5 kept). Slot 6 in classroom-objects, days-months, family and numbers-time (where both slots were spelling) is now a meaning error: Arabic-L1 polysemy or calque, one correct fix, A1 words, the answer word not shown elsewhere in the form, prompts within ±2 words. The other vocabulary files already had at most one spelling EC item per form.
+
+| Item | Old (sentence → key) | New (sentence → key) | Tag |
+|---|---|---|---|
+| EN-F-A1-VO-classroom-objects-A-6 | I do my maths sums with my calculter. → I do my maths sums with my calculator. | Open your books at paper ten, please. → Open your books at page ten, please. | lexical_l1_polysemy (Arabic waraqa = paper/page: paper for page) |
+| EN-F-A1-VO-classroom-objects-B-6 | I look up the word in my dictionry. → I look up the word in my dictionary. | I always wear my clock on my arm. → I always wear my watch on my arm. | lexical_l1_polysemy (Arabic saa'a = clock/watch: clock for watch) |
+| EN-F-A1-VO-classroom-objects-C-6 | I do my homework in my notbook. → I do my homework in my notebook. | I borrow books from the school bookshop every week. → I borrow books from the school library every week. | lexical_l1_polysemy (Arabic maktaba = library/bookshop: bookshop for library) |
+| EN-F-A1-VO-days-months-A-6 | We have English on Tusday. → We have English on Tuesday. | What is the history today? It is 5 May. → What is the date today? It is 5 May. | lexical_l1_calque (Arabic tarikh = date/history: history for date) |
+| EN-F-A1-VO-days-months-B-6 | My cousin visits us every Wensday. → My cousin visits us every Wednesday. | We have a family party this night. → We have a family party tonight. | lexical_l1_calque (Arabic al-layla = this night: this night for tonight) |
+| EN-F-A1-VO-days-months-C-6 | We visit grandma every Thersday. → We visit grandma every Thursday. | I watched a film with my brother yesterday night. → I watched a film with my brother last night. | lexical_l1_calque (Arabic ams bil-layl = yesterday night: yesterday night for last night) |
+| EN-F-A1-VO-family-A-6 | My hasband works in a big bank. → My husband works in a big bank. | My brother is married. His woman is a teacher. → My brother is married. His wife is a teacher. | lexical_l1_polysemy (Arabic imra'a = woman/wife: woman for wife) |
+| EN-F-A1-VO-family-B-6 | My little brather goes to school by bus. → My little brother goes to school by bus. | My aunt has three sons: two girls, one boy. → My aunt has three children: two girls, one boy. | lexical_l1_polysemy (Arabic awlad = sons/children: sons for children) |
+| EN-F-A1-VO-family-C-6 | My childrin go to school near our house. → My children go to school near our house. | My aunt's man is a doctor at the hospital. → My aunt's husband is a doctor at the hospital. | lexical_l1_polysemy (Egyptian Arabic ragil = man/husband: man for husband) |
+| EN-F-A1-VO-numbers-time-A-6 | My grandfather is sevnty years old. → My grandfather is seventy years old. | The English lesson is one clock long. → The English lesson is one hour long. | lexical_l1_polysemy (Arabic saa'a = clock/hour: clock for hour) |
+| EN-F-A1-VO-numbers-time-B-6 | My aunt is fivty years old. → My aunt is fifty years old. | The film is two clocks long. → The film is two hours long. | lexical_l1_polysemy (Arabic saa'a = clock/hour: clocks for hours) |
+| EN-F-A1-VO-numbers-time-C-6 | There are ninty students in our school. → There are ninety students in our school. | We waited for three clocks at the station. → We waited for three hours at the station. | lexical_l1_polysemy (Arabic saa'a = clock/hour: clocks for hours) |
+
+### New test
+
+`backend/test/assessmentVocabValidity.test.ts`: fails if every error-correction item in a vocabulary form (EN-F-*-VO-*) is tagged spelling (any l1ErrorType starting with `spelling`), or if a form has more than one spelling EC item.
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed. No existing tests were changed.
