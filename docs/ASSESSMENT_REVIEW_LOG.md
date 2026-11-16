@@ -432,3 +432,48 @@ Not revised (keys correct; noted for a later pass): H12 numbers-time f/v directi
 ### Tests
 
 Parallel forms kept matched (word counts within ±2 per slot, novelty and separation checks). `cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. Three prompt-length and one novelty failure during the pass were fixed in the data, not the tests.
+
+## Review round 3 (A1–A2)
+
+Status: **DRAFT**. Sources: `research/assessment-review/a1a2/rereview2_R1/R2/R3.json`; grouping in `consolidate3.py` → `CONSOLIDATED3.json`; changed targets in `REVISED_TARGETS3.json` (41). No grader or tutor code changed. No CEFR level changed.
+
+| Reviewer | Flags |
+|---|---|
+| R1 | 12 |
+| R2 | 14 |
+| R3 | 12 |
+| Total | 38 → 21 groups: 6 flagged by ≥2 reviewers (revised), 9 single-reviewer clear key/parallelism errors (revised), 6 single-reviewer noted or left to the user |
+
+Merge notes: R1-1/2/3, R2-0..5 and R3-0 are one classroom-objects problem (T01). R1-10, R2-13 and R3-11 are the PL-A2-RD-03 mapping (T04). R1-11 (accepted answers) is kept separate as T07.
+
+### ≥2-reviewer groups and fixes
+
+| Group | Target | Reviewers | Fix |
+|---|---|---|---|
+| T01 | classroom-objects A/B/C-5, A/B/C-6 + outcome | R1, R2, R3 | The object swaps (cut with a ruler, tell the time with a calendar, measure with an eraser, sharpen with a rubber, rub out with a ruler, stick with scissors) are replaced by realistic Arabic-L1 spelling slips on a classroom noun. Slot 5 is `phon_p_b`: bencil→pencil, ben→pen, baper→paper. Slot 6 is `spelling_vowel` (vowel left out): calculter→calculator, dictionry→dictionary, notbook→notebook. The corrected noun does not appear anywhere else in the same form. Outcome `l1ErrorTypes` = [phon_p_b, spelling_vowel]. |
+| T02 | food-drink C-6 | R1, R2 | "drinks her ice cream" → "drinks her lentil soup with a spoon" → eats/has, parallel to A-6 soup and B-6 yoghurt. |
+| T03 | jobs-workplaces A/B/C-6 | R1, R2 | The factual absurdities (pilot in a hospital and so on) are replaced in every form by `article_indef_omission` before the job noun: "My mother is nurse in a big hospital", "My brother is waiter in a small restaurant", "My aunt is farmer on a farm near Fayoum" → a nurse / a waiter / a farmer. There is now one fix direction and one key. This error type also matches the outcome's existing `l1ErrorTypes` (round-2 H25). |
+| T04 | PL-A2-RD-03 | R1, R2, R3 | Re-tagged to `EN-C-A2-RD-short-everyday-texts`. Its statement covers "specific details in short everyday texts such as emails", so it is a detail-reading outcome. No lesson-level A2 detail outcome fits an email: dialogue-details and timetable are narrower. The item text is unchanged. |
+| T05 | possessive-s `l1ErrorTypes` | R1, R2 | Set to [article_def_misuse], the closest schema enum value. Idafa transfer ("the car of the teacher") brings article misuse with it. The schema has no possessive/idafa type, and adding one is a user decision. |
+| T06 | prepositions-place `l1ErrorTypes` | R1, R2 | Set to [article_def_misuse], the closest schema enum value ("on table"). The schema has no preposition type for the in/on transfer from Arabic fi, and adding one is a user decision. |
+
+### Single-reviewer decisions
+
+Revised (clear key, cueing or parallelism errors):
+- T07 PL-A2-RD-03: added "at the cafe" and "at the café". The forms "the cafe", "cafe", "the café" and "café" were already accepted.
+- T08 days-months B-8/C-8: the prompts no longer depend on climate ("a month with a school holiday" / "a month you like"). Both now accept all 12 months, as A-8 does.
+- T11 weather A/B/C-5: copula omission is a grammar error. It is replaced by a weather-adjective spelling slip (-ey for final -y: foggey, cloudey, snowey; `spelling_vowel`). The adjective is not shown elsewhere in its form.
+- T12 clothes-shopping B-4: the is/are item is replaced by a vocabulary choice, "changing / sleeping / waiting … room", parallel to A-4 (try on) and C-4 (fit).
+- T14 days-months B-9/C-9: Wed→Fri and Tue→Sat, so the answer is not cued or repeated elsewhere in the form.
+- T15 family A-7, A-8, B-7, B-8, C-8: now use the "named word" rubric, as C-7 already does.
+- T16 home-rooms C-2: "family sits together" had several right answers, and living room was also the C-9 answer. It is now "We wash the dishes in the ____" → kitchen, which is parallel to A-1/B-2.
+- T18 capitals-full-stops A/B/C-6: the prompt now reads "Add a full stop and a capital letter:", so the join with 'and' is no longer a second correct answer. All forms were changed so they stay parallel.
+- T21 much-many: removed the stale item-6 description from the matching note.
+
+Left to the user (not changed): T09 imperatives CEFR A2 vs EGP A1 (level); T10 was-were `l1ErrorTypes` agreement_3s (held with the was-were level question).
+
+Noted, keys correct: T13 common-adjectives statement vs slots 5 and 7-8 (outcome wording); T17 numbers-time 7 criterion ('at seven', 'seven thirty'); T19 make-do 9 rubric for 1 point; T20 clothes-shopping 7 colour not scored (repeat of round-2 H24).
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. During the pass three prompt-length failures (days-months slot 8, home-rooms slot 2, clothes-shopping slot 4) and one novelty overlap (classroom B-6 "check new words in a dictionary") were fixed in the data, not the tests.

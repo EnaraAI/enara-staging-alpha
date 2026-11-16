@@ -2,7 +2,7 @@
   "status": "DRAFT",
   "outcomeId": "EN-F-A1-VO-classroom-objects",
   "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-  "matching": "Items 1-2 gap-fill naming an object from its use; 3-4 choice of object in context; EC = wrong classroom noun for its use (I [verb] ... with my X); FP = one sentence naming an object on your desk/in your bag; transfer = a teacher's list instruction. All nouns EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 are now wrong-object errors (wrong classroom noun for its use), not article omission. Re-review round 2: B-6 and C-6 replaced (notebook/pencil case and close the board were not certain errors); all six EC items now follow one pattern; l1ErrorTypes in outcomes.json cleared because lexical object confusion has no schema enum value.",
+  "matching": "Items 1-2 gap-fill naming an object from its use; 3-4 choice of object in context; EC = wrong classroom noun for its use (I [verb] ... with my X); FP = one sentence naming an object on your desk/in your bag; transfer = a teacher's list instruction. All nouns EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 are now wrong-object errors (wrong classroom noun for its use), not article omission. Re-review round 2: B-6 and C-6 replaced (notebook/pencil case and close the board were not certain errors); all six EC items now follow one pattern; l1ErrorTypes in outcomes.json cleared because lexical object confusion has no schema enum value. Review round 3: slots 5-6 rewritten as realistic Arabic-L1 spelling slips on a classroom noun (slot 5 = phon_p_b, p written as b: bencil/ben/baper; slot 6 = spelling_vowel, vowel omitted: calculter/dictionry/notbook); the earlier wrong-object swaps were not real learner errors. The corrected noun is not shown elsewhere in the same form. l1ErrorTypes in outcomes.json set to phon_p_b, spelling_vowel.",
   "forms": {
     "A": [
       {
@@ -71,36 +71,36 @@
       {
         "id": "EN-F-A1-VO-classroom-objects-A-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: I cut the paper with my ruler.",
-        "answerKey": "I cut the paper with my scissors.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I draw a picture with my bencil.",
+        "answerKey": "I draw a picture with my pencil.",
         "acceptedAnswers": [
-          "I cut the paper with my scissors.",
-          "I cut the paper with scissors."
+          "I draw a picture with my pencil.",
+          "I draw a picture with a pencil."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "I cut the paper with my scissors.",
+        "targetForm": "I draw a picture with my pencil.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "lexical_object_confusion (wrong classroom noun for the use)"
+        "l1ErrorType": "phon_p_b (p written as b: bencil for pencil)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-A-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: I tell the time with my calendar.",
-        "answerKey": "I tell the time with my clock.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I do my maths sums with my calculter.",
+        "answerKey": "I do my maths sums with my calculator.",
         "acceptedAnswers": [
-          "I tell the time with my clock.",
-          "I tell the time with my watch."
+          "I do my maths sums with my calculator.",
+          "I do my maths sums with a calculator."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "I tell the time with my clock.",
+        "targetForm": "I do my maths sums with my calculator.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "lexical_object_confusion (wrong classroom noun for the use)"
+        "l1ErrorType": "spelling_vowel (vowel omitted: calculter for calculator)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-A-7",
@@ -228,36 +228,36 @@
       {
         "id": "EN-F-A1-VO-classroom-objects-B-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: I measure the line with my eraser.",
-        "answerKey": "I measure the line with my ruler.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I write my name with my ben.",
+        "answerKey": "I write my name with my pen.",
         "acceptedAnswers": [
-          "I measure the line with my ruler.",
-          "I measure the line with a ruler."
+          "I write my name with my pen.",
+          "I write my name with a pen."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "I measure the line with my ruler.",
+        "targetForm": "I write my name with my pen.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "lexical_object_confusion (wrong classroom noun for the use)"
+        "l1ErrorType": "phon_p_b (p written as b: ben for pen)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-B-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: I sharpen my pencil with my rubber.",
-        "answerKey": "I sharpen my pencil with my sharpener.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I look up the word in my dictionry.",
+        "answerKey": "I look up the word in my dictionary.",
         "acceptedAnswers": [
-          "I sharpen my pencil with my sharpener.",
-          "I sharpen my pencil with a sharpener."
+          "I look up the word in my dictionary.",
+          "I look up the word in a dictionary."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "I sharpen my pencil with my sharpener.",
+        "targetForm": "I look up the word in my dictionary.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "lexical_object_confusion (wrong classroom noun for the use)"
+        "l1ErrorType": "spelling_vowel (vowel omitted: dictionry for dictionary)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-B-7",
@@ -387,37 +387,35 @@
       {
         "id": "EN-F-A1-VO-classroom-objects-C-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: I rub out the mistake with my ruler.",
-        "answerKey": "I rub out the mistake with my rubber.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I write my name on the baper.",
+        "answerKey": "I write my name on the paper.",
         "acceptedAnswers": [
-          "I rub out the mistake with my rubber.",
-          "I rub out the mistake with my eraser."
+          "I write my name on the paper.",
+          "I write my name on paper."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "I rub out the mistake with my rubber.",
+        "targetForm": "I write my name on the paper.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "lexical_object_confusion (wrong classroom noun for the use)"
+        "l1ErrorType": "phon_p_b (p written as b: baper for paper)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-C-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: I stick the pictures with my scissors.",
-        "answerKey": "I stick the pictures with glue.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I do my homework in my notbook.",
+        "answerKey": "I do my homework in my notebook.",
         "acceptedAnswers": [
-          "I stick the pictures with glue.",
-          "I stick the pictures with my glue.",
-          "I stick the pictures with my glue stick."
+          "I do my homework in my notebook."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "I stick the pictures with glue.",
+        "targetForm": "I do my homework in my notebook.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
-        "l1ErrorType": "lexical_object_confusion (wrong classroom noun for the use)"
+        "l1ErrorType": "spelling_vowel (vowel omitted: notbook for notebook)"
       },
       {
         "id": "EN-F-A1-VO-classroom-objects-C-7",
