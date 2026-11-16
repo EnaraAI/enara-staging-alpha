@@ -432,9 +432,53 @@ function secondClauseBase(w: string[]) {
   return n;
 }
 
+// Round-7 fix: be forms incl. past; the head noun of a subject with a preposition phrase / relative clause.
+const BE_ALL = new Set(['am', 'is', 'are', 'was', 'were']);
+const DET_SG = new Set(['a', 'an', 'the', 'my', 'his', 'her', 'this', 'that', 'your', 'our', 'their', 'its']);
+const NOT_SUBJ = new Set(['there', 'here', 'what', 'where', 'who', 'which', 'how', 'why', 'when', 'that', 'these', 'those', 'both', 'all', 'today', 'tomorrow', 'yesterday', 'now', 'it', 'not']);
+const SUBJ_PREP = new Set(['in', 'on', 'at', 'with', 'of', 'from', 'near', 'for', 'by', 'behind', 'under', 'without', 'who', 'that', 'which', 'whose']);
+const QUANT_OF = new Set(['lot', 'lots', 'some', 'all', 'most', 'many', 'both', 'plenty', 'couple', 'number', 'half', 'none', 'any', 'kind', 'type']);
+const CLAUSE_BREAK = new Set(['and', 'but', 'because', 'so', 'when', 'if', 'or', 'then']);
+function subjectHead(w: string[], i: number): number {
+  const prev = w[i - 1] ?? '';
+  if (i < 2 || SUBJ_BE[prev] || PRON.has(prev) || SUBJ_PREP.has(prev) || NOT_SUBJ.has(prev)) return i - 1;
+  let start = 0;
+  for (let k = i - 2; k >= 0; k--) {
+    if (BE_ALL.has(w[k]) || CLAUSE_BREAK.has(w[k]) || (verbish(w[k]) && !DET.has(w[k - 1] ?? '') && !SUBJ_PREP.has(w[k]))) { start = k + 1; break; }
+  }
+  for (let p = start + 1; p < i - 1; p++) {
+    if (!SUBJ_PREP.has(w[p])) continue;
+    const h = w[p - 1];
+    if (SUBJ_PREP.has(h) || DET.has(h) || PRON.has(h) || (w[p] === 'of' && QUANT_OF.has(h))) return i - 1;
+    return p - 1;
+  }
+  return i - 1;
+}
+// Round-7 fix: verbs joined to a third-person clause by and/then/or/but (no new subject) are checked too.
+const NOUNISH = new Set(['work', 'rain', 'film', 'park', 'text', 'email', 'shop', 'plan', 'order', 'post', 'type', 'phone', 'dance', 'help', 'love', 'ski', 'surf', 'swim', 'cut', 'drink', 'run', 'walk', 'call', 'change', 'answer', 'check']);
+function joinedVerbs3sg(w: string[], from: number): { ok: number; bad: number } {
+  let ok = 0, bad = 0;
+  for (let k = from; k < w.length - 1; k++) {
+    if (PRON.has(w[k]) || w[k] === 'because' || w[k] === 'when' || w[k] === 'if') break;
+    if (!['and', 'then', 'or', 'but'].includes(w[k])) continue;
+    let v = w[k + 1];
+    if (v === 'then') v = w[k + 2] ?? '';
+    if (FREQ.has(v)) v = w[w.indexOf(v, k + 1) + 1] ?? '';
+    if (!v || PRON.has(v) || DET.has(v) || NOUNISH.has(v)) continue;
+    if (IRREG_3SG.has(v)) ok++;
+    else if (BASE_3SG_WRONG.has(v) || (REG.has(v) && !/s$/.test(v))) bad++;
+    else if (/s$/.test(v) && (REG.has(v.slice(0, -1)) || REG.has(v.slice(0, -2)) || REG.has(v.replace(/ies$/, 'y')))) ok++;
+  }
+  return { ok, bad };
+}
+
+/** Round-7 fix: the number of target slots in the item's key(s) (a key with "there is" and "there are" = 2). */
+function keySlots(item: TargetFormItem, re: RegExp): number {
+  return Math.max(0, ...acceptedKeys(item).map((k) => (normaliseV2(k).match(re) ?? []).length));
+}
 // Score of a grammar form, per docs/SCORING_RUBRIC.md; null = form not handled here.
 const GRAMMAR: [RegExp, (c: Ctx) => TFScore | null][] = [
-  [/there is/, ({ w }) => {
+  [/there is/, ({ w, item }) => {
     let ok = 0, bad = 0;
     for (let i = 0; i < w.length - 1; i++) {
       if (w[i] !== 'there' || !BE.has(w[i + 1])) { if (/^(ther|thier|their)$/.test(w[i]) && BE.has(w[i + 1])) bad += 0.5; continue; }
@@ -443,21 +487,35 @@ const GRAMMAR: [RegExp, (c: Ctx) => TFScore | null][] = [
       if ((w[i + 1] === 'is' && plural && NUMS.has(next)) || (w[i + 1] === 'are' && ['a', 'an', 'one'].includes(next))) bad += 1; else ok += 1;
     }
     if (!ok) return bad === 0.5 ? 1 : 0;
+    // Round-7 fix (rubric §2.4): a key with two there-is/are slots needs both; one right and one missing/wrong = 1.
+    if (!bad && ok < keySlots(item, /\bthere (is|are)\b/g)) return 1;
     return bad ? 1 : 2;
   }],
-  [/am \/ is \/ are after|^am \/ is \/ are/, ({ w }) => {
+  [/am \/ is \/ are after|^am \/ is \/ are/, ({ w, raw }) => {
     // Round-3 fix: every be form is checked against its subject, including plural and "X and Y" subjects.
+    // Round-7 fix: was/were are checked too; a name or singular noun + are/were is wrong (+ is/was right);
+    // the subject is the head noun before a preposition phrase or relative clause (The people in my town are).
+    const orig = straightQuotes(raw).replace(/[^\p{L}\s']/gu, ' ').split(/\s+/).filter(Boolean);
     let ok = 0, bad = 0, seenBe = false;
     for (let i = 0; i < w.length; i++) {
-      if (!BE.has(w[i]) && w[i] !== 'be') continue;
-      const subj = w[i - 1];
+      if (!BE_ALL.has(w[i]) && w[i] !== 'be') continue;
       const compound = !seenBe && w.slice(0, i).includes('and');
       seenBe = true;
       if (w[i] === 'be') { bad++; continue; }
-      if (subj && SUBJ_BE[subj]) { if (SUBJ_BE[subj] === w[i]) ok++; else bad++; continue; }
+      const sp = subjectHead(w, i);
+      const subj = w[sp];
+      const past = w[i] === 'was' || w[i] === 'were';
+      if (subj && SUBJ_BE[subj]) {
+        const want = past ? (['we', 'you', 'they'].includes(subj) ? 'were' : 'was') : SUBJ_BE[subj];
+        if (want === w[i]) ok++; else bad++;
+        continue;
+      }
       const plural = compound || IRREG_PL.has(subj ?? '') || (subj && /[^s']s$/.test(subj) && !['his', 'this', 'bus', 'news', 'maths', 'physics', 'class', 'glass'].includes(subj));
-      if (plural && w[i] !== 'are') bad++;
-      else if (!plural && subj && !compound && w[i] === 'are' && w[i - 2] !== undefined && ['a', 'an', 'my', 'the', 'his', 'her', 'this'].includes(w[i - 2]) && !/s$/.test(subj)) bad++;
+      const pluralBe = w[i] === 'are' || w[i] === 'were';
+      const singular = !plural && !!subj && !NOT_SUBJ.has(subj) && !/s$/.test(subj) && !DET.has(subj) && (
+        (DET_SG.has(w[sp - 1] ?? '')) || MALE.has(subj) || FEMALE.has(subj) || (sp > 0 && /^[A-Z]/.test(orig[sp] ?? '')) || (sp === 0 && /^[A-Z]/.test(orig[0] ?? '')));
+      if (plural && !pluralBe) bad++;
+      else if (singular && pluralBe) bad++;
       else ok++;
     }
     if (!ok) return 0;
@@ -541,6 +599,9 @@ const GRAMMAR: [RegExp, (c: Ctx) => TFScore | null][] = [
       const v = w[j];
       // Round-6 fix: does/goes/has/is are right third-person forms; do/have/are after he/she/it (not in a question) are wrong.
       // "is" counts only as the copula (She is a teacher), not as an auxiliary (is play, is playing).
+      // Round-7 fix: every verb joined to this clause (has ... and go) is checked, not only the first.
+      const joined = joinedVerbs3sg(w, j + 1);
+      ok += joined.ok; bad += joined.bad;
       if (v && IRREG_3SG.has(v) && !(v === 'is' && verbish(w[j + 1] ?? '') && !AUX.has(w[j + 1] ?? ''))) { ok++; continue; }
       if (v && BASE_3SG_WRONG.has(v) && !AUX.has(w[i - 1] ?? '')) { bad++; continue; }
       if (!v || BE.has(v) || AUX.has(v) || DET.has(v) || ['and', 'or', 'but', 'who', 'that', 'not', 'to', 'too', 'also'].includes(v)) continue;

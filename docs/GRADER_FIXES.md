@@ -186,3 +186,14 @@ SIMULATION ONLY / DRAFT. Details: `research/assessment-validation/a1a2/round6/FI
 - Full suite: 16 failed of 2064 tests. These are the known base failures.
 - ESL6 answer check: 0 failures, down from 1 (C-9 now scores 2/2). The graderBlind list is unchanged (15).
 - Round-5 rerun: no score changed. Exact agreement stays at 96.0% and QWK at 0.914.
+
+## Round 7 fix
+
+SIMULATION ONLY / DRAFT. This change affects only the graderV2-ON path; OFF is unchanged. Details: `research/assessment-validation/a1a2/round7/FIX_RESULT.md`.
+
+1. **third-person-s:** every verb joined by and/then/or/but to a he/she/it/name clause is checked ("has … and go" = 1).
+2. **copula-be:** was/were are checked. A name or singular noun + are/were = wrong; + is/was = right.
+3. **copula-be:** subject agreement uses the head noun before a preposition phrase or relative clause ("The people in my town are" = 2; "The boy with the dogs are" = 0).
+4. **there-is-are:** a two-slot key with one slot right and the other missing = 1 (rubric §2.4).
+
+Results: ESL6 answer check 0 failures (graderBlind 15). Round-5 rerun: 1 score changed (R5-039, 2→1, now matches the reference); exact 96.0%, QWK 0.914 → 0.921. Round-6 rerun: 4 scores changed, all now match the reference; exact 100%, QWK 0.732 → 1.000. Backend suite: only the 16 known failures remain.

@@ -438,3 +438,32 @@ describe('round-6 fix: irregular forms (new examples, not bank or earlier rounds
     expect(scoreTargetForm(BE, 'The children is in the garden.')).toBe(0);
   });
 });
+
+describe('round-7 fix: every verb, be agreement, head noun, two-slot items', () => {
+  const g = (targetForm: string) => ({ targetForm, scoring: 'target_form_0_1_2', prompt: 'Write a sentence.' }) as TargetFormItem;
+  const TP = g('he/she/it + verb-s/-es'), BE = g('am / is / are after the subject');
+  it('round-6 reference sentences', () => {
+    expect(tf('A2-GR-third-person-s-A-8', 'My father has a big breakfast and go to the mosque.')).toBe(1);
+    expect(tf('A1-GR-copula-be-B-8', 'Huda are very good at maths.')).toBe(0);
+    expect(tf('A1-GR-copula-be-B-7', 'The people in my town are very friendly.')).toBe(2);
+    expect(tf('A1-GR-there-is-are-A-9', 'There is a pool and two restaurants.')).toBe(1);
+  });
+  it('fix 1: every verb is checked', () => {
+    expect(scoreTargetForm(TP, 'My aunt cooks lunch and cleans the kitchen.')).toBe(2);
+    expect(scoreTargetForm(TP, 'My aunt cooks lunch and clean the kitchen.')).toBe(1);
+  });
+  it('fix 2: singular subject + to be', () => {
+    expect(scoreTargetForm(BE, 'Samir is in the library.')).toBe(2);
+    expect(scoreTargetForm(BE, 'Samir are in the library.')).toBe(0);
+    expect(scoreTargetForm(BE, 'My sister was at home yesterday.')).toBe(2);
+    expect(scoreTargetForm(BE, 'My sister were at home yesterday.')).toBe(0);
+  });
+  it('fix 3: words between subject and verb', () => {
+    expect(scoreTargetForm(BE, 'The books on my desk are new.')).toBe(2);
+    expect(scoreTargetForm(BE, 'The boy with the dogs are my cousin.')).toBe(0);
+  });
+  it('fix 4: two-slot transfer item', () => {
+    expect(tf('A1-GR-there-is-are-B-9', 'There is a lake and there are three cafes.')).toBe(2);
+    expect(tf('A1-GR-there-is-are-C-9', 'There is a cinema and two lifts.')).toBe(1);
+  });
+});
