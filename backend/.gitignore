@@ -234,6 +234,9 @@ models/
 # ...and not the Express/Mongoose domain models package (also matches the `models/` glob above).
 !src/models/
 !src/models/*.ts
+# ...and not the LMS integration's Mongoose models (docs/lms).
+!src/integrations/lms/models/
+!src/integrations/lms/models/*.ts
 
 # Ingestion accuracy eval outputs (JSON reports + baseline).
 eval/ingestion/results/
