@@ -1,0 +1,11 @@
+# ESL6 — build the study infrastructure before pre-registration (SIMULATION ONLY)
+No API calls, no git, no sub-agents, never print secrets. Do NOT run any tutor session or `init`.
+Read: config/agent_sim_esl6/PROTOCOL.md (DRAFT), DECISIONS_FOR_PROTOCOL.md (decisions 1–7 binding; n = 180 at ~65% power), LEARNING_RULES.md, F1_PARAMS.json; config/agent_sim_esl5/ (PROTOCOL.md, tasks/*.md); src/offline/esl5Study.ts, esl5_analyze.py, eslFixtures.ts, esl6_forget.py, esl6_outcomes.py; /home/user/enara-staging-alpha/data/assessments/outcomes/ and backend/src/services/graderV2.ts.
+Build exactly what PROTOCOL.md says still has to exist, following ESL5's patterns:
+1. src/offline/esl6Study.ts runner (init with hash + overlap checks, round/cell management, prompt build for P+ (same file + hash) and LE (switch set incl. graderV2, production [[assess]] parser), promptcheck, F1 v2 between sessions and before delayed test, assessment answer generation per the protocol, scoring via the REAL deterministic grader with ENARA_ENGINE_V2=graderV2 and model path off, 10% grader recheck sampling with fixed seed).
+2. src/offline/esl6_analyze.py: primary (paired sign-flip exact or MC 100k with stated seed, bootstrap CI), secondaries, guards, decision rule — exactly as PROTOCOL.md.
+3. config/agent_sim_esl6/ITEM_BELIEF_MAP.json and WRONG_ANSWERS.json (frozen), with a check script that every key scores full and every wrong string scores < full under graderV2 (run it; report failures and fix the data, not the grader).
+4. Lessons/fixtures for the 30 outcomes (new src/offline/esl6Fixtures.ts) derived from the outcome lessons in the repo; state the source for each.
+5. config/agent_sim_esl6/tasks/: TUTOR_TASK.md, JUDGE_TASK.md, RATE_TASK.md, FID_TASK.md, RECHECK_TASK.md (adapted from ESL5; judge task = the validated ESL6 judge task).
+6. A dry run with NO agents: run init in a temp copy (or a --dry flag) to prove hash check, overlap check, rotation, answer generation and grading work end-to-end on a scripted reply; report.
+Update PROTOCOL.md: set n = 180 per decision 7 (state power ~0.65 inflated / ~0.77 uninflated), add SHA-256 hashes of every frozen file (runner, analysis, maps, fixtures, tasks, rules, F1 params), keep the DRAFT marker (I remove it at pre-registration). Reply briefly: files, check results, dry-run result, anything blocking.
