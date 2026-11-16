@@ -1,0 +1,210 @@
+{
+ "reviewer": "R3",
+ "flags": [
+  {
+   "target": "rubric:all",
+   "check": "C6",
+   "problem": "Rubric rule 2 says final and inner punctuation and case never change the score. Applied to EN-F-A1-GR-capitals-full-stops, the target form IS capitals and full stops, so every item in that outcome would score 1 for an unpunctuated, lowercase answer.",
+   "fix": "Add an exception to rule 2: for capitals-full-stops items (and any item whose targetForm is punctuation/case), case and punctuation are scored, not normalised."
+  },
+  {
+   "target": "EN-F-A1-GR-capitals-full-stops",
+   "check": "C6",
+   "problem": "Item types are mislabelled: slots 1-2 (pick a, b or c) are typed gap_fill, and slots 3-4 (rewrite the sentence) are typed multiple_choice. The grader mapping in rubric §2 depends on type, so a rewrite scored as a choice item would expect a letter.",
+   "fix": "Retype slots 1-2 as multiple_choice and slots 3-4 as rewrite/controlled (exact) items."
+  },
+  {
+   "target": "EN-F-A1-GR-word-order-svo",
+   "check": "C6",
+   "problem": "Slots 1-2 are 'choose the correct sentence (a/b/c)' items but are typed gap_fill; slots 3-4 are word-ordering items typed multiple_choice.",
+   "fix": "Retype them (multiple_choice for 1-2, ordering/exact for 3-4)."
+  },
+  {
+   "target": "EN-F-A1-GR-can-ability-A-6",
+   "check": "C3",
+   "problem": "acceptedAnswers includes 'She can cook very well biryani.', which is ungrammatical (adverb between verb and object).",
+   "fix": "Remove it; keep 'She can cook very good biryani.'"
+  },
+  {
+   "target": "EN-F-A2-GR-past-simple-irregular-B-6",
+   "check": "C3",
+   "problem": "The key 'Last week we drank tea at that café every day.' changes 'the café daily' to 'that café every day'. The correct minimal fix 'Last week we drank tea at the café daily.' is not in the key.",
+   "fix": "Make the key 'Last week we drank tea at the café daily.' (keep the other version only as an extra accepted answer)."
+  },
+  {
+   "target": "EN-F-A1-GR-possessive-adjectives-A-4",
+   "check": "C3",
+   "problem": "The options are his/our/their, and 'our' gives a grammatical, meaningful sentence in all three forms ('The twins love our grandmother', B: 'painted our classroom', C: 'fixed our garden gate'). That gives two correct answers.",
+   "fix": "Replace the distractor 'our' with one that does not fit (e.g. 'her' or 'its'), or add context that rules out 'our'. Apply to A-4, B-4 and C-4."
+  },
+  {
+   "target": "EN-F-A2-GR-conjunctions-A-1",
+   "check": "C3",
+   "problem": "There is no option list, and 'and' is also grammatical and natural ('I like tea, and my sister likes coffee'). The same applies to B-1 and C-1, but only 'but' is accepted.",
+   "fix": "Either add '(and / but / because)' with a context that forces contrast (e.g. '... but my sister doesn't'), or accept 'and'. Apply to A-1, B-1 and C-1."
+  },
+  {
+   "target": "EN-F-A1-GR-article-the-A-2",
+   "check": "C3",
+   "problem": "'Can you open a window, please? It is hot.' is natural English, so 'a' is also correct. The same applies to B-2 ('turn off a light') and, less strongly, C-2.",
+   "fix": "Add context that makes the referent unique ('There is only one window in this room.'), or accept 'a'."
+  },
+  {
+   "target": "EN-F-A2-VO-appearance-B-4",
+   "check": "C3",
+   "problem": "'The baby is not tall. She is ____ (short / small / little)': 'small' and 'little' are the most natural answers for a baby, but only 'short' is keyed.",
+   "fix": "Use an adult subject (e.g. 'My uncle is not tall. He is ____') or accept small/little."
+  },
+  {
+   "target": "EN-F-A2-VO-clothes-shopping-C-6",
+   "check": "C3",
+   "problem": "The accepted answer 'This shirt is a big size for me.' keeps the error the item targets (big size for 'too big') with only an article added.",
+   "fix": "Remove it; accept 'too big' versions only."
+  },
+  {
+   "target": "EN-F-A2-FN-polite-requests-A-6",
+   "check": "C3",
+   "problem": "A-5/B-5/C-5 accept 'Could I have ...', but A-6/B-6/C-6 do not, and none of the slot-1 gaps accept 'May'. Keys are inconsistent within the outcome.",
+   "fix": "Add 'Could I have ..., please?' to A-6/B-6/C-6, and add 'May' to the slot-1 keys (or state that only Can/Could count)."
+  },
+  {
+   "target": "EN-F-A2-FN-polite-requests-B-1",
+   "check": "C4",
+   "problem": "B-1 is word for word the same as A-1 ('___ I have a cup of tea, please?'). The forms are no longer independent: a learner who retakes the test sees the same item.",
+   "fix": "Change B-1 (e.g. '___ I have a glass of water, please?')."
+  },
+  {
+   "target": "EN-F-A1-GR-word-order-svo-A-9",
+   "check": "C3",
+   "problem": "The task is a text to Hany, but the accepted answers include 'I meet Hany at the café at six.' (third person, addressed to Hany himself). Under rubric §2.4 this does not do the task. The same applies to B-9 and C-9.",
+   "fix": "Remove the third-person versions, or reword the task as a diary note."
+  },
+  {
+   "target": "EN-F-A1-VO-numbers-time-A-8",
+   "check": "C3",
+   "problem": "The token list of accepted number words leaves out common prices (e.g. forty, sixty, seventy, eighty, hundred in A; one to four, six to nine and sixty+ in B/C), so correct answers may fail a key check.",
+   "fix": "Accept any correctly spelled number word, or list them in full (one to twenty, the tens, hundred)."
+  },
+  {
+   "target": "placement:PL-A1-VO-07",
+   "check": "C3",
+   "problem": "'Write the number in words: 15' accepts '15', which does not do the task.",
+   "fix": "Remove '15' from acceptedAnswers."
+  },
+  {
+   "target": "placement:PL-A1-GR-01",
+   "check": "C3",
+   "problem": "'I have ___ apple in my bag.' with option 'the' is grammatical (a known apple), so there are two possible answers.",
+   "fix": "Replace 'the' with another distractor (e.g. 'some' or 'two')."
+  },
+  {
+   "target": "placement:PL-A2-VO-07",
+   "check": "C1",
+   "problem": "'A person who teaches is a ___ (teacher)' is A1 vocabulary (EVP A1). It does not separate A2 from A1 in an A2 band.",
+   "fix": "Use an A2 -er/-or noun (e.g. 'A person who visits a museum is a ___', or 'collects tickets', 'designs buildings')."
+  },
+  {
+   "target": "EN-F-A1-VO-classroom-objects",
+   "check": "C2",
+   "problem": "Slots 5-6 (all forms) are article-omission corrections ('I have ruler...'). They measure a/an, not classroom-object vocabulary; the noun is already given.",
+   "fix": "Replace them with lexical errors (e.g. L1 calques or confusions such as 'rubber/eraser', or 'blackboard pen' for 'marker')."
+  },
+  {
+   "target": "EN-F-A2-VO-jobs-workplaces",
+   "check": "C2",
+   "problem": "Slots 5-6 (all forms) are article-omission corrections ('My uncle is mechanic...'). They test a/an, not job or workplace vocabulary. Slots 7-8 key only the job word that the prompt gives ('Use waiter'), so the workplace, which is the outcome, is not checked.",
+   "fix": "Make slots 5-6 job/workplace lexical errors (e.g. 'A doctor works in a pharmacy'). Make the slot 7-8 keys check a correct workplace word."
+  },
+  {
+   "target": "EN-F-A2-GR-much-many",
+   "check": "C2",
+   "problem": "Slot 6 (all forms: 'There are many shop/tree/car') tests the plural -s, not the much/many choice.",
+   "fix": "Replace it with a much-for-many or many-for-much error in a question or statement (e.g. 'How much bottles...?')."
+  },
+  {
+   "target": "EN-F-A1-VO-food-drink",
+   "check": "C2",
+   "problem": "Slot 5 (all forms: 'three orange', 'four tomato') tests plural -s grammar, not food vocabulary.",
+   "fix": "Replace it with a food lexical error (e.g. Arabic-L1 calque or word confusion)."
+  },
+  {
+   "target": "EN-F-A1-VO-common-adjectives",
+   "check": "C2",
+   "problem": "Slots 7-8 (all forms) ask for any sentence using a given word ('cheap', 'dirty'), with the word itself as the key. The outcome is giving the opposite; copying the given word shows nothing.",
+   "fix": "Ask for the opposite in context (e.g. 'Write one sentence about something that is not expensive.' and key 'cheap')."
+  },
+  {
+   "target": "EN-F-A1-VO-common-adjectives-A-5",
+   "check": "C5",
+   "problem": "'Our house is not big, it is a little room' / 'a little clean' / 'a little easy' is not a documented Arabic-L1 pattern and is mislabelled 'lexical_opposite_negation'. A-5 also differs from B/C (noun phrase versus adjective).",
+   "fix": "Use a realistic error, e.g. using 'not' + adjective in place of the antonym when a contrast is required, or a known L1 opposite confusion (e.g. 'long' for 'tall', 'little' for 'young'). Keep the form parallel across A/B/C."
+  },
+  {
+   "target": "EN-F-A1-VO-family",
+   "check": "C2",
+   "problem": "Slots 5-6 correct 'The brother of my father' and similar. This is grammatical English, only less natural, and the key accepts \"My father's brother\", so the target word (uncle) need not appear. The items do not measure kinship vocabulary.",
+   "fix": "Key only the kinship noun (uncle/aunt/cousin/niece...), or turn the slots into gap-fills that require the word."
+  },
+  {
+   "target": "EN-F-A1-VO-family-C-6",
+   "check": "C4",
+   "problem": "C-6 targets 'sister-in-law' (EVP B1), against 'niece' and 'nephew' in A/B. C-4 targets 'niece' against 'aunt' and 'uncle' in A-4/B-4. These are above A1 and not of equal difficulty.",
+   "fix": "Use A1 kinship words of equal level in each slot (e.g. aunt/uncle/cousin)."
+  },
+  {
+   "target": "EN-F-A1-VO-home-rooms-C-5",
+   "check": "C4",
+   "problem": "C-5 'path room' is a spelling/phonology error (b/p), while A-5 and B-5 are lexical calques ('sleeping room', 'cooking room'). The slots test different things. The p-for-b direction is also the reverse of the usual Arabic-L1 substitution (b for p).",
+   "fix": "Use a calque in C-5 too (e.g. 'washing room'). Move any b/p item to a spelling outcome and use the b-for-p direction."
+  },
+  {
+   "target": "EN-F-A1-VO-numbers-time-A-5",
+   "check": "C5",
+   "problem": "'fivteen' (A-5) and 'fivty' (B-6) are f/v consonant errors but are labelled spelling_vowel. Arabic has no /v/, so learners usually write f for v, not v for f.",
+   "fix": "Relabel them (consonant spelling), or use vowel errors (e.g. 'fiftin', 'fourty') to match the label."
+  },
+  {
+   "target": "EN-F-A1-VO-numbers-time-C-3",
+   "check": "C4",
+   "problem": "'quarter to' (C-3, C-9) needs counting back to the next hour and is harder than 'half past' (A-3) or 'quarter past' (B-3). Slot 9 has the same imbalance (A 'quarter', B 'half', C 'to').",
+   "fix": "Use the same time relation in each slot across forms (e.g. all 'quarter past' in slot 3 and all 'quarter to' in slot 9)."
+  },
+  {
+   "target": "EN-F-A2-VO-appearance-C-1",
+   "check": "C4",
+   "problem": "C-1 gives the answer in the prompt ('Her hair is very short; she has a ____ haircut' with key 'short'). B-1 'bald' is EVP B1. A-1 'tall' is A1. The slot difficulties are very uneven.",
+   "fix": "Use the same kind of target in each form (e.g. tall/short/fair with an A2 context clue), and remove the giveaway."
+  },
+  {
+   "target": "EN-F-A1-VO-food-drink-A-6",
+   "check": "C3",
+   "problem": "'My grandfather drinks soup every night.' is acceptable English (soup can be drunk from a cup or bowl), so the planted error is not clearly an error, unlike B-6 (rice) and C-6 (bread). This also makes the forms unequal.",
+   "fix": "Use a food that cannot be drunk (e.g. 'drinks his beans')."
+  },
+  {
+   "target": "EN-F-A2-GR-going-to",
+   "check": "C2",
+   "problem": "The free items A-7 to C-8 ('Write one sentence about your plan for this evening') never ask for 'going to'. A correct 'I will...' or 'I'm meeting...' scores 0 under rule 3, so the score reflects the instruction, not ability.",
+   "fix": "Add 'Use going to.' to each free prompt."
+  },
+  {
+   "target": "EN-F-A2-GR-past-questions-did",
+   "check": "C2",
+   "problem": "The free items A-7 to C-7 do not ask for 'did'. 'Were you at home?' or 'Was it fun?' are correct past questions but would score 0.",
+   "fix": "Add 'Use did.' to the slot-7 prompts."
+  },
+  {
+   "target": "EN-F-A1-VO-food-drink-A-4",
+   "check": "C6",
+   "problem": "The prompt 'I would like some orange ____ , please?' ends with a question mark after a statement, so it is a faulty model sentence.",
+   "fix": "End it with a full stop."
+  },
+  {
+   "target": "outcomes:A1-A2",
+   "check": "C2",
+   "problem": "8 A1-A2 outcomes in outcomes.json have no item file in data/assessments/outcomes: was-were, plural-nouns, prepositions-place, possessive-s, subject-object-pronouns, superlatives, imperatives, transport-travel. Several are used by placement items (e.g. PL-A1-GR-06, PL-A1-GR-07, PL-A2-VO-05).",
+   "fix": "Write A/B/C item files for these outcomes, or mark them as not yet assessed."
+  }
+ ],
+ "passed_note": "Reviewed all 33 outcome item files (A/B/C, 9 slots each), the A1-A2 outcomes, the 42 placement items and the A1-A2 rubric. Most grammar outcomes (third-person-s, present-continuous, past-simple-regular, comparatives, some-any, there-is-are, copula-be, prepositions-time, frequency-adverbs, make-do, weather, article-a-an) fit the level by CEFR/EGP. Their items are parallel across forms, their keys are sound, and their Arabic-L1 errors are realistic: copula omission, a/an omission, verb-subject order, adjective after the noun, have for existential there, some in negatives, make/do confusion, long for tall. The placement writing rubrics add up to their stated points."
+}
