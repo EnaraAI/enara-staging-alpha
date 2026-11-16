@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Parents portal: Controls, Omar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f6f7fa}
+a{color:#2f6bff}a:hover{color:#0b203c}
+.card{background:#ffffff;border:1px solid #dce2ea;border-radius:10px;box-shadow:0 1px 2px 0 rgba(0,0,0,0.05)}
+.eyebrow{font-size:12px;line-height:16px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#566376;margin:0}
+.chip{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:9999px;border:1px solid #dce2ea;background:#ffffff;text-decoration:none;color:#111c2c;min-height:44px;box-sizing:border-box;flex-shrink:0}
+.chip-on{border:2px solid #2f6bff;background:#eaf0ff}
+.navlink{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:56px;text-decoration:none;color:#566376;font-size:11px;font-weight:500}
+.navlink:hover{color:#111c2c}
+.nav-on{color:#2f6bff}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:none;background:transparent;color:#111c2c;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 1500px; box-sizing: border-box; display: flex; flex-direction: column; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif; color: #111c2c; background: #f6f7fa">
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 4px 20px">
+    <div style="display: flex; align-items: baseline; gap: 8px">
+      <span style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: #0b203c">ENARA</span>
+      <span style="font-size: 14px; font-weight: 500; color: #566376">Parents</span>
+      <span style="font-size: 11px; font-weight: 500; color: #566376; border: 1px solid #dce2ea; border-radius: 9999px; padding: 2px 8px; margin-left: 4px">Sample data</span>
+    </div>
+    <button class="iconbtn" aria-label="Notifications, 2 unread">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+    </button>
+  </header>
+  <nav aria-label="Choose learner" style="display: flex; gap: 8px; padding: 8px 16px 12px 16px; overflow-x: auto">
+    <a class="chip chip-on" href="Main.dc.html" aria-current="page">
+      <span style="width: 32px; height: 32px; border-radius: 9999px; background: #f59f0a; color: #08172b; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px">O</span>
+      <span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600; line-height: 18px">Omar</span><span style="font-size: 11px; color: #566376; line-height: 14px">Age 9</span></span>
+    </a>
+    <a class="chip" href="Teen.dc.html">
+      <span style="width: 32px; height: 32px; border-radius: 9999px; background: #0ea5a4; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px">L</span>
+      <span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600; line-height: 18px">Laila</span><span style="font-size: 11px; color: #566376; line-height: 14px">Age 15</span></span>
+    </a>
+    <a class="chip" href="Adult.dc.html">
+      <span style="width: 32px; height: 32px; border-radius: 9999px; background: #0b203c; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px">Y</span>
+      <span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600; line-height: 18px">Youssef</span><span style="font-size: 11px; color: #566376; line-height: 14px">Age 20</span></span>
+    </a>
+  </nav>
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding: 0 16px 16px 16px">
+<h1 style="margin: 4px 0 0 0; font-size: 24px; font-weight: 600; line-height: 32px; letter-spacing: -0.01em">Controls</h1>
+
+    <section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+      <div>
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">Weekly goal</h2>
+        <p style="margin: 2px 0 0 0; font-size: 13px; color: #566376">Drives the status line and weekly report</p>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <button onClick="{{goalDown}}" aria-label="Decrease weekly goal" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #d0d8e2; background: #ffffff; font-size: 20px; color: #0b203c; cursor: pointer">−</button>
+        <p style="margin: 0; text-align: center"><span style="font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums">{{goal}}</span> <span style="font-size: 14px; color: #566376">min / week</span></p>
+        <button onClick="{{goalUp}}" aria-label="Increase weekly goal" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #d0d8e2; background: #ffffff; font-size: 20px; color: #0b203c; cursor: pointer">+</button>
+      </div>
+      <p style="margin: 0; font-size: 12px; color: #566376; text-align: center">About {{perDay}} minutes on 5 days</p>
+    </section>
+
+    <section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">Screen time</h2>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+        <span style="font-size: 14px">Daily limit</span>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <button onClick="{{limitDown}}" aria-label="Decrease daily limit" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #d0d8e2; background: #ffffff; font-size: 18px; color: #0b203c; cursor: pointer">−</button>
+          <span style="min-width: 64px; text-align: center; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums">{{limit}} min</span>
+          <button onClick="{{limitUp}}" aria-label="Increase daily limit" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #d0d8e2; background: #ffffff; font-size: 18px; color: #0b203c; cursor: pointer">+</button>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #eef2f6">
+        <span style="font-size: 14px">School nights</span>
+        <span style="font-size: 14px; font-weight: 500; color: #2f6bff">4:00 – 9:00 pm</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 14px">Weekend (Fri, Sat)</span>
+        <span style="font-size: 14px; font-weight: 500; color: #2f6bff">10:00 am – 8:00 pm</span>
+      </div>
+    </section>
+
+    <section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">Learning focus</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <sc-for list="{{foci}}" as="f" hint-placeholder-count="4">
+          <button onClick="{{f.pick}}" aria-pressed="{{f.on}}" style="{{f.style}}">{{f.label}}</button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">Rewards</h2>
+        <a href="#" style="font-size: 14px; font-weight: 500">Add reward</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #f6f7fa">
+        <div style="display: flex; justify-content: space-between; font-size: 14px">
+          <span style="font-weight: 600">Movie night</span>
+          <span style="color: #566376">4 of 5 practice days</span>
+        </div>
+        <div style="height: 8px; border-radius: 9999px; background: #e3e8ef; overflow: hidden"><div style="width: 80%; height: 8px; background: #f59f0a; border-radius: 9999px"></div></div>
+        <p style="margin: 0; font-size: 12px; color: #566376">Omar sees this goal in his app. You approve it when reached.</p>
+      </div>
+    </section>
+
+    <section class="card" style="padding: 8px 20px; display: flex; flex-direction: column">
+      <h2 style="margin: 12px 0 4px 0; font-size: 16px; font-weight: 600; line-height: 20px">Tutor settings</h2>
+      <sc-for list="{{toggles}}" as="t" hint-placeholder-count="4">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 56px; border-bottom: 1px solid #eef2f6">
+          <label for="{{t.id}}" style="font-size: 14px; flex-grow: 1">{{t.label}}<br><span style="font-size: 12px; color: #566376">{{t.hint}}</span></label>
+          <button id="{{t.id}}" role="switch" aria-checked="{{t.on}}" onClick="{{t.flip}}" style="{{t.track}}"><span style="{{t.knob}}"></span></button>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display: flex; gap: 10px; align-items: flex-start; padding: 14px 16px; border-radius: 10px; background: #eaf0ff; border: 1px solid #c9d8ff">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" style="color: #2f6bff; flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v5h1"></path></svg>
+      <p style="margin: 0; font-size: 14px; line-height: 20px; color: #16263b">{{summary}}</p>
+    </section>
+  </main>
+  <nav aria-label="Main" style="display: flex; background: #ffffff; border-top: 1px solid #dce2ea; padding: 4px 4px 12px 4px">
+    <a class="navlink" href="Main.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path></svg>Home</a>
+    <a class="navlink" href="Progress.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>Progress</a>
+    <a class="navlink" href="Activity.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>Activity</a>
+    <a class="navlink nav-on" href="Controls.dc.html" aria-current="page"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path></svg>Controls</a>
+    <a class="navlink" href="Account.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>Account</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+var self = this;
+    var st = this.state || {};
+    var goal = st.goal || 90, limit = st.limit || 45, focus = st.focus || 'Conversation';
+    var tg = st.tg || { avatar: true, mic: true, cam: false, rem: true };
+    var set = function (patch) { self.setState(Object.assign({ goal: goal, limit: limit, focus: focus, tg: tg }, patch)); };
+    var foci = ['Conversation', 'School support', 'Exam prep', 'Reading'].map(function (l) {
+      var on = l === focus;
+      return { label: l, on: on, pick: function () { set({ focus: l }); },
+        style: 'min-height: 40px; padding: 0 14px; border-radius: 9999px; font-family: inherit; font-size: 14px; cursor: pointer; ' + (on ? 'background: #0b203c; color: #ffffff; border: 1px solid #0b203c; font-weight: 500;' : 'background: #ffffff; color: #16263b; border: 1px solid #d0d8e2;') };
+    });
+    var defs = [['rem', 'Practice reminders', 'Sun–Thu at 5:00 pm in Omar’s app'], ['avatar', 'Live avatar tutor', 'Video tutor; off = voice and text only'], ['mic', 'Microphone', 'Needed for speaking practice'], ['cam', 'Camera', 'Used only for pronunciation mouth-shape tips']];
+    var toggles = defs.map(function (d) {
+      var on = !!tg[d[0]];
+      return { id: 'sw-' + d[0], label: d[1], hint: d[2], on: on,
+        flip: function () { var n = Object.assign({}, tg); n[d[0]] = !on; set({ tg: n }); },
+        track: 'width: 48px; height: 28px; border-radius: 9999px; border: none; padding: 2px; cursor: pointer; flex-shrink: 0; display: flex; box-sizing: border-box; ' + (on ? 'background: #2f6bff; justify-content: flex-end;' : 'background: #d0d8e2; justify-content: flex-start;'),
+        knob: 'width: 24px; height: 24px; border-radius: 9999px; background: #ffffff; display: block; box-shadow: 0 1px 2px rgba(0,0,0,0.2);' };
+    });
+    return {
+      goal: goal, limit: limit, perDay: Math.round(goal / 5), foci: foci, toggles: toggles,
+      goalUp: function () { set({ goal: Math.min(300, goal + 15) }); },
+      goalDown: function () { set({ goal: Math.max(30, goal - 15) }); },
+      limitUp: function () { set({ limit: Math.min(120, limit + 15) }); },
+      limitDown: function () { set({ limit: Math.max(15, limit - 15) }); },
+      summary: 'Omar can practise up to ' + limit + ' minutes a day, 4–9 pm on school nights, aiming for ' + goal + ' minutes this week with a focus on ' + focus.toLowerCase() + '.'
+    };
+  }
+}
+</script>
+</body>
+</html>
