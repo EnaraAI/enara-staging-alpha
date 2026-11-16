@@ -734,3 +734,6 @@ Status: DRAFT. User instruction: fix every known issue from the close-out table 
 ### Tests
 
 `cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed (data changed, not tests; first run caught prompt-length and benchmark-overlap hits, fixed in the items).
+
+## User decision: new error types (A1–A2)
+The user approved keeping the three error types the agent added during the fix of the 2+ reviewer issues: `lexical_l1_transfer`, `request_directness`, `agreement_be`. The "added by agent" label in docs/LEARNING_OUTCOMES.md PART 2 will be changed to "approved by user" once the verification check finishes, so the reviewers' input does not change while they work. Imperatives still has no error type (none fits).
