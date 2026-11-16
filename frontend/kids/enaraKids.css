@@ -97,7 +97,7 @@
 
 /* Enara Kids components. Every value comes from tokens.css. Class prefix: ek- */
 
-.ek-root { min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-body); }
+.ek-root { min-height: 100vh; min-height: 100dvh; background: var(--paper); color: var(--ink); font-family: var(--font-body); }
 .ek-root[dir="rtl"], .ek-root [dir="rtl"] { font-family: var(--font-arabic); }
 .ek-icon { width: var(--icon-md); height: var(--icon-md); flex: none; }
 [dir="rtl"] .ek-icon--dir { transform: scaleX(-1); }
@@ -273,7 +273,7 @@
 .ek-panel { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5); background: var(--surface); border: 3px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sticker); }
 .ek-panel .ek-section-head { margin-bottom: 0; }
 .ek-panel .ek-section-title { font-size: 22px; line-height: 28px; }
-.ek-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--space-5); }
+.ek-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: var(--space-5); }
 .ek-cards .ek-lesson { max-width: none; }
 .ek-steps { display: flex; flex-direction: column; gap: var(--space-4); }
 .ek-pagehead { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
@@ -365,7 +365,7 @@
 .ek-home__side .ek-task__action { width: 100%; justify-content: flex-start; }
 
 /* Timer */
-.ek-timer { display: inline-flex; align-items: center; gap: var(--space-2); min-width: 220px; padding: var(--space-2) var(--space-4); border-radius: var(--radius-pill); background: var(--surface-sky); color: var(--ink); font: 700 17px/22px var(--font-body); flex-wrap: wrap; }
+.ek-timer { display: inline-flex; align-items: center; gap: var(--space-2); min-width: min(220px, 100%); padding: var(--space-2) var(--space-4); border-radius: var(--radius-pill); background: var(--surface-sky); color: var(--ink); font: 700 17px/22px var(--font-body); flex-wrap: wrap; }
 .ek-timer__track { flex: 1 0 100%; height: 8px; border-radius: var(--radius-pill); background: var(--line); overflow: hidden; }
 .ek-timer__track i { display: block; height: 100%; background: var(--blue); border-radius: var(--radius-pill); }
 .ek-timer.is-low { background: var(--surface-sun); }
@@ -515,7 +515,9 @@
 .ek-levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-3); }
 .ek-levels__tile { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); padding: var(--space-4); background: var(--surface); border: 3px solid var(--line); border-radius: var(--radius-md); }
 .ek-levels__tile strong { font: 800 40px/1 var(--font-display); }
-.ek-skillgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); }
+.ek-levels__tile { min-width: 0; }
+.ek-levels__tile .ek-skill { max-width: 100%; box-sizing: border-box; white-space: normal; }
+.ek-skillgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: var(--space-4); }
 .ek-skillcard { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-3); padding: var(--space-4) var(--space-5); background: var(--surface); color: var(--ink); text-align: start; border: 3px solid var(--line-strong); border-radius: var(--radius-lg); box-shadow: var(--shadow-sticker); cursor: pointer; }
 .ek-skillcard:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; }
 .ek-skillcard__title { font: 800 22px/28px var(--font-display); }
@@ -663,3 +665,150 @@
 .ek-drawer__panel { position: relative; width: 100%; max-width: 640px; height: 100%; overflow: auto; background: var(--paper); box-shadow: var(--shadow-lift); }
 [dir="rtl"] .ek-drawer { justify-content: flex-start; }
 .ek-standard-embed { background: #fff; border-radius: var(--radius-lg); border: 3px solid var(--line); padding: var(--space-4); }
+
+/* ===== Phones (portrait, 360–430 px and up to 600 px) =====
+   Tablet and desktop are unchanged: everything below lives inside these queries. */
+.ek-root img, .ek-root video, .ek-root iframe { max-width: 100%; }
+@media (max-width: 600px) {
+  .ek-root { --ek-gutter: var(--space-4); overflow-wrap: break-word; }
+
+  /* App shell: the side rail becomes a bottom tab bar that stays on screen. */
+  .ek-app { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; min-height: 100vh; min-height: 100dvh; --ek-nav-h: calc(72px + env(safe-area-inset-bottom)); }
+  .ek-rail {
+    grid-row: 2; position: sticky; inset-block-end: 0; z-index: 15;
+    flex-direction: row; align-items: stretch; justify-content: flex-start; gap: var(--space-1);
+    padding-block: var(--space-1) calc(var(--space-1) + env(safe-area-inset-bottom)); padding-inline: max(var(--space-1), env(safe-area-inset-left)) max(var(--space-1), env(safe-area-inset-right));
+    border-inline-end: 0; border-block-start: 3px solid var(--line);
+    overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none;
+  }
+  .ek-rail::-webkit-scrollbar { display: none; }
+  .ek-rail__logo, .ek-rail__spacer { display: none; }
+  .ek-tab, .ek-tab--quiet { flex: 1 0 64px; width: auto; min-width: 64px; min-height: 60px; padding: var(--space-1) 2px; font-size: 13px; line-height: 16px; scroll-snap-align: start; }
+  .ek-tab__icon { width: 48px; height: 32px; }
+  .ek-app__main { padding-bottom: calc(56px + 2 * var(--space-4)); }
+  .ek-app__tutor { inset-block-end: var(--space-4); inset-inline-end: var(--ek-gutter); min-height: var(--tap-min); padding-inline: var(--space-5); font-size: 20px; }
+  .ek-app__overlay { position: fixed; z-index: 25; top: auto; inset-inline: var(--ek-gutter); inset-block-end: calc(var(--ek-nav-h) + var(--space-3)); }
+  .ek-tour { width: 100%; max-height: calc(100dvh - var(--ek-nav-h) - 2 * var(--space-4)); overflow: auto; padding: var(--space-4); }
+  .ek-tour__actions .ek-btn { flex: 1 1 auto; }
+
+  /* Screens: a 16px side gutter, tighter rhythm, fluid type. */
+  .ek-screen { gap: var(--space-5); padding: var(--space-5) var(--ek-gutter); }
+  .ek-screen--center, .ek-screen--signin { min-height: 0; }
+  .ek-screen--reward { min-height: 0; padding-block: var(--space-6); }
+  .ek-screen__question, .ek-home__title, .ek-map__title, .ek-pagehead__title, .ek-signin__title { font-size: clamp(26px, 6.5vw, 30px); line-height: 1.2; }
+  .ek-pagehead__sub, .ek-home__sub, .ek-signin__sub, .ek-card__text, .ek-sheet__text, .ek-reward__message { font-size: clamp(18px, 4.8vw, 20px); line-height: 1.45; }
+  .ek-prose p { font-size: clamp(18px, 4.8vw, 20px); line-height: 1.55; }
+  .ek-resume__title, .ek-card__title { font-size: clamp(24px, 6.5vw, 28px); line-height: 1.2; }
+  .ek-section-title, .ek-sheet__title, .ek-state__title, .ek-lesson__title, .ek-feedback__text strong { font-size: clamp(22px, 6vw, 26px); line-height: 1.25; }
+  .ek-reward__title { font-size: clamp(32px, 9vw, 40px); line-height: 1.15; }
+  .ek-reward__title--md { font-size: clamp(24px, 6.5vw, 30px); }
+  .ek-screen__question, .ek-pagehead__title, .ek-card__title, .ek-resume__title, .ek-task__title, .ek-lesson__title, .ek-prose p, .ek-bubble__body, .ek-choice__text { overflow-wrap: anywhere; }
+
+  /* Buttons: big primary actions go full width; labels may wrap instead of overflowing. */
+  .ek-btn { max-width: 100%; white-space: normal; text-align: center; line-height: 1.15; padding-block: var(--space-2); }
+  .ek-btn--lg { min-height: 64px; padding-inline: var(--space-5); font-size: 22px; }
+  .ek-btn--round { padding: 0; }
+  .ek-screen__actions > .ek-btn, .ek-lessonfoot > .ek-btn, .ek-reward__actions > .ek-btn, .ek-map__go > .ek-btn { flex: 1 1 auto; }
+  .ek-screen__actions--split > .ek-btn--ghost { flex: 0 1 auto; }
+  .ek-resume__body > .ek-btn, .ek-card > .ek-btn, .ek-state > .ek-btn, .ek-reward > .ek-btn { align-self: stretch; }
+  .ek-lessonfoot > .ek-cheer { align-self: center; }
+  .ek-link { min-width: 44px; padding-inline: var(--space-2); }
+  .ek-row > .ek-btn { flex: 1 1 auto; }
+
+  /* Cards, panels and lists */
+  .ek-panel { padding: var(--space-4); }
+  .ek-card { padding: var(--space-5) var(--space-4); border-radius: var(--radius-lg); }
+  .ek-state { padding: var(--space-6) var(--space-4); }
+  .ek-state__msg { font-size: 18px; line-height: 26px; }
+  .ek-resume { grid-template-columns: minmax(0, 1fr); }
+  .ek-resume__body { padding: var(--space-4); align-items: stretch; }
+  .ek-resume__body > * { min-width: 0; }
+  .ek-trail { min-width: 0; }
+  .ek-trail__step { flex: 0 1 36px; width: auto; min-width: 24px; height: auto; aspect-ratio: 1; box-sizing: border-box; font-size: 16px; }
+  .ek-trail__step.is-current { flex-basis: 44px; width: auto; height: auto; font-size: 18px; }
+  .ek-trail__step .ek-icon { width: 60%; height: 60%; max-width: 22px; }
+  .ek-trail__link { min-width: var(--space-1); }
+  .ek-lesson__body, .ek-quizcard, .ek-check { padding: var(--space-4); }
+  .ek-lesson__band { height: 72px; padding: var(--space-3) var(--space-4); }
+  .ek-cards { gap: var(--space-4); }
+  .ek-task { gap: var(--space-3); padding: var(--space-3) var(--space-4); }
+  .ek-task__action > .ek-btn { flex: 1 1 auto; }
+  .ek-plan__item { align-items: flex-start; gap: var(--space-2); }
+  .ek-plan__n { width: 36px; height: 36px; font-size: 18px; margin-block-start: var(--space-3); }
+  .ek-plan__item > .ek-task { min-width: 0; }
+  .ek-list__row { flex-wrap: wrap; }
+  .ek-mini, .ek-skill, .ek-chip { white-space: normal; }
+  .ek-skill { max-width: 100%; box-sizing: border-box; }
+  .ek-levels { gap: var(--space-2); }
+  .ek-levels__tile { padding: var(--space-3); }
+  .ek-levels__tile strong { font-size: 32px; }
+  .ek-twostep { flex-wrap: wrap; }
+  .ek-week__day { flex: 1 1 0; min-width: 0; }
+  .ek-week__dot { width: min(36px, 100%); height: auto; aspect-ratio: 1; }
+  .ek-file { max-width: 100%; min-height: var(--tap-min); padding-block: var(--space-2); line-height: 1.25; overflow-wrap: anywhere; }
+  .ek-answer { padding: var(--space-3) var(--space-4); }
+  .ek-answer__head { flex-wrap: wrap; font-size: 19px; }
+  .ek-why, .ek-alert { font-size: 17px; line-height: 25px; }
+  .ek-cheer { font-size: 18px; line-height: 24px; padding-inline-end: var(--space-4); }
+  [dir="rtl"] .ek-cheer { padding: var(--space-2); padding-inline-end: var(--space-4); }
+
+  /* Questions and answers */
+  .ek-choices { gap: var(--space-3); }
+  .ek-choice { min-height: 64px; padding: var(--space-3); font-size: clamp(18px, 5vw, 20px); }
+  .ek-choice__status { flex-wrap: wrap; justify-content: flex-end; font-size: 16px; text-align: end; }
+  .ek-field { min-width: 0; }
+  .ek-row > .ek-field { flex: 1 1 100%; }
+  .ek-input { width: 100%; min-width: 0; padding-inline: var(--space-4); font-size: 24px; }
+  .ek-input--long { font-size: 18px; line-height: 28px; padding: var(--space-3) var(--space-4); }
+  .ek-field--plain .ek-input { font-size: 18px; }
+  .ek-feedback { padding: var(--space-4); gap: var(--space-3); }
+  .ek-feedback__text { flex-basis: 0; min-width: 0; }
+  .ek-feedback .ek-btn { flex: 1 1 100%; margin-inline-start: 0; }
+  .ek-bubble { gap: var(--space-2); }
+  .ek-bubble__avatar { width: 44px; height: 44px; }
+  .ek-bubble__avatar img { width: 24px; height: 24px; }
+  .ek-bubble__body { min-width: 0; padding: var(--space-3) var(--space-4); font-size: 19px; line-height: 28px; }
+  [dir="rtl"] .ek-bubble__body { line-height: 32px; }
+  .ek-workhead { gap: var(--space-3); }
+  .ek-timer { box-sizing: border-box; }
+  .ek-workhead .ek-timer { flex: 1 1 100%; min-width: 0; }
+  .ek-qnav__b { width: 48px; height: 48px; }
+  .ek-stars--lg .ek-icon { width: 56px; height: 56px; }
+  .ek-stars--lg .is-mid .ek-icon { width: 72px; height: 72px; }
+  .ek-reward { gap: var(--space-4); padding: var(--space-6) var(--space-4) var(--space-5); }
+  .ek-reward--flat { padding: var(--space-3) 0; }
+  .ek-reward__look { flex-direction: column; text-align: center; }
+  .ek-map::before { inset-inline-start: 37px; }
+  .ek-map__item { grid-template-columns: 80px minmax(0, 1fr); gap: var(--space-3); }
+  .is-current > .ek-map__node { width: 80px; height: 80px; }
+  .ek-map__name { font-size: 20px; line-height: 26px; }
+  .ek-map__head, .ek-lessonhead { gap: var(--space-3); }
+  .ek-map__head > div { min-width: 0; }
+
+  /* Bottom sheets: full width, room for the home indicator, never taller than the screen. */
+  .ek-sheet__panel { max-width: none; max-height: 90vh; max-height: 90dvh; padding: var(--space-5) var(--ek-gutter) calc(var(--space-5) + env(safe-area-inset-bottom)); border-radius: var(--radius-lg) var(--radius-lg) 0 0; overscroll-behavior: contain; }
+  .ek-sheet__actions { flex-direction: column; align-items: stretch; }
+  .ek-sheet__actions > .ek-btn { width: 100%; }
+
+  /* Tutor drawer and chat: full screen; the composer sticks to the bottom, above the keyboard. */
+  .ek-drawer__panel { max-width: none; height: 100%; height: 100dvh; overscroll-behavior: contain; }
+  .ek-screen--tutor { min-height: 100%; padding-block-end: 0; }
+  .ek-drawer .ek-screen--tutor { min-height: 100dvh; }
+  .ek-screen--tutor .ek-chat { flex: 1 0 auto; }
+  .ek-tutorhead__title { font-size: 22px; line-height: 28px; }
+  .ek-chips { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--ek-gutter)); padding-inline: var(--ek-gutter); padding-block-end: var(--space-1); scrollbar-width: none; }
+  .ek-chips::-webkit-scrollbar { display: none; }
+  .ek-chips > .ek-btn { flex: none; white-space: nowrap; }
+  .ek-composer { position: sticky; inset-block-end: calc(var(--ek-nav-h, 0px) + var(--space-2)); z-index: 5; margin-block-end: calc(var(--space-2) + env(safe-area-inset-bottom)); box-shadow: 0 var(--space-4) 0 var(--space-2) var(--paper), 0 calc(-1 * var(--space-2)) 0 var(--space-2) var(--paper); }
+  .ek-composer__input { font-size: 18px; max-height: 40vh; }
+}
+@media (max-width: 360px) {
+  .ek-screen__question, .ek-home__title, .ek-map__title, .ek-pagehead__title, .ek-signin__title { font-size: 25px; }
+  .ek-tab, .ek-tab--quiet { flex-basis: 60px; min-width: 60px; font-size: 12px; }
+  .ek-levels { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .ek-levels__tile strong { font-size: 28px; }
+  .ek-stars--lg .ek-icon { width: 48px; height: 48px; }
+  .ek-stars--lg .is-mid .ek-icon { width: 64px; height: 64px; }
+  .ek-btn--lg { font-size: 20px; }
+  .ek-choice__key { width: 40px; height: 40px; font-size: 20px; }
+}
