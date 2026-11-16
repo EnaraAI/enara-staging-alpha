@@ -85,7 +85,7 @@ export const T = {
     noLearners: 'No learners linked yet', noLearnersBody: "Ask your child's school for a parent link code, then enter it here.",
     pendingLink: 'A link is waiting to be confirmed.',
     // Link a child
-    linkTitle: 'Link your child', linkBody: 'Enter the code from your child\'s school. It looks like ENR-ABCD-EF.', codeLabel: 'Parent link code', codePh: 'ENR-XXXX-XX', check: 'Check code',
+    linkTitle: 'Link your child', linkBody: 'Enter the code from your child\'s school. It looks like ENR-ABCD-EFGH.', codeLabel: 'Parent link code', codePh: 'ENR-XXXX-XXXX', check: 'Check code',
     previewTitle: 'Is this your child?', previewSchool: (s: string) => `at ${s}`, confirm: 'Yes, link my child', cancel: 'Cancel', linked: (name: string) => `${name} is linked. You can now follow their progress.`,
     codeInvalid: 'Code not valid or expired', codeLocked: 'Too many wrong codes. Try again in 15 minutes.', whatYouSee: 'Once linked you see their progress, sessions and conversations, and they are told that you can.',
   },
@@ -155,7 +155,7 @@ export const T = {
     unlink: 'شيل الربط', unlinkConfirm: (name: string) => `تشيل الربط بـ ${name}؟ مش هتشوف تقدّمه تاني.`,
     noLearners: 'مفيش أبناء مربوطين لسه', noLearnersBody: 'اطلب من مدرسة ابنك كود ربط وليّ الأمر، واكتبه هنا.',
     pendingLink: 'فيه ربط مستني التأكيد.',
-    linkTitle: 'اربط ابنك', linkBody: 'اكتب الكود اللي من مدرسة ابنك. شكله كده ENR-ABCD-EF.', codeLabel: 'كود ربط وليّ الأمر', codePh: 'ENR-XXXX-XX', check: 'اتأكد من الكود',
+    linkTitle: 'اربط ابنك', linkBody: 'اكتب الكود اللي من مدرسة ابنك. شكله كده ENR-ABCD-EFGH.', codeLabel: 'كود ربط وليّ الأمر', codePh: 'ENR-XXXX-XXXX', check: 'اتأكد من الكود',
     previewTitle: 'ده ابنك؟', previewSchool: (s: string) => `في ${s}`, confirm: 'أيوه، اربط ابني', cancel: 'إلغاء', linked: (name: string) => `${name} اتربط. تقدر تتابع تقدّمه دلوقتي.`,
     codeInvalid: 'الكود مش صحيح أو خلص', codeLocked: 'كودات غلط كتير. جرّب تاني بعد ١٥ دقيقة.', whatYouSee: 'بعد الربط هتشوف تقدّمه وجلساته ومحادثاته، وهو هيعرف إنك شايف.',
   },

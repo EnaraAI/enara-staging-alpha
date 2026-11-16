@@ -17,7 +17,7 @@ import { tierOf } from './policy';
 // Learner-issued codes and a 13+ accept step are deferred.
 
 export const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O/1/I/L
-export const CODE_LENGTH = 6; // shown as ENR-XXXX-XX
+export const CODE_LENGTH = 8; // shown as ENR-XXXX-XXXX (31^8 ≈ 8.5e11)
 export const CODE_TTL_MS = 7 * 86_400_000;
 export const MAX_FAILED_REDEEMS = 5;
 export const REDEEM_LOCK_MS = 15 * 60_000;
@@ -36,7 +36,10 @@ export function generateCode(): { display: string; normalized: string } {
   return { display: `ENR-${raw.slice(0, 4)}-${raw.slice(4)}`, normalized: raw };
 }
 
-/** "enr-abcd-ef", "ABCDEF", "ENR ABCD EF" -> "ABCDEF"; null if it can't be a code. */
+/**
+ * "enr-abcd-efgh", "ABCDEFGH", "ENR ABCD EFGH" -> "ABCDEFGH"; null if it can't be a code.
+ * Codes in the old 6-character format (ENR-XXXX-XX) are no longer valid.
+ */
 export function normalizeCode(input: unknown): string | null {
   if (typeof input !== 'string' || input.length > 40) return null;
   let s = input.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -100,7 +103,7 @@ export async function listCodes(actor: Actor, studentId: string) {
   const links = await ParentLearnerLink.find({ studentId: student.id }).lean();
   const parents = await User.find({ _id: { $in: links.map((l) => l.parentUserId) } }).select('name email').lean();
   return {
-    codes: codes.map((c) => ({ id: c.id, display: `ENR-••••-•${c.hint.slice(-1)}`, hint: c.hint, expiresAt: c.expiresAt, createdAt: c.createdAt })),
+    codes: codes.map((c) => ({ id: c.id, display: `ENR-••••-••${c.hint.slice(-2)}`, hint: c.hint, expiresAt: c.expiresAt, createdAt: c.createdAt })),
     links: links.map((l) => {
       const p = parents.find((u) => String(u._id) === l.parentUserId);
       return { linkId: l.id, parentName: p?.name ?? 'Parent', parentEmail: p?.email ?? null, role: l.role, status: l.status, consent: l.consent ?? 'not_required', createdAt: l.createdAt };

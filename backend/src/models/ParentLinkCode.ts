@@ -1,7 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
 
 // Parent link codes (decision 16 Nov 2026): a school admin issues one for a
-// learner; a parent redeems it once to link. Shown once as ENR-XXXX-XX;
+// learner; a parent redeems it once to link. Shown once as ENR-XXXX-XXXX;
 // only the SHA-256 hash is stored (like AccountToken). 7-day expiry.
 export interface IParentLinkCode extends Document {
   id: string;

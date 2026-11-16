@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, AtSign, BookOpen, CircleAlert, Eye, EyeOff, GraduationCap, Info, KeyRound, LayoutDashboard, Link2, Lock, UserRound } from 'lucide-react';
-import { clearSession, fetchDemoStatus, login, registerParent, requestPasswordReset, SessionUser, startDemo, type DemoRole } from '../services/apiService';
+import { clearSession, fetchDemoStatus, fetchParentAuthConfig, googleParentSignIn, login, registerParent, requestPasswordReset, SessionUser, startDemo, type DemoRole } from '../services/apiService';
 import { uiRoleFor, UiRole, LoginChoice } from '../services/roleRouting';
 import './Login.css';
 import { EnaraLogo } from '../components/brand/EnaraLogo';
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
 
 // Sign-in "Floating Classroom" (redesign concept B). The sign-in flow is the
 // same as before: the backend checks the email and password, and
@@ -41,6 +42,12 @@ const TEXT = {
     createSubmit: 'Create account', creating: 'Creating account…', exists: 'An account with this email already exists. Sign in instead.',
     parentForgotInfo: 'We will email you a link to reset your password.',
     parentManaged: 'Parent accounts see only learners linked with a school code.',
+    or: 'or',
+    googleFailed: 'Google sign-in did not work. Try again, or use your email and password.',
+    googleUnverified: 'Your Google email is not verified. Verify it with Google, or use your email and password.',
+    googleNotParent: 'This email belongs to an ENARA school account, so it cannot be a parent account. Sign in on the Student or School staff tab, or use a different Google account.',
+    googleMismatch: 'This parent account is linked to a different Google account. Use that Google account, or your email and password.',
+    googleUnavailable: 'Google sign-in is not available right now. Use your email and password.',
     email: 'Email', emailPh: 'name@school.edu', badEmail: 'Enter an email like name@school.edu.',
     password: 'Password', passwordPh: 'Your password', noPassword: 'Enter your password.',
     forgot: 'Forgot password?', forgotInfo: "Your school manages ENARA accounts. Ask your school's administrator to reset your password.",
@@ -74,6 +81,12 @@ const TEXT = {
     createSubmit: 'اعمل الحساب', creating: 'جاري عمل الحساب…', exists: 'فيه حساب بالإيميل ده. سجّل دخولك بدل كده.',
     parentForgotInfo: 'هنبعت لك رابط على الإيميل تغيّر بيه كلمة السر.',
     parentManaged: 'حساب وليّ الأمر بيشوف بس الأبناء المربوطين بكود من المدرسة.',
+    or: 'أو',
+    googleFailed: 'الدخول بجوجل ما نفعش. جرّب تاني، أو استخدم الإيميل وكلمة السر.',
+    googleUnverified: 'إيميل جوجل بتاعك مش متأكَّد منه. أكّده عند جوجل، أو استخدم الإيميل وكلمة السر.',
+    googleNotParent: 'الإيميل ده تبع حساب مدرسة على إنارة، فمينفعش يبقى حساب وليّ أمر. ادخل من تبويب «طالب» أو «فريق المدرسة»، أو استخدم حساب جوجل تاني.',
+    googleMismatch: 'حساب وليّ الأمر ده مربوط بحساب جوجل تاني. استخدم حساب جوجل ده، أو الإيميل وكلمة السر.',
+    googleUnavailable: 'الدخول بجوجل مش متاح دلوقتي. استخدم الإيميل وكلمة السر.',
     email: 'الإيميل', emailPh: 'name@school.edu', badEmail: 'اكتب إيميل زي name@school.edu.',
     password: 'كلمة السر', passwordPh: 'كلمة السر بتاعتك', noPassword: 'اكتب كلمة السر.',
     forgot: 'نسيت كلمة السر؟', forgotInfo: 'مدرستك هي اللي بتدير حسابات إنارة. اطلب من مسؤول المدرسة يغيّر لك كلمة السر.',
@@ -117,6 +130,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
   const [fieldError, setFieldError] = useState<{ field: 'email' | 'password' | 'name'; text: string } | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  // Parents tab: "Continue with Google", shown only when the server has a Google client ID.
+  const [googleCfg, setGoogleCfg] = useState<{ google: boolean; clientId?: string }>({ google: false });
+  useEffect(() => {
+    if (isSharedCourse || isSharedAssessment) return;
+    fetchParentAuthConfig().then((c) => setGoogleCfg(c?.google && c.clientId ? c : { google: false })).catch(() => setGoogleCfg({ google: false }));
+  }, [isSharedCourse, isSharedAssessment]);
   // One-click partner demo, shown only while the demo is open.
   const [demoOpen, setDemoOpen] = useState(false);
   const [demoBusy, setDemoBusy] = useState<DemoRole | null>(null);
@@ -215,6 +234,27 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
     }
   };
 
+  const handleGoogle = async (credential: string) => {
+    setAuthError(null); setInfo(null); setFieldError(null);
+    setIsLoading(true);
+    try {
+      try { localStorage.setItem('enara_parents_lang', lang); } catch { /* storage unavailable */ }
+      const user = await googleParentSignIn(credential, lang);
+      onLogin('parent', user);
+    } catch (err: any) {
+      const code = err?.code;
+      setAuthError(
+        code === 'GOOGLE_ACCOUNT_NOT_PARENT' ? t.googleNotParent
+          : code === 'GOOGLE_ACCOUNT_MISMATCH' ? t.googleMismatch
+          : code === 'GOOGLE_EMAIL_UNVERIFIED' ? t.googleUnverified
+          : err?.status === 503 ? t.googleUnavailable
+          : err?.status ? t.googleFailed : t.unreachable,
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const portalIndex = PORTALS.indexOf(portal);
 
   return (
@@ -280,6 +320,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
         )}
         {info && (
           <div className="si-alert info" role="status"><Info size={18} /><span>{info}</span></div>
+        )}
+
+        {isParent && googleCfg.google && googleCfg.clientId && (
+          <GoogleSignInButton clientId={googleCfg.clientId} lang={lang} context={signingUp ? 'signup' : 'signin'} disabled={isLoading} onCredential={handleGoogle} orLabel={t.or} />
         )}
 
         {signingUp && (

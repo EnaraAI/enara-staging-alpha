@@ -142,6 +142,7 @@ export function createApp() {
   app.use('/api/auth/password-reset', makeLimiter('password-reset', 15 * 60 * 1000, 10, 'Too many password reset requests'));
   // Parents Portal: sign-up and link-code redemption, per IP (the per-account lockout is in parents/codes.ts).
   app.use('/api/parents/register', makeLimiter('parent-register', 60 * 60 * 1000, 10, 'Too many registration attempts'));
+  app.use('/api/parents/google', makeLimiter('parent-google', 15 * 60 * 1000, 30, 'Too many sign-in attempts'));
   app.use('/api/parents/link', makeLimiter('parent-link', 15 * 60 * 1000, 30, 'Too many code attempts'));
   app.use('/api/workspace/invitations/accept', makeLimiter('invitation-accept', 15 * 60 * 1000, 20, 'Too many invitation attempts'));
   app.use('/api/upload', makeLimiter('upload', 60 * 60 * 1000, 30, 'Too many upload requests'));

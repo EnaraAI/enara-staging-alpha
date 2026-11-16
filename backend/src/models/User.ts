@@ -19,6 +19,8 @@ export interface IUser extends Document {
   tokenVersion?: number;
   // When the account finished or skipped the product tour (new accounts only).
   tourCompletedAt?: Date;
+  // Google account subject ("sub") for parents who use "Continue with Google".
+  googleSub?: string;
   createdAt?: Date;
 }
 
@@ -39,6 +41,7 @@ const userSchema = new Schema<IUser>(
     origin: { type: String, enum: ['live', 'demo_seed'], default: 'live' },
     tokenVersion: { type: Number, default: 0 },
     tourCompletedAt: { type: Date },
+    googleSub: { type: String, unique: true, sparse: true },
   },
   { timestamps: true }
 );

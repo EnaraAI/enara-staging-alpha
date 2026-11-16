@@ -194,6 +194,19 @@ export async function registerParent(name: string, email: string, password: stri
   return data.user;
 }
 
+// Parents Portal: which sign-in methods to offer. The Google client ID is public.
+export async function fetchParentAuthConfig(): Promise<{ google: boolean; clientId?: string }> {
+  return request('GET', '/api/parents/auth-config');
+}
+
+// Parents Portal "Continue with Google": the Google ID token (GIS credential) is
+// verified on the server, which signs in or creates a 'parent' account only.
+export async function googleParentSignIn(credential: string, language: 'en' | 'ar'): Promise<SessionUser> {
+  const data = await request<{ token: string; user: SessionUser; created: boolean }>('POST', '/api/parents/google', { credential, language });
+  saveSession(data.token, data.user);
+  return data.user;
+}
+
 // Shared client for the Parents Portal (frontend/parents) and its admin panel.
 export function apiRequest<T = any>(method: string, path: string, body?: unknown): Promise<T> {
   return request<T>(method, path, body);

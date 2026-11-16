@@ -15,6 +15,8 @@ import * as svc from './service';
 import { confirmCode, previewCode, setGuardianRole, unlink } from './codes';
 import { reportSenders, type WeeklySummary } from './reportSender';
 import { mockPlan } from './mock';
+import { authConfig, googleParentSignIn } from './google';
+import { recordSignIn } from '../services/signInHistory';
 
 // /api/parents/* — the Parents Portal API. Every learner endpoint goes through
 // svc.requireLearner (active link + role check, policy.ts). Real-time: each
@@ -43,6 +45,23 @@ router.post('/register', h(async (req, res) => {
   await ParentProfile.create({ userId: String(user._id), language: body.language === 'ar' ? 'ar' : 'en' });
   await recordAudit('parent_registered', { id: String(user._id), role: 'parent' }, { type: 'user', id: String(user._id) });
   res.status(201).json({ token: signToken(user), user: await sessionUser(user) });
+}));
+
+// Public: which sign-in methods the parents screens offer. The Google client
+// ID is public by design (the browser needs it to render the button).
+router.get('/auth-config', h(async (_req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json(authConfig());
+}));
+
+// Public: "Continue with Google". Body { credential: <Google ID token>, language? }.
+// Verified server-side; creates or signs in a role 'parent' account only.
+router.post('/google', h(async (req, res) => {
+  const body = ensurePlainObject(req.body);
+  rejectMongoOperators(body);
+  const { user, created } = await googleParentSignIn(body.credential, { language: body.language });
+  await recordSignIn(req, 'success', { email: user.email, userId: String(user._id), role: user.role });
+  res.status(created ? 201 : 200).json({ token: signToken(user), user: await sessionUser(user), created });
 }));
 
 // ---------------------------------------------------------------------------

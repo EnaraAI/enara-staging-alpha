@@ -70,6 +70,9 @@ export interface AppConfig {
     testRecipient?: string;
   };
   appUrl: string;
+  // Parents Portal "Continue with Google": the OAuth 2.0 Web client ID. Public
+  // by design (the browser needs it); unset hides the Google button.
+  googleClientId?: string;
   cronSecret?: string;
   // Emergency global stop for non-grading AI (P0d). The database switch
   // (ai_controls) is the normal way; this needs no database.
@@ -462,6 +465,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     elevenlabs,
     email,
     appUrl: readString(source, "APP_URL") || "https://enara-sandbox-frontend.vercel.app",
+    googleClientId: readString(source, "GOOGLE_CLIENT_ID") || undefined,
     cronSecret: readString(source, "CRON_SECRET"),
     // Staging starts with AI paused and invite-only registration unless set explicitly.
     aiPaused: readBoolean(source, "AI_PAUSED", staging),

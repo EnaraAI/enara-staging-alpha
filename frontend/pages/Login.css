@@ -87,6 +87,11 @@
 /* Parents tab (Parents Portal) */
 .si-panel{display:flex;flex-direction:column;gap:inherit}
 .si-parent-links{display:flex;flex-direction:column;gap:8px}
+/* Parents tab: official Google button (rendered by Google Identity Services) + "or" divider. */
+.si-google{display:flex;justify-content:center;align-items:center;min-height:44px;width:100%}
+.si-google-btn{display:flex;justify-content:center;align-items:center;width:100%;max-width:400px;min-height:44px}
+.si-or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;font-weight:600;margin:2px 0}
+.si-or::before,.si-or::after{content:"";flex:1;height:1px;background:var(--line-2)}
 .si-ghost{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface);color:var(--brand);font-size:14px;font-weight:650;cursor:pointer;padding:8px 12px;text-align:center}
 .si-ghost:hover{background:var(--brand-50)}
 .si-ghost[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-50)}

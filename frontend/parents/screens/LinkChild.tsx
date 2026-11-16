@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { parentsApi } from '../api';
 import { Icon, useP } from '../ui';
+import { formatCodeInput } from '../codeFormat';
 
 // Enter a school-issued parent link code -> minimal preview -> confirm.
 export const LinkChild: React.FC<{ initialCode?: string; onLinked: (studentId: string) => void; onCancel?: () => void }> = ({ initialCode = '', onLinked, onCancel }) => {
   const { t } = useP();
-  const [code, setCode] = useState(initialCode);
+  const [code, setCode] = useState(() => formatCodeInput(initialCode));
   const [preview, setPreview] = useState<{ learner: string; school: string | null } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -37,8 +38,8 @@ export const LinkChild: React.FC<{ initialCode?: string; onLinked: (studentId: s
           <p style={{ fontSize: 14 }}>{t.linkBody}</p>
           <div className="pp-input">
             <label htmlFor="pp-code">{t.codeLabel}</label>
-            <input id="pp-code" dir="ltr" inputMode="text" autoComplete="one-time-code" autoCapitalize="characters" spellCheck={false} maxLength={14} placeholder={t.codePh}
-              value={code} onChange={(e) => { setCode(e.target.value); setError(null); }} aria-invalid={!!error} aria-describedby={error ? 'pp-code-err' : 'pp-code-help'} />
+            <input id="pp-code" dir="ltr" inputMode="text" autoComplete="one-time-code" autoCapitalize="characters" spellCheck={false} maxLength={24} placeholder={t.codePh}
+              value={code} onChange={(e) => { setCode(formatCodeInput(e.target.value)); setError(null); }} aria-invalid={!!error} aria-describedby={error ? 'pp-code-err' : 'pp-code-help'} />
             <p className="pp-sub" id="pp-code-help">{t.whatYouSee}</p>
           </div>
           {error && <p className="pp-error" id="pp-code-err" role="alert"><Icon name="alert" />{error}</p>}

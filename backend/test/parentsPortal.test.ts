@@ -17,6 +17,26 @@ import { methodWords } from '../src/parents/service';
 const mail = vi.hoisted(() => ({ send: vi.fn(async () => ({ ok: true as const, id: 'mock-email-id' })) }));
 vi.mock('../src/email/sendTemplate', async (orig) => ({ ...(await orig<object>()), sendTemplate: mail.send }));
 
+// "Continue with Google": verifyIdToken is mocked (no calls to Google). A token
+// is a key into G_TOKENS; the mock checks the audience like the real library.
+const GOOGLE_CLIENT_ID = 'test-client.apps.googleusercontent.com';
+const g = vi.hoisted(() => ({ tokens: {} as Record<string, Record<string, unknown>>, verify: vi.fn() }));
+vi.mock('google-auth-library', () => ({
+  OAuth2Client: class {
+    verifyIdToken(opts: { idToken: string; audience: string }) { return g.verify(opts); }
+  },
+}));
+g.verify.mockImplementation(async ({ idToken, audience }: { idToken: string; audience: string }) => {
+  const p = g.tokens[idToken];
+  if (!p) throw new Error('Invalid token signature');
+  if (p.aud !== audience) throw new Error('Wrong recipient, payload audience != requiredAudience');
+  return { getPayload: () => p };
+});
+const gTok = (key: string, over: Record<string, unknown> = {}) => {
+  g.tokens[key] = { iss: 'https://accounts.google.com', aud: GOOGLE_CLIENT_ID, sub: `sub-${key}`, email: `${key}@gmail.test`, email_verified: true, name: `G ${key}`, ...over };
+  return key;
+};
+
 const NOW = new Date('2026-11-16T12:00:00Z'); // Monday in Cairo
 
 describe('policy', () => {
@@ -81,17 +101,39 @@ describe('levels, codes, time', () => {
     expect(checkpointLevel('Unit 3 A1 checkpoint', 82)).toBe('A1');
     expect(checkpointLevel('Unit 3 A1 checkpoint', 40)).toBeNull();
   });
-  it('codes: ENR-XXXX-XX without confusables, normalised input', () => {
+  it('codes: ENR-XXXX-XXXX (8 chars) without confusables, normalised input; old 6-char format is invalid', () => {
     for (let i = 0; i < 200; i++) {
       const c = generateCode();
-      expect(c.display).toMatch(/^ENR-[A-Z2-9]{4}-[A-Z2-9]{2}$/);
+      expect(c.display).toMatch(/^ENR-[A-Z2-9]{4}-[A-Z2-9]{4}$/);
+      expect(c.normalized).toHaveLength(8);
       expect([...c.normalized].every((ch) => CODE_ALPHABET.includes(ch))).toBe(true);
       expect(c.normalized).not.toMatch(/[0O1IL]/);
     }
-    expect(normalizeCode('enr-abcd-ef')).toBe('ABCDEF');
-    expect(normalizeCode('ABCD EF')).toBe('ABCDEF');
-    expect(normalizeCode('ENR-AB0D-EF')).toBeNull();
+    expect(normalizeCode('enr-abcd-efgh')).toBe('ABCDEFGH');
+    expect(normalizeCode('ENR-ABCD-EFGH')).toBe('ABCDEFGH');
+    expect(normalizeCode('ABCDEFGH')).toBe('ABCDEFGH');
+    expect(normalizeCode('abcd efgh')).toBe('ABCDEFGH');
+    expect(normalizeCode('ENRABCDEFGH')).toBe('ABCDEFGH');
+    expect(normalizeCode(' enr abcd-efgh ')).toBe('ABCDEFGH');
+    expect(normalizeCode('ENR-AB0D-EFGH')).toBeNull();
+    expect(normalizeCode('ENR-ABCD-EFG')).toBeNull();
+    // Old format (ENR-XXXX-XX): no longer valid.
+    expect(normalizeCode('ENR-ABCD-EF')).toBeNull();
+    expect(normalizeCode('ABCDEF')).toBeNull();
     expect(normalizeCode({})).toBeNull();
+  });
+  it('code input mask (frontend parents/codeFormat.ts)', async () => {
+    const { formatCodeInput } = await import('../../frontend/parents/codeFormat');
+    expect(formatCodeInput('')).toBe('');
+    expect(formatCodeInput('a')).toBe('ENR-A');
+    expect(formatCodeInput('ENR-ABCD')).toBe('ENR-ABCD');
+    expect(formatCodeInput('ENR-ABCDE')).toBe('ENR-ABCD-E');
+    expect(formatCodeInput('enr-abcd-efgh')).toBe('ENR-ABCD-EFGH');
+    expect(formatCodeInput('abcdefgh')).toBe('ENR-ABCD-EFGH');
+    expect(formatCodeInput('ENR ABCD EFGH')).toBe('ENR-ABCD-EFGH');
+    expect(formatCodeInput('ENRXABCD')).toBe('ENR-ENRX-ABCD'); // a code that starts with ENR
+    expect(formatCodeInput('ENR-ABCD-EFGHJK')).toBe('ENR-ABCD-EFGH');
+    expect(formatCodeInput('ENR-')).toBe('');
   });
   it('weeks start on Saturday in Cairo time', () => {
     expect(weekStartDay(NOW)).toBe('2026-11-14');
@@ -148,6 +190,7 @@ beforeAll(async () => {
     NODE_ENV: 'test', MONGODB_URI: mongo.getUri(), JWT_SECRET: 'test-jwt-secret-32-characters-minimum', JWT_EXPIRES_IN: '1h',
     JWT_ISSUER: 'enara-backend', JWT_AUDIENCE: 'enara-platform', INGEST_HMAC_SECRET: 'test-hmac-secret-32-characters-minimum',
     CORS_ALLOWED_ORIGINS: 'http://localhost:5173', AWS_S3_BUCKET: '', TRUST_PROXY: 'false', SERVE_LOCAL_UPLOADS: 'false',
+    GOOGLE_CLIENT_ID,
   });
   for (const k of ['ENARA_ORCHESTRATOR_URL', 'ENARA_API_KEY', 'AI_ENGINE_URL', 'ELEVENLABS_API_KEY', 'ANAM_API_KEY', 'DATABASE_URL', 'AI_PAUSED']) delete process.env[k];
   (await import('../src/config/env')).resetConfigForTests();
@@ -215,6 +258,92 @@ describe('parent sign-up and login', () => {
   });
 });
 
+describe('continue with Google (parents)', () => {
+  const google = (credential: unknown, extra: object = {}) => request(app).post('/api/parents/google').send({ credential, ...extra });
+  it('auth-config exposes the public client ID when configured', async () => {
+    const r = await request(app).get('/api/parents/auth-config');
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ google: true, clientId: GOOGLE_CLIENT_ID });
+  });
+  it('a new Google user becomes a parent (never another role); the next sign-in matches on googleSub', async () => {
+    const r = await google(gTok('newparent'), { language: 'ar', role: 'admin' });
+    expect(r.status).toBe(201);
+    expect(r.body.created).toBe(true);
+    expect(r.body.user.role).toBe('parent');
+    const u = await M.User.findOne({ email: 'newparent@gmail.test' }).lean();
+    expect(u).toMatchObject({ role: 'parent', googleSub: 'sub-newparent', name: 'G newparent' });
+    expect(u.institutionId).toBeUndefined();
+    expect(await M.AuditEvent.exists({ action: 'parent_registered', targetId: String(u._id), 'detail.method': 'google' })).toBeTruthy();
+    // Same session as a normal login: the token opens the parent API.
+    expect((await request(app).get('/api/parents/learners').set('Authorization', `Bearer ${r.body.token}`)).status).toBe(200);
+    // The Google email changed but the subject is the same: still the same account.
+    gTok('newparent2', { sub: 'sub-newparent', email: 'renamed@gmail.test' });
+    const again = await google('newparent2');
+    expect(again.status).toBe(200);
+    expect(again.body.created).toBe(false);
+    expect(again.body.user.id ?? again.body.user._id).toBe(r.body.user.id ?? r.body.user._id);
+    expect(await M.User.countDocuments({ googleSub: 'sub-newparent' })).toBe(1);
+    expect(await M.AuditEvent.exists({ action: 'parent_google_signin', targetId: String(u._id) })).toBeTruthy();
+  });
+  it('an existing email/password parent signs in with Google; googleSub is stored', async () => {
+    const before = await M.User.findOne({ email: 'p2@parents.test' }).lean();
+    const r = await google(gTok('p2g', { email: 'P2@parents.test' }));
+    expect(r.status).toBe(200);
+    expect(r.body.created).toBe(false);
+    expect(r.body.user.role).toBe('parent');
+    const after = await M.User.findOne({ email: 'p2@parents.test' }).select('+password').lean();
+    expect(String(after._id)).toBe(String(before._id));
+    expect(after.googleSub).toBe('sub-p2g');
+    // Email/password sign-in still works.
+    expect((await request(app).post('/api/auth/login').send({ email: 'p2@parents.test', password: PW })).status).toBe(200);
+    // A different Google account for the same parent is refused.
+    expect((await google(gTok('p2other', { email: 'p2@parents.test' }))).status).toBe(403);
+  });
+  it('an email that belongs to a student, teacher or admin is refused with 403 and nothing changes', async () => {
+    for (const email of ['kid1@pp-A.test', 'teacher@pp-A.test', 'admin@pp-A.test', 'ea@enara.test']) {
+      const before = await M.User.findOne({ email }).lean();
+      const r = await google(gTok(`np-${email}`, { email }));
+      expect(r.status).toBe(403);
+      expect(r.body.error.code).toBe('GOOGLE_ACCOUNT_NOT_PARENT');
+      expect(r.body.message).toMatch(/school account/);
+      expect(r.body.token).toBeUndefined();
+      const after = await M.User.findOne({ email }).lean();
+      expect(after.role).toBe(before.role);
+      expect(after.googleSub).toBeUndefined();
+      expect(JSON.stringify(after)).toBe(JSON.stringify(before));
+    }
+  });
+  it('email_verified false -> 401, no account', async () => {
+    const r = await google(gTok('unverified', { email_verified: false }));
+    expect(r.status).toBe(401);
+    expect(r.body.error.code).toBe('GOOGLE_EMAIL_UNVERIFIED');
+    expect(await M.User.exists({ email: 'unverified@gmail.test' })).toBeNull();
+  });
+  it('wrong audience, wrong issuer, invalid or missing token -> 401', async () => {
+    for (const cred of [gTok('wrongaud', { aud: 'someone-else.apps.googleusercontent.com' }), gTok('wrongiss', { iss: 'evil.example' }), 'not-a-real-token', '', undefined, { $gt: '' }]) {
+      const r = await google(cred);
+      expect([400, 401]).toContain(r.status);
+      if (typeof cred === 'string') expect(r.status).toBe(401);
+    }
+    expect(await M.User.exists({ email: { $in: ['wrongaud@gmail.test', 'wrongiss@gmail.test'] } })).toBeNull();
+  });
+  it('not configured -> 503 google_not_configured, and auth-config hides Google', async () => {
+    const env = await import('../src/config/env');
+    delete process.env.GOOGLE_CLIENT_ID;
+    env.resetConfigForTests();
+    try {
+      expect((await request(app).get('/api/parents/auth-config')).body).toEqual({ google: false });
+      const r = await google(gTok('nocfg'));
+      expect(r.status).toBe(503);
+      expect(r.body.error.code).toBe('google_not_configured');
+      expect(await M.User.exists({ email: 'nocfg@gmail.test' })).toBeNull();
+    } finally {
+      process.env.GOOGLE_CLIENT_ID = GOOGLE_CLIENT_ID;
+      env.resetConfigForTests();
+    }
+  });
+});
+
 describe('link codes (school admin issues, parent redeems)', () => {
   it('only an admin of the learner\'s school (or ENARA admin) can create codes', async () => {
     expect((await as('admin@pp-B').post('/api/students/kid1/parent-codes')).status).toBe(403);
@@ -264,7 +393,7 @@ describe('link codes (school admin issues, parent redeems)', () => {
     expect((await as('p4').post('/api/parents/link/preview', { code: code2 })).body.message).toBe('Code not valid or expired');
   });
   it('5 wrong codes lock the parent account for 15 minutes', async () => {
-    for (let i = 0; i < 5; i++) expect((await as('p3').post('/api/parents/link/preview', { code: 'ENR-ZZZZ-ZZ' })).status).toBe(400);
+    for (let i = 0; i < 5; i++) expect((await as('p3').post('/api/parents/link/preview', { code: 'ENR-ZZZZ-ZZZZ' })).status).toBe(400);
     const good = await issue('admin@pp-A', 'adult1');
     const locked = await as('p3').post('/api/parents/link/preview', { code: good });
     expect(locked.status).toBe(429);
