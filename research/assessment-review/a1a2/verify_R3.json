@@ -1,0 +1,43 @@
+{
+  "reviewer": "R3",
+  "checked": 103,
+  "unresolved": [
+    {
+      "target": "EN-F-A1-VO-classroom-objects-B-6",
+      "issue": "K08 office -> desk; B-3 changed so the B-6 key is not shown in the form",
+      "why": "B-7 prompt still reads 'Write one sentence about something on your desk now.', so the key 'desk' is shown in the same form (form B)."
+    }
+  ],
+  "new": [
+    {
+      "target": "EN-F-A1-VO-home-rooms-C-3",
+      "check": "wrong or ambiguous key",
+      "problem": "'Our car is in the ____' with options garage / office / shop: 'Our car is in the shop' is natural English (car at the repair shop), so two options are correct.",
+      "fix": "Use a stem only garage fits (e.g. 'We park our car in the ____ at night.') or replace 'shop' with 'school'."
+    },
+    {
+      "target": "EN-F-A2-FN-polite-requests-A-5/B-5/C-5/A-6/B-6/C-6",
+      "check": "missing correct answer",
+      "problem": "Exact scoring ignores only final punctuation; correct answers with no comma before 'please' ('Can I have the key please?') or 'May I have ...' (accepted in slot 1) are marked wrong.",
+      "fix": "Ignore commas in the normalisation (or add no-comma variants) and add 'May I have ..., please?' variants."
+    },
+    {
+      "target": "EN-F-A2-FN-polite-requests-A-3/A-4 (and B, C)",
+      "check": "answer word shown elsewhere in the same form",
+      "problem": "The slot 3-4 options and the slot 7-8 prompts show 'Can I have ... please' and 'I would like ... please', which give away the slot 1 key (Can) and slot 2 key (would) in every form.",
+      "fix": "Present slots 1-2 before slots 3-8 on separate screens, or change slots 1-2 to a target the later items do not show."
+    },
+    {
+      "target": "EN-F-A2-GR-third-person-s-A-6/B-6/C-6",
+      "check": "error tag not fitting",
+      "problem": "'watchs/washs/teachs' keep agreement (the -s is present); the error is the -es spelling rule, not -s omission, and is not an Arabic-L1 transfer error, so agreement_3s (and its L1 rationale) does not fit.",
+      "fix": "Tag as a spelling error (or note agreement_3s covers the -s/-es form rule in PART 2), or use a planted error that omits -s/-es."
+    },
+    {
+      "target": "EN-F-A2-GR-third-person-s-B-7",
+      "check": "vocabulary above the outcome's CEFR level",
+      "problem": "'neighbour' is EVP A2, but the item is labelled vocabLevel A1 (K16: all A1 words).",
+      "fix": "Use 'a friend of your family' or 'your uncle' instead of 'a neighbour'; update acceptedAnswers."
+    }
+  ]
+}
