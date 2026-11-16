@@ -1,0 +1,5970 @@
+{
+ "note": "SIMULATION ONLY. Computed deterministically by esl6_valprep.py with esl6_forget.py and reference events (no judge).",
+ "learners": "60 (30 outcomes x A1/A2), same learners and dice in both arms; immediate = end of session 2 (2a applies), delayed = after 7 days of F1",
+ "counted": "full",
+ "designs": {
+  "full": "COUNTED. Scripted tutor d content. s1: rule+pair + 3 own sentences + item B0, feedback each; s2 (a): rule+pair + new items B1, B2 with feedback; s2 (b): recall item B0 (answered in s1) first, then the same.",
+  "light": "sensitivity only (lower teaching dose, to rule out a ceiling explanation). s1: rule+pair+item B0, feedback. s2 (a): rule+pair, no item. s2 (b): recall item B0 first, then the same."
+ },
+ "mechanism": [
+  {
+   "W1": "removed (R4 reset)",
+   "C1_end": 1.0,
+   "r0": {
+    "C1_day7": 0.0,
+    "W1_day7": 0,
+    "pError": 0.4
+   },
+   "r1": {
+    "C1_day7": 0.475,
+    "W1_day7": 0,
+    "pError": 0.4
+   }
+  },
+  {
+   "W1": "removed (R4 reset)",
+   "C1_end": 1.5,
+   "r0": {
+    "C1_day7": 0.45,
+    "W1_day7": 0,
+    "pError": 0.4
+   },
+   "r1": {
+    "C1_day7": 0.975,
+    "W1_day7": 0,
+    "pError": 0.4
+   }
+  },
+  {
+   "W1": "removed (R4 reset)",
+   "C1_end": 2.0,
+   "r0": {
+    "C1_day7": 0.95,
+    "W1_day7": 0,
+    "pError": 0.4
+   },
+   "r1": {
+    "C1_day7": 1.475,
+    "W1_day7": 0,
+    "pError": 0.05
+   }
+  },
+  {
+   "W1": "removed (R4 reset)",
+   "C1_end": 2.5,
+   "r0": {
+    "C1_day7": 1.45,
+    "W1_day7": 0,
+    "pError": 0.05
+   },
+   "r1": {
+    "C1_day7": 1.975,
+    "W1_day7": 0,
+    "pError": 0.05
+   }
+  },
+  {
+   "W1": "removed (R4 reset)",
+   "C1_end": 3.0,
+   "r0": {
+    "C1_day7": 1.95,
+    "W1_day7": 0,
+    "pError": 0.05
+   },
+   "r1": {
+    "C1_day7": 2.475,
+    "W1_day7": 0,
+    "pError": 0.05
+   }
+  },
+  {
+   "W1": "lowered to 0 from 3, not removed",
+   "C1_end": 1.0,
+   "r0": {
+    "C1_day7": 0.0,
+    "W1_day7": 1.5,
+    "pError": 0.8
+   },
+   "r1": {
+    "C1_day7": 0.475,
+    "W1_day7": 1.5,
+    "pError": 0.8
+   }
+  },
+  {
+   "W1": "lowered to 0 from 3, not removed",
+   "C1_end": 1.5,
+   "r0": {
+    "C1_day7": 0.45,
+    "W1_day7": 1.5,
+    "pError": 0.8
+   },
+   "r1": {
+    "C1_day7": 0.975,
+    "W1_day7": 1.5,
+    "pError": 0.8
+   }
+  },
+  {
+   "W1": "lowered to 0 from 3, not removed",
+   "C1_end": 2.0,
+   "r0": {
+    "C1_day7": 0.95,
+    "W1_day7": 1.5,
+    "pError": 0.8
+   },
+   "r1": {
+    "C1_day7": 1.475,
+    "W1_day7": 1.5,
+    "pError": 0.8
+   }
+  },
+  {
+   "W1": "lowered to 0 from 3, not removed",
+   "C1_end": 2.5,
+   "r0": {
+    "C1_day7": 1.45,
+    "W1_day7": 1.5,
+    "pError": 0.8
+   },
+   "r1": {
+    "C1_day7": 1.975,
+    "W1_day7": 1.5,
+    "pError": 0.8
+   }
+  },
+  {
+   "W1": "lowered to 0 from 3, not removed",
+   "C1_end": 3.0,
+   "r0": {
+    "C1_day7": 1.95,
+    "W1_day7": 1.5,
+    "pError": 0.8
+   },
+   "r1": {
+    "C1_day7": 2.475,
+    "W1_day7": 1.5,
+    "pError": 0.8
+   }
+  }
+ ],
+ "rule": "pass iff delayed mean (b) > (a) and |immediate mean (b) - (a)| <= 0.03",
+ "light": {
+  "means": {
+   "a": {
+    "n": 60,
+    "immediate": 0.859,
+    "delayed": 0.3662
+   },
+   "b": {
+    "n": 60,
+    "immediate": 0.9084,
+    "delayed": 0.3662
+   }
+  },
+  "diff": {
+   "delayed_b_minus_a": 0.0,
+   "immediate_b_minus_a": 0.0494
+  },
+  "pass": {
+   "delayed_b_gt_a": false,
+   "immediate_abs_diff_le_0.03": false
+  },
+  "learnersWithDelayedDiff": 0,
+  "perLearner": {
+   "a": [
+    {
+     "outcome": "EN-F-A1-GR-article-a-an",
+     "band": "A1",
+     "immediate": 0.44,
+     "delayed": 0.146667,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 0.0,
+      "C2": 0.0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 0.0,
+      "C2": 0.0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-a-an",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-the",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-the",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-copula-be",
+     "band": "A1",
+     "immediate": 0.910417,
+     "delayed": 0.133333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 0.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-copula-be",
+     "band": "A2",
+     "immediate": 0.910417,
+     "delayed": 0.4,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-third-person-s",
+     "band": "A1",
+     "immediate": 0.44,
+     "delayed": 0.28,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 0.0,
+      "C2": 0.0
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 0.0,
+      "C2": 0.0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-third-person-s",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-present-continuous",
+     "band": "A1",
+     "immediate": 0.44,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 0.0,
+      "C2": 0.0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 0.0,
+      "C2": 0.0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-present-continuous",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-regular",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-regular",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-irregular",
+     "band": "A1",
+     "immediate": 0.6,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-irregular",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-questions-did",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 0.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-questions-did",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-prepositions-time",
+     "band": "A1",
+     "immediate": 0.6,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-prepositions-time",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-there-is-are",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 0.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-there-is-are",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-can-ability",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-can-ability",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-word-order-svo",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 0.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-word-order-svo",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-frequency-adverbs",
+     "band": "A1",
+     "immediate": 0.6,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-frequency-adverbs",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-comparatives",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-comparatives",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-going-to",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-going-to",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-much-many",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-much-many",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-some-any",
+     "band": "A1",
+     "immediate": 0.6,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-some-any",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-conjunctions",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-conjunctions",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-capitals-full-stops",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-capitals-full-stops",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-family",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 0.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-family",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-food-drink",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-food-drink",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-classroom-objects",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 0.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-classroom-objects",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-home-rooms",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 0.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-home-rooms",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-numbers-time",
+     "band": "A1",
+     "immediate": 0.44,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 0.0,
+      "C2": 0.0
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 0.0,
+      "C2": 0.0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-numbers-time",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-days-months",
+     "band": "A1",
+     "immediate": 0.44,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 0.0,
+      "C2": 0.0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 0.0,
+      "C2": 0.0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-days-months",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-jobs-workplaces",
+     "band": "A1",
+     "immediate": 0.6,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-jobs-workplaces",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-weather",
+     "band": "A1",
+     "immediate": 0.44,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 0.0,
+      "C2": 0.0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 0.0,
+      "C2": 0.0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-weather",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 1.65,
+      "C2": 0.65
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-clothes-shopping",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-clothes-shopping",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-appearance",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-appearance",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-FN-polite-requests",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.65,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-FN-polite-requests",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 1.65,
+      "C2": 0
+     }
+    }
+   ],
+   "b": [
+    {
+     "outcome": "EN-F-A1-GR-article-a-an",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.146667,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.0,
+      "C2": 1.0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 0.475,
+      "C2": 0.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-a-an",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-the",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 1.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-the",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-copula-be",
+     "band": "A1",
+     "immediate": 0.910417,
+     "delayed": 0.133333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 2.175,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-copula-be",
+     "band": "A2",
+     "immediate": 0.910417,
+     "delayed": 0.4,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-third-person-s",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.28,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.0,
+      "C2": 1.0
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 0.475,
+      "C2": 0.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-third-person-s",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-present-continuous",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.0,
+      "C2": 1.0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 0.475,
+      "C2": 0.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-present-continuous",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-regular",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 1.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-regular",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-irregular",
+     "band": "A1",
+     "immediate": 0.6,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-irregular",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-questions-did",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 1.175,
+      "C2": 1.175
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-questions-did",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-prepositions-time",
+     "band": "A1",
+     "immediate": 0.6,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.0,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-prepositions-time",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-there-is-are",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 1.175,
+      "C2": 1.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-there-is-are",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-can-ability",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 2.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-can-ability",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-word-order-svo",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 2.175,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-word-order-svo",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-frequency-adverbs",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-frequency-adverbs",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-comparatives",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 1.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-comparatives",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-going-to",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 2.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-going-to",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-much-many",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 2.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-much-many",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-some-any",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-some-any",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-conjunctions",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 2.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-conjunctions",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-capitals-full-stops",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 2.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-capitals-full-stops",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-family",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 2.175,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-family",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-food-drink",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 2.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-food-drink",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-classroom-objects",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.7,
+      "C2": 1.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 1.175,
+      "C2": 1.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-classroom-objects",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-home-rooms",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 2.7,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 2.175,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-home-rooms",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-numbers-time",
+     "band": "A1",
+     "immediate": 0.44,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 0.0,
+      "C2": 0.0
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.5,
+      "C1": 0.0,
+      "C2": 0.0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-numbers-time",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 0.5,
+      "W2": 1.0,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-days-months",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 1.0,
+      "C2": 1.0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 0.475,
+      "C2": 0.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-days-months",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-jobs-workplaces",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 0.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-jobs-workplaces",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-weather",
+     "band": "A1",
+     "immediate": 0.44,
+     "delayed": 0.213333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 0.0,
+      "C2": 0.0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0.5,
+      "C1": 0.0,
+      "C2": 0.0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-weather",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.44,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0.0,
+      "C1": 3.0,
+      "C2": 2.7
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0.5,
+      "C1": 2.475,
+      "C2": 2.175
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-clothes-shopping",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 2.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-clothes-shopping",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-appearance",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 1.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 1.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-appearance",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-FN-polite-requests",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.2,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 2.7,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.5,
+      "W2": 0,
+      "C1": 2.175,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-FN-polite-requests",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.6,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 0,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0.0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 1.0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    }
+   ]
+  }
+ },
+ "full": {
+  "means": {
+   "a": {
+    "n": 60,
+    "immediate": 0.936,
+    "delayed": 0.936
+   },
+   "b": {
+    "n": 60,
+    "immediate": 0.936,
+    "delayed": 0.936
+   }
+  },
+  "diff": {
+   "delayed_b_minus_a": 0.0,
+   "immediate_b_minus_a": 0.0
+  },
+  "pass": {
+   "delayed_b_gt_a": false,
+   "immediate_abs_diff_le_0.03": true
+  },
+  "learnersWithDelayedDiff": 0,
+  "perLearner": {
+   "a": [
+    {
+     "outcome": "EN-F-A1-GR-article-a-an",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-a-an",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-the",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-the",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-copula-be",
+     "band": "A1",
+     "immediate": 0.910417,
+     "delayed": 0.910417,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-copula-be",
+     "band": "A2",
+     "immediate": 0.910417,
+     "delayed": 0.910417,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-third-person-s",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-third-person-s",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-present-continuous",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-present-continuous",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-regular",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-regular",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-irregular",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-irregular",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-questions-did",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-questions-did",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-prepositions-time",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-prepositions-time",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-there-is-are",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-there-is-are",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-can-ability",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-can-ability",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-word-order-svo",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-word-order-svo",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-frequency-adverbs",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-frequency-adverbs",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-comparatives",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-comparatives",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-going-to",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-going-to",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-much-many",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-much-many",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-some-any",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-some-any",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-conjunctions",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-conjunctions",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-capitals-full-stops",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-capitals-full-stops",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-family",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-family",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-food-drink",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-food-drink",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-classroom-objects",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-classroom-objects",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-home-rooms",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-home-rooms",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-numbers-time",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-numbers-time",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-days-months",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-days-months",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-jobs-workplaces",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-jobs-workplaces",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-weather",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-weather",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 1.95
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-clothes-shopping",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-clothes-shopping",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-appearance",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-appearance",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-FN-polite-requests",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-FN-polite-requests",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 0,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 1.95,
+      "C2": 0
+     }
+    }
+   ],
+   "b": [
+    {
+     "outcome": "EN-F-A1-GR-article-a-an",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-a-an",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-the",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-article-the",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-copula-be",
+     "band": "A1",
+     "immediate": 0.910417,
+     "delayed": 0.910417,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-copula-be",
+     "band": "A2",
+     "immediate": 0.910417,
+     "delayed": 0.910417,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-third-person-s",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-third-person-s",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-present-continuous",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-present-continuous",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-regular",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-regular",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-irregular",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-simple-irregular",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-questions-did",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-past-questions-did",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-prepositions-time",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-prepositions-time",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-there-is-are",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-there-is-are",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-can-ability",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-can-ability",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-word-order-svo",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-word-order-svo",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-frequency-adverbs",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-frequency-adverbs",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-comparatives",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-comparatives",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-going-to",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-going-to",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-much-many",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-much-many",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-some-any",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-some-any",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-conjunctions",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-GR-conjunctions",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-capitals-full-stops",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-GR-capitals-full-stops",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-family",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-family",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-food-drink",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-food-drink",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-classroom-objects",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-classroom-objects",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-home-rooms",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-home-rooms",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-numbers-time",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-numbers-time",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-days-months",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A1-VO-days-months",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-jobs-workplaces",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-jobs-workplaces",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-weather",
+     "band": "A1",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-weather",
+     "band": "A2",
+     "immediate": 0.918333,
+     "delayed": 0.918333,
+     "wrongAtZeroImm": 2,
+     "wrongAtZeroDelayed": 2,
+     "r": {
+      "C1": 1,
+      "C2": 1
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 3.0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 2.475
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-clothes-shopping",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-clothes-shopping",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-appearance",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-VO-appearance",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-FN-polite-requests",
+     "band": "A1",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    },
+    {
+     "outcome": "EN-F-A2-FN-polite-requests",
+     "band": "A2",
+     "immediate": 0.95,
+     "delayed": 0.95,
+     "wrongAtZeroImm": 1,
+     "wrongAtZeroDelayed": 1,
+     "r": {
+      "C1": 1,
+      "C2": 0
+     },
+     "endState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 3.0,
+      "C2": 0
+     },
+     "delayedState": {
+      "W1": 0,
+      "W2": 0,
+      "C1": 2.475,
+      "C2": 0
+     }
+    }
+   ]
+  }
+ }
+}
