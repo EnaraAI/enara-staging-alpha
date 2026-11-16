@@ -42,9 +42,16 @@ vi.mock('../src/services/emailService', async (orig) => ({
 
 import { logger } from '../src/utils/logging';
 import { buildActionUrl } from '../src/email/links';
-import { sendTemplate, resetEmailClientForTests } from '../src/email/sendTemplate';
+import { sendTemplate, resetEmailClientForTests, renderTemplate } from '../src/email/sendTemplate';
 import { createInvitation, requestPasswordReset, formatTtl } from '../src/services/accountTokens';
-import { TEMPLATE_REGISTRY } from '../src/email/templateRegistry';
+
+/** The sent email is exactly the bundled template rendered with these variables. */
+function expectRendered(arg: any, alias: Parameters<typeof renderTemplate>[0], vars: Record<string, string | number>) {
+  const r = renderTemplate(alias, vars);
+  expect(arg.subject).toBe(r.subject);
+  expect(arg.html).toBe(r.html);
+  expect(arg).not.toHaveProperty('template');
+}
 
 const INVITER_ID = '64b7f0c2a1b2c3d4e5f60718';
 
@@ -114,11 +121,11 @@ describe('sendTemplate links + account emails', () => {
 
   it('builds ACTION_URL for assessment and lesson templates', async () => {
     await sendTemplate('enara-assessment-results', 'j@example.com', { NAME: 'J', CHILD_NAME: 'K', TEST_NAME: 'T', SCORE: 9, LEVEL: 'B1', SUMMARY: 'S', assessmentId: 'as 1' });
-    expect(sendMock.mock.lastCall![0].template.variables).toEqual({ NAME: 'J', CHILD_NAME: 'K', TEST_NAME: 'T', SCORE: 9, LEVEL: 'B1', SUMMARY: 'S', ACTION_URL: 'https://app.example.org/?assessment=as%201' });
+    expectRendered(sendMock.mock.lastCall![0], 'enara-assessment-results', { NAME: 'J', CHILD_NAME: 'K', TEST_NAME: 'T', SCORE: 9, LEVEL: 'B1', SUMMARY: 'S', ACTION_URL: 'https://app.example.org/?assessment=as%201' });
     await sendTemplate('enara-lesson-reminder', 'j@example.com', { NAME: 'J', LESSON_TITLE: 'L', courseId: 'c1' });
-    expect(sendMock.mock.lastCall![0].template.variables.ACTION_URL).toBe('https://app.example.org/?course=c1');
+    expect(sendMock.mock.lastCall![0].html).toContain('href="https://app.example.org/?course=c1"');
     await sendTemplate('enara-verify-email', 'j@example.com', { NAME: 'J', ACTION_URL: 'https://custom/verify', EXPIRES_IN: '1 day' });
-    expect(sendMock.mock.lastCall![0].template.variables.ACTION_URL).toBe('https://custom/verify');
+    expect(sendMock.mock.lastCall![0].html).toContain('href="https://custom/verify"');
   });
 
   it('password reset uses enara-password-reset with the token link and real expiry', async () => {
@@ -126,10 +133,7 @@ describe('sendTemplate links + account emails', () => {
     expect(sendMock).toHaveBeenCalledTimes(1);
     const arg = sendMock.mock.calls[0][0];
     expect(arg.to).toBe('jane@example.com');
-    expect(arg.template).toEqual({
-      id: TEMPLATE_REGISTRY['enara-password-reset'].id,
-      variables: { NAME: 'Jane', EXPIRES_IN: '30 minutes', ACTION_URL: `https://app.example.org/reset-password?token=${encodeURIComponent(token!)}` },
-    });
+    expectRendered(arg, 'enara-password-reset', { NAME: 'Jane', EXPIRES_IN: '30 minutes', ACTION_URL: `https://app.example.org/reset-password?token=${encodeURIComponent(token!)}` });
     expect(arg.attachments).toHaveLength(2);
     expect(legacySend).not.toHaveBeenCalled();
   });
@@ -137,19 +141,18 @@ describe('sendTemplate links + account emails', () => {
   it('invitation uses enara-class-invitation with inviter, school and 7-day expiry', async () => {
     const { token } = await createInvitation({ institutionId: 'instA', email: 'new@example.com', role: 'teacher', invitedBy: INVITER_ID });
     const arg = sendMock.mock.calls[0][0];
-    expect(arg.template).toEqual({
-      id: TEMPLATE_REGISTRY['enara-class-invitation'].id,
-      variables: { NAME: 'there', TEACHER_NAME: 'Ms Teacher', CLASS_NAME: 'Alpha School', EXPIRES_IN: '7 days', ACTION_URL: `https://app.example.org/accept-invitation?token=${encodeURIComponent(token)}` },
-    });
+    expectRendered(arg, 'enara-class-invitation', { NAME: 'there', TEACHER_NAME: 'Ms Teacher', CLASS_NAME: 'Alpha School', EXPIRES_IN: '7 days', ACTION_URL: `https://app.example.org/accept-invitation?token=${encodeURIComponent(token)}` });
   });
 
   it('invitation falls back to the school name, then ENARA', async () => {
     db.inviter = null;
     await createInvitation({ institutionId: 'instA', email: 'new@example.com', role: 'teacher', invitedBy: 'not-an-object-id' });
-    expect(sendMock.mock.lastCall![0].template.variables).toMatchObject({ TEACHER_NAME: 'Alpha School', CLASS_NAME: 'Alpha School' });
+    expect(sendMock.mock.lastCall![0].subject).toBe("You're invited to join Alpha School on Enara");
+    expect(sendMock.mock.lastCall![0].html).not.toContain('Ms Teacher');
     db.school = null;
     await createInvitation({ institutionId: 'instA', email: 'new2@example.com', role: 'teacher', invitedBy: INVITER_ID });
-    expect(sendMock.mock.lastCall![0].template.variables).toMatchObject({ TEACHER_NAME: 'ENARA', CLASS_NAME: 'ENARA' });
+    expect(sendMock.mock.lastCall![0].subject).toBe("You're invited to join ENARA on Enara");
+    expect(sendMock.mock.lastCall![0].html).not.toContain('Alpha School');
   });
 
   it('skips .test addresses and honours the test recipient', async () => {

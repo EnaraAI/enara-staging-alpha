@@ -11,11 +11,16 @@ vi.mock('../src/config/env', async (orig) => ({
 }));
 
 import { logger } from '../src/utils/logging';
-import { sendTemplate, resetEmailClientForTests } from '../src/email/sendTemplate';
+import fs from 'fs';
+import path from 'path';
+import { sendTemplate, resetEmailClientForTests, fillPlaceholders } from '../src/email/sendTemplate';
+import { TEMPLATES_BUNDLE } from '../src/email/templatesBundle';
+import { buildBundleSource } from '../../scripts/email/bundle-templates';
 import { EMAIL_SENDER, TEMPLATE_REGISTRY } from '../src/email/templateRegistry';
 
 const EMAIL = 'jane.doe@example.com';
 const NAME = 'Jane Doe';
+const TEMPLATES_DIR = path.join(__dirname, '../src/email/templates');
 
 describe('sendTemplate', () => {
   let errorSpy: ReturnType<typeof vi.spyOn>;
@@ -62,7 +67,7 @@ describe('sendTemplate', () => {
     expect(typeof typeOnly).toBe('function');
   });
 
-  it('sends by template id with the sender and variables (success path)', async () => {
+  it('sends rendered html + subject with both inline logos (success path)', async () => {
     sendMock.mockResolvedValue({ data: { id: 'email_123' }, error: null });
     const vars = { NAME, EXPIRES_IN: '1 hour', token: 'a b/c' };
     const result = await sendTemplate('enara-password-reset', EMAIL, vars);
@@ -71,45 +76,105 @@ describe('sendTemplate', () => {
     expect(sendMock).toHaveBeenCalledWith({
       from: EMAIL_SENDER,
       to: EMAIL,
-      template: {
-        id: '15397fc6-acaa-453d-a103-b80d9e0f6394',
-        variables: { NAME, EXPIRES_IN: '1 hour', ACTION_URL: `${app}/reset-password?token=a%20b%2Fc` },
-      },
+      subject: 'Reset your Enara password',
+      html: expect.any(String),
       attachments: [
         expect.objectContaining({ contentId: 'enara-logo', contentType: 'image/png', filename: 'enara-logo.png' }),
         expect.objectContaining({ contentId: 'enara-logo-white', contentType: 'image/png', filename: 'enara-logo-white.png' }),
       ],
     });
-    expect(sendMock.mock.calls[0][0]).not.toHaveProperty('html');
+    const sent = sendMock.mock.calls[0][0];
+    expect(sent).not.toHaveProperty('template');
+    expect(sent.html).toContain(NAME);
+    expect(sent.html).toContain('1 hour');
+    expect(sent.html).toContain(`${app}/reset-password?token=a%20b%2Fc`);
+    expect(sent.html).toContain('src="cid:enara-logo"');
+    expect(sent.html).toContain('src="cid:enara-logo-white"');
+    expect(sent.html).not.toContain('assets.enara.app/email/');
+    expect(sent.html).not.toMatch(/\{\{/);
   });
 
-  it('attaches the inline logo that every template references as cid:enara-logo', async () => {
-    const fs = await import('fs');
-    const path = await import('path');
+  it('fills subject variables', async () => {
+    sendMock.mockResolvedValue({ data: { id: 'e' }, error: null });
+    await sendTemplate('enara-class-invitation', EMAIL, { NAME, TEACHER_NAME: 'Ms <B>', CLASS_NAME: 'Year 5 English', EXPIRES_IN: '7 days', token: 't' });
+    const sent = sendMock.mock.calls[0][0];
+    expect(sent.subject).toBe("You're invited to join Year 5 English on Enara");
+    expect(sent.html).toContain('Ms <B>'); // triple-brace: not escaped, as in Resend
+  });
+
+  it('uses fallback_value from the template json when a value is empty', async () => {
+    sendMock.mockResolvedValue({ data: { id: 'e' }, error: null });
+    await sendTemplate('enara-welcome', EMAIL, { NAME: '' });
+    const sent = sendMock.mock.calls[0][0];
+    const meta = JSON.parse(fs.readFileSync(path.join(TEMPLATES_DIR, 'enara-welcome.json'), 'utf8'));
+    const fb = meta.variables.find((v: any) => v.key === 'NAME').fallback_value;
+    expect(sent.html).toContain(fb);
+    expect(sent.html).not.toContain(NAME);
+    expect(sent.html).not.toMatch(/\{\{/);
+  });
+
+  it('fillPlaceholders: triple raw, double escaped, fallback, unknown left in place', () => {
+    const out = fillPlaceholders('{{{A}}}|{{A}}|{{{B}}}|{{{C}}}', { A: '<x&>' }, { B: 'fb' });
+    expect(out).toBe('<x&>|&lt;x&amp;&gt;|fb|{{{C}}}');
+  });
+
+  it('fails with unfilled_placeholder if a placeholder remains, without calling Resend', async () => {
+    const orig = TEMPLATES_BUNDLE['enara-welcome'];
+    (TEMPLATES_BUNDLE as any)['enara-welcome'] = { ...orig, html: orig.html + '{{{UNKNOWN_VAR}}}' };
+    try {
+      const result = await sendTemplate('enara-welcome', EMAIL, { NAME });
+      expect(result).toMatchObject({ ok: false, code: 'unfilled_placeholder' });
+      expect(sendMock).not.toHaveBeenCalled();
+    } finally {
+      (TEMPLATES_BUNDLE as any)['enara-welcome'] = orig;
+    }
+  });
+
+  it('templatesBundle.ts matches templates/*.html and *.json byte-for-byte (re-run bundle-templates.ts)', () => {
+    const files = fs.readdirSync(TEMPLATES_DIR).filter((n) => n.endsWith('.html')).map((n) => n.replace(/\.html$/, '')).sort();
+    expect(Object.keys(TEMPLATES_BUNDLE).sort()).toEqual(files);
+    for (const alias of files) {
+      const b = (TEMPLATES_BUNDLE as any)[alias];
+      expect(b.html === fs.readFileSync(path.join(TEMPLATES_DIR, `${alias}.html`), 'utf8'), alias).toBe(true);
+      const meta = JSON.parse(fs.readFileSync(path.join(TEMPLATES_DIR, `${alias}.json`), 'utf8'));
+      expect(b.subject, alias).toBe(meta.subject);
+      const fallbacks = Object.fromEntries(meta.variables.filter((v: any) => v.fallback_value != null).map((v: any) => [v.key, String(v.fallback_value)]));
+      expect(b.fallbacks, alias).toEqual(fallbacks);
+    }
+    expect(fs.readFileSync(path.join(TEMPLATES_DIR, '../templatesBundle.ts'), 'utf8')).toBe(buildBundleSource());
+  });
+
+  it('templates use the hosted logos; the inline logo data matches the assets', async () => {
     const { LOGO_PNG_BASE64, LOGO_WHITE_PNG_BASE64 } = await import('../src/email/logoInline');
     const png = fs.readFileSync(path.join(__dirname, '../src/email/assets/enara-logo.png'));
     expect(Buffer.from(LOGO_PNG_BASE64, 'base64').equals(png)).toBe(true);
     const white = fs.readFileSync(path.join(__dirname, '../src/email/assets/enara-logo-white.png'));
     expect(Buffer.from(LOGO_WHITE_PNG_BASE64, 'base64').equals(white)).toBe(true);
-    const dir = path.join(__dirname, '../src/email/templates');
-    for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.html'))) {
-      const html = fs.readFileSync(path.join(dir, f), 'utf8');
-      expect(html, f).toContain('src="cid:enara-logo"');
-      expect(html, f).toContain('src="cid:enara-logo-white"');
+    for (const f of fs.readdirSync(TEMPLATES_DIR).filter((n) => n.endsWith('.html'))) {
+      const html = fs.readFileSync(path.join(TEMPLATES_DIR, f), 'utf8');
+      expect(html, f).toContain('src="https://assets.enara.app/email/enara-logo.png"');
+      expect(html, f).toContain('src="https://assets.enara.app/email/enara-logo-white.png"');
       expect(html, f).toContain('prefers-color-scheme: dark');
-      expect(html, f).not.toContain('assets.enara.app/email/enara-logo.png');
+      expect(html, f).not.toContain('cid:');
     }
   });
 
-  it('maps every alias to its registry id', async () => {
+  it('renders every alias with cid logos, filled subject and no leftover placeholders', async () => {
     sendMock.mockResolvedValue({ data: { id: 'e' }, error: null });
     for (const [alias, entry] of Object.entries(TEMPLATE_REGISTRY)) {
       const { TEMPLATE_LINKS } = await import('../src/email/links');
       const linkParams: readonly string[] = (TEMPLATE_LINKS as Record<string, { params: readonly string[] }>)[alias]?.params ?? [];
       const keys = alias in TEMPLATE_LINKS ? [...entry.variables.filter((k) => k !== 'ACTION_URL'), ...linkParams] : [...entry.variables];
       const vars = Object.fromEntries(keys.map((k) => [k, 'v']));
-      await sendTemplate(alias as any, EMAIL, vars as any);
-      expect(sendMock.mock.lastCall![0].template.id).toBe(entry.id);
+      const r = await sendTemplate(alias as any, EMAIL, vars as any);
+      expect(r, alias).toMatchObject({ ok: true });
+      const sent = sendMock.mock.lastCall![0];
+      expect(sent.html, alias).toContain('src="cid:enara-logo"');
+      expect(sent.html, alias).toContain('src="cid:enara-logo-white"');
+      expect(sent.html, alias).not.toContain('assets.enara.app/email/');
+      expect(sent.html, alias).not.toMatch(/\{\{/);
+      expect(sent.subject, alias).not.toMatch(/\{\{/);
+      expect(sent.subject, alias).toBe(fillPlaceholders(TEMPLATES_BUNDLE[alias as keyof typeof TEMPLATES_BUNDLE].subject, vars, {}));
     }
     expect(sendMock).toHaveBeenCalledTimes(8);
   });

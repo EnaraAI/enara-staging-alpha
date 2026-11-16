@@ -1,6 +1,8 @@
 # Transactional email (Resend templates)
 
-All HTML lives in Resend-hosted templates. Code only picks a template and passes variables.
+The HTML source of every email is `templates/<alias>.html` (+ subject/variables in `<alias>.json`).
+`sendTemplate` renders that HTML in code and sends it as `html` (it does **not** send by Resend template id).
+The same files are pushed to Resend so its dashboard, preview and "send test" show them.
 The single source of truth for aliases, ids and variables is [`templateRegistry.ts`](./templateRegistry.ts).
 
 Sender: `The Enara Team <noreply@test.enara.app>` (`EMAIL_SENDER`).
@@ -29,26 +31,31 @@ npx tsx scripts/email/pull-templates.ts            # writes templates/<alias>.ht
 npx tsx scripts/email/push-templates.ts            # dry run: lists what would change, exits 1
 npx tsx scripts/email/push-templates.ts --confirm  # PATCH /templates/{id} then POST /templates/{id}/publish
 npx tsx scripts/email/push-templates.ts --confirm enara-welcome   # only some aliases
+npx tsx scripts/email/bundle-templates.ts          # REQUIRED after any edit: regenerates templatesBundle.ts
 ```
+
+**Always re-run `bundle-templates.ts` after editing a template.** The runtime (Vercel functions) cannot read
+`templates/`, so `sendTemplate` uses the generated [`templatesBundle.ts`](./templatesBundle.ts)
+(alias → `{ subject, fallbacks, html }`). A test checks the bundle matches the files byte-for-byte, so a stale
+bundle fails CI. `push-templates.ts` still updates Resend, but only for previews/dashboard — sending ignores it.
 
 `<alias>.json` holds `id`, `name`, `subject`, `from` and `variables` (`key`, `type`, `fallback_value`).
 When adding or renaming variables, update `templateRegistry.ts` too — `sendTemplate` types follow it.
 
 ## Logo
 
-The logo is **embedded in every email** as an inline (CID) attachment, so it shows even in mail
-clients that block remote images (Roundcube, Outlook desktop, many school mail systems).
+Templates reference the **hosted** logos, so Resend's preview and test button show them:
+`https://assets.enara.app/email/enara-logo.png` (black, transparent) and
+`https://assets.enara.app/email/enara-logo-white.png` (white, swapped in under `prefers-color-scheme: dark`;
+Apple Mail, iOS/macOS Outlook, Outlook.com; Gmail keeps the black one). Both live in the Cloudflare R2 bucket
+`enara-email-assets`.
 
-- Every template uses `<img src="cid:enara-logo" …>` (black, 120×55, left-aligned) and a white
-  version `cid:enara-logo-white` that replaces it in dark mode (`prefers-color-scheme: dark`;
-  Apple Mail, iOS/macOS Outlook and Outlook.com). Gmail ignores this and keeps the black logo.
-- `sendTemplate` always attaches both logos (content IDs `enara-logo` and `enara-logo-white`), from `logoInline.ts`
-  (base64 of [`assets/enara-logo.png`](./assets/enara-logo.png)). **Send these templates only through
-  `sendTemplate`**; an email sent to a template without the attachment shows no logo.
-- To change the logo: replace `assets/enara-logo.png`, regenerate `logoInline.ts` from it (the test
-  `attaches the inline logo…` checks that they match), and re-upload the hosted copy.
-- A hosted copy also exists at `https://assets.enara.app/email/enara-logo.png` (Cloudflare R2 bucket
-  `enara-email-assets`), for previews and other uses. The templates no longer reference it.
+On send, `sendTemplate` replaces those two URLs with `cid:enara-logo` / `cid:enara-logo-white` and attaches both
+PNGs inline (from `logoInline.ts`, base64 of `assets/*.png`), so real emails show the logo even in clients that
+block remote images (Roundcube, Outlook desktop, many school mail systems).
+
+To change the logo: replace `assets/enara-logo*.png`, regenerate `logoInline.ts` (a test checks they match),
+and re-upload the hosted copies.
 
 ## Links (ACTION_URL is built in code)
 
@@ -78,6 +85,10 @@ const result = await sendTemplate('enara-password-reset', user.email, {
   NAME: user.name, EXPIRES_IN: '30 minutes', token,
 }); // { ok: true, id } | { ok: false, code, message }
 ```
+
+Rendering follows Resend: `{{{VAR}}}` is inserted raw, `{{VAR}}` HTML-escaped (the current templates only use
+triple braces). A missing/empty value uses the variable's `fallback_value` from `<alias>.json`; the subject is
+filled the same way. If any placeholder remains after filling, the call returns `{ ok: false, code: 'unfilled_placeholder' }`.
 
 Variables are type-checked per alias (template variables minus `ACTION_URL` plus the link params above;
 all required, no extras) and re-checked at runtime. Failures are logged

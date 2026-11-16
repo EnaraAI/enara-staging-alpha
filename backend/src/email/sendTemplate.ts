@@ -14,6 +14,7 @@ import {
   LOGO_WHITE_FILENAME,
   LOGO_WHITE_PNG_BASE64,
 } from './logoInline';
+import { TEMPLATES_BUNDLE } from './templatesBundle';
 import { MissingAppUrlError, TEMPLATE_LINKS, buildActionUrl, isLinkedAlias, type TemplateSendVariables } from './links';
 
 export type SendTemplateResult =
@@ -46,9 +47,57 @@ function fail(alias: string, code: string, message: string): SendTemplateResult 
   return { ok: false, code, message: safe };
 }
 
+export const HOSTED_LOGO_URL = 'https://assets.enara.app/email/enara-logo.png';
+export const HOSTED_LOGO_WHITE_URL = 'https://assets.enara.app/email/enara-logo-white.png';
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 /**
- * Send one of the Resend-hosted templates. The HTML lives in Resend (mirrored in
- * ./templates via scripts/email/pull-templates.ts); no markup is built here.
+ * Fill placeholders the way Resend does: {{{VAR}}} raw, {{VAR}} HTML-escaped. A missing/empty value
+ * uses the template's fallback_value. Unknown placeholders are left in place (caught by the caller).
+ */
+export function fillPlaceholders(
+  text: string,
+  values: Record<string, string | number | null | undefined>,
+  fallbacks: Readonly<Record<string, string>>,
+): string {
+  const resolve = (key: string): string | undefined => {
+    const v = values[key];
+    if (v !== undefined && v !== null && String(v) !== '') return String(v);
+    return fallbacks[key];
+  };
+  return text
+    .replace(/\{\{\{\s*([A-Za-z0-9_]+)\s*\}\}\}/g, (m, key: string) => resolve(key) ?? m)
+    .replace(/(?<!\{)\{\{\s*([A-Za-z0-9_]+)\s*\}\}(?!\})/g, (m, key: string) => {
+      const v = resolve(key);
+      return v === undefined ? m : escapeHtml(v);
+    });
+}
+
+const LEFTOVER_PLACEHOLDER = /\{\{\{?\s*[A-Za-z0-9_]+\s*\}?\}\}/;
+
+/** Render a bundled template: fill variables, then point the hosted logos at the inline CID attachments. */
+export function renderTemplate(
+  alias: TemplateAlias,
+  values: Record<string, string | number>,
+): { subject: string; html: string } {
+  const t = TEMPLATES_BUNDLE[alias];
+  const html = fillPlaceholders(t.html, values, t.fallbacks)
+    .split(HOSTED_LOGO_WHITE_URL).join(`cid:${LOGO_WHITE_CONTENT_ID}`)
+    .split(HOSTED_LOGO_URL).join(`cid:${LOGO_CONTENT_ID}`);
+  return { subject: fillPlaceholders(t.subject, values, t.fallbacks), html };
+}
+
+/**
+ * Send one of the ENARA templates. The HTML comes from ./templates (bundled into templatesBundle.ts);
+ * it is rendered here and sent as html with both logos attached inline.
  */
 export async function sendTemplate<A extends TemplateAlias>(
   alias: A,
@@ -93,6 +142,11 @@ export async function sendTemplate<A extends TemplateAlias>(
     }
   }
 
+  const { subject, html } = renderTemplate(alias, templateVariables);
+  if (LEFTOVER_PLACEHOLDER.test(html) || LEFTOVER_PLACEHOLDER.test(subject)) {
+    return fail(alias, 'unfilled_placeholder', 'Rendered template still contains a {{{...}}} placeholder');
+  }
+
   const resend = getClient();
   if (!resend) return fail(alias, 'missing_api_key', 'RESEND_API_KEY is not set');
 
@@ -100,8 +154,9 @@ export async function sendTemplate<A extends TemplateAlias>(
     const { data, error } = await resend.emails.send({
       from: EMAIL_SENDER,
       to,
-      template: { id: entry.id, variables: templateVariables },
-      // Every template references cid:enara-logo (light) and cid:enara-logo-white (dark mode), so both are always attached.
+      subject,
+      html,
+      // The rendered HTML references cid:enara-logo (light) and cid:enara-logo-white (dark mode), so both are always attached.
       attachments: [
         { filename: LOGO_FILENAME, content: LOGO_PNG_BASE64, contentType: 'image/png', contentId: LOGO_CONTENT_ID },
         { filename: LOGO_WHITE_FILENAME, content: LOGO_WHITE_PNG_BASE64, contentType: 'image/png', contentId: LOGO_WHITE_CONTENT_ID },
