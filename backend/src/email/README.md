@@ -34,11 +34,19 @@ npx tsx scripts/email/push-templates.ts --confirm enara-welcome   # only some al
 `<alias>.json` holds `id`, `name`, `subject`, `from` and `variables` (`key`, `type`, `fallback_value`).
 When adding or renaming variables, update `templateRegistry.ts` too — `sendTemplate` types follow it.
 
-## Logo hosting
+## Logo
 
-The logo source is [`assets/enara-logo.png`](./assets/enara-logo.png). Templates reference the hosted copy at
-`https://assets.enara.app/email/enara-logo.png` (Cloudflare R2 bucket `enara-email-assets`). To change it,
-upload the new file to the same key in that bucket; templates need no edit.
+The logo is **embedded in every email** as an inline (CID) attachment, so it shows even in mail
+clients that block remote images (Roundcube, Outlook desktop, many school mail systems).
+
+- Every template uses `<img src="cid:enara-logo" …>`.
+- `sendTemplate` always attaches the logo with content ID `enara-logo`, from `logoInline.ts`
+  (base64 of [`assets/enara-logo.png`](./assets/enara-logo.png)). **Send these templates only through
+  `sendTemplate`**; an email sent to a template without the attachment shows no logo.
+- To change the logo: replace `assets/enara-logo.png`, regenerate `logoInline.ts` from it (the test
+  `attaches the inline logo…` checks that they match), and re-upload the hosted copy.
+- A hosted copy also exists at `https://assets.enara.app/email/enara-logo.png` (Cloudflare R2 bucket
+  `enara-email-assets`), for previews and other uses. The templates no longer reference it.
 
 ## Sending
 

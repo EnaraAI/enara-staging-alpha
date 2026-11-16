@@ -7,6 +7,7 @@ import {
   type TemplateAlias,
   type TemplateVariables,
 } from './templateRegistry';
+import { LOGO_CONTENT_ID, LOGO_FILENAME, LOGO_PNG_BASE64 } from './logoInline';
 
 export type SendTemplateResult =
   | { ok: true; id: string }
@@ -69,6 +70,10 @@ export async function sendTemplate<A extends TemplateAlias>(
       from: EMAIL_SENDER,
       to,
       template: { id: entry.id, variables: variables as Record<string, string | number> },
+      // Every template references the logo as cid:enara-logo, so it must always be attached.
+      attachments: [
+        { filename: LOGO_FILENAME, content: LOGO_PNG_BASE64, contentType: 'image/png', contentId: LOGO_CONTENT_ID },
+      ],
     });
     if (error || !data) {
       return fail(alias, error?.name ?? 'unknown_error', error?.message ?? 'No data returned');
