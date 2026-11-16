@@ -411,3 +411,30 @@ describe('production safety: no meaning check for word-target items (new example
     expect(p.points).toBe(1);
   });
 });
+
+describe('round-6 fix: irregular forms (new examples, not bank or earlier rounds)', () => {
+  const g = (targetForm: string) => ({ targetForm, scoring: 'target_form_0_1_2', prompt: 'Write a sentence.' }) as TargetFormItem;
+  const TP = g('he/she/it + verb-s/-es'), MM = g('much + uncountable noun; many + plural countable noun'), BE = g('am / is / are after the subject');
+  it('third-person: does (C-9 key) = 2, do = 0', () => {
+    expect(tf('A2-GR-third-person-s-C-9', 'Karim does his homework at home.')).toBe(2);
+    expect(tf('A2-GR-third-person-s-C-9', 'Karim do his homework')).toBe(0);
+  });
+  it('third-person: has = 2, have = 0', () => {
+    expect(scoreTargetForm(TP, 'My cousin has a small garden.')).toBe(2);
+    expect(scoreTargetForm(TP, 'My cousin have a small garden.')).toBe(0);
+  });
+  it('third-person: copula is = 2; is + base verb still 0; question unaffected', () => {
+    expect(scoreTargetForm(TP, 'My teacher is very kind.')).toBe(2);
+    expect(scoreTargetForm(TP, 'She is cook dinner.')).toBe(0);
+    expect(scoreTargetForm(TP, 'Does he have a bike?')).toBe(0);
+  });
+  it('much/many: irregular plurals teeth, feet, mice = 2; uncountable after many still wrong', () => {
+    expect(scoreTargetForm(MM, 'The baby has many teeth now.')).toBe(2);
+    expect(scoreTargetForm(MM, 'A spider has many feet.')).toBe(2);
+    expect(scoreTargetForm(MM, 'We found many rice in the box.')).toBe(0);
+  });
+  it('copula: irregular plural subject + are = 2; + is = 0', () => {
+    expect(scoreTargetForm(BE, 'The women are at the market.')).toBe(2);
+    expect(scoreTargetForm(BE, 'The children is in the garden.')).toBe(0);
+  });
+});

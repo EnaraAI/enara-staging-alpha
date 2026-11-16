@@ -290,6 +290,10 @@ const verbish = (x: string) => {
 const DOUBLE = new Set(['sit', 'run', 'swim', 'get', 'put', 'stop', 'shop', 'plan', 'begin', 'cut', 'hit', 'jog', 'travel']);
 const EDROP = new Set(['write', 'make', 'take', 'come', 'have', 'ride', 'dance', 'drive', 'leave', 'live', 'smile', 'use']);
 const ADJ_DOUBLE = new Set(['big', 'hot', 'fat', 'thin', 'wet', 'sad']);
+// Round-6 fix: irregular plurals (no -s) and irregular third-person forms (do/go/have/be).
+const IRREG_PL = new Set(['children', 'men', 'women', 'people', 'teeth', 'feet', 'mice']);
+const IRREG_3SG = new Set(['does', 'goes', 'has', 'is']);
+const BASE_3SG_WRONG = new Set(['do', 'have', 'are']);
 const IRREG_COMP = new Set(['better', 'worse', 'further', 'farther']);
 const BAD_COMP = new Set(['gooder', 'badder', 'more better', 'more bigger']);
 const PREP_TIME = { at: /^(\d|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|noon|midnight|night|oclock|half|quarter)/, on: new Set([...DAYS_MONTHS].slice(0, 7).concat(['weekend', 'friday', 'birthday', 'monday'])), in: new Set([...DAYS_MONTHS].slice(7).concat(['summer', 'winter', 'spring', 'autumn', 'morning', 'afternoon', 'evening', 'december'])) } as const;
@@ -451,7 +455,7 @@ const GRAMMAR: [RegExp, (c: Ctx) => TFScore | null][] = [
       seenBe = true;
       if (w[i] === 'be') { bad++; continue; }
       if (subj && SUBJ_BE[subj]) { if (SUBJ_BE[subj] === w[i]) ok++; else bad++; continue; }
-      const plural = compound || (subj && /[^s']s$/.test(subj) && !['his', 'this', 'bus', 'news', 'maths', 'physics', 'class', 'glass'].includes(subj));
+      const plural = compound || IRREG_PL.has(subj ?? '') || (subj && /[^s']s$/.test(subj) && !['his', 'this', 'bus', 'news', 'maths', 'physics', 'class', 'glass'].includes(subj));
       if (plural && w[i] !== 'are') bad++;
       else if (!plural && subj && !compound && w[i] === 'are' && w[i - 2] !== undefined && ['a', 'an', 'my', 'the', 'his', 'her', 'this'].includes(w[i - 2]) && !/s$/.test(subj)) bad++;
       else ok++;
@@ -535,6 +539,10 @@ const GRAMMAR: [RegExp, (c: Ctx) => TFScore | null][] = [
       let j = i + 1;
       if (FREQ.has(w[j])) j++;
       const v = w[j];
+      // Round-6 fix: does/goes/has/is are right third-person forms; do/have/are after he/she/it (not in a question) are wrong.
+      // "is" counts only as the copula (She is a teacher), not as an auxiliary (is play, is playing).
+      if (v && IRREG_3SG.has(v) && !(v === 'is' && verbish(w[j + 1] ?? '') && !AUX.has(w[j + 1] ?? ''))) { ok++; continue; }
+      if (v && BASE_3SG_WRONG.has(v) && !AUX.has(w[i - 1] ?? '')) { bad++; continue; }
       if (!v || BE.has(v) || AUX.has(v) || DET.has(v) || ['and', 'or', 'but', 'who', 'that', 'not', 'to', 'too', 'also'].includes(v)) continue;
       // Round-3 fix: every he/she/it clause is checked (right in one place, wrong in another = 1).
       if (/(ch|sh|x|ss)s$/.test(v) || v === 'gos' || v === 'dos' || /[^aeiou]ys$/.test(v)) slip++;
@@ -599,7 +607,7 @@ const GRAMMAR: [RegExp, (c: Ctx) => TFScore | null][] = [
     for (let i = 0; i < w.length - 1; i++) {
       const n = w[i + 1];
       if (w[i] === 'much') (UNCOUNT.has(n) || !/s$/.test(n) ? ok++ : bad++);
-      if (w[i] === 'many') (/s$|people|children|men|women/.test(n) && !UNCOUNT.has(n) ? ok++ : bad++);
+      if (w[i] === 'many') ((/s$|people|children|men|women/.test(n) || IRREG_PL.has(n)) && !UNCOUNT.has(n) ? ok++ : bad++);
     }
     if (!ok) return 0;
     return bad ? 1 : 2;

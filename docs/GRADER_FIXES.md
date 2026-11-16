@@ -164,3 +164,25 @@ Tests: `backend/test/graderV2.test.ts` "round-3 fixes" block (one test per rule,
 - Call sites: `needsAiEvaluation` (`autoGrading.ts`, assignments) returns false for them; `evaluateShortAnswer` (`gradingProposals.ts`) returns a key-only proposal without a model call. Assessments, diagnostics and lesson exercises have no meaning-check call (key only), so nothing changes there.
 - Open responses (rubric) and grammar short answers keep the model path. graderV2 OFF is unchanged (parity tests pass).
 - Model path (eval-v2 meaning check and rubric): NOT VALIDATED until run with the API.
+
+## Round 6 fix
+SIMULATION ONLY / DRAFT. Details: `research/assessment-validation/a1a2/round6/FIX_RESULT.md`.
+
+**Cause.** The third-person rule skipped any verb in `AUX` or `BE`, so `does`, `has` and `is` were never counted. The C-9 bank key `Karim does his homework at home.` scored 0.
+
+**Fix (`graderV2.ts`).**
+- `does`, `goes`, `has` and copula `is` after he/she/it or a name count as right. `is` + a verb keeps the old path.
+- `do`, `have` and `are` after a third-person subject count as wrong, except after an auxiliary (a question).
+- Irregular plurals (children, men, women, people, teeth, feet, mice):
+  - count as plural after `many`;
+  - count as plural as a copula subject (`The children are …`).
+- Already correct before the fix: irregular past forms, better/worse/farther/further.
+- No outcome tests superlatives.
+
+**Tests.** The "round-6 fix" block has 5 tests.
+
+**Results.**
+- graderV2, parity and assessment* tests: 176/176 pass.
+- Full suite: 16 failed of 2064 tests. These are the known base failures.
+- ESL6 answer check: 0 failures, down from 1 (C-9 now scores 2/2). The graderBlind list is unchanged (15).
+- Round-5 rerun: no score changed. Exact agreement stays at 96.0% and QWK at 0.914.
