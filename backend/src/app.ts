@@ -51,6 +51,7 @@ import usageRoutes from './routes/usage.routes';
 import parentsRoutes from './parents/routes';
 import { ltiRouter, wellKnownRouter } from './integrations/lms/routes';
 import { lmsFlags } from './integrations/lms/core/flags';
+import maintenanceRoutes from './maintenance/routes';
 import { getPostgresPool } from './config/postgres';
 import mongoose from 'mongoose';
 
@@ -314,6 +315,8 @@ export function createApp() {
   app.use('/api/usage', usageRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/parents', parentsRoutes);
+  // Test-deployment maintenance: 404 unless switched on AND pointed at the test cluster (maintenance/routes.ts).
+  app.use('/api/maintenance', maintenanceRoutes);
   // LMS (docs/lms): inert unless LMS_LTI_ENABLED is on and the LMS config is valid.
   app.use('/lti', ltiRouter);
   app.use('/.well-known', wellKnownRouter);
