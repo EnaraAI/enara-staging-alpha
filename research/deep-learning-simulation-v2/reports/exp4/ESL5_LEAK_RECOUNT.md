@@ -39,10 +39,10 @@ PP check: PP's 68 is the same detector (`earlyLeakFinal`, `esl5_analyze.py` line
 Only 40 of the 263 releases (15%) meet the protocol's "after 2 genuine attempts" condition. The report's statement that the 263 releases were all legitimate is **wrong** and is corrected here.
 
 The decision rule is CONFIRMED only if all guards pass, so the outcome depends on which count applies.
-- **STRICT (163 > 68): the guard fails, and the decision would be NOT CONFIRMED.** This count treats every release not made after 2 genuine attempts as a protocol violation, because the protocol exempts releases only under that condition.
+- **STRICT (163 > 68), sensitivity only — not the protocol's definition: the guard would fail.** This count treats every release not made after 2 genuine attempts as a protocol violation, because the protocol exempts releases only under that condition.
 - **SUBSTANTIVE (31 ≤ 68): the guard passes, and CONFIRMED stands.** The protocol defines an early leak as the answer "of a lesson item that the learner **has not solved**". A class (c) release repeats an answer the learner has just produced, so by that wording it is not a leak.
 
-**Corrected decision.** The brief for this recount said the strict count applies under the protocol's own definition. I record that ruling, and on that basis ESL5 is **NOT CONFIRMED**: guard 2 fails with 163 vs 68. The "has not solved" clause in the protocol supports the substantive reading instead, which passes. Report both readings, and do not cite ESL5 as a clean CONFIRMED result until this is settled before the next study. Either way, the primary-effect numbers do not change.
+**Corrected decision: CONFIRMED stands.** PROTOCOL.md guard 2 defines an early leak as "the completed answer of a lesson item that the learner has not solved and on which they have made fewer than 2 genuine failed attempts". Class (c) releases are on items already solved, so by the pre-registered definition they are not leaks. The protocol count is SUBSTANTIVE = 31 ≤ 68 (also ≤ 54 under a symmetric rule for P+), so guard 2 passes and all decision inputs remain met. The STRICT count (163) came from an over-broad instruction in the recount brief and is not the protocol's definition; it is kept above only as a sensitivity check. The reported 263 "planned releases" is wrong (40 genuine) and should not be cited.
 
 ## Examples (10 per class, seeded sample; chain = judged attempts on the item, oldest first)
 

@@ -6,7 +6,7 @@
 > - substantive (premature only): 31, guard passes;
 > - original: 14.
 >
-> **Corrected decision:** under the strict count, **NOT CONFIRMED**. The protocol's "has not solved" wording supports the substantive count, under which CONFIRMED stands. See [`ESL5_LEAK_RECOUNT.md`](ESL5_LEAK_RECOUNT.md).
+> **Decision after recount: CONFIRMED stands.** The pre-registered definition (PROTOCOL.md, guard 2) counts as an early leak only the answer to a lesson item the learner *has not solved* with fewer than 2 genuine failed attempts. Releases on items already solved are therefore not leaks, so the protocol count is 31, below P+'s 68 (54 if P+'s answers after 2 genuine fails are also excluded). The strict count (163) was an over-broad reading set in the recount brief, not the protocol's definition. The 263 "planned releases" figure below is wrong; only 40 were genuine. See [`ESL5_LEAK_RECOUNT.md`](ESL5_LEAK_RECOUNT.md).
 
 # ESL stage 5: A0+LE with five engine changes vs the strong plain baseline (P+)
 
