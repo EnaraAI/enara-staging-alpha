@@ -56,7 +56,11 @@ export function expandContractionsV2(t: string): string {
     .replace(/\b(do|does|did|is|are|was|were|have|has|had|could|would|should|must|need)n'?t\b/gi, '$1 not')
     .replace(/n't\b/gi, ' not')
     .replace(/\bi'm\b|\bim\b/gi, 'i am')
-    .replace(/\b(it|that|there|here|what|where|who|how)'s\b/gi, '$1 is')
+    .replace(/\b(it|that|there|here|what|where|who|how|he|she)'s\b/gi, '$1 is')
+    // Round-4 fix: apostrophe-less forms that are not other words (theres, thats, whats, hes, shes, youre, theyre).
+    // "its" is ambiguous (possessive) and is handled per item in matchKeyV2; "were", "ill", "wont", "lets" are words.
+    .replace(/\b(there|that|what|where|who|he|she)s\b/gi, '$1 is')
+    .replace(/\b(you|they)re\b/gi, '$1 are')
     .replace(/\blet's\b/gi, 'let us')
     .replace(/\b(i|you|he|she|we|they)'d like\b/gi, '$1 would like')
     .replace(/\b(\w+)'re\b/gi, '$1 are').replace(/\b(\w+)'ve\b/gi, '$1 have').replace(/\b(\w+)'ll\b/gi, '$1 will');
@@ -118,6 +122,93 @@ function filledSentence(item: KeyItem, option: string, sens: Sensitivity) {
   return { words: [...b, ...o, ...tokens(normaliseV2(after, sens))], from: b.length, to: b.length + o.length };
 }
 
+// Round-4 fix: a gap answer that repeats words the prompt already shows before the gap ("I'm reading" after "I ___").
+function gapWithSubject(item: KeyItem, a: string, nkeys: string[], sens: Sensitivity): boolean {
+  const p = String(item.prompt ?? item.text ?? '').replace(/^[^:]*:\s*/, '');
+  const m = /^(.*?)_{2,}/.exec(p);
+  if (!m) return false;
+  const before = tokens(normaliseV2(m[1], sens));
+  const ans = tokens(a);
+  for (const k of nkeys) {
+    const kt = tokens(k);
+    const n = ans.length - kt.length;
+    if (n < 1 || n > before.length || n > 3) continue;
+    if (kt.every((x, i) => ans[n + i] === x) && ans.slice(0, n).every((x, i) => x === before[before.length - n + i])) return true;
+  }
+  return false;
+}
+
+const isErrorCorrection = (item: KeyItem) => /error.?correction/i.test(String(item.type ?? '')) || /\b(correct|fix) the (mistake|error)|find and correct/i.test(String(item.prompt ?? item.text ?? ''));
+const FUNC = new Set(['a', 'an', 'the', 'to', 'of', 'in', 'on', 'at', 'is', 'are', 'am', 'and', 'for', 'very', 'my', 'it']);
+const slipOf = (x: string, k: string) => x !== k && Math.min(x.length, k.length) >= 3 && (lev(x, k) <= (k.length >= 7 ? 2 : 1) || (x.length >= 4 && k.length >= 4 && x.slice(0, 3) === k.slice(0, 3) && Math.abs(x.length - k.length) <= 2));
+/** Token edit script from a to b: ['=',i,j] | ['s',i,j] | ['d',i,-1] (a[i] dropped) | ['i',-1,j] (b[j] added). */
+function align(a: string[], b: string[]) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)] as number[]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  const ops: [string, number, number][] = [];
+  let i = a.length, j = b.length;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && d[i][j] === d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)) { ops.push([a[i - 1] === b[j - 1] ? '=' : 's', i - 1, j - 1]); i--; j--; }
+    else if (i > 0 && d[i][j] === d[i - 1][j] + 1) { ops.push(['d', i - 1, -1]); i--; }
+    else { ops.push(['i', -1, j - 1]); j--; }
+  }
+  return ops.reverse();
+}
+/**
+ * Round-4 fix (rubric §2.2): error correction is scored on the target only. The target is the part of the key that
+ * differs from the prompt's wrong sentence (for a deletion, the key words on both sides of it), plus nearby key
+ * words named in the item's targetForm ("than" in a comparative). Credit when every target word is right, none of the
+ * removed wrong words is still there, and the rest differs from the key by at most two slips (a misspelt or
+ * mis-inflected word, or a dropped/added small word).
+ */
+function errorCorrectionTarget(item: KeyItem & { targetForm?: string }, a: string, sens: Sensitivity): boolean {
+  if (!isErrorCorrection(item)) return false;
+  const p = String(item.prompt ?? item.text ?? '');
+  const wrongSrc = p.includes(':') ? p.slice(p.lastIndexOf(':') + 1) : '';
+  const E = tokens(normaliseV2(wrongSrc, sens));
+  if (E.length < 2) return false;
+  const A = tokens(a);
+  // targetForm words widen the target only when targetForm describes the form; a copy of a key sentence does not.
+  const tfNorm = normaliseV2(String(item.targetForm ?? ''));
+  const tfWords = new Set(acceptedKeys(item).some((k) => normaliseV2(k) === tfNorm) ? [] : tokens(tfNorm));
+  for (const key of acceptedKeys(item)) {
+    const K = tokens(normaliseV2(key, sens));
+    if (K.length < 2 || Math.abs(K.length - E.length) > 3) continue;
+    const ek = align(E, K);
+    const target = new Set<number>();
+    const removed = new Set<string>();
+    ek.forEach(([op, i, j], n) => {
+      if (op === 's' || op === 'i') target.add(j);
+      if (op === 's' || op === 'd') removed.add(E[i]);
+      if (op === 'd') { // deletion: the key words around it are the target
+        const prev = ek.slice(0, n).reverse().find((o) => o[2] >= 0), next = ek.slice(n + 1).find((o) => o[2] >= 0);
+        if (prev) target.add(prev[2]);
+        if (next) target.add(next[2]);
+      }
+    });
+    if (!target.size) continue;
+    for (const j of [...target]) for (let k = Math.max(0, j - 2); k <= Math.min(K.length - 1, j + 2); k++) if (tfWords.has(K[k]) && !FUNC.has(K[k])) target.add(k);
+    for (const x of K) removed.delete(x);
+    if (A.some((x) => removed.has(x))) continue;
+    let slips = 0, ok = true;
+    const ops = align(A, K);
+    ops.forEach(([op, i, j], n) => {
+      if (op === '=') return;
+      if (j >= 0 && target.has(j)) { ok = false; return; }
+      if (op === 'd') { // an added word next to the target changes the target
+        const prev = ops.slice(0, n).reverse().find((o) => o[2] >= 0), next = ops.slice(n + 1).find((o) => o[2] >= 0);
+        if ((prev && target.has(prev[2]) && next && target.has(next[2])) || !FUNC.has(A[i])) { ok = false; return; }
+      }
+      if (op === 'i' && !FUNC.has(K[j])) { ok = false; return; }
+      if (op === 's' && !slipOf(A[i], K[j])) { ok = false; return; }
+      slips++;
+    });
+    if (ok && slips <= 2) return true;
+  }
+  return false;
+}
+
 const LETTER = /^\s*\(?\s*([a-h])\s*(?:\)|\.|:|\s*$)\s*(.*)$/i;
 
 // Fixes 1-3. True when the answer matches an accepted answer.
@@ -130,7 +221,12 @@ export function matchKeyV2(item: KeyItem, answer: string | number | undefined | 
   if (!a) return false;
   const nkeys = keys.map((k) => normaliseV2(k, sens));
   if (nkeys.includes(a)) return true;
-  if (!isChoice(item)) return false;
+  // Round-4 fix: "its" for "it's" counts only where every key reads "it is" there and no key has possessive "its".
+  if (sens !== 'case_punct' && /\bits\b/.test(a) && !nkeys.some((k) => /\bits\b/.test(k)) && nkeys.includes(a.replace(/\bits\b/g, 'it is'))) return true;
+  if (!isChoice(item)) {
+    if (sens === 'case_punct') return false;
+    return gapWithSubject(item, a, nkeys, sens) || errorCorrectionTarget(item, a, sens);
+  }
   const options = choiceOptions(item);
   if (!options.length) return false;
   const letterOf = (k: string) => (/^\(?[a-h]\)?\.?$/i.test(k.trim()) ? k.trim().replace(/[().]/g, '').toLowerCase() : null);
@@ -198,6 +294,11 @@ const IRREG_COMP = new Set(['better', 'worse', 'further', 'farther']);
 const BAD_COMP = new Set(['gooder', 'badder', 'more better', 'more bigger']);
 const PREP_TIME = { at: /^(\d|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|noon|midnight|night|oclock|half|quarter)/, on: new Set([...DAYS_MONTHS].slice(0, 7).concat(['weekend', 'friday', 'birthday', 'monday'])), in: new Set([...DAYS_MONTHS].slice(7).concat(['summer', 'winter', 'spring', 'autumn', 'morning', 'afternoon', 'evening', 'december'])) } as const;
 
+/** One syllable, or two syllables ending in -y (big, new, long, easy, happy): takes -er, not "more". */
+function shortAdj(x: string) {
+  const v = (x.replace(/e$/, '').match(/[aeiouy]+/g) ?? []).length;
+  return v <= 1 || (v === 2 && /[^aeiou]y$/.test(x));
+}
 const LEX: [RegExp, string[]][] = [
   [/classroom/, ['pen', 'pencil', 'rubber', 'eraser', 'ruler', 'book', 'notebook', 'board', 'clock', 'map', 'poster', 'desk', 'chair', 'bag', 'sharpener', 'calculator', 'scissors', 'glue', 'paper', 'window', 'door', 'calendar', 'picture']],
   [/clothing/, ['jeans', 't-shirt', 'tshirt', 'shirt', 'dress', 'skirt', 'jacket', 'coat', 'shoes', 'trainers', 'hat', 'scarf', 'jumper', 'sweater', 'trousers', 'shorts', 'socks', 'abaya', 'hijab', 'boots', 'tracksuit', 'hoodie']],
@@ -270,6 +371,32 @@ function wordOrder({ w, item }: Ctx): TFScore {
   return faults === 0 ? 2 : faults === 1 ? 1 : 0;
 }
 
+// Round-4 fix: his/her must agree with the owner. The owner is the nearest gendered noun or known first name before
+// it. A his/her whose owner is a name of unknown gender cannot be checked: null (not decided; the caller keeps its path).
+const MALE = new Set(['he', 'him', 'man', 'boy', 'father', 'dad', 'brother', 'son', 'uncle', 'grandfather', 'grandpa', 'husband', 'nephew', 'mr', 'king', 'ahmed', 'ahmad', 'mohamed', 'mohammed', 'muhammad', 'ali', 'omar', 'umar', 'khaled', 'khalid', 'hassan', 'hussein', 'youssef', 'yusuf', 'ibrahim', 'mahmoud', 'mustafa', 'karim', 'kareem', 'tarek', 'tariq', 'hamza', 'adam', 'sami', 'samir', 'nabil', 'walid', 'fadi', 'majid', 'saeed', 'saleh', 'faisal', 'john', 'tom', 'david', 'james', 'peter', 'mark', 'paul', 'jack', 'sam']);
+const FEMALE = new Set(['she', 'woman', 'girl', 'mother', 'mum', 'mom', 'sister', 'daughter', 'aunt', 'grandmother', 'grandma', 'wife', 'niece', 'mrs', 'ms', 'miss', 'queen', 'fatima', 'fatma', 'aisha', 'aysha', 'mariam', 'maryam', 'mona', 'noor', 'nour', 'huda', 'hoda', 'layla', 'leila', 'laila', 'sara', 'sarah', 'salma', 'amira', 'yasmin', 'yasmine', 'rania', 'dina', 'reem', 'hana', 'hanan', 'nadia', 'zainab', 'zeinab', 'khadija', 'asma', 'lina', 'rana', 'mai', 'nada', 'samira', 'mary', 'anna', 'emma', 'lucy', 'kate', 'jane', 'lisa']);
+function possessives({ w, raw }: Ctx): TFScore | null {
+  if (!w.some((x) => ['his', 'her', 'our', 'their', 'my', 'your', 'its'].includes(x))) return 0;
+  const orig = straightQuotes(raw).replace(/[^\p{L}\s']/gu, ' ').split(/\s+/).filter(Boolean);
+  let ok = 0, bad = 0, unknown = 0, other = 0;
+  for (let i = 0; i < w.length; i++) {
+    if (w[i] !== 'his' && w[i] !== 'her') { if (['our', 'their', 'my', 'your', 'its'].includes(w[i])) other++; continue; }
+    let owner: 'm' | 'f' | '?' | null = null;
+    for (let k = i - 1; k >= 0 && owner === null; k--) {
+      if (MALE.has(w[k])) owner = 'm';
+      else if (FEMALE.has(w[k])) owner = 'f';
+      else if (k > 0 && /^[A-Z]/.test(orig[k] ?? '') && orig[k] !== 'I' && !DAYS_MONTHS.has(w[k])) owner = '?';
+    }
+    if (owner === null && w[i] === 'her' && i > 0 && verbish(w[i - 1])) { other++; continue; } // object "her" (I call her)
+    if (owner === '?') unknown++;
+    else if (owner === null || (owner === 'm') === (w[i] === 'his')) ok++;
+    else bad++;
+  }
+  if (bad) return ok ? 1 : 0;
+  if (unknown) return ok ? 2 : null;
+  return ok || other ? 2 : 0;
+}
+
 // Round-3 fix: clock times written out; the number word is part of the form ("elevn o'clock" = slip, digits = not in words).
 function clockTime({ w }: Ctx): TFScore {
   let ok = 0, slip = 0, found = 0;
@@ -290,8 +417,19 @@ function clockTime({ w }: Ctx): TFScore {
   return slip ? 1 : 2;
 }
 
+/** Round-4 fix: base-form verbs in a joined clause ("... and wash the car", "... and I buy") in a past sentence. */
+function secondClauseBase(w: string[]) {
+  let n = 0;
+  for (let i = 1; i < w.length; i++) {
+    if (!['and', 'then', 'but'].includes(w[i - 1]) && !(PRON.has(w[i - 1]) && ['and', 'then', 'but'].includes(w[i - 2] ?? ''))) continue;
+    const x = w[i];
+    if (REG.has(x) && !PASTS.has(x) && !AUX.has(x)) n++;
+  }
+  return n;
+}
+
 // Score of a grammar form, per docs/SCORING_RUBRIC.md; null = form not handled here.
-const GRAMMAR: [RegExp, (c: Ctx) => TFScore][] = [
+const GRAMMAR: [RegExp, (c: Ctx) => TFScore | null][] = [
   [/there is/, ({ w }) => {
     let ok = 0, bad = 0;
     for (let i = 0; i < w.length - 1; i++) {
@@ -332,7 +470,7 @@ const GRAMMAR: [RegExp, (c: Ctx) => TFScore][] = [
     return 2;
   }],
   [/regular verb \+ -ed/, ({ w }) => {
-    if (w.some((x) => OVERREG.has(x))) return 0;
+    if (w.some((x) => OVERREG.has(x))) return w.some((x) => PASTS.has(x) && !['read', 'put', 'cut'].includes(x)) ? 1 : 0;
     // Round-3 fix: every past form is checked; a recognisable -ed with one spelling slip is 1.
     let ok = 0, slip = 0;
     for (const x of w) {
@@ -342,13 +480,18 @@ const GRAMMAR: [RegExp, (c: Ctx) => TFScore][] = [
       else if (/d$/.test(x) && !/ed$/.test(x) && REG.has(x.slice(0, -1)) && !/e$/.test(x.slice(0, -1))) slip++; // watchd
       else if (/[a-z]{2,}ed$/.test(x) && !['need', 'feed', 'bed', 'red', 'shed', 'seed', 'speed'].includes(x)) ok++;
     }
+    slip += secondClauseBase(w);
     if (!ok) return slip ? 1 : 0;
     return slip ? 1 : 2;
   }],
   [/irregular past/, ({ w }) => {
-    if (w.some((x) => OVERREG.has(x))) return 0;
+    // Rubric rule 4: an over-regularised form (goed, buyed) is wrong (0); next to a right irregular past it is
+    // "right in one place, wrong in another" (tf1). Round-4 fix: a base verb in the second clause is also checked.
+    const right = w.some((x) => PASTS.has(x) && x !== 'read' && x !== 'put' && x !== 'cut');
+    if (w.some((x) => OVERREG.has(x))) return right ? 1 : 0;
     if (w.some((x) => [...PASTS].some((p) => x === `${p}ed` || x === `${p}d`))) return 1;
-    return w.some((x) => PASTS.has(x) && x !== 'read' && x !== 'put' && x !== 'cut') ? 2 : 0;
+    if (!right) return 0;
+    return secondClauseBase(w) ? 1 : 2;
   }],
   [/did \+ subject/, ({ w }) => {
     const i = w.indexOf('did');
@@ -407,7 +550,8 @@ const GRAMMAR: [RegExp, (c: Ctx) => TFScore][] = [
     const t = w.indexOf('than');
     if (t < 1) return 0;
     const adj = w[t - 1];
-    if (w[t - 2] === 'more') return 2;
+    // Round-4 fix: "more" + short adjective (one syllable, or two ending in -y) = wrong form; more + -er = double comparative.
+    if (w[t - 2] === 'more') return /er$/.test(adj) && adj.length > 4 ? 0 : shortAdj(adj) ? 0 : 2;
     if (IRREG_COMP.has(adj)) return 2;
     if (!/er$/.test(adj)) return 0;
     const base = adj.slice(0, -2);
@@ -441,9 +585,12 @@ const GRAMMAR: [RegExp, (c: Ctx) => TFScore][] = [
     if (!ok) return 0;
     return bad ? 1 : 2;
   }],
-  [/^some \(positive/, ({ w, s }) => {
-    const neg = /\bnot\b|\bno\b|\bnever\b/.test(s) || /\?$/.test(s);
-    if (w.includes('some')) return neg && !/^(would|can|could) /.test(s) ? 0 : 2;
+  [/^some \(positive/, ({ w, s, raw }) => {
+    // Round-4 fix: the question mark is read from the raw answer (normalisation removes it); a yes/no question opening
+    // with do/does/did/have/has/is/are counts too. Offers and requests (would/could/can/may ...) keep "some".
+    const question = /\?\s*$/.test(raw) || /^(do|does|did|have|has|is|are|was|were) /.test(s);
+    const neg = /\bnot\b|\bno\b|\bnever\b/.test(s) || question;
+    if (w.includes('some')) return neg && !/^(would|can|could|may|shall) /.test(s) ? 0 : 2;
     if (w.includes('any')) return neg || /^(do|does|did|have|has|is|are) /.test(s) ? 2 : 0;
     return 0;
   }],
@@ -465,9 +612,12 @@ const GRAMMAR: [RegExp, (c: Ctx) => TFScore][] = [
     if (w[i] === 'never' && (w[i - 1] === 'not' || w[i - 1] === 'no')) return 1;
     if (BE.has(w[i - 1] ?? '') || ['was', 'were'].includes(w[i - 1] ?? '')) return 2;
     if (i === 0 || BE.has(w[i + 1] ?? '')) return 0;
+    // Round-4 fix: after an auxiliary (can, do not, will) is right; after a main verb ("I read sometimes stories") is wrong.
+    const prev = w[i - 1] ?? '';
+    if (!AUX.has(prev) && prev !== 'not' && !PRON.has(prev) && i > 1 && verbish(prev) && !DET.has(w[i - 2] ?? '') && (PRON.has(w[i - 2] ?? '') || w[i - 2] === 'not' || AUX.has(w[i - 2] ?? ''))) return 0;
     return 2;
   }],
-  [/possessive adjective/, ({ w }) => (w.some((x) => ['his', 'her', 'our', 'their', 'my', 'your', 'its'].includes(x)) ? 2 : 0)],
+  [/possessive adjective/, possessives],
   [/^the \+ noun/, ({ w }) => (w.includes('the') ? 2 : 0)],
   [/and \/ but \/ because/, ({ w }) => {
     const CONJ = ['and', 'but', 'because'];
@@ -525,7 +675,9 @@ function vocabScore(c: Ctx): TFScore | null {
     if (DAYS_MONTHS.has(hit)) return new RegExp(`\\b${hit[0].toUpperCase()}${hit.slice(1)}\\b`).test(c.raw) ? 2 : 1;
     return 2;
   }
-  return c.w.some((x) => keys.some((k) => !k.includes(' ') && nearMiss(x, k))) ? 1 : 0;
+  // Round-4 fix: a 3-letter target word misspelt by a doubled letter or a swap (wett, hott, wte) is a slip too.
+  const shortSlip = (x: string, k: string) => k.length === 3 && x !== k && (x === k.replace(/(.)$/, '$1$1') || x === k.replace(/^(.)(.)/, '$1$2$2') || (x.length === 3 && lev(x, k) === 1 && [...x].sort().join('') === [...k].sort().join('')));
+  return c.w.some((x) => keys.some((k) => !k.includes(' ') && (nearMiss(x, k) || shortSlip(x, k)))) ? 1 : 0;
 }
 
 const DONT_KNOW = /^(i (do not|dont) know|idk|no idea|not sure|\?+)$/;
@@ -566,6 +718,8 @@ export function spellingIsTarget(item: TargetFormItem & { objectiveIds?: string[
 
 /** Fix 5. true = the item requires a target form and the answer does not show it; null = cannot tell. */
 export function targetFormMissing(item: TargetFormItem, answer: string): boolean | null {
+  // Round-4 fix: an answer that matches the key after normalisation (theres, I'm reading, target-only correction) shows the form.
+  if (matchKeyV2(item, answer)) return false;
   // Round-3 fix: when the written form is the target, only the key match shows it (no credit for "carot", lowercase "thursday").
   if (spellingIsTarget(item)) return !matchKeyV2(item, answer);
   const forms = (item.targetForms ?? []).map((f) => normaliseV2(f)).filter(Boolean);

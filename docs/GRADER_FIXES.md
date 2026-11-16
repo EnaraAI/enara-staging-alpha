@@ -115,3 +115,46 @@ The 2 `phase0.test.ts > upload links` failures were checked on the unmodified co
 6. **Guard extension.** `spellingIsTarget()`: an exact item whose matchingNote is case- or day/month-sensitive, or a vocabulary item keyed by single words (or keyed by its own single-word target form). For these, `targetFormMissing()` is true unless the key matches, so the meaning check cannot credit `carot`, `fourty`, `grand father`, lowercase month/day names.
 
 Tests: `backend/test/graderV2.test.ts` "round-3 fixes" block (one test per rule, new examples). One earlier expectation changed: `I can to swim.` is now 1 (was 0), following the rubric clarification. Limits: the rules are still heuristics (word lists for verbs, collocations and number words); a run with graderV2 ON on fresh answers is needed before relying on the numbers.
+
+## Round-4 fixes
+
+*DRAFT. After round 4 (deterministic exact 93.3%, free/transfer QWK 0.819). These are general rules, not answer patches. The new tests use new examples. Code changes are in `backend/src/services/graderV2.ts` and run only with graderV2 ON. The OFF path is unchanged (`graderV2Parity.test.ts` passes).*
+
+1. **Apostrophe-less contractions.** `theres`, `thats`, `whats`, `hes`, `shes`, `youre` and `theyre` now normalise like `cant`, `dont`, `isnt` and `Im` already did. `he's` and `she's` are expanded too. `its` counts as `it is` only when every key reads "it is" at that point and no key has possessive `its`. Case- and punctuation-sensitive items are not normalised. The guard (`targetFormMissing`) now returns false whenever the key matches, so the model path no longer blocks these answers.
+2. **Error correction, target only (rubric §2.2).** The target is the part of the key that differs from the prompt's wrong sentence; for a deletion, it is the key words on each side. Nearby key words named in a descriptive `targetForm` are added (e.g. `than`). An answer gets credit when:
+   - every target word is right;
+   - none of the removed wrong words is still there;
+   - the rest differs from the key by at most 2 slips (a misspelt or mis-inflected word, or a small word dropped or added).
+
+   `longer then` stays 0, because `than` is part of the comparative target in the rubric.
+3. **A gap answer that repeats the subject.** An answer that repeats up to 3 words shown before the gap, followed by the key (`She's cooking` for `She ___ (cook)`), is accepted.
+4. **Comparatives.** `more` + a short adjective (one syllable, or two ending in -y) = 0. `more` + an -er form = 0 (double comparative).
+5. **Frequency adverbs.** An adverb right after a main verb (`We eat usually fish`) = 0. After `be`, an auxiliary or `not` is still right.
+6. **some/any.** A yes/no question is now detected from the raw `?` (normalisation had removed it) or from an opening do/does/did/have/has/is/are/was/were. `some` in such a question = 0. Offers and requests (would/could/can/may/shall …) keep `some`.
+7. **Past simple: every verb.** A base verb in a joined clause (`… and play`, `… and I eat`) next to a right past form = 1.
+8. **Over-regularisation.** Rubric rule 4 and tf0 say that `goed` and `buyed` are wrong (0). That stays. Next to a right irregular past, though, it is "right in one place and wrong in another" (tf1) = 1. The task said "→ 1"; the rubric text says 0 when the form stands alone, so 1 applies only in the mixed case.
+9. **Possessives.** his/her is checked against the nearest gendered noun or known first name before it (short lists of common Arabic and English names). A mismatch = 0, or 1 if another his/her is right. A his/her whose owner is a name of unknown gender returns `null`: the rule does not decide, so the caller keeps its path. No owner at all (`Her bag is red.`) = 2.
+10. **Short target words.** A 3-letter target word misspelt by a doubled letter or a swap (`hott`) = 1.
+
+**Data fixes (bank, minimal).**
+- **targetForm faults.** The prompt, `answerKey` and `acceptedAnswers` were already consistent; only `targetForm` was wrong:
+  - `EN-F-A1-VO-food-drink-C-5`: `targetForm` is now `pepper`;
+  - `EN-F-A2-VO-jobs-workplaces-B-5`: now `driver`;
+  - `EN-F-A2-VO-appearance-B-1`: now `thin`.
+- **Transfer scoring.** All 54 transfer items whose `scoring` was `exact` now have `target_form_0_1_2` (rubric §2.4) and a `rubric` string: the grammar 0/1/2 text plus the transfer condition, or the vocabulary variant. This covers forms A, B and C (items 9) of:
+  - article-a-an, article-the, possessive-adjectives;
+  - classroom-objects, common-adjectives, days-months, family, food-drink, home-rooms, numbers-time;
+  - conjunctions, past-questions-did, past-simple-regular, third-person-s;
+  - appearance, clothes-shopping, jobs-workplaces, weather.
+
+  All other item types already matched the rubric: error_correction, gap_fill, multiple_choice, controlled_* and rewrite are exact; free_production is 0/1/2.
+
+**Tests.**
+- `graderV2.test.ts`: new "round-4 fixes" block (11 tests, one per rule plus a bank-data check). One earlier expectation changed: days-months A-9 is now a 0/1/2 item, so `THURSDAY` scores 1 and is no longer "missing".
+- Results: graderV2 + parity + assessment* tests 164/164 pass. The whole backend suite has 2054 tests: 16 failed, the known base failures, listed in the round-4 report. `tsc --noEmit` is clean.
+
+**Limits.**
+- The rules are still word lists and heuristics.
+- The name-gender list is small.
+- Error-correction alignment is token-based.
+- Fresh answers and the real model are needed before relying on any figure.

@@ -265,7 +265,9 @@ describe('round-3 fixes (new examples, not round-3 answers)', () => {
     expect(targetFormMissing(item('A1-VO-numbers-time-A-2'), 'fourtey')).toBe(true);
     expect(targetFormMissing(item('A1-VO-family-B-1'), 'grand pa')).toBe(true);
     expect(targetFormMissing(item('A1-VO-family-B-1'), 'grandpa')).toBe(false);
-    expect(targetFormMissing(item('A1-VO-days-months-A-9'), 'THURSDAY')).toBe(true);
+    // days-months A-9 is a transfer item, now scored 0/1/2 (round-4 data fix): an all-capitals day is 1, not missing
+    expect(targetFormMissing(item('A1-VO-days-months-A-9'), 'THURSDAY')).toBe(false);
+    expect(scoreTargetForm(item('A1-VO-days-months-A-9'), 'THURSDAY')).toBe(1);
     expect(targetFormMissing(item('A1-VO-days-months-C-5'), 'School starts again in september')).toBe(true);
     expect(targetFormMissing(item('A1-GR-capitals-full-stops-A-3'), 'Ahmed lives in cairo.')).toBe(true);
     const q = { id: 'v1', type: 'short-answer', text: 'Write one word: an orange vegetable', correctAnswer: 'carrot', objectiveIds: ['EN-F-A1-VO-food-drink'], explanation: '', points: 1 } as IQuestion;
@@ -274,5 +276,93 @@ describe('round-3 fixes (new examples, not round-3 answers)', () => {
     expect(p.points).toBe(0);
     // a grammar error-correction item keeps the meaning check
     expect(spellingIsTarget(item('A2-GR-third-person-s-A-5'))).toBe(false);
+  });
+});
+
+describe('round-4 fixes (new examples, not round-4 answers)', () => {
+  const gap = (prompt: string, keys: string[], extra: Partial<TargetFormItem> = {}): TargetFormItem => ({ type: 'gap_fill', prompt, answerKey: keys[0], acceptedAnswers: keys, matchingNote: 'Case-insensitive; ignore final punctuation and extra spaces.', scoring: 'exact', ...extra });
+  const free = (targetForm: string, prompt = 'Write one sentence.', acceptedAnswers: string[] = []): TargetFormItem => ({ type: 'free_production', prompt, targetForm, acceptedAnswers, scoring: 'target_form_0_1_2' });
+  it('1. apostrophe-less contractions match; "its" only where unambiguous; the guard follows', () => {
+    const it1 = gap("Complete: ___ a lot of cars on our street.", ["That's", 'That is']);
+    expect(matchKeyV2(it1, 'thats')).toBe(true);
+    expect(matchKeyV2(gap('Complete: ___ my teacher.', ["She's"]), 'shes')).toBe(true);
+    expect(matchKeyV2(gap('Complete: We ___ like fish.', ["don't"]), 'dont')).toBe(true);
+    expect(matchKeyV2(gap('Complete: He ___ at home.', ["isn't"]), 'isnt')).toBe(true);
+    expect(matchKeyV2(gap('Complete: ___ very cold today.', ["It's"]), 'its')).toBe(true);
+    expect(matchKeyV2(gap('Complete: The dog wants ___ food.', ['its']), 'it is')).toBe(false);
+    expect(matchKeyV2({ ...gap('Write the word:', ["they're"]), matchingNote: 'Case- and punctuation-sensitive.' }, 'theyre')).toBe(false);
+    expect(targetFormMissing({ ...it1, id: 'X-VO-x', targetForm: 'that' }, 'thats')).toBe(false);
+  });
+  it('2. error correction: target-only, slips outside the target ignored', () => {
+    const ec = (prompt: string, key: string, targetForm = ''): TargetFormItem => ({ type: 'error_correction', prompt, answerKey: key, acceptedAnswers: [key], targetForm, scoring: 'exact' });
+    const a = ec('Find and correct the mistake. Rewrite the sentence: My sistr works in a hospital.', 'My sister works in a hospital.');
+    expect(matchKeyV2(a, 'My sister work in a hospital.')).toBe(true);
+    expect(matchKeyV2(a, 'My sister works in hospital.')).toBe(true);
+    expect(matchKeyV2(a, 'My sistr works in a hospital.')).toBe(false);
+    expect(matchKeyV2(a, 'My sistar works in a hospital.')).toBe(false);
+    expect(matchKeyV2(a, 'My brother works in a hospital.')).toBe(false);
+    const c = ec('Fix the mistake: My bag is more heavier than yours.', 'My bag is heavier than yours.', 'adjective-er / more + adjective + than');
+    expect(matchKeyV2(c, 'My bag is heavier than your.')).toBe(true);
+    expect(matchKeyV2(c, 'My bag is heavier then yours.')).toBe(false); // than is part of the comparative target
+    expect(matchKeyV2(c, 'My bag is more heavier than yours.')).toBe(false);
+    expect(matchKeyV2(c, 'My bag is heavyer than yours.')).toBe(false);
+  });
+  it('3. a gap answer that repeats the subject shown before the gap', () => {
+    const g = gap('Write the present continuous: She ___ (cook) dinner now.', ['is cooking', "'s cooking"]);
+    expect(matchKeyV2(g, "She's cooking")).toBe(true);
+    expect(matchKeyV2(g, 'she is cooking')).toBe(true);
+    expect(matchKeyV2(g, 'He is cooking')).toBe(false);
+    expect(matchKeyV2(g, 'She cooking')).toBe(false);
+  });
+  it('4. comparatives: more + short adjective = 0, more + -er = 0, more + long adjective = 2', () => {
+    const tf = 'adjective-er / more + adjective + than';
+    expect(scoreTargetForm(free(tf), 'My street is more quiet than yours... no, more old than yours.')).toBe(0);
+    expect(scoreTargetForm(free(tf), 'Summer is more hot than winter.')).toBe(0);
+    expect(scoreTargetForm(free(tf), 'This test is more easy than the last one.')).toBe(0);
+    expect(scoreTargetForm(free(tf), 'My phone is more smaller than yours.')).toBe(0);
+    expect(scoreTargetForm(free(tf), 'This book is more interesting than that one.')).toBe(2);
+    expect(scoreTargetForm(free(tf), 'Summer is hotter than winter.')).toBe(2);
+  });
+  it('5. frequency adverbs: position after a main verb = 0', () => {
+    const tf = 'always/usually/sometimes/never before the main verb';
+    expect(scoreTargetForm(free(tf), 'We eat usually fish on Friday.')).toBe(0);
+    expect(scoreTargetForm(free(tf), 'We usually eat fish on Friday.')).toBe(2);
+    expect(scoreTargetForm(free(tf), 'She is always late.')).toBe(2);
+    expect(scoreTargetForm(free(tf), "I can't always sleep well.")).toBe(2);
+  });
+  it('6. some in a yes/no question = 0; offers/requests keep some', () => {
+    const tf = 'some (positive), any (negative and questions)';
+    expect(scoreTargetForm(free(tf), 'Have you got some stamps?')).toBe(0);
+    expect(scoreTargetForm(free(tf), 'Is there some milk in the fridge?')).toBe(0);
+    expect(scoreTargetForm(free(tf), 'Would you like some juice?')).toBe(2);
+    expect(scoreTargetForm(free(tf), 'Is there any milk?')).toBe(2);
+  });
+  it('7./8. past simple: every verb checked; over-regularised alone 0, next to a right past 1', () => {
+    expect(scoreTargetForm(free('regular verb + -ed'), 'We visited my aunt and play football.')).toBe(1);
+    expect(scoreTargetForm(free('regular verb + -ed'), 'We visited my aunt and played football.')).toBe(2);
+    expect(scoreTargetForm(free('irregular past'), 'I went to the market and I eat a sandwich.')).toBe(1);
+    expect(scoreTargetForm(free('irregular past'), 'I went to the market and I eated a sandwich.')).toBe(1);
+    expect(scoreTargetForm(free('irregular past'), 'Yesterday I eated a sandwich.')).toBe(0);
+    expect(scoreTargetForm(free('irregular past'), 'I went to the market and ate a sandwich.')).toBe(2);
+  });
+  it('9. possessives: his/her checked against the owner; unknown name gender is not decided', () => {
+    const tf = 'possessive adjective agreeing with the owner (his/her/our/their)';
+    expect(scoreTargetForm(free(tf), 'My sister lost his keys.')).toBe(0);
+    expect(scoreTargetForm(free(tf), 'My sister lost her keys.')).toBe(2);
+    expect(scoreTargetForm(free(tf), 'Omar washes her car on Friday.')).toBe(0);
+    expect(scoreTargetForm(free(tf), 'My friend Zorin likes his bike.')).toBeNull();
+    expect(scoreTargetForm(free(tf), 'Her bag is red.')).toBe(2);
+  });
+  it('10. a misspelt 3-letter target word in a free sentence = 1', () => {
+    const v = free('hot', "Write one sentence. Use 'hot'.", ['hot']);
+    expect(scoreTargetForm({ ...v, id: 'X-VO-weather-1' }, 'The soup is hott.')).toBe(1);
+    expect(scoreTargetForm({ ...v, id: 'X-VO-weather-1' }, 'The soup is hot.')).toBe(2);
+    expect(scoreTargetForm({ ...v, id: 'X-VO-weather-1' }, 'The soup is good.')).toBe(0);
+  });
+  it('bank data: targetForm matches the prompt; transfer items use 0/1/2', () => {
+    expect(item('A1-VO-food-drink-C-5').targetForm).toBe('pepper');
+    expect(item('A2-VO-jobs-workplaces-B-5').targetForm).toBe('driver');
+    expect(item('A2-VO-appearance-B-1').targetForm).toBe('thin');
+    for (const it of BANK.values()) if (it.type === 'transfer') expect(it.scoring).toBe('target_form_0_1_2');
   });
 });
