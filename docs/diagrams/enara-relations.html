@@ -1,0 +1,62 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+body{margin:0;background:#f6f7fa;font-family:Inter,Arial,sans-serif}
+.t{font-size:15px;fill:#111c2c;font-weight:600}.s{font-size:12px;fill:#566376}
+.h{font-size:13px;fill:#566376;font-weight:700;letter-spacing:.08em}
+.title{font-size:26px;font-weight:800;fill:#0b203c}.sub{font-size:14px;fill:#566376}
+.e{stroke:#8a96a8;stroke-width:1.6;fill:none;marker-end:url(#a)}.e2{stroke:#6d4aff;stroke-width:1.8;fill:none;marker-end:url(#a2);stroke-dasharray:6 4}
+.l{font-size:11px;fill:#566376;paint-order:stroke;stroke:#f6f7fa;stroke-width:4px;stroke-linejoin:round}
+</style></head><body>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="960" viewBox="0 0 1600 960">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#8a96a8"/></marker>
+<marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#6d4aff"/></marker></defs>
+<text x="40" y="52" class="title">ENARA: how the pieces relate (as of 16 Nov 2026)</text>
+<text x="40" y="78" class="sub">Solid arrows = data relations in the app · dashed violet = new work this session (graderV2, outcomes, photos, emails, parents portal)</text>
+<!-- column headers -->
+<text x="40" y="120" class="h">PEOPLE &amp; ROLES</text><text x="40" y="790" class="h">PARENTS (NEW)</text><text x="430" y="120" class="h">SCHOOL &amp; COURSES</text><text x="830" y="120" class="h">LEARNING</text><text x="1230" y="120" class="h">SERVICES</text>
+<g id="boxes"></g>
+</svg>
+<script>
+const B={ // id:[x,y,w,h,fill,stroke,title,sub]
+ enara:[40,140,320,64,'#0b203c','#0b203c','ENARA admin','runs the platform · all schools'],
+ admin:[40,240,320,64,'#fff','#dce2ea','School admin','enrols students · sets photos · issues parent codes'],
+ mgr:[40,340,320,56,'#fff','#dce2ea','Academic manager','read-mostly school insights'],
+ teacher:[40,430,320,56,'#fff','#dce2ea','Teacher','courses, assignments, grading'],
+ student:[40,540,320,84,'#fff','#2f6bff','Student','in a batch · age band (child/teen/adult) · Kids mode · photo (pending → approved)'],
+ school:[430,140,330,64,'#fff','#dce2ea','Institution (school)','institutionId scopes everything'],
+ batch:[430,240,330,56,'#fff','#dce2ea','Batch / class','students grouped for teaching'],
+ curr:[430,330,330,64,'#fff','#dce2ea','Curriculum (course)','chapters · quizzes · languageSpec'],
+ ci:[430,430,330,56,'#fff','#dce2ea','Course instance','a course taught to a batch'],
+ asg:[430,540,330,64,'#fff','#dce2ea','Assignments & assessments','attempts → grades'],
+ outc:[430,650,330,64,'#f1edff','#6d4aff','Learning outcomes & item bank (new)','33 A1–A2 outcomes · 3 parallel forms · DRAFT'],
+ tutor:[830,140,330,84,'#fff','#2f6bff','AI tutor sessions','TutorSession + tutor_messages (transcripts) · live avatar voice'],
+ prog:[830,270,330,56,'#fff','#dce2ea','Lesson progress & learning events','what was done, when'],
+ mast:[830,370,330,56,'#fff','#dce2ea','Objective mastery','retention / review items'],
+ grader:[830,540,330,84,'#f1edff','#6d4aff','Grader – graderV2 switch (new)','deterministic path validated (controlled 92–96%) · AI meaning check NOT validated'],
+ parent:[40,810,320,84,'#f1edff','#6d4aff','Parent (new)','Parents tab on login · mobile portal at /parents (EN/AR)'],
+ link:[430,810,330,84,'#f1edff','#6d4aff','Parent ↔ learner link (new)','owner / full / view · redeem admin-issued code ENR-XXXX-XX (7 days, single use)'],
+ pview:[830,790,330,124,'#f1edff','#6d4aff','Parent portal views (new)','Home · Progress · Activity · Controls · Account · live data · full access for all ages once linked · learner sees "what your parent can see"'],
+ resend:[1230,140,330,84,'#f1edff','#6d4aff','Email – Resend (new)','8 templates · sendTemplate · logo embedded · links from APP_URL'],
+ r2:[1230,270,330,64,'#fff','#dce2ea','Cloudflare R2 storage','uploads · student photos · email logos'],
+ ai:[1230,370,330,64,'#fff','#dce2ea','AI models & voice','tutor replies · ElevenLabs / avatar'],
+ db:[1230,470,330,56,'#fff','#dce2ea','MongoDB Atlas','all app data'],
+ vercel:[1230,560,330,64,'#fff','#dce2ea','Vercel → test.enara.app','manual CLI deploys (no Git link)'],
+};
+const E=[ // from,to,label,dashed
+ ['enara','school','manages'],['admin','school','belongs to'],
+ ['mgr','school','reads'],['teacher','ci','teaches'],['batch','ci','takes'],['curr','ci','used by'],['ci','asg','sets'],
+ ['student','tutor','learns with'],['student','asg','attempts'],['tutor','prog','writes'],['prog','mast','updates'],
+ ['outc','asg','defines forms',1],['grader','asg','scores',1],['parent','link','redeems code',1],['link','student','links to',1],
+ ['link','pview','grants access',1],['tutor','ai','uses'],['resend','r2','logo hosted',1],
+];
+const g=document.getElementById('boxes');const ns='http://www.w3.org/2000/svg';
+const mk=(t,a)=>{const e=document.createElementNS(ns,t);for(const k in a)e.setAttribute(k,a[k]);return e};
+function wrap(txt,max){const w=txt.split(' ');const out=[];let cur='';for(const x of w){if((cur+' '+x).trim().length>max){out.push(cur);cur=x}else cur=(cur+' '+x).trim()}if(cur)out.push(cur);return out}
+const C=id=>{const[x,y,w,h]=B[id];return{x,y,w,h,cx:x+w/2,cy:y+h/2}};
+function edgePt(a,b){const A=C(a),Bb=C(b);const dx=Bb.cx-A.cx,dy=Bb.cy-A.cy;const sx=A.w/2/Math.abs(dx||1e-9),sy=A.h/2/Math.abs(dy||1e-9);const s=Math.min(sx,sy);return[A.cx+dx*s,A.cy+dy*s]}
+for(const[f,t,l,d]of E){const[x1,y1]=edgePt(f,t),[x2,y2]=edgePt(t,f);g.appendChild(mk('line',{x1,y1,x2,y2,class:d?'e2':'e'}));const tx=mk('text',{x:(x1+x2)/2+4,y:(y1+y2)/2-4,class:'l'});tx.textContent=l;g.appendChild(tx)}
+for(const id in B){const[x,y,w,h,fill,st,ti,su]=B[id];g.appendChild(mk('rect',{x,y,width:w,height:h,rx:10,fill,stroke:st,'stroke-width':1.6}));
+ const dark=fill==='#0b203c';const t=mk('text',{x:x+14,y:y+24,class:'t'});t.textContent=ti;if(dark)t.style.fill='#fff';g.appendChild(t);
+ wrap(su,46).forEach((ln,i)=>{const s=mk('text',{x:x+14,y:y+43+i*16,class:'s'});s.textContent=ln;if(dark)s.style.fill='#c9d3e3';g.appendChild(s)})}
+const n=mk('text',{x:1230,y:700,class:'s'});n.textContent='Portal reads live: transcripts, progress,';g.appendChild(n);
+for(const [i,tx] of ['mastery and assessments.','Emails to parents: password reset,','invitations, weekly progress.'].entries()){const m=mk('text',{x:1230,y:718+i*18,class:'s'});m.textContent=tx;g.appendChild(m)}
+</script></body></html>
