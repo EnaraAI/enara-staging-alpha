@@ -1,4 +1,5 @@
-import { calculateJwkThumbprint, exportJWK, exportPKCS8, generateKeyPair, importPKCS8, type JWK } from 'jose';
+import type { JWK } from 'jose';
+import { loadJose, type Jose } from './jose';
 import { LmsToolKey } from '../models';
 import { decryptSecret, encryptSecret } from './crypto';
 
@@ -9,6 +10,7 @@ const ALG = 'RS256';
 const aadFor = (kid: string) => `lms_tool_keys:${kid}`;
 
 async function newKeyRow(status: 'active' | 'next') {
+  const { generateKeyPair, exportJWK, calculateJwkThumbprint, exportPKCS8 } = await loadJose();
   const { publicKey, privateKey } = await generateKeyPair(ALG, { modulusLength: 2048, extractable: true });
   const jwk = await exportJWK(publicKey);
   const kid = await calculateJwkThumbprint(jwk, 'sha256');
@@ -61,13 +63,14 @@ export async function getPublicJwks(): Promise<{ keys: JWK[] }> {
 }
 
 /** The active private key, for signing (Phase 1 onwards). */
-export type LmsSigningKey = Awaited<ReturnType<typeof importPKCS8>>;
+export type LmsSigningKey = Awaited<ReturnType<Jose['importPKCS8']>>;
 
 export async function getSigningKey(): Promise<{ kid: string; key: LmsSigningKey }> {
   await ensureActiveKey();
   const row = await LmsToolKey.findOne({ status: 'active' }).select('+privateKeyEnc').lean();
   if (!row) throw new Error('No active LMS signing key');
   const pem = decryptSecret(row.privateKeyEnc, aadFor(row.kid));
+  const { importPKCS8 } = await loadJose();
   return { kid: row.kid, key: await importPKCS8(pem, ALG) };
 }
 
