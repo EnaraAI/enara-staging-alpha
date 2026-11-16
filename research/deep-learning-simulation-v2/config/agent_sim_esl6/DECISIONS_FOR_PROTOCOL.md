@@ -7,3 +7,4 @@
 4. **Model path status:** NOT VALIDATED (A1–A2 round 5). It is not used anywhere in ESL6.
 
 Recorded by Claude from the user's instructions; they become binding only once copied into PROTOCOL.md and committed before session 1.
+5. **Outcome scope:** 30 outcomes. The 3 A1–A2 form outcomes with no l1ErrorTypes (possessive-adjectives, common-adjectives, make-do) are excluded: they have no wrong belief to simulate. User decision: "Leave them out, go with 30". The protocol must state this as a scope limit, not as a post-hoc exclusion.
