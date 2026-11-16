@@ -239,6 +239,17 @@ export const createStudent = (data: {
 export const updateStudent = (id: string, data: any) => request('PATCH', `/api/students/${encodeURIComponent(id)}`, data);
 export const deleteStudent = (id: string) => request('DELETE', `/api/students/${encodeURIComponent(id)}`);
 
+// STUDENT PHOTOS — admins set a photo at once; a student's own upload waits for a school admin.
+export interface PendingPhoto { id: string; name: string; avatar: string; photoUrl: string | null; pendingPhotoUrl: string | null; pendingPhotoAt: string | null }
+const photoForm = (file: File) => { const form = new FormData(); form.append('photo', file); return form; };
+export const setStudentPhoto = (id: string, file: File) =>
+  request<PendingPhoto>('PUT', `/api/students/${encodeURIComponent(id)}/photo`, photoForm(file), true);
+export const fetchPendingPhotos = () => request<PendingPhoto[]>('GET', '/api/students/photos/pending');
+export const approveStudentPhoto = (id: string) => request<PendingPhoto>('POST', `/api/students/${encodeURIComponent(id)}/photo/approve`);
+export const rejectStudentPhoto = (id: string) => request<PendingPhoto>('POST', `/api/students/${encodeURIComponent(id)}/photo/reject`);
+export const uploadMyPhoto = (file: File) =>
+  request<{ photoUrl: string | null; photoPending: boolean }>('POST', '/api/me/photo', photoForm(file), true);
+
 // CURRICULUMS (admin)
 export const fetchCurriculums = () => request<any[]>('GET', '/api/curriculums');
 export const getCurriculum = (id: string) => request('GET', `/api/curriculums/${encodeURIComponent(id)}`);

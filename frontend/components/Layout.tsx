@@ -39,6 +39,7 @@ import {
 } from 'lucide-react';
 import { getSessionUser } from '../services/apiService';
 import { staffPageAllowed } from '../services/roleRouting';
+import { PhotoPicker, StudentAvatar, useMyPhoto } from './StudentPhoto';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -82,6 +83,7 @@ export const Header: React.FC<{
   };
 
   const isEnaraAdmin = role === 'enara-admin';
+  const myPhoto = useMyPhoto(role === 'student');
 
   return (
     <header className="sticky top-0 z-50 glass-panel border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
@@ -155,13 +157,23 @@ export const Header: React.FC<{
               <span className="text-xs sm:text-sm font-semibold text-slate-800">{userName}</span>
               <span className="text-[10px] sm:text-xs text-slate-500 capitalize">{({ teacher: 'teacher', academic_manager: 'academic manager' } as Record<string, string>)[getSessionUser()?.role ?? ''] ?? role}</span>
             </div>
-            <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${isEnaraAdmin ? 'bg-slate-900' : 'bg-teal-600'} flex items-center justify-center text-white text-[10px] sm:text-xs font-bold`}>
-              {userName.split(' ').map(n => n[0]).join('')}
-            </div>
+            <StudentAvatar
+              photoUrl={role === 'student' ? myPhoto.photoUrl : null}
+              initials={userName.split(' ').map(n => n[0]).join('')}
+              name={userName}
+              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${isEnaraAdmin ? 'bg-slate-900' : 'bg-teal-600'} text-white text-[10px] sm:text-xs font-bold`}
+            />
           </button>
           
           {showMenu && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 overflow-hidden z-50">
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-1 overflow-hidden z-50">
+              {role === 'student' && (
+                <div className="px-4 py-2.5 border-b border-gray-50">
+                  <PhotoPicker label="Change photo" onFile={myPhoto.upload}
+                    className="w-full text-left text-sm text-slate-700 hover:text-teal-700 flex items-center gap-2 disabled:opacity-50" />
+                  {myPhoto.pending && <p className="mt-1 text-xs text-amber-700">New photo waiting for approval</p>}
+                </div>
+              )}
               <button className="w-full px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
                 <Settings size={16} /> Settings
               </button>

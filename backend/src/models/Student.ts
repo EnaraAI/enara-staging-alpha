@@ -70,6 +70,13 @@ export interface IStudent extends Document {
   origin?: 'live' | 'demo_seed';
   // 'kids' shows this student the Enara Kids interface (set per student by school staff).
   uiMode?: StudentUiMode;
+  // Profile photo (approved) and a student's own upload awaiting a school admin.
+  // Urls are plain /uploads/<key> paths, signed per response (uploadSigning).
+  photoUrl?: string;
+  photoKey?: string;
+  pendingPhotoUrl?: string;
+  pendingPhotoKey?: string;
+  pendingPhotoAt?: Date;
 }
 
 const studentSchema = new Schema<IStudent>(
@@ -80,6 +87,11 @@ const studentSchema = new Schema<IStudent>(
     grade: { type: String, default: '' },
     uiMode: { type: String, enum: STUDENT_UI_MODES, default: 'standard' },
     avatar: { type: String, default: '' },
+    photoUrl: { type: String },
+    photoKey: { type: String },
+    pendingPhotoUrl: { type: String },
+    pendingPhotoKey: { type: String },
+    pendingPhotoAt: { type: Date, index: true },
     institutionId: { type: String, index: true },
     batchId: { type: String, index: true },
     academicYear: { type: String },

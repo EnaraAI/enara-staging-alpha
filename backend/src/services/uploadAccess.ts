@@ -2,7 +2,8 @@ import path from 'path';
 import { randomUUID } from 'crypto';
 import { CurriculumFileJob } from '../models/CurriculumChunk';
 import { Curriculum } from '../models/Curriculum';
-import { isVideoFileName } from '../utils/uploadSecurity';
+import { isImageFileName, isVideoFileName } from '../utils/uploadSecurity';
+import { Student } from '../models/Student';
 
 // Who owns an uploaded file, and may its original be downloaded? (P22,
 // owner decisions of 2026-11-01: malware scanning is deferred; nobody, staff
@@ -66,6 +67,15 @@ export async function resolveUploads(paths: string[]): Promise<Map<string, Uploa
     // The same stored path is never reused; if it were, the strictest record wins.
     if (!prev || !eligibilityOf(j, j.fileUrl).downloadable) jobByUrl.set(j.fileUrl, j);
   }
+  // Student profile photos (approved or awaiting approval) are images checked on
+  // upload, served like lesson media.
+  const imagePaths = plain.filter((p) => !jobByUrl.has(p) && isImageFileName(p));
+  const photos = new Set<string>();
+  if (imagePaths.length) {
+    const rows = await Student.find({ $or: [{ photoUrl: { $in: imagePaths } }, { pendingPhotoUrl: { $in: imagePaths } }] })
+      .select('photoUrl pendingPhotoUrl').lean();
+    for (const r of rows) for (const u of [r.photoUrl, r.pendingPhotoUrl]) if (u && imagePaths.includes(u)) photos.add(u);
+  }
   const needOwner = plain.filter((p) => !ownerFromName(p) && !jobByUrl.has(p));
   const listed = new Map<string, Set<string>>();
   if (needOwner.length) {
@@ -81,7 +91,8 @@ export async function resolveUploads(paths: string[]): Promise<Map<string, Uploa
     const prefixed = ownerFromName(p);
     const fromList = listed.get(p);
     const owner = prefixed ?? (job ? schoolSlug(job.institutionId) : fromList && fromList.size === 1 ? [...fromList][0] : null);
-    out.set(p, { owner, eligibility: eligibilityOf(job, p) });
+    const eligibility: DownloadEligibility = !job && photos.has(p) ? { downloadable: true, reason: 'media' } : eligibilityOf(job, p);
+    out.set(p, { owner, eligibility });
   }
   return out;
 }

@@ -11,12 +11,13 @@ import {
   getStudentOrThrow,
 } from '../services/studentCourseService';
 import { Curriculum } from '../models/Curriculum';
+import { ownStudentView } from './studentPhoto.controller';
 
 export const getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
   const studentId = req.user!.studentId!;
   const student = await getStudentOrThrow(studentId);
   res.json({
-    ...toPlainObject(student),
+    ...ownStudentView(toPlainObject(student)),
     user: {
       email: req.user!.email,
       role: req.user!.role,

@@ -19,6 +19,7 @@ import {
   updateStudent,
 } from '../services/apiService';
 import { toast } from '../services/toastService';
+import { PendingPhotoQueue, StudentAvatar } from '../components/StudentPhoto';
 
 interface StudentManagementProps {
   students: Student[];
@@ -466,6 +467,8 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
         </div>
       </div>
 
+      <PendingPhotoQueue onDecided={row => setStudents(prev => prev.map(st => (st.id === row.id ? { ...st, photoUrl: row.photoUrl, pendingPhotoUrl: null } : st)))} />
+
       {isLoadingStudents && students.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 p-6 flex items-center justify-center gap-3 text-slate-500 text-sm font-semibold">
           <div className="w-5 h-5 border-2 border-teal-600/30 border-t-teal-600 rounded-full animate-spin" />
@@ -487,9 +490,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
               
               <div className="flex flex-col items-center text-center">
                 <div className="relative mb-4">
-                  <div className="w-20 h-20 rounded-xl bg-teal-600 flex items-center justify-center text-2xl font-bold text-white">
-                    {s.avatar}
-                  </div>
+                  <StudentAvatar photoUrl={s.photoUrl} initials={s.avatar} name={s.name} className="w-20 h-20 rounded-xl bg-teal-600 text-2xl font-bold text-white" />
                   <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg border-4 border-white flex items-center justify-center ${
                     s.status === 'excelling' ? 'bg-emerald-500' : s.status === 'on track' ? 'bg-blue-500' : 'bg-red-500'
                   }`}>
@@ -581,9 +582,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
                   <tr key={s.id || i} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-sm font-bold text-white">
-                          {s.avatar}
-                        </div>
+                        <StudentAvatar photoUrl={s.photoUrl} initials={s.avatar} name={s.name} className="w-10 h-10 rounded-xl bg-teal-600 text-sm font-bold text-white" />
                         <div>
                           <p className="text-sm font-bold text-slate-900">{s.name}</p>
                           <p className="text-xs text-slate-500">{s.email}</p>

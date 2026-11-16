@@ -45,6 +45,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Student, ExamResult } from '../types';
 import { getStudent, fetchStudentAnalytics, StudentAnalytics, RiskFlag } from '../services/apiService';
 import { toast } from '../services/toastService';
+import { adminSetPhoto, PhotoPicker, StudentAvatar } from '../components/StudentPhoto';
+import { approveStudentPhoto, rejectStudentPhoto } from '../services/apiService';
 
 interface StudentProfileProps {
   student: Student;
@@ -223,8 +225,33 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ student: initial
             animate={{ opacity: 1, y: 0 }}
             className="lg:col-span-2 bg-white rounded-xl p-6 border border-slate-200 flex flex-col md:flex-row gap-8 items-center md:items-start"
           >
-            <div className="w-20 h-20 rounded-full bg-teal-600 flex items-center justify-center text-white text-2xl font-bold  shrink-0">
-              {student.avatar}
+            <div className="flex flex-col items-center gap-2 shrink-0">
+              <StudentAvatar photoUrl={student.photoUrl} initials={student.avatar} name={student.name} className="w-20 h-20 rounded-full bg-teal-600 text-white text-2xl font-bold" />
+              <PhotoPicker label={student.photoUrl ? 'Replace photo' : 'Add photo'} onFile={async file => {
+                const res = await adminSetPhoto(student.id, file);
+                if (res) setStudent(prev => ({ ...prev, photoUrl: res.photoUrl }));
+              }} />
+              {student.pendingPhotoUrl && (
+                <div className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-amber-200 bg-amber-50">
+                  <span className="text-xs text-amber-800 font-semibold">New photo waiting for approval</span>
+                  <StudentAvatar photoUrl={student.pendingPhotoUrl} initials={student.avatar} name={`${student.name} (new)`} className="w-14 h-14 rounded-full bg-slate-200 text-slate-600 text-lg font-bold" />
+                  <div className="flex gap-1.5">
+                    {([['Approve', approveStudentPhoto], ['Reject', rejectStudentPhoto]] as const).map(([label, act]) => (
+                      <button key={label} type="button" onClick={async () => {
+                        try {
+                          const res = await act(student.id);
+                          setStudent(prev => ({ ...prev, photoUrl: res.photoUrl, pendingPhotoUrl: null }));
+                          toast.success(label === 'Approve' ? 'Photo approved' : 'Photo rejected', student.name);
+                        } catch (e) {
+                          toast.error('Could not update the photo', e instanceof Error ? e.message : 'Unexpected error');
+                        }
+                      }} className={label === 'Approve' ? 'px-2.5 py-1 rounded-md bg-teal-600 text-white text-xs font-semibold hover:bg-teal-700' : 'px-2.5 py-1 rounded-md border border-slate-300 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50'}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex-1 text-center md:text-left space-y-4">
               <div>

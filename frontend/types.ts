@@ -20,6 +20,13 @@ export interface Student {
   // 'kids' shows this student the Enara Kids interface.
   uiMode?: 'standard' | 'kids';
   avatar: string;
+  // Approved profile photo (signed /uploads link); falls back to initials.
+  photoUrl?: string | null;
+  // A student's own upload awaiting a school admin (admin views only).
+  pendingPhotoUrl?: string | null;
+  pendingPhotoAt?: string | null;
+  // Own profile only: a new photo is waiting for approval.
+  photoPending?: boolean;
   progress: number;
   avgScore: number;
   studyTime: string;
