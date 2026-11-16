@@ -276,6 +276,60 @@ export const setChapterQuiz = asyncHandler(async (req: AuthRequest, res: Respons
   res.json(toCurriculumResponse(curriculum));
 });
 
+// POST /api/curriculums/:id/chapters/:chapterId/quiz/generate { count?: 3-10 }
+// An AI draft of the lesson's practice quiz, written for young learners from the
+// chapter's title, description and the passages of its approved documents. Not
+// saved: the teacher reviews it and saves it with PUT …/quiz. Needs the school's
+// AI assessment drafts (ai_assessment_authoring_enabled); uses its AI credits.
+export const generateChapterQuiz = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const body = ensurePlainObject(req.body ?? {});
+  rejectMongoOperators(body);
+  const rawCount = body.count === undefined ? 5 : body.count;
+  if (typeof rawCount !== 'number' || !Number.isInteger(rawCount) || rawCount < 3 || rawCount > MAX_QUIZ_QUESTIONS) {
+    throw new AppError(`count must be a whole number from 3 to ${MAX_QUIZ_QUESTIONS}`, 400, 'VALIDATION_ERROR');
+  }
+  const curriculum = await Curriculum.findOne(await curriculumScope(req, { id: req.params.id }, 'write'));
+  if (!curriculum) throw new AppError('Curriculum not found', 404);
+  const chapter = curriculum.chapters.find((ch) => ch.id === req.params.chapterId);
+  if (!chapter) throw new AppError('Chapter not found', 404);
+  if (!(chapter.description || '').trim() && !(chapter.uploads || []).length) {
+    throw new AppError('Add a chapter description or upload the lesson documents first, so the quiz has something to come from', 400, 'CHAPTER_EMPTY');
+  }
+  const { isFeatureEnabled } = await import('../services/featureFlags');
+  if (!(await isFeatureEnabled(curriculum.institutionId, 'ai_assessment_authoring_enabled'))) {
+    throw new AppError('AI drafts are not enabled for your school', 404, 'FEATURE_DISABLED');
+  }
+  const { generateAssessmentDraft } = await import('../services/educatorAi');
+  const draft = await generateAssessmentDraft({
+    institutionId: curriculum.institutionId,
+    curriculumId: curriculum.id,
+    courseName: curriculum.courseName,
+    lessonId: chapter.id,
+    objectiveIds: [],
+    brief: [
+      `A short practice quiz for young learners (ages 5 to 12) at the end of the lesson "${chapter.title}".`,
+      'Ask only about this lesson. Use simple words and short sentences. Each question has one clearly right answer.',
+      'Give a one-sentence, friendly explanation of the right answer.',
+      chapter.description ? `Lesson description: ${chapter.description}` : '',
+    ].filter(Boolean).join(' '),
+    language: 'en',
+    difficulty: 'Easy',
+    counts: { 'multiple-choice': rawCount, 'true-false': 0, 'short-answer': 0, 'open-response': 0 },
+    allowOpen: false,
+  });
+  // The generator names the right option by its text; the quiz stores its index.
+  const questions = (draft.questions as Array<{ type: string; text: string; options?: string[]; correctAnswer?: string; explanation?: string }>)
+    .map((q) => {
+      const options = q.type === 'true-false' ? ['True', 'False'] : (q.options || []).map((o) => o.slice(0, 200));
+      const correctAnswer = options.findIndex((o) => o === String(q.correctAnswer).slice(0, 200));
+      return { text: q.text.slice(0, 500), options, correctAnswer, explanation: (q.explanation || '').slice(0, 500) };
+    })
+    .filter((q) => q.options.length >= 2 && q.options.length <= 6 && q.correctAnswer >= 0)
+    .slice(0, MAX_QUIZ_QUESTIONS);
+  if (!questions.length) throw new AppError('The AI draft had no usable questions. Please try again.', 502, 'DRAFT_EMPTY');
+  res.json({ questions, sources: draft.sources });
+});
+
 export const deployCurriculum = asyncHandler(async (req: AuthRequest, res: Response) => {
   const curriculum = await Curriculum.findOne(scopedFilter(req, { id: req.params.id }));
   if (!curriculum) throw new AppError('Curriculum not found', 404);

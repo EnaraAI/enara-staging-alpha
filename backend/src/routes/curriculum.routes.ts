@@ -18,6 +18,7 @@ import {
   getBatchesForAssignment,
   publishCurriculumToClass,
   setChapterQuiz,
+  generateChapterQuiz,
 } from '../controllers/curriculum.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { requirePermission } from '../auth/permissions';
@@ -59,5 +60,6 @@ router.post('/:id/chapters/:chapterId/file-uploads/complete', completeChapterFil
 router.post('/:id/chapters/:chapterId/video-uploads', requestChapterVideoUpload);
 router.post('/:id/chapters/:chapterId/video-uploads/complete', completeChapterVideoUpload);
 router.put('/:id/chapters/:chapterId/quiz', setChapterQuiz);
+router.post('/:id/chapters/:chapterId/quiz/generate', generateChapterQuiz);
 
 export default router;

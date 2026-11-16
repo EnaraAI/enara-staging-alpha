@@ -117,11 +117,21 @@ export interface ExamResult {
   manualTotalScore?: number;
 }
 
+// The practice quiz at the end of a lesson; correctAnswer is an index into options.
+export interface ChapterQuizQuestion {
+  id?: string;
+  text: string;
+  options: string[];
+  correctAnswer: number;
+  explanation?: string;
+}
+
 export interface Chapter {
   id: string;
   title: string;
   uploads: string[]; // URLs or file names
   description?: string;
+  quiz?: { questions: ChapterQuizQuestion[] };
 }
 
 export interface Curriculum {
