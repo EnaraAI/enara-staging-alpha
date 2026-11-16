@@ -250,6 +250,9 @@ export function uploadChapterFile(curriculumId: string, chapterId: string, file:
 export type ChapterQuizQuestion = { id?: string; text: string; options: string[]; correctAnswer: number; explanation?: string };
 export const setChapterQuiz = (curriculumId: string, chapterId: string, questions: ChapterQuizQuestion[]) =>
   request('PUT', `/api/curriculums/${encodeURIComponent(curriculumId)}/chapters/${encodeURIComponent(chapterId)}/quiz`, { questions });
+// An AI draft of the quiz from the saved chapter (description and documents); not saved until setChapterQuiz.
+export const generateChapterQuiz = (curriculumId: string, chapterId: string, count = 5) =>
+  request<{ questions: ChapterQuizQuestion[] }>('POST', `/api/curriculums/${encodeURIComponent(curriculumId)}/chapters/${encodeURIComponent(chapterId)}/quiz/generate`, { count });
 
 export async function uploadChapterVideo(
   curriculumId: string,

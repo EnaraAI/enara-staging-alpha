@@ -28,6 +28,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { Curriculum, Batch, Chapter, CourseInstance, Student } from '../types';
+import { ChapterQuizEditor, normalizeQuiz, quizFingerprint, quizProblems } from '../components/ChapterQuizEditor';
 import {
   fetchCurriculums,
   createCurriculum,
@@ -38,6 +39,8 @@ import {
   unassignBatchFromCurriculum,
   uploadChapterFile,
   uploadChapterVideo,
+  setChapterQuiz,
+  generateChapterQuiz,
   fetchBatches,
   createBatch,
   updateBatch,
@@ -201,6 +204,24 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
   // Files picked in the form; uploaded once the curriculum exists on the backend.
   const [pendingFiles, setPendingFiles] = useState<Record<string, File[]>>({});
   const [expandedChapters, setExpandedChapters] = useState<string[]>([]);
+  // Each chapter's quiz as last saved, to save only the quizzes that changed.
+  const savedQuizzes = React.useRef<Record<string, string>>({});
+  const rememberQuizzes = (list: Chapter[]) => {
+    savedQuizzes.current = Object.fromEntries(list.map(ch => [ch.id, quizFingerprint(ch.quiz?.questions)]));
+  };
+
+  // Saves the quizzes edited in the form (snapshot taken before saving) that differ from the saved ones.
+  const saveChangedQuizzes = async (curriculum: Curriculum, edited: Chapter[]): Promise<Curriculum> => {
+    let latest = curriculum;
+    for (const ch of edited) {
+      if (!latest.chapters.some(c => c.id === ch.id)) continue;
+      if (quizFingerprint(ch.quiz?.questions) === (savedQuizzes.current[ch.id] ?? quizFingerprint(undefined))) continue;
+      latest = (await setChapterQuiz(latest.id, ch.id, normalizeQuiz(ch.quiz?.questions))) as Curriculum;
+    }
+    rememberQuizzes(latest.chapters);
+    setChapters(latest.chapters.map(c => ({ ...c, uploads: c.uploads || [] })));
+    return latest;
+  };
 
   const filteredCurriculums = useMemo(() => {
     return curriculums.filter(c => {
@@ -300,6 +321,14 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
   };
 
   const handleCreateCurriculum = async (status: 'draft' | 'deployed') => {
+    // Check every lesson quiz first, so nothing is half saved.
+    const edited = chapters;
+    const quizIssue = edited.map(ch => ({ ch, problems: quizProblems(ch.quiz?.questions || []) })).find(x => x.problems.length);
+    if (quizIssue) {
+      toast.error('Check the lesson quiz', `${quizIssue.ch.title || 'A chapter'}: ${quizIssue.problems[0]}`);
+      setExpandedChapters(prev => (prev.includes(quizIssue.ch.id) ? prev : [...prev, quizIssue.ch.id]));
+      return;
+    }
     setIsSaving(true);
     const payload = {
       name: curriculumForm.name,
@@ -322,6 +351,7 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
       if (editingCurriculum) {
         saved = (await updateCurriculum(editingCurriculum.id, payload)) as Curriculum;
         saved = await uploadPendingFiles(saved);
+        saved = await saveChangedQuizzes(saved, edited);
         if (status === 'deployed' && saved.status !== 'deployed') {
           saved = (await deployCurriculum(saved.id)) as Curriculum;
         }
@@ -334,6 +364,7 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
         setCurriculums(prev => [saved, ...prev]);
         setEditingCurriculum(saved);
         saved = await uploadPendingFiles(saved);
+        saved = await saveChangedQuizzes(saved, edited);
         if (status === 'deployed') {
           saved = (await deployCurriculum(saved.id)) as Curriculum;
         }
@@ -360,6 +391,7 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
       description: ''
     });
     setChapters([]);
+    savedQuizzes.current = {};
     setPendingFiles({});
     setExpandedChapters([]);
     setEditingCurriculum(null);
@@ -377,6 +409,7 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
       description: curr.description || ''
     });
     setChapters((curr.chapters || []).map(ch => ({ ...ch, uploads: ch.uploads || [] })));
+    rememberQuizzes(curr.chapters || []);
     setPendingFiles({});
     setExpandedChapters([]);
     setShowUploadModal(true);
@@ -1625,6 +1658,24 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
                                   />
                                 </label>
                               </div>
+                            </div>
+
+                            <div className="pt-3 border-t border-slate-100">
+                              <ChapterQuizEditor
+                                questions={chapter.quiz?.questions || []}
+                                onChange={(questions) => updateChapter(chapter.id, { quiz: questions.length ? { questions } : undefined })}
+                                onGenerate={editingCurriculum?.chapters?.some(c => c.id === chapter.id) ? async () => {
+                                  try {
+                                    const draft = await generateChapterQuiz(editingCurriculum.id, chapter.id, 5);
+                                    toast.success('Quiz drafted', 'Check the questions and right answers, then save.');
+                                    return draft.questions;
+                                  } catch (err) {
+                                    toast.error('Could not draft a quiz', errorMessage(err));
+                                    return chapter.quiz?.questions || [];
+                                  }
+                                } : undefined}
+                                generateHint={editingCurriculum?.chapters?.some(c => c.id === chapter.id) ? undefined : 'Save the curriculum once, then AI can draft a quiz from this chapter.'}
+                              />
                             </div>
                           </div>
                         )}
