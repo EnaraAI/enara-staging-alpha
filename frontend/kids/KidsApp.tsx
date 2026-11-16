@@ -268,7 +268,7 @@ function Course({ ctx, courseId, lessonId }: { ctx: Ctx; courseId: string; lesso
   const video = view.videoUrl
     ? (/youtube\.com|youtu\.be|vimeo\.com|player\./.test(view.videoUrl)
       ? <iframe src={view.videoUrl} title={view.lesson.title} allow="accelerometer; autoplay; encrypted-media; picture-in-picture" allowFullScreen />
-      : <video src={view.videoUrl} controls />)
+      : <video src={view.videoUrl} controls playsInline preload="metadata" />)
     : null;
   const next = view.next;
   return (

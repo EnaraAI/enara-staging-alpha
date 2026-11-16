@@ -1,11 +1,22 @@
 import { Schema, model, Document } from 'mongoose';
 
+// A short practice quiz at the end of a lesson (the knowledge check). Students
+// see the answers after checking, so it is practice only, never graded.
+export interface IChapterQuizQuestion {
+  id: string;
+  text: string;
+  options: string[];
+  correctAnswer: number; // index into options
+  explanation?: string;
+}
+
 export interface IChapter {
   id: string;
   title: string;
   uploads: string[];
   description?: string;
   enaraSectionId?: string;
+  quiz?: { questions: IChapterQuizQuestion[] };
 }
 
 export interface ICurriculum extends Document {
@@ -31,6 +42,17 @@ export interface ICurriculum extends Document {
   origin?: 'live' | 'demo_seed';
 }
 
+const quizQuestionSchema = new Schema<IChapterQuizQuestion>(
+  {
+    id: { type: String, required: true },
+    text: { type: String, required: true },
+    options: { type: [String], default: [] },
+    correctAnswer: { type: Number, required: true },
+    explanation: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
 const chapterSchema = new Schema<IChapter>(
   {
     id: { type: String, required: true },
@@ -38,6 +60,7 @@ const chapterSchema = new Schema<IChapter>(
     uploads: { type: [String], default: [] },
     description: { type: String, default: '' },
     enaraSectionId: { type: String },
+    quiz: { type: new Schema({ questions: { type: [quizQuestionSchema], default: [] } }, { _id: false }), default: undefined },
   },
   { _id: false }
 );

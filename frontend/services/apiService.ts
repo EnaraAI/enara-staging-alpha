@@ -245,6 +245,12 @@ export function uploadChapterFile(curriculumId: string, chapterId: string, file:
 
 // Lesson videos: compressed in the browser, then PUT straight to R2 with a signed
 // URL (they're too large to pass through the API), then attached to the chapter.
+// A lesson's practice quiz (the knowledge check students see after the lesson).
+// correctAnswer is the index of the right option; an empty list removes the quiz.
+export type ChapterQuizQuestion = { id?: string; text: string; options: string[]; correctAnswer: number; explanation?: string };
+export const setChapterQuiz = (curriculumId: string, chapterId: string, questions: ChapterQuizQuestion[]) =>
+  request('PUT', `/api/curriculums/${encodeURIComponent(curriculumId)}/chapters/${encodeURIComponent(chapterId)}/quiz`, { questions });
+
 export async function uploadChapterVideo(
   curriculumId: string,
   chapterId: string,
