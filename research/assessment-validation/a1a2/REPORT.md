@@ -51,3 +51,19 @@
 ## 5. Files
 
 `answers.json`, `answers_design.json`, `build_answers.py`, `scorer1.json`, `scorer2.json`, `scorer3.json`, `reference.json`, `standin_short.json`, `standin_rubric_run1.json`, `standin_rubric_run2.json`, `build_standin.py`, `harness.ts`, `results.json`.
+
+## Round 2 (counted) — independent blind reference, blind grader run
+
+DRAFT. Supersedes the round-1 numbers above, whose reference scores came from one agent scoring three times.
+
+- **Reference:** 3 separate agent scorers, each reading only the rubric and the 100 answers, blind to each other and to earlier scores. All 3 agreed on 84 of 100; every other case had a 2-of-3 majority (no 3-way ties). `round2/REFERENCE.json`.
+- **Grader run:** a 4th agent, blind to the reference. Deterministic = real grader code offline (`gradeAnswer` for exact items; `evaluateAgainstKey` for target-form items, right→2 / wrong→0). Stand-in = an agent applying the grader's own eval-v2 short-answer and rubric prompts, outputs passed the real validators; **AGENT STAND-IN — not the production grader**, one run per answer.
+
+| Path | Exact items (53): agreement | Target ≥95% | Free/transfer (47): QWK | Target ≥0.80 |
+|---|---|---|---|---|
+| Deterministic (production code, offline) | 60.4% | fail | 0.193 | fail |
+| Agent stand-in for the model path | 92.5% | fail | 0.986 | pass |
+
+**Verdict:** the existing grader is **not validated** for these outcome assessments. The deterministic path fails both targets; the model path (as approximated by the stand-in) passes the free/transfer target but misses the 95% controlled target. The model path could not be run for real (no API), so its numbers are an estimate only.
+
+**Needed fixes (recommendations; grader unchanged):** see §3 above — normalised matching (case, final punctuation, contractions, curly apostrophes), multiple accepted answers in the assignment grader, option letter = option text for choice items, a target-form-only scorer (0/1/2) for free sentences, and a guard so the meaning check cannot credit answers that avoid the target form. Re-run this validation (round 3) after those fixes, and with the real model path.
