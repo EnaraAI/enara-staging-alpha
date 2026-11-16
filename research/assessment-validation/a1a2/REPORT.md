@@ -67,3 +67,38 @@ DRAFT. Supersedes the round-1 numbers above, whose reference scores came from on
 **Verdict:** the existing grader is **not validated** for these outcome assessments. The deterministic path fails both targets; the model path (as approximated by the stand-in) passes the free/transfer target but misses the 95% controlled target. The model path could not be run for real (no API), so its numbers are an estimate only.
 
 **Needed fixes (recommendations; grader unchanged):** see §3 above — normalised matching (case, final punctuation, contractions, curly apostrophes), multiple accepted answers in the assignment grader, option letter = option text for choice items, a target-form-only scorer (0/1/2) for free sentences, and a guard so the meaning check cannot credit answers that avoid the target form. Re-run this validation (round 3) after those fixes, and with the real model path.
+
+## Round 3 — graderV2 ON, final item bank (counted)
+
+SIMULATION ONLY · DRAFT. Supersedes round 2, which ran on the item bank before review rounds 2–5 and the user's decisions.
+
+- **Answers:** 150 new simulated answers (`round3/answers.json`) on the final bank, covering all 33 outcomes that passed review: 75 exact (0/1) and 75 target-form (0/1/2). No round-2 answers were reused.
+- **Reference:** 3 new independent agent scorers, rubric only (`round3/scorer_S1..3.json`). The reference is the majority score (`REFERENCE.json`). All 3 scorers agreed on 147 of 150 answers; on the other 3, two of three agreed. The scorers run on the same model and read the same rubric, so shared bias is likely. The reference is only as good as the rubric and does not replace human raters.
+- **Grader run:** a 4th agent, blind to the reference, ran it two ways:
+  - **Deterministic path:** the real production code with `ENARA_ENGINE_V2=graderV2`, called from `round3/harness3.ts`.
+  - **Model path:** an **AGENT STAND-IN, not the production grader**. It applied the eval-v2 prompts, passed its replies through the real validators, and then applied the graderV2 guard (`GRADER_STANDIN.json`). It scored answers the deterministic path missed and all target-form items.
+
+| Path | Exact (75): agreement, target ≥95% | Free/transfer (75): QWK, target ≥0.80 |
+|---|---|---|
+| Deterministic, graderV2 ON | **96.0%**: pass | **0.754**: fail |
+| Deterministic + model-path stand-in | 90.7%: fail | 0.904: pass (estimate) |
+
+**Agreement by item type (deterministic):**
+- gap-fill 19/19, multiple choice 13/13, controlled choice 7/7, controlled gap-fill 6/6, rewrite 2/2;
+- transfer (exact) 5/5, transfer (0/1/2) 10/12;
+- error correction 20/23;
+- free production 49/63.
+
+Every disagreement, with its outcome, answer and cause, is in `round3/AGREEMENT3.json`.
+
+**Causes (deterministic, 19 disagreements):**
+1. **No partial credit (5):** a target form attempted with one slip scores 0 instead of 1. Examples: "can to swim", "watchd", "is study", "very quite", "becuse".
+2. **Over-credit (10):** the scorer checks one occurrence of the target form but misses errors in the rest of it. Examples: "he correct it", "his wife is", "visites", "cleanned", "elevn", "don't never", "but not the money", lowercase "mrs". It also gave full credit to a fragment ("My cousin.") and to a wrong collocation ("does the beds").
+3. **No rule for word order (1, R3-044):** the scorer returns no rule, so the answer scores 0.
+4. **Error correction (3):** a valid correction that is not in the accepted list scores 0: "Honey good…", "their dog", "there is small mosque".
+
+**Causes (model-path stand-in, controlled items):** the meaning check credits misspellings on items that test spelling or case: "carot", "fourty", "grand father", lowercase "september" and "thursday". The graderV2 guard covers only a missing target form, not spelling- or case-sensitive items.
+
+**Action:** round-4 fixes for these causes are in progress (see `round4/FIX_TASK.md`). They will be checked on a NEW set of 150 answers (round 4). Per the stopping rule, that is the last round.
+
+**Model path: NOT VALIDATED.** Its numbers come from an agent stand-in and are estimates only. Validation needs a run with the API.
