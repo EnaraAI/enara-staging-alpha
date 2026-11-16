@@ -206,13 +206,18 @@ export const updateCurriculum = asyncHandler(async (req: AuthRequest, res: Respo
       }
     }
   }
-  // Language lesson specs are cleaned and capped like on create (ltc-v1).
+  // Lesson quizzes change only through PUT …/chapters/:chapterId/quiz: keep each
+  // chapter's saved quiz and ignore any quiz sent here.
   if (Array.isArray(body.chapters)) {
-    for (const raw of body.chapters as unknown[]) {
-      if (raw && typeof raw === 'object' && 'languageSpec' in raw) {
-        (raw as { languageSpec?: unknown }).languageSpec = sanitizeLanguageSpec((raw as { languageSpec?: unknown }).languageSpec);
-      }
-    }
+    const quizzes = new Map(curriculum.chapters.map((c) => [c.id, c.quiz]));
+    body.chapters = (body.chapters as unknown[]).map((raw) => {
+      if (!raw || typeof raw !== 'object') return raw;
+      const { quiz: _ignored, ...rest } = raw as Record<string, unknown>;
+      // Language lesson specs are cleaned and capped like on create (ltc-v1).
+      if ('languageSpec' in rest) rest.languageSpec = sanitizeLanguageSpec(rest.languageSpec);
+      const kept = typeof rest.id === 'string' ? quizzes.get(rest.id) : undefined;
+      return kept && kept.questions?.length ? { ...rest, quiz: kept } : rest;
+    });
   }
   for (const key of allowed) {
     if (body[key] !== undefined) {
@@ -227,6 +232,47 @@ export const updateCurriculum = asyncHandler(async (req: AuthRequest, res: Respo
   curriculum.lastUpdated = formatDate();
   await curriculum.save();
   void queueCurriculumProcessing(curriculum);
+  res.json(toCurriculumResponse(curriculum));
+});
+
+// PUT /api/curriculums/:id/chapters/:chapterId/quiz { questions: [{ text, options, correctAnswer, explanation? }] }
+// Sets the lesson's practice quiz; an empty list removes it.
+export const MAX_QUIZ_QUESTIONS = 10;
+export function parseChapterQuiz(body: unknown) {
+  const b = ensurePlainObject(body);
+  if (!Array.isArray(b.questions)) throw new AppError('questions must be a list', 400, 'VALIDATION_ERROR');
+  if (b.questions.length > MAX_QUIZ_QUESTIONS) throw new AppError(`A lesson quiz has at most ${MAX_QUIZ_QUESTIONS} questions`, 400, 'VALIDATION_ERROR');
+  return b.questions.map((raw, i) => {
+    const q = ensurePlainObject(raw, `question ${i + 1}`);
+    const text = getRequiredString(q, 'text', { max: 500 });
+    const options = getOptionalStringArray(q, 'options', { maxItems: 6, maxLength: 200 }) || [];
+    const clean = options.map((o) => o.trim()).filter(Boolean);
+    if (clean.length < 2) throw new AppError(`Question ${i + 1} needs at least 2 options`, 400, 'VALIDATION_ERROR');
+    const correctAnswer = q.correctAnswer;
+    if (typeof correctAnswer !== 'number' || !Number.isInteger(correctAnswer) || correctAnswer < 0 || correctAnswer >= clean.length) {
+      throw new AppError(`Question ${i + 1}: correctAnswer must be the index of one of its options`, 400, 'VALIDATION_ERROR');
+    }
+    return {
+      id: getOptionalId(q, 'id') || `q${i + 1}-${randomUUID().slice(0, 8)}`,
+      text,
+      options: clean,
+      correctAnswer,
+      explanation: getOptionalString(q, 'explanation', { max: 500 }) || '',
+    };
+  });
+}
+
+export const setChapterQuiz = asyncHandler(async (req: AuthRequest, res: Response) => {
+  rejectMongoOperators(ensurePlainObject(req.body));
+  const questions = parseChapterQuiz(req.body);
+  const curriculum = await Curriculum.findOne(await curriculumScope(req, { id: req.params.id }, 'write'));
+  if (!curriculum) throw new AppError('Curriculum not found', 404);
+  const chapter = curriculum.chapters.find((ch) => ch.id === req.params.chapterId);
+  if (!chapter) throw new AppError('Chapter not found', 404);
+  chapter.quiz = questions.length ? { questions } : undefined;
+  curriculum.markModified('chapters');
+  curriculum.lastUpdated = formatDate();
+  await curriculum.save();
   res.json(toCurriculumResponse(curriculum));
 });
 

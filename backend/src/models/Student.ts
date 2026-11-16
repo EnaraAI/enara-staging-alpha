@@ -1,6 +1,9 @@
 import { LEARNER_AGE_BANDS, type LearnerAgeBand } from './learnerAgeBand';
 import { Schema, model, Document } from 'mongoose';
 
+export const STUDENT_UI_MODES = ['standard', 'kids'] as const;
+export type StudentUiMode = (typeof STUDENT_UI_MODES)[number];
+
 export interface IStudent extends Document {
   id: string;
   name: string;
@@ -65,6 +68,8 @@ export interface IStudent extends Document {
   }>;
   // Demo/live separation (P1): seeded demo data is 'demo_seed'.
   origin?: 'live' | 'demo_seed';
+  // 'kids' shows this student the Enara Kids interface (set per student by school staff).
+  uiMode?: StudentUiMode;
 }
 
 const studentSchema = new Schema<IStudent>(
@@ -73,6 +78,7 @@ const studentSchema = new Schema<IStudent>(
     name: { type: String, required: true },
     email: { type: String, required: true },
     grade: { type: String, default: '' },
+    uiMode: { type: String, enum: STUDENT_UI_MODES, default: 'standard' },
     avatar: { type: String, default: '' },
     institutionId: { type: String, index: true },
     batchId: { type: String, index: true },

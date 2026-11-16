@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { confirmPasswordResetHandler, createUser, demoLogin, login, logout, register, requestPasswordResetHandler, completeTour } from '../controllers/auth.controller';
+import { confirmPasswordResetHandler, createUser, demoLogin, login, logout, register, requestPasswordResetHandler, completeTour, session } from '../controllers/auth.controller';
 import { authMiddleware, requireRole } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -7,6 +7,7 @@ const router = Router();
 router.post('/login', login);
 router.post('/logout', authMiddleware, logout);
 router.post('/tour/complete', authMiddleware, completeTour);
+router.get('/session', authMiddleware, session);
 router.post('/register', register);
 router.post('/demo-login', demoLogin);
 router.post('/password-reset/request', requestPasswordResetHandler);

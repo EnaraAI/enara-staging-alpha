@@ -24,6 +24,8 @@ export interface SessionUser {
   institutionId?: string;
   // New accounts get the product tour once, until they finish or skip it.
   tourPending?: boolean;
+  // 'kids' only for a student the school moved to the Enara Kids interface.
+  uiMode?: 'standard' | 'kids';
 }
 
 export class ApiError extends Error {
@@ -87,6 +89,16 @@ export function clearSession() {
   } catch {
     // Storage unavailable; nothing to clear.
   }
+}
+
+// Re-reads the signed-in account (GET /api/auth/session) so changes made by
+// staff, such as moving a student to Enara Kids, apply without signing in again.
+export async function refreshSession(): Promise<SessionUser | null> {
+  const token = getToken();
+  if (!token) return null;
+  const res = await request<{ user: SessionUser }>('GET', '/api/auth/session');
+  if (res?.user) saveSession(token, res.user);
+  return res?.user ?? null;
 }
 
 function toUrl(path: string): string {
@@ -221,6 +233,8 @@ export const createStudent = (data: {
   academicYear?: string;
   groupId?: string;
   institutionId?: string;
+  // 'kids' gives the student the Enara Kids interface.
+  uiMode?: 'standard' | 'kids';
 }) => request('POST', '/api/students', data);
 export const updateStudent = (id: string, data: any) => request('PATCH', `/api/students/${encodeURIComponent(id)}`, data);
 export const deleteStudent = (id: string) => request('DELETE', `/api/students/${encodeURIComponent(id)}`);
@@ -279,6 +293,12 @@ export function uploadChapterFile(curriculumId: string, chapterId: string, file:
 
 // Lesson videos: compressed in the browser, then PUT straight to R2 with a signed
 // URL (they're too large to pass through the API), then attached to the chapter.
+// A lesson's practice quiz (the knowledge check students see after the lesson).
+// correctAnswer is the index of the right option; an empty list removes the quiz.
+export type ChapterQuizQuestion = { id?: string; text: string; options: string[]; correctAnswer: number; explanation?: string };
+export const setChapterQuiz = (curriculumId: string, chapterId: string, questions: ChapterQuizQuestion[]) =>
+  request('PUT', `/api/curriculums/${encodeURIComponent(curriculumId)}/chapters/${encodeURIComponent(chapterId)}/quiz`, { questions });
+
 export async function uploadChapterVideo(
   curriculumId: string,
   chapterId: string,

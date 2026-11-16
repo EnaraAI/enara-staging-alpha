@@ -17,6 +17,8 @@ export interface Student {
   name: string;
   email: string;
   grade: string;
+  // 'kids' shows this student the Enara Kids interface.
+  uiMode?: 'standard' | 'kids';
   avatar: string;
   progress: number;
   avgScore: number;
