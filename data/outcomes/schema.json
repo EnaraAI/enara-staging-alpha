@@ -12,7 +12,7 @@
     "cefr": { "enum": ["A1", "A2", "B1", "B2", "C1", "C2"] },
     "skill": { "enum": ["reading", "writing", "listening", "speaking", "grammar", "vocabulary", "function"] },
     "statement": { "type": "string", "pattern": "^Can ", "minLength": 10, "maxLength": 300,
-      "not": { "pattern": "(?i)\\b(understand|know|learn|appreciate|be aware of|be familiar with|grasp|feel confident|master|internalise|internalize|think about)\\b" } },
+      "not": { "pattern": "\\b(understand|know|learn|appreciate|be aware of|be familiar with|grasp|feel confident|master|internalise|internalize|think about)\\b" } },
     "verb": { "enum": ["write", "complete", "choose", "match", "order", "identify", "underline", "correct", "rewrite", "combine", "answer", "ask", "say", "name", "list", "describe", "compare", "explain", "summarise", "give", "use", "spell", "transform", "punctuate"] },
     "condition": { "type": "string", "minLength": 3, "maxLength": 300 },
     "criterion": { "type": "string", "minLength": 3, "maxLength": 300 },
