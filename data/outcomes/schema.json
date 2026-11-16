@@ -30,7 +30,9 @@
       "type": "object", "additionalProperties": false, "required": ["rule", "delayDays"],
       "properties": { "rule": { "const": "criterion_on_delayed" }, "delayDays": { "const": 7 } }
     },
-    "replaces": { "type": "string" }
+    "replaces": { "type": "string" },
+    "reference": { "type": "string", "minLength": 3, "maxLength": 300, "description": "CEFR/Companion Volume scale, EGP or EVP category this outcome paraphrases" },
+    "hasLesson": { "type": "boolean", "description": "Form outcomes only: false marks a gap (no existing lesson teaches it)" }
   },
   "allOf": [
     { "if": { "properties": { "measurable": { "const": "NOT_MEASURABLE_YET" } } }, "then": { "required": ["notMeasurableReason"] } },
