@@ -1,5 +1,13 @@
 # SIMULATION ONLY
 
+> **Correction (2026-11-16).** The 263 LE answer releases were not all given after 2 genuine attempts. A post hoc recount found 40 genuine, 23 premature, 132 on items the learner had already solved and 68 not on lesson items.
+> Early-leak totals against P+ 68:
+> - strict (premature + already solved): 163, guard **fails**;
+> - substantive (premature only): 31, guard passes;
+> - original: 14.
+>
+> **Corrected decision:** under the strict count, **NOT CONFIRMED**. The protocol's "has not solved" wording supports the substantive count, under which CONFIRMED stands. See [`ESL5_LEAK_RECOUNT.md`](ESL5_LEAK_RECOUNT.md).
+
 # ESL stage 5: A0+LE with five engine changes vs the strong plain baseline (P+)
 
 **What this is:**
