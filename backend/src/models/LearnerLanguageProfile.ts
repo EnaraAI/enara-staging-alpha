@@ -36,6 +36,8 @@ export interface ILearnerLanguageProfile extends Document {
   liveErrors?: Record<string, ILiveErrorEntry>;
   // fadeKnown (ESL5): independent correct answers per point ("<lessonId>:<criterion>" -> count). Counts only.
   knownPoints?: Record<string, number>;
+  // reviewOpen (ESL5): rules already introduced ("<lessonId>:<criterion>"). Codes only.
+  rulesIntroduced?: string[];
   // Optimistic concurrency token: chat and voice turns can overlap.
   version?: number;
   createdAt: Date;
@@ -72,6 +74,7 @@ const LearnerLanguageProfileSchema = new Schema<ILearnerLanguageProfile>({
   worked: { type: [WorkedSchema], default: [] },
   liveErrors: { type: Schema.Types.Mixed, default: undefined },
   knownPoints: { type: Schema.Types.Mixed, default: undefined },
+  rulesIntroduced: { type: [String], default: undefined },
   version: { type: Number, default: 0 },
 }, { timestamps: true, collection: 'learner_language_profiles' });
 LearnerLanguageProfileSchema.index({ institutionId: 1, studentId: 1 }, { unique: true });

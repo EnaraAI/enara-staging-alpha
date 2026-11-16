@@ -22,7 +22,9 @@ export interface TurnOutcome { errorCode?: string; independentSuccessOn?: Lesson
   // liveError (ESL5): the expected-L1 error type seen in this message, and the one the previous reply targeted that this answer got right (codes only).
   liveError?: string; liveCorrect?: string;
   // fadeKnown (ESL5): points ("<lessonId>:<criterion>") answered correctly without help now, and points whose quick check failed (count restarts).
-  knownInc?: string[]; knownReset?: string[] }
+  knownInc?: string[]; knownReset?: string[];
+  // reviewOpen (ESL5 fix 3): rules this reply introduced ("<lessonId>:<criterion>"), kept so a later session recalls them instead of re-stating them.
+  rulesIntroduced?: string[] }
 
 /** fadeKnown (ESL5): pure update of independent-success counts per point. Counts only. */
 export function applyKnownPoints(rec: Record<string, number> | undefined, o: Pick<TurnOutcome, 'knownInc' | 'knownReset'>): Record<string, number> {
@@ -152,13 +154,14 @@ export async function recordProfileTurn(institutionId: string | undefined, stude
   const v2 = engineV2('memory') && Boolean(o.belief || o.independentSuccessOn);
   const live = engineV2('liveError') && Boolean(o.liveError || o.liveCorrect);
   const known = engineV2('fadeKnown') && Boolean(o.knownInc?.length || o.knownReset?.length);
-  if (!institutionId || !studentId || (!o.errorCode && !o.independentSuccessOn && !v2 && !live && !known)) return;
+  const intro = engineV2('reviewOpen') && Boolean(o.rulesIntroduced?.length);
+  if (!institutionId || !studentId || (!o.errorCode && !o.independentSuccessOn && !v2 && !live && !known && !intro)) return;
   try {
     for (let attempt = 0; attempt < 4; attempt += 1) {
       const p = await LearnerLanguageProfile.findOne({ institutionId, studentId }).lean();
       const entries = applyTurn((p?.entries ?? []) as ILanguageErrorEntry[], o);
       const next = engineV2('memory') ? applyTurnV2({ beliefs: (p?.beliefs ?? []) as IBeliefEntry[], worked: (p?.worked ?? []) as IWorkedEntry[] }, o) : null;
-      const set = { entries, ...(next ? { beliefs: next.beliefs, worked: next.worked } : {}), ...(live ? { liveErrors: applyLiveErrors(p?.liveErrors as Record<string, ILiveErrorEntry> | undefined, o) } : {}), ...(known ? { knownPoints: applyKnownPoints(p?.knownPoints as Record<string, number> | undefined, o) } : {}) };
+      const set = { entries, ...(next ? { beliefs: next.beliefs, worked: next.worked } : {}), ...(live ? { liveErrors: applyLiveErrors(p?.liveErrors as Record<string, ILiveErrorEntry> | undefined, o) } : {}), ...(known ? { knownPoints: applyKnownPoints(p?.knownPoints as Record<string, number> | undefined, o) } : {}), ...(intro ? { rulesIntroduced: [...new Set([...((p?.rulesIntroduced as string[] | undefined) ?? []), ...(o.rulesIntroduced ?? [])])] } : {}) };
       if (!p) {
         try { await LearnerLanguageProfile.create({ institutionId, studentId, ...set, version: 1 }); return; } catch { continue; } // lost the race to create: retry on the new document
       }
@@ -173,7 +176,7 @@ export async function recordProfileTurn(institutionId: string | undefined, stude
 
 // ---------------------------------------------------------------------------
 // ESL5 (reviewOpen, fadeKnown): the structured part of ENARA's own learner record the engine reads (codes and counts only, never learner text).
-export interface Esl5Record { live: string[]; knownPoints: Record<string, number> }
+export interface Esl5Record { live: string[]; knownPoints: Record<string, number>; /** reviewOpen (ESL5 fix 3): rules already introduced ("<lessonId>:<criterion>"), any session. */ introduced?: string[] }
 const NOT_A_TYPE = new Set(['unknown', 'unchanged_from_prompt']);
 /** Error types still live: a liveError type not yet answered correctly since it was last seen, then a recorded error type without two independent successes (most seen first). */
 export function liveErrorTypes(p: { entries?: ILanguageErrorEntry[]; liveErrors?: Record<string, ILiveErrorEntry> }): string[] {
@@ -188,7 +191,7 @@ export async function loadEsl5Record(institutionId: string | undefined, studentI
   try {
     const p = await LearnerLanguageProfile.findOne({ institutionId, studentId }).lean();
     if (!p) return null;
-    return { live: liveErrorTypes({ entries: p.entries as ILanguageErrorEntry[], liveErrors: p.liveErrors as Record<string, ILiveErrorEntry> | undefined }), knownPoints: { ...((p.knownPoints as Record<string, number> | undefined) ?? {}) } };
+    return { live: liveErrorTypes({ entries: p.entries as ILanguageErrorEntry[], liveErrors: p.liveErrors as Record<string, ILiveErrorEntry> | undefined }), knownPoints: { ...((p.knownPoints as Record<string, number> | undefined) ?? {}) }, ...(engineV2('reviewOpen') && Array.isArray(p.rulesIntroduced) ? { introduced: [...(p.rulesIntroduced as string[])] } : {}) };
   } catch (error) {
     logger.warn('learner_profile_load_failed', { error: serializeError(error) });
     return null;

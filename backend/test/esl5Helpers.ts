@@ -29,7 +29,7 @@ export function build(msg: string, hist: HistoryTurn[], o: { level?: string; mas
   const { signals, moves } = esl5Adjust({ signals: signals0, moves: moves0, record: o.record, history: hist, lessonId: 'lsn' });
   const learner = deriveLearnerContext({ courseLevel: o.level ?? 'A1', courseLanguages: ['English'], adultSchool: false, learnerMessages: [msg], objectiveStatus: o.masteryStatus });
   const research = researchSignals(hist, signals, SPEC);
-  const { explicit, ruleFirst } = ruleFirstDecision({ band, masteryStatus: o.masteryStatus, history: hist, signals, spec: SPEC, moves });
+  const { explicit, ruleFirst } = ruleFirstDecision({ band, masteryStatus: o.masteryStatus, history: hist, signals, spec: SPEC, moves, record: o.record, lessonId: 'lsn' });
   const ctx = { version: 'ltc-v1', learner, lesson: { status: 'structured', lessonId: 'lsn', title: LESSON.title, spec: SPEC }, signals, moves, research, ...(o.history?.length ? { history: o.history } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(o.record ? { record: o.record } : {}) } as Omit<LanguageTeachingContext, 'prompt'>;
   return { ...ctx, prompt: renderLanguageContextPrompt(ctx) } as LanguageTeachingContext;
 }

@@ -105,7 +105,7 @@ export async function completeLanguageTurn(opts: {
   const belief = (lt as { assessment?: { belief?: string } }).assessment?.belief;
   // liveError (ESL5): the error type seen now, and the one the previous reply targeted when this answer got it right (codes only).
   const live = engineV2('liveError') ? { ...(language.signals.liveError ? { liveError: language.signals.liveError.code } : {}), ...(language.signals.liveTarget && isSuccess(lt.assessment.verdict) ? { liveCorrect: language.signals.liveTarget } : {}) } : {};
-  await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt), ...(belief ? { belief } : {}), lessonId: language.lesson.lessonId, lessonTitle: language.lesson.title, style: styleFromMoves(language.prevMoves), ...live, ...known });
+  await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt), ...(belief ? { belief } : {}), lessonId: language.lesson.lessonId, lessonTitle: language.lesson.title, style: styleFromMoves(language.prevMoves), ...live, ...known, ...(engineV2('reviewOpen') && lt.rulesIntroduced?.length ? { rulesIntroduced: lt.rulesIntroduced.map((c) => knownKey(language.lesson.lessonId, c)) } : {}) });
   return lt as unknown as LanguageTurnEvidence;
 }
 
