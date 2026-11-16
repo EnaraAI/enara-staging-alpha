@@ -1,0 +1,165 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import './parents.css';
+import type { Lang } from './i18n';
+import { parentsApi, type LearnerChip } from './api';
+import { Avatar, Icon, Loading, ParentsCtx, makeCtx, ErrorBox } from './ui';
+import { StatusLine, Updated } from './shared';
+import { useLive } from './useLive';
+import { Home } from './screens/Home';
+import { Progress } from './screens/Progress';
+import { Activity } from './screens/Activity';
+import { Controls } from './screens/Controls';
+import { Account } from './screens/Account';
+import { LinkChild } from './screens/LinkChild';
+import { ShareSheet } from './screens/ShareSheet';
+
+// ENARA Parents Portal: a parent mode inside the ENARA app, under /parents.
+// Mobile-first; English and Arabic with full RTL; week starts Saturday;
+// times in Africa/Cairo; live data on every visit, focus and pull-to-refresh.
+
+const TABS = ['home', 'progress', 'activity', 'controls', 'account'] as const;
+type Tab = (typeof TABS)[number] | 'link';
+const LANG_KEY = 'enara_parents_lang';
+const LEARNER_KEY = 'enara_parents_learner';
+const LINK_INTENT_KEY = 'enara_parent_link_intent';
+
+const read = (k: string, store: 'local' | 'session' = 'local') => { try { return (store === 'local' ? localStorage : sessionStorage).getItem(k); } catch { return null; } };
+const write = (k: string, v: string | null, store: 'local' | 'session' = 'local') => { try { const s = store === 'local' ? localStorage : sessionStorage; if (v === null) s.removeItem(k); else s.setItem(k, v); } catch { /* storage unavailable */ } };
+
+function tabFromPath(): Tab {
+  const seg = window.location.pathname.replace(/^\/parents\/?/, '').split('/')[0];
+  if (seg === 'link') return 'link';
+  return (TABS as readonly string[]).includes(seg) ? (seg as Tab) : 'home';
+}
+
+function usePwaHead(lang: Lang) {
+  useEffect(() => {
+    const added: HTMLElement[] = [];
+    const add = (tag: string, attrs: Record<string, string>) => { const el = document.createElement(tag); Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v)); document.head.appendChild(el); added.push(el); };
+    add('link', { rel: 'manifest', href: '/parents.webmanifest' });
+    add('meta', { name: 'theme-color', content: '#0b203c' });
+    add('link', { rel: 'apple-touch-icon', href: '/parents-icon.svg' });
+    add('link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap' });
+    const prevTitle = document.title;
+    return () => { added.forEach((el) => el.remove()); document.title = prevTitle; };
+  }, []);
+  useEffect(() => {
+    document.title = lang === 'ar' ? 'إنارة لأولياء الأمور' : 'ENARA Parents';
+    const html = document.documentElement;
+    const prev = { lang: html.lang, dir: html.dir };
+    html.lang = lang; html.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    return () => { html.lang = prev.lang; html.dir = prev.dir; };
+  }, [lang]);
+}
+
+const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ onSignOut }) => {
+  const [lang, setLangState] = useState<Lang>(() => (read(LANG_KEY) === 'ar' ? 'ar' : 'en'));
+  const setLang = (l: Lang) => { setLangState(l); write(LANG_KEY, l); };
+  const ctx = useMemo(() => makeCtx(lang), [lang]);
+  const { t, n } = ctx;
+  usePwaHead(lang);
+
+  const initialCode = useMemo(() => new URLSearchParams(window.location.search).get('code') ?? '', []);
+  const [tab, setTab] = useState<Tab>(() => (read(LINK_INTENT_KEY, 'session') === '1' || initialCode ? 'link' : tabFromPath()));
+  useEffect(() => { write(LINK_INTENT_KEY, null, 'session'); }, []);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
+  const [sharing, setSharing] = useState(false);
+
+  const learners = useLive(() => parentsApi.learners(), [], refreshKey);
+  const list = learners.data?.learners ?? [];
+  const [selectedId, setSelectedId] = useState<string | null>(() => read(LEARNER_KEY));
+  const learner: LearnerChip | undefined = list.find((l) => l.studentId === selectedId) ?? list[0];
+  useEffect(() => { if (learner) write(LEARNER_KEY, learner.studentId); }, [learner?.studentId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const status = useLive(() => (learner ? parentsApi.status(learner.studentId).then((r) => r.status) : Promise.resolve(null)), [learner?.studentId], refreshKey);
+  const [screenFetched, setScreenFetched] = useState<{ at: Date | null; loading: boolean }>({ at: null, loading: false });
+  const onFetched = useCallback((at: Date | null, loading: boolean) => setScreenFetched({ at, loading }), []);
+  useEffect(() => { setScreenFetched({ at: null, loading: false }); }, [tab, learner?.studentId]);
+
+  const go = (next: Tab) => {
+    setTab(next);
+    const path = next === 'home' ? '/parents' : `/parents/${next}`;
+    if (window.location.pathname !== path) window.history.pushState({ tab: next }, '', path);
+    window.scrollTo({ top: 0 });
+  };
+  useEffect(() => {
+    const onPop = () => setTab(tabFromPath());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // Pull to refresh (touch): drag down from the top of the page.
+  const pull = useRef<{ y: number; active: boolean }>({ y: 0, active: false });
+  const [pullPx, setPullPx] = useState(0);
+  const onTouchStart = (e: React.TouchEvent) => { pull.current = { y: e.touches[0].clientY, active: window.scrollY <= 0 }; };
+  const onTouchMove = (e: React.TouchEvent) => { if (pull.current.active) setPullPx(Math.max(0, Math.min(80, e.touches[0].clientY - pull.current.y))); };
+  const onTouchEnd = () => { if (pullPx >= 64) refresh(); setPullPx(0); pull.current.active = false; };
+
+  const dir = lang === 'ar' ? 'rtl' : 'ltr';
+  const noLearners = learners.data && list.length === 0;
+  const showLink = tab === 'link' || noLearners;
+  const fetched = screenFetched.at ?? status.fetchedAt;
+
+  const nav = (
+    <nav className="pp-nav" aria-label={t.main}>
+      {TABS.map((k) => (
+        <button type="button" key={k} className="pp-navlink" aria-current={tab === k ? 'page' : undefined} onClick={() => go(k)}>
+          <Icon name={k} />{t.tabs[k]}
+        </button>
+      ))}
+    </nav>
+  );
+
+  return (
+    <ParentsCtx.Provider value={ctx}>
+      <div className="pp" dir={dir} lang={lang} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+        <header className="pp-header">
+          <div className="pp-brand"><b>{t.brand}</b><span>{t.parents}</span></div>
+          <div className="pp-head-actions">
+            <button type="button" className="pp-langbtn" onClick={() => setLang(lang === 'en' ? 'ar' : 'en')} lang={lang === 'en' ? 'ar' : 'en'} aria-label={`${t.language}: ${lang === 'en' ? 'العربية' : 'English'}`}>{lang === 'en' ? 'ع' : 'EN'}</button>
+            <button type="button" className="pp-iconbtn" aria-label={t.signOut} onClick={onSignOut}><Icon name="out" flip /></button>
+          </div>
+        </header>
+
+        {list.length > 0 && !showLink && (
+          <nav className="pp-switcher" aria-label={t.chooseLearner}>
+            {list.map((l, i) => (
+              <button type="button" key={l.studentId} className="pp-chip" aria-current={learner?.studentId === l.studentId ? 'true' : undefined} onClick={() => setSelectedId(l.studentId)}>
+                <Avatar initial={l.initial} index={i} />
+                <span className="pp-chip-name"><b>{l.firstName}</b><small>{l.age !== null ? t.age(n(l.age)) : t.tierLine[l.tier].split('·')[0].trim()}</small></span>
+              </button>
+            ))}
+            <button type="button" className="pp-chip pp-chip--add" onClick={() => go('link')} aria-label={t.linkChild}><Icon name="plus" /></button>
+          </nav>
+        )}
+
+        <main className="pp-main" id="pp-main">
+          <div className="pp-ptr" style={{ blockSize: pullPx }} aria-hidden="true">{pullPx > 0 ? (pullPx >= 64 ? t.refreshing : t.pullToRefresh) : ''}</div>
+          {!learners.data && (learners.error ? <ErrorBox onRetry={learners.reload} /> : <Loading />)}
+          {showLink && learners.data && (
+            <>
+              {noLearners && tab !== 'link' && <section className="pp-notice"><Icon name="link" style={{ color: '#075985' }} /><div><b>{t.noLearners}</b><p>{t.noLearnersBody}</p></div></section>}
+              <LinkChild initialCode={initialCode} onCancel={list.length ? () => go('home') : undefined} onLinked={(id) => { setSelectedId(id); refresh(); go('home'); }} />
+            </>
+          )}
+          {!showLink && learner && (
+            <>
+              {status.data && <StatusLine status={status.data} />}
+              <Updated at={fetched} loading={status.loading || screenFetched.loading} onRefresh={refresh} />
+              {tab === 'home' && <Home learner={learner} refreshKey={refreshKey} go={(k) => go(k as Tab)} onShare={() => setSharing(true)} onFetched={onFetched} />}
+              {tab === 'progress' && <Progress learner={learner} refreshKey={refreshKey} onFetched={onFetched} />}
+              {tab === 'activity' && <Activity learner={learner} refreshKey={refreshKey} onFetched={onFetched} />}
+              {tab === 'controls' && <Controls learner={learner} refreshKey={refreshKey} />}
+              {tab === 'account' && <Account refreshKey={refreshKey} setLang={setLang} onLink={() => go('link')} onPick={(id) => { setSelectedId(id); go('home'); }} onChanged={refresh} onSignOut={onSignOut} />}
+            </>
+          )}
+        </main>
+        {!showLink && learner && nav}
+        {sharing && learner && <ShareSheet learner={learner} onClose={() => setSharing(false)} />}
+      </div>
+    </ParentsCtx.Provider>
+  );
+};
+
+export default ParentsApp;

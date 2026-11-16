@@ -47,6 +47,7 @@ import { getStudent, fetchStudentAnalytics, StudentAnalytics, RiskFlag } from '.
 import { toast } from '../services/toastService';
 import { adminSetPhoto, PhotoPicker, StudentAvatar } from '../components/StudentPhoto';
 import { approveStudentPhoto, rejectStudentPhoto } from '../services/apiService';
+import { ParentAccessPanel } from '../components/ParentAccessPanel';
 
 interface StudentProfileProps {
   student: Student;
@@ -216,6 +217,9 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ student: initial
             </button>
           </div>
         )}
+
+        {/* Parents Portal: school admins issue parent link codes here. */}
+        <ParentAccessPanel studentId={student.id} studentName={student.name} />
 
         {/* Top Section: Info Card & Quick Stats */}
         <div className="grid lg:grid-cols-3 gap-6">

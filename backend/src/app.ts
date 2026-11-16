@@ -48,6 +48,7 @@ import documentsRoutes from './routes/documents.routes';
 import educatorChatRoutes from './routes/educatorChat.routes';
 import speakingRoutes from './routes/speaking.routes';
 import usageRoutes from './routes/usage.routes';
+import parentsRoutes from './parents/routes';
 import { getPostgresPool } from './config/postgres';
 import mongoose from 'mongoose';
 
@@ -139,6 +140,9 @@ export function createApp() {
   app.use('/api/auth/register', makeLimiter('register', 60 * 60 * 1000, 10, 'Too many registration attempts'));
   app.use('/api/auth/demo-login', makeLimiter('demo-login', 60 * 1000, 10, 'Too many demo login attempts'));
   app.use('/api/auth/password-reset', makeLimiter('password-reset', 15 * 60 * 1000, 10, 'Too many password reset requests'));
+  // Parents Portal: sign-up and link-code redemption, per IP (the per-account lockout is in parents/codes.ts).
+  app.use('/api/parents/register', makeLimiter('parent-register', 60 * 60 * 1000, 10, 'Too many registration attempts'));
+  app.use('/api/parents/link', makeLimiter('parent-link', 15 * 60 * 1000, 30, 'Too many code attempts'));
   app.use('/api/workspace/invitations/accept', makeLimiter('invitation-accept', 15 * 60 * 1000, 20, 'Too many invitation attempts'));
   app.use('/api/upload', makeLimiter('upload', 60 * 60 * 1000, 30, 'Too many upload requests'));
   app.post('/api/documents', makeLimiter('documents', 60 * 60 * 1000, 60, 'Too many document uploads', true));
@@ -305,6 +309,7 @@ export function createApp() {
   app.use('/api/speaking', speakingRoutes);
   app.use('/api/usage', usageRoutes);
   app.use('/api/analytics', analyticsRoutes);
+  app.use('/api/parents', parentsRoutes);
 
   app.use((_req, _res, next) => {
     next(new AppError('Route not found', 404, 'NOT_FOUND'));

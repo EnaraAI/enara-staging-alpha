@@ -2,8 +2,8 @@
 // so it can be tested without a browser. The server's permission checks stay
 // authoritative; this only keeps people out of screens they cannot use.
 
-export type UiRole = 'student' | 'admin' | 'enara-admin' | 'academic-manager';
-export type LoginChoice = 'student' | 'admin' | 'enara-admin';
+export type UiRole = 'student' | 'admin' | 'enara-admin' | 'academic-manager' | 'parent';
+export type LoginChoice = 'student' | 'admin' | 'enara-admin' | 'parent';
 
 // The login card each account may use, and the portal it then opens.
 // Academic managers sign in with the staff card but get their own read-only
@@ -14,6 +14,8 @@ const ALLOWED: Record<string, Partial<Record<LoginChoice, UiRole>>> = {
   academic_manager: { admin: 'academic-manager' },
   admin: { admin: 'admin' },
   'enara-admin': { 'enara-admin': 'enara-admin', admin: 'admin' },
+  // Parents Portal: parent accounts open only the parents area, from the Parents tab.
+  parent: { parent: 'parent' },
 };
 
 export function uiRoleFor(backendRole: string, choice: LoginChoice): UiRole | null {

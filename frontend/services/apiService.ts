@@ -14,7 +14,7 @@ const API_BASE = (import.meta.env.VITE_API_URL || '/api/railway').replace(/\/+$/
 const TOKEN_KEY = 'enara_token';
 const USER_KEY = 'enara_user';
 
-export type BackendRole = 'student' | 'teacher' | 'academic_manager' | 'admin' | 'enara-admin';
+export type BackendRole = 'student' | 'teacher' | 'academic_manager' | 'admin' | 'enara-admin' | 'parent';
 
 export interface SessionUser {
   email: string;
@@ -186,6 +186,29 @@ export async function login(email: string, password: string): Promise<SessionUse
   saveSession(data.token, data.user);
   return data.user;
 }
+
+// Parents Portal sign-up: the server always creates a 'parent' account.
+export async function registerParent(name: string, email: string, password: string, language: 'en' | 'ar'): Promise<SessionUser> {
+  const data = await request<{ token: string; user: SessionUser }>('POST', '/api/parents/register', { name: name.trim(), email: email.trim(), password, language });
+  saveSession(data.token, data.user);
+  return data.user;
+}
+
+// Shared client for the Parents Portal (frontend/parents) and its admin panel.
+export function apiRequest<T = any>(method: string, path: string, body?: unknown): Promise<T> {
+  return request<T>(method, path, body);
+}
+
+// School admin: parent link codes for a learner (Parents Portal).
+export interface ParentCodeList {
+  codes: { id: string; display: string; hint: string; expiresAt: string; createdAt: string }[];
+  links: { linkId: string; parentName: string; parentEmail: string | null; role: 'owner' | 'full' | 'view'; status: string; consent: string; createdAt: string }[];
+}
+export const fetchParentCodes = (studentId: string) => request<ParentCodeList>('GET', `/api/students/${encodeURIComponent(studentId)}/parent-codes`);
+export const createParentCode = (studentId: string, sendToEmail?: string) =>
+  request<{ id: string; code: string; expiresAt: string; emailed?: { ok: boolean; reason?: string } }>('POST', `/api/students/${encodeURIComponent(studentId)}/parent-codes`, sendToEmail ? { sendToEmail } : {});
+export const revokeParentCode = (studentId: string, codeId: string) => request('DELETE', `/api/students/${encodeURIComponent(studentId)}/parent-codes/${encodeURIComponent(codeId)}`);
+export const removeParentLink = (studentId: string, linkId: string) => request('DELETE', `/api/students/${encodeURIComponent(studentId)}/parent-links/${encodeURIComponent(linkId)}`);
 
 // The product tour was finished or skipped: remembered on the account (so it
 // doesn't come back on another device) and in the stored session.

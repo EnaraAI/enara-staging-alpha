@@ -18,6 +18,10 @@ export interface IStudent extends Document {
   // Written only by Workspace Admins via /api/age-bands; never selected by
   // default so existing reads don't expose it.
   learnerAgeBand?: LearnerAgeBand;
+  // Optional exact birth date (Parents Portal). When set it decides the
+  // parent-portal tier (age < 13 = kid); otherwise learnerAgeBand does.
+  // Never selected by default.
+  birthDate?: Date;
   progress?: number;
   avgScore?: number;
   studyTime?: string;
@@ -97,6 +101,7 @@ const studentSchema = new Schema<IStudent>(
     academicYear: { type: String },
     groupId: { type: String },
     learnerAgeBand: { type: String, enum: LEARNER_AGE_BANDS, select: false },
+    birthDate: { type: Date, select: false },
     progress: { type: Number, default: 0 },
     avgScore: { type: Number, default: 0 },
     studyTime: { type: String, default: '0h/week' },

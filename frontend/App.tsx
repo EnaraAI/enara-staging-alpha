@@ -48,6 +48,9 @@ import { fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPl
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
+// Parents Portal: parent accounts only, under /parents. Loaded on demand.
+const ParentsApp = React.lazy(() => import('./parents/ParentsApp'));
+const onParentsPath = () => /^\/parents(\/|$)/.test(window.location.pathname);
 export const usesKidsApp = (role: string | null | undefined, user: Pick<SessionUser, 'role' | 'uiMode'> | null | undefined) =>
   role === 'student' && user?.role === 'student' && user?.uiMode === 'kids';
 import { KnowledgeMap } from './pages/KnowledgeMap';
@@ -175,6 +178,7 @@ const App: React.FC = () => {
       }
     }
 
+    if (role === 'parent' && !onParentsPath()) window.history.pushState({}, '', '/parents');
     setState(prev => ({ ...prev, role, page, activeAssessment }));
     setKidsMode(usesKidsApp(role, user));
     setUserName(user.name || user.email);
@@ -186,6 +190,7 @@ const App: React.FC = () => {
     setAssessments([]);
     setStudents([]);
     setKidsMode(false);
+    if (state.role === 'parent') window.history.replaceState({}, '', '/parents');
     setState(prev => ({ ...prev, role: null, page: 'courses', activeAssessment: null, selectedStudent: null }));
   };
 
@@ -295,7 +300,16 @@ const App: React.FC = () => {
         onLogin={handleLogin} 
         isSharedCourse={!!state.sharedCourseId} 
         isSharedAssessment={!!state.sharedAssessmentId}
+        initialPortal={onParentsPath() ? 'parent' : undefined}
       />
+    );
+  }
+
+  if (state.role === 'parent') {
+    return (
+      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-slate-500">Loading…</div>}>
+        <ParentsApp userName={userName} onSignOut={handleLogout} />
+      </React.Suspense>
     );
   }
 
