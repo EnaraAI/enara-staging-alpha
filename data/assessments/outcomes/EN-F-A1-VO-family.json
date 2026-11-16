@@ -2,13 +2,13 @@
   "status": "DRAFT",
   "outcomeId": "EN-F-A1-VO-family",
   "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic-L1 vowel spelling slip on a kin word in a natural sentence; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 now contain a wrong kin word that must be replaced (uncle/aunt/cousin/grandmother/grandfather, all A1); C-4 now aunt. Review round 3: all items 7-8 use the 'VOCABULARY variant, named word' rubric (as C-7 already did), since each prompt names the kin word. Review round 4: the kin-word swaps (my mother's mother is my aunt ...) were factual absurdities, not learner errors. Slots 5-6 are now vowel slips on an A1 kin word: doughter/hasband (A), parints/brather (B), grandmather/nece (C). outcomes.json l1ErrorTypes = [spelling_vowel].",
+  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic-L1 vowel spelling slip on a kin word in a natural sentence; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 now contain a wrong kin word that must be replaced (uncle/aunt/cousin/grandmother/grandfather, all A1); C-4 now aunt. Review round 3: all items 7-8 use the 'VOCABULARY variant, named word' rubric (as C-7 already did), since each prompt names the kin word. Review round 4: the kin-word swaps (my mother's mother is my aunt ...) were factual absurdities, not learner errors. Slots 5-6 are now vowel slips on an A1 kin word: doughter/hasband (A), parints/brather (B), grandmather/nece (C). outcomes.json l1ErrorTypes = [spelling_vowel]. Review round 5: C-6 'nece' (niece, EVP A2) -> 'childrin' (children, A1, not used elsewhere in form C); 'niece' distractor removed from A-4. No item's answer word is shown elsewhere in its form: gap-fill definitions, slot 3-4 options and slot 7-8 named kin words use only words not keyed in that form; C-9 no longer shows 'son'.",
   "forms": {
     "A": [
       {
         "id": "EN-F-A1-VO-family-A-1",
         "type": "controlled_gap_fill",
-        "prompt": "Write one word in the gap: My father's mother is my ____ .",
+        "prompt": "Write one word in the gap: My mother's mother is my ____ .",
         "answerKey": "grandmother",
         "acceptedAnswers": [
           "grandmother",
@@ -25,7 +25,7 @@
       {
         "id": "EN-F-A1-VO-family-A-2",
         "type": "controlled_gap_fill",
-        "prompt": "Write one word in the gap: My aunt's son is my ____ .",
+        "prompt": "Write one word in the gap: My uncle's son is my ____ .",
         "answerKey": "cousin",
         "acceptedAnswers": [
           "cousin"
@@ -55,7 +55,7 @@
       {
         "id": "EN-F-A1-VO-family-A-4",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (aunt / niece / cousin): My uncle's wife is my ____ .",
+        "prompt": "Choose the correct word (aunt / sister / mother): My uncle's wife is my ____ .",
         "answerKey": "aunt",
         "acceptedAnswers": [
           "aunt"
@@ -121,15 +121,15 @@
       {
         "id": "EN-F-A1-VO-family-A-8",
         "type": "free_production",
-        "prompt": "Write one sentence about a cousin. Use the word 'cousin'.",
-        "answerKey": "cousin",
+        "prompt": "Write one sentence about an uncle. Use the word 'uncle'.",
+        "answerKey": "uncle",
         "acceptedAnswers": [
-          "cousin",
-          "cousins"
+          "uncle",
+          "uncles"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "cousin",
+        "targetForm": "uncle",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
@@ -157,7 +157,7 @@
       {
         "id": "EN-F-A1-VO-family-B-1",
         "type": "controlled_gap_fill",
-        "prompt": "Write one word in the gap: My mother's father is my ____ .",
+        "prompt": "Write one word in the gap: My father's father is my ____ .",
         "answerKey": "grandfather",
         "acceptedAnswers": [
           "grandfather",
@@ -175,7 +175,7 @@
       {
         "id": "EN-F-A1-VO-family-B-2",
         "type": "controlled_gap_fill",
-        "prompt": "Write one word in the gap: My uncle's daughter is my ____ .",
+        "prompt": "Write one word in the gap: My aunt's son is my ____ .",
         "answerKey": "cousin",
         "acceptedAnswers": [
           "cousin"
@@ -205,7 +205,7 @@
       {
         "id": "EN-F-A1-VO-family-B-4",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (uncle / nephew / cousin): My aunt's husband is my ____ .",
+        "prompt": "Choose the correct word (uncle / father / son): My aunt's husband is my ____ .",
         "answerKey": "uncle",
         "acceptedAnswers": [
           "uncle"
@@ -270,15 +270,16 @@
       {
         "id": "EN-F-A1-VO-family-B-8",
         "type": "free_production",
-        "prompt": "Write one sentence about an uncle. Use the word 'uncle'.",
-        "answerKey": "uncle",
+        "prompt": "Write one sentence about an aunt. Use the word 'aunt'.",
+        "answerKey": "aunt",
         "acceptedAnswers": [
-          "uncle",
-          "uncles"
+          "aunt",
+          "aunts",
+          "auntie"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "uncle",
+        "targetForm": "aunt",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
@@ -287,17 +288,14 @@
       {
         "id": "EN-F-A1-VO-family-B-9",
         "type": "transfer",
-        "prompt": "Laila is married to Adel. Their daughter is Nour. What is Laila to Nour? One word.",
-        "answerKey": "mother",
+        "prompt": "Laila and Adel have a girl, Nour. What is Nour to Laila? One word.",
+        "answerKey": "daughter",
         "acceptedAnswers": [
-          "mother",
-          "mum",
-          "mom",
-          "mummy"
+          "daughter"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "mother",
+        "targetForm": "daughter",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
@@ -307,17 +305,16 @@
       {
         "id": "EN-F-A1-VO-family-C-1",
         "type": "controlled_gap_fill",
-        "prompt": "Write one word in the gap: My father's father is my ____ .",
-        "answerKey": "grandfather",
+        "prompt": "Write one word in the gap: My mother's mother is my ____ .",
+        "answerKey": "grandmother",
         "acceptedAnswers": [
-          "grandfather",
-          "grandpa",
-          "grandad",
-          "granddad"
+          "grandmother",
+          "grandma",
+          "granny"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "grandfather",
+        "targetForm": "grandmother",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
@@ -340,7 +337,7 @@
       {
         "id": "EN-F-A1-VO-family-C-3",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (father / brother / uncle): Salma is Hany's daughter, and Hany is Salma's ____ .",
+        "prompt": "Choose the correct word (father / brother / cousin): Salma is Hany's daughter, and Hany is Salma's ____ .",
         "answerKey": "father",
         "acceptedAnswers": [
           "father"
@@ -355,7 +352,7 @@
       {
         "id": "EN-F-A1-VO-family-C-4",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (aunt / uncle / cousin): My father's sister is my ____ .",
+        "prompt": "Choose the correct word (aunt / cousin / wife): My mother's sister is my ____ .",
         "answerKey": "aunt",
         "acceptedAnswers": [
           "aunt"
@@ -386,18 +383,18 @@
       {
         "id": "EN-F-A1-VO-family-C-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My nece lives in Alexandria with her parents.",
-        "answerKey": "My niece lives in Alexandria with her parents.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My childrin go to school near our house.",
+        "answerKey": "My children go to school near our house.",
         "acceptedAnswers": [
-          "My niece lives in Alexandria with her parents."
+          "My children go to school near our house."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My niece lives in Alexandria with her parents.",
+        "targetForm": "My children go to school near our house.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: nece for niece)"
+        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: childrin for children)"
       },
       {
         "id": "EN-F-A1-VO-family-C-7",
@@ -421,16 +418,15 @@
       {
         "id": "EN-F-A1-VO-family-C-8",
         "type": "free_production",
-        "prompt": "Write one sentence about an aunt. Use the word 'aunt'.",
-        "answerKey": "aunt",
+        "prompt": "Write one sentence about a cousin. Use the word 'cousin'.",
+        "answerKey": "cousin",
         "acceptedAnswers": [
-          "aunt",
-          "aunts",
-          "auntie"
+          "cousin",
+          "cousins"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "aunt",
+        "targetForm": "cousin",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
@@ -439,7 +435,7 @@
       {
         "id": "EN-F-A1-VO-family-C-9",
         "type": "transfer",
-        "prompt": "Amal is married to Fady. Their son is Ziad. What is Ziad to Amal? One word.",
+        "prompt": "Amal and Fady have a little boy, Ziad. What is Ziad to Amal? One word.",
         "answerKey": "son",
         "acceptedAnswers": [
           "son"

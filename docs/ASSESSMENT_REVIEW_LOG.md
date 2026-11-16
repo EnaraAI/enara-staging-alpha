@@ -524,3 +524,36 @@ Independence note: R1 showed a partial-independence slip on round-3 groups T05/T
 ### Tests
 
 `cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. During the pass, two prompt-length failures (family slot 5, clothes-shopping slot 4) were fixed in the data, not the tests.
+
+## Review round 5 (A1–A2)
+
+Status: DRAFT. Sources: `research/assessment-review/a1a2/rereview4_R1/R2/R3.json` → `consolidate5.py` → `CONSOLIDATED5.json` (14 flags, 11 groups, 2 flagged by ≥2 reviewers). Revised targets: `REVISED_TARGETS5.json` (48).
+
+Rule used for cueing: no item's answer word (gap-fill, choice, error-correction correction, transfer key) is shown in any other item's prompt or options in the same form. Words named in slot 7–8 prompts and choice distractors use only rooms, kin words and weather words that are not keyed in that form. Repeated keys that are never shown (e.g. a correction that is also a gap-fill key) are allowed. The check was run on home-rooms, family and weather, and it reports no hits.
+
+### ≥2-reviewer groups (revised)
+
+| Group | Target | Reviewers | Change |
+|---|---|---|---|
+| G01 | family C-6 | R1, R2, R3 | 'nece' (niece, EVP A2) → 'childrin' (children, A1, not used elsewhere in form C). |
+| G02 | weather slots 3/6/7/8 | R2, R3 | B-6 wind→sun (sunny), so 'windy' now appears only in B-3's own options. A-3 key sunny→snowy (sunny is the A-9 key). The free-production prompts name hot/warm (A-7), wet (B-7), warm (B-8) and dry (C-7). |
+
+### Single-reviewer decisions
+
+- G05 home-rooms B-5/B-6 (R1): 'cooking room' → 'eating room' (dining room). The double error 'sitting room of guests' → a single p/b slip, 'path room' (bathroom). Revised. Setting `l1ErrorTypes` to l1_calque/spelling_p_b needs new enum values, so it is a user decision.
+- G06 home-rooms C-9 (R1): prompt now says "One or two words" (lounge stays accepted). Revised.
+- G07 weather A-9 (R1): 'hot' removed from the accepted answers. Revised.
+- G08 home-rooms cueing (R3): the no-cueing rule is applied to all forms. Choice keys, distractors, named rooms in slots 7–8 and some gap-fill keys were rebalanced. The adverts no longer show 'bedrooms'. Revised.
+- G09 family cueing (R3): the no-cueing rule is applied to all forms. Definitions, options and slot-8 kin words were changed. The 'niece' distractor was removed. B-9 now asks for daughter, and C-9 no longer shows 'son'. Revised.
+- G10 jobs A-6 (R3): 'pharmacest' (pharmacist, EVP B1) → 'artest' (artist, A2). Revised. B-4 'pharmacist/pharmacy' was not flagged and is left as it is.
+- G03 classroom p/b and G04 weather noun-for-adjective (R1): these need new enum values. They are user decisions, carried over from round 4.
+- G11 days-months repetition (R3): noted, low severity. The repeated words are never shown to the learner, so they do not cue answers, and resampling them would undo the spelling-difficulty matching from round 4.
+
+### User decisions (not changed)
+
+- Enum values for an L1 calque, a typed consonant (p/b) spelling slip and noun-for-adjective (home-rooms, classroom-objects and weather `l1ErrorTypes`).
+- Carried over from round 4: preposition-transfer, eat/drink and quantifier enum values, imperatives CEFR level, and was-were `l1ErrorTypes`.
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. Prompt-length (±2 words) failures in home-rooms slots 3/4/5/9 and family slot 9 came up during the pass and were fixed in the data, not the tests.

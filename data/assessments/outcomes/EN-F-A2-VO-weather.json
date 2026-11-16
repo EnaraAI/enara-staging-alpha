@@ -2,7 +2,7 @@
   "status": "DRAFT",
   "outcomeId": "EN-F-A2-VO-weather",
   "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
-  "matching": "Items 1-2 gap-fill weather adjective from a noun clue (sun/rain/wind/snow/cloud); 3-4 choice adjective vs noun; EC = Arabic-L1 vowel spelling slip on a weather adjective (slot 5) and noun-for-adjective ('It is rain today', slot 6); FP = one sentence describing weather with a given adjective; transfer = forecast/postcard. Adjectives EVP A1-A2 (-y adjectives), prompts 8-13 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 3: slot 5 copula omission (a grammar error) replaced by a weather-adjective spelling error (-ey for final -y: foggey/cloudey/snowey, spelling_vowel); slot 6 unchanged (noun for adjective). Each slot-5 adjective is not shown elsewhere in its form. Review round 4: the '-ey' spellings are not a typical Arabic-L1 slip and 'foggy' is above A2, so slot 5 is now a vowel slip on an A1-A2 weather adjective not shown elsewhere in its form: wit for wet (A, i/e), clody for cloudy (B, vowel left out), hut for hot (C, short-vowel confusion). The slot-6 tag no longer says copula_omission. outcomes.json l1ErrorTypes = [spelling_vowel]; noun-for-adjective has no enum value.",
+  "matching": "Items 1-2 gap-fill weather adjective from a noun clue (sun/rain/wind/snow/cloud); 3-4 choice adjective vs noun; EC = Arabic-L1 vowel spelling slip on a weather adjective (slot 5) and noun-for-adjective ('It is rain today', slot 6); FP = one sentence describing weather with a given adjective; transfer = forecast/postcard. Adjectives EVP A1-A2 (-y adjectives), prompts 8-13 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 3: slot 5 copula omission (a grammar error) replaced by a weather-adjective spelling error (-ey for final -y: foggey/cloudey/snowey, spelling_vowel); slot 6 unchanged (noun for adjective). Each slot-5 adjective is not shown elsewhere in its form. Review round 4: the '-ey' spellings are not a typical Arabic-L1 slip and 'foggy' is above A2, so slot 5 is now a vowel slip on an A1-A2 weather adjective not shown elsewhere in its form: wit for wet (A, i/e), clody for cloudy (B, vowel left out), hut for hot (C, short-vowel confusion). The slot-6 tag no longer says copula_omission. outcomes.json l1ErrorTypes = [spelling_vowel]; noun-for-adjective has no enum value. Review round 5: no item's answer word is shown elsewhere in its form. A-3 key sunny -> snowy (sunny is the A-9 key); A-7 names hot/warm; A-9 no longer accepts 'hot' ('warm and hot'); B-6 wind -> sun (sunny), so 'windy' is shown only in its own B-3 options; B-7/B-8 name wet/warm; C-7 names dry.",
   "forms": {
     "A": [
       {
@@ -39,14 +39,14 @@
       {
         "id": "EN-F-A2-VO-weather-A-3",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (sunny / sun / rain): Take your sunglasses. It is so ____ outside.",
-        "answerKey": "sunny",
+        "prompt": "Choose the correct word (snowy / snow / sun): Wear your gloves and scarf. It is ____ in the mountains.",
+        "answerKey": "snowy",
         "acceptedAnswers": [
-          "sunny"
+          "snowy"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "sunny",
+        "targetForm": "snowy",
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
@@ -107,15 +107,15 @@
       {
         "id": "EN-F-A2-VO-weather-A-7",
         "type": "free_production",
-        "prompt": "Write one sentence about the weather this morning. Use 'sunny' or 'cloudy'.",
-        "answerKey": "sunny/cloudy",
+        "prompt": "Write one sentence about the weather this morning. Use 'hot' or 'warm'.",
+        "answerKey": "hot/warm",
         "acceptedAnswers": [
-          "sunny",
-          "cloudy"
+          "hot",
+          "warm"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "sunny/cloudy",
+        "targetForm": "hot/warm",
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
@@ -144,7 +144,6 @@
         "answerKey": "sunny",
         "acceptedAnswers": [
           "sunny",
-          "hot",
           "clear"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
@@ -237,15 +236,15 @@
       {
         "id": "EN-F-A2-VO-weather-B-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: Close the window, it is wind this morning.",
-        "answerKey": "Close the window, it is windy this morning.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Wear a hat, it is sun this morning.",
+        "answerKey": "Wear a hat, it is sunny this morning.",
         "acceptedAnswers": [
-          "Close the window, it is windy this morning.",
-          "Close the window, it's windy this morning."
+          "Wear a hat, it is sunny this morning.",
+          "Wear a hat, it's sunny this morning."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "Close the window, it is windy this morning.",
+        "targetForm": "Wear a hat, it is sunny this morning.",
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
@@ -254,15 +253,14 @@
       {
         "id": "EN-F-A2-VO-weather-B-7",
         "type": "free_production",
-        "prompt": "Write one sentence about the weather now. Use 'windy' or 'rainy'.",
-        "answerKey": "windy/rainy",
+        "prompt": "Write one sentence about the weather after rain. Use 'wet'.",
+        "answerKey": "wet",
         "acceptedAnswers": [
-          "windy",
-          "rainy"
+          "wet"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "windy/rainy",
+        "targetForm": "wet",
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
@@ -271,14 +269,14 @@
       {
         "id": "EN-F-A2-VO-weather-B-8",
         "type": "free_production",
-        "prompt": "Write one sentence about the weather in summer. Use 'hot'.",
-        "answerKey": "hot",
+        "prompt": "Write one sentence about the weather in spring. Use 'warm'.",
+        "answerKey": "warm",
         "acceptedAnswers": [
-          "hot"
+          "warm"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "hot",
+        "targetForm": "warm",
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
@@ -401,15 +399,14 @@
       {
         "id": "EN-F-A2-VO-weather-C-7",
         "type": "free_production",
-        "prompt": "Write one sentence about the weather yesterday. Use 'rainy' or 'windy'.",
-        "answerKey": "rainy/windy",
+        "prompt": "Write one sentence about the weather in the desert. Use 'dry'.",
+        "answerKey": "dry",
         "acceptedAnswers": [
-          "rainy",
-          "windy"
+          "dry"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "rainy/windy",
+        "targetForm": "dry",
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
