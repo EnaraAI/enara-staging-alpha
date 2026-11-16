@@ -42,7 +42,12 @@ import { CourseTeacherAnalytics } from './pages/CourseTeacherAnalytics';
 import { StudentDeepAnalytics } from './pages/StudentDeepAnalytics';
 import { Integrations } from '@/pages/Integrations';
 import { AdminAvatarControlCenter } from './components/enara/AdminAvatarControlCenter';
-import { fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
+import { fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
+
+// Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
+const KidsApp = React.lazy(() => import('./kids/KidsApp'));
+export const usesKidsApp = (role: string | null | undefined, user: Pick<SessionUser, 'role' | 'uiMode'> | null | undefined) =>
+  role === 'student' && user?.role === 'student' && user?.uiMode === 'kids';
 import { KnowledgeMap } from './pages/KnowledgeMap';
 import { Documents } from './pages/workspace/Documents';
 import { AIChat } from './pages/workspace/AIChat';
@@ -96,6 +101,14 @@ const App: React.FC = () => {
       completedAssessmentIds: new Set<string>()
     };
   });
+
+  const [kidsMode, setKidsMode] = useState(() => usesKidsApp(restoreUiRole(getSessionUser()?.role, (() => { try { return localStorage.getItem(UI_ROLE_KEY); } catch { return null; } })()), getSessionUser()));
+
+  // Staff may move a student to Enara Kids (or back) at any time: re-read the account.
+  useEffect(() => {
+    if (state.role !== 'student') return;
+    refreshSession().then(u => setKidsMode(usesKidsApp('student', u)), () => undefined);
+  }, [state.role]);
 
   const [userName, setUserName] = useState(() => {
     const session = getSessionUser();
@@ -161,6 +174,7 @@ const App: React.FC = () => {
     }
 
     setState(prev => ({ ...prev, role, page, activeAssessment }));
+    setKidsMode(usesKidsApp(role, user));
     setUserName(user.name || user.email);
   };
 
@@ -169,6 +183,7 @@ const App: React.FC = () => {
     try { localStorage.removeItem(UI_ROLE_KEY); } catch { /* storage unavailable */ }
     setAssessments([]);
     setStudents([]);
+    setKidsMode(false);
     setState(prev => ({ ...prev, role: null, page: 'courses', activeAssessment: null, selectedStudent: null }));
   };
 
@@ -274,6 +289,20 @@ const App: React.FC = () => {
         isSharedCourse={!!state.sharedCourseId} 
         isSharedAssessment={!!state.sharedAssessmentId}
       />
+    );
+  }
+
+  if (state.role === 'student' && kidsMode) {
+    return (
+      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-slate-500">Loading…</div>}>
+        <KidsApp
+          userName={userName}
+          tourPending={getSessionUser()?.tourPending}
+          sharedAssessmentId={state.sharedAssessmentId}
+          sharedCourseId={state.sharedCourseId}
+          onSignOut={handleLogout}
+        />
+      </React.Suspense>
     );
   }
 
