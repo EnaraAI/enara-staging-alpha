@@ -60,6 +60,7 @@ const emptyNewStudent = () => ({
   name: '',
   email: '',
   grade: 'Grade 10',
+  uiMode: 'standard' as 'standard' | 'kids',
   password: generateSecurePassword()
 });
 
@@ -109,7 +110,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
   // Edit / delete state
   const [menuStudentId, setMenuStudentId] = useState<string | null>(null);
   const [studentToEdit, setStudentToEdit] = useState<Student | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', email: '', grade: 'Grade 10' });
+  const [editForm, setEditForm] = useState({ name: '', email: '', grade: 'Grade 10', uiMode: 'standard' as 'standard' | 'kids' });
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [deletingStudentId, setDeletingStudentId] = useState<string | null>(null);
 
@@ -227,6 +228,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
         name: newStudent.name.trim(),
         email: newStudent.email.trim(),
         grade: newStudent.grade,
+        uiMode: newStudent.uiMode,
       }) as Student;
     } catch (err) {
       toast.error('Could not create student', errorMessage(err));
@@ -290,7 +292,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
   const openEditStudent = (student: Student) => {
     setMenuStudentId(null);
     setStudentToEdit(student);
-    setEditForm({ name: student.name || '', email: student.email || '', grade: student.grade || 'Grade 10' });
+    setEditForm({ name: student.name || '', email: student.email || '', grade: student.grade || 'Grade 10', uiMode: student.uiMode === 'kids' ? 'kids' : 'standard' });
   };
 
   const handleSaveEdit = async (e: React.FormEvent) => {
@@ -302,6 +304,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
         name: editForm.name.trim(),
         email: editForm.email.trim(),
         grade: editForm.grade,
+        uiMode: editForm.uiMode,
       }) as Student;
       setStudents(prev => prev.map(s => (s.id === updated.id ? updated : s)));
       toast.success('Student updated', `${updated.name} was saved.`);
@@ -494,7 +497,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
                   </div>
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 leading-tight">{s.name}</h3>
-                <p className="text-xs font-semibold text-slate-500 mt-1">{s.grade} • ID:{s.id}</p>
+                <p className="text-xs font-semibold text-slate-500 mt-1">{s.grade} • ID:{s.id}{s.uiMode === 'kids' && <span className="ml-1.5 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">Kids</span>}</p>
                 
                 <div className="mt-3 flex items-center justify-center">
                   <span className="px-2 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100 flex items-center gap-1.5 tracking-wide">
@@ -589,6 +592,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm font-medium text-slate-600">{s.grade}</span>
+                      {s.uiMode === 'kids' && <span className="ml-2 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-xs font-bold">Kids</span>}
                     </td>
                     <td className="px-6 py-4">
                       <span className="px-2 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100 flex items-center gap-1.5 tracking-wide">
@@ -949,6 +953,19 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
                           </div>
                         </div>
                       </div>
+
+                <label className="flex items-start gap-3 p-3 rounded-md border border-slate-200 bg-slate-50 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newStudent.uiMode === 'kids'}
+                    onChange={(e) => setNewStudent({ ...newStudent, uiMode: e.target.checked ? 'kids' : 'standard' })}
+                    className="mt-1 w-4 h-4 accent-teal-600"
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-slate-800">Enara Kids</span>
+                    <span className="block text-xs text-slate-500">Show this student the kids interface: bigger buttons, simpler words, stars instead of scores. For young learners.</span>
+                  </span>
+                </label>
 
                       {/* Course Commitment Selection */}
                       <div className="space-y-2">
@@ -1330,6 +1347,18 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
                     ))}
                   </select>
                 </div>
+                <label className="flex items-start gap-3 p-3 rounded-md border border-slate-200 bg-slate-50 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editForm.uiMode === 'kids'}
+                    onChange={(e) => setEditForm({ ...editForm, uiMode: e.target.checked ? 'kids' : 'standard' })}
+                    className="mt-1 w-4 h-4 accent-teal-600"
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-slate-800">Enara Kids</span>
+                    <span className="block text-xs text-slate-500">Show this student the kids interface: bigger buttons, simpler words, stars instead of scores. For young learners.</span>
+                  </span>
+                </label>
                 <div className="pt-4 flex gap-4">
                   <button
                     type="button"

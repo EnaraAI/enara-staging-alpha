@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { Student } from '../models/Student';
+import { Student, STUDENT_UI_MODES, StudentUiMode } from '../models/Student';
 import { Batch } from '../models/Batch';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
@@ -44,12 +44,22 @@ export const getStudent = asyncHandler(async (req: AuthRequest, res: Response) =
   res.json(toPlainObject(student));
 });
 
+// uiMode: 'kids' gives the student the Enara Kids interface; 'standard' (the default) the usual one.
+function readUiMode(body: Record<string, unknown>): StudentUiMode | undefined {
+  if (body.uiMode === undefined) return undefined;
+  if (typeof body.uiMode !== 'string' || !(STUDENT_UI_MODES as readonly string[]).includes(body.uiMode)) {
+    throw new AppError(`uiMode must be one of: ${STUDENT_UI_MODES.join(', ')}`, 400, 'INVALID_UI_MODE');
+  }
+  return body.uiMode as StudentUiMode;
+}
+
 export const createStudent = asyncHandler(async (req: AuthRequest, res: Response) => {
   const body = ensurePlainObject(req.body);
   rejectMongoOperators(body);
   const name = getRequiredString(body, 'name', { max: 120 });
   const email = normalizeEmail(body.email);
   const grade = getRequiredString(body, 'grade', { max: 80 });
+  const uiMode = readUiMode(body);
   const batchId = getOptionalId(body, 'batchId');
   const academicYear = getOptionalString(body, 'academicYear', { max: 32 });
   const groupId = getOptionalString(body, 'groupId', { max: 80 });
@@ -76,6 +86,7 @@ export const createStudent = asyncHandler(async (req: AuthRequest, res: Response
     batchId: batchId || undefined,
     academicYear: academicYear || undefined,
     groupId: groupId || undefined,
+    uiMode: uiMode || 'standard',
   });
 
   if (batchId) {
@@ -97,6 +108,7 @@ export const updateStudent = asyncHandler(async (req: AuthRequest, res: Response
   const batchId = getOptionalId(body, 'batchId');
   const academicYear = getOptionalString(body, 'academicYear', { max: 32 });
   const groupId = getOptionalString(body, 'groupId', { max: 80 });
+  const uiMode = readUiMode(body);
 
   if (email && email !== student.email) {
     const duplicate = await Student.findOne(scopedFilter(req, { email }));
@@ -109,6 +121,7 @@ export const updateStudent = asyncHandler(async (req: AuthRequest, res: Response
     student.avatar = initialsFromName(name);
   }
   if (grade !== undefined) student.grade = grade;
+  if (uiMode !== undefined) student.uiMode = uiMode;
   if (academicYear !== undefined) student.academicYear = academicYear || undefined;
   if (groupId !== undefined) student.groupId = groupId || undefined;
 

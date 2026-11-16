@@ -92,6 +92,34 @@ export const completeTour = asyncHandler(async (req: AuthRequest, res: Response)
   res.json({ ok: true });
 });
 
+// What the app needs to know about the signed-in account. uiMode is 'kids' only
+// for a student whose Student record the school set to the Enara Kids interface.
+export async function uiModeFor(user: { role: string; studentId?: string }): Promise<'standard' | 'kids'> {
+  if (user.role !== 'student' || !user.studentId) return 'standard';
+  const student = await Student.findOne({ id: user.studentId }).select('uiMode').lean();
+  return student?.uiMode === 'kids' ? 'kids' : 'standard';
+}
+
+async function sessionUser(user: InstanceType<typeof User>) {
+  return {
+    email: user.email,
+    role: user.role,
+    name: user.name,
+    studentId: user.studentId,
+    institutionId: user.institutionId,
+    tourPending: tourPending(user),
+    uiMode: await uiModeFor(user),
+  };
+}
+
+// GET /api/auth/session: the signed-in account as sign-in returns it, so the app
+// picks up changes (such as a student moved to Enara Kids) without signing in again.
+export const session = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const user = await User.findById(req.user!.id);
+  if (!user || user.status !== 'active') throw new AppError('Not signed in', 401);
+  res.json({ user: await sessionUser(user) });
+});
+
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const body = ensurePlainObject(req.body);
   rejectMongoOperators(body);
@@ -129,14 +157,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
   res.json({
     token,
-    user: {
-      email: user.email,
-      role: user.role,
-      name: user.name,
-      studentId: user.studentId,
-      institutionId: user.institutionId,
-      tourPending: tourPending(user),
-    },
+    user: await sessionUser(user),
   });
 });
 
@@ -191,14 +212,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   res.status(201).json({
     token,
-    user: {
-      email: user.email,
-      role: user.role,
-      name: user.name,
-      studentId: user.studentId,
-      institutionId: user.institutionId,
-      tourPending: tourPending(user),
-    },
+    user: await sessionUser(user),
   });
 });
 
@@ -245,14 +259,7 @@ export const demoLogin = asyncHandler(async (req: Request, res: Response) => {
 
   res.json({
     token,
-    user: {
-      email: user.email,
-      role: user.role,
-      name: user.name,
-      studentId: user.studentId,
-      institutionId: user.institutionId,
-      tourPending: tourPending(user),
-    },
+    user: await sessionUser(user),
   });
 });
 
