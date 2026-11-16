@@ -67,11 +67,13 @@ describe('vercel.json', () => {
   it('sends API, uploads and health paths to the function before the SPA fallback', () => {
     const sources = cfg.rewrites.map((r: { source: string }) => r.source);
     const spa = sources.indexOf('/((?!assets/).*)');
-    for (const s of ['/api/:path*', '/uploads/:path*', '/ready', '/health']) {
+    // LMS (docs/lms): /lti/* and the tool JWKS; inert unless LMS_LTI_ENABLED is on.
+    const toFunction = ['/api/:path*', '/uploads/:path*', '/ready', '/health', '/lti/:path*', '/.well-known/jwks.json'];
+    for (const s of toFunction) {
       expect(sources.indexOf(s), s).toBeGreaterThanOrEqual(0);
       expect(sources.indexOf(s), s).toBeLessThan(spa);
     }
-    expect(cfg.rewrites.filter((r: { destination: string }) => r.destination === '/api')).toHaveLength(4);
+    expect(cfg.rewrites.filter((r: { destination: string }) => r.destination === '/api').map((r: { source: string }) => r.source)).toEqual(toFunction);
   });
 
   it('builds the SPA same-origin, deploys only staging-alpha, and keeps the function near the database', () => {

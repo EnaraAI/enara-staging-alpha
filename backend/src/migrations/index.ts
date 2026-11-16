@@ -25,6 +25,7 @@ import { LessonProgress } from '../models/LessonProgress';
 import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
+import { LMS_MODELS, LmsGradeSyncJob, LmsPlatform, LmsToolKey } from '../integrations/lms/models';
 import type { Migration } from './runner';
 
 // Inserts events with fixed ids, so re-running adds nothing twice.
@@ -377,6 +378,20 @@ export const MIGRATIONS: Migration[] = [
       await CommercialPlan.createIndexes();
       await CurrentToolSpend.createIndexes();
       await UsageLedger.createIndexes();
+    },
+  },
+  {
+    id: '2026-11-16-lms-phase0-indexes',
+    description: 'LMS integration: create the 14 LMS collections and their indexes (additive; no existing rows touched)',
+    up: async () => {
+      // Built here and verified, not left to Mongoose's background build: the
+      // outbox and key rotation rely on these unique indexes.
+      for (const model of LMS_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
+      const names = async (m: { collection: { indexes(): Promise<Array<{ name?: string; unique?: boolean; key: Record<string, unknown> }>> } }) =>
+        m.collection.indexes();
+      if (!(await names(LmsToolKey)).some((i) => i.name === 'one_active_key' && i.unique)) throw new Error('lms_tool_keys one_active_key index missing');
+      if (!(await names(LmsGradeSyncJob)).some((i) => i.key.idempotencyKey === 1 && i.unique)) throw new Error('lms_grade_sync_jobs idempotencyKey unique index missing');
+      if (!(await names(LmsPlatform)).some((i) => i.key.issuer === 1 && i.key.clientId === 1 && i.unique)) throw new Error('lms_platforms issuer+clientId unique index missing');
     },
   },
 ];

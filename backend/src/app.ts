@@ -49,6 +49,8 @@ import educatorChatRoutes from './routes/educatorChat.routes';
 import speakingRoutes from './routes/speaking.routes';
 import usageRoutes from './routes/usage.routes';
 import parentsRoutes from './parents/routes';
+import { ltiRouter, wellKnownRouter } from './integrations/lms/routes';
+import { lmsFlags } from './integrations/lms/core/flags';
 import { getPostgresPool } from './config/postgres';
 import mongoose from 'mongoose';
 
@@ -144,6 +146,7 @@ export function createApp() {
   app.use('/api/parents/register', makeLimiter('parent-register', 60 * 60 * 1000, 10, 'Too many registration attempts'));
   app.use('/api/parents/google', makeLimiter('parent-google', 15 * 60 * 1000, 30, 'Too many sign-in attempts'));
   app.use('/api/parents/link', makeLimiter('parent-link', 15 * 60 * 1000, 30, 'Too many code attempts'));
+  app.use(['/lti', '/.well-known'], makeLimiter('lti', 60 * 1000, 600, 'Too many requests', false, () => !lmsFlags().lti));
   app.use('/api/workspace/invitations/accept', makeLimiter('invitation-accept', 15 * 60 * 1000, 20, 'Too many invitation attempts'));
   app.use('/api/upload', makeLimiter('upload', 60 * 60 * 1000, 30, 'Too many upload requests'));
   app.post('/api/documents', makeLimiter('documents', 60 * 60 * 1000, 60, 'Too many document uploads', true));
@@ -311,6 +314,9 @@ export function createApp() {
   app.use('/api/usage', usageRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/parents', parentsRoutes);
+  // LMS (docs/lms): inert unless LMS_LTI_ENABLED is on and the LMS config is valid.
+  app.use('/lti', ltiRouter);
+  app.use('/.well-known', wellKnownRouter);
 
   app.use((_req, _res, next) => {
     next(new AppError('Route not found', 404, 'NOT_FOUND'));

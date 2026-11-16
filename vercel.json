@@ -22,6 +22,8 @@
     { "source": "/uploads/:path*", "destination": "/api" },
     { "source": "/ready", "destination": "/api" },
     { "source": "/health", "destination": "/api" },
+    { "source": "/lti/:path*", "destination": "/api" },
+    { "source": "/.well-known/jwks.json", "destination": "/api" },
     { "source": "/((?!assets/).*)", "destination": "/index.html" }
   ]
 }

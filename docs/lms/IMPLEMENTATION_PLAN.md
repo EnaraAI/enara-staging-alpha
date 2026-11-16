@@ -10,7 +10,7 @@ Release 1 ships and is tested on **Moodle + Google Classroom (Mode A) only**. Th
 | Area | Finding |
 |---|---|
 | Backend | Node and TypeScript, Express (`backend/src/app.ts`), one Vercel serverless entry (`api/index.js`, `maxDuration` 60 s) |
-| DB | MongoDB Atlas with Mongoose. **No migrations**: schema lives in the models, indexes are created by script. Postgres is used only for ingestion and diagnostics |
+| DB | MongoDB Atlas with Mongoose. Schema lives in the models; a forward-only migration runner (`backend/src/migrations`) creates indexes and runs on start-up outside staging. Postgres is used only for ingestion and diagnostics |
 | Jobs | No queue. `/api/cron/daily` exists. Vercel **Hobby** plan: daily crons only |
 | Background work | `@vercel/functions` is already a dependency, so `waitUntil` is available |
 | Secrets | Vercel env vars. No encryption-at-rest helper yet |
@@ -72,7 +72,7 @@ admin/       Integrations admin endpoints (platforms, failures, retry, seats, ex
 
 ## 3. Conflicts and gaps, with the resolution for each
 
-1. **No migrations.** Mongoose models plus an idempotent `scripts/lms/ensure-indexes.ts`. Phase 0 is done when "indexes are created and models validate".
+1. **Forward-only migrations.** The existing runner has no "down" step. LMS indexes are one idempotent migration (`2026-11-16-lms-phase0-indexes`); the "down" is a separate `npm run lms:drop -- --confirm` script that is never run automatically. *(Corrected in Phase 0: the first draft said the repo had no migrations.)*
 2. **No frequent cron.** Grade delivery is built in layers (§5).
 3. **No encryption helper.** AES-256-GCM with Node `crypto` and a key-version field per record, keyed by `LMS_KEK`.
 4. **Frame headers.** Turn off helmet frameguard **only** on `/lti/*` and the LMS landing pages, and add `Content-Security-Policy: frame-ancestors <registered platform origins>`. All other routes keep today's headers.

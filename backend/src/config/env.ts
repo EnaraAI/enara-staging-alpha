@@ -117,6 +117,25 @@ export interface AppConfig {
     anamMaxSessionSeconds?: number;
   };
   r2?: { accountId: string; bucket: string; accessKeyId: string; secretAccessKey: string };
+  lms: LmsConfig;
+}
+
+// LMS integration (docs/lms/IMPLEMENTATION_PLAN.md). Every flag defaults to off.
+// A missing or malformed LMS_KEK never stops the app: the LMS parts stay off and
+// `problem` names the variable (never its value).
+export const LMS_DRAIN_TRIGGER_NAMES = ['inline', 'piggyback', 'targeted', 'daily', 'cron'] as const;
+export type LmsDrainTrigger = (typeof LMS_DRAIN_TRIGGER_NAMES)[number];
+export interface LmsConfig {
+  ltiEnabled: boolean;
+  googleClassroomEnabled: boolean;
+  gradePassbackEnabled: boolean;
+  toolBaseUrl?: string;
+  /** Key-encryption key (32 bytes) and an optional previous one for rotation. */
+  kek?: Buffer;
+  kekPrevious?: Buffer;
+  drainTriggers: LmsDrainTrigger[];
+  google: { clientId?: string; clientSecret?: string; redirectUri?: string };
+  problem?: string;
 }
 
 let cachedConfig: AppConfig | undefined;
@@ -169,6 +188,65 @@ function readNumber(
     throw new Error(`${key} must be <= ${options.max}`);
   }
   return value;
+}
+
+function readKek(source: NodeJS.ProcessEnv, key: string): { value?: Buffer; problem?: string } {
+  const raw = readString(source, key);
+  if (!raw) return {};
+  const value = Buffer.from(raw, 'base64');
+  if (value.length !== 32 || value.toString('base64').replace(/=+$/, '') !== raw.replace(/=+$/, '')) {
+    return { problem: `${key} must be 32 random bytes in base64` };
+  }
+  return { value };
+}
+
+export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
+  const problems: string[] = [];
+  const kek = readKek(source, 'LMS_KEK');
+  const kekPrevious = readKek(source, 'LMS_KEK_PREVIOUS');
+  if (kek.problem) problems.push(kek.problem);
+  if (kekPrevious.problem) problems.push(kekPrevious.problem);
+  const ltiEnabled = readBoolean(source, 'LMS_LTI_ENABLED', false);
+  const googleClassroomEnabled = readBoolean(source, 'LMS_GOOGLE_CLASSROOM_ENABLED', false);
+  if ((ltiEnabled || googleClassroomEnabled) && !kek.value && !kek.problem) problems.push('LMS_KEK is required when an LMS flag is on');
+
+  let toolBaseUrl = readString(source, 'LMS_TOOL_BASE_URL');
+  if (toolBaseUrl) {
+    try {
+      const u = new URL(toolBaseUrl);
+      const local = u.hostname === 'localhost' || u.hostname === '127.0.0.1';
+      if (u.protocol !== 'https:' && !(local && u.protocol === 'http:')) throw new Error('scheme');
+      toolBaseUrl = u.origin;
+    } catch {
+      problems.push('LMS_TOOL_BASE_URL must be an https origin');
+      toolBaseUrl = undefined;
+    }
+  } else if (ltiEnabled) {
+    problems.push('LMS_TOOL_BASE_URL is required when LMS_LTI_ENABLED is on');
+  }
+
+  const triggersRaw = readString(source, 'LMS_DRAIN_TRIGGERS') ?? 'inline,piggyback,targeted,daily';
+  const drainTriggers: LmsDrainTrigger[] = [];
+  for (const t of triggersRaw.split(',').map((x) => x.trim()).filter(Boolean)) {
+    if ((LMS_DRAIN_TRIGGER_NAMES as readonly string[]).includes(t)) drainTriggers.push(t as LmsDrainTrigger);
+    else problems.push(`LMS_DRAIN_TRIGGERS has an unknown trigger`);
+  }
+
+  return {
+    ltiEnabled,
+    googleClassroomEnabled,
+    gradePassbackEnabled: readBoolean(source, 'LMS_GRADE_PASSBACK_ENABLED', false),
+    toolBaseUrl,
+    kek: kek.value,
+    kekPrevious: kekPrevious.value,
+    drainTriggers: [...new Set(drainTriggers)],
+    google: {
+      clientId: readString(source, 'GOOGLE_CLASSROOM_CLIENT_ID'),
+      clientSecret: readString(source, 'GOOGLE_CLASSROOM_CLIENT_SECRET'),
+      redirectUri: readString(source, 'GOOGLE_CLASSROOM_REDIRECT_URI'),
+    },
+    problem: problems.length ? problems.join('; ') : undefined,
+  };
 }
 
 function requireString(source: NodeJS.ProcessEnv, key: string): string {
@@ -467,6 +545,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     appUrl: readString(source, "APP_URL") || "https://enara-sandbox-frontend.vercel.app",
     googleClientId: readString(source, "GOOGLE_CLIENT_ID") || undefined,
     cronSecret: readString(source, "CRON_SECRET"),
+    lms: parseLmsConfig(source),
     // Staging starts with AI paused and invite-only registration unless set explicitly.
     aiPaused: readBoolean(source, "AI_PAUSED", staging),
     registrationInviteOnly: readBoolean(source, "REGISTRATION_INVITE_ONLY", staging),
