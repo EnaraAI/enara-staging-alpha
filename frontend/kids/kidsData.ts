@@ -113,7 +113,8 @@ export function courseOutline(tree: Any) {
 export function fileName(url: string) {
   try {
     const last = decodeURIComponent(String(url).split('?')[0].split('/').pop() || '');
-    return last.replace(/^\d{10,}[-_]/, '') || url;
+    // Stored names are <school>~<uuid>-<original name>; older ones start with a timestamp.
+    return last.replace(/^[A-Za-z0-9_-]+~[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-/i, '').replace(/^\d{10,}[-_]/, '') || url;
   } catch {
     return url;
   }

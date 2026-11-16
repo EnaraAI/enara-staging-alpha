@@ -6,6 +6,7 @@ import { AppError } from '../middleware/errorHandler';
 import { STUDENT_VISIBLE_COURSE_FILTER } from './courseVisibility';
 import { requestMemo } from '../utils/callContext';
 import { resolveUploads } from './uploadAccess';
+import { isVideoFileName } from '../utils/uploadSecurity';
 
 export async function getStudentOrThrow(studentId: string) {
   const student = await requestMemo(`student:${studentId}`, () => Student.findOne({ id: studentId }).exec());
@@ -83,6 +84,14 @@ export async function buildCourseTree(studentId: string, courseId: string) {
     if (isCompleted) status = 'completed';
     else if (prevCompleted) status = 'active';
 
+    // The lesson video is the chapter's first uploaded MP4/WebM; it plays in the
+    // lesson instead of being listed as a download. Paths are signed on the way out.
+    const uploads: string[] = chapter.uploads || [];
+    const videoUrl = uploads.find((u) => u.startsWith('/uploads/') && isVideoFileName(u));
+    const quiz = chapter.quiz?.questions?.length
+      ? { questions: chapter.quiz.questions.map((q: any) => ({ id: q.id, text: q.text, options: q.options, correctAnswer: q.correctAnswer, explanation: q.explanation || '' })) }
+      : undefined;
+
     return {
       id: chapter.id,
       title: chapter.title,
@@ -90,11 +99,15 @@ export async function buildCourseTree(studentId: string, courseId: string) {
       status,
       order: idx + 1,
       content: chapter.description || '',
-      materials: chapter.uploads || [],
+      materials: uploads.filter((u) => u !== videoUrl),
       description: chapter.description || '',
       enaraSectionId: chapter.enaraSectionId,
+      ...(videoUrl ? { videoUrl } : {}),
+      ...(quiz ? { quiz } : {}),
     };
   });
+
+  const lessonVideos = new Set(lessons.map((l) => (l as { videoUrl?: string }).videoUrl).filter(Boolean) as string[]);
 
   if (lessons.length > 0 && !lessons.some((l) => l.status === 'active')) {
     const firstIncomplete = lessons.find((l) => l.status !== 'completed');
@@ -129,7 +142,7 @@ export async function buildCourseTree(studentId: string, courseId: string) {
         lessonsCount: lessons.length,
         completedLessons,
         lessons,
-        materials: chapters.flatMap((c) => c.uploads || []),
+        materials: chapters.flatMap((c) => c.uploads || []).filter((u: string) => !lessonVideos.has(u)),
         explanation:
           curriculum?.summary ||
           `Welcome to ${instance.courseName}. Your AI tutor is ready to help.`,

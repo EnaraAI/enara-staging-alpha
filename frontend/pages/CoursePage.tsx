@@ -895,13 +895,18 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
               {selectedLesson.videoUrl && (
                 <div className="mb-8">
                   <div className="aspect-video w-full bg-slate-900 rounded-lg overflow-hidden">
-                    <iframe
-                      src={selectedLesson.videoUrl}
-                      title={selectedLesson.title}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
+                    {/^\/uploads\/|\.(mp4|webm)(\?|$)/i.test(selectedLesson.videoUrl) ? (
+                      // An uploaded lesson video (stored in R2; the signed link redirects there).
+                      <video key={selectedLesson.videoUrl} src={selectedLesson.videoUrl} controls playsInline preload="metadata" className="w-full h-full" title={selectedLesson.title} />
+                    ) : (
+                      <iframe
+                        src={selectedLesson.videoUrl}
+                        title={selectedLesson.title}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    )}
                   </div>
                   <div className="flex justify-end mt-2">
                     <button

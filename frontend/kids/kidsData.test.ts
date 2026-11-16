@@ -66,3 +66,16 @@ test('plan items map sources and keep done or dismissed items aside', () => {
   assert.deepEqual(p.items.map((x: any) => x.source), ['assignment', 'suggested']);
   assert.deepEqual(p.done, ['k2']);
 });
+
+test('lessons carry the uploaded video and the practice quiz (choices by index)', () => {
+  const tree = { modules: [{ title: 'Counting', lessons: [
+    { id: 'l1', title: 'Tens', order: 1, status: 'active', content: 'A\n\nB', materials: ['/uploads/instA~3f2a9c1e-1b2c-4d5e-8f90-123456789abc-worksheet.pdf?exp=1&sig=ab'], videoUrl: '/uploads/a~2-lesson.mp4?exp=1&sig=cd',
+      quiz: { questions: [{ id: 'q1', text: 'After 30?', options: ['31', '40'], correctAnswer: 1, explanation: '+10' }] } },
+    { id: 'l2', title: 'Next', order: 2, status: 'locked', content: '' }] }] };
+  const v = D.lessonView(tree, 'l1')!;
+  assert.equal(v.videoUrl, '/uploads/a~2-lesson.mp4?exp=1&sig=cd');
+  assert.deepEqual(v.lesson.quiz, [{ id: 'q1', text: 'After 30?', choices: [{ id: '0', text: '31' }, { id: '1', text: '40' }], answer: '1', why: '+10' }]);
+  assert.deepEqual(v.lesson.text, ['A', 'B']);
+  assert.equal(v.lesson.files[0].name, 'worksheet.pdf');
+  assert.equal(D.lessonView(tree, 'l2')!.lesson.quiz.length, 0);
+});
