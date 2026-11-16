@@ -242,3 +242,28 @@ The graderV2 guard caught "thursday", "grand mother", "bath room", "cheapper" an
   - n = 75 per group;
   - the rules are hand-written word lists;
   - this is the third fix-and-test round, so some fitting to the error types seen in rounds 3–4 is possible even on new answers.
+
+## Round 6: narrow irregular-forms fix, re-check (target MISSED)
+
+SIMULATION ONLY · DRAFT.
+
+**Fix (commit b8d2f01):** the graderV2 target-form scorer now accepts the irregular third-person forms does, has and is after he, she, it or a name, and treats do, have and are there as wrong (except in questions). It also accepts irregular plural subjects with are and with many (children, men, women, people, teeth, feet, mice). Irregular past forms and comparatives (better, worse) already worked, so they were not changed. See `round6/FIX_RESULT.md` and `docs/GRADER_FIXES.md`.
+
+**Re-check A, ESL6 item safety check (810 items):** 0 failures, down from 1. Item C-9's key now scores 2/2. The graderBlind list is unchanged (15).
+
+**Re-check B, round-5 answers rerun:** 0 of 150 scores changed. Exact agreement is still 96.0%, QWK still 0.914.
+
+**Re-check C, 40 NEW answers on the affected outcomes** (third-person-s, copula-be, much-many and there-is-are; 3 independent agent scorers, majority reference; all 3 agreed on 39 of 40):
+
+| | Result | Target |
+|---|---|---|
+| Exact items (18) | **100%** (18/18) | ≥95%: pass |
+| Free/transfer items (22), QWK | **0.732** | ≥0.80: **FAIL** |
+
+**Disagreements (4, all free/transfer):**
+- R6-006 third-person-s, "has a big breakfast and go…": reference 1, grader 2. Once "has" counts as correct, the second verb ("go") is not checked. This over-credit is caused by the fix.
+- R6-017 copula-be, "Huda are…": reference 0, grader 2. The copula rule does not mark are as wrong after a singular name. The fix covered the third-person-s rule, not the copula rule.
+- R6-019 copula-be, "The people in my town are…": reference 2, grader 0. The irregular-plural subject is not recognised when words come between it and are. The fix is incomplete.
+- R6-039 there-is-are, "There is a pool and two restaurants.": reference 1, grader 2. A two-slot transfer item gets full credit with only one slot right. This is pre-existing; round 5 showed the same pattern.
+
+**Status: STOPPED, per the user's rule ("If the re-check misses a target, stop and tell me"). ESL6 is not pre-registered and has not started.** The grader change is committed behind the graderV2 switch, which defaults to OFF.
