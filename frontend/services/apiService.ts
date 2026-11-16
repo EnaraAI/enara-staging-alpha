@@ -14,7 +14,7 @@ const API_BASE = (import.meta.env.VITE_API_URL || '/api/railway').replace(/\/+$/
 const TOKEN_KEY = 'enara_token';
 const USER_KEY = 'enara_user';
 
-export type BackendRole = 'student' | 'teacher' | 'academic_manager' | 'admin' | 'enara-admin';
+export type BackendRole = 'student' | 'teacher' | 'academic_manager' | 'admin' | 'enara-admin' | 'parent';
 
 export interface SessionUser {
   email: string;
@@ -42,9 +42,19 @@ export class ApiError extends Error {
 // Fired when the backend rejects our token, so the app can return to login.
 export const SESSION_EXPIRED_EVENT = 'enara-session-expired';
 
+// Demo sessions live in sessionStorage: closing the browser forgets them.
+const DEMO_KEY = 'enara_demo';
+export function isDemoSession(): boolean {
+  try {
+    return sessionStorage.getItem(DEMO_KEY) === '1' && !!sessionStorage.getItem(TOKEN_KEY);
+  } catch {
+    return false;
+  }
+}
+
 export function getToken(): string | null {
   try {
-    return localStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY);
   } catch {
     return null;
   }
@@ -52,20 +62,25 @@ export function getToken(): string | null {
 
 export function getSessionUser(): SessionUser | null {
   try {
-    const raw = localStorage.getItem(USER_KEY);
+    const raw = sessionStorage.getItem(USER_KEY) || localStorage.getItem(USER_KEY);
     return raw && getToken() ? (JSON.parse(raw) as SessionUser) : null;
   } catch {
     return null;
   }
 }
 
-function saveSession(token: string, user: SessionUser) {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+function saveSession(token: string, user: SessionUser, demo = false) {
+  const store = demo ? sessionStorage : localStorage;
+  store.setItem(TOKEN_KEY, token);
+  store.setItem(USER_KEY, JSON.stringify(user));
+  if (demo) sessionStorage.setItem(DEMO_KEY, '1');
 }
 
 export function clearSession() {
   try {
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(DEMO_KEY);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     // Keys used by older versions of the app.
@@ -137,6 +152,32 @@ async function request<T = any>(method: string, path: string, body?: unknown, is
 export const requestIdOf = (value: unknown): string | null => (value && typeof value === 'object' ? ((value as { __requestId?: string }).__requestId ?? null) : null);
 
 // AUTH
+// Partner demo: one click opens a fresh demo school as this role.
+export const DEMO_CHANGED_EVENT = 'enara-demo-changed';
+export type DemoRole = 'student' | 'teacher' | 'admin';
+export async function fetchDemoStatus(): Promise<{ available: boolean; full: boolean }> {
+  return request('GET', '/api/demo/status');
+}
+export async function startDemo(role: DemoRole): Promise<SessionUser> {
+  try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); } catch { /* storage unavailable */ }
+  const data = await request<{ token: string; user: SessionUser }>('POST', '/api/demo/start', { role });
+  saveSession(data.token, data.user, true);
+  window.dispatchEvent(new Event(DEMO_CHANGED_EVENT));
+  return data.user;
+}
+export async function switchDemoRole(role: DemoRole): Promise<SessionUser> {
+  const data = await request<{ token: string; user: SessionUser }>('POST', '/api/demo/switch', { role });
+  saveSession(data.token, data.user, true);
+  return data.user;
+}
+export async function demoHeartbeat(): Promise<void> {
+  await request('POST', '/api/demo/heartbeat');
+}
+export async function endDemo(): Promise<void> {
+  await request('POST', '/api/demo/end').catch(() => undefined);
+  clearSession();
+}
+
 export async function login(email: string, password: string): Promise<SessionUser> {
   const data = await request<{ token: string; user: SessionUser }>('POST', '/api/auth/login', {
     email: email.trim(),
@@ -146,12 +187,50 @@ export async function login(email: string, password: string): Promise<SessionUse
   return data.user;
 }
 
+// Parents Portal sign-up: the server always creates a 'parent' account.
+export async function registerParent(name: string, email: string, password: string, language: 'en' | 'ar'): Promise<SessionUser> {
+  const data = await request<{ token: string; user: SessionUser }>('POST', '/api/parents/register', { name: name.trim(), email: email.trim(), password, language });
+  saveSession(data.token, data.user);
+  return data.user;
+}
+
+// Parents Portal: which sign-in methods to offer. The Google client ID is public.
+export async function fetchParentAuthConfig(): Promise<{ google: boolean; clientId?: string }> {
+  return request('GET', '/api/parents/auth-config');
+}
+
+// Parents Portal "Continue with Google": the Google ID token (GIS credential) is
+// verified on the server, which signs in or creates a 'parent' account only.
+export async function googleParentSignIn(credential: string, language: 'en' | 'ar'): Promise<SessionUser> {
+  const data = await request<{ token: string; user: SessionUser; created: boolean }>('POST', '/api/parents/google', { credential, language });
+  saveSession(data.token, data.user);
+  return data.user;
+}
+
+// Shared client for the Parents Portal (frontend/parents) and its admin panel.
+export function apiRequest<T = any>(method: string, path: string, body?: unknown): Promise<T> {
+  return request<T>(method, path, body);
+}
+
+// School admin: parent link codes for a learner (Parents Portal).
+export interface ParentCodeList {
+  codes: { id: string; display: string; hint: string; expiresAt: string; createdAt: string }[];
+  links: { linkId: string; parentName: string; parentEmail: string | null; role: 'owner' | 'full' | 'view'; status: string; consent: string; createdAt: string }[];
+}
+export const fetchParentCodes = (studentId: string) => request<ParentCodeList>('GET', `/api/students/${encodeURIComponent(studentId)}/parent-codes`);
+export const createParentCode = (studentId: string, sendToEmail?: string) =>
+  request<{ id: string; code: string; expiresAt: string; emailed?: { ok: boolean; reason?: string } }>('POST', `/api/students/${encodeURIComponent(studentId)}/parent-codes`, sendToEmail ? { sendToEmail } : {});
+export const revokeParentCode = (studentId: string, codeId: string) => request('DELETE', `/api/students/${encodeURIComponent(studentId)}/parent-codes/${encodeURIComponent(codeId)}`);
+export const removeParentLink = (studentId: string, linkId: string) => request('DELETE', `/api/students/${encodeURIComponent(studentId)}/parent-links/${encodeURIComponent(linkId)}`);
+
 // The product tour was finished or skipped: remembered on the account (so it
 // doesn't come back on another device) and in the stored session.
 export async function completeTour(): Promise<void> {
   try {
-    const raw = localStorage.getItem(USER_KEY);
-    if (raw) localStorage.setItem(USER_KEY, JSON.stringify({ ...JSON.parse(raw), tourPending: false }));
+    for (const store of [sessionStorage, localStorage]) {
+      const raw = store.getItem(USER_KEY);
+      if (raw) store.setItem(USER_KEY, JSON.stringify({ ...JSON.parse(raw), tourPending: false }));
+    }
   } catch { /* storage unavailable: the server copy still counts */ }
   await request('POST', '/api/auth/tour/complete').catch(() => undefined);
 }
@@ -159,6 +238,11 @@ export async function completeTour(): Promise<void> {
 // Signs out on the server too (S-1): every token of the account stops
 // working, on every device. Best effort; the local session is cleared anyway.
 export function logout() {
+  // Signing out of a demo ends it (its school is wiped).
+  if (isDemoSession()) {
+    void endDemo();
+    return;
+  }
   if (getToken()) void request('POST', '/api/auth/logout').catch(() => undefined);
   clearSession();
 }
@@ -190,6 +274,17 @@ export const createStudent = (data: {
 }) => request('POST', '/api/students', data);
 export const updateStudent = (id: string, data: any) => request('PATCH', `/api/students/${encodeURIComponent(id)}`, data);
 export const deleteStudent = (id: string) => request('DELETE', `/api/students/${encodeURIComponent(id)}`);
+
+// STUDENT PHOTOS — admins set a photo at once; a student's own upload waits for a school admin.
+export interface PendingPhoto { id: string; name: string; avatar: string; photoUrl: string | null; pendingPhotoUrl: string | null; pendingPhotoAt: string | null }
+const photoForm = (file: File) => { const form = new FormData(); form.append('photo', file); return form; };
+export const setStudentPhoto = (id: string, file: File) =>
+  request<PendingPhoto>('PUT', `/api/students/${encodeURIComponent(id)}/photo`, photoForm(file), true);
+export const fetchPendingPhotos = () => request<PendingPhoto[]>('GET', '/api/students/photos/pending');
+export const approveStudentPhoto = (id: string) => request<PendingPhoto>('POST', `/api/students/${encodeURIComponent(id)}/photo/approve`);
+export const rejectStudentPhoto = (id: string) => request<PendingPhoto>('POST', `/api/students/${encodeURIComponent(id)}/photo/reject`);
+export const uploadMyPhoto = (file: File) =>
+  request<{ photoUrl: string | null; photoPending: boolean }>('POST', '/api/me/photo', photoForm(file), true);
 
 // CURRICULUMS (admin)
 export const fetchCurriculums = () => request<any[]>('GET', '/api/curriculums');
@@ -1127,3 +1222,25 @@ export const setWorkspaceUserStatus = (id: string, status: 'active' | 'disabled'
 export const fetchWorkspaceInvitations = () => request<{ invitations: WorkspaceInvitation[] }>('GET', '/api/workspace/invitations');
 export const createWorkspaceInvitation = (email: string, role: string) => request<{ inviteLink: string; invitation: WorkspaceInvitation }>('POST', '/api/workspace/invitations', { email, role });
 export const revokeWorkspaceInvitation = (id: string) => request<void>('DELETE', `/api/workspace/invitations/${encodeURIComponent(id)}`);
+
+// Trusted learner age band (Option B). Workspace Admin edits; Academic Manager views.
+export type LearnerAgeBandValue = 'child' | 'teen' | 'adult';
+export interface AgeBandOverview {
+  values: LearnerAgeBandValue[];
+  adultSchool: boolean;
+  canEdit: boolean;
+  classes: { id: string; name: string; ageBand: LearnerAgeBandValue | null }[];
+  students: {
+    id: string;
+    name: string;
+    classId: string | null;
+    ageBand: LearnerAgeBandValue | null;
+    classAgeBand: LearnerAgeBandValue | null;
+    effective: { ageBand: LearnerAgeBandValue | 'unknown'; source: string; status: string };
+  }[];
+}
+export const fetchAgeBands = () => request<AgeBandOverview>('GET', '/api/age-bands');
+export const setStudentAgeBand = (id: string, ageBand: LearnerAgeBandValue | null) =>
+  request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/students/${encodeURIComponent(id)}`, { ageBand });
+export const setClassAgeBand = (id: string, ageBand: LearnerAgeBandValue | null) =>
+  request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/classes/${encodeURIComponent(id)}`, { ageBand });

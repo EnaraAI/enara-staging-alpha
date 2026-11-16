@@ -1,0 +1,581 @@
+{
+ "arm": "PP",
+ "rep": 2,
+ "learnerIdx": 309,
+ "seed": "esl4|L309|rep2",
+ "state": {
+  "form": "articles",
+  "band": "A1",
+  "primary": "W2",
+  "s": {
+   "W2": 0,
+   "W1": 1,
+   "C1": 0,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 4
+  }
+ },
+ "start": {
+  "form": "articles",
+  "band": "A1",
+  "primary": "W2",
+  "s": {
+   "W2": 3,
+   "W1": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "entries": [],
+ "v2": {
+  "beliefs": [],
+  "worked": []
+ },
+ "turns": [
+  {
+   "session": 1,
+   "learner": "Hello! Can you give me an exercise on a, an and the?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "tutor": "Hi! Great idea. Remember: \"a\" + consonant sound (a dog), \"an\" + vowel sound: a, e, i, o, u (an apple). Here is your first one: My uncle is ___ doctor. Write only a or an.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 3: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on a, an and the?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi! Great idea. Remember: \"a\" + consonant sound (a dog), \"an\" + vowel sound: a, e, i, o, u (an apple). Here is your first one: My uncle is ___ doctor. Write only a or an.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"a\" + consonant sound (a dog), \"an\" + vowel sound"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "(I leave it empty, no word)",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "(I leave it empty, no word)"
+   },
+   "tutor": "That's okay, let's try together. Look at the word \"doctor\". Does it start with a vowel sound (a, e, i, o, u) or a consonant sound? Now write a or an: My uncle is ___ doctor.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Great idea. Remember: \"a\" + consonant sound (a dog), \"an\" + vowel sound: a, e, i, o, u (an apple). Here is your first one: My uncle is ___ doctor. Write only a or an.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nThat's okay, let's try together. Look at the word \"doctor\". Does it start with a vowel sound (a, e, i, o, u) or a consonant sound? Now write a or an: My uncle is ___ doctor.",
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "a"
+   },
+   "tutor": "Yes, well done! \"Doctor\" starts with the sound \"d\", a consonant sound, so we say \"a doctor\". Next: She has ___ orange in her bag. Write a or an.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's okay, let's try together. Look at the word \"doctor\". Does it start with a vowel sound (a, e, i, o, u) or a consonant sound? Now write a or an: My uncle is ___ doctor.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, well done! \"Doctor\" starts with the sound \"d\", a consonant sound, so we say \"a doctor\". Next: She has ___ orange in her bag. Write a or an.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, well done!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"Doctor\" starts with the sound \"d\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 1,
+     "C1": 0,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   },
+   "tutor": "Well done! \"An orange\" is right, because \"orange\" starts with the vowel sound \"o\". Now a new one with \"the\": I bought a book. ___ book is very good. Write a, an or the.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 2: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, well done! \"Doctor\" starts with the sound \"d\", a consonant sound, so we say \"a doctor\". Next: She has ___ orange in her bag. Write a or an.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nWell done! \"An orange\" is right, because \"orange\" starts with the vowel sound \"o\". Now a new one with \"the\": I bought a book. ___ book is very good. Write a, an or the.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Well done! \"An orange\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"An orange\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "(I leave it empty, no word)",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "(I leave it empty, no word)"
+   },
+   "tutor": "That's okay, have a try! Look at the first sentence: \"I bought a book.\" Now we know this book, because we talked about it. Remember: I saw a dog. The dog was big. So, a, an or the? I bought a book. ___ book is very good.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nWell done! \"An orange\" is right, because \"orange\" starts with the vowel sound \"o\". Now a new one with \"the\": I bought a book. ___ book is very good. Write a, an or the.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nThat's okay, have a try! Look at the first sentence: \"I bought a book.\" Now we know this book, because we talked about it. Remember: I saw a dog. The dog was big. So, a, an or the? I bought a book. ___ book is very good.",
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "",
+     "W2": "A"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise a, an and the again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "tutor": "Welcome back! Yes, let's practise. Remember: \"a\" + consonant sound, like a doctor. \"an\" + vowel sound (a, e, i, o, u), like an egg. First question: My uncle is ___ doctor. Write a or an.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nWelcome back! Yes, let's practise. Remember: \"a\" + consonant sound, like a doctor. \"an\" + vowel sound (a, e, i, o, u), like an egg. First question: My uncle is ___ doctor. Write a or an.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"a\" + consonant sound, like a doctor. \"an\" + vowel sound"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "(I leave it empty, no word)",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "(I leave it empty, no word)"
+   },
+   "tutor": "That's okay, don't worry! Let's think together. Say the word \"doctor\" out loud. The first sound is \"d\". Is \"d\" a vowel sound (a, e, i, o, u) or a consonant sound? Now try: My uncle is ___ doctor.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nWelcome back! Yes, let's practise. Remember: \"a\" + consonant sound, like a doctor. \"an\" + vowel sound (a, e, i, o, u), like an egg. First question: My uncle is ___ doctor. Write a or an.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nThat's okay, don't worry! Let's think together. Say the word \"doctor\" out loud. The first sound is \"d\". Is \"d\" a vowel sound (a, e, i, o, u) or a consonant sound? Now try: My uncle is ___ doctor.",
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "a"
+   },
+   "tutor": "Yes, well done! \"a doctor\" is correct, because \"doctor\" starts with \"d\", a consonant sound. Next one: She has ___ orange in her bag. Write a or an.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's okay, don't worry! Let's think together. Say the word \"doctor\" out loud. The first sound is \"d\". Is \"d\" a vowel sound (a, e, i, o, u) or a consonant sound? Now try: My uncle is ___ doctor.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, well done! \"a doctor\" is correct, because \"doctor\" starts with \"d\", a consonant sound. Next one: She has ___ orange in her bag. Write a or an.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, well done! \"a doctor\" is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   },
+   "tutor": "Great! \"an orange\" is correct, because \"orange\" starts with \"o\", a vowel sound. Next one: He wants ___ umbrella. Write a or an.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, well done! \"a doctor\" is correct, because \"doctor\" starts with \"d\", a consonant sound. Next one: She has ___ orange in her bag. Write a or an.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGreat! \"an orange\" is correct, because \"orange\" starts with \"o\", a vowel sound. Next one: He wants ___ umbrella. Write a or an.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Great! \"an orange\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "an"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   },
+   "tutor": "Excellent! \"an umbrella\" is correct, because \"umbrella\" starts with a vowel sound, \"u\". Now something new: I bought a book. ___ book is very good. Write a, an or the.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGreat! \"an orange\" is correct, because \"orange\" starts with \"o\", a vowel sound. Next one: He wants ___ umbrella. Write a or an.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nExcellent! \"an umbrella\" is correct, because \"umbrella\" starts with a vowel sound, \"u\". Now something new: I bought a book. ___ book is very good. Write a, an or the.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Excellent! \"an umbrella\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"an umbrella\" is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "",
+     "W2": "A"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 4
+    }
+   }
+  }
+ ],
+ "stateAfterS1": {
+  "form": "articles",
+  "band": "A1",
+  "primary": "W2",
+  "s": {
+   "W2": 0,
+   "W1": 1,
+   "C1": 0,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 2
+  }
+ }
+}

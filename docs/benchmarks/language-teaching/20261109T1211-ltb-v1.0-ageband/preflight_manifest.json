@@ -1,0 +1,37 @@
+{
+  "title": "Preflight manifest: LTB v1.0 official run with trusted age-band fixtures (Option B)",
+  "writtenAt": "2026-11-09T12:37Z",
+  "frozenArtifactsVerified": "124/124 against the r2 manifest",
+  "cases": 120,
+  "turns": 219,
+  "casesSha256": "725edb2bcabeb316a388b702b2baba6dc35ed178c80f8de7727c9768c356a2bb",
+  "rubric": "ltb-rubric-v1 963962bba8b427ea7e15afd5d2b7bc2ad90945fc16fcff6633813941546f0e5b",
+  "scoringSpec": "ltb-scoring-v1 8fbf752bffd4fe9c1f51831b313e06f020e3d47dc57b62e446fd65dc38f82c05",
+  "judge": "backend/benchmarks/ltc-v1/judge.ts c4ebefcbea9a4621fc3a2aa06b12fe70b736016e7a3c479bfb9d034906a760c3",
+  "scorer": "backend/benchmarks/ltc-v1/score.mjs 49841ea626b957b0a872057af508fdf7571063ab5b9ead2ecbbfc422d9af3ed6",
+  "runner": "backend/benchmarks/ltc-v1/run_trusted_age.ts 3c8653fc606a1f9c9fcdcebeee99c7293d3f4a6fc00106e5e8837c275ce4491f (frozen run.ts unchanged: a4d17a855b2f3023f732e3d96576fdca4668112f2b25dfbf1b2807bfc6235f9c)",
+  "models": {
+    "tutor": "claude-opus-5-5, effort low, max_tokens 4000, gateway maxAttempts 2, SDK retries 0 (as official r3)",
+    "judge": "claude-sonnet-5-5, effort medium, max 6000 (as r3)"
+  },
+  "engine": "ltc-v1-r3-ab1 (r3 teaching policy + trusted age-band resolver)",
+  "fixtureProvenancePerCohort": {
+    "child": "class band set by synthetic Workspace Admin via PUT /api/age-bands/classes/:batchId",
+    "teen": "same, ageBand=teen",
+    "adult": "school setting set by synthetic Workspace Admin via PUT /api/learning/settings adultLearners=true"
+  },
+  "dryRunFixtureStatuses": {
+    "child:200": 40,
+    "teen:200": 40,
+    "adult:200": 40
+  },
+  "dryRunProvenancePerTurn": {
+    "child|child|class_age_band": 73,
+    "teen|teen|class_age_band": 73,
+    "adult|adult|school_setting_adult_learners": 73
+  },
+  "environment": "local in-process Express app + mongodb-memory-server (throwaway); outbound blocked except api.anthropic.com; no staging/production",
+  "budgetPolicy": "runner --cap 100 / judge --cap 50 are runaway guards only; app test-spend cap set inside the throwaway process; no global, staging, school or AI_TEST_SPEND_ID control changed",
+  "estimateUsd": "~$4.5 (r3 official was $4.54)",
+  "tests": "focused 287/288 (1 pre-existing elie.sprint4); backend+frontend typecheck exit 0; frontend vite build exit 0"
+}

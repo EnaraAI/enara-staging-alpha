@@ -1,0 +1,5 @@
+# Re-review task, A1–A2 round 2 (DRAFT)
+You are one of three independent re-reviewers. Do NOT open review_R*.json, rereview_R*.json by others, CONSOLIDATED.json, or docs/ASSESSMENT_REVIEW_LOG.md. No API calls, no git, no sub-agents, do not delete files.
+Read: research/assessment-review/a1a2/REVISED_TARGETS.json (the targets to check), and for each target its current content in data/outcomes/outcomes.json, data/assessments/outcomes/*.json, data/assessments/placement/placement.json, docs/SCORING_RUBRIC.md (A1–A2). Also docs/ENARA_ESL_FRAMEWORK.md §9.
+For each target apply the checklist: C1 level right, C2 measures the outcome, C3 key complete and correct, C4 parallel forms equal, C5 Arabic-L1 error realistic, C6 rubric clear. Flag only real remaining problems.
+Write /home/user/enara-staging-alpha/research/assessment-review/a1a2/rereview_R<N>.json: {"reviewer":"R<N>","checked":<count>,"flags":[{"target":..,"check":..,"problem":..,"fix":..}]}. Validate with python3 json.load. Reply with checked count and flag count.

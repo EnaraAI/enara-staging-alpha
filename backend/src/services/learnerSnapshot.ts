@@ -114,9 +114,10 @@ export async function buildLearnerSnapshot(studentId: string): Promise<LearnerSn
   };
 }
 
-// Compact text for prompts.
+// Compact text for prompts. Sent to the AI provider, so it carries no direct
+// identifier: no name, email or ID (Phase 1 privacy rule, LTC-D12).
 export function describeSnapshot(s: LearnerSnapshot): string {
-  const lines = [`Student: ${s.firstName}`];
+  const lines: string[] = [];
   for (const c of s.courses) {
     lines.push(
       `Course "${c.title}": ${c.completedLessons}/${c.totalLessons} lessons done` +

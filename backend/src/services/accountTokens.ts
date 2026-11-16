@@ -9,6 +9,9 @@ import { getConfig } from '../config/env';
 import { logger } from '../utils/logging';
 import { emailLayout, escapeHtml, sendEmail } from './emailService';
 import { GRANTABLE_PERMISSIONS, isPermission } from '../auth/permissions';
+import { Institution } from '../models/Institution';
+import { sendTemplate } from '../email/sendTemplate';
+import { isValidObjectId } from 'mongoose';
 
 // Invitations and password resets (4Level1 plan, P1). Tokens are 32 random
 // bytes, stored only as SHA-256 hashes, single use and expiring.
@@ -22,6 +25,42 @@ export const hashToken = (token: string) => createHash('sha256').update(token).d
 function appLink(path: string, token: string) {
   const base = (getConfig() as { appUrl?: string }).appUrl || '';
   return `${base.replace(/\/$/, '')}${path}?token=${encodeURIComponent(token)}`;
+}
+
+/** "30 minutes" / "7 days" from a TTL, so the email always matches the real expiry. */
+export function formatTtl(ms: number): string {
+  const units: [number, string][] = [[86_400_000, 'day'], [3_600_000, 'hour'], [60_000, 'minute']];
+  for (const [size, unit] of units) {
+    if (ms >= size && ms % size === 0) {
+      const n = ms / size;
+      return `${n} ${unit}${n === 1 ? '' : 's'}`;
+    }
+  }
+  return `${Math.max(1, Math.round(ms / 60_000))} minutes`;
+}
+
+// With RESEND_API_KEY set, account emails use the Resend templates (sendTemplate).
+// Without it, the previous inline-HTML path (sendEmail) runs unchanged.
+const useTemplates = () => !!process.env.RESEND_API_KEY;
+
+// Same guards as sendEmail: never mail reserved .test addresses (demo/test
+// accounts), and honour REMINDER_TEST_RECIPIENT when set.
+function templateRecipient(to: string): string | null {
+  if (/\.test$/i.test(to.trim())) return null;
+  return getConfig().email.testRecipient || to;
+}
+
+async function invitationValues(institutionId: string, invitedBy: string) {
+  const [school, inviter] = await Promise.all([
+    Institution.findOne({ id: institutionId }).select('name').lean().catch(() => null),
+    isValidObjectId(invitedBy) ? User.findById(invitedBy).select('name').lean().catch(() => null) : Promise.resolve(null),
+  ]);
+  const schoolName = (school as { name?: string } | null)?.name?.trim() || '';
+  const inviterName = (inviter as { name?: string } | null)?.name?.trim() || '';
+  return {
+    TEACHER_NAME: inviterName || schoolName || 'ENARA',
+    CLASS_NAME: schoolName || 'ENARA',
+  };
 }
 
 export async function createInvitation(params: {
@@ -50,7 +89,14 @@ export async function createInvitation(params: {
     expiresAt: new Date(Date.now() + INVITATION_TTL_MS),
     origin: params.origin ?? 'live',
   });
-  if (params.sendMail !== false) {
+  if (params.sendMail !== false && useTemplates()) {
+    const to = templateRecipient(params.email);
+    if (to) {
+      const values = await invitationValues(params.institutionId, params.invitedBy);
+      // The invitee has no account yet, so no name is known.
+      await sendTemplate('enara-class-invitation', to, { NAME: 'there', ...values, EXPIRES_IN: formatTtl(INVITATION_TTL_MS), token }).catch(() => undefined);
+    }
+  } else if (params.sendMail !== false) {
     const link = appLink('/accept-invitation', token);
     await sendEmail({
       to: params.email,
@@ -101,11 +147,16 @@ export async function acceptInvitation(params: { token: string; password: string
 
 // Starts a reset. Always succeeds from the caller's view (no account probing).
 export async function requestPasswordReset(email: string, opts: { sendMail?: boolean } = {}): Promise<string | null> {
-  const user = await User.findOne({ email, status: 'active' }).select('_id email');
+  const user = await User.findOne({ email, status: 'active' }).select('_id email name');
   if (!user) return null;
   const token = newToken();
   await PasswordReset.create({ tokenHash: hashToken(token), userId: user._id.toString(), expiresAt: new Date(Date.now() + PASSWORD_RESET_TTL_MS) });
-  if (opts.sendMail !== false) {
+  if (opts.sendMail !== false && useTemplates()) {
+    const to = templateRecipient(user.email);
+    if (to) {
+      await sendTemplate('enara-password-reset', to, { NAME: user.name?.trim() || 'there', EXPIRES_IN: formatTtl(PASSWORD_RESET_TTL_MS), token }).catch(() => undefined);
+    }
+  } else if (opts.sendMail !== false) {
     await sendEmail({
       to: user.email,
       subject: 'Reset your ENARA password',

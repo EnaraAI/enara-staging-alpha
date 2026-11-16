@@ -1,0 +1,156 @@
+{
+ "reviewer": "R1",
+ "flags": [
+  {
+   "target": "EN-F-A1-GR-can-ability-A-6",
+   "check": "C3",
+   "problem": "acceptedAnswers includes 'She can cook very well biryani.' which is ungrammatical (adverb between verb and object).",
+   "fix": "Remove it; keep 'She can cook very good biryani.' (optionally add 'She can cook biryani very well.')."
+  },
+  {
+   "target": "EN-F-A2-GR-past-simple-irregular-B-6",
+   "check": "C3",
+   "problem": "Key 'Last week we drank tea at that café every day.' changes 'the café daily' to 'that café every day'; the minimal correction 'Last week we drank tea at the café daily.' is not accepted.",
+   "fix": "Make the key 'Last week we drank tea at the café daily.' and add the 'every day' variant as an alternative."
+  },
+  {
+   "target": "EN-F-A1-GR-word-order-svo-A-9",
+   "check": "C3",
+   "problem": "Task is a text TO Hany but first accepted answer is 'I meet Hany at the café at six.' (third-person reference to the addressee); present simple 'I meet you at six' is unnatural for an arrangement, and natural answers ('I'm meeting you at the café at six', 'See you at the café at six') are absent. Same in B-9 and C-9.",
+   "fix": "Keep only 'you' variants, add 'I'm meeting/seeing/waiting for you ...' variants, and score word order with the 0/1/2 rubric rather than exact."
+  },
+  {
+   "target": "EN-F-A1-VO-numbers-time-A-7",
+   "check": "C3",
+   "problem": "Keyword list includes 'to' and 'past'; 'to' matches almost any sentence ('I go to bed...'), so the item is passed without writing a time in words. Same list in B-7 and C-7 (C-7 'go to bed' prompt makes it trivial).",
+   "fix": "Remove bare 'to'/'past'; require a number word (one..twelve) plus o'clock/past/to, or score with the rubric."
+  },
+  {
+   "target": "EN-F-A1-VO-numbers-time-A-8",
+   "check": "C3",
+   "problem": "Number-word keyword lists are incomplete and differ by form (A-8 lacks thirteen, fourteen, sixteen..nineteen, forty, sixty etc.; B-8/C-8 lack many numbers too), so correct answers score 0.",
+   "fix": "Accept any correctly spelled number word (pattern for one-ninety-nine + hundred) in all three forms."
+  },
+  {
+   "target": "EN-F-A1-VO-numbers-time-C-5",
+   "check": "C4",
+   "problem": "Slot 5 tests -teen spelling in A ('fivteen') and B ('forteen') but C uses 'nin' (nine), an easier, non-teen word; C-5 is not parallel.",
+   "fix": "Replace with a -teen error, e.g. 'The shop opens at ninteen minutes past eight' -> 'nineteen'."
+  },
+  {
+   "target": "EN-F-A1-VO-numbers-time-A-5",
+   "check": "C5",
+   "problem": "Tag spelling_vowel but 'fivteen' is a consonant (f/v) error; Arabic has no /v/, so the realistic Arabic-L1 confusion goes the other way (v written as f).",
+   "fix": "Retag (e.g. spelling_consonant) or use a vowel error like 'fiftin'."
+  },
+  {
+   "target": "EN-F-A1-VO-food-drink-B-6",
+   "check": "C5",
+   "problem": "'drinks his rice' (B-6) and 'drinks bread and cheese' (C-6) are not realistic Arabic-L1 errors; the real transfer is drink/eat with soup (Arabic 'yashrab shurba'). A-6 itself is weak because 'drink soup' is acceptable English from a cup.",
+   "fix": "Use realistic eat/drink transfer items (e.g. 'I drink a cigarette'->'smoke', or 'eat medicine'->'take'), and drop A-6 or accept 'drinks soup'."
+  },
+  {
+   "target": "EN-F-A1-VO-food-drink-A-4",
+   "check": "C2",
+   "problem": "Prompt 'I would like some orange ____ , please?' is a statement ending with a question mark: a model-error in the stem.",
+   "fix": "End with a full stop."
+  },
+  {
+   "target": "EN-F-A1-VO-classroom-objects",
+   "check": "C2",
+   "problem": "Error-correction slots 5-6 in all forms test indefinite article omission ('I have ruler'), not naming classroom objects; same in EN-F-A2-VO-jobs-workplaces slots 5-6 and EN-F-A1-VO-food-drink slot 5 (plural -s). These measure grammar outcomes already covered elsewhere.",
+   "fix": "Replace with lexical errors in the target vocabulary (wrong object/job/workplace word, L1 calque), or move the items to the article/plural outcomes."
+  },
+  {
+   "target": "EN-F-A2-VO-jobs-workplaces-A-7",
+   "check": "C2",
+   "problem": "Slots 7-8 accept any sentence containing the job word that the prompt itself gives ('Use waiter'), so the workplace (the outcome) is never checked.",
+   "fix": "Key on the workplace (restaurant/café; hospital; garage; dental clinic; farm; airport/plane) or score with a rubric that requires a correct workplace."
+  },
+  {
+   "target": "EN-F-A2-GR-much-many",
+   "check": "C2",
+   "problem": "Slot 6 in all forms ('There are many shop') tests plural -s, not the much/many choice; 'many' is already given correctly.",
+   "fix": "Replace with a much/many error, e.g. 'There is many traffic in our street' -> much / 'How much books' -> many."
+  },
+  {
+   "target": "EN-F-A2-VO-appearance-B-4",
+   "check": "C3",
+   "problem": "'The baby is not tall. She is ____' (short / small / little): 'small' is also correct for a baby, so the item has two right answers.",
+   "fix": "Change the subject to an adult ('My aunt is not tall. She is ____') or accept small."
+  },
+  {
+   "target": "EN-F-A2-VO-appearance-C-1",
+   "check": "C4",
+   "problem": "C-1 'she has a ____ haircut' with key 'short'/'boyish' repeats the word in the stem and uses a B2 word; A-1 'tall', B-1 'bald' (B1 in EVP) are not equal difficulty either.",
+   "fix": "Rewrite slot 1 with A2 words of equal difficulty in all forms (e.g. tall/short/fair) and drop 'boyish'."
+  },
+  {
+   "target": "EN-F-A1-VO-family-C-6",
+   "check": "C4",
+   "problem": "Slot 6 asks for 'sister-in-law' in C (B1 word, hyphenated) but niece/nephew in A/B; C-4 'niece' vs A-4 'aunt' / B-4 'uncle' is also harder (niece/nephew are A2).",
+   "fix": "Use kin terms of the same EVP level per slot (e.g. C-6 'The daughter of my uncle' -> cousin)."
+  },
+  {
+   "target": "EN-F-A1-VO-days-months-A-2",
+   "check": "C4",
+   "problem": "Slot 2 keys are February (A), August (B), September (C); February is much harder to spell than August, so forms differ in difficulty.",
+   "fix": "Use months of similar spelling difficulty in all forms or put February in all three slot variants' distractor set."
+  },
+  {
+   "target": "EN-F-A2-FN-polite-requests-B-1",
+   "check": "C4",
+   "problem": "B-1 prompt is identical to A-1 ('___ I have a cup of tea, please?'): a learner who retakes with form B sees the same item.",
+   "fix": "Change the noun (e.g. 'a glass of water')."
+  },
+  {
+   "target": "EN-F-A2-FN-polite-requests-A-1",
+   "check": "C3",
+   "problem": "'May' is a correct polite answer to '___ I have a cup of tea, please?' but only Can/Could are accepted (same B-1, C-1).",
+   "fix": "Add 'May' to acceptedAnswers."
+  },
+  {
+   "target": "EN-F-A1-GR-possessive-adjectives",
+   "check": "C2",
+   "problem": "Outcome lists my, your, his, her, our, their but no item in any form tests my or your (or its).",
+   "fix": "Replace one slot per form with a my/your item (e.g. 'Is this ___ pen, Sara?' -> your)."
+  },
+  {
+   "target": "EN-F-A2-VO-weather-A-6",
+   "check": "C5",
+   "problem": "Slot 6 tagged copula_omission/noun_for_adj but the copula is present ('it is rain'); it is only noun-for-adjective.",
+   "fix": "Retag noun_for_adj."
+  },
+  {
+   "target": "outcomes:A1-A2 form outcomes",
+   "check": "C6",
+   "problem": "Every form outcome has criterion '8 of 10 correct' but each form has 9 items with mixed 0/1 and 0/1/2 scoring (max 13 points), so the criterion cannot be applied as written.",
+   "fix": "State the criterion in points per form (e.g. >=80% of 13 points) or as items correct out of 9."
+  },
+  {
+   "target": "outcomes:missing banks",
+   "check": "C2",
+   "problem": "8 A1-A2 form outcomes have no item bank file: was-were, plural-nouns, prepositions-place, possessive-s, subject-object-pronouns, superlatives, imperatives, transport-travel; some are used by placement items (PL-A1-GR-06, PL-A1-GR-07, PL-A2-VO-05).",
+   "fix": "Write banks for these 8 or mark them as not yet assessable."
+  },
+  {
+   "target": "rubric:all",
+   "check": "C6",
+   "problem": "Rule 1 says capitals, punctuation and spelling of other words are always ignored, but for EN-F-A1-GR-capitals-full-stops and EN-F-A1-VO-days-months (e.g. 'tusday' -> 'Tuesday') the capital is the target or part of it; the rubric does not say whether a lowercase 'tuesday' scores 1.",
+   "fix": "Add an exception: when the targetForm is punctuation/capitalisation or a proper-noun spelling, case and full stops are scored."
+  },
+  {
+   "target": "rubric:free_production",
+   "check": "C6",
+   "problem": "The 0/1/2 target_form rubric is defined for grammar forms; vocabulary free items store keyword lists in acceptedAnswers and the rubric does not say whether a keyword alone (wrong meaning, e.g. 'My grandfather is cheap') scores 2.",
+   "fix": "Add a vocabulary variant: 2 = target word used with correct meaning, 1 = right word with spelling slip, 0 = missing or wrong meaning."
+  },
+  {
+   "target": "placement:PL-A1-VO-07",
+   "check": "C3",
+   "problem": "'Write the number in words: 15' accepts '15', which is just copying the prompt.",
+   "fix": "Remove '15' from acceptedAnswers."
+  }
+ ],
+ "passed_note": "All 33 banks and the placement bank read. Most items are level-appropriate, parallel across A/B/C, with complete keys; Arabic-L1 errors for copula omission, articles, 3rd-person -s, did+past, adjective order, make/do, some/any, and/but/because are realistic and well tagged. Rubric 0/1/2 levels and scored examples are clear for grammar items."
+}

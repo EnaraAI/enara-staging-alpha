@@ -1,0 +1,632 @@
+{
+ "arm": "LE",
+ "rep": 2,
+ "learnerIdx": 151,
+ "seed": "esl3|L151|rep2",
+ "state": {
+  "form": "articles",
+  "band": "B2",
+  "primary": "W2",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 3
+  }
+ },
+ "start": {
+  "form": "articles",
+  "band": "B2",
+  "primary": "W2",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "entries": [],
+ "v2": {
+  "beliefs": [],
+  "worked": []
+ },
+ "turns": [
+  {
+   "session": 1,
+   "learner": "Hello! Can you give me an exercise on a, an and the?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "present_lesson_item",
+    "fade_support",
+    "independent_practice"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Sure. Here's one from the lesson. Write a or an:\nShe has ___ orange in her bag. (answer with only the missing word)\n\nAfter that, here's an extension: write two sentences of your own, one with \"a\" and one with \"an\", choosing nouns where the first letter could mislead you, and tell me what decides your choice.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on a, an and the?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure. Here's one from the lesson. Write a or an:\nShe has ___ orange in her bag. (answer with only the missing word)\n\nAfter that, here's an extension: write two sentences of your own, one with \"a\" and one with \"an\", choosing nouns where the first letter could mislead you, and tell me what decides your choice.",
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"an\" is right here. Before the follow-up task with your own sentences, let's check the same point once more on a fresh item, with no worked example this time:\n\nWrite a or an: He wants ___ umbrella. (answer with only the missing word)\n\nAfter you answer, add one short sentence saying what decided your choice. Then we can move on to the tricky nouns where spelling and sound disagree.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure. Here's one from the lesson. Write a or an:\nShe has ___ orange in her bag. (answer with only the missing word)\n\nAfter that, here's an extension: write two sentences of your own, one with \"a\" and one with \"an\", choosing nouns where the first letter could mislead you, and tell me what decides your choice.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"an\" is right here. Before the follow-up task with your own sentences, let's check the same point once more on a fresh item, with no worked example this time:\n\nWrite a or an: He wants ___ umbrella. (answer with only the missing word)\n\nAfter you answer, add one short sentence saying what decided your choice. Then we can move on to the tricky nouns where spelling and sound disagree.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"an\" is right here."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"an\" is right here."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct again: \"an\". You have now chosen between a and an correctly on two different nouns on your own, so we don't need more of that kind.\nLet's move to the other part of this lesson: when to use \"the\". It is about whether the reader already knows which thing you mean.\nWrite a, an or the: I bought a book. ___ book is very good. (answer with only the missing word)\nAfter you answer, add one short sentence saying what decided your choice.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"an\" is right here. Before the follow-up task with your own sentences, let's check the same point once more on a fresh item, with no worked example this time:\n\nWrite a or an: He wants ___ umbrella. (answer with only the missing word)\n\nAfter you answer, add one short sentence saying what decided your choice. Then we can move on to the tricky nouns where spelling and sound disagree.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect again: \"an\". You have now chosen between a and an correctly on two different nouns on your own, so we don't need more of that kind.\nLet's move to the other part of this lesson: when to use \"the\". It is about whether the reader already knows which thing you mean.\nWrite a, an or the: I bought a book. ___ book is very good. (answer with only the missing word)\nAfter you answer, add one short sentence saying what decided your choice.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct again: \"an\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "on your own"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "",
+     "W2": "A"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "The",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "The"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"The\" (the capital is fine at the start of a sentence). The book was already mentioned, so the reader knows which one.\nNow a different reason for \"the\", with no model: here both people simply know which thing is meant.\nWrite a, an or the: It is cold. Please close ___ door. (answer with only the missing word)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect again: \"an\". You have now chosen between a and an correctly on two different nouns on your own, so we don't need more of that kind.\nLet's move to the other part of this lesson: when to use \"the\". It is about whether the reader already knows which thing you mean.\nWrite a, an or the: I bought a book. ___ book is very good. (answer with only the missing word)\nAfter you answer, add one short sentence saying what decided your choice.\n\nLEARNER'S LAST MESSAGE:\nThe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"The\" (the capital is fine at the start of a sentence). The book was already mentioned, so the reader knows which one.\nNow a different reason for \"the\", with no model: here both people simply know which thing is meant.\nWrite a, an or the: It is cold. Please close ___ door. (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"The\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"The\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "the",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "the",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "the"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"the\". Both people know which door is meant.\nTo recap: \"a\" or \"an\" depends on the first sound of the next word.\n\"The\" is for a thing already mentioned, or one both people know.\nTell me the rule in your own words.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"The\" (the capital is fine at the start of a sentence). The book was already mentioned, so the reader knows which one.\nNow a different reason for \"the\", with no model: here both people simply know which thing is meant.\nWrite a, an or the: It is cold. Please close ___ door. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nthe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"the\". Both people know which door is meant.\nTo recap: \"a\" or \"an\" depends on the first sound of the next word.\n\"The\" is for a thing already mentioned, or one both people know.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"the\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "the"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"a\" or \"an\" depends on the first sound of the next word"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise a, an and the again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "activate_prior_knowledge",
+    "fade_support",
+    "independent_practice"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Yes, let's go further than the basics. First, recall for me: how do you decide between a and an, and when does the become the right choice?\nHere is a nuance to test your rule. Spelling can mislead: we write \"a European city\" and \"a one-day trip\" because those words begin with consonant sounds, while \"an honest answer\" begins with a vowel sound. With the, the key question is whether the reader can identify the exact thing, for example \"Can you pass me the salt?\" at a dinner table.\nYour task: write two short sentences of your own, one where a or an depends on sound rather than the first letter, and one with the for something identifiable from context. Add a brief reason for each.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYes, let's go further than the basics. First, recall for me: how do you decide between a and an, and when does the become the right choice?\nHere is a nuance to test your rule. Spelling can mislead: we write \"a European city\" and \"a one-day trip\" because those words begin with consonant sounds, while \"an honest answer\" begins with a vowel sound. With the, the key question is whether the reader can identify the exact thing, for example \"Can you pass me the salt?\" at a dinner table.\nYour task: write two short sentences of your own, one where a or an depends on sound rather than the first letter, and one with the for something identifiable from context. Add a brief reason for each.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"a European city\"... because those words begin with consonant sounds, while \"an honest answer\" begins with a vowel sound"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "That's a true starting point: a singular countable noun usually needs an article. It answers part of my recall question, but it doesn't yet show the two choices the task is about.\nHere is the task once more:\nWrite two short sentences of your own. In one, a or an should depend on the sound of the next word rather than its first letter. In the other, use the for something the reader can identify from context.\nAdd a brief reason for each. As you check, focus on the opening sound of the word after a or an, and on whether your reader knows exactly which thing you mean.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, let's go further than the basics. First, recall for me: how do you decide between a and an, and when does the become the right choice?\nHere is a nuance to test your rule. Spelling can mislead: we write \"a European city\" and \"a one-day trip\" because those words begin with consonant sounds, while \"an honest answer\" begins with a vowel sound. With the, the key question is whether the reader can identify the exact thing, for example \"Can you pass me the salt?\" at a dinner table.\nYour task: write two short sentences of your own, one where a or an depends on sound rather than the first letter, and one with the for something identifiable from context. Add a brief reason for each.\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat's a true starting point: a singular countable noun usually needs an article. It answers part of my recall question, but it doesn't yet show the two choices the task is about.\nHere is the task once more:\nWrite two short sentences of your own. In one, a or an should depend on the sound of the next word rather than its first letter. In the other, use the for something the reader can identify from context.\nAdd a brief reason for each. As you check, focus on the opening sound of the word after a or an, and on whether your reader knows exactly which thing you mean.",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I waited an hour for the bus.",
+    "errors": {
+     "W1": "I waited hour for the bus.",
+     "W2": "I waited a hour for the bus."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I waited an hour for the bus.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I waited an hour for the bus."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "\"I waited an hour for the bus.\" covers both parts in one sentence: the article before hour follows sound rather than spelling, and the bus can be read as a specific bus the reader can identify from context.\nWhat is still missing is the brief reason the task asked for.\nIn a few words, explain each choice: why does your noun after an take that article despite its first letter, and what makes the bus identifiable to the reader even though it was not mentioned before?",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's a true starting point: a singular countable noun usually needs an article. It answers part of my recall question, but it doesn't yet show the two choices the task is about.\nHere is the task once more:\nWrite two short sentences of your own. In one, a or an should depend on the sound of the next word rather than its first letter. In the other, use the for something the reader can identify from context.\nAdd a brief reason for each. As you check, focus on the opening sound of the word after a or an, and on whether your reader knows exactly which thing you mean.\n\nLEARNER'S LAST MESSAGE:\nI waited an hour for the bus.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I waited an hour for the bus.\" covers both parts in one sentence: the article before hour follows sound rather than spelling, and the bus can be read as a specific bus the reader can identify from context.\nWhat is still missing is the brief reason the task asked for.\nIn a few words, explain each choice: why does your noun after an take that article despite its first letter, and what makes the bus identifiable to the reader even though it was not mentioned before?",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "covers both parts in one sentence: the article before hour follows sound rather than spelling"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "covers both parts in one sentence: the article before hour follows sound rather than spelling"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "That general rule is still true, but it doesn't explain the two specific choices in your sentence, \"I waited an hour for the bus.\"\nOne short question, then: what is it about the start of the word hour that makes you choose an? Answer that first, and then we'll look at the bus.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I waited an hour for the bus.\" covers both parts in one sentence: the article before hour follows sound rather than spelling, and the bus can be read as a specific bus the reader can identify from context.\nWhat is still missing is the brief reason the task asked for.\nIn a few words, explain each choice: why does your noun after an take that article despite its first letter, and what makes the bus identifiable to the reader even though it was not mentioned before?\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat general rule is still true, but it doesn't explain the two specific choices in your sentence, \"I waited an hour for the bus.\"\nOne short question, then: what is it about the start of the word hour that makes you choose an? Answer that first, and then we'll look at the bus.",
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Your general rule still holds, but twice now it hasn't touched the specific choices, so let's close the unit with a clear recap instead.\nIn your sentence \"I waited an hour for the bus.\" two separate ideas are at work.\nFirst, a versus an depends on the opening sound of the next word, not its first letter.\nSecond, the is used when the reader can identify exactly which thing you mean, either from an earlier mention or from the context.\nTell me the rule in your own words.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat general rule is still true, but it doesn't explain the two specific choices in your sentence, \"I waited an hour for the bus.\"\nOne short question, then: what is it about the start of the word hour that makes you choose an? Answer that first, and then we'll look at the bus.\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour general rule still holds, but twice now it hasn't touched the specific choices, so let's close the unit with a clear recap instead.\nIn your sentence \"I waited an hour for the bus.\" two separate ideas are at work.\nFirst, a versus an depends on the opening sound of the next word, not its first letter.\nSecond, the is used when the reader can identify exactly which thing you mean, either from an earlier mention or from the context.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "a versus an depends on the opening sound of the next word, not its first letter"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  }
+ ],
+ "stateAfterS1": {
+  "form": "articles",
+  "band": "B2",
+  "primary": "W2",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 2
+  }
+ }
+}

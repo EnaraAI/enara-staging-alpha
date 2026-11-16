@@ -1,0 +1,2633 @@
+[
+ {
+  "reviewId": "R3-01",
+  "caseId": "LTB-CA1-T04",
+  "cohortLabel": "child",
+  "cefr": "A1",
+  "situation": "T04_minor_error",
+  "expectedBehavior": "Recognises the answer is essentially correct, confirms clearly, at most mentions the minor surface point (capital letter/apostrophe) lightly, and moves forward.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_novice_prompt_first",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! **Goal:** introduce a family member with \"This is my …\" and say one thing with \"He is / She is …\".\n\n**Model:**\n*This is my brother. He is twelve.*\n- **He** = a boy or man\n- **She** = a girl or woman\n\n**Exercise:** Fill in the gaps.\n\n*This is my grandmother. ___ is seventy.*\n\nWhich word goes in the gap, **He** or **She**?"
+    },
+    {
+     "learner": "he is twelve",
+     "tutor": "Good start: **\"___ is\"** is the right pattern, and the number stays **seventy**, not twelve.\n\nThe gap is about the word **grandmother**.\n\n**Hint:**\n- **He** = a man or boy (father, brother)\n- **She** = a woman or girl (mother, sister)\n\nIs a grandmother a man or a woman?\n\nTry again: *This is my grandmother. ___ is seventy.*"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Our goal: introduce a family member.\n\nRemember the pattern:\n- **This is my** + family word.\n- **He is** (for a boy or man) / **She is** (for a girl or woman) + one fact.\n\nExample: *This is my grandmother. She is seventy.*\n\n**Your exercise:** Fill in the gaps.\n\n*This is my brother. ___ is twelve.*\n\nWhich word goes in the gap, **He** or **She**? Why?"
+    },
+    {
+     "learner": "he is twelve",
+     "tutor": "Yes, **He** is correct. *Brother* is a boy or man, so we use **he**.\n\nOne small thing: start the sentence with a capital letter: **He** is twelve.\n\n**Next step:** Now write about your own family. Choose a woman or girl (mother, sister or grandmother).\n\n*This is my ______. She is ______.*"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Fits a Grade 3 A1 learner and invents no facts, though it uses 'woman or girl' and 'seventy' without checking they suit the child's level.",
+    "lesson_alignment": "Uses the lesson patterns and vocabulary correctly; the 'He is' explanation is accurate. The next item departs slightly from the planned grandmother exercise, but it stays within the lesson objective.",
+    "pedagogical_appropriateness": "Confirms the answer clearly, adds one light capitalisation note, and moves forward, which matches the expected 'confirm + light note + next step'.",
+    "scaffolding_adaptation": "Responds to the learner's reply and shifts to a freer production task for 'She', so the learner keeps doing the work; a bit of a jump from a gap-fill to personal writing.",
+    "age_proficiency_fit": "Short and simple, suitable for A1 Grade 3, though 'man or girl' phrasing and the formatting are slightly adult-ish.",
+    "formative_check_evidence": "The next step is a transfer task that checks she/he and 'This is my…' without claiming mastery.",
+    "clarity_accessibility": "Clear and concise with easy-to-act-on instructions; the fill-in blanks are well signposted."
+   },
+   "failures": []
+  }
+ },
+ {
+  "reviewId": "R3-02",
+  "caseId": "LTB-CA1-T08",
+  "cohortLabel": "child",
+  "cefr": "A1",
+  "situation": "T08_mastery_move_on",
+  "expectedBehavior": "Recognises consistent unassisted success, reduces support, and moves forward with a transfer or slightly harder task; does not claim full mastery or invent progress percentages.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_sentence_frame",
+    "level_novice_prompt_first",
+    "recurrence_unknown",
+    "after_confirmed_success",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Let's practise introducing a family member.\n\n**Model:**\n*This is my sister. She is ten.*\n\n- Use **He** for a boy or man (father, brother, grandfather).\n- Use **She** for a girl or woman (mother, sister, grandmother).\n\n**Your exercise:** Complete with **He** or **She**:\n\n*This is my grandfather. ___ is seventy.*"
+    },
+    {
+     "learner": "This is my brother. He is twelve.",
+     "tutor": "Your sentence is correct.\n\n- **\"This is my brother.\"** uses *This is my + family word* well.\n- **\"He is twelve.\"** *He* is right, because a brother is a boy.\n\nNow try the exercise from before. Fill in **He** or **She**:\n\n*This is my grandfather. ___ is seventy.*"
+    },
+    {
+     "learner": "This is my grandmother. She is very kind. This is my father. He is tall.",
+     "tutor": "Both introductions are correct.\n\n- **\"This is my grandmother. She is very kind.\"** *She* is right for a woman.\n- **\"This is my father. He is tall.\"** *He* is right for a man.\n\nYou haven't done the blank yet. Fill in **He** or **She**:\n\n*This is my grandfather. ___ is seventy.*"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder:\n\n- **This is my …** shows a person. Example: *This is my father.*\n- **He is …** for a man or boy. **She is …** for a woman or girl. Example: *He is a driver.*\n\n**Your exercise:** Complete the sentences.\n\n1. This is my ___ (mother / brother). ___ is a teacher.\n2. This is my grandfather. ___ is seventy.\n\nWrite your answers, and I'll check them."
+    },
+    {
+     "learner": "This is my brother. He is twelve.",
+     "tutor": "Your sentences are correct. **\"This is my brother.\"** uses *This is my* + a family word. **\"He is twelve.\"** uses *He* because a brother is a boy.\n\nNow try the exercise:\n\n1. This is my ___ (mother / brother). ___ is a teacher.\n2. This is my grandfather. ___ is seventy.\n\nWrite both answers. Check that *He* or *She* matches the person."
+    },
+    {
+     "learner": "This is my grandmother. She is very kind. This is my father. He is tall.",
+     "tutor": "Both pairs are correct. **\"She is very kind\"** matches *grandmother*, and **\"He is tall\"** matches *father*.\n\nNow a bigger task. Imagine a family photo. Write **four sentences** about two new people: your **sister** and your **grandfather**.\n\nFrame:\n*This is my ___. ___ is ___.*\n\nGive each person a different fact, like age, job, or what they are like."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 2,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "The final turn builds on the learner's own sentences and the \"developing\" status, and it invents no mastery claim or progress figures.",
+    "lesson_alignment": "The task uses only the lesson patterns (This is my…, He/She is…) and the lesson's family vocabulary, with correct English.",
+    "pedagogical_appropriateness": "After two correct responses the tutor moves to a transfer task with a frame, which fits the expected next move.",
+    "scaffolding_adaptation": "The final turn adapts well by moving to a bigger task, but turn 2 repeated the same exercise after the learner ignored it and answered something different, and the tutor did not mention this mismatch.",
+    "age_proficiency_fit": "The language is simple and suitable for an A1 Grade 3 learner, though the final turn is a little long and has some abstract wording such as \"what they are like\".",
+    "formative_check_evidence": "The four-sentence photo task is a good unassisted transfer check, and the tutor makes no mastery claims.",
+    "clarity_accessibility": "The instructions are clear and use bold text and a frame, though the final turn is somewhat dense for a young learner."
+   },
+   "failures": [
+    {
+     "category": "ignored_learner_reply",
+     "severity": "minor",
+     "note": "In turn 2 the learner wrote their own sentences instead of answering the exercise. The tutor praised them but just re-posted the same exercise instead of noting the mismatch."
+    },
+    {
+     "category": "verbosity",
+     "severity": "minor",
+     "note": "The final turn is near or over the 90-word limit and could be shorter for a Grade 3 learner."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-03",
+  "caseId": "LTB-CA1-T12",
+  "cohortLabel": "child",
+  "cefr": "A1",
+  "situation": "T12_contradictory_evidence",
+  "expectedBehavior": "Treats the school record (proficient) as one piece of evidence: notices the current error, probes with a quick check, and does not assume mastery or say the learner \"already knows\" it.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "unprompted_learner_sentence",
+    "record_vs_current_check",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "This is my sister. He is ten.",
+     "tutor": "**\"This is my sister.\"** is correct.\n\n**\"He is ten.\"** has one mistake: the pronoun. A sister is a girl. Which word do we use for a girl, *he* or *she*?\n\nWrite the second sentence again with the right word.\n\nThen try a new one: introduce your **grandfather** and give one fact about him."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "This is my sister. He is ten.",
+     "tutor": "You have most of it! **\"This is my sister.\"** is correct.\n\nLet's check one part: **\"He is ten.\"**\n\nHint: Is your sister a boy or a girl? Which word goes with a girl, **he** or **she**?\n\nCan you write the second sentence again?"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 4,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 4,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 4
+   },
+   "rationale": {
+    "learner_context_fidelity": "Does not mention or lean on the 'proficient' record, treats the current error as real evidence, and invents nothing.",
+    "lesson_alignment": "Stays on the lesson's 'This is my…' and he/she targets, and the facts are correct.",
+    "pedagogical_appropriateness": "Praises the correct part, flags the error, and gives a guiding hint with a retry, which fits a likely slip.",
+    "scaffolding_adaptation": "Hint is a leading question that keeps the learner doing the work, though it nearly gives away the answer and there is only one turn to adapt to.",
+    "age_proficiency_fit": "Short, simple, friendly wording suits an A1 Grade 3 child and is well under the word limit.",
+    "formative_check_evidence": "Asking for a rewrite is a quick check and no mastery is claimed, but it does not probe whether this is a slip or a gap, for example with a new item.",
+    "clarity_accessibility": "Clear, concise, and easy to act on with one specific task."
+   },
+   "failures": []
+  }
+ },
+ {
+  "reviewId": "R3-04",
+  "caseId": "LTB-CA2-T04",
+  "cohortLabel": "child",
+  "cefr": "A2",
+  "situation": "T04_minor_error",
+  "expectedBehavior": "Recognises the answer is essentially correct, confirms clearly, at most mentions the minor surface point (capital letter/apostrophe) lightly, and moves forward.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_instruction",
+    "level_novice_prompt_first",
+    "self_corrected",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Our goal: talk about daily habits, like \"She **gets up** at seven.\"\n\nQuick reminder: with **he/she/it**, the verb adds **-s** or **-es**.\nExample: *My brother **usually gets up** at seven.*\nWords like **usually** and **never** go **before** the main verb.\n\n**Exercise:** Put the words in order and fix the verb.\n\n*Sara / always / have breakfast / at eight*\n\nWrite your sentence. I'll check it with you."
+    },
+    {
+     "learner": "She go to bed at ten o clock — sorry, She goes to bed at ten",
+     "tutor": "Your fix is right: \"She **goes** to bed at ten.\" With **she**, the verb needs **-s/-es**, and **go** becomes **goes**. Small spelling note: write **o'clock** with an apostrophe.\n\nYour sentence has no frequency word yet, like **always** or **usually**.\n\n**Next step:** Try the exercise again.\n\n*Sara / always / have breakfast / at eight*\n\nTwo things to check:\n- Does **have** change for Sara?\n- Where does **always** go?"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! **Goal:** talk about daily routines, like *\"My brother usually gets up at seven.\"*\n\nQuick reminder: with **he / she / it**, the verb gets **-s**. Words like **always, usually, sometimes, never** go **before** the main verb.\n\n**Exercise:** Put the words in the right order to make a sentence.\n\n*school / at eight / goes / she / always / to*\n\nWrite your sentence, and I'll give you feedback."
+    },
+    {
+     "learner": "She go to bed at ten o clock — sorry, She goes to bed at ten",
+     "tutor": "Your correction is right: **\"She goes to bed at ten.\"** With **she**, the verb needs **-s**, so *go* becomes **goes**. (Small spelling note: *o'clock* has an apostrophe.)\n\nThis is a new sentence, not the word-order exercise, and that's fine.\n\n**Next step:** Add **usually** to your sentence. Think about where it goes: before or after *goes*?\n\nWrite the new sentence."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Fits a Grade 3 A2 learner and invents no history, though it does not use the lesson's supplied next item.",
+    "lesson_alignment": "Stays on he/she/it -s and adverb placement with correct facts, but the first exercise was a word-order task that did not use the lesson's exercise bank; the reply handles the mismatch honestly.",
+    "pedagogical_appropriateness": "Confirms the self-correction clearly, lightly notes o'clock, and moves forward with a relevant extension, which matches the expected confirm + light note + next step.",
+    "scaffolding_adaptation": "Responds to the learner's self-correction and gives a hint ('before or after goes?') while leaving the sentence for the learner to write; this does not use the lesson's planned next item, though the extension is sensible.",
+    "age_proficiency_fit": "Short, simple language suited to A2 and a young child, though the parenthetical spelling note and the phrase 'new sentence, not the word-order exercise' add slight load.",
+    "formative_check_evidence": "The 'add usually' task is a reasonable check of the second success criterion and makes no mastery claims.",
+    "clarity_accessibility": "Clear, brief and actionable, but the remark about the new sentence is slightly confusing for a child."
+   },
+   "failures": [
+    {
+     "category": "lesson_drift",
+     "severity": "minor",
+     "note": "Did not use the lesson's next item ('My dad watch TV...'); the original exercise did not match the supplied exercise bank, and the reply glosses over the unanswered word-order task."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-05",
+  "caseId": "LTB-CA2-T08",
+  "cohortLabel": "child",
+  "cefr": "A2",
+  "situation": "T08_mastery_move_on",
+  "expectedBehavior": "Recognises consistent unassisted success, reduces support, and moves forward with a transfer or slightly harder task; does not claim full mastery or invent progress percentages.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_novice_prompt_first",
+    "recurrence_unknown",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Quick reminder first: with **he/she/it**, the verb gets **-s** (get → gets). Words like **always, usually, sometimes, never** go **before** the main verb.\n\nExample: *My brother usually **gets** up at seven.*\n\n**Your exercise:** Put the words in the right order. Change the verb if needed.\n\n*Anna / sometimes / have breakfast / at school*\n\nWrite your sentence, and I'll check it."
+    },
+    {
+     "learner": "She goes to bed at ten.",
+     "tutor": "Your sentence is correct: **\"She goes to bed at ten.\"** You added **-es** to *go* → *goes* for **she**. \n\nBut that's a different sentence from the exercise. Let's go back to it:\n\n*Anna / sometimes / have breakfast / at school*\n\nTwo things to check:\n- **Anna** is like **she**, so what happens to *have*?\n- Where does **sometimes** go?\n\nWrite the full sentence, and I'll check it."
+    },
+    {
+     "learner": "My dad watches TV after dinner. I always do my homework before that.",
+     "tutor": "Both sentences are correct:\n- **\"My dad watches TV\"**: *watch* gets **-es** for *he* (dad).\n- **\"I always do my homework\"**: *always* comes **before** the main verb *do*.\n\nYou clearly know these two rules. Now try them in the exercise:\n\n*Anna / sometimes / have breakfast / at school*\n\nSmall hint: *have* is special. For **she**, it doesn't become \"haves.\"\n\nWhat does it become? Then write the full sentence."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Quick reminder first: in this lesson, we talk about habits.\n\n- With **he/she/it**, the verb gets **-s**: *I get up* → *She get**s** up*.\n- Words like **always, usually, sometimes, never** go **before** the main verb.\n\nExample: *My brother **usually gets** up at seven.*\n\n**Your exercise:** Put the words in order and fix the verb.\n\n*(always / have breakfast / at eight / my sister)*\n\nWrite your sentence. Try it first, and I can give you a hint if you need one."
+    },
+    {
+     "learner": "She goes to bed at ten.",
+     "tutor": "**\"She goes to bed at ten.\"** is correct! You added **-es** to *go* for **she**: *goes*. \n\nBut it doesn't answer the exercise yet. Let's go back to it:\n\n*(always / have breakfast / at eight / my sister)*\n\nSmall hint: start with **My sister**, and remember **always** goes before the verb.\n\nCan you write that sentence?"
+    },
+    {
+     "learner": "My dad watches TV after dinner. I always do my homework before that.",
+     "tutor": "Both sentences are correct:\n\n- **\"My dad watches TV\"**: you added **-es** for *he* (watch → watch**es**).\n- **\"I always do my homework\"**: **always** is before the verb *do*.\n\nNow let's finish the exercise with these words:\n\n*(always / have breakfast / at eight / my sister)*\n\nYou already know both rules. Start with **My sister always ...**\n\nWhat form of **have** do we use with **she**?"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 1,
+    "lesson_alignment": 2,
+    "pedagogical_appropriateness": 1,
+    "scaffolding_adaptation": 1,
+    "age_proficiency_fit": 2,
+    "formative_check_evidence": 1,
+    "clarity_accessibility": 2
+   },
+   "rationale": {
+    "learner_context_fidelity": "Ignores that the learner has now twice answered the lesson's own exercises correctly and unassisted (including the next item), and treats them as still needing the original task; \"you already know both rules\" overclaims from thin evidence.",
+    "lesson_alignment": "Content is correct and on-topic, but the tutor ignores the lesson's own exercise and nextItem, and the first turn's exercise (word-order with 'have breakfast') drifted from the lesson's exercise.",
+    "pedagogical_appropriateness": "Keeps pushing the same sentence-ordering task the learner has bypassed twice instead of moving to a harder or transfer task after demonstrated success.",
+    "scaffolding_adaptation": "Increases support (gives 'Start with My sister always...' and asks the form of have) even though the learner just succeeded unassisted, which is the opposite of fading support.",
+    "age_proficiency_fit": "Language is simple enough for A2 Grade 3, but the formatting is heavy and the repeated task feels frustrating for a child.",
+    "formative_check_evidence": "Does not set a new unassisted transfer check; the final question basically gives away the answer ('has'), and 'You already know both rules' claims mastery from limited evidence.",
+    "clarity_accessibility": "Messages are readable, but the repeated insistence on the original exercise is confusing since the learner answered other items, and the feedback is wordy."
+   },
+   "failures": [
+    {
+     "category": "over_helping",
+     "severity": "major",
+     "note": "Gives the start of the sentence and points to the verb form, despite the learner's unassisted success."
+    },
+    {
+     "category": "premature_mastery_claim",
+     "severity": "minor",
+     "note": "'You already know both rules' overstates what two correct sentences show; status is 'developing'."
+    },
+    {
+     "category": "lesson_drift",
+     "severity": "minor",
+     "note": "Repeats the same easy exercise instead of moving to a harder or transfer task."
+    },
+    {
+     "category": "ignored_learner_reply",
+     "severity": "major",
+     "note": "Does not build on the learner's own extra sentence; pulls back to the original task rather than extending it."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-06",
+  "caseId": "LTB-CA2-T12",
+  "cohortLabel": "child",
+  "cefr": "A2",
+  "situation": "T12_contradictory_evidence",
+  "expectedBehavior": "Treats the school record (proficient) as one piece of evidence: notices the current error, probes with a quick check, and does not assume mastery or say the learner \"already knows\" it.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "unprompted_learner_sentence",
+    "record_vs_current_check",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "My sister always get up at six.",
+     "tutor": "You have most of it! \"Always\" is in the right place, before the main verb. Let's sharpen one part: the verb.\n\nThe subject is **my sister** (she). What do we add to the verb after he, she or it?\n\nTry to fix the sentence yourself:\n\n*My sister always ___ up at six.*\n\nThen write one more sentence about someone in your family, using **usually** or **never**."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "My sister always get up at six.",
+     "tutor": "You have most of it. \"always\" is in the right place, before the verb. Good.\n\nNow check the verb. The subject is \"My sister\", so it is **she**.\n\nWhat do we add to the verb after **he / she / it** in the present simple?\n\nCan you write the sentence again with that change?"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Notices the current error and does not defer to the 'proficient' record or claim mastery, but never explicitly treats the record as one piece of evidence; it invents nothing.",
+    "lesson_alignment": "Targets he/she/it + -s and confirms correct adverb placement, which matches the lesson objectives with accurate facts.",
+    "pedagogical_appropriateness": "Flags the error without giving the answer and prompts self-correction, a good hint-level move, though it points straight at the error rather than probing independently.",
+    "scaffolding_adaptation": "There is only one learner turn; the reply leaves the correction to the learner via a guiding question and a retry, without giving the answer.",
+    "age_proficiency_fit": "Short, simple language suits a Grade 3 A2 learner, though the bold formatting and the brief 'Good.' are slightly plain for a child.",
+    "formative_check_evidence": "Asks the learner to rewrite the sentence, but the check is heavily scaffolded (the subject is identified as 'she' and the rule is cued), so it shows little independent evidence and no transfer item.",
+    "clarity_accessibility": "Clear, well organised and easy to act on, though it asks two questions at once."
+   },
+   "failures": [
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "The check is over-cued; a fresh sentence or a less-guided probe would give better evidence of mastery, given the contradictory record."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-07",
+  "caseId": "LTB-CB1-T04",
+  "cohortLabel": "child",
+  "cefr": "B1",
+  "situation": "T04_minor_error",
+  "expectedBehavior": "Recognises the answer is essentially correct, confirms clearly, at most mentions the minor surface point (capital letter/apostrophe) lightly, and moves forward.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_strong_reformulation_ok"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Today's goal: talk about life experiences with **have/has + past participle** (\"Have you ever…?\"), and switch to the past simple when you say *when* it happened.\n\nQuick start: you may already know \"Have you ever…?\" questions. Let's see what you remember.\n\n**Exercise:** Complete each sentence with the correct form of the verb in brackets.\n\n1. I ______ (never / eat) Indian food.\n2. ______ you ever ______ (meet) a famous person?\n3. We ______ (visit) London last year.\n\nWrite your three answers, and I'll give you feedback on each one."
+    },
+    {
+     "learner": "I visited my aunt in aswan last year.",
+     "tutor": "Your sentence works: **\"I visited my aunt in Aswan last year.\"**\n\n- \"visited\" is the past simple, and that is the right choice because **\"last year\"** is a finished time.\n- Small fix: **Aswan** is a place name, so it needs a capital letter.\n\nNow let's look at the other side of the lesson. Imagine you **don't** say when the trip happened. You only want to say it's part of your life experience.\n\n**Your task:** Rewrite the idea as an experience, starting with:\n**\"I have ______ to Aswan.\"**\n\nWhich verb goes in the gap, and in what form?"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Today's goal: talk about life experiences with **have/has + past participle**, and switch to the past simple when you say *when* it happened.\n\nQuick start: you may already know questions like *\"Have you ever…?\"*\n\n**Exercise:** Complete these two sentences with the verb in brackets.\n\n1. I ______ (never / eat) Indian food.\n2. My brother ______ (visit) London last year.\n\nFor sentence 2, also tell me in a few words why you chose that form."
+    },
+    {
+     "learner": "I visited my aunt in aswan last year.",
+     "tutor": "Your sentence is correct: **\"I visited my aunt in Aswan last year.\"**\n\n- **\"visited\"** is the past simple, the right choice because **\"last year\"** is a finished time.\n- One small slip: city names need a capital letter, so **Aswan**.\n\nYou already used the same rule that sentence 2 of the exercise needs.\n\n**Next step:** Now try sentence 1. There's no finished time in it, just a life experience.\n\n1. I ______ (never / eat) Indian food.\n\nHint: think **have + past participle**, and where does *never* go?"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 2,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 2,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "The Grade 3 child is treated broadly appropriately, but the tutor ignored the supplied exercise and nextItem (the learner's sentence was the lesson exercise); it did not recognise the learner was answering a different item and the language is a bit adult for a child.",
+    "lesson_alignment": "The feedback is correct (past simple with 'last year', capital letter for Aswan) and on objective, though the tutor's own exercise differs from the lesson's exercise and nextItem.",
+    "pedagogical_appropriateness": "It confirms clearly, notes the capital letter lightly, and moves on, which matches the expected move; the claim that the learner has 'used the same rule that sentence 2 needs' is a loose link, since the learner answered a different sentence.",
+    "scaffolding_adaptation": "It responds to the learner's actual answer and moves to the next sentence with a hint rather than the full answer, keeping the learner doing the work.",
+    "age_proficiency_fit": "Short and clear, but 'past participle' and 'finished time' terminology is heavy for a Grade 3 child, and the hint is somewhat abstract.",
+    "formative_check_evidence": "The next sentence works as a check with no mastery claim; however, the earlier request to explain why was not followed up, and the learner did not complete sentence 2.",
+    "clarity_accessibility": "Well organised with a bolded correct sentence, a bullet explanation, and a single next task; easy to act on."
+   },
+   "failures": [
+    {
+     "category": "age_tone_mismatch",
+     "severity": "minor",
+     "note": "Grammar terms such as 'past participle' and 'finished time' are heavy for a Grade 3 child."
+    },
+    {
+     "category": "lesson_drift",
+     "severity": "minor",
+     "note": "The next item is not the lesson's own nextItem (Have you ever seen a camel), and the tutor's sentence 2 differed from the lesson exercise."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-08",
+  "caseId": "LTB-CB1-T08",
+  "cohortLabel": "child",
+  "cefr": "B1",
+  "situation": "T08_mastery_move_on",
+  "expectedBehavior": "Recognises consistent unassisted success, reduces support, and moves forward with a transfer or slightly harder task; does not claim full mastery or invent progress percentages.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_strong_reformulation_ok",
+    "recurrence_unknown",
+    "after_confirmed_success"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder: when we talk about an experience at **any time in our life**, we use **have/has + past participle** (e.g. *I have tried sushi*). When we say **when** it happened (*yesterday, last year*), we switch to the **past simple** (*I tried it last summer*).\n\n**Exercise:** Complete the mini-dialogue with the verbs in brackets.\n\nA: ___ you ever ___ (meet) a famous person?\nB: Yes, I ___. I ___ (meet) a singer two years ago.\n\nWrite your answers, and tell me why you chose each form."
+    },
+    {
+     "learner": "I visited my aunt in Aswan last year.",
+     "tutor": "Your sentence is correct: **\"I visited my aunt in Aswan last year.\"**\n\nYou used the **past simple** (*visited*) because you gave a **finished time**: *last year*. That's exactly the rule from this lesson.\n\nNow let's connect it to an experience. If you don't say *when*, which form do you need?\n\n**Try this:** Complete the question and short answer.\n\nA: ___ you ever ___ (be) to Aswan?\nB: Yes, I ___.\n\nThen, if you like, go back to the dialogue about meeting a famous person and fill in those gaps too."
+    },
+    {
+     "learner": "Have you ever seen a camel? I have seen one, but I saw it only once, in 2019.",
+     "tutor": "Your sentences are correct:\n\n- **\"I have seen one\"**: present perfect for an experience, with no time given.\n- **\"I saw it only once, in 2019\"**: past simple because you named a finished time, *2019*.\n\nThat's exactly the switch this lesson is about.\n\n(As Enara's AI, I haven't seen a camel myself!)\n\nNow try the gaps from before:\n\nA: ___ you ever ___ (be) to Aswan?\nB: Yes, I ___. I ___ (go) there last year.\n\nWhich two gaps need the present perfect, and why does the last one change?"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder: we use **have/has + past participle** for experiences (no time given), and the **past simple** when we say *when* it happened.\n\n**Exercise:** Complete the mini-dialogue with the correct form of the verbs in brackets.\n\n> **A:** ___ you ever ___ (meet) a famous person?\n> **B:** Yes, I ___. I ___ (meet) a football player last year.\n> **A:** Wow! I ___ never ___ (meet) anyone famous.\n\nTry all the gaps yourself first. If you get stuck, ask for a hint.\n\nWhich gap uses the past simple, and which words tell you so?"
+    },
+    {
+     "learner": "I visited my aunt in Aswan last year.",
+     "tutor": "Your sentence is **correct**. 👍\n\n*\"I **visited** my aunt in Aswan **last year**.\"*\n**Last year** is a finished time, so the past simple **visited** is the right choice.\n\nYour sentence works the same way as one of the gaps in the exercise. Look at speaker B's line:\n\n> **B:** Yes, I ___. I ___ (meet) a football player last year.\n\nWhich word in that line tells you to use the past simple, like in your Aswan sentence? Try filling in the second gap."
+    },
+    {
+     "learner": "Have you ever seen a camel? I have seen one, but I saw it only once, in 2019.",
+     "tutor": "Your sentences are **correct**.\n\n- *\"Have you ever **seen** a camel?\"* asks about an experience with no time, so the present perfect fits.\n- *\"I **have seen** one\"* answers it the same way.\n- *\"I **saw** it only once, **in 2019**.\"* gives a finished time, so you switched to the past simple. That switch is the key point of this lesson.\n\n(I'm an AI, so no camels for me!)\n\n**Next step, a bit freer:** Write a short dialogue of 3–4 lines about a food, place or person. Include:\n1. a *Have you ever…?* question\n2. a sentence with **never**\n3. a sentence with a finished time (*last summer, in 2020…*)"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 4,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Treats the learner as ready to move on without claiming mastery or inventing facts, and fits the 'developing' status, though the Grade 3 child's age is not obviously reflected in the task design.",
+    "lesson_alignment": "Uses the lesson's own patterns (Have you ever, never, finished time) with correct English and explains the key present perfect to past simple switch accurately.",
+    "pedagogical_appropriateness": "Moves forward with a freer transfer production task after consistent success, which is the expected move, and does not re-explain basics at length.",
+    "scaffolding_adaptation": "Reduces support from a guided gap-fill to open writing, builds on the learner's own sentences, and keeps the work with the learner.",
+    "age_proficiency_fit": "Short and mostly simple, with a friendly camel aside, but a three-part writing task with metalanguage may be somewhat demanding for a Grade 3 child.",
+    "formative_check_evidence": "The unassisted transfer dialogue with three required features is a good check, with no mastery or percentage claims; it could have said more about the evidence so far, such as noting that the earlier dialogue gaps were left unanswered.",
+    "clarity_accessibility": "Well organised with a clear numbered task, though the formatting is slightly heavy for a young learner."
+   },
+   "failures": [
+    {
+     "category": "age_tone_mismatch",
+     "severity": "minor",
+     "note": "Task and formatting are somewhat heavy for a Grade 3 child."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-09",
+  "caseId": "LTB-CB1-T12",
+  "cohortLabel": "child",
+  "cefr": "B1",
+  "situation": "T12_contradictory_evidence",
+  "expectedBehavior": "Treats the school record (proficient) as one piece of evidence: notices the current error, probes with a quick check, and does not assume mastery or say the learner \"already knows\" it.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "unprompted_learner_sentence",
+    "record_vs_current_check"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "I have met my teacher yesterday.",
+     "tutor": "You have the form of the present perfect right: **have + met**. Let's sharpen one part.\n\nLook at the word **yesterday**. Is that time finished or still continuing?\n\nThink back to the lesson rule: when we say *when* something happened, with a finished time like *yesterday* or *last year*, which tense do we use?\n\nYour task: **rewrite the sentence correctly.**\n\nThen, for a harder variant, write one more sentence about the same experience **without** a time word, starting with *I have…* or *I've never…*."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "I have met my teacher yesterday.",
+     "tutor": "Thanks for writing your own sentence! You have most of it: \"met\" is the correct past form of *meet*, and the sentence is clear.\n\nLet's sharpen one part. Look at the time word at the end: **\"yesterday\"**.\n\n- Is yesterday a **finished** time or an unfinished one?\n- When we say *exactly when* something happened in a finished time, which tense do we use?\n\nNow look again at **\"have met\"** and try to rewrite the sentence so it fits with \"yesterday\".\n\nWhat's your new version?"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 2,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "It notices the current error and does not lean on the 'proficient' record or claim mastery, but it makes no explicit use of the child/Grade 3 context.",
+    "lesson_alignment": "It targets the lesson's finished-time rule (yesterday means past simple) accurately, and 'met' is correctly identified as the past form.",
+    "pedagogical_appropriateness": "Guiding questions plus a rewrite task is a good probe that avoids giving the answer, though the praise 'met is correct past form' slightly muddies the point that 'have met' is present perfect.",
+    "scaffolding_adaptation": "It gives a hint without the answer and asks for a retry, so the learner does the work; with only one turn, adaptation is limited.",
+    "age_proficiency_fit": "Terms like 'finished time' and 'exactly when' plus three questions at once are somewhat abstract for a Grade 3 child; the tone is friendly but the language is a little heavy.",
+    "formative_check_evidence": "The rewrite task is a quick check of the error and no mastery is claimed, but it is not a separate transfer item.",
+    "clarity_accessibility": "It is well organised and actionable, but the multiple questions plus a rewrite request could be simpler for a child."
+   },
+   "failures": [
+    {
+     "category": "level_mismatch",
+     "severity": "minor",
+     "note": "Metalinguistic questions (finished vs unfinished time) are abstract for a Grade 3 child; one simple question would be better."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-10",
+  "caseId": "LTB-TA1-T04",
+  "cohortLabel": "teen",
+  "cefr": "A1",
+  "situation": "T04_minor_error",
+  "expectedBehavior": "Recognises the answer is essentially correct, confirms clearly, at most mentions the minor surface point (capital letter/apostrophe) lightly, and moves forward.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_sentence_frame",
+    "level_novice_prompt_first",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! **Goal:** introduce a family member with \"This is my …\" and say one fact with \"He is / She is …\".\n\n**Model:**\n*This is my father. He is a driver.*\n\nUse **he** for a boy or man. Use **she** for a girl or woman.\n\n**Your task:** Complete the sentences.\n\nThis is my ______ (mother / brother). ______ is twelve."
+    },
+    {
+     "learner": "he is twelve",
+     "tutor": "You chose **\"He\"**. That works with **brother**, because a brother is a boy or man.\n\nThe first blank is still empty. Which word goes in \"This is my ______\"?\n\n**Next step:** Write the full two sentences. Start each sentence with a capital letter.\n\nThis is my ______. ______ is twelve."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "**Goal:** introduce a family member with **\"This is my …\"** and say one fact with **\"He is / She is …\"**.\n\nQuick reminder:\n- A man or boy → **He is** (father, brother, grandfather)\n- A woman or girl → **She is** (mother, sister, grandmother)\n\nExample: *This is my brother. He is twelve.*\n\n**Your exercise:** Fill in the gaps.\n\n*This is my ______ (grandmother). ______ is seventy.*"
+    },
+    {
+     "learner": "he is twelve",
+     "tutor": "Your sentence **\"he is twelve\"** is from my example about the brother, not the exercise.\n\nThe exercise is about your **grandmother**.\n\nHint: a grandmother is a woman. Is a woman **He** or **She**?\n\nTry again. Write the full sentences:\n\n*This is my ______. ______ is seventy.*"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 2,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 2,
+    "scaffolding_adaptation": 2,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Stays at A1 and teen-appropriate, but the tutor's own earlier exercise made the learner's answer ambiguous and the final turn ignores that.",
+    "lesson_alignment": "Uses the lesson's grammar and vocabulary correctly, and the hint about he/she is accurate.",
+    "pedagogical_appropriateness": "The case expects the answer to be treated as essentially correct (it matches the lesson's own exercise 'He is twelve'), but the tutor treats it as an error and redirects, which is the wrong move.",
+    "scaffolding_adaptation": "Gives a hint and a retry, but it responds to a perceived error that the learner did not make, and does not acknowledge that the learner's sentence was a reasonable answer to the example shown.",
+    "age_proficiency_fit": "Short, simple language suited to a Grade 9 A1 learner.",
+    "formative_check_evidence": "Retry is a check, but the tutor never confirms the correct 'He is twelve' and the new task is arguably tied to a confusing, changed exercise.",
+    "clarity_accessibility": "Clear and easy to follow with a concrete retry instruction, though the 'full sentences' request is slightly cluttered."
+   },
+   "failures": [
+    {
+     "category": "ignored_learner_reply",
+     "severity": "major",
+     "note": "Learner's 'he is twelve' was essentially correct for the lesson exercise; tutor treated it as wrong rather than confirming it."
+    },
+    {
+     "category": "under_scaffolding",
+     "severity": "minor",
+     "note": "No confirmation or acknowledgement that the learner's sentence was correct English; the confusing mismatch between the example and the exercise was left unaddressed."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-11",
+  "caseId": "LTB-TA1-T08",
+  "cohortLabel": "teen",
+  "cefr": "A1",
+  "situation": "T08_mastery_move_on",
+  "expectedBehavior": "Recognises consistent unassisted success, reduces support, and moves forward with a transfer or slightly harder task; does not claim full mastery or invent progress percentages.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_novice_prompt_first",
+    "recurrence_unknown",
+    "after_confirmed_success",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder:\n\n- **This is my …** introduces a person.\n- **He is …** is for a man or boy. **She is …** is for a woman or girl.\n\nExample: *This is my grandmother. She is seventy.*\n\n**Your exercise:** Write two sentences about one person in your family.\n\nFrame: *This is my ___. He/She is ___.*\n\nBefore you write, ask yourself: is this person a man or a woman?"
+    },
+    {
+     "learner": "This is my brother. He is twelve.",
+     "tutor": "Both sentences are correct.\n\n- \"This is my **brother**\" uses the frame and a family word.\n- \"**He** is twelve\" is right, because a brother is a boy or man.\n\n**Next one, with less help:** Write two sentences about a different family member, a woman this time. No frame now.\n\nAfter you write, check: did you use **He** or **She**?"
+    },
+    {
+     "learner": "This is my grandmother. She is very kind. This is my father. He is tall.",
+     "tutor": "All four sentences are correct.\n\n- \"This is my **grandmother**. **She** is very kind.\" uses **She** for a woman.\n- \"This is my **father**. **He** is tall.\" uses **He** for a man.\n\nYou also added \"very kind\" and \"tall\". That is good detail.\n\n**Next:** Check your own work this time. Write about your **sister** or **mother**, then tell me: how did you choose He or She?"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder from this lesson:\n\n- **This is my …** introduces a person.\n- **He is …** is for a man or boy (father, brother).\n- **She is …** is for a woman or girl (mother, sister).\n\nExample: *This is my sister. She is ten.*\n\n**Your exercise:** Write two sentences about your brother or your grandmother.\n\n*This is my ______. ______ is ______.*"
+    },
+    {
+     "learner": "This is my brother. He is twelve.",
+     "tutor": "**Correct!** ✅\n\n- \"This is my brother.\" uses **This is my + family word**.\n- \"He is twelve.\" uses **He** for a boy. Good choice.\n\n**Next task (no sentence frame this time):** Write two sentences about your **mother** or your **grandfather**.\n\nBefore you write, ask yourself: *Is this person a man or a woman? So, **he** or **she**?*"
+    },
+    {
+     "learner": "This is my grandmother. She is very kind. This is my father. He is tall.",
+     "tutor": "**Correct!** ✅ All four sentences work.\n\n- \"This is my grandmother. **She** is very kind.\" uses **she** for a woman.\n- \"This is my father. **He** is tall.\" uses **he** for a man.\n\n**Harder task:** Write about **one** person, with **three** sentences: one \"This is my …\" and two facts.\n\nWhen you finish, check: *Did I use the right word, he or she, in both facts?*"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Treats the learner as developing A1, invents no history, and makes no mastery claim.",
+    "lesson_alignment": "Stays on 'This is my…' and 'He/She is…' with correct English and the lesson's family vocabulary.",
+    "pedagogical_appropriateness": "Moves on to a slightly harder transfer task of three sentences with two facts, which is the expected next move.",
+    "scaffolding_adaptation": "Removed the sentence frame after the first success and now removes the hint question, then gives only a self-check prompt, so the learner does the work.",
+    "age_proficiency_fit": "Simple language and a short reply suit a Grade 9 A1 learner, though the bulleted formatting is slightly heavy.",
+    "formative_check_evidence": "The three-sentence task is a good transfer check, and there is no mastery claim or percentage; 'All four sentences work' is accurate.",
+    "clarity_accessibility": "Clear and actionable; the task and self-check are easy to follow, with minor formatting clutter."
+   },
+   "failures": [
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "The self-check prompt repeats the earlier hint instead of fully fading support, and 'two facts' is not defined. It is a minor point."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-12",
+  "caseId": "LTB-TA1-T12",
+  "cohortLabel": "teen",
+  "cefr": "A1",
+  "situation": "T12_contradictory_evidence",
+  "expectedBehavior": "Treats the school record (proficient) as one piece of evidence: notices the current error, probes with a quick check, and does not assume mastery or say the learner \"already knows\" it.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "unprompted_learner_sentence",
+    "record_vs_current_check",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "This is my sister. He is ten.",
+     "tutor": "**\"This is my sister.\"** is correct.\n\nLet's fix one part: **\"He is ten.\"** should be **\"She is ten.\"**\n\nA sister is a girl, so we use **she**.\nA brother is a boy, so we use **he**.\n\nExample: This is my grandfather. **He** is seventy.\n\nYour turn: write two sentences about your **mother**. Then tell me why you chose **he** or **she**."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "This is my sister. He is ten.",
+     "tutor": "Good start! **\"This is my sister.\"** is correct.\n\nNow check the second sentence: **\"He is ten.\"**\n\nHint: Your sister is a girl. Is **\"he\"** the word for a boy or a girl?\n\nPlease write the second sentence again with the right word."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 4,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 4,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 4
+   },
+   "rationale": {
+    "learner_context_fidelity": "Notices the current error and does not lean on the 'proficient' record or claim mastery, though it does not explicitly treat the record as one piece of evidence.",
+    "lesson_alignment": "Stays on the lesson pattern 'This is my…' and 'He/She is…', and the facts about he/she are correct.",
+    "pedagogical_appropriateness": "Confirms what is correct, flags the error, and gives a guiding hint rather than the answer, which is an appropriate probe.",
+    "scaffolding_adaptation": "The hint keeps the work with the learner and invites a retry, but the question 'boy or girl?' is fairly leading for a first hint.",
+    "age_proficiency_fit": "Short, simple A1 language with a friendly, teen-appropriate tone, within the word limit.",
+    "formative_check_evidence": "The retry works as a quick check and no mastery is claimed, but there is no separate transfer item to test whether the learner can choose he/she unaided.",
+    "clarity_accessibility": "Clearly organised with one concrete action to take."
+   },
+   "failures": [
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "Only a retry of the same sentence; no fresh item to check he/she independently."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-13",
+  "caseId": "LTB-TA2-T04",
+  "cohortLabel": "teen",
+  "cefr": "A2",
+  "situation": "T04_minor_error",
+  "expectedBehavior": "Recognises the answer is essentially correct, confirms clearly, at most mentions the minor surface point (capital letter/apostrophe) lightly, and moves forward.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_instruction",
+    "level_novice_prompt_first",
+    "self_corrected",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Today's goal: talk about daily routines with the present simple. For **he/she/it**, the verb adds **-s** (*I get up* → *she gets up*). Words like **always, usually, sometimes, never** go **before** the main verb.\n\nHere's an example I made: *My sister always has breakfast at eight.*\n\n**Your exercise:** Put the words in order. Make one correct sentence.\n\n*school / Tom / goes / to / usually / at 8:00*"
+    },
+    {
+     "learner": "She go to bed at ten o clock — sorry, She goes to bed at ten",
+     "tutor": "Your correction is right. **\"She goes to bed at ten\"** works because with **she** the verb adds **-s**: *go* → *goes*. Your first try, \"She go\", was missing that **-s**.\n\nNow add a frequency word to your sentence. Remember where these words go: **before** the main verb.\n\nExample: *He sometimes plays football after school.*\n\nRewrite your sentence with **usually**. Then try the Tom exercise too:\n*school / Tom / goes / to / usually / at 8:00*"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Today's goal: describe a daily routine with **he/she/it + -s** and words like *always, usually, sometimes, never*.\n\nQuick reminder: with **he/she/it**, the verb gets **-s**. The frequency word goes **before** the main verb.\nExample: *My brother **usually gets up** at seven.*\n\n**Your exercise:** Put the words in order to make a sentence.\n\n*school / always / goes / she / to / at eight*\n\nWrite your sentence below."
+    },
+    {
+     "learner": "She go to bed at ten o clock — sorry, She goes to bed at ten",
+     "tutor": "Your correction is right: **\"She goes to bed at ten\"** uses **goes**, with **-s** for *she*. \"She go\" was missing it, and you fixed it yourself.\n\nBut your sentence doesn't use the words from the exercise yet. It needs **school** and **always** too.\n\nHere's a hint: put **always** just before the main verb, like *My brother **usually gets** up at seven.*\n\nNow try again with these words:\n\n*school / always / goes / she / to / at eight*"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 1,
+    "lesson_alignment": 2,
+    "pedagogical_appropriateness": 1,
+    "scaffolding_adaptation": 1,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 1,
+    "clarity_accessibility": 2
+   },
+   "rationale": {
+    "learner_context_fidelity": "The tutor ignores that the learner was answering the lesson's correction exercise (\"She go to bed at ten\") and treats the reply as a failed attempt at a different task, so it misreads the learner's evidence.",
+    "lesson_alignment": "The -s rule and frequency-adverb placement are correct, but the tutor drifts from the lesson's own exercise and wrongly says the answer is missing required words.",
+    "pedagogical_appropriateness": "The learner self-corrected successfully, but the tutor withholds clean confirmation, demands a redo of the earlier unscrambling task, and does not move on to the next item.",
+    "scaffolding_adaptation": "It credits the self-correction but sends the learner back to the same exercise with an unneeded hint, rather than adjusting to evidence of success and advancing.",
+    "age_proficiency_fit": "Language is simple and short enough for a Grade 9 A2 learner and the tone is friendly.",
+    "formative_check_evidence": "No new check is given; it repeats the same unscramble even though the learner already showed the -s correction, and it does not advance to the next correction item.",
+    "clarity_accessibility": "The messaging is mixed (\"Your correction is right\" followed by \"But...\"), and the hint example with 'usually gets' is confusing for the task, since the previous tutor turn set a different exercise."
+   },
+   "failures": [
+    {
+     "category": "ignored_learner_reply",
+     "severity": "major",
+     "note": "Learner correctly self-corrected; tutor treats the reply as not meeting the task and asks for a redo."
+    },
+    {
+     "category": "over_helping",
+     "severity": "minor",
+     "note": "Gives an unneeded hint about adverb placement."
+    },
+    {
+     "category": "lesson_drift",
+     "severity": "major",
+     "note": "Keeps the learner on the earlier unscramble exercise rather than confirming and moving to the next item."
+    },
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "No new check item; repeats the old prompt."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-14",
+  "caseId": "LTB-TA2-T08",
+  "cohortLabel": "teen",
+  "cefr": "A2",
+  "situation": "T08_mastery_move_on",
+  "expectedBehavior": "Recognises consistent unassisted success, reduces support, and moves forward with a transfer or slightly harder task; does not claim full mastery or invent progress percentages.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_novice_prompt_first",
+    "recurrence_unknown",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Quick reminder first: in this lesson, we talk about habits.\n\nTwo rules:\n- With **he/she/it**, add **-s** to the verb: *I get up* → *She get**s** up*.\n- Put **always / usually / sometimes / never** before the main verb: *My brother **usually** gets up at seven.*\n\n**Your exercise:** Write one sentence about a friend or family member's morning. Use **he** or **she** and one of these words: *always, usually, sometimes, never*."
+    },
+    {
+     "learner": "She goes to bed at ten.",
+     "tutor": "Good start! **\"She goes\"** is correct. You added **-es** to *go* for *she*.\n\nOne part is missing: the task asked for a word like **always, usually, sometimes** or **never**.\n\nHint: this word goes **before the main verb**. In your sentence, the main verb is *goes*.\n\nCan you write your sentence again with one of those four words in the right place?"
+    },
+    {
+     "learner": "My dad watches TV after dinner. I always do my homework before that.",
+     "tutor": "Two things are right here:\n- **\"My dad watches\"**: correct. You added **-es** to *watch* for *he*.\n- **\"I always do\"**: correct. *Always* is before the main verb *do*.\n\nOne part is still missing: the task asks for **he or she** and one frequency word **in the same sentence**.\n\nBefore you write, check: where is the main verb in your dad sentence?\n\nNow add *always, usually, sometimes* or *never* to the sentence about your dad."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder: with **he / she / it**, the verb gets **-s**, and words like *always* or *never* go **before** the verb.\n\nExample: *My brother usually **gets up** at seven.*\n\n**Your exercise:** Put the words in the right order and fix the verb.\n\n*she / always / have breakfast / at 7:30*\n\nBefore you write, check two things:\n1. Where does *always* go?\n2. Does *have* change with *she*?\n\nWrite your sentence below."
+    },
+    {
+     "learner": "She goes to bed at ten.",
+     "tutor": "Your sentence is correct. **She goes** has the **-s/-es** ending, just like it should.\n\nBut it's a different sentence from the exercise. Let's go back to it:\n\n*she / always / have breakfast / at 7:30*\n\nHint: *have* is special with **she**. It doesn't just add -s. Think: *I have, she ___?*\n\nAnd remember, *always* goes **before** the verb.\n\nTry writing the full sentence now."
+    },
+    {
+     "learner": "My dad watches TV after dinner. I always do my homework before that.",
+     "tutor": "Both sentences are correct:\n- **watches** has the **-es** ending for *my dad*.\n- **always** comes **before** the verb *do*.\n\nThe exercise is still open, so let's take a smaller step.\n\n*have* is irregular with **he / she / it**:\n*I have a bike → my dad **has** a bike.*\n\nNow try just the verb part:\n*she ___ breakfast*\n\nThen add *always* and *at 7:30* to make the full sentence."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 2,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 1,
+    "scaffolding_adaptation": 1,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "The tutor treats the learner as needing basics and ignores strong unassisted evidence that they used -s/-es and 'always' correctly twice, though it makes no invented claims.",
+    "lesson_alignment": "The content is accurate and uses the lesson's grammar and vocabulary, but the 'have' to 'has' irregularity goes slightly beyond the lesson items.",
+    "pedagogical_appropriateness": "After two correct unassisted sentences, the tutor insists on the original task and re-explains, when it should recognise success and move on to a transfer or harder task.",
+    "scaffolding_adaptation": "Support increases (smaller step, gives the 'has' model) after the learner showed competence, so over-scaffolding and re-explaining basics instead of fading support.",
+    "age_proficiency_fit": "Short, simple language suits an A2 teen, though the tone is a little rigid.",
+    "formative_check_evidence": "It does acknowledge correct sentences without claiming mastery, but the check is a fill-in-the-blank that is easier than what the learner already produced.",
+    "clarity_accessibility": "The reply is well organised with clear steps and bolded key forms, easy to act on."
+   },
+   "failures": [
+    {
+     "category": "under_scaffolding",
+     "severity": "major",
+     "note": "Misjudges evidence: the learner already showed consistent success, yet the tutor reduces challenge and re-explains instead of moving to a transfer or harder task."
+    },
+    {
+     "category": "ignored_learner_reply",
+     "severity": "minor",
+     "note": "Insists on the original exercise rather than adapting to the learner's demonstrated ability and self-generated sentences."
+    },
+    {
+     "category": "over_helping",
+     "severity": "minor",
+     "note": "Gives the answer 'has' via the model sentence in the smaller step."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-15",
+  "caseId": "LTB-TA2-T12",
+  "cohortLabel": "teen",
+  "cefr": "A2",
+  "situation": "T12_contradictory_evidence",
+  "expectedBehavior": "Treats the school record (proficient) as one piece of evidence: notices the current error, probes with a quick check, and does not assume mastery or say the learner \"already knows\" it.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "unprompted_learner_sentence",
+    "record_vs_current_check",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "My sister always get up at six.",
+     "tutor": "You have most of it. **always** is in the right place, before the main verb. Let's sharpen one part: the verb.\n\nThe subject is **my sister** (= she), so the verb changes:\n\n**My sister always gets up at six.**\n\nCompare: *I always **get** up at six.* / *She always **gets** up at six.*\n\nYour turn: why does the verb change with *she* but not with *I*? Then write one new sentence about your father with **usually**."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "My sister always get up at six.",
+     "tutor": "Good try! One part is right:\n\n- **\"always\"** is in the correct place, before the verb.\n\nNow check the verb **\"get up\"**. The subject is **\"My sister\"**. That is like **she**.\n\nWith he, she, or it, what do we add to the verb in the present simple?\n\nWrite the sentence again with that change."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 4,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 4
+   },
+   "rationale": {
+    "learner_context_fidelity": "It notices the current error and doesn't assume mastery or mention the 'proficient' record, but it also doesn't explicitly treat that record as one piece of evidence.",
+    "lesson_alignment": "It targets exactly the lesson's he/she/it + -s and adverb placement, and the facts are correct.",
+    "pedagogical_appropriateness": "Praising the correct adverb placement and then prompting self-correction is a good hint-based move, though it leaves out the fact that 'get up' is a phrasal verb so the -s goes on 'get'.",
+    "scaffolding_adaptation": "It gives a hint (she = -s) without giving the answer and asks for a retry, but the hint is fairly heavy given the learner's 'proficient' record, so a lighter prompt could have come first.",
+    "age_proficiency_fit": "Short, simple sentences with a friendly tone fit an A2 Grade 9 learner.",
+    "formative_check_evidence": "The rewrite is a check of this one sentence, but it is heavily scaffolded and there is no unassisted transfer item, so it doesn't probe whether the error is a slip or a gap.",
+    "clarity_accessibility": "It is well organised, concise and gives one clear action."
+   },
+   "failures": [
+    {
+     "category": "under_scaffolding",
+     "severity": "minor",
+     "note": "The hint names the rule almost outright, which reduces the diagnostic value of the probe given the conflicting 'proficient' record."
+    },
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "There is no quick independent check (e.g. a fresh sentence) to test whether the error is a slip or a gap."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-16",
+  "caseId": "LTB-TB1-T04",
+  "cohortLabel": "teen",
+  "cefr": "B1",
+  "situation": "T04_minor_error",
+  "expectedBehavior": "Recognises the answer is essentially correct, confirms clearly, at most mentions the minor surface point (capital letter/apostrophe) lightly, and moves forward.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_strong_reformulation_ok"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Our goal today: talk about life experiences with **have/has + past participle** (\"Have you ever…?\") and switch to the **past simple** when we say a finished time (like *yesterday* or *last year*).\n\nFirst, a quick warm-up so I know where to start:\n\n**Exercise:** Complete each sentence with the right form of the verb in brackets.\n\n1. I ______ (never / meet) a famous person.\n2. ______ you ever ______ (be) to another country?\n3. We ______ (visit) my grandparents last weekend.\n\nWrite your three answers, and tell me **why** you chose the form in sentence 3."
+    },
+    {
+     "learner": "I visited my aunt in aswan last year.",
+     "tutor": "Your sentence uses the right form: **\"I visited… last year\"**. *Last year* is a finished time, so the past simple *visited* fits. One small fix: **Aswan** needs a capital letter because it's the name of a place.\n\nNow let's go one step further. Imagine you want to talk about the experience **without saying when** it happened.\n\n**Your task:** Rewrite your sentence so it starts with **\"I have…\"** and has **no time word**. Then add one sentence that says *when*, using the past simple.\n\nAfter that, try the three sentences from my exercise."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! **Goal:** talk about life experiences with *have/has + past participle*, and switch to the past simple when you say a finished time (like *last year*).\n\nFirst, a quick warm-up: what do you already know about the question **\"Have you ever…?\"**\n\n**Exercise:** Complete each sentence with the correct form of the verb in brackets.\n\n1. I ______ (never / eat) Indian food.\n2. ______ you ever ______ (meet) a famous person?\n3. My brother ______ (go) to Turkey last summer.\n\nWrite your three answers, and for number 3, tell me **why** you chose that form."
+    },
+    {
+     "learner": "I visited my aunt in aswan last year.",
+     "tutor": "**\"I visited my aunt in Aswan last year.\"** This sentence is correct. 👍\n\n- You used the **past simple** (*visited*) with a **finished time** (*last year*). That is exactly the rule for this lesson.\n- Small slip: city names start with a capital letter, so write **Aswan**.\n\nNow a deeper question: imagine there is **no** time in the sentence. You just want to say this is one of your life experiences. How would you change it?\n\nStart with: **I ______ to Aswan.** (use *been*)\n\nThen try the three sentences from the exercise above."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 2
+   },
+   "rationale": {
+    "learner_context_fidelity": "Treats the learner's sentence as the exercise answer, invents no history or mastery, and keeps a teen-appropriate B1 tone.",
+    "lesson_alignment": "Facts are correct (visited and last year, capital A in Aswan), the reply uses the lesson's contrast, and the 'been to' prompt matches the lesson vocabulary.",
+    "pedagogical_appropriateness": "It confirms the answer clearly and flags the capital letter lightly, which fits the case. The 'deeper question' then adds a new transformation and re-assigns the earlier three items instead of moving to the planned next item.",
+    "scaffolding_adaptation": "It responds to the learner's actual sentence and keeps the learner doing the work, but it ignores that the first three exercise items were never answered and adds more tasks on top of them.",
+    "age_proficiency_fit": "The language is simple and suitable for B1 Grade 9, though the 'deeper question' is a slight step up in demand.",
+    "formative_check_evidence": "It sets a transfer task (present perfect with no finished time) and makes no mastery claim, but stacking it with three pending items weakens the check.",
+    "clarity_accessibility": "The confirmation is clear, but the closing instructions, with the 'I ___ to Aswan' prompt plus 'then try the three sentences', are somewhat cluttered, and the fill-in blank is odd because it needs 'have been'."
+   },
+   "failures": [
+    {
+     "category": "verbosity",
+     "severity": "minor",
+     "note": "Adds an extra task and re-assigns earlier items instead of a single clean next step."
+    },
+    {
+     "category": "lesson_drift",
+     "severity": "minor",
+     "note": "The 'I ___ to Aswan (been)' prompt departs from the planned next item ('Have you ever seen a camel')."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-17",
+  "caseId": "LTB-TB1-T08",
+  "cohortLabel": "teen",
+  "cefr": "B1",
+  "situation": "T08_mastery_move_on",
+  "expectedBehavior": "Recognises consistent unassisted success, reduces support, and moves forward with a transfer or slightly harder task; does not claim full mastery or invent progress percentages.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_strong_reformulation_ok",
+    "recurrence_unknown",
+    "after_confirmed_success"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder: we use **have/has + past participle** for experiences in your life (\"Have you ever…?\"). When we say a **finished time** (yesterday, last year), we switch to the past simple.\n\n**Exercise:** Complete the mini-dialogue with the correct form of the verb in brackets.\n\nA: ______ you ever ______ (go) to a concert?\nB: Yes, I ______. I ______ (go) to one last month.\n\n**Tip before you start:** look for a time word in each line. Does it show a finished time or not?\n\nWrite your answers, and I'll check them."
+    },
+    {
+     "learner": "I visited my aunt in Aswan last year.",
+     "tutor": "Your sentence is correct. **\"I visited my aunt in Aswan last year\"** uses the past simple, and that fits, because **\"last year\"** is a finished time.\n\nNow try the same idea in the mini-dialogue from before:\n\nA: ______ you ever ______ (go) to a concert?\nB: Yes, I ______. I ______ (go) to one last month.\n\n**Plan first:** line A has no finished time, but line B does (\"last month\"). Which form does each line need?\n\nWrite your four answers, and I'll check them."
+    },
+    {
+     "learner": "Have you ever seen a camel? I have seen one, but I saw it only once, in 2019.",
+     "tutor": "Your sentences are correct.\n\n- **\"Have you ever seen a camel?\"** uses have + past participle (*seen*) for an experience.\n- **\"I have seen one\"** gives the experience, with no time.\n- **\"I saw it only once, in 2019\"** switches to the past simple, because **2019** is a finished time.\n\nThat's the exact pattern of this lesson. As for your question, I'm an AI, so no camels for me!\n\nNow complete the dialogue on your own:\n\nA: ______ you ever ______ (go) to a concert?\nB: Yes, I ______. I ______ (go) to one last month.\n\nWrite your four answers."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder: we use **have/has + past participle** for experiences (\"Have you ever…?\"). When we say *when* it happened (yesterday, last year), we switch to the **past simple**.\n\n**Exercise:** Complete the mini-dialogue with the correct form of the verb in brackets.\n\nA: ______ you ever ______ (meet) a famous person?\nB: Yes, I ______. I ______ (meet) a famous singer last year.\n\n**Before you answer, plan:** look for a time word in each sentence. Is the time finished or not?\n\nWrite your four answers, and tell me which clue helped you choose."
+    },
+    {
+     "learner": "I visited my aunt in Aswan last year.",
+     "tutor": "Your sentence is correct. \"I **visited** my aunt in Aswan **last year**.\" \"Last year\" is a finished time, so the past simple \"visited\" is the right choice.\n\nThe present perfect version has no time word:\n\"I **have been to** Aswan.\"\n\nNow try the exercise from before. Here it is again:\n\nA: ______ you ever ______ (meet) a famous person?\nB: Yes, I ______. I ______ (meet) a famous singer last year.\n\n**Tip:** Do what you just did with your Aswan sentence. Find the time word first. Which line has one?"
+    },
+    {
+     "learner": "Have you ever seen a camel? I have seen one, but I saw it only once, in 2019.",
+     "tutor": "Your sentences are correct.\n\n- \"Have you ever **seen** a camel?\" and \"I **have seen** one\" talk about an experience with no time, so the present perfect is right.\n- \"I **saw** it only once, **in 2019**\": \"in 2019\" is a finished time, so you switched to the past simple. That switch is exactly the lesson's key point.\n\n**Next task:** Write a short mini-dialogue (3–4 lines) about a food you have tried.\nUse **ever** or **never**, and include one finished time (e.g. *last summer*).\n\n**Before you send it, check:** Did you switch tense when the time word appeared?"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Treats the learner as a developing B1 teen, invents no history, and makes no mastery claim; it does not explicitly name the learner's consistent success.",
+    "lesson_alignment": "Grammar explanations are correct and use the lesson's own pattern (experience vs finished time) with the ever/never and last summer scaffold; the food example comes from the lesson.",
+    "pedagogical_appropriateness": "The final turn moves to a harder production task (a mini-dialogue) instead of repeating the easy item, which is the expected next move; the earlier turn re-asked the unanswered exercise, which was reasonable.",
+    "scaffolding_adaptation": "Support fades appropriately in the final turn: it confirms the correct switch and asks for free production with only a brief self-check prompt; the earlier turn did not credit the learner's off-task answer much but did redirect.",
+    "age_proficiency_fit": "Language is simple and B1-appropriate, the topic is teen-friendly, and the reply is well within the 200-word limit.",
+    "formative_check_evidence": "The unassisted transfer task with a self-check targets the success criterion and makes no mastery or percentage claims, though it does not state that the evidence is still limited.",
+    "clarity_accessibility": "Short, bolded, bulleted feedback and a clear task with explicit requirements make it easy to act on."
+   },
+   "failures": [
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "The final turn does not acknowledge that one or two correct answers are only early evidence, and the earlier meet exercise was never completed."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-18",
+  "caseId": "LTB-TB1-T12",
+  "cohortLabel": "teen",
+  "cefr": "B1",
+  "situation": "T12_contradictory_evidence",
+  "expectedBehavior": "Treats the school record (proficient) as one piece of evidence: notices the current error, probes with a quick check, and does not assume mastery or say the learner \"already knows\" it.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "unprompted_learner_sentence",
+    "record_vs_current_check"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "I have met my teacher yesterday.",
+     "tutor": "You have most of it: \"have met\" is formed correctly (have + past participle). Let's sharpen one part.\n\nLook at the word **yesterday**. It's a finished time.\n\nThink back to the lesson: which tense do we use when a finished time like *yesterday* or *last year* is in the sentence?\n\nTry rewriting your sentence, and tell me **why** your new version is better.\n\nBonus: write a second sentence about meeting someone with **no** time given, like a life experience. Which tense fits there?"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "I have met my teacher yesterday.",
+     "tutor": "Good try. The form **\"have met\"** is built correctly: *have* + past participle (*met*). That part is right.\n\nNow look at the end of your sentence: **\"yesterday\"**.\n\nAsk yourself: is \"yesterday\" a finished time or an unfinished one? Which tense does English use when we say *exactly when* something happened in a finished time?\n\nRewrite the sentence with that in mind, and then tell me in one short line **why** your new version is better."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 4,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "It notices the current error and does not lean on the 'proficient' record or assume mastery, though it makes no explicit reference to that record as one piece of evidence.",
+    "lesson_alignment": "It targets the lesson's key contrast of past simple with a finished time and correctly praises the have + past participle form.",
+    "pedagogical_appropriateness": "A hint-and-retry prompt that makes the learner find the error is a good fit, but it does not use a quick probe on a fresh item to test whether the error is a slip or a gap.",
+    "scaffolding_adaptation": "It gives a guiding question without the answer and asks for a rewrite, so the learner keeps the work, though the hint nearly names the rule.",
+    "age_proficiency_fit": "The language is simple and suited to a B1 teen, and the length is fine, though the phrase 'finished or unfinished time' is somewhat abstract.",
+    "formative_check_evidence": "The rewrite plus a 'why' line is a modest check on the same sentence, but there is no separate, unassisted transfer item to probe for mastery.",
+    "clarity_accessibility": "It is well organised with clear steps, though it contains several questions at once, which slightly clutters it."
+   },
+   "failures": [
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "No fresh item to probe whether the error is a slip or a gap; the check is tied to the same corrected sentence."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-19",
+  "caseId": "LTB-AA1-T04",
+  "cohortLabel": "adult",
+  "cefr": "A1",
+  "situation": "T04_minor_error",
+  "expectedBehavior": "Recognises the answer is essentially correct, confirms clearly, at most mentions the minor surface point (capital letter/apostrophe) lightly, and moves forward.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_sentence_frame",
+    "level_novice_prompt_first",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Today's goal: introduce a family member with **\"This is my …\"** and say one fact with **\"He is / She is …\"**.\n\nQuick reminder first. Use **he** for a man (father, brother) and **she** for a woman (mother, sister).\n\n**Example:**\n*This is my sister. She is ten.*\n\n**Your exercise:** Write two sentences about one person in your family. Use this frame:\n\nThis is my ______. ______ is ______."
+    },
+    {
+     "learner": "he is twelve",
+     "tutor": "Good start. **\"he is twelve\"** has the right pattern: *he* + *is* + age.\n\n**What's missing:** the first sentence. The task needs two sentences, and the first one says **who** the person is.\n\n**Hint:** Start with **\"This is my\"** + a family word (for example *brother*, *father*, *grandfather*). Then add your sentence.\n\nTry again and write both sentences:\n\nThis is my ______. He is twelve."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "**Goal:** introduce a family member with \"This is my …\" and say one fact with \"He is / She is …\".\n\nQuick reminder:\n- A man (father, brother, grandfather) → **He is …**\n- A woman (mother, sister, grandmother) → **She is …**\n\nExample from the lesson: *This is my father. He is a driver.*\n\n**Your exercise:** Write two sentences about one person in your family.\n\nThis is my ______. ______ is ______."
+    },
+    {
+     "learner": "he is twelve",
+     "tutor": "**What's right:** \"he is twelve\" uses **He is + age**, which is the correct form. One small slip: start with a capital letter, **He**.\n\n**What's missing:** the first sentence. Who is twelve? We need **This is my + family word** first.\n\nHint: choose a family word for a boy or man (brother, father, grandfather), so it matches **He**.\n\n**Try again:** Write both sentences.\n\nThis is my ______. He is twelve."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 2,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 2,
+    "scaffolding_adaptation": 2,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "The reply keeps to the A1 adult context and invents nothing, but it ignores that the learner was most likely answering the lesson's own fill-in item ('___ is twelve'), not the two-sentence task the tutor set.",
+    "lesson_alignment": "It stays on 'This is my…' and 'He is…', and the facts about English are correct, including the capital letter on He.",
+    "pedagogical_appropriateness": "The case calls for confirming a correct answer, a light note and moving on. The reply instead treats the answer as incomplete and asks for a redo, and the 'missing first sentence' point reflects the tutor's own task design more than a learner error.",
+    "scaffolding_adaptation": "It gives a retry with a hint, and it also hands over 'He is twelve' in the template, so the learner has less to produce. The hint is a bit heavy for a minor issue and there is no move to the next item.",
+    "age_proficiency_fit": "The language is simple and short enough for A1 adults, though the headings and bold formatting add some clutter.",
+    "formative_check_evidence": "The retry asks only for the family word, a weak check, and it does not move to the next item as expected. It makes no mastery claim.",
+    "clarity_accessibility": "The structure is clear and actionable, but several labelled sections make the reply longer than it needs to be."
+   },
+   "failures": [
+    {
+     "category": "over_helping",
+     "severity": "minor",
+     "note": "It supplies 'He is twelve' in the retry template and hints at the family word."
+    },
+    {
+     "category": "lesson_drift",
+     "severity": "major",
+     "note": "It treats an essentially correct answer as incomplete and asks for a redo instead of confirming and moving on to the next item."
+    },
+    {
+     "category": "verbosity",
+     "severity": "minor",
+     "note": "Heavy correction structure for a trivial capitalisation slip."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-20",
+  "caseId": "LTB-AA1-T08",
+  "cohortLabel": "adult",
+  "cefr": "A1",
+  "situation": "T08_mastery_move_on",
+  "expectedBehavior": "Recognises consistent unassisted success, reduces support, and moves forward with a transfer or slightly harder task; does not claim full mastery or invent progress percentages.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_novice_prompt_first",
+    "recurrence_unknown",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder of the two sentence patterns:\n\n- **This is my** + family word → *This is my brother.*\n- **He is / She is** + one fact → *He is a teacher.*\n\nUse **he** for a man (father, brother, grandfather).\nUse **she** for a woman (mother, sister, grandmother).\n\n**Exercise:** Write two sentences about one person in your family.\n\n*This is my ______. ______ is ______.*\n\nBefore you write, ask yourself: is this person a man or a woman?"
+    },
+    {
+     "learner": "This is my brother. He is twelve.",
+     "tutor": "Both sentences are correct.\n\n- \"**This is my brother.**\" uses the right pattern: *This is my* + family word.\n- \"**He is twelve.**\" Brother is a man, so **he** is right.\n\n**Next task:** Write two sentences about a **woman** in your family. This time there's no frame. Use the same patterns from memory.\n\nWhen you finish, check: Did I start with *This is my*? Did I choose *he* or *she* correctly?"
+    },
+    {
+     "learner": "This is my grandmother. She is very kind. This is my father. He is tall.",
+     "tutor": "All four sentences are correct.\n\n- \"**This is my grandmother.** **She** is very kind.\" Grandmother is a woman, so **she** is right.\n- \"**This is my father.** **He** is tall.\" Father is a man, so **he** is right.\n\nYou also used different facts: an age, a personality word, a height. That works well.\n\n**Next task:** Write about **two** different family members, one man and one woman. No reminders this time. When you finish, check your own **he/she** choices before you send."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Let's practise introducing a family member.\n\nFirst, a quick reminder:\n- **This is my** + family word → *This is my brother.*\n- **He** = a man or boy. **She** = a woman or girl.\n\nExample (my own): *This is my mother. She is a teacher.*\n\n**Your exercise:**\nWrite two sentences about **your grandfather**.\n1. Start with **This is my …**\n2. Then say one fact with **He is … / She is …**\n\nBefore you write, ask yourself: *Is a grandfather \"he\" or \"she\"?*"
+    },
+    {
+     "learner": "This is my brother. He is twelve.",
+     "tutor": "Your sentences are correct:\n- **\"This is my brother.\"** uses **This is my** + family word.\n- **\"He is twelve.\"** uses **He** for a boy.\n\nOne thing: the exercise asked about your **grandfather**, not your brother.\n\nNow try it with **grandfather**. Write two sentences, one with **This is my …** and one with **He is …**\n\nWhen you finish, check: did you use the family word from the task?"
+    },
+    {
+     "learner": "This is my grandmother. She is very kind. This is my father. He is tall.",
+     "tutor": "All four sentences are correct:\n- **\"This is my grandmother. She is very kind.\"** Correct. **She** for a woman.\n- **\"This is my father. He is tall.\"** Correct. **He** for a man.\n\nYour **he/she** choices are right every time.\n\nOne gap: the task word was **grandfather**. Look at the pair:\n- grand**mother** → she\n- grand**father** → he\n\nNow write two sentences about your **grandfather**. Before you send, check: is the family word in your first sentence **grandfather**?"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 2,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 1,
+    "scaffolding_adaptation": 1,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "It uses the supplied A1 level and the he/she focus, but ignores the evidence of repeated success (developing status) and never adapts to it.",
+    "lesson_alignment": "Content and English facts are accurate and match the lesson's target patterns, though it fixates on a task word instead of the objective.",
+    "pedagogical_appropriateness": "Third turn repeats the same grandfather task for the third time even though the learner has shown consistent correct he/she use across two turns; the expected move was a transfer or harder task.",
+    "scaffolding_adaptation": "Support is not reduced and nothing changes except a mother/father hint; it does not move forward to the nextItem or a transfer task, and instead insists on the original wording.",
+    "age_proficiency_fit": "Language is simple and suitable for an adult A1 learner, with a neutral tone, though the bold formatting and repeated checks are a little heavy.",
+    "formative_check_evidence": "It accurately notes he/she were right every time and avoids mastery claims, but the check it sets is a repeat of the same item rather than a new transfer task.",
+    "clarity_accessibility": "Clear, organised, and easy to act on, with a helpful mother/father contrast."
+   },
+   "failures": [
+    {
+     "category": "under_scaffolding",
+     "severity": "major",
+     "note": "Does not recognise consistent success or reduce support; learner is not given a new or harder task."
+    },
+    {
+     "category": "lesson_drift",
+     "severity": "minor",
+     "note": "Over-focuses on the specific word grandfather rather than the objective (he/she with family words), which learner has already shown."
+    },
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "Repeats the same exercise rather than a transfer task such as the nextItem or an unprompted introduction."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-21",
+  "caseId": "LTB-AA1-T12",
+  "cohortLabel": "adult",
+  "cefr": "A1",
+  "situation": "T12_contradictory_evidence",
+  "expectedBehavior": "Treats the school record (proficient) as one piece of evidence: notices the current error, probes with a quick check, and does not assume mastery or say the learner \"already knows\" it.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "unprompted_learner_sentence",
+    "record_vs_current_check",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "This is my sister. He is ten.",
+     "tutor": "You have most of it. \"This is my sister.\" is correct.\n\nLet's sharpen one part: the second sentence. \"He\" does not match \"sister.\"\n\nRemember:\n- **He** = a man or boy (father, brother)\n- **She** = a woman or girl (mother, sister)\n\n**Your turn:**\n1. Rewrite your second sentence correctly.\n2. Explain in a few words why that word is right.\n3. Write one new pair about your grandfather, like: \"This is my … He/She is …\""
+    }
+   ],
+   "r3": [
+    {
+     "learner": "This is my sister. He is ten.",
+     "tutor": "You have most of it right.\n\n\"This is my sister.\" is correct. Good use of \"This is my + family word\".\n\nNow check the second sentence: \"**He** is ten.\"\n\nHint: \"sister\" is a woman or a girl. Is \"he\" the right word for a woman? Which word do we use for a woman?\n\nPlease write the second sentence again."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Does not assume mastery despite the 'proficient' record, treats the current error as real evidence, and invents nothing, though it never mentions the record directly.",
+    "lesson_alignment": "Stays on the lesson's 'This is my…' and 'He/She is…' patterns, and the facts are correct.",
+    "pedagogical_appropriateness": "Praises the correct part, flags the he/she error with a hint, and asks for a rewrite, which is a sensible move, but it nearly gives the answer.",
+    "scaffolding_adaptation": "Gives a hint and a retry without supplying 'She', so the learner keeps the work, though the hint is fairly heavy (the leading question plus 'woman or girl').",
+    "age_proficiency_fit": "Short simple sentences suit an A1 adult, though 'woman or girl' is slightly childish and three questions in a row is a lot.",
+    "formative_check_evidence": "The rewrite is only a fix of the same sentence with heavy support, and there is no separate quick check on a new item such as a brother or father to test whether the learner has really mastered he/she.",
+    "clarity_accessibility": "Clear and actionable with a single instruction, though the stacked questions are slightly cluttered."
+   },
+   "failures": [
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "Only asks for a supported rewrite; no independent probe, such as a new family member, to test he/she."
+    },
+    {
+     "category": "over_helping",
+     "severity": "minor",
+     "note": "The hint nearly gives away the answer by stating sister = woman/girl and asking which word is used for a woman."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-22",
+  "caseId": "LTB-AA2-T04",
+  "cohortLabel": "adult",
+  "cefr": "A2",
+  "situation": "T04_minor_error",
+  "expectedBehavior": "Recognises the answer is essentially correct, confirms clearly, at most mentions the minor surface point (capital letter/apostrophe) lightly, and moves forward.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_instruction",
+    "level_novice_prompt_first",
+    "self_corrected",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Our goal in this lesson is to **describe daily routines** with the present simple.\n\nTwo quick reminders:\n- With **he / she / it**, the verb gets **-s**: *I get up* → *she get**s** up*.\n- Words like **always, usually, sometimes, never** go **before the main verb**.\n\nExample: *My brother **usually gets up** at seven.*\n\n**Exercise:** Put the words in the right order and write the correct sentence.\n\n1. (my sister / have breakfast / always) at 8 o'clock.\n2. (he / go to work / never) on Sunday.\n3. (Tom / sometimes / watch TV) in the evening.\n\nWrite your three sentences, and I'll check them with you."
+    },
+    {
+     "learner": "She go to bed at ten o clock — sorry, She goes to bed at ten",
+     "tutor": "Your correction is right. **\"She goes to bed at ten\"** is correct present simple.\n\n- *She **go*** was the error. With **she**, the verb needs an ending.\n- **Go** ends in **-o**, so it takes **-es**: go → **goes**. The same happens with *do → does* and *watch → watches*.\n\nNow let's add a frequency word.\n\n**Your task:** Add **usually** to your sentence. Where does it go?\n\n*She ___ goes to bed at ten.* or *She goes ___ to bed at ten.*\n\nWrite the full sentence. Then try the three sentences from the exercise above."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Our goal today: **describe daily routines** with the present simple.\n\nQuick reminder of two rules:\n- With **he/she/it**, add **-s** to the verb: *I get up* → *She get**s** up*.\n- Words like **always, usually, sometimes, never** go **before** the main verb.\n\nExample: *My brother **usually gets** up at seven.*\n\n**Your exercise:** Put the words in the right order and fix the verb.\n\n*my sister / have breakfast / always / at 8:00*\n\nWrite your sentence below, and I'll give you feedback."
+    },
+    {
+     "learner": "She go to bed at ten o clock — sorry, She goes to bed at ten",
+     "tutor": "Your corrected sentence is right: *She **goes** to bed at ten.* You spotted the missing **-es** yourself. With he/she/it, *go* becomes *goes* (like *do → does*). Small spelling note: it's **o'clock**, with an apostrophe.\n\nNow add one more piece: a frequency word.\n\n**Task:** Rewrite your sentence with **usually**. Where does *usually* go?\n\n*She ___ ___ to bed at ten.*\n\nAfter that, we can go back to the *my sister / have breakfast* exercise."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "The reply uses the learner's actual self-correction and the lesson objective, and invents nothing about the learner.",
+    "lesson_alignment": "It stays on the -es rule and the frequency adverb pattern, and the do→does comparison is accurate; the o'clock note is correct.",
+    "pedagogical_appropriateness": "It confirms clearly, makes only a light spelling note, and moves forward with a related next step, as expected; it does not use the lesson's own next item (My dad watch TV).",
+    "scaffolding_adaptation": "It credits the learner's self-correction and raises the challenge with a gap-fill that keeps the work with the learner, though it adds a new target rather than the planned next item.",
+    "age_proficiency_fit": "The language is short and simple, suited to A2 adults, with a neutral tone.",
+    "formative_check_evidence": "The usually rewrite is a reasonable transfer check, and the reply makes no mastery claims; the blank partly gives away the structure.",
+    "clarity_accessibility": "The reply is clear and actionable, but the final line about returning to the earlier exercise adds a little clutter."
+   },
+   "failures": [
+    {
+     "category": "lesson_drift",
+     "severity": "minor",
+     "note": "It skips the planned next item (My dad watch TV) and adds an extra step, while also referencing the earlier, still-unanswered exercise, which adds a slight loop."
+    },
+    {
+     "category": "over_helping",
+     "severity": "minor",
+     "note": "The blank template 'She ___ ___ to bed' gives away much of the sentence structure."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-23",
+  "caseId": "LTB-AA2-T08",
+  "cohortLabel": "adult",
+  "cefr": "A2",
+  "situation": "T08_mastery_move_on",
+  "expectedBehavior": "Recognises consistent unassisted success, reduces support, and moves forward with a transfer or slightly harder task; does not claim full mastery or invent progress percentages.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_novice_prompt_first",
+    "recurrence_unknown",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder from this lesson:\n\n- With **he/she/it**, add **-s** to the verb: *I get up* → *She **gets** up*.\n- Put **always / usually / sometimes / never** before the main verb.\n\nExample: *My brother **usually gets** up at seven.*\n\n**Your exercise:**\nPut the words in the right order and fix the verb.\n\n*Anna / go to work / always / at eight.*\n\nBefore you write, check two things: Does the verb need **-s**? Where does **always** go?\n\nWrite your sentence, and I'll tell you if it's right."
+    },
+    {
+     "learner": "She goes to bed at ten.",
+     "tutor": "Your sentence is correct. **\"She goes\"** has the right ending. *Go* takes **-es** with he/she/it, like *do → does* and *watch → watches*.\n\nBut it's a different sentence from the exercise. Let's go back to that one:\n\n*Anna / go to work / always / at eight.*\n\nUse the same check you just did:\n\n- **Verb:** Anna = she, so what happens to *go*? (You already know this one.)\n- **Always:** put it **before** the main verb.\n\nWrite the full sentence about Anna."
+    },
+    {
+     "learner": "My dad watches TV after dinner. I always do my homework before that.",
+     "tutor": "Both sentences are correct.\n\n- **\"My dad watches\"**: right. *Watch* takes **-es** with he/she/it.\n- **\"I always do\"**: right. *Always* is before the main verb, and *I* needs no -s.\n\nSo you already know both rules for the Anna sentence. You used them in your own sentences, so try it without my hints this time:\n\n*Anna / go to work / always / at eight.*\n\nBefore you send it, check your own sentence:\n1. Did I change the verb for Anna?\n2. Is *always* before the verb?\n\nWrite the sentence about Anna."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder from this lesson:\n\n- With **he/she/it**, add **-s** to the verb: *I work* → *She work**s***.\n- Put **always / usually / sometimes / never** before the main verb: *My brother **usually gets up** at seven.*\n\n**Exercise:** Put the words in the right order and fix the verb.\n\n*Anna / have breakfast / never / at home*\n\nBefore you write, check two things: Does the verb need **-s**? Where does **never** go?\n\nWrite your sentence. I'll check it with you."
+    },
+    {
+     "learner": "She goes to bed at ten.",
+     "tutor": "Your sentence **\"She goes to bed at ten.\"** is correct. **Goes** has the right ending for *she*: *go* → *goes*.\n\nBut it's a different sentence from the exercise. Let's go back to it:\n\n*Anna / have breakfast / never / at home*\n\nTwo checks before you write:\n\n1. *Anna* = *she*. What happens to **have** with *she*? (Careful: it's irregular, like *go* → *goes*.)\n2. **Never** goes before the main verb.\n\nNow write the full sentence about Anna."
+    },
+    {
+     "learner": "My dad watches TV after dinner. I always do my homework before that.",
+     "tutor": "Both sentences are correct:\n\n- **\"My dad watches TV\"**: *watch* → *watch**es*** for *he*. Right ending.\n- **\"I always do my homework\"**: **always** is before the main verb *do*. Right place. And with **I**, no -s, so *do* is correct.\n\nYou've shown both rules in your own sentences. Now use them together for Anna:\n\n*Anna / have breakfast / never / at home*\n\nPlan it first: say to yourself where **never** goes, then what **have** becomes with *she*.\n\nWrite your sentence."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 2,
+    "lesson_alignment": 2,
+    "pedagogical_appropriateness": 2,
+    "scaffolding_adaptation": 2,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Treats the learner as still developing and invents nothing, but ignores that the learner has twice produced correct unassisted sentences (the learner's sentences match the lesson's exercise and nextItem).",
+    "lesson_alignment": "Stays on the lesson's grammar, but the first turn's 'irregular like go→goes' hint is a bit off (have→has is the irregular one), and the exercise 'put words in order and fix the verb' is a custom task rather than the lesson's.",
+    "pedagogical_appropriateness": "Accurately confirms the learner's correct sentences, but keeps pushing the same Anna item after two successes, rather than moving to a transfer or harder task.",
+    "scaffolding_adaptation": "Does respond to the learner's actual sentences, yet re-supplies the same checklist hints (never position, have→has) instead of fading support after evident success.",
+    "age_proficiency_fit": "Simple vocabulary and a short, adult-appropriate tone at A2 level.",
+    "formative_check_evidence": "No mastery claim is made, and the Anna item combines both rules, but it is repeated and heavily pre-scaffolded, so it does not work as an unassisted transfer check.",
+    "clarity_accessibility": "Well organised and easy to act on, though the repeated reminders add some clutter."
+   },
+   "failures": [
+    {
+     "category": "over_helping",
+     "severity": "minor",
+     "note": "Final turn repeats hints, pre-solving the Anna item (never before the verb, have→has) after the learner showed success."
+    },
+    {
+     "category": "ignored_learner_reply",
+     "severity": "minor",
+     "note": "Learner twice wrote their own correct sentences, yet the tutor sends them back to the same exercise rather than advancing to a transfer/harder task."
+    },
+    {
+     "category": "factual_error",
+     "severity": "minor",
+     "note": "First turn describes 'have' as 'irregular like go→goes' while the lesson's example is a regular -s ending; 'have→has' is not explained clearly."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-24",
+  "caseId": "LTB-AA2-T12",
+  "cohortLabel": "adult",
+  "cefr": "A2",
+  "situation": "T12_contradictory_evidence",
+  "expectedBehavior": "Treats the school record (proficient) as one piece of evidence: notices the current error, probes with a quick check, and does not assume mastery or say the learner \"already knows\" it.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "unprompted_learner_sentence",
+    "record_vs_current_check",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "My sister always get up at six.",
+     "tutor": "You have most of it. \"Always\" is in the right place, before the main verb. Let's sharpen one part: the verb.\n\n**My sister always get~~s~~ up at six.** ✗\n**My sister always gets up at six.** ✓\n\n\"My sister\" = **she**, so the verb needs **-s**. The adverb doesn't change that. The verb after \"always\" still takes -s.\n\nAnother example: *My manager usually **checks** his email at eight.*\n\nNow your turn. Why does \"gets\" need -s here, but not in \"I always get up at six\"? Then write one new sentence about a colleague or friend using **sometimes** or **never**."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "My sister always get up at six.",
+     "tutor": "Good start. You put **\"always\"** in the right place, before the main verb. \"At six\" is correct too.\n\nLet's sharpen one part: look at the verb **\"get\"**.\n\nHint: the subject is **\"My sister\"**. That is the same as **she**. What happens to the verb after he, she or it in the present simple?\n\nExample with a different sentence:\n- I work at home. → **He** work**s** at home.\n\nCan you rewrite your sentence with the correct verb form? Then tell me in a few words **why** the verb changes."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 2,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "It notices the current error and does not assume mastery, but it never refers to the 'proficient' record or treats it as one piece of evidence that conflicts with this error.",
+    "lesson_alignment": "It stays on he/she/it + -s and adverb placement, and its facts are correct; the example sentence is clearly its own.",
+    "pedagogical_appropriateness": "Praising what was correct, giving a hint and asking for a rewrite is a sound move, but it does not probe with a separate quick check as expected, and the hint nearly gives away the rule.",
+    "scaffolding_adaptation": "The learner keeps the work of fixing the verb, and the hint is graded: it names the subject-pronoun link and gives a parallel example without the answer. It also asks for a reason, which pushes the learner beyond copying the pattern.",
+    "age_proficiency_fit": "Short, plain sentences suit A2 adults and the tone is respectful, though the request for an explanation of 'why' may be a little demanding.",
+    "formative_check_evidence": "Asking for a rewrite plus a reason is a check, but it is the same sentence with heavy support. There is no new unassisted item, and the record's 'proficient' claim is not tested.",
+    "clarity_accessibility": "Well organised, with bolded key words and a clear final instruction; the two-part ask is a little heavy."
+   },
+   "failures": [
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "No fresh, unassisted transfer item to test whether the error is a slip or a gap; the rule is mostly cued by the hint and example."
+    },
+    {
+     "category": "over_helping",
+     "severity": "minor",
+     "note": "The hint and the example (work → works) nearly give away the correction before the learner tries."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-25",
+  "caseId": "LTB-AB1-T04",
+  "cohortLabel": "adult",
+  "cefr": "B1",
+  "situation": "T04_minor_error",
+  "expectedBehavior": "Recognises the answer is essentially correct, confirms clearly, at most mentions the minor surface point (capital letter/apostrophe) lightly, and moves forward.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_strong_reformulation_ok"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! **Goal for today:** talk about life experiences with the present perfect (*have/has* + past participle) and switch to the past simple when you say *when* it happened.\n\nFirst, a quick check of what you already know. Complete these two sentences in your own words:\n\n1. Have you ever ___ (visit) another country?\n2. If yes: I ___ (go) there in ___ (a year or time).\n\nThen answer the question about yourself, like this:\n*Yes, I have. I …* or *No, I haven't. I've never …*\n\nTry it without looking anything up. I'll tell you exactly which parts work and what to adjust. After that, I'll give you a harder exercise."
+    },
+    {
+     "learner": "I visited my aunt in aswan last year.",
+     "tutor": "**What works:** *\"I visited my aunt in Aswan last year.\"* uses the past simple **correctly**. *Last year* is a finished time, so *visited* (not *have visited*) is exactly right. That's the second success point of this lesson.\n\n**Small note:** *Aswan* is a place name, so it needs a capital **A**.\n\n**What's missing:** the first part, the **experience** without a time. Before giving the details (*when*), English usually starts with the present perfect:\n\n*Have you ever ___ (visit) Aswan?*\n*Yes, I ___.* → then your sentence with *last year*.\n\n**Your next step:** write the full mini-dialogue (question + short answer + your sentence).\n\nThen think about this: why do we use *have* in the short answer but *visited* (not *have visited*) in your sentence?"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Today's goal is to talk about **life experiences** with the present perfect (*have/has + past participle*), and to switch to the past simple when there's a **finished time** (like *yesterday* or *last year*).\n\nHere's a short exercise to see where you're starting from. Put the verb in brackets into the correct form, either the **present perfect** or the **past simple**:\n\n1. ___ you ever ___ (meet) a famous person?\n2. My brother ___ never ___ (be) to Japan.\n3. I ___ (try) Indian food for the first time last month.\n4. We ___ (visit) Rome in 2019.\n\n**Tip:** Look for time words. Does the sentence say *when* it happened?\n\nWrite your four answers, and for one of them, tell me *why* you chose that tense."
+    },
+    {
+     "learner": "I visited my aunt in aswan last year.",
+     "tutor": "Your sentence is correct. **\"I visited my aunt in Aswan last year\"** uses the past simple, and that's the right choice because **\"last year\"** is a finished time. One small slip: *Aswan* is a place name, so it needs a capital **A**.\n\nNow let's go deeper. Imagine a friend asks you about this experience, but *without* a time word:\n\n*\"___ you ever ___ (be) to Aswan?\"*\n\n1. Complete your friend's question.\n2. Write your answer in **two sentences**: first a short answer about the experience, then a sentence that says **when** it happened.\n\n**Hint:** The question has no finished time, but your second sentence does. Does the tense stay the same, or does it change?\n\nAfter that, try the four sentences from the exercise above."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 2
+   },
+   "rationale": {
+    "learner_context_fidelity": "Treats the learner as a B1 adult, builds on their own Aswan sentence, and invents no facts.",
+    "lesson_alignment": "Correct grammar and a correct finished-time explanation, but the follow-up uses 'been to Aswan', which is in the vocabulary list, so it stays on objective; the only slip is that the learner's sentence was not the lesson's four-item exercise, which the tutor handles reasonably.",
+    "pedagogical_appropriateness": "Confirms correctness first, lightly notes the capital A, then moves to a contrast task; it ignores that the learner answered only one of four items, though the extension is a sensible next step.",
+    "scaffolding_adaptation": "Responds to the learner's actual sentence and gives a hint without the answer, but the next step is heavy: a new question, a two-sentence answer, and then all four earlier items.",
+    "age_proficiency_fit": "Language is at B1 level and adult in tone, though the workload is a bit large.",
+    "formative_check_evidence": "The transfer task (present perfect question plus past simple answer) targets the contrast well and claims no mastery.",
+    "clarity_accessibility": "Clear confirmation, but 'Now let's go deeper' followed by several tasks and a return to the four sentences makes the next step cluttered, where the expected move was a single next item."
+   },
+   "failures": [
+    {
+     "category": "verbosity",
+     "severity": "minor",
+     "note": "Gives multiple tasks (new question, two-sentence answer, plus four earlier sentences) when one next step was expected."
+    },
+    {
+     "category": "lesson_drift",
+     "severity": "minor",
+     "note": "Did not use the lesson's next item (seen a camel) and added its own extension instead of moving forward simply."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-26",
+  "caseId": "LTB-AB1-T08",
+  "cohortLabel": "adult",
+  "cefr": "B1",
+  "situation": "T08_mastery_move_on",
+  "expectedBehavior": "Recognises consistent unassisted success, reduces support, and moves forward with a transfer or slightly harder task; does not claim full mastery or invent progress percentages.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_strong_reformulation_ok",
+    "recurrence_unknown"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder: when we talk about experiences in our life, without saying *when*, we use **have/has + past participle**. When we give a **finished time** (yesterday, last year, in 2019), we switch to the **past simple**.\n\n**Exercise:** Complete the short conversation with the correct form of the verb in brackets.\n\nA: ___ you ever ___ (be) to Italy?\nB: Yes, I ___. I ___ (go) there last summer.\nA: ___ you ___ (try) real Italian pizza?\nB: Of course! I ___ (eat) it every day.\n\n**Tip before you start:** For each gap, check: is there a finished time, or is it about life experience in general?\n\nWrite your answers, and tell me which word helped you choose for one of the gaps."
+    },
+    {
+     "learner": "I visited my aunt in Aswan last year.",
+     "tutor": "That sentence is correct. **\"visited\"** is past simple, and that fits because you gave a **finished time**: **\"last year\"**. That time word is exactly the signal to look for.\n\nIf you wanted to talk about the experience *without* a time, it would change to the present perfect:\n*I **have visited** my aunt in Aswan.* (or *I **have been** to Aswan.*)\n\nNow use the same check on the exercise from before. Look at B's second sentence:\n\n*I ___ (go) there last summer.*\n\n**Plan first:** Is there a finished time word here? Then choose the form.\n\nWrite your answer for that gap, and the word that helped you decide."
+    },
+    {
+     "learner": "Have you ever seen a camel? I have seen one, but I saw it only once, in 2019.",
+     "tutor": "Your sentences are correct, and they show exactly the contrast from this lesson:\n\n- **\"Have you ever seen a camel?\"** uses have + past participle (*seen*) to ask about life experience.\n- **\"I have seen one\"** gives the experience, with no time.\n- **\"I saw it only once, in 2019\"** switches to past simple (*saw*) because **\"in 2019\"** is a finished time.\n\nThis is the same pattern as the course example: *Have you ever tried sushi? Yes, I have. I tried it last summer.*\n\n**Check your own thinking:** Notice that *seen* and *saw* come from the same verb. How did you decide which one to use in each sentence?\n\nThen try this gap from the exercise:\n\n*I ___ (go) there last summer.*\n\nWrite the verb, and name the time word that told you which form to choose."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! First, a quick reminder to connect to what you know: when we talk about an experience in our life *without saying when*, we use the present perfect (**have/has + past participle**). When we give a **finished time** (yesterday, last year, in 2019), we switch to the past simple.\n\nHere's your exercise. Complete this short exchange with the correct form of the verbs in brackets:\n\nA: ______ you ever ______ (visit) London?\nB: Yes, I ______. I ______ (go) there two years ago.\nA: ______ you ______ (like) it?\nB: Yes, but I ______ never ______ (see) so much rain!\n\nBefore you write, plan: for each gap, ask yourself, *\"Is there a finished time, or is this about life experience in general?\"*\n\nGive it a try, and tell me which gap you found hardest."
+    },
+    {
+     "learner": "I visited my aunt in Aswan last year.",
+     "tutor": "Your sentence is correct: **\"I visited my aunt in Aswan last year.\"**\n\nWhy it works: *last year* is a **finished time**, so the past simple (*visited*) is the right choice. \"I have visited my aunt last year\" would be wrong, because the present perfect doesn't go with a finished time.\n\nNow try the other side of the contrast. Imagine someone asks you about Aswan as a **life experience**, with no time given. Write two lines:\n\n1. The question, starting with **\"Have you ever…?\"**\n2. Your short answer (*Yes, I have* / *No, I haven't*), then one more sentence that adds **when** it happened.\n\nAs you write, check each verb: *Is there a finished time here, or not?*\n\nAfter that, you can go back to the London exchange if you'd like more practice."
+    },
+    {
+     "learner": "Have you ever seen a camel? I have seen one, but I saw it only once, in 2019.",
+     "tutor": "Yes, this is correct, and it shows the full contrast from this lesson:\n\n- **\"Have you ever seen a camel?\"** uses the present perfect for a life experience (*have + seen*).\n- **\"I have seen one\"** is still about experience, with no time given.\n- **\"I saw it only once, in 2019\"** switches to the past simple because *in 2019* is a finished time.\n\nOne small tip: in a conversation, people often start with the short answer first: *\"Yes, I have. I saw one in 2019.\"*\n\nNext step, with less help this time: go back to the London exchange and fill in all the gaps.\n\nA: ______ you ever ______ (visit) London?\nB: Yes, I ______. I ______ (go) there two years ago.\nA: ______ you ______ (like) it?\nB: Yes, but I ______ never ______ (see) so much rain!\n\nWhen you finish, tell me which gap you were least sure about and why."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "It treats the learner as developing and invents no history or percentages, but it does not say what the unassisted successes show about the learner's progress.",
+    "lesson_alignment": "It stays on the objective and the explanation of the present perfect versus the past simple is correct, though the London exchange has an awkward item: 'Yes, but I have never seen so much rain' is a slightly odd answer to 'Did you like it?'",
+    "pedagogical_appropriateness": "It confirms the answer, explains the contrast and moves forward, but the next task is the same London exercise given earlier, so it is not really harder or a transfer task.",
+    "scaffolding_adaptation": "It reduces support ('with less help this time') and drops the planning prompt, but it sends the learner back to an exercise they have not yet attempted rather than raising the challenge.",
+    "age_proficiency_fit": "The language suits B1 adults, the tone is respectful, and the length is reasonable.",
+    "formative_check_evidence": "It makes no mastery claim and sets an unassisted gap-fill, but that check is the old exercise and not a new transfer task.",
+    "clarity_accessibility": "The feedback is well organised with bullets and a clear next step."
+   },
+   "failures": [
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "The next task repeats the previously assigned London exercise rather than offering a new transfer or harder task."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-27",
+  "caseId": "LTB-AB1-T12",
+  "cohortLabel": "adult",
+  "cefr": "B1",
+  "situation": "T12_contradictory_evidence",
+  "expectedBehavior": "Treats the school record (proficient) as one piece of evidence: notices the current error, probes with a quick check, and does not assume mastery or say the learner \"already knows\" it.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "unprompted_learner_sentence",
+    "record_vs_current_check"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "I have met my teacher yesterday.",
+     "tutor": "You have most of it: **met** is the correct past participle, and **have + past participle** is formed correctly. Let's sharpen one part: the time word.\n\nLook at **yesterday**. Is it a finished time or an unfinished one?\n\nThe present perfect is for experiences at some time in your life, *without* saying when:\n- *I have met my teacher.* (sometime, time not important)\n\nWhen you add a finished time like *yesterday* or *last year*, English switches tense.\n\n**Your turn:**\n1. Rewrite your sentence so it works with *yesterday*.\n2. In one sentence, explain **why** you changed it."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "I have met my teacher yesterday.",
+     "tutor": "Thanks for the sentence! You have most of it; let's sharpen one part.\n\n**What's right:**\n- \"met\" is the correct past form of *meet*.\n- The meaning is clear.\n\n**What to check:**\nLook at the time word at the end: **\"yesterday\"**. Now look at the verb form you chose: **\"have met\"**.\n\n**Hint:** \"Yesterday\" is a **finished time**. It's over, with a clear point in the past. Which tense does English use when a finished time is given: the present perfect or the past simple?\n\n**Your turn:**\n1. Rewrite the sentence so the verb fits \"yesterday.\"\n2. In one line, explain **why** your new form is correct."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 4,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "It notices the actual error and does not rely on the 'proficient' record or invent facts, though it never explicitly treats the record as just one piece of evidence.",
+    "lesson_alignment": "It targets exactly the lesson contrast of past simple with a finished time and uses the learner's own verb 'met' correctly.",
+    "pedagogical_appropriateness": "A hint plus a rewrite request is an appropriate move, but it effectively names the error and the fix (finished time means past simple) rather than probing first.",
+    "scaffolding_adaptation": "It responds to the learner's sentence and keeps the rewrite with the learner without giving the answer, though the hint is quite strong for a first step.",
+    "age_proficiency_fit": "B1-appropriate language and an adult-neutral tone, although the formatting is somewhat heavy for a short exchange.",
+    "formative_check_evidence": "The rewrite plus a one-line explanation checks understanding and makes no mastery claims, but it is not a fresh unassisted transfer item.",
+    "clarity_accessibility": "Well organised with clear steps, though the headings and bullets add a bit of clutter for a single error."
+   },
+   "failures": [
+    {
+     "category": "over_helping",
+     "severity": "minor",
+     "note": "The hint nearly gives away the rule and the answer choice before the learner has attempted a correction."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-28",
+  "caseId": "LTB-CA1-T03",
+  "cohortLabel": "child",
+  "cefr": "A1",
+  "situation": "T03_blocking_error",
+  "expectedBehavior": "Identifies the error that blocks meaning, explains briefly with the lesson pattern, gives a hint and asks for a retry before giving the full answer.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_sentence_frame",
+    "level_novice_prompt_first",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Today's goal: introduce a family member with **\"This is my …\"** and say one thing about them with **\"He is / She is …\"**.\n\nExample:\n*This is my brother. **He** is twelve.*\n(**He** = a boy or man. **She** = a girl or woman.)\n\n**Your exercise:** Write two sentences about your **mother** or **father**.\n\nUse this frame:\nThis is my ______. ___ is ______."
+    },
+    {
+     "learner": "Is my brother mother.",
+     "tutor": "You used **\"is my\"** and family words. That part is right.\n\nTwo things to fix:\n- The sentence needs **\"This\"** at the start.\n- Use **one** family word, not two.\n\nExample: *This is my **grandmother**.*\n\n**Try again:** Choose **mother** or **father**. Write one sentence:\n\n**This is my ______.**"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Today's goal: introduce a family member with \"This is my …\" and say one thing about them with \"He is / She is …\".\n\nExample:\n**This is my brother. He is twelve.**\n\nUse **he** for a boy or man and **she** for a girl or woman.\n\nYour exercise: write two sentences about your mother or father, like the example."
+    },
+    {
+     "learner": "Is my brother mother.",
+     "tutor": "Good start: you used **my** and family words.\n\nTwo things to fix:\n- Start with **This is my**, not \"Is my\".\n- Use one family word only: **brother** or **mother**, not both.\n\nFrame:\n**This is my ___. She is ___.**\n\nExample: **This is my grandmother. She is seventy.**\n\nNow try again: write two sentences about your **mother**."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 2,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 2,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Fits an A1 Grade 3 child and the family topic, and invents no facts about the learner.",
+    "lesson_alignment": "Uses the lesson's patterns and vocabulary correctly; the example 'grandmother ... seventy' is the tutor's own and is accurate English.",
+    "pedagogical_appropriateness": "It gives targeted feedback and asks for a retry, but it lists two errors at once, which the case warns against, and gives a nearly full frame with a model sentence.",
+    "scaffolding_adaptation": "It responds to the learner's reply and has them retry with a frame, but the frame plus a near-identical example over-supports the task.",
+    "age_proficiency_fit": "The instructions are short, but 'Two things to fix' and the bullet list with 'Frame' are a bit heavy for an A1 child, and 'Good start' praise is mild.",
+    "formative_check_evidence": "It asks for a retry with two sentences about the mother, which is a reasonable check, and makes no mastery claims.",
+    "clarity_accessibility": "It is well organised and actionable, though a little long for the 90-word limit and for a beginner."
+   },
+   "failures": [
+    {
+     "category": "over_helping",
+     "severity": "minor",
+     "note": "Gives a sentence frame and a near-identical example, so the retry is mostly copying."
+    },
+    {
+     "category": "verbosity",
+     "severity": "minor",
+     "note": "Lists two errors at once for an A1 child instead of focusing on the one that blocks meaning."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-29",
+  "caseId": "LTB-CA2-T10",
+  "cohortLabel": "child",
+  "cefr": "A2",
+  "situation": "T10_missing_context",
+  "expectedBehavior": "Asks one short question to find the learner's goal (and offers a few concrete options); does not invent the learner's level, history or a curriculum.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "clarify_goal"
+   ],
+   "reasons": [
+    "missing_lesson_or_goal"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "hi, help me with english",
+     "tutor": "Hi! I'm happy to help you with English.\n\nWhat would you like to practise today?\n- Grammar (for example, past tense)\n- New words\n- Writing short sentences\n\nOr tell me another topic you want!"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "hi, help me with english",
+     "tutor": "Hi! I'm happy to help you with English. 😊\n\nWhat would you like to practise today?\n\n- Grammar (for example, past tense)\n- New words (for example, food or travel)\n- Writing short sentences\n\nChoose one, or tell me your own idea!"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": "n/a",
+    "age_proficiency_fit": 2,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Invents no level, history or curriculum and asks for the goal, though it doesn't clearly adapt to a Grade 3 child.",
+    "lesson_alignment": "No lesson is invented; the options are generic and correct, and none is presented as course content.",
+    "pedagogical_appropriateness": "Asking one short question with concrete options is the expected clarify-goal move, executed well.",
+    "scaffolding_adaptation": "Single learner turn, so this does not apply.",
+    "age_proficiency_fit": "Short and friendly with an emoji, but 'Grammar' and 'past tense' are abstract terms for a Grade 3 A2 child, and 'travel' is a less child-relevant topic.",
+    "formative_check_evidence": "No check is needed yet, and the reply makes no unsupported claims about progress.",
+    "clarity_accessibility": "Well organised, brief, and easy to act on by choosing an option."
+   },
+   "failures": [
+    {
+     "category": "level_mismatch",
+     "severity": "minor",
+     "note": "'Grammar (past tense)' is too abstract for a Grade 3 child; simpler options like animals, family or school would fit better."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-30",
+  "caseId": "LTB-CA2-T11",
+  "cohortLabel": "child",
+  "cefr": "A2",
+  "situation": "T11_off_topic",
+  "expectedBehavior": "Acknowledges the request is outside this lesson, does not do non-language work for the learner, offers brief help that stays educational or links back to the lesson, and redirects.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "redirect_to_lesson",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "off_topic_request",
+    "level_beginner"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you do my maths homework? 25 + 37",
+     "tutor": "I'm your English tutor, so I won't do the maths for you. But maths can help with English!\n\nHere is a daily routine sentence about homework:\n\n**My sister usually does her homework after school.**\n\n- **usually** = most days\n- **does** = do + **-es** for he/she/it\n\nYour turn: write one sentence about when **you** do your homework. Use **always**, **usually**, **sometimes** or **never**."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you do my maths homework? 25 + 37",
+     "tutor": "I'm your English tutor, so I can't do your maths homework. You can do it yourself!\n\nHere's some English for talking about it:\n*\"I usually **do** my homework after school.\"*\n(**usually** = most days)\n\nNow a small task about your routine. Finish this sentence:\n**\"I always ___ at ___ o'clock.\"**\n\nExample: *I always **get up** at seven o'clock.*\n\nWhat do *you* always do?"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": "n/a",
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Fits a Grade 3 A2 child with a friendly tone and invents no facts about the learner.",
+    "lesson_alignment": "Stays on lesson with the adverb 'usually', 'always' and 'get up'; the example sentence is correct English, and 'usually = most days' is accurate.",
+    "pedagogical_appropriateness": "Declines the maths and links back to homework routines before redirecting. It could have been warmer and acknowledged the request more kindly, but the move is appropriate.",
+    "scaffolding_adaptation": "Single learner turn, so n/a.",
+    "age_proficiency_fit": "Short, simple language suited to a Grade 3 child, with a modelled example.",
+    "formative_check_evidence": "The fill-in task practises adverb placement, but it uses first person 'I', so it does not check the key he/she/it + -s target. It is a weak match for the lesson's main skill.",
+    "clarity_accessibility": "Clear, concise and easy to act on, with a model example; the format is slightly cluttered with bold and italics."
+   },
+   "failures": [
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "The redirect task practises 'always' but not the he/she/it + -s target, and does not return to the lesson exercise ('She go to bed at ten')."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-31",
+  "caseId": "LTB-CB1-T05",
+  "cohortLabel": "child",
+  "cefr": "B1",
+  "situation": "T05_partially_correct",
+  "expectedBehavior": "Says specifically what is right and what is wrong, gives a hint for the wrong part, and asks for a retry.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_strong_reformulation_ok"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Quick reminder first: when do we say \"Have you ever…?\" and when do we switch to the past simple?\n\nHere's one exercise to try. Fill in the gaps with the verb in brackets, using the present perfect or the past simple:\n\n**A:** ___ you ever ___ (meet) a famous person?\n**B:** Yes, I ___. I ___ (meet) a singer at an airport last year.\n\nTip: look for a finished time word in each sentence.\n\nWrite your answer, and I'll check it with you."
+    },
+    {
+     "learner": "I have visited my aunt in Aswan last year.",
+     "tutor": "Good attempt! \"visited\" is the correct form of the verb, and \"my aunt in Aswan\" works well.\n\nOne thing to fix: look at the end of your sentence, **\"last year\"**. That's a finished time.\n\nHint: with a finished time (yesterday, last year, in 2020), we don't use *have/has*. We use a different tense.\n\nCan you rewrite your sentence with that change?\n\nThen try the gaps in the exercise above. The same idea will help with the second line."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Quick reminder first: when we ask about experiences in general, we use **have/has + past participle** (\"Have you ever…?\"). When we say *when* it happened (yesterday, last year), we switch to the past simple.\n\n**Exercise:** Complete the mini-dialogue with the correct form of the verbs in brackets.\n\nA: ___ you ever ___ (meet) a famous person?\nB: Yes, I ___. I ___ (meet) a footballer at the airport last month.\n\nWrite your answers, and try to explain why you chose each form. I'll check them with you."
+    },
+    {
+     "learner": "I have visited my aunt in Aswan last year.",
+     "tutor": "You're using **have + past participle** correctly to form the present perfect: \"have visited.\" The idea of sharing a real experience is great too.\n\nBut look at the end of your sentence: **\"last year.\"**\n\n**Hint:** \"Last year\" is a finished time. When we say *when* something happened, which tense do we switch to?\n\nTry rewriting the sentence with that in mind.\n\nThen, if you like, have a go at the exercise from before (A and B talking about meeting a famous person). It practises the same switch."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 2,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Uses the learner's actual sentence and the lesson's own exercise context without inventing facts about the learner, though it does not reflect the Grade 3 child age band.",
+    "lesson_alignment": "Correctly identifies that 'last year' is a finished time requiring the past simple and stays on the lesson objective with accurate English.",
+    "pedagogical_appropriateness": "Gives partial credit for have + past participle, hints at the error without giving the answer, and asks for a retry, which matches the expected move. It does slightly mislabel the form as 'correct' even though the whole sentence is wrong.",
+    "scaffolding_adaptation": "Responds directly to the learner's sentence and keeps the correction with the learner by asking for a rewrite. The hint is fairly direct, and the extra A/B task is only loosely connected to the learner's reply.",
+    "age_proficiency_fit": "Terms like 'past participle' and 'present perfect' and the 'switch tenses' framing are fairly abstract for a Grade 3 child, though acceptable at B1; the tone is warm.",
+    "formative_check_evidence": "The retry is a good check, and the optional earlier exercise offers transfer. It makes no mastery claims.",
+    "clarity_accessibility": "Well organised with a bold hint and a clear instruction, but the two possible tasks (rewrite and the earlier dialogue) slightly dilute the focus."
+   },
+   "failures": [
+    {
+     "category": "age_tone_mismatch",
+     "severity": "minor",
+     "note": "Grammar terminology is heavy for a Grade 3 learner."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-32",
+  "caseId": "LTB-TA2-T07",
+  "cohortLabel": "teen",
+  "cefr": "A2",
+  "situation": "T07_hint_then_fail",
+  "expectedBehavior": "Treats the hint-aided success as progress, not mastery; on the independent item, recognises the repeat error and gives targeted support plus another independent attempt; makes no mastery claim.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_novice_prompt_first",
+    "recurrence_unknown",
+    "after_confirmed_success",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Our goal: describe daily routines, like \"My brother usually gets up at seven.\"\n\nQuick reminder: with **he / she / it**, the verb adds **-s** (gets, goes). Words like **always, usually, sometimes, never** go **before** the main verb.\n\nExample: *She always has breakfast at home.*\n\n**Exercise:** Put the words in order to make a correct sentence. Watch the verb!\n\n*go / to school / sometimes / Tom / by bus*\n\nWrite your sentence below."
+    },
+    {
+     "learner": "She goed to bed at ten.",
+     "tutor": "You have **\"She\"** and **\"to bed at ten\"** right.\n\nThe problem is **\"goed\"**. For a daily routine, we use the present simple, not the past. With **she**, the verb adds an ending. Verbs ending in **-o** take **-es**, not just -s.\n\nExample: *He **does** his homework after dinner.* (do → does)\n\n**Try again:** Rewrite your sentence with the correct form of **go**. Then you can try the Tom sentence too."
+    },
+    {
+     "learner": "She goes to bed at ten.",
+     "tutor": "That's correct: **\"goes\"** is the right form. **go** ends in **-o**, so with **she** it takes **-es**, like *do → does*.\n\nNow let's add a frequency word. Remember, it goes **before** the main verb.\n\nExample: *My dad never watches TV in the morning.*\n\n**Next step:** Rewrite your sentence and add **usually** or **always**. Where does it go: before or after **goes**?"
+    },
+    {
+     "learner": "Next one: My dad watch TV after dinner.",
+     "tutor": "You kept **\"My dad\"** and **\"TV after dinner\"** right.\n\nThe problem is **\"watch\"**. **My dad** is the same as **he**, so the verb needs an ending. Verbs ending in **-ch, -sh, -s, -x** take **-es**.\n\nExample: *My sister brushes her teeth at night.* (brush → brushes)\n\n**Try again:** Rewrite your sentence with the correct form of **watch**.\n\nThen add **usually** or **sometimes** to it. Put it before the main verb."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Our goal today: describe daily routines, like *\"My brother **usually gets** up at seven.\"*\n\nTwo quick reminders:\n- With **he/she/it**, the verb gets **-s**: *I get up → she get**s** up*.\n- Words like **always / usually / sometimes / never** go **before** the main verb.\n\n**Exercise:** Put the words in the right order and fix the verb.\n\n1. *Tom / sometimes / have breakfast / at school*\n2. *My sister / always / go to school / by bus*\n\nWrite your two sentences, and I'll give you feedback!"
+    },
+    {
+     "learner": "She goed to bed at ten.",
+     "tutor": "You started well: **\"She\"** and **\"to bed at ten\"** are correct.\n\nThe problem is the verb **\"goed\"**:\n- \"goed\" is not an English word.\n- For a daily routine we use the **present simple**, not the past.\n\n**Hint:** with **he/she/it**, *go* takes **-es**, like *do → does* or *watch → watches*.\n\nCan you write the sentence again with the right form of *go*? Then try my two exercise sentences above."
+    },
+    {
+     "learner": "She goes to bed at ten.",
+     "tutor": "Yes, that's right! **\"goes\"** is the correct form: *go + es* with **she**. Present simple, perfect for a daily routine.\n\nNow let's go one step further and add a frequency word.\n\n**Task:** Rewrite your sentence with **usually**.\n*She ___ ___ to bed at ten.*\n\nWhere does **usually** go: before or after the verb?"
+    },
+    {
+     "learner": "Next one: My dad watch TV after dinner.",
+     "tutor": "Good sentence for a daily routine. **\"My dad\"** and **\"TV after dinner\"** are correct.\n\nThe problem is the verb **\"watch\"**:\n- **My dad** = **he**, so the verb needs an ending.\n- *watch* ends in **-ch**, so it takes **-es**, not just -s (like *go → goes*).\n\n**Try again:** write the sentence with the right form of *watch*.\n\nThen add **often** or **usually** in the right place. Remember: before the main verb."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 2,
+    "lesson_alignment": 2,
+    "pedagogical_appropriateness": 2,
+    "scaffolding_adaptation": 2,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "It recognises the repeat -s error but treats the learner's pasted sentence as a tutor-set item and does not say this is the independent item; it also says 'perfect' earlier, which overstates the evidence.",
+    "lesson_alignment": "It stays on the present simple and frequency adverbs, but 'often' is not in the lesson vocabulary and the earlier turn said 'go takes -es, like do → does'. The final turn wrongly implies 'watch' is the same pattern as 'go' without noting the learner already got 'goes'.",
+    "pedagogical_appropriateness": "It identifies the error and gives a targeted explanation, but it gives the rule and the ending '-es' almost outright, and it adds a second task (the adverb) that overloads the retry.",
+    "scaffolding_adaptation": "It does give a retry, but it does not point out that the learner repeated the same error after the earlier hint, and it hands over the ending instead of fading support.",
+    "age_proficiency_fit": "The language is simple and short and suits an A2 Grade 9 learner.",
+    "formative_check_evidence": "It asks for another attempt with the adverb, but it never says that the earlier success was hint-aided, and 'perfect for a daily routine' edges toward a mastery claim; the check is mixed with a new skill.",
+    "clarity_accessibility": "It is well organised with bold highlights and a clear instruction, although the double task adds some clutter."
+   },
+   "failures": [
+    {
+     "category": "over_helping",
+     "severity": "minor",
+     "note": "Gives the -es ending and the 'like go → goes' link before the learner attempts again."
+    },
+    {
+     "category": "premature_mastery_claim",
+     "severity": "minor",
+     "note": "Earlier turn said 'perfect' after a hinted success, with no caution that it is progress rather than mastery."
+    },
+    {
+     "category": "under_scaffolding",
+     "severity": "minor",
+     "note": "Does not name the repeated error pattern or reduce the load to a single independent retry."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-33",
+  "caseId": "LTB-TB1-T01",
+  "cohortLabel": "teen",
+  "cefr": "B1",
+  "situation": "T01_limited_vocab",
+  "expectedBehavior": "Gives the needed word(s) directly and simply, with one short model sentence from the lesson pattern; for A1 keeps language very simple and may gloss in the learner's language; checks with one tiny production prompt.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "short_explanation",
+    "comprehension_check"
+   ],
+   "reasons": [
+    "help_requested",
+    "after_explanation"
+   ],
+   "ageBand": "unknown"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "I want to say I have travelled a lot but I dont know how to say the word for going to many countries",
+     "tutor": "Good idea for this lesson. Here are two natural ways to say it:\n\n- **I have been to many countries.**\n- **I'm well-travelled.** (one adjective that means \"I have travelled to many places\")\n\n\"Been to\" is the key phrase for experiences: **have/has + been to + place**.\nExample: *She has been to Japan and Brazil.*\n\nIf you add a finished time, switch to the past simple:\n*I went to Italy last year.*\n\nYour turn: write one sentence with **have been to** about a country you've visited, then one sentence saying **when** you went there."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "I want to say I have travelled a lot but I dont know how to say the word for going to many countries",
+     "tutor": "Your sentence \"I have travelled a lot\" is already correct. It uses **have + past participle** for a life experience.\n\nTo talk about going to many countries, try **been to**:\n\n- *I have been to many countries.*\n- *I'**ve been to** seven countries.*\n\nYou can also say a person is **well-travelled**: *My aunt is very well-travelled.*\n\nBe careful: with a finished time, switch to the past simple:\n*I **went** to Spain last year.* (not \"have been\")\n\nYour turn: write one sentence about a country you have been to, and one sentence saying **when** you went there."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": "n/a",
+    "age_proficiency_fit": 2,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Responds to the learner's actual sentence and goal, and invents no history, though it does not explicitly note the learner's limited vocabulary.",
+    "lesson_alignment": "Uses 'been to' from the lesson vocabulary and the present perfect versus past simple contrast with correct English, though 'well-travelled' is an extra item outside the lesson.",
+    "pedagogical_appropriateness": "Gives the needed phrase directly with short models and a tiny production prompt, as expected, though the past-simple contrast is added before the learner needs it.",
+    "scaffolding_adaptation": "Only one learner turn, so adaptation across turns does not apply.",
+    "age_proficiency_fit": "Mostly B1-appropriate for a Grade 9 learner, but adding 'well-travelled', the past-simple warning and a two-part task puts slightly too much into a limited-vocabulary reply.",
+    "formative_check_evidence": "The two-sentence prompt checks both 'been to' and the past-simple switch without claiming mastery, though it is a bit heavy as a 'tiny' prompt.",
+    "clarity_accessibility": "Well organised, bolded and concise, with a clear action step, though the extra content adds some clutter."
+   },
+   "failures": [
+    {
+     "category": "verbosity",
+     "severity": "minor",
+     "note": "Extra word 'well-travelled' and an unrequested tense contrast add load beyond the single needed phrase."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-34",
+  "caseId": "LTB-AA2-T07",
+  "cohortLabel": "adult",
+  "cefr": "A2",
+  "situation": "T07_hint_then_fail",
+  "expectedBehavior": "Treats the hint-aided success as progress, not mastery; on the independent item, recognises the repeat error and gives targeted support plus another independent attempt; makes no mastery claim.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_novice_prompt_first",
+    "recurrence_unknown",
+    "after_confirmed_success",
+    "level_beginner",
+    "during_feedback"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Our goal in this lesson is to **describe daily routines** with the present simple.\n\nQuick reminder: with **he / she / it**, the verb gets **-s** or **-es**.\nAnd words like **always / usually / sometimes / never** (how often) go **before the main verb**.\n\nExample: *My brother usually **gets** up at seven.*\n\n**Your exercise:** Write the sentence correctly.\n\n1. My sister (have / always) breakfast at 8:00.\n\nWrite your answer, and I'll tell you what works and what to fix."
+    },
+    {
+     "learner": "She goed to bed at ten.",
+     "tutor": "Thanks for writing a sentence!\n\n**What works:** \"She ... to bed at ten.\" The word order and the time are correct.\n\n**What to fix:** \"goed\". This is not a real English word. In this lesson we talk about routines (things she does every day), so we use the **present simple**, not the past.\n\n**Hint:** With **he / she / it**, verbs ending in **-o** take **-es**.\nExample: *He **does** his homework after dinner.* (do → does)\n\n**Try again:** Rewrite your sentence with the correct form of **go**."
+    },
+    {
+     "learner": "She goes to bed at ten.",
+     "tutor": "That's correct: **\"She goes to bed at ten.\"**\n\nYou changed **go → goes**. That is the right **-es** form for **she**, and it shows a daily routine.\n\n**Next step:** Let's add **how often**. Words like **always / usually / sometimes / never** go **before the main verb**.\n\nExample: *My friend **sometimes** walks to work.*\n\n**Try this one** (it's the exercise from before):\n\nMy sister (have / always) breakfast at 8:00.\n\nTwo things to check:\n- Where does **always** go?\n- What form of **have** do we use with **she**?"
+    },
+    {
+     "learner": "Next one: My dad watch TV after dinner.",
+     "tutor": "Let's look at your sentence: **\"My dad watch TV after dinner.\"**\n\n**What works:** The word order and \"after dinner\" are correct. It describes a routine.\n\n**What to fix:** \"watch\". **My dad** = **he**, so the verb needs an ending.\n\n**Hint:** Verbs ending in **-ch, -sh, -s, -x** take **-es**, not just -s.\nExample: *She wash**es** the dishes every evening.*\n\n**Try again:** Rewrite your sentence with the correct form of **watch**.\n\nAfter that, we can come back to *My sister (have / always) breakfast at 8:00.*"
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! This lesson's goal is to **describe a daily routine with the present simple**.\n\nFirst, a quick reminder:\n- With **he / she / it**, the verb adds **-s** (or **-es**): *I get up* becomes *she get**s** up*.\n- **Always, usually, sometimes, never** go **before** the main verb.\n\nExample: *My sister **usually has** breakfast at eight.*\n\n**Exercise:** Put the words in order and fix the verb.\n\n1. Tom / always / go to work / by bus\n2. She / never / have / coffee in the evening\n3. My father / sometimes / get up / at six\n\nWrite your three sentences, and I'll check them."
+    },
+    {
+     "learner": "She goed to bed at ten.",
+     "tutor": "Good, your sentence has the right parts: **She**, a verb, and a time (*at ten*).\n\nThe problem is the verb **\"goed\"**:\n- It looks like a past form, but a daily routine needs the **present simple**.\n- With **she**, the verb **go** adds **-es** (like *do → does*).\n\nExample with a different verb: *He **watches** TV every evening.* (*watch → watches*)\n\n**Your turn:** Rewrite your sentence with the correct present simple form of **go**. Then try adding **usually** in the right place."
+    },
+    {
+     "learner": "She goes to bed at ten.",
+     "tutor": "Yes, that's correct. **\"goes\"** is the right present simple form with **she**: *go → goes*, like *do → does*. *At ten* tells us the time, so the sentence describes a routine clearly.\n\n**Next step:** add an adverb of frequency. Remember, *always, usually, sometimes, never* go **before** the main verb.\n\nExample with a different sentence: *He **sometimes walks** to work.*\n\n**Your turn:** Rewrite your sentence with **usually** in the correct place. Where does it go: before or after **goes**?"
+    },
+    {
+     "learner": "Next one: My dad watch TV after dinner.",
+     "tutor": "Your sentence has a clear routine: **My dad** + a verb + **after dinner**. The word order is correct.\n\nThe error is in the verb **\"watch\"**:\n- **My dad** = **he**, so the verb needs an ending.\n- Verbs that end in **-ch, -sh, -s, -x, -o** add **-es**, not just -s.\n\nExample with a different verb: *She **washes** the dishes after lunch.* (*wash → washes*)\n\n**Your turn:** Rewrite your sentence with the correct form of **watch**.\n\n(After that, we can come back to adding **usually**.)"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 2,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "It recognises the repeated missing -s/-es error on a new item and invents no facts about the learner, though it does not explicitly note that the repeat error is a pattern.",
+    "lesson_alignment": "It stays on present simple he/she/it and adverb placement, and the facts are correct (watch→watches, wash→washes, go→goes), though the earlier tutor turn introduced a mismatched exercise.",
+    "pedagogical_appropriateness": "It targets the error with a rule and a different-verb example, then asks for a retry without giving the answer, which fits the situation.",
+    "scaffolding_adaptation": "It responds to the new error, gives a hint without the answer, and keeps the learner doing the work, but the support is a bit heavy and the rule is given up front rather than as a graded hint.",
+    "age_proficiency_fit": "The language is simple and adult-appropriate for A2, and the length is within the limit, though the -ch/-sh/-s/-x/-o list is slightly dense.",
+    "formative_check_evidence": "It asks for one retry and defers the adverb, with no mastery claim, but it does not plan a fresh independent item or comment on the hinted-versus-independent evidence.",
+    "clarity_accessibility": "The reply is well organised with a clear single task and bolded key forms."
+   },
+   "failures": [
+    {
+     "category": "no_formative_check",
+     "severity": "minor",
+     "note": "It asks only for a retry of the same sentence rather than a new independent item to check transfer."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-35",
+  "caseId": "LTB-AB1-T07",
+  "cohortLabel": "adult",
+  "cefr": "B1",
+  "situation": "T07_hint_then_fail",
+  "expectedBehavior": "Treats the hint-aided success as progress, not mastery; on the independent item, recognises the repeat error and gives targeted support plus another independent attempt; makes no mastery claim.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "corrective_feedback_retry"
+   ],
+   "reasons": [
+    "answer_to_question",
+    "level_strong_reformulation_ok",
+    "recurrence_unknown",
+    "after_confirmed_success"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! **Goal:** talk about life experiences with the present perfect (*have/has + past participle*), and switch to the past simple when you mention a finished time.\n\nQuick reminder: when we ask about experiences in someone's whole life, without saying *when*, we often use *ever*:\n*Have you ever …?*\n\n**Exercise:** complete this short text message with the correct form of the verbs in brackets.\n\n> Hi Sam! **(1)** ___ you ever ___ (try) Ethiopian food? I **(2)** ___ (eat) it for the first time last weekend. It was delicious! My sister **(3)** ___ never ___ (be) to an Ethiopian restaurant, so I **(4)** ___ (take) her there yesterday.\n\nWrite your four answers, and for each one add a few words on **why** you chose that tense. That will help us see exactly where you're starting from."
+    },
+    {
+     "learner": "I have visited my aunt in Aswan last year.",
+     "tutor": "Thanks for sharing a real experience. Let's check it together.\n\n**What's right:** *have visited* is a correctly formed present perfect (*have + past participle*).\n\n**What needs to change:** the sentence ends with **\"last year\"**. That's a *finished time*: it's over, and you're saying exactly when it happened. The present perfect is for experiences when the time is **not** given, so with *last year* the verb needs a different tense.\n\n**Hint:** compare the course example: *\"Yes, I have. I **tried** it last summer.\"* Look at the verb next to *last summer*.\n\n**Your next step:** rewrite your sentence about Aswan with the correct verb form.\n\nThen, if you like, add a sentence **before** it that uses *Have you ever …?* or *I've …* to introduce the experience without a time."
+    },
+    {
+     "learner": "I visited my aunt in Aswan last year.",
+     "tutor": "**Correct:** *I **visited** my aunt in Aswan last year.* You switched to the past simple because *last year* is a finished time. That's exactly the rule.\n\nNow let's connect the two tenses, the way people do in real conversation. Look at the course example again:\n\n*Have you ever tried sushi? Yes, I have. I tried it last summer.*\n\nThe first part uses the present perfect (the experience, no time). Then the speaker adds the details with a finished time, so they change to the past simple.\n\n**Your next task:** write a short two-part answer about Aswan in the same pattern.\n\n1. A question with *Have you ever …?* (for example, about Aswan or visiting family)\n2. Your answer: first the experience with **no time** (*Yes, I have. / I've …*), then the detail with **last year**\n\nWhich tense will you use in each part?"
+    },
+    {
+     "learner": "Next: You ever saw a camel?",
+     "tutor": "**What's right:** *ever* is in a good place, and a camel fits nicely with your Aswan story.\n\n**What needs to change:** *\"You ever saw…\"* has no question structure, and *saw* is the past simple. A present perfect question needs two things:\n\n- **Have** at the very start\n- the **past participle**, not the past simple\n\nLook at the pattern in the course example:\n*Have you ever **tried** sushi?* → **Have** + *you* + *ever* + past participle\n\n**Hint:** the verb *see* has three forms: *see – saw – ___*. You need the third one here.\n\n**Your next step:** rewrite your camel question using that pattern. Then, if you feel ready, add your answer with *Yes, I have.* and a detail with **last year**."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you give me one exercise from this lesson?",
+     "tutor": "Sure! Today's goal: talk about **life experiences** with the present perfect (*have/has + past participle*), and switch to the **past simple** when you mention a finished time (*yesterday, last year*).\n\nFirst, a quick recall: what two words make the present perfect in *\"She has never been to the sea\"*?\n\nThen try this exercise. Complete each sentence with the correct form of the verb in brackets:\n\n1. ___ you ever ___ (try) Indian food?\n2. Yes, I have. I ___ (try) it last month.\n3. My brother ___ never ___ (meet) a famous person.\n4. We ___ (go) to Paris in 2019.\n\nBefore you answer, decide for each sentence: **is there a finished time or not?** That tells you which tense to use.\n\nWrite your answers, and I'll give you feedback on each one."
+    },
+    {
+     "learner": "I have visited my aunt in Aswan last year.",
+     "tutor": "Good choice of topic, and the form **\"have visited\"** (have + past participle) is built correctly.\n\nThe problem is the time phrase: **\"last year\"** is a **finished time**. In this lesson, a finished time means we don't use *have/has + past participle*.\n\nHint: look at the course example *\"Yes, I have. I **tried** it last summer.\"* Which tense is *\"tried\"*?\n\nYour next step: rewrite your sentence about your aunt in Aswan so the verb matches **\"last year\"**.\n\nThen, if you like, add one sentence **before** it that uses the present perfect with no time phrase, for example starting with *\"I have been to…\"* or *\"I have never…\"*."
+    },
+    {
+     "learner": "I visited my aunt in Aswan last year.",
+     "tutor": "Correct: **\"I visited\"** is the past simple, and it matches **\"last year\"**, a finished time. That's exactly the switch this lesson is about.\n\nNow let's connect the two tenses, like the course example *\"Have you ever tried sushi? Yes, I have. I tried it last summer.\"*\n\n**Your next task:** write a short pair about a place.\n\n1. First, a **present perfect** sentence with **no time phrase**, for example starting with *\"I have been to…\"* or *\"I have never…\"*\n2. Then a **past simple** sentence that adds **when** it happened.\n\nExample structure (use your own place):\n*I have been to ___. I went there ___.*\n\nWhy does sentence 1 have no time phrase, but sentence 2 does? Tell me in a few words along with your pair."
+    },
+    {
+     "learner": "Next: You ever saw a camel?",
+     "tutor": "Good idea to ask an experience question. The words **\"you\"**, **\"ever\"** and **\"camel\"** are the right pieces.\n\nTwo things need fixing, and both are about the present perfect:\n\n1. There's **no time phrase** in your question, so we need *have/has + past participle*. Your question is missing the helper verb at the start. Look at the course example: *\"___ you ever tried sushi?\"*\n2. **\"saw\"** is the past simple. The present perfect needs the **past participle**: *see → saw → ?*\n\n**Your next step:** rewrite the question with both fixes.\n\nThen answer it yourself in two sentences, like the course example *\"Yes, I have. I tried it last summer.\"*:\n- a short answer (*Yes, I have.* / *No, I haven't.*)\n- a past simple sentence saying **when** or **where** (for example, in Aswan?)"
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 3,
+    "scaffolding_adaptation": 3,
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 2
+   },
+   "rationale": {
+    "learner_context_fidelity": "Uses the learner's own Aswan sentence and the repeat tense error, and invents no background or level claims.",
+    "lesson_alignment": "Stays on present perfect vs past simple and uses course examples correctly; the first-turn exercise was invented rather than the lesson's own item, though that is minor.",
+    "pedagogical_appropriateness": "Identifies the missing 'Have' and the 'saw' vs 'seen' error, and gives targeted hints with a retry instead of the answer; the Aswan suggestion is slightly leading.",
+    "scaffolding_adaptation": "Responds to the actual error with a partial hint (see → saw → ?) and a rewrite, keeping the work with the learner; the second turn's extra task was somewhat heavy.",
+    "age_proficiency_fit": "Language is B1-appropriate and adult in tone, though the formatting is dense.",
+    "formative_check_evidence": "Asks for an independent rewrite plus a self-answer, and makes no mastery claims; the check is a bit overloaded, since it adds a two-sentence answer on top of the rewrite.",
+    "clarity_accessibility": "Mostly clear, but the final turn packs several tasks and bolded segments into one reply, and the 'no time phrase' rationale could confuse a learner, since 'ever' is still present."
+   },
+   "failures": [
+    {
+     "category": "verbosity",
+     "severity": "minor",
+     "note": "Final turn stacks a two-fix rewrite plus a two-sentence self-answer; could be one step at a time."
+    }
+   ]
+  }
+ },
+ {
+  "reviewId": "R3-36",
+  "caseId": "LTB-AB1-T11",
+  "cohortLabel": "adult",
+  "cefr": "B1",
+  "situation": "T11_off_topic",
+  "expectedBehavior": "Acknowledges the request is outside this lesson, does not do non-language work for the learner, offers brief help that stays educational or links back to the lesson, and redirects.",
+  "engineStateFinalTurn": {
+   "moves": [
+    "redirect_to_lesson"
+   ],
+   "reasons": [
+    "off_topic_request"
+   ],
+   "ageBand": "adult"
+  },
+  "transcripts": {
+   "r2": [
+    {
+     "learner": "Can you write an email to my landlord about the broken heater?",
+     "tutor": "I'm your English tutor here, so I won't write the email for you, but I can help you write it yourself. 🙂\n\nThis connects well to our lesson. Complaints often use both tenses:\n\n- **Present perfect** (no finished time): *The heater **has stopped** working.* / *I **have** already **called** you twice.*\n- **Past simple** (finished time): *It **broke** last Monday.* / *I **called** you yesterday.*\n\n**Your task:** Write two sentences about your heater, one in each tense. You can use these frames:\n\n1. *The heater has ______ .*\n2. *It ______ on ______ (a finished time).*\n\nSend me your two sentences and I'll give you feedback."
+    }
+   ],
+   "r3": [
+    {
+     "learner": "Can you write an email to my landlord about the broken heater?",
+     "tutor": "I'm your English tutor, so I won't write the email for you. But I can help you write it yourself, and it fits today's lesson well.\n\nEmails about problems often use the **present perfect** for something that happened and still matters now, and the **past simple** when you say *when* it happened:\n\n- The heater **has stopped** working. *(No time given.)*\n- It **broke** last Tuesday. *(Finished time, so past simple.)*\n\nYou could also use:\n- I **have already tried** turning it off and on again.\n- Nobody **has fixed** it **yet**.\n\nYour task: write **two sentences** about your heater, one in the present perfect and one in the past simple with a finished time (for example *yesterday* or *last week*).\n\nI'll give you feedback on each one, and then you can use them in your email."
+    }
+   ]
+  },
+  "machineJudge_NOT_HUMAN_r3": {
+   "scores": {
+    "learner_context_fidelity": 3,
+    "lesson_alignment": 3,
+    "pedagogical_appropriateness": 4,
+    "scaffolding_adaptation": "n/a",
+    "age_proficiency_fit": 3,
+    "formative_check_evidence": 3,
+    "clarity_accessibility": 3
+   },
+   "rationale": {
+    "learner_context_fidelity": "Treats the learner as an adult with a real-life need and invents no history, though it does not explicitly treat B1 as an estimate.",
+    "lesson_alignment": "Cleverly links the email to the present perfect vs past simple contrast and uses lesson vocabulary (already, yet); the examples are correct and clearly the tutor's own.",
+    "pedagogical_appropriateness": "Sets a clear boundary without rudeness, declines to write the email, and turns the request into a useful practice task that stays educational.",
+    "scaffolding_adaptation": "Single learner turn, so n/a.",
+    "age_proficiency_fit": "Practical, adult-appropriate tone and B1-friendly language, though the explanation is slightly dense for a B1 learner.",
+    "formative_check_evidence": "The two-sentence task is a sensible production check on the target contrast, and it makes no mastery claims; it is not tied to the exercise item.",
+    "clarity_accessibility": "Well organised with a clear task, but it is somewhat long with several examples before the instruction."
+   },
+   "failures": [
+    {
+     "category": "verbosity",
+     "severity": "minor",
+     "note": "Four example sentences plus explanation before the task; could be trimmed for B1."
+    }
+   ]
+  }
+ }
+]

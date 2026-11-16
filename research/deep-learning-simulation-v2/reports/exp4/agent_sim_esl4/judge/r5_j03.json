@@ -1,0 +1,853 @@
+{
+ "batch": "r5_j03",
+ "cases": {
+  "c5b37340000": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Perfect!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Perfect!"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c13b36a0708": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like \"She is a teacher\" always needs am, is or are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "cc7539a4fc6": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a present sentence like \"She is a teacher\" needs am, is or are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "cc24afb8a26": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"They\" is more than one person, so it takes are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c9791ecd119": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"the\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"the\" is correct."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c897385cff9": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "consonant + y changes to -ies, while vowel + y (as in \"enjoy\") just takes -s"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cc38d85fd80": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Watches\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Watches\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"Watches\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"Watches\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Watch\" ends in -ch, so after she we add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "goes",
+    "errors": {
+     "W1": "go",
+     "W2": "gos"
+    }
+   }
+  },
+  "c1a6f699c02": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "so it is the same word: They are happy"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English we always need are here."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "They are happy.",
+    "errors": {
+     "W1": "They happy.",
+     "W2": "They is happy."
+    }
+   }
+  },
+  "c1e5809b74e": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a singular noun needs a word like \"a\" or \"an\" before it"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the first sound of the next word decides between \"a\" and \"an\""
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c226225a4cd": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Well done!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Well done!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Well done!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Well done!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Go ends in -o, so we add -es: goes"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My father watches the news every morning.",
+    "errors": {
+     "W1": "My father watch the news every morning.",
+     "W2": "My father watchs the news every morning."
+    }
+   }
+  },
+  "c9e5f0236ab": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Excellent!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Excellent!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Go ends in -o, so we add -es: goes"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "c7eaffa30a2": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "When a verb ends in a consonant + y, we take away the y and add -ies."
+    },
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is: The baby cries at night."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "studies",
+    "errors": {
+     "W1": "study",
+     "W2": "studys"
+    }
+   }
+  },
+  "c50f519e983": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c5e48bab688": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "That's right."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "That's right."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Am is the form used only with I"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c168ccc98f3": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, well done!"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "cd12c869b7c": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"cries\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"cries\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "After -ch, -sh, -x or -o add -es, like \"watches\"; a letter like r plus y becomes -ies."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "caa92e83740": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A singular noun usually needs a word before it, like \"a\" or \"an\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "The first sound of the noun tells you which one."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cd8ee356fed": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, well done! \"A doctor\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "",
+     "W2": "A"
+    }
+   }
+  },
+  "c2ac329be18": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, excellent!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, excellent!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, excellent!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, excellent!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"An orange\" is right, because \"orange\" starts with the vowel sound \"o\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "",
+     "W2": "A"
+    }
+   }
+  },
+  "c3d8d1b009c": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "One person, he, she or it, then the verb with -s"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cb8b2cc50db": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like \"She is a teacher\" always needs am, is or are"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Ahmed is tired.",
+    "errors": {
+     "W1": "Ahmed tired."
+    }
+   }
+  },
+  "c6f1b2ec231": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, well done!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, well done!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Go\" ends in -o, so we add -es: goes."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "teaches",
+    "errors": {
+     "W1": "teach",
+     "W2": "teachs"
+    }
+   }
+  },
+  "c12959b40ef": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After she, we add -s: play becomes plays."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is plays."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "drinks",
+    "errors": {
+     "W1": "drink"
+    }
+   }
+  },
+  "c4762baf026": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "English needs am, is or are in each one"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am a student.",
+    "errors": {
+     "W1": "I a student.",
+     "W2": "I is a student."
+    }
+   }
+  },
+  "c6a3b0f88a6": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "in English we need a word between Ahmed and tired"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Ahmed is tired.",
+    "errors": {
+     "W1": "Ahmed tired."
+    }
+   }
+  },
+  "cee6e6c1958": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"a\": My uncle is a doctor."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "in English we need \"a\" before a job"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"He is a doctor\", not \"He is doctor\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c30748aa8fd": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"an\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Before a vowel sound, use an. Before other sounds, use a."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c419a590eee": {
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "the",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c78a7200305": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like this always needs am, is or are"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "He, she and it go with is; you, we and they go with are; I has its own word."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c0dcceb55dc": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "If it is a vowel sound, use 'an', like 'an owl'. If not, use 'a', like 'a dog'."
+    }
+   ],
+   "next_task": {
+    "kind": "none"
+   }
+  },
+  "c731fad72b6": {
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c1b50be106b": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "so we use are: They are happy"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "We always need are."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "In English we cannot say \"They happy\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c32ae1eb886": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Excellent, both are correct!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Excellent, both are correct!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Excellent, both are correct!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Excellent, both are correct!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"she\" is one person, so we use is, and \"they\" is more than one person, so we use are"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am happy today.",
+    "errors": {
+     "W1": "I happy today.",
+     "W2": "I is happy today."
+    }
+   }
+  },
+  "c9897223717": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like this always needs am, is or are. The word is never left out."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: You are tired. Wrong: You tired."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cfb52984fe9": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A sentence like this always needs one word in the gap. We never leave it empty."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "am with I, is with he, she or it, are with you, we or they"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c5177f4406c": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"cries\" is right."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"cries\" is right."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, the verb gets -s"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "a letter like r plus y becomes -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  }
+ }
+}

@@ -5,6 +5,8 @@ import { MAX_AUDIO_BYTES } from '../services/speakingExam';
 import { listMyEvents, recordMyEvent } from '../controllers/learningEvents.controller';
 import { answerReviewItem, getNextSteps, listReviews } from '../controllers/meProactive.controller';
 import { getMyTutorFace, setMyTutorFace } from '../controllers/tutorFaces.controller';
+import { uploadMyPhoto } from '../controllers/studentPhoto.controller';
+import { photoUpload } from '../utils/uploadSecurity';
 import { authMiddleware, requireStudent } from '../middleware/auth.middleware';
 import { tutorInstitutionLimiter, tutorUserLimiter } from '../middleware/aiRateLimits';
 import { requireFeature } from '../services/featureFlags';
@@ -35,6 +37,7 @@ import {
   clearTutorSessions,
   sendTutorMessage,
   streamTutorMessage,
+  listDueReviews,
 } from '../controllers/tutor.controller';
 import {
   tutorVisualize,
@@ -87,6 +90,7 @@ router.patch('/study-plan/items', teaching, studyPlans, setMyStudyItem);
 router.post('/tutor/handoff', teaching, startTutorHandoff);
 
 router.get('/', getMe);
+router.post('/photo', photoUpload.single('photo'), uploadMyPhoto);
 router.get('/dashboard', getDashboard);
 router.post('/study-plans', createStudyPlan);
 router.get('/achievements', getAchievements);
@@ -114,6 +118,7 @@ router.get('/results', listMyResults);
 router.get('/results/analytics', getResultsAnalytics);
 router.get('/results/:id', getMyResult);
 
+router.get('/tutor/reviews/due', listDueReviews);
 router.get('/tutor/sessions', listTutorSessions);
 router.post('/tutor/sessions', createTutorSession);
 router.delete('/tutor/sessions', clearTutorSessions);

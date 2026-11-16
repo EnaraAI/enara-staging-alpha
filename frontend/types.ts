@@ -20,6 +20,13 @@ export interface Student {
   // 'kids' shows this student the Enara Kids interface.
   uiMode?: 'standard' | 'kids';
   avatar: string;
+  // Approved profile photo (signed /uploads link); falls back to initials.
+  photoUrl?: string | null;
+  // A student's own upload awaiting a school admin (admin views only).
+  pendingPhotoUrl?: string | null;
+  pendingPhotoAt?: string | null;
+  // Own profile only: a new photo is waiting for approval.
+  photoPending?: boolean;
   progress: number;
   avgScore: number;
   studyTime: string;
@@ -503,7 +510,7 @@ export interface LiveAvatar {
   name: string;
   title: string;
   subject: string;
-  provider: 'enara-webrtc' | 'tavus' | 'elevenlabs-did' | 'custom-webrtc';
+  provider: 'enara-webrtc' | 'custom-webrtc';
   avatarModelId: string;
   voiceId: string;
   avatarUrl: string;
@@ -520,7 +527,7 @@ export interface LiveAvatar {
 }
 
 export interface AvatarConfig {
-  provider: 'enara-webrtc' | 'tavus' | 'elevenlabs-did' | 'custom-webrtc';
+  provider: 'enara-webrtc' | 'custom-webrtc';
   apiKey: string;
   apiEndpoint: string;
   apiKeyMasked?: string;
@@ -553,8 +560,8 @@ export interface AvatarStreamAnalytics {
   tokenExpenditureMonthly: number;
   providerStatus: {
     enaraAvatar: 'operational' | 'degraded' | 'offline';
-    elevenlabs: 'operational' | 'degraded' | 'offline';
-    tavus: 'operational' | 'degraded' | 'offline';
+    enaraVoice: 'operational' | 'degraded' | 'offline';
+    enaraVideo: 'operational' | 'degraded' | 'offline';
   };
   recentSessions: AvatarSession[];
 }

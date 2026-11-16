@@ -1,0 +1,732 @@
+{
+ "arm": "LEM",
+ "learnerIdx": 7,
+ "seed": "esl2|L7|rep1",
+ "state": {
+  "form": "copula",
+  "band": "A1",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 4
+  }
+ },
+ "start": {
+  "form": "copula",
+  "band": "A1",
+  "primary": "W1",
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "entries": [],
+ "v2": {
+  "beliefs": [],
+  "worked": []
+ },
+ "turns": [
+  {
+   "session": 1,
+   "learner": "Hello! Can you give me an exercise on am, is and are?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "present_lesson_item",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": true,
+   "rulesIntroduced": [
+    1
+   ],
+   "profileLines": 0,
+   "tutor": "Here is an example. You ___ my friend. The word is \"you\", so I write are: You are my friend.\nThe rule: use am with I, is with he, she and it, and are with you, we and they.\nRight: He is tall. Wrong: He are tall.\n\nNow you try. Write the missing word.\nWrite am, is or are: I ___ a student. (answer with only the missing word)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 1: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on am, is and are?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHere is an example. You ___ my friend. The word is \"you\", so I write are: You are my friend.\nThe rule: use am with I, is with he, she and it, and are with you, we and they.\nRight: He is tall. Wrong: He are tall.\n\nNow you try. Write the missing word.\nWrite am, is or are: I ___ a student. (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "The rule: use am with I, is with he, she and it, and are with you, we and they"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "(I leave it empty, no word)",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "(I leave it empty, no word)"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "The gap is still empty. In English, a sentence like this needs a word there.\n\nLook at this pair:\nRight: We are friends.\nWrong: We friends.\nThe wrong one has no word between \"We\" and \"friends\".\n\nWhich word did you think of? Write one word for the gap: I ___ a student.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHere is an example. You ___ my friend. The word is \"you\", so I write are: You are my friend.\nThe rule: use am with I, is with he, she and it, and are with you, we and they.\nRight: He is tall. Wrong: He are tall.\n\nNow you try. Write the missing word.\nWrite am, is or are: I ___ a student. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nThe gap is still empty. In English, a sentence like this needs a word there.\n\nLook at this pair:\nRight: We are friends.\nWrong: We friends.\nThe wrong one has no word between \"We\" and \"friends\".\n\nWhich word did you think of? Write one word for the gap: I ___ a student.",
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: We are friends.\nWrong: We friends."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "(I leave it empty, no word)",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "(I leave it empty, no word)"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "You are leaving the gap empty. But this sentence needs a word there.\nThe rule: use am with I, is with he, she and it, and are with you, we and they.\nExample: You ___ a pilot. The word is \"you\", so I write are: You are a pilot.\n\nNow you try again. Write one word: I ___ a student.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 2: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe gap is still empty. In English, a sentence like this needs a word there.\n\nLook at this pair:\nRight: We are friends.\nWrong: We friends.\nThe wrong one has no word between \"We\" and \"friends\".\n\nWhich word did you think of? Write one word for the gap: I ___ a student.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nYou are leaving the gap empty. But this sentence needs a word there.\nThe rule: use am with I, is with he, she and it, and are with you, we and they.\nExample: You ___ a pilot. The word is \"you\", so I write are: You are a pilot.\n\nNow you try again. Write one word: I ___ a student.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "use am with I, is with he, she and it, and are with you, we and they"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "(I leave it empty, no word)",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "(I leave it empty, no word)"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "You are leaving the gap empty again. But this sentence needs one word there.\nThe rule: I takes am. He, she and it take is. You, we and they take are.\nExample: He ___ a pilot. The word is \"he\", so I write is: He is a pilot.\n\nNow write only one word for the gap: I ___ a student.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 2: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are leaving the gap empty. But this sentence needs a word there.\nThe rule: use am with I, is with he, she and it, and are with you, we and they.\nExample: You ___ a pilot. The word is \"you\", so I write are: You are a pilot.\n\nNow you try again. Write one word: I ___ a student.\n\nLEARNER'S LAST MESSAGE:\n(I leave it empty, no word)\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nYou are leaving the gap empty again. But this sentence needs one word there.\nThe rule: I takes am. He, she and it take is. You, we and they take are.\nExample: He ___ a pilot. The word is \"he\", so I write is: He is a pilot.\n\nNow write only one word for the gap: I ___ a student.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "this sentence needs one word there."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I takes am. He, she and it take is. You, we and they take are."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "am",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "am"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Yes, \"am\" is correct. Well done.\n\nRecap:\nI takes am. He, she and it take is. You, we and they take are.\nA sentence like this always needs one of these words.\n\nTell me the rule in your own words.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 0: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are leaving the gap empty again. But this sentence needs one word there.\nThe rule: I takes am. He, she and it take is. You, we and they take are.\nExample: He ___ a pilot. The word is \"he\", so I write is: He is a pilot.\n\nNow write only one word for the gap: I ___ a student.\n\nLEARNER'S LAST MESSAGE:\nam\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"am\" is correct. Well done.\n\nRecap:\nI takes am. He, she and it take is. You, we and they take are.\nA sentence like this always needs one of these words.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"am\" is correct. Well done."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is correct. Well done."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I takes am. He, she and it take is. You, we and they take are."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A sentence like this always needs one of these words."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise am, is and are again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "activate_prior_knowledge",
+    "short_explanation",
+    "comprehensible_model",
+    "comprehension_check"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": true,
+   "rulesIntroduced": [
+    1
+   ],
+   "profileLines": 0,
+   "tutor": "Sure! Think of the three words am, is and are.\nMy example: We are friends. We is more than one person with me, so I write are.\nSo: am goes with I, is with he, she or it, are with you, we or they.\nRight: Tom is my friend. Wrong: Tom are my friend.\nYour turn. Write am, is or are: My cat ___ black.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 1: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure! Think of the three words am, is and are.\nMy example: We are friends. We is more than one person with me, so I write are.\nSo: am goes with I, is with he, she or it, are with you, we or they.\nRight: Tom is my friend. Wrong: Tom are my friend.\nYour turn. Write am, is or are: My cat ___ black.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "am goes with I, is with he, she or it, are with you, we or they"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "is",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "is"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Yes, \"is\" is right. My cat is one animal, like it.\n\nNext one:\nWrite am, is or are: I ___ a student. (answer with only the missing word)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 1: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure! Think of the three words am, is and are.\nMy example: We are friends. We is more than one person with me, so I write are.\nSo: am goes with I, is with he, she or it, are with you, we or they.\nRight: Tom is my friend. Wrong: Tom are my friend.\nYour turn. Write am, is or are: My cat ___ black.\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"is\" is right. My cat is one animal, like it.\n\nNext one:\nWrite am, is or are: I ___ a student. (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"is\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"is\" is right."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "am",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "am"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Yes, \"am\" is right. I goes with am.\n\nNow one on your own, with no help.\nWrite am, is or are: My brother ___ tired.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"is\" is right. My cat is one animal, like it.\n\nNext one:\nWrite am, is or are: I ___ a student. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nam\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"am\" is right. I goes with am.\n\nNow one on your own, with no help.\nWrite am, is or are: My brother ___ tired.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "is correct/right"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "is correct/right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "(learner's new production)"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "(learner's new production)"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I goes with am"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "is",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "is"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Yes, \"is\" is right. My brother is one person, like he.\n\nNow write your own sentence. Write one sentence about a friend: who is your friend, or how does your friend feel?",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"am\" is right. I goes with am.\n\nNow one on your own, with no help.\nWrite am, is or are: My brother ___ tired.\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"is\" is right. My brother is one person, like he.\n\nNow write your own sentence. Write one sentence about a friend: who is your friend, or how does your friend feel?",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"is\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"is\" is right."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My friend is happy.",
+    "errors": {
+     "W1": "My friend happy."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My friend is happy.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My friend is happy."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Yes, \"My friend is happy.\" is right. My friend is one person, like he or she, so is fits.\n\nSo: am goes with I, is with he, she or it, and are with you, we or they.\nAnd never leave the word out.\n\nTell me the rule in your own words.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"is\" is right. My brother is one person, like he.\n\nNow write your own sentence. Write one sentence about a friend: who is your friend, or how does your friend feel?\n\nLEARNER'S LAST MESSAGE:\nMy friend is happy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My friend is happy.\" is right. My friend is one person, like he or she, so is fits.\n\nSo: am goes with I, is with he, she or it, and are with you, we or they.\nAnd never leave the word out.\n\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My friend is happy.\" is right"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"My friend is happy.\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"My friend is happy.\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"My friend is happy.\" is right"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "am goes with I, is with he, she or it, and are with you, we or they"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "never leave the word out"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   }
+  }
+ ],
+ "stateAfterS1": {
+  "form": "copula",
+  "band": "A1",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 1
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ }
+}

@@ -2,7 +2,9 @@ import { getConfig } from '../config/env';
 import { StudentTutorChoice, TutorFace, TutorFaceOptions } from '../models/TutorFace';
 import { logger } from '../utils/logging';
 
-// Anam's stock avatars, as faces admins can choose for their tutor.
+// The video provider's stock avatars, as faces admins can choose for their tutor.
+// Their pictures are served from ENARA's own address (faceImageUrl), so the
+// provider's image host never reaches the browser.
 
 export interface AvatarChoice {
   id: string;
@@ -15,6 +17,17 @@ export interface AvatarChoice {
 
 const LIST_TTL_MS = 60 * 60 * 1000;
 let cached: { at: number; avatars: AvatarChoice[] } | undefined;
+const imageSources = new Map<string, string>();
+
+export function faceImageUrl(avatarId: string): string {
+  return `/api/tutor-faces/image/${encodeURIComponent(avatarId)}`;
+}
+
+// The provider's picture for a face, for the image route only.
+export async function faceImageSource(avatarId: string): Promise<string | undefined> {
+  if (!imageSources.has(avatarId)) await listAvatarChoices();
+  return imageSources.get(avatarId);
+}
 
 function genderOf(tags: unknown): AvatarChoice['gender'] {
   const list = Array.isArray(tags) ? tags.map((t) => String(t).toLowerCase()) : [];
@@ -39,11 +52,13 @@ export async function listAvatarChoices(): Promise<AvatarChoice[]> {
     }
     const body = (await res.json()) as { data?: Record<string, unknown>[]; meta?: { lastPage?: number } };
     for (const a of body.data || []) {
+      const source = (a.portraitImageUrl || a.imageUrl) as string | undefined;
+      if (source) imageSources.set(String(a.id), source);
       avatars.push({
         id: String(a.id),
         name: String(a.displayName || 'Tutor'),
         variant: a.variantName ? String(a.variantName) : undefined,
-        imageUrl: (a.portraitImageUrl || a.imageUrl) as string | undefined,
+        imageUrl: source ? faceImageUrl(String(a.id)) : undefined,
         gender: genderOf(a.displayTags),
         description: a.description ? String(a.description) : undefined,
       });
@@ -77,7 +92,7 @@ export async function resolveTutorFace(
     if (pick) {
       const offered = institutionId ? await TutorFaceOptions.findOne({ institutionId }).lean() : null;
       if (!offered?.avatarIds.length || offered.avatarIds.includes(pick.avatarId)) {
-        return { avatarId: pick.avatarId, name: pick.name, imageUrl: pick.imageUrl, gender: pick.gender, source: 'student' };
+        return { avatarId: pick.avatarId, name: pick.name, imageUrl: pick.imageUrl ? faceImageUrl(pick.avatarId) : undefined, gender: pick.gender, source: 'student' };
       }
     }
   }
@@ -86,6 +101,6 @@ export async function resolveTutorFace(
   const course = faces.find((f) => courseId && f.courseId === courseId);
   const face = course || faces.find((f) => f.courseId === '');
   return face
-    ? { avatarId: face.avatarId, name: face.name, imageUrl: face.imageUrl, gender: face.gender, source: course ? 'course' : 'school' }
+    ? { avatarId: face.avatarId, name: face.name, imageUrl: face.imageUrl ? faceImageUrl(face.avatarId) : undefined, gender: face.gender, source: course ? 'course' : 'school' }
     : undefined;
 }

@@ -1,0 +1,96 @@
+{
+ "cond": "F",
+ "studentIdx": 7,
+ "outcomeId": "FN-08",
+ "persona": "You are role-playing an English learner in Egypt (first language Arabic), course level B1. Write ONLY what the learner types; never mention being an AI or role-playing; keep each message under 25 words. You learn quickly. Your confidence in your own answers is about right. You currently believe something wrong about this point: Uses How much cost or How many for price questions (for example you might write: \"How much cost this hat?\"). You hold this belief only weakly. You change it only if what you are taught - by a tutor or by study material, whichever - really convinces you; how easily you are convinced depends on how well it is explained and on your learning speed. You do not yet know this point well. Your basic prerequisite knowledge is moderate. Sometimes you are distracted (0% of the time) and sometimes you guess (0% of the time). Do not pretend to understand if the explanation did not help you; you may ask for clarification, make mistakes, guess, or fail to learn.",
+ "turns": [
+  {
+   "learner": "Hello teacher! I want to practise shopping for clothes, like asking about price of things in a shop.",
+   "tutor": "Hello! Good plan. Asking the price is very useful in a shop.\n\nLet's look at a question a customer wrote:\n\n\"How much cost this scarf?\"\n\nThe shop assistant understands, but the English question has a mistake. In a price question, we need a small verb after \"How much\" and before the thing, like in \"How much is the bag?\"\n\nCan you find the mistake in the scarf question? Tell me what is wrong.",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "Maybe the mistake is cost? It should be is, not cost: How much is this scarf?",
+   "tutor": "Yes, you found it. \"Cost\" is the problem in that question, and your new question is correct.\n\nNow try another one. Read this question from a customer and fix it:\n\nCorrect this question: \"How much cost this hat?\"",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "How much is this hat?",
+   "tutor": "Yes, \"How much is this hat?\" is a correct question. You used \"is\" for one thing.\n\nNow a new task. Think about a different question for the shop:\n\nYou want the same jacket in small. Ask the shop assistant.",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "Can I have this jacket in small?",
+   "tutor": "Your message is polite, and it names the jacket and the size. But in this lesson we ask if the shop has the item, using the words \"Do you have\".\n\nExample: \"Do you have this shirt in blue?\" is the right type. \"I want this shirt in blue\" is wrong, because it is a statement, not a question.\n\nNew task: you want the same shoes in size 40. Ask the shop assistant.",
+   "rulesIntroduced": [
+    2,
+    3
+   ],
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "Do you have these shoes in size 40?",
+   "tutor": "\"Do you have these shoes in size 40?\" is a full question that asks for a size. It works for this shoe task.\n\nRule: ask the price with \"How much is/are\", and ask for a size or colour with \"Do you have this in\".\n\nNow write one new example of your own.",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "How much are these socks?",
+   "tutor": "Remember: use \"How much are\" for more than one thing, as in \"How much are these socks?\"\n\nYou are ready for a quick check. Would you like to try one now, to show what you can do on your own?",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  }
+ ]
+}

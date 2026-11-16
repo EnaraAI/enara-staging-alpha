@@ -1,0 +1,16 @@
+--- docs/benchmarks/language-teaching/20261109T0831-ltb-v1.0-remediation-r1/baseline_code_snapshot/TutorMessage.ts	2026-11-09 08:31:45.997399595 +0000
++++ backend/src/models/TutorMessage.ts	2026-11-09 08:33:56.265511885 +0000
+@@ -94,6 +94,13 @@
+           provenance: String,
+           confidence: String,
+           masteryClaim: Boolean,
++          // ltc-v1-r1
++          policyRevision: String,
++          pendingTask: String,
++          learnerResponse: String,
++          attemptsOnTask: Number,
++          offTopic: String,
++          lengthTarget: { type: { targetWords: Number, maxWords: Number, basis: String, _id: false }, default: undefined },
+           _id: false,
+         },
+         default: undefined,

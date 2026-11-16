@@ -1,0 +1,580 @@
+{
+ "arm": "LE",
+ "rep": 1,
+ "learnerIdx": 154,
+ "seed": "esl3|L154|rep1",
+ "state": {
+  "form": "articles",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 3
+  }
+ },
+ "start": {
+  "form": "articles",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "entries": [],
+ "v2": {
+  "beliefs": [],
+  "worked": []
+ },
+ "turns": [
+  {
+   "session": 1,
+   "learner": "Hello! Can you give me an exercise on a, an and the?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "present_lesson_item",
+    "fade_support",
+    "independent_practice"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Sure. Here is your first one. Fill the gap with a single word:\n\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)\n\nOnce you've answered, I'll give you a harder variant with trickier first sounds.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on a, an and the?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure. Here is your first one. Fill the gap with a single word:\n\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)\n\nOnce you've answered, I'll give you a harder variant with trickier first sounds.",
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"an\" is right there.\nNow the harder variant I promised. The choice depends on the first sound you say, not the first letter you see, and some words hide their first sound.\nFill the gap with a or an, and add one short sentence explaining what decided your choice:\nIt was ___ honest mistake, so nobody was angry.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure. Here is your first one. Fill the gap with a single word:\n\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)\n\nOnce you've answered, I'll give you a harder variant with trickier first sounds.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"an\" is right there.\nNow the harder variant I promised. The choice depends on the first sound you say, not the first letter you see, and some words hide their first sound.\nFill the gap with a or an, and add one short sentence explaining what decided your choice:\nIt was ___ honest mistake, so nobody was angry.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"an\" is right there."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"an\" is right there."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"an\" fits \"honest\". I asked for a short explanation too, though.\nPlease give me the rule in your own words in one sentence: what decided your choice?",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"an\" is right there.\nNow the harder variant I promised. The choice depends on the first sound you say, not the first letter you see, and some words hide their first sound.\nFill the gap with a or an, and add one short sentence explaining what decided your choice:\nIt was ___ honest mistake, so nobody was angry.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"an\" fits \"honest\". I asked for a short explanation too, though.\nPlease give me the rule in your own words in one sentence: what decided your choice?",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"an\" fits \"honest\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"an\" fits \"honest\"."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "That's correct as a general point: singular countable nouns need a determiner.\nIt doesn't yet explain the a/an choice, though, which depends on pronunciation rather than spelling.\nPlease restate the rule in one sentence, covering what made \"honest\" take the article you chose.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"an\" fits \"honest\". I asked for a short explanation too, though.\nPlease give me the rule in your own words in one sentence: what decided your choice?\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat's correct as a general point: singular countable nouns need a determiner.\nIt doesn't yet explain the a/an choice, though, which depends on pronunciation rather than spelling.\nPlease restate the rule in one sentence, covering what made \"honest\" take the article you chose.",
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "You're explaining that a determiner is required, which is true, but not the a/an choice.\nRule: choose by the first sound you pronounce. Vowel sound takes \"an\"; consonant sound takes \"a\".\nExample: \"a European city\": \"European\" starts with a \"y\" sound, so \"a\".\nNow restate the rule in one sentence and apply it to \"honest\".",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's correct as a general point: singular countable nouns need a determiner.\nIt doesn't yet explain the a/an choice, though, which depends on pronunciation rather than spelling.\nPlease restate the rule in one sentence, covering what made \"honest\" take the article you chose.\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYou're explaining that a determiner is required, which is true, but not the a/an choice.\nRule: choose by the first sound you pronounce. Vowel sound takes \"an\"; consonant sound takes \"a\".\nExample: \"a European city\": \"European\" starts with a \"y\" sound, so \"a\".\nNow restate the rule in one sentence and apply it to \"honest\".",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Vowel sound takes \"an\"; consonant sound takes \"a\"."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise a, an and the again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "activate_prior_knowledge",
+    "fade_support",
+    "independent_practice"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "closingAsk": "deferred",
+   "profileLines": 0,
+   "tutor": "Of course.\nOnce you have that, here is a harder edge to test it on. Abbreviations and some words starting with h or u are where people slip, for example \"an MP\" versus \"a European city\": the article follows how the word is said, not how it is spelled.\nYour task: write two sentences of your own, each with a singular noun where the spelling might mislead someone about a or an. Use words that are not in my examples. After each sentence, add a short note explaining why you chose that article.",
+   "raw": "Of course. Let's start with recall: in your own words, what is the rule for choosing between a and an?\nOnce you have that, here is a harder edge to test it on. Abbreviations and some words starting with h or u are where people slip, for example \"an MP\" versus \"a European city\": the article follows how the word is said, not how it is spelled.\nYour task: write two sentences of your own, each with a singular noun where the spelling might mislead someone about a or an. Use words that are not in my examples. After each sentence, add a short note explaining why you chose that article.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": true,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise a, an and the again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nOf course.\nOnce you have that, here is a harder edge to test it on. Abbreviations and some words starting with h or u are where people slip, for example \"an MP\" versus \"a European city\": the article follows how the word is said, not how it is spelled.\nYour task: write two sentences of your own, each with a singular noun where the spelling might mislead someone about a or an. Use words that are not in my examples. After each sentence, add a short note explaining why you chose that article.",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "She is an honest woman.",
+    "errors": {
+     "W1": "She is honest woman.",
+     "W2": "She is a honest woman."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "She is an honest woman.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She is an honest woman."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "\"She is an honest woman.\" The article is right, and honest is a good choice of word where the spelling could mislead.\nNow look at the part of the task that is still open: the short note after the sentence. Explain in a line why you chose an rather than a here. Then add your second sentence with a different tricky word, plus its note.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nOf course.\nOnce you have that, here is a harder edge to test it on. Abbreviations and some words starting with h or u are where people slip, for example \"an MP\" versus \"a European city\": the article follows how the word is said, not how it is spelled.\nYour task: write two sentences of your own, each with a singular noun where the spelling might mislead someone about a or an. Use words that are not in my examples. After each sentence, add a short note explaining why you chose that article.\n\nLEARNER'S LAST MESSAGE:\nShe is an honest woman.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She is an honest woman.\" The article is right, and honest is a good choice of word where the spelling could mislead.\nNow look at the part of the task that is still open: the short note after the sentence. Explain in a line why you chose an rather than a here. Then add your second sentence with a different tricky word, plus its note.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "The article is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "The article is right"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "That principle is true, but it doesn't explain your choice in \"She is an honest woman.\" The note is still open.\nLook at the first sound of honest, not its first letter. What do you hear there, and how does that point to an?\nThen give your second sentence with a different tricky word, plus its note.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"She is an honest woman.\" The article is right, and honest is a good choice of word where the spelling could mislead.\nNow look at the part of the task that is still open: the short note after the sentence. Explain in a line why you chose an rather than a here. Then add your second sentence with a different tricky word, plus its note.\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat principle is true, but it doesn't explain your choice in \"She is an honest woman.\" The note is still open.\nLook at the first sound of honest, not its first letter. What do you hear there, and how does that point to an?\nThen give your second sentence with a different tricky word, plus its note.",
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "We seem to be going round the same principle, so let's set it aside: it's true, but the note asks about something else.\nLook only at the word honest and say it aloud. Focus on the very first sound you produce, not the letter h on the page.\nIn one line, tell me what that first sound is. That line will be your note for \"She is an honest woman.\"\nThe second sentence can wait until after that.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat principle is true, but it doesn't explain your choice in \"She is an honest woman.\" The note is still open.\nLook at the first sound of honest, not its first letter. What do you hear there, and how does that point to an?\nThen give your second sentence with a different tricky word, plus its note.\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nWe seem to be going round the same principle, so let's set it aside: it's true, but the note asks about something else.\nLook only at the word honest and say it aloud. Focus on the very first sound you produce, not the letter h on the page.\nIn one line, tell me what that first sound is. That line will be your note for \"She is an honest woman.\"\nThe second sentence can wait until after that.",
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a singular countable noun needs a/an (or the).",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a singular countable noun needs a/an (or the)."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Your principle is true: a singular countable noun needs a determiner. Let's close the unit here.\nRecap: the choice between a and an follows the first sound of the next word, not its spelling.\nThat is why your sentence \"She is an honest woman.\" is right: the h is silent, so the word begins with a vowel sound.\nTell me the rule in your own words.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nWe seem to be going round the same principle, so let's set it aside: it's true, but the note asks about something else.\nLook only at the word honest and say it aloud. Focus on the very first sound you produce, not the letter h on the page.\nIn one line, tell me what that first sound is. That line will be your note for \"She is an honest woman.\"\nThe second sentence can wait until after that.\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour principle is true: a singular countable noun needs a determiner. Let's close the unit here.\nRecap: the choice between a and an follows the first sound of the next word, not its spelling.\nThat is why your sentence \"She is an honest woman.\" is right: the h is silent, so the word begins with a vowel sound.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the choice between a and an follows the first sound of the next word, not its spelling"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   }
+  }
+ ],
+ "stateAfterS1": {
+  "form": "articles",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 2
+  }
+ }
+}

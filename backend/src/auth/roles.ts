@@ -1,6 +1,8 @@
 // academic_manager (4Level1 P1): read-mostly school insights only; it is not
 // in any legacy requireRole list, so it gets nothing beyond its permissions.
-export const USER_ROLES = ['student', 'teacher', 'academic_manager', 'admin', 'enara-admin'] as const;
+// parent (Parents Portal MVP): sees only the learners linked to it by an active
+// ParentLearnerLink (src/parents/policy.ts); never in any staff list.
+export const USER_ROLES = ['student', 'teacher', 'academic_manager', 'admin', 'enara-admin', 'parent'] as const;
 
 export type UserRole = (typeof USER_ROLES)[number];
 

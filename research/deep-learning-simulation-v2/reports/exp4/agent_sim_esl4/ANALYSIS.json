@@ -1,0 +1,171 @@
+{
+ "complete": true,
+ "nExplicitFirst": 96,
+ "nB2": 12,
+ "primary": {
+  "outcome": "controlled accuracy, LE - P+, explicit-first, mean of 2 replications",
+  "meanLE": 0.7891,
+  "meanP": 0.7917,
+  "diff": -0.0026,
+  "ci95": [
+   -0.0456,
+   0.0417
+  ],
+  "p": 0.9529020114787272,
+  "positive": 17,
+  "negative": 22,
+  "zero": 57
+ },
+ "secondary": {
+  "free": {
+   "meanLE": 0.7604,
+   "meanP": 0.7839,
+   "diff": -0.0234,
+   "ci95": [
+    -0.0651,
+    0.0169
+   ]
+  },
+  "wrongAtZero": {
+   "meanLE": 1.7656,
+   "meanP": 1.7604,
+   "diff": 0.0052,
+   "ci95": [
+    -0.0625,
+    0.0729
+   ]
+  },
+  "expectedControlled": {
+   "meanLE": 0.8013,
+   "meanP": 0.8073,
+   "diff": -0.0061,
+   "ci95": [
+    -0.0425,
+    0.0295
+   ]
+  },
+  "expectedFree": {
+   "meanLE": 0.7711,
+   "meanP": 0.7846,
+   "diff": -0.0135,
+   "ci95": [
+    -0.0505,
+    0.0242
+   ]
+  },
+  "controlled_rep1": {
+   "diff": -0.026,
+   "ci95": [
+    -0.0885,
+    0.0391
+   ]
+  },
+  "controlled_rep2": {
+   "diff": 0.0208,
+   "ci95": [
+    -0.0312,
+    0.0755
+   ]
+  }
+ },
+ "b2NoHarm": {
+  "pass": true,
+  "maxWrongStrength": 0
+ },
+ "trajectory": {
+  "LE": [
+   2.135,
+   1.812,
+   1.464,
+   1.062,
+   0.807,
+   0.693,
+   0.682,
+   0.646,
+   0.599,
+   0.443
+  ],
+  "PP": [
+   2.474,
+   2.172,
+   1.714,
+   1.438,
+   1.042,
+   0.865,
+   0.755,
+   0.599,
+   0.474,
+   0.365
+  ]
+ },
+ "ratings": {
+  "LE": {
+   "overall": 3.667,
+   "clarity": 3.889,
+   "reasoning": 3.926,
+   "answer_protection": 4.981,
+   "hint_progression": 3.481,
+   "recap": 3.731,
+   "n": 108
+  },
+  "PP": {
+   "overall": 2.926,
+   "clarity": 3.861,
+   "reasoning": 2.954,
+   "answer_protection": 3.241,
+   "hint_progression": 2.972,
+   "recap": 1.019,
+   "n": 108
+  }
+ },
+ "guards": {
+  "twoAsks": {
+   "LE": 0,
+   "turns": 2160,
+   "rate": 0.0,
+   "pass": true,
+   "rawBeforeGuard": 32
+  },
+  "leaks": {
+   "LE": 6,
+   "PP": 96,
+   "pass": true
+  },
+  "answerProtection": {
+   "LE": 4.981,
+   "PP": 3.241,
+   "pass": true
+  }
+ },
+ "judge_agreement": {
+  "rounds": {
+   "3": {
+    "cases": 77,
+    "same": 62,
+    "missing": 0
+   },
+   "7": {
+    "cases": 88,
+    "same": 46,
+    "missing": 0
+   }
+  },
+  "cases": 165,
+  "same": 108,
+  "agreement": 0.6545,
+  "pass": false
+ },
+ "fidelity": {
+  "_label": "SIMULATION ONLY",
+  "checked": 223,
+  "missing": 0,
+  "followedRate": 0.9821,
+  "oneTaskRate": 1.0,
+  "tryFirstRate": 0.9821,
+  "afterTwoMisses": {
+   "applicable": 15,
+   "yes": 15
+  }
+ },
+ "decision": "NOT CONFIRMED"
+}

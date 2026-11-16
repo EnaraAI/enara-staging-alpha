@@ -1,0 +1,92 @@
+{
+ "cond": "E",
+ "studentIdx": 7,
+ "outcomeId": "FN-08",
+ "persona": "You are role-playing an English learner in Egypt (first language Arabic), course level B1. Write ONLY what the learner types; never mention being an AI or role-playing; keep each message under 25 words. You learn quickly. Your confidence in your own answers is about right. You currently believe something wrong about this point: Uses How much cost or How many for price questions (for example you might write: \"How much cost this hat?\"). You hold this belief only weakly. You change it only if what you are taught - by a tutor or by study material, whichever - really convinces you; how easily you are convinced depends on how well it is explained and on your learning speed. You do not yet know this point well. Your basic prerequisite knowledge is moderate. Sometimes you are distracted (0% of the time) and sometimes you guess (0% of the time). Do not pretend to understand if the explanation did not help you; you may ask for clarification, make mistakes, guess, or fail to learn.",
+ "turns": [
+  {
+   "learner": "Hello! I want to practise shopping for clothes. How much cost this shirt, please?",
+   "tutor": "Hello! Good, you know the shirt question is about price. One small change helps: in English we ask the price with \"How much is ...?\" for one thing. Example in a shop: \"How much is this scarf, please?\"\n\nNow you try. You see two blue belts and want the price of both. Ask the shop assistant. Remember it is more than one thing.",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "How much are these two blue belts, please?",
+   "tutor": "Your belts question is a full question about price, and \"are\" fits two things.\n\nNow look at a different sentence from another customer: \"How much cost this scarf?\"\n\nSomething is wrong after \"How much\". Think aloud: which word do you think is wrong, and what word should be there?",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "I think cost is wrong. Maybe it must be is, like How much is this scarf? But I always said cost before.",
+   "tutor": "Yes. \"Cost\" is the wrong word there, and \"How much is this scarf?\" is the correct question. It is good that you noticed your old habit.\n\nHere is the next task.\n\nCorrect this question: \"How much cost this hat?\"",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "How much is this hat?",
+   "tutor": "\"How much is this hat?\" is correct. It is a full question, and \"is\" fits one thing.\n\nNext, a new idea: asking for a size or colour. We use \"Do you have ...?\" for this. Example in a shop: \"Do you have these shoes?\"\n\nTask: You want the same jacket in small. Ask the shop assistant.",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "Do you have this jacket small, please?",
+   "tutor": "\"Do you have this jacket\" is a good start, and it is a full question. The size part is not yet clear in \"Do you have this jacket small, please?\"\n\nTell me in your own words: what were you thinking when you wrote \"small\" after \"jacket\"?\n\nTell me the rule in your own words.",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "I thought I just put the size word after jacket. Maybe I need a small word between, like in?",
+   "tutor": "Remember: a size or colour needs a small word before it, and \"in\" is the right word.\n\nNow a new task, without help. You are in a shop and see a nice shirt. You want the same shirt in red. Ask the shop assistant.",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  }
+ ]
+}

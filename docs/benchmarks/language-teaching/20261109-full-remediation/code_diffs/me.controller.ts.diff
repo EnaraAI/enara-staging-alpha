@@ -1,0 +1,19 @@
+--- ../remed2/me.controller.ts.orig	2026-11-09 14:48:36.732472534 +0000
++++ backend/src/controllers/me.controller.ts	2026-11-09 14:48:36.751830457 +0000
+@@ -132,6 +132,15 @@
+     id: curriculum?.id,
+     name: curriculum?.name,
+     summary: curriculum?.summary || course.curriculumSummary,
+-    chapters: curriculum?.chapters || [],
++    // r4: lesson items reach students as id + prompt only; accepted answers and
++    // target forms (the answer key) stay staff-side.
++    chapters: (curriculum?.chapters || []).map(studentChapter),
+   });
+ });
++
++function studentChapter(ch: unknown) {
++  const c = typeof (ch as { toObject?: () => unknown })?.toObject === 'function' ? (ch as { toObject: () => Record<string, any> }).toObject() : (ch as Record<string, any>);
++  const items = c?.languageSpec?.items;
++  if (!Array.isArray(items)) return c;
++  return { ...c, languageSpec: { ...c.languageSpec, items: items.map((i: { id: string; prompt: string }) => ({ id: i.id, prompt: i.prompt })) } };
++}

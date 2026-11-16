@@ -1,0 +1,124 @@
+[
+ {
+  "id": "PA-01",
+  "area": "fixture_parity",
+  "input": "fixture_v2_cases.jsonl",
+  "expected": "0 failures",
+  "actual": "0 failures",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-02",
+  "area": "fixture_parity",
+  "input": "v1.0 as run",
+  "expected": "54",
+  "actual": "54",
+  "severityIfFail": "P2",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-03",
+  "area": "fixture_parity",
+  "input": "120 v2 records vs v1.0 lines",
+  "expected": "120 mapped, 0 bad",
+  "actual": "120 records, 120 unique v1 ids, bad=[]",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-04",
+  "area": "fixture_parity",
+  "input": "learnerScript",
+  "expected": "219 turns, 0 missing",
+  "actual": "219 turns, 0 missing",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-05",
+  "area": "fixture_parity",
+  "input": "tutorView + evaluatorView",
+  "expected": "[]",
+  "actual": "[]",
+  "severityIfFail": "P0",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-06",
+  "area": "fixture_parity",
+  "input": "120 cases",
+  "expected": "[]",
+  "actual": "[]",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-07",
+  "area": "fixture_parity",
+  "input": "111 lesson cases",
+  "expected": "[]",
+  "actual": "[]",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-08",
+  "area": "fixture_parity",
+  "input": "changeLog vs v1.0",
+  "expected": "9 revisions, all traceable",
+  "actual": "9 revisions, traceable=true",
+  "severityIfFail": "P2",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-09",
+  "area": "fixture_parity",
+  "input": "manifest + in-memory rebuild",
+  "expected": "file==manifest and rebuild==file",
+  "actual": "file==manifest true; rebuild==file true",
+  "severityIfFail": "P2",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-10",
+  "area": "evaluator_integration",
+  "input": "[\"backend/benchmarks/ltc-v1/cases.mjs\",\"backend/benchmarks/ltc-v1/judge.ts\",\"backend/benchmarks/ltc-v1/run.ts\",\"backend/benchmarks/ltc-v1/run_trusted_age.ts\",\"backend/benchmarks/ltc-v1/score.mjs\",\"backend/benchmarks/ltc-v2/build_fixture_v2.mjs\",\"backend/benchmarks/ltc-v2/run_fixture_v2.ts\",\"backend/benchmarks/ltc-v2/validate_parity.mjs\"]",
+  "expected": ">=1 v2 judge/reviewer consuming evaluatorView",
+  "actual": "0 consumers",
+  "severityIfFail": "P1",
+  "note": "open measurement-readiness item: no v2 judge or reviewer exists",
+  "pass": false,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-11",
+  "area": "evaluator_integration",
+  "input": "judge.ts caseView, AI-review blind_review.ts caseView",
+  "expected": "evaluators use evaluatorView",
+  "actual": "judge.ts passes c.lesson=true; blind_review.ts passes c.lesson=true",
+  "pass": false,
+  "severityIfFail": "P1",
+  "note": "running the frozen v1 judge on fixture v2 records would not even find c.lesson (v2 uses lessonDelivered/evaluatorView); a v2 judge is required",
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ },
+ {
+  "id": "PA-12",
+  "area": "fixture_parity",
+  "input": "stored dry-run outputs (reproduced separately by CLI)",
+  "expected": "{\"turns\":219,\"li\":72,\"saw\":72,\"ans\":0,\"mark\":0,\"idLeaks\":0,\"cost\":0}",
+  "actual": "{\"turns\":219,\"li\":72,\"saw\":72,\"ans\":0,\"mark\":0,\"idLeaks\":0,\"cost\":0}",
+  "severityIfFail": "P1",
+  "pass": true,
+  "ref": "backend/test/audit-post-remediation/parity.audit.ts"
+ }
+]

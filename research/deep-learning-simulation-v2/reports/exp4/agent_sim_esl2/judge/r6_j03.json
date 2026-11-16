@@ -1,0 +1,717 @@
+{
+ "batch": "r6_j03",
+ "cases": {
+  "cefd723b442": {
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c46a85556d3": {
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c18569851ff": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the choice between \"a\" and \"an\" depends on the sound, not the spelling"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I waited an hour for the bus.",
+    "errors": {
+     "W1": "I waited hour for the bus.",
+     "W2": "I waited a hour for the bus."
+    }
+   }
+  },
+  "c5a240ef512": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"am\" with I, \"is\" with he, she and it, \"are\" with you, we and they"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"be\" must not be dropped, even in fast writing"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"My neighbours are noisy,\" not \"My neighbours noisy.\""
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My friends are here.",
+    "errors": {
+     "W1": "My friends here.",
+     "W2": "My friends is here."
+    }
+   }
+  },
+  "c183d41faee": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I am, he/she/it is, you/we/they are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c6016639433": {
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "cdeb4071fa7": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the choice of a or an follows the first sound, not the first letter"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c4e3fb45590": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "sound, not letter ... 'an hour' (silent h), 'a university'"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cf059101911": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "we use a before a consonant sound (a book), an before a vowel sound (an apple)"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "cf0a5c94ea1": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, add -s to the verb."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Tom reads. Wrong: Tom read."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "eats",
+    "errors": {
+     "W1": "eat"
+    }
+   }
+  },
+  "c0df93f8e55": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "say \"an\" before a vowel sound, and \"a\" before other sounds"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: I have an egg. Wrong: I have a egg."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c934d9ba334": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I am, he/she/it is, you/we/they are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c7f93579d35": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Use an before a vowel sound (a, e, i, o, u), and a before other sounds."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: Sara has an egg. Wrong: Sara has a egg."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "cbb22950408": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Verbs ending in -sh, -ch, -s, -x or -o take -es ... a consonant plus y changes to -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My friend studies every evening.",
+    "errors": {
+     "W1": "My friend study every evening.",
+     "W2": "My friend studys every evening."
+    }
+   }
+  },
+  "c233451a4bf": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "use am with I, is with he, she or it, and are with you, we or they"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "ca7e7e2d109": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "we use a before a consonant sound (a book), an before a vowel sound (an apple)"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c910823570f": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Verbs ending in -sh, -ch, -s, -x or -o add -es (watches, goes). A consonant plus y becomes -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My friend studies every evening.",
+    "errors": {
+     "W1": "My friend study every evening.",
+     "W2": "My friend studys every evening."
+    }
+   }
+  },
+  "c7949621516": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Verbs ending in -sh, -ch, -s, -x or -o take -es ... a consonant plus y changes to -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My friend studies every evening.",
+    "errors": {
+     "W1": "My friend study every evening.",
+     "W2": "My friend studys every evening."
+    }
+   }
+  },
+  "c4e4c8a5493": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "before a vowel sound, we write 'an'"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c1343e3388c": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I am, he/she/it is, and you/we/they are"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Never leave them out!"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "cba0f8d9d35": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "use an before a, e, i, o, u sounds; use a before other sounds"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: I see an ant. Wrong: I see a ant."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c89f49fa131": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after he, she and it, add -s or -es to the verb"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   }
+  },
+  "c8f4cdc0c7e": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: after he, she or it, add -s to the verb."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: She sings. Wrong: She sing."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "reads",
+    "errors": {
+     "W1": "read"
+    }
+   }
+  },
+  "c2eb92f209b": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "use am with I, is with he, she or it, and are with you, we or they"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: My dog is big. Wrong: My dog big."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c4924e24705": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "a and an follow the first sound, not the letter, so we say an hour but a uniform"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I have an umbrella.",
+    "errors": {
+     "W1": "I have umbrella.",
+     "W2": "I have a umbrella."
+    }
+   }
+  },
+  "c874e0c6d1e": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "I am, he/she/it is, you/we/they are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "ca1d3722ae0": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Use am with I, is with he, she or it, and are with you, we or they."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c08135b7557": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "use \"am\" with I, \"is\" with he, she and it, and \"are\" with you, we and they"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c16f13b2d88": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Write an before a vowel sound (a, e, i, o, u), and a before other sounds."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: Tom eats an egg. Wrong: Tom eats a egg."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c310e654487": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "am with I; is with he, she, it; are with you, we, they"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c4bf5f4e30e": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "fix becomes fixes, study becomes studies, but enjoy stays enjoys"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c9c1df7aed2": {
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The students in my class are happy.",
+    "errors": {
+     "W1": "The students in my class happy.",
+     "W2": "The students in my class is happy."
+    }
+   }
+  },
+  "cb93214215c": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Umbrella\" starts with a vowel sound, so an."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "",
+     "W2": "A"
+    }
+   }
+  },
+  "c840e7e78c6": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Use \"am\" with I, \"is\" with he, she and it, and \"are\" with you, we and they."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "ca2e3737363": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Use am with I, is with he, she or it, and are with you, we or they."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "cc6592d1977": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "it is the first sound, not the first letter"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  }
+ }
+}

@@ -137,7 +137,8 @@ afterAll(async () => {
 const SKIP = new Set(['/api/auth/logout', '/api/cron/daily']); // logout revokes the caller (S-1); cron is secret-gated
 const apiRoutes = () => routes.filter((r) => r.path.startsWith('/api/') && !SKIP.has(r.path));
 const ok = (s: number) => s >= 200 && s < 300;
-const serverError = (res: any) => res.status >= 500 && !(res.status === 503 && /_UNAVAILABLE$/.test(res.body?.error?.code ?? ''));
+// 503 *_UNAVAILABLE / google_not_configured (Parents "Continue with Google" without GOOGLE_CLIENT_ID): a dependency not configured here.
+const serverError = (res: any) => res.status >= 500 && !(res.status === 503 && (/_UNAVAILABLE$/.test(res.body?.error?.code ?? '') || res.body?.error?.code === 'google_not_configured'));
 
 describe('P14.9 tenant isolation with real foreign ids', () => {
   it('fixtures: two schools, two classes in school A, foreign ids of every seeded kind', async () => {

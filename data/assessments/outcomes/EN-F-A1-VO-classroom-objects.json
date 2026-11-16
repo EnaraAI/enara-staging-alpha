@@ -1,0 +1,485 @@
+{
+  "status": "DRAFT",
+  "outcomeId": "EN-F-A1-VO-classroom-objects",
+  "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+  "matching": "Items 1-2 gap-fill naming an object from its use; 3-4 choice of object in context; EC = wrong classroom noun for its use (I [verb] ... with my X); FP = one sentence naming an object on your desk/in your bag; transfer = a teacher's list instruction. All nouns EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 are now wrong-object errors (wrong classroom noun for its use), not article omission. Re-review round 2: B-6 and C-6 replaced (notebook/pencil case and close the board were not certain errors); all six EC items now follow one pattern; l1ErrorTypes in outcomes.json cleared because lexical object confusion has no schema enum value. Review round 3: slots 5-6 rewritten as realistic Arabic-L1 spelling slips on a classroom noun (slot 5 = phon_p_b, p written as b: bencil/ben/baper; slot 6 = spelling_vowel, vowel omitted: calculter/dictionry/notbook); the earlier wrong-object swaps were not real learner errors. The corrected noun is not shown elsewhere in the same form. l1ErrorTypes in outcomes.json set to phon_p_b, spelling_vowel. Review round 4: phon_p_b is an audio-only type in docs/LEARNING_OUTCOMES.md, so the typed slot-5 slips (bencil/ben/baper) are now tagged spelling_vowel, the only typed-spelling enum value; outcomes.json l1ErrorTypes = [spelling_vowel]. A consonant-spelling enum value is a user decision. C-6 now also accepts 'in a notebook', like the other slot 5-6 items. User decisions (A1-A2): vocabulary validity - each form keeps one spelling error-correction item (slot 5); slot 6 is now a meaning error (Arabic-L1 polysemy or calque on an A1 word), with exactly one correct fix and the answer word not shown elsewhere in the form. Fix of 2+ reviewer known issues: slot-6 tag -> lexical_l1_transfer; B-6 now office -> desk (classroom object, Arabic maktab), B-3 no longer shows 'desk'.",
+  "forms": {
+    "A": [
+      {
+        "id": "EN-F-A1-VO-classroom-objects-A-1",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: I write in my notebook with a blue ____ .",
+        "answerKey": "pen",
+        "acceptedAnswers": [
+          "pen",
+          "pencil"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "pen",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-A-2",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: The teacher writes the date on the ____ .",
+        "answerKey": "board",
+        "acceptedAnswers": [
+          "board",
+          "whiteboard",
+          "blackboard"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "board",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-A-3",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (desk / door / bag): Please sit down at your ____ and open your books.",
+        "answerKey": "desk",
+        "acceptedAnswers": [
+          "desk"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "desk",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-A-4",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (rubber / window / chair): I made a mistake. Can I use your ____ , please?",
+        "answerKey": "rubber",
+        "acceptedAnswers": [
+          "rubber"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "rubber",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-A-5",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I draw a picture with my bencil.",
+        "answerKey": "I draw a picture with my pencil.",
+        "acceptedAnswers": [
+          "I draw a picture with my pencil.",
+          "I draw a picture with a pencil."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "I draw a picture with my pencil.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "l1ErrorType": "spelling_consonant (p written as b: bencil for pencil)"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-A-6",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Open your books at paper ten, please.",
+        "answerKey": "Open your books at page ten, please.",
+        "acceptedAnswers": [
+          "Open your books at page ten, please."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "Open your books at page ten, please.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "l1ErrorType": "lexical_l1_transfer (Arabic waraqa = paper/page: paper for page)"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-A-7",
+        "type": "free_production",
+        "prompt": "Write one sentence about something in your school bag.",
+        "answerKey": "classroom noun",
+        "acceptedAnswers": [
+          "pen",
+          "pencil",
+          "book",
+          "notebook",
+          "ruler",
+          "rubber",
+          "eraser",
+          "pencil case",
+          "dictionary",
+          "calculator"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "classroom noun",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-A-8",
+        "type": "free_production",
+        "prompt": "Write one sentence about something on the classroom wall.",
+        "answerKey": "classroom noun",
+        "acceptedAnswers": [
+          "board",
+          "clock",
+          "map",
+          "poster",
+          "picture",
+          "calendar"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "classroom noun",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-A-9",
+        "type": "transfer",
+        "prompt": "Teacher's note: 'Bring a ____ to draw straight lines.' One word.",
+        "answerKey": "ruler",
+        "acceptedAnswers": [
+          "ruler"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "ruler",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "rubric": "VOCABULARY variant (transfer, SCORING_RUBRIC §2.3/§2.4): 2 = the target word (answerKey or a variant listed in acceptedAnswers) used with the right meaning for the task; 1 = the right word misspelt or in the wrong form; 0 = no target word, the word used with the wrong meaning, or the task not done. Other errors are not scored."
+      }
+    ],
+    "B": [
+      {
+        "id": "EN-F-A1-VO-classroom-objects-B-1",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: I cut the paper with a pair of ____ .",
+        "answerKey": "scissors",
+        "acceptedAnswers": [
+          "scissors"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "scissors",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-B-2",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: The teacher hangs the world ____ on the wall.",
+        "answerKey": "map",
+        "acceptedAnswers": [
+          "map"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "map",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-B-3",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (bag / board / window): Please put your ____ on the floor and sit down.",
+        "answerKey": "bag",
+        "acceptedAnswers": [
+          "bag"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "bag",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-B-4",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (pencil / chair / door): I need to sharpen my ____ before the drawing lesson.",
+        "answerKey": "pencil",
+        "acceptedAnswers": [
+          "pencil"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "pencil",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-B-5",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I write my name with my ben.",
+        "answerKey": "I write my name with my pen.",
+        "acceptedAnswers": [
+          "I write my name with my pen.",
+          "I write my name with a pen."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "I write my name with my pen.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "l1ErrorType": "spelling_consonant (p written as b: ben for pen)"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-B-6",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: In class, I put my books on my office.",
+        "answerKey": "In class, I put my books on my desk.",
+        "acceptedAnswers": [
+          "In class, I put my books on my desk."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "In class, I put my books on my desk.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "l1ErrorType": "lexical_l1_transfer (Arabic maktab = desk/office: office for desk)"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-B-7",
+        "type": "free_production",
+        "prompt": "Write one sentence about something you use in class every day.",
+        "answerKey": "classroom noun",
+        "acceptedAnswers": [
+          "pen",
+          "pencil",
+          "book",
+          "notebook",
+          "ruler",
+          "rubber",
+          "eraser",
+          "laptop",
+          "dictionary",
+          "calculator"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "classroom noun",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-B-8",
+        "type": "free_production",
+        "prompt": "Write one sentence about the furniture in your classroom.",
+        "answerKey": "classroom noun",
+        "acceptedAnswers": [
+          "desk",
+          "desks",
+          "chair",
+          "chairs",
+          "table",
+          "tables",
+          "cupboard",
+          "shelf"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "classroom noun",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-B-9",
+        "type": "transfer",
+        "prompt": "Teacher's note: 'Bring a ____ to do the maths sums.' One word.",
+        "answerKey": "calculator",
+        "acceptedAnswers": [
+          "calculator"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "calculator",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "rubric": "VOCABULARY variant (transfer, SCORING_RUBRIC §2.3/§2.4): 2 = the target word (answerKey or a variant listed in acceptedAnswers) used with the right meaning for the task; 1 = the right word misspelt or in the wrong form; 0 = no target word, the word used with the wrong meaning, or the task not done. Other errors are not scored."
+      }
+    ],
+    "C": [
+      {
+        "id": "EN-F-A1-VO-classroom-objects-C-1",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: I check new words in my English ____ .",
+        "answerKey": "dictionary",
+        "acceptedAnswers": [
+          "dictionary"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "dictionary",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-C-2",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: We look at the time on the ____ above the board.",
+        "answerKey": "clock",
+        "acceptedAnswers": [
+          "clock"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "clock",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-C-3",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (chair / pencil / map): Please sit on your ____ and look at me.",
+        "answerKey": "chair",
+        "acceptedAnswers": [
+          "chair"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "chair",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-C-4",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (window / ruler / bag): The room is hot. Please open the ____ .",
+        "answerKey": "window",
+        "acceptedAnswers": [
+          "window"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "window",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-C-5",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I write my name on the baper.",
+        "answerKey": "I write my name on the paper.",
+        "acceptedAnswers": [
+          "I write my name on the paper.",
+          "I write my name on paper."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "I write my name on the paper.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "l1ErrorType": "spelling_consonant (p written as b: baper for paper)"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-C-6",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: I borrow books from the school bookshop every week.",
+        "answerKey": "I borrow books from the school library every week.",
+        "acceptedAnswers": [
+          "I borrow books from the school library every week."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "I borrow books from the school library every week.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "l1ErrorType": "lexical_l1_transfer (Arabic maktaba = library/bookshop: bookshop for library)"
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-C-7",
+        "type": "free_production",
+        "prompt": "Write one sentence about something in your pencil case.",
+        "answerKey": "classroom noun",
+        "acceptedAnswers": [
+          "pen",
+          "pencil",
+          "ruler",
+          "rubber",
+          "eraser",
+          "sharpener",
+          "scissors",
+          "glue"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "classroom noun",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-C-8",
+        "type": "free_production",
+        "prompt": "Write one sentence about something at the front of the classroom.",
+        "answerKey": "classroom noun",
+        "acceptedAnswers": [
+          "board",
+          "whiteboard",
+          "desk",
+          "table",
+          "screen",
+          "clock",
+          "map"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "classroom noun",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-classroom-objects-C-9",
+        "type": "transfer",
+        "prompt": "Teacher's note: 'Bring a ____ to keep your pencils in.' Two words.",
+        "answerKey": "pencil case",
+        "acceptedAnswers": [
+          "pencil case",
+          "pencil-case",
+          "pencilcase"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "pencil case",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (school/classroom); Cambridge A1 Starters/Movers-style items",
+        "rubric": "VOCABULARY variant (transfer, SCORING_RUBRIC §2.3/§2.4): 2 = the target word (answerKey or a variant listed in acceptedAnswers) used with the right meaning for the task; 1 = the right word misspelt or in the wrong form; 0 = no target word, the word used with the wrong meaning, or the task not done. Other errors are not scored."
+      }
+    ]
+  }
+}

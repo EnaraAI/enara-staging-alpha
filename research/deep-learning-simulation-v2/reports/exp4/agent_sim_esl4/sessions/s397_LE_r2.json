@@ -1,0 +1,670 @@
+{
+ "arm": "LE",
+ "rep": 2,
+ "learnerIdx": 397,
+ "seed": "esl4|L397|rep2",
+ "state": {
+  "form": "copula",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 3
+  }
+ },
+ "start": {
+  "form": "copula",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "entries": [],
+ "v2": {
+  "beliefs": [],
+  "worked": []
+ },
+ "turns": [
+  {
+   "session": 1,
+   "learner": "Hello! Can you give me an exercise on am, is and are?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "present_lesson_item",
+    "fade_support",
+    "independent_practice"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Sure. Here is the first one. Fill in the gap with the correct form of be:\n\nWrite am, is or are: I ___ a student. (answer with only the missing word)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on am, is and are?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure. Here is the first one. Fill in the gap with the correct form of be:\n\nWrite am, is or are: I ___ a student. (answer with only the missing word)",
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "am",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "am"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"am\".\nNow a harder one, on your own. Here no gap is shown, so you must find where the word goes:\nWrite the sentence again with the missing word: Ahmed tired.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure. Here is the first one. Fill in the gap with the correct form of be:\n\nWrite am, is or are: I ___ a student. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nam\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"am\".\nNow a harder one, on your own. Here no gap is shown, so you must find where the word goes:\nWrite the sentence again with the missing word: Ahmed tired.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"am\"."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"am\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "am"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "am"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "is",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "is"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "You have the right word: \"is\" is the form of be this sentence needs. Let us sharpen one part.\nThis task is different from the gap exercise. There is no gap shown, so the answer is the whole sentence, with the missing word placed where it belongs. A single word does not show where it goes.\nThink about where be usually sits in a short sentence like this: between who the sentence is about and the word that describes them.\nPlease write the full sentence again, with the missing word in its place:\nAhmed tired.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"am\".\nNow a harder one, on your own. Here no gap is shown, so you must find where the word goes:\nWrite the sentence again with the missing word: Ahmed tired.\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYou have the right word: \"is\" is the form of be this sentence needs. Let us sharpen one part.\nThis task is different from the gap exercise. There is no gap shown, so the answer is the whole sentence, with the missing word placed where it belongs. A single word does not show where it goes.\nThink about where be usually sits in a short sentence like this: between who the sentence is about and the word that describes them.\nPlease write the full sentence again, with the missing word in its place:\nAhmed tired.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "You have the right word: \"is\" is the form of be this sentence needs."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"is\" is the form of be this sentence needs."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "You have the right word"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Ahmed is tired.",
+    "errors": {
+     "W1": "Ahmed tired."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Ahmed is tired.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Ahmed is tired."
+   },
+   "moves": [
+    "reteach_simpler",
+    "fade_support",
+    "comprehension_check"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"Ahmed is tired.\" The missing word is in the right place, between the subject and the describing word, and the sentence is complete.\nNow state the rule in your own words, in one short sentence: what does a sentence like this always need, and where does it go?",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou have the right word: \"is\" is the form of be this sentence needs. Let us sharpen one part.\nThis task is different from the gap exercise. There is no gap shown, so the answer is the whole sentence, with the missing word placed where it belongs. A single word does not show where it goes.\nThink about where be usually sits in a short sentence like this: between who the sentence is about and the word that describes them.\nPlease write the full sentence again, with the missing word in its place:\nAhmed tired.\n\nLEARNER'S LAST MESSAGE:\nAhmed is tired.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"Ahmed is tired.\" The missing word is in the right place, between the subject and the describing word, and the sentence is complete.\nNow state the rule in your own words, in one short sentence: what does a sentence like this always need, and where does it go?",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"Ahmed is tired.\""
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I think: a present sentence like \"She is a teacher\" needs am/is/are.",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a present sentence like \"She is a teacher\" needs am/is/are."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Remember: a sentence like \"She is a teacher\" always needs am, is or are, placed between the subject and what describes it.\nNow a freer task. Write one sentence of your own about two or more people in your family, using the right form of be.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"Ahmed is tired.\" The missing word is in the right place, between the subject and the describing word, and the sentence is complete.\nNow state the rule in your own words, in one short sentence: what does a sentence like this always need, and where does it go?\n\nLEARNER'S LAST MESSAGE:\nI think: a present sentence like \"She is a teacher\" needs am/is/are.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nRemember: a sentence like \"She is a teacher\" always needs am, is or are, placed between the subject and what describes it.\nNow a freer task. Write one sentence of your own about two or more people in your family, using the right form of be.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like \"She is a teacher\" always needs am, is or are"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My parents are kind.",
+    "errors": {
+     "W1": "My parents kind.",
+     "W2": "My parents is kind."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise am, is and are again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "activate_prior_knowledge",
+    "fade_support",
+    "independent_practice"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Absolutely. Since you know the basics, let's push a bit further.\n\nThe tricky cases are usually subjects where the head noun is not right next to the verb, or where the subject looks plural but is grammatically singular. For example: \"The list of names is on the desk\" (the head is list, so is), and \"Neither of the answers is perfect\" (formally singular, though are is common in speech).\n\nYour task: write two sentences of your own. In one, put a long phrase between the subject and am, is or are. In the other, use a subject like \"everyone\", \"the news\" or \"each of\". Then tell me in a few words what made you choose that form.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nAbsolutely. Since you know the basics, let's push a bit further.\n\nThe tricky cases are usually subjects where the head noun is not right next to the verb, or where the subject looks plural but is grammatically singular. For example: \"The list of names is on the desk\" (the head is list, so is), and \"Neither of the answers is perfect\" (formally singular, though are is common in speech).\n\nYour task: write two sentences of your own. In one, put a long phrase between the subject and am, is or are. In the other, use a subject like \"everyone\", \"the news\" or \"each of\". Then tell me in a few words what made you choose that form.",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The list of names on my desk is long.",
+    "errors": {
+     "W1": "The list of names on my desk long."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The list of names on my desk is long.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "The list of names on my desk is long."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"The list of names on my desk is long.\" You matched the verb to the head noun, list, and ignored the plural names in the phrase in between. That is exactly the trap this pattern sets.\n\nLet's keep going with a quick item from the lesson:\nWrite am, is or are: I ___ a student. (answer with only the missing word)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nAbsolutely. Since you know the basics, let's push a bit further.\n\nThe tricky cases are usually subjects where the head noun is not right next to the verb, or where the subject looks plural but is grammatically singular. For example: \"The list of names is on the desk\" (the head is list, so is), and \"Neither of the answers is perfect\" (formally singular, though are is common in speech).\n\nYour task: write two sentences of your own. In one, put a long phrase between the subject and am, is or are. In the other, use a subject like \"everyone\", \"the news\" or \"each of\". Then tell me in a few words what made you choose that form.\n\nLEARNER'S LAST MESSAGE:\nThe list of names on my desk is long.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"The list of names on my desk is long.\" You matched the verb to the head noun, list, and ignored the plural names in the phrase in between. That is exactly the trap this pattern sets.\n\nLet's keep going with a quick item from the lesson:\nWrite am, is or are: I ___ a student. (answer with only the missing word)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"The list of names on my desk is long.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "am",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "am"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"am\". With I as the subject, the only present form of be is am.\n\nThat item is easy for you, so here is a harder one to do on your own. When two subjects are joined by \"either ... or\", the verb usually agrees with the subject nearer to it.\n\nFill the gap with am, is or are, and then add one short sentence saying why that form fits:\n\nEither my brothers or I ___ cooking dinner tonight.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"The list of names on my desk is long.\" You matched the verb to the head noun, list, and ignored the plural names in the phrase in between. That is exactly the trap this pattern sets.\n\nLet's keep going with a quick item from the lesson:\nWrite am, is or are: I ___ a student. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nam\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"am\". With I as the subject, the only present form of be is am.\n\nThat item is easy for you, so here is a harder one to do on your own. When two subjects are joined by \"either ... or\", the verb usually agrees with the subject nearer to it.\n\nFill the gap with am, is or are, and then add one short sentence saying why that form fits:\n\nEither my brothers or I ___ cooking dinner tonight.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"am\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"am\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "am",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "am"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "closingAsk": "deferred",
+   "profileLines": 0,
+   "tutor": "Correct: \"am\". Well judged on a genuinely tricky item.\n\nYou left out the explanation, though, and that is the part that shows the reasoning. or\"?",
+   "raw": "Correct: \"am\". Well judged on a genuinely tricky item.\n\nYou left out the explanation, though, and that is the part that shows the reasoning. Tell me the rule in your own words, in one short sentence: what decides the verb when two subjects are joined by \"either ... or\"?",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": true,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"am\". With I as the subject, the only present form of be is am.\n\nThat item is easy for you, so here is a harder one to do on your own. When two subjects are joined by \"either ... or\", the verb usually agrees with the subject nearer to it.\n\nFill the gap with am, is or are, and then add one short sentence saying why that form fits:\n\nEither my brothers or I ___ cooking dinner tonight.\n\nLEARNER'S LAST MESSAGE:\nam\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"am\". Well judged on a genuinely tricky item.\n\nYou left out the explanation, though, and that is the part that shows the reasoning. or\"?",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"am\"."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: a present sentence like \"She is a teacher\" needs am/is/are.",
+   "production": {
+    "kind": "rule",
+    "text": "I think: a present sentence like \"She is a teacher\" needs am/is/are."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "closingAsk": "deferred",
+   "profileLines": 0,
+   "tutor": "That statement is true, but it is the general rule, not the reason for your choice in the either ... or item.\nLet's close the unit here. Recap: the copula is never dropped, and it agrees with its subject, the head noun, as in your \"The list of names on my desk is long.\" With either ... or, it agrees with the nearer subject.",
+   "raw": "That statement is true, but it is the general rule, not the reason for your choice in the either ... or item.\nLet's close the unit here. Recap: the copula is never dropped, and it agrees with its subject, the head noun, as in your \"The list of names on my desk is long.\" With either ... or, it agrees with the nearer subject.\nTell me the rule in your own words.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": true,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"am\". Well judged on a genuinely tricky item.\n\nYou left out the explanation, though, and that is the part that shows the reasoning. or\"?\n\nLEARNER'S LAST MESSAGE:\nI think: a present sentence like \"She is a teacher\" needs am/is/are.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat statement is true, but it is the general rule, not the reason for your choice in the either ... or item.\nLet's close the unit here. Recap: the copula is never dropped, and it agrees with its subject, the head noun, as in your \"The list of names on my desk is long.\" With either ... or, it agrees with the nearer subject.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "the copula is never dropped"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "it agrees with its subject, the head noun"
+    }
+   ],
+   "next_task": {
+    "kind": "none"
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  }
+ ],
+ "stateAfterS1": {
+  "form": "copula",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 1
+  }
+ }
+}

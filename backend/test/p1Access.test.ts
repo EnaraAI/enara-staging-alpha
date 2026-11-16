@@ -84,13 +84,15 @@ const newCurriculum = (w: Who, over: object = {}) => w.post('/api/curriculums', 
 describe('role permission defaults', () => {
   it('matches the pilot matrix; there is no content-creator role', async () => {
     const { USER_ROLES } = await import('../src/auth/roles');
-    expect(USER_ROLES).toEqual(['student', 'teacher', 'academic_manager', 'admin', 'enara-admin']);
+    // 'parent' (Parents Portal MVP) holds no permissions, even with stored grants.
+    expect(USER_ROLES).toEqual(['student', 'teacher', 'academic_manager', 'admin', 'enara-admin', 'parent']);
     expect(USER_ROLES.some((r) => /content/.test(r))).toBe(false);
     const of = (role: string, permissions?: string[]) => [...P.permissionsFor({ role: role as never, permissions })].sort();
     expect(of('teacher')).toEqual(['class:teach', 'content:author', 'content:publish']);
     expect(of('academic_manager')).toEqual(['insights:read_school']);
     expect(of('admin')).toEqual(['class:teach', 'content:author', 'content:manage_school', 'content:publish', 'insights:read_school', 'workspace:billing', 'workspace:users']);
     expect(of('student', ['content:author'])).toEqual([]);
+    expect(of('parent', ['content:author', 'insights:read_school'])).toEqual([]);
     expect(of('admin', ['cost:internal'])).not.toContain('cost:internal');
     expect(of('enara-admin')).toContain('cost:internal');
   });

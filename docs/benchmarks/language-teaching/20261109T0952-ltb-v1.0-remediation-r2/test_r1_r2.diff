@@ -1,0 +1,30 @@
+--- docs/benchmarks/language-teaching/20261109T0952-ltb-v1.0-remediation-r2/pre_edit_code_snapshot/languageTeachingRemediation.test.ts	2026-11-09 09:53:12.687001373 +0000
++++ backend/test/languageTeachingRemediation.test.ts	2026-11-09 10:00:48.232479787 +0000
+@@ -90,11 +90,15 @@
+     expect(prompt).toContain('aimed only at the gap');
+   });
+ 
+-  it('a second wrong attempt allows showing the model answer (explanation is not withheld forever)', () => {
++  // ltc-v1-r2 replaced r1's "show the model on attempt 2" with a strategy shift
++  // and a bounded exit (see languageTeachingR2.test.ts). An unmatched second
++  // attempt gets feedback plus the conditional repeated-error policy.
++  it('a second attempt with nothing matchable gets feedback with the conditional repeated-error policy, not an automatic reveal', () => {
+     const h = [u('exercise'), EXERCISE, u('She is twelve'), a('Close! Think: brother = boy. Try again: ___ is twelve.')];
+     const r = movesFor('it is twelve', h);
+     expect(r.ids).toContain('corrective_feedback_retry');
+-    expect(r.reasons).toContain('attempt_2_plus_show_model_if_still_wrong');
++    expect(r.reasons).toContain('recurrence_unknown');
++    expect(r.ids).not.toContain('answer_with_reasoning');
+   });
+ 
+   it('hints-only assignment policy never gives the answer, even after attempts', () => {
+@@ -321,7 +325,8 @@
+     const missed = new Set<string>(agg.deterministicChecks.expected_move_any.failedCases);
+     const feedback = raw.filter((r) => missed.has(r.caseId) && /^T0[3-8]/.test(cases.get(r.caseId).caseType));
+     expect(feedback).toHaveLength(23);
+-    for (const r of feedback) expect(replay(r).last.ids, r.caseId).toContain('corrective_feedback_retry');
++    // r2: a repeated flagged error gets the strategy shift (reteach_simpler) instead.
++    for (const r of feedback) expect(replay(r).last.ids.some((m) => m === 'corrective_feedback_retry' || m === 'reteach_simpler'), r.caseId).toBe(true);
+   });
+ 
+   it('all 9 T13 answer requests now get a hint before any attempt', () => {

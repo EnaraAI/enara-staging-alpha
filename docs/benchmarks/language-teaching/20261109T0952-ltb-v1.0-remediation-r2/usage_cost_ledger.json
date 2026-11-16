@@ -1,0 +1,37 @@
+{
+  "run": "ltc-v1-r2 primary",
+  "prices": "repo priceCatalog.ts current version (Opus 5.5 $4/$20/$0.20 cr; Sonnet 5.5 $2/$10 per MTok)",
+  "tutor": {
+    "model": "claude-opus-5-5",
+    "attempts": 219,
+    "errors": 0,
+    "inputTokens": 420278,
+    "outputTokens": 54237,
+    "cacheRead": 34952,
+    "cacheWrite": 514,
+    "costUsd": 2.775426,
+    "latencyMsMedian": 3190,
+    "latencyMsP95": 5075,
+    "servedModels": [
+      "claude-opus-5-5"
+    ]
+  },
+  "judge": {
+    "model": "claude-sonnet-5-5",
+    "attempts": 132,
+    "errors": 0,
+    "inputTokens": 471585,
+    "outputTokens": 77265,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "costUsd": 1.71582,
+    "latencyMsMedian": 4733,
+    "latencyMsP95": 5796,
+    "servedModels": [
+      "claude-sonnet-5-5"
+    ]
+  },
+  "diagnosticPaidCalls": 0,
+  "reconciliation": "Harness meters (run_status.json meteredUsd, judge_status.json meteredUsd) equal the per-attempt ledger sums; no failed attempts; app UsageLedger lived in the throwaway DB (discarded by design).",
+  "totalUsd": 4.491246
+}

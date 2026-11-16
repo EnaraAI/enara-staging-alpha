@@ -1,0 +1,942 @@
+{
+ "arm": "LE",
+ "rep": 2,
+ "learnerIdx": 514,
+ "seed": "esl5|L514|rep2",
+ "state": {
+  "form": "thirdS",
+  "band": "A1",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 3,
+   "C2": 1
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  }
+ },
+ "start": {
+  "form": "thirdS",
+  "band": "A1",
+  "primary": "W1",
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "rec": {
+  "entries": [
+   {
+    "code": "missing_third_person_s",
+    "occurrences": 1,
+    "lastSeenAt": "2027-01-11T09:02:00.000Z",
+    "independentStreak": 0,
+    "nextReviewAt": "2027-01-12T09:02:00.000Z"
+   }
+  ],
+  "liveErrors": {},
+  "knownPoints": {}
+ },
+ "turns": [
+  {
+   "session": 1,
+   "learner": "Hello! Can you give me an exercise on he, she and it with -s?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "present_lesson_item",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": true,
+   "rulesIntroduced": [
+    1
+   ],
+   "profileLines": 0,
+   "ev5": {},
+   "engineVerdict": "NOT_EVALUATED",
+   "recordLive": [],
+   "tutor": "Hello! Here is an example.\nI work. She works.\nStep: the person is \"she\", so I add -s. Work becomes works.\nThe rule: with he, she or it, the verb ends in -s.\nRight: He works every day. Wrong: He work every day.\n\nNow try this one. Write only the verb:\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 0: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on he, she and it with -s?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! Here is an example.\nI work. She works.\nStep: the person is \"she\", so I add -s. Work becomes works.\nThe rule: with he, she or it, the verb ends in -s.\nRight: He works every day. Wrong: He work every day.\n\nNow try this one. Write only the verb:\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The rule: with he, she or it, the verb ends in -s."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: He works every day. Wrong: He work every day."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "play",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "play"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "ev5": {},
+   "engineVerdict": "INCORRECT",
+   "recordLive": [],
+   "tutor": "Not yet. You wrote \"play\".\nLook at this pair:\nRight: She sleeps late. Wrong: She sleep late.\nThe wrong one has no -s after \"she\".\nWho plays tennis in your sentence? Look at the first two words.\nCompare, then try again. Write only the verb:\nMy sister ___ (play) tennis on Sundays.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 0: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Here is an example.\nI work. She works.\nStep: the person is \"she\", so I add -s. Work becomes works.\nThe rule: with he, she or it, the verb ends in -s.\nRight: He works every day. Wrong: He work every day.\n\nNow try this one. Write only the verb:\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nplay\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nNot yet. You wrote \"play\".\nLook at this pair:\nRight: She sleeps late. Wrong: She sleep late.\nThe wrong one has no -s after \"she\".\nWho plays tennis in your sentence? Look at the first two words.\nCompare, then try again. Write only the verb:\nMy sister ___ (play) tennis on Sundays.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: She sleeps late. Wrong: She sleep late."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   },
+   "applied": [
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "plays",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "plays"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "ev5": {},
+   "engineVerdict": "CORRECT",
+   "recordLive": [
+    "missing_third_person_s"
+   ],
+   "tutor": "Yes, \"plays\" is right now. Good fix.\nThe first two words, \"My sister\", are like \"she\", so the verb gets -s.\nTell me the rule in your own words, in one short sentence.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 0: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot yet. You wrote \"play\".\nLook at this pair:\nRight: She sleeps late. Wrong: She sleep late.\nThe wrong one has no -s after \"she\".\nWho plays tennis in your sentence? Look at the first two words.\nCompare, then try again. Write only the verb:\nMy sister ___ (play) tennis on Sundays.\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"plays\" is right now. Good fix.\nThe first two words, \"My sister\", are like \"she\", so the verb gets -s.\nTell me the rule in your own words, in one short sentence.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"plays\" is right now."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"My sister\", are like \"she\", so the verb gets -s."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I think the verb does not change after he/she/it.",
+   "production": {
+    "kind": "rule",
+    "text": "I think the verb does not change after he/she/it."
+   },
+   "moves": [
+    "answer_with_reasoning",
+    "comprehensible_model",
+    "comprehension_check"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "closingAsk": "deferred",
+   "profileLines": 0,
+   "ev5": {
+    "answerReleased": true
+   },
+   "engineVerdict": "INCORRECT",
+   "recordLive": [
+    "missing_third_person_s"
+   ],
+   "tutor": "Not quite. After he, she or it, the verb changes: it gets -s.\nTry again.",
+   "raw": "Not quite. After he, she or it, the verb changes: it gets -s.\nTry again. Say the rule in your own words, in one short sentence.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": true,
+   "twoAsks": false,
+   "twoAsksRaw": true,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is right now. Good fix.\nThe first two words, \"My sister\", are like \"she\", so the verb gets -s.\nTell me the rule in your own words, in one short sentence.\n\nLEARNER'S LAST MESSAGE:\nI think the verb does not change after he/she/it.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nNot quite. After he, she or it, the verb changes: it gets -s.\nTry again.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, the verb changes: it gets -s."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I think the verb does not change after he/she/it.",
+   "production": {
+    "kind": "rule",
+    "text": "I think the verb does not change after he/she/it."
+   },
+   "moves": [
+    "answer_with_reasoning",
+    "comprehensible_model",
+    "comprehension_check"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "ev5": {
+    "answerReleased": true
+   },
+   "engineVerdict": "INCORRECT",
+   "recordLive": [
+    "missing_third_person_s"
+   ],
+   "tutor": "That part is not right. After he, she or it, the verb is not the same: it gets -s.\nExample: I sit. She sits.\nPlease say the rule again, in one short sentence.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": true,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot quite. After he, she or it, the verb changes: it gets -s.\nTry again.\n\nLEARNER'S LAST MESSAGE:\nI think the verb does not change after he/she/it.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat part is not right. After he, she or it, the verb is not the same: it gets -s.\nExample: I sit. She sits.\nPlease say the rule again, in one short sentence.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, the verb is not the same: it gets -s."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise he, she and it with -s again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "activate_prior_knowledge",
+    "short_explanation",
+    "comprehensible_model",
+    "comprehension_check"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": true,
+   "rulesIntroduced": [
+    1
+   ],
+   "profileLines": 2,
+   "ev5": {
+    "reviewOpen": [
+     "missing_third_person_s"
+    ]
+   },
+   "engineVerdict": "NOT_EVALUATED",
+   "recordLive": [
+    "missing_third_person_s"
+   ],
+   "tutor": "Hello! Yes, we can practise that today.\n\nStart with this one from memory. Complete the sentence:\n\nShe ___ (eat) an apple every day.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! Yes, we can practise that today.\n\nStart with this one from memory. Complete the sentence:\n\nShe ___ (eat) an apple every day.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   },
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "eats",
+    "errors": {
+     "W1": "eat"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "eats",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "eats"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 2,
+   "ev5": {},
+   "engineVerdict": "CORRECT",
+   "recordLive": [
+    "missing_third_person_s"
+   ],
+   "tutor": "Good, \"eats\" is correct.\n\nLet's do one from the lesson now:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, we can practise that today.\n\nStart with this one from memory. Complete the sentence:\n\nShe ___ (eat) an apple every day.\n\nLEARNER'S LAST MESSAGE:\neats\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGood, \"eats\" is correct.\n\nLet's do one from the lesson now:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Good, \"eats\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Good, \"eats\" is correct."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "plays",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "plays"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 2,
+   "ev5": {
+    "ownSentence": "asked"
+   },
+   "engineVerdict": "CORRECT",
+   "recordLive": [
+    "missing_third_person_s"
+   ],
+   "tutor": "Yes, \"plays\" is correct. Good work with this one.\n\nNow I want your own sentence. Think of a person you know. Write one sentence about a thing he or she does often. Remember the ending on the verb.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, \"eats\" is correct.\n\nLet's do one from the lesson now:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"plays\" is correct. Good work with this one.\n\nNow I want your own sentence. Think of a person you know. Write one sentence about a thing he or she does often. Remember the ending on the verb.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"plays\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"plays\" is correct."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My mother watches TV every evening.",
+    "errors": {
+     "W1": "My mother watch TV every evening.",
+     "W2": "My mother watchs TV every evening."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My mother watch TV every evening.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My mother watch TV every evening."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 2,
+   "ev5": {
+    "ownSentence": "feedback"
+   },
+   "engineVerdict": "INCORRECT",
+   "recordLive": [
+    "missing_third_person_s"
+   ],
+   "tutor": "The verb in your sentence needs a look.\n\nCompare this pair:\nRight: He reads a book.\nWrong: He read a book.\nThe wrong one has no ending after \"he\".\n\n\"My mother\" is one person. Look at your verb again and write your sentence again.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is correct. Good work with this one.\n\nNow I want your own sentence. Think of a person you know. Write one sentence about a thing he or she does often. Remember the ending on the verb.\n\nLEARNER'S LAST MESSAGE:\nMy mother watch TV every evening.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe verb in your sentence needs a look.\n\nCompare this pair:\nRight: He reads a book.\nWrong: He read a book.\nThe wrong one has no ending after \"he\".\n\n\"My mother\" is one person. Look at your verb again and write your sentence again.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: He reads a book. Wrong: He read a book."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My mother watches TV every evening.",
+    "errors": {
+     "W1": "My mother watch TV every evening.",
+     "W2": "My mother watchs TV every evening."
+    }
+   },
+   "applied": [
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My mother watches TV every evening.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My mother watches TV every evening."
+   },
+   "moves": [
+    "answer_with_reasoning",
+    "comprehensible_model",
+    "comprehension_check"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "closingAsk": "added",
+   "profileLines": 2,
+   "ev5": {
+    "answerReleased": true
+   },
+   "engineVerdict": "INCORRECT",
+   "recordLive": [
+    "missing_third_person_s"
+   ],
+   "tutor": "Yes, \"watches\" is right now. \"My mother\" is one person, so the verb needs an ending.\n\nHere is a new one for you to do alone:\n\nThe bird ___ (sing) in the tree every morning.\n\nWrite only the verb.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": true,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe verb in your sentence needs a look.\n\nCompare this pair:\nRight: He reads a book.\nWrong: He read a book.\nThe wrong one has no ending after \"he\".\n\n\"My mother\" is one person. Look at your verb again and write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy mother watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"watches\" is right now. \"My mother\" is one person, so the verb needs an ending.\n\nHere is a new one for you to do alone:\n\nThe bird ___ (sing) in the tree every morning.\n\nWrite only the verb.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"watches\" is right now."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"watches\" is right now."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"My mother\" is one person, so the verb needs an ending."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "sings",
+    "errors": {
+     "W1": "sing"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  }
+ ],
+ "stateAfterS1": {
+  "form": "thirdS",
+  "band": "A1",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "recAfterS1": {
+  "entries": [
+   {
+    "code": "missing_third_person_s",
+    "occurrences": 1,
+    "lastSeenAt": "2027-01-11T09:02:00.000Z",
+    "independentStreak": 0,
+    "nextReviewAt": "2027-01-12T09:02:00.000Z"
+   }
+  ],
+  "liveErrors": {},
+  "knownPoints": {}
+ }
+}

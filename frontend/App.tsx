@@ -2,7 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { Login } from './pages/Login';
 import { AccountLink, accountLinkFromLocation } from './pages/AccountLink';
+import { DemoPortal } from './pages/DemoPortal';
 import { People } from './pages/workspace/People';
+import { LearnerAgeBands } from './pages/workspace/LearnerAgeBands';
 import { StudentDashboard } from './pages/StudentDashboard';
 import { CoursePage } from './pages/CoursePage';
 import { AdminDashboard } from './pages/AdminDashboard';
@@ -46,6 +48,9 @@ import { fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPl
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
+// Parents Portal: parent accounts only, under /parents. Loaded on demand.
+const ParentsApp = React.lazy(() => import('./parents/ParentsApp'));
+const onParentsPath = () => /^\/parents(\/|$)/.test(window.location.pathname);
 export const usesKidsApp = (role: string | null | undefined, user: Pick<SessionUser, 'role' | 'uiMode'> | null | undefined) =>
   role === 'student' && user?.role === 'student' && user?.uiMode === 'kids';
 import { KnowledgeMap } from './pages/KnowledgeMap';
@@ -173,6 +178,7 @@ const App: React.FC = () => {
       }
     }
 
+    if (role === 'parent' && !onParentsPath()) window.history.pushState({}, '', '/parents');
     setState(prev => ({ ...prev, role, page, activeAssessment }));
     setKidsMode(usesKidsApp(role, user));
     setUserName(user.name || user.email);
@@ -184,6 +190,7 @@ const App: React.FC = () => {
     setAssessments([]);
     setStudents([]);
     setKidsMode(false);
+    if (state.role === 'parent') window.history.replaceState({}, '', '/parents');
     setState(prev => ({ ...prev, role: null, page: 'courses', activeAssessment: null, selectedStudent: null }));
   };
 
@@ -282,13 +289,27 @@ const App: React.FC = () => {
   const accountLink = accountLinkFromLocation();
   if (accountLink) return <AccountLink kind={accountLink.kind} token={accountLink.token} />;
 
+ // Public partner demo: one-click sign-in into a fresh demo school.
+  if (!state.role && window.location.pathname.replace(/\/$/, '') === '/demo') {
+    return <DemoPortal onStart={handleLogin} />;
+  }
+
   if (!state.role) {
     return (
       <Login 
         onLogin={handleLogin} 
         isSharedCourse={!!state.sharedCourseId} 
         isSharedAssessment={!!state.sharedAssessmentId}
+        initialPortal={onParentsPath() ? 'parent' : undefined}
       />
+    );
+  }
+
+  if (state.role === 'parent') {
+    return (
+      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-slate-500">Loading…</div>}>
+        <ParentsApp userName={userName} onSignOut={handleLogout} />
+      </React.Suspense>
     );
   }
 
@@ -450,6 +471,8 @@ const App: React.FC = () => {
           {page === 'dashboard' && <InstitutionAnalytics />}
           {/* P4: read-only school outcome aggregates (no class filter, no student timeline). */}
           {page === 'dashboard' && <Outcomes allowClassFilter={false} showTimeline={false} />}
+          {/* Option B: read-only for academic managers (the server returns canEdit=false and rejects writes). */}
+          {page === 'age-bands' && <LearnerAgeBands />}
         </main>
       </div>
     );
@@ -545,6 +568,8 @@ const App: React.FC = () => {
           {/* P5: Workspace Admin only; the server enforces workspace:billing too. */}
           {state.page === 'usage' && sessionUser()?.role === 'admin' && <Usage />}
           {state.page === 'people' && (sessionUser()?.role === 'admin' || sessionUser()?.role === 'enara-admin') && <People />}
+          {/* Option B: Workspace Admin edits learner age bands; the server enforces it. */}
+          {state.page === 'age-bands' && sessionUser()?.role === 'admin' && <LearnerAgeBands />}
           {state.page === 'savings' && sessionUser()?.role === 'admin' && <SavingsCenter />}
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments />}
@@ -552,7 +577,7 @@ const App: React.FC = () => {
           {state.page === 'teaching' && <TeachingDashboard />}
           {state.page === 'lesson-planner' && <LessonPlanner />}
           {state.page === 'operations' && <div className="p-20 text-center text-slate-400">Operational Efficiency & Resource Management</div>}
-          {state.page === 'integrations' && <Integrations />}
+          {/* Integrations (API keys) is for Enara admins only. */}
           {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
           {state.page === 'governance' && <div className="p-20 text-center text-slate-400">Platform Governance & Security</div>}
           {state.page === 'compliance' && <div className="p-20 text-center text-slate-400">Accessibility & Compliance Audits</div>}

@@ -1,0 +1,30 @@
+{
+ "experimentId": "repeat-b",
+ "kind": "validation_campaign",
+ "seed": "enara-dls-v2-validation",
+ "students": 24,
+ "replications": 1,
+ "maxTurns": 6,
+ "adversarialShare": 0.25,
+ "models": {
+  "student": "claude-haiku-5-5",
+  "genericTutor": "claude-opus-5-5",
+  "judge": "claude-haiku-5-5"
+ },
+ "budgetCapUsd": 6,
+ "concurrency": 8,
+ "judgeRate": 0,
+ "ablate": [
+  "diagnosis",
+  "hint_ladder",
+  "teach_rule",
+  "rule_check",
+  "learner_history",
+  "transfer_check"
+ ],
+ "conditions": [
+  "B",
+  "F"
+ ],
+ "samples": 3
+}

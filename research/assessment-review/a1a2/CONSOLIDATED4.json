@@ -1,0 +1,492 @@
+{
+ "source": [
+  "rereview3_R1.json",
+  "rereview3_R2.json",
+  "rereview3_R3.json"
+ ],
+ "rule": "revise=true when >=2 distinct reviewers flagged the same target+issue; single-reviewer clear factual key errors also revised (singleReviewerFactual)",
+ "totals": {
+  "flagsPerReviewer": {
+   "R1": 6,
+   "R2": 6,
+   "R3": 12
+  },
+  "flags": 24,
+  "groups": 15,
+  "revise": 5,
+  "singleReviewerFactual": 10,
+  "noted": 0
+ },
+ "mergeDecisions": [
+  "R1-0, R2-1 and R3-7 (clothes B-4) merged as T01; R1-3, R2-3 and R3-5 (classroom C-6) as T02.",
+  "R2-0, R3-8 and R3-9 (jobs slot 6 grammar + A-6 cue) merged as T03: one fix (new slot-6 design) resolves both.",
+  "R1-4 (foggy level) and R3-10 (-ey not Arabic-L1, foggy above A2) merged as T05; R3-11 (weather tags/MATCHING) kept separate as T15 but fixed in the same edit.",
+  "R1-1 and R1-2 (phon_p_b) are one reviewer: T06, single-reviewer."
+ ],
+ "groups": [
+  {
+   "group": "T01",
+   "targets": [
+    "EN-F-A2-VO-clothes-shopping-B-4"
+   ],
+   "issue": "B-4 has no shop context, so 'waiting room' also fits",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 0,
+     "target": "EN-F-A2-VO-clothes-shopping-B-4",
+     "check": "C3",
+     "problem": "Prompt 'Where is the ____ room, please?' has no shop context, so 'waiting room' is also a correct, natural answer; key is not unique.",
+     "fix": "Add shop context, e.g. 'I want to try on these jeans. Where is the ____ room, please?', or replace 'waiting' with a non-viable distractor."
+    },
+    {
+     "reviewer": "R2",
+     "index": 1,
+     "target": "EN-F-A2-VO-clothes-shopping-B-4",
+     "check": "C3",
+     "problem": "'Where is the ____ room, please?' has no shop context, so 'waiting room' is also a correct, natural answer; the key is not unique.",
+     "fix": "Add shop context, e.g. 'I want to try on this dress. Where is the ____ room, please?' (keep changing / sleeping / waiting)."
+    },
+    {
+     "reviewer": "R3",
+     "index": 7,
+     "target": "EN-F-A2-VO-clothes-shopping-B-4",
+     "check": "C3",
+     "problem": "'Where is the ____ room, please?' has no shop context, so 'waiting room' is also a correct, natural answer; the item has two right keys.",
+     "fix": "Add context, e.g. 'I want to try on this dress. Where is the ____ room, please?', or replace 'waiting' with a distractor that cannot fit (e.g. 'sleeping / cooking')."
+    }
+   ]
+  },
+  {
+   "group": "T02",
+   "targets": [
+    "EN-F-A1-VO-classroom-objects-C-6"
+   ],
+   "issue": "C-6 does not accept 'in a notebook' like other slot 5-6 items",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 3,
+     "target": "EN-F-A1-VO-classroom-objects-C-6",
+     "check": "C3",
+     "problem": "acceptedAnswers lacks the article variant ('...in a notebook.') that A-5..C-5, A-6 and B-6 all accept; inconsistent key across parallel forms.",
+     "fix": "Add 'I do my homework in a notebook.' to acceptedAnswers."
+    },
+    {
+     "reviewer": "R2",
+     "index": 3,
+     "target": "EN-F-A1-VO-classroom-objects-C-6",
+     "check": "C4",
+     "problem": "A-5, A-6, B-5, B-6 and C-5 all accept an article/determiner variant ('with a pencil', 'in a dictionary', 'on paper'), but C-6 accepts only 'in my notebook'. 'I do my homework in a notebook.' is equally correct, so form C is stricter.",
+     "fix": "Add 'I do my homework in a notebook.' to acceptedAnswers."
+    },
+    {
+     "reviewer": "R3",
+     "index": 5,
+     "target": "EN-F-A1-VO-classroom-objects-C-6",
+     "check": "C4",
+     "problem": "Unlike A-5, A-6, B-5, B-6 and C-5, C-6 accepts only the 'my' version; 'I do my homework in a notebook.' is equally correct but would score 0. Parallel forms keyed unequally.",
+     "fix": "Add 'I do my homework in a notebook.' to acceptedAnswers."
+    }
+   ]
+  },
+  {
+   "group": "T03",
+   "targets": [
+    "EN-F-A2-VO-jobs-workplaces",
+    "EN-F-A2-VO-jobs-workplaces-A-6",
+    "EN-F-A2-VO-jobs-workplaces-B-6",
+    "EN-F-A2-VO-jobs-workplaces-C-6"
+   ],
+   "issue": "slot 6 tests article 'a' (grammar) in a vocabulary outcome; A-6 nurse/hospital cues A-1",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 0,
+     "target": "EN-F-A2-VO-jobs-workplaces-A-6",
+     "check": "C2",
+     "problem": "Slot 6 in all forms (A-6/B-6/C-6) now tests indefinite-article omission before a job noun, a grammar error, in a vocabulary outcome (jobs/workplaces). Round 3 removed copula omission from EN-F-A2-VO-weather slot 5 for exactly this reason, so the two vocabulary files now follow contradictory rules. A learner can fix it without knowing any job or workplace word.",
+     "fix": "Use a lexical error on the job/workplace word in slot 6 (e.g. Arabic-transfer 'doctor of teeth' -> dentist, or a job-noun spelling slip like 'enginear'), or state explicitly in the matching note and outcome that article-before-job-noun is part of this vocabulary outcome. Apply the same to B-6 and C-6."
+    },
+    {
+     "reviewer": "R3",
+     "index": 8,
+     "target": "EN-F-A2-VO-jobs-workplaces-A-6",
+     "check": "C4",
+     "problem": "A-6 'My mother is nurse in a big hospital' shows the word 'nurse' with 'hospital', which is the answer to A-1 ('A ____ works in a hospital and helps doctors'). Form A cues a controlled item; B-6 (waiter) and C-6 (farmer) do not cue a gap-fill answer in their forms.",
+     "fix": "Change the A-6 job to one not keyed elsewhere in form A, e.g. 'My mother is engineer in a big company.' -> 'an engineer' (also gives an/a variety) or 'pharmacist in a pharmacy'."
+    },
+    {
+     "reviewer": "R3",
+     "index": 9,
+     "target": "EN-F-A2-VO-jobs-workplaces",
+     "check": "C2",
+     "problem": "Round 3 made slot 6 an article_indef_omission item in all forms. Supplying 'a' before a job noun is a grammar target, not 'match common jobs to workplaces'; the same reasoning was used in round 3 to remove copula omission from weather slot 5. A learner can master the outcome and still lose this point (or vice versa).",
+     "fix": "Either accept it explicitly as an L1 collocation item in MATCHING with a stated rationale, or replace slot 6 with a job/workplace lexical error that has one fix direction (e.g. 'A pharmacist works in a pharmacist' -> pharmacy; 'a factory' vs 'a farm' confusion)."
+    }
+   ]
+  },
+  {
+   "group": "T04",
+   "targets": [
+    "EN-F-A1-GR-prepositions-place (outcomes.json)"
+   ],
+   "issue": "l1ErrorTypes article_def_misuse does not fit preposition transfer",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 5,
+     "target": "EN-F-A1-GR-prepositions-place (outcomes.json)",
+     "check": "C5",
+     "problem": "The only l1ErrorType is article_def_misuse. The typical Arabic-L1 error for in/on/under/next to is choosing the wrong preposition (fi/'ala transfer, e.g. 'in the table' for 'on the table'), not article misuse. The schema enum has no preposition value, so the tag is misleading.",
+     "fix": "Add a preposition enum value (e.g. prep_place_transfer) to schema.json and use it. If the schema cannot change, leave l1ErrorTypes empty and give the reason in a note, as was done for classroom-objects in re-review round 2."
+    },
+    {
+     "reviewer": "R3",
+     "index": 0,
+     "target": "EN-F-A1-GR-prepositions-place (outcomes.json)",
+     "check": "C5",
+     "problem": "l1ErrorTypes = article_def_misuse, but the outcome is choosing in/on/under/next to; the characteristic Arabic-L1 error here is preposition transfer (in/on confusion, e.g. 'in the table'), which has no schema enum. Article misuse is not the error this outcome targets.",
+     "fix": "Set l1ErrorTypes to [] (as done for classroom-objects in re-review 2) or add a preposition-transfer enum value to schema.json and use it."
+    }
+   ]
+  },
+  {
+   "group": "T05",
+   "targets": [
+    "EN-F-A2-VO-weather",
+    "EN-F-A2-VO-weather-A-5",
+    "EN-F-A2-VO-weather-B-5",
+    "EN-F-A2-VO-weather-C-5"
+   ],
+   "issue": "slot 5 '-ey' spellings not typical Arabic-L1; 'foggy' above A2",
+   "reviewers": [
+    "R1",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 4,
+     "target": "EN-F-A2-VO-weather-A-5",
+     "check": "C4",
+     "problem": "'foggy' is less frequent / higher-level (EVP B1) than 'cloudy' and 'snowy' (A2) used in B-5/C-5, so the forms are not equally difficult.",
+     "fix": "Use an A2 -y adjective not shown elsewhere in form A (e.g. 'windey' -> windy, if windy is not used elsewhere in A), or accept and document the difference."
+    },
+    {
+     "reviewer": "R3",
+     "index": 10,
+     "target": "EN-F-A2-VO-weather-A-5",
+     "check": "C7",
+     "problem": "Slot 5 plants '-ey' spellings (foggey, cloudey, snowey) tagged spelling_vowel. Arabic-L1 spelling transfer is typically vowel omission or i/e confusion (framework §9: short vowels unwritten, /ɪ/-/e/ merge), not adding an extra 'e'; '-ey' is an overgeneralisation possible but not the characteristic Arabic-L1 slip. Also 'foggy' is not EVP A1-A2 (fog A2, foggy higher), so A-5 is a harder word than cloudy/snowy (C1, C4).",
+     "fix": "Use realistic Arabic-L1 slips on A1-A2 weather adjectives, e.g. 'wendy' (i/e merge) / 'clody' / 'rany' / 'sny', one per form not shown elsewhere in that form; avoid 'foggy'."
+    }
+   ]
+  },
+  {
+   "group": "T06",
+   "targets": [
+    "EN-F-A1-VO-classroom-objects (outcomes.json)",
+    "EN-F-A1-VO-classroom-objects-A-5",
+    "EN-F-A1-VO-classroom-objects-B-5",
+    "EN-F-A1-VO-classroom-objects-C-5"
+   ],
+   "issue": "phon_p_b is audio-only but tags typed slot-5 spelling slips",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (tag -> spelling_vowel, the only typed-spelling enum value; consonant-spelling enum is a user decision) (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 1,
+     "target": "EN-F-A1-VO-classroom-objects (outcomes.json)",
+     "check": "C5",
+     "problem": "l1ErrorTypes includes phon_p_b, which docs/LEARNING_OUTCOMES.md defines as an audio-only type (NOT MEASURABLE YET); slot-5 items use it on typed text (bencil/ben/baper).",
+     "fix": "Either relabel slot 5 as spelling_vowel-style typed spelling error per the enum, or document that phon_p_b may be tagged on typed p/b spelling slips; keep outcome l1ErrorTypes consistent with that decision."
+    },
+    {
+     "reviewer": "R1",
+     "index": 2,
+     "target": "EN-F-A1-VO-classroom-objects-A-5",
+     "check": "C5",
+     "problem": "l1ErrorType phon_p_b is an audio-only enum type but is applied to a typed error-correction item (same for B-5, C-5).",
+     "fix": "Align with the decision for the outcome-level l1ErrorTypes (see classroom-objects outcomes.json flag)."
+    }
+   ]
+  },
+  {
+   "group": "T07",
+   "targets": [
+    "EN-F-A1-GR-capitals-full-stops",
+    "EN-F-A1-GR-capitals-full-stops-A-6",
+    "EN-F-A1-GR-capitals-full-stops-B-6",
+    "EN-F-A1-GR-capitals-full-stops-C-6"
+   ],
+   "issue": "item l1ErrorType 'missing_full_stop (run_on)' is not an enum value",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (-> run_on_and) (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 5,
+     "target": "EN-F-A1-GR-capitals-full-stops-A-6",
+     "check": "C5",
+     "problem": "l1ErrorType 'missing_full_stop (run_on)' is not a schema enum value; the enum value is run_on_and (same for B-6, C-6).",
+     "fix": "Use run_on_and (with the descriptive note in parentheses) or record the outcome as having no exact enum match."
+    }
+   ]
+  },
+  {
+   "group": "T08",
+   "targets": [
+    "EN-F-A1-VO-home-rooms",
+    "EN-F-A1-VO-home-rooms-C-9"
+   ],
+   "issue": "C-9 advert shows 'bathrooms' (C-1 key, C-5 correction)",
+   "reviewers": [
+    "R2"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 2,
+     "target": "EN-F-A1-VO-home-rooms",
+     "check": "C4",
+     "problem": "Form C item 9 ('Flat advert: 2 bathrooms, a ____ with a big sofa and TV') shows the word 'bathrooms', which is the answer to C-1 and the correction in C-5. That cues two items in form C, and forms A and B have no such cue. (C-2 itself is now fine.)",
+     "fix": "Change the C-9 advert to avoid a room word that is keyed elsewhere in form C, e.g. '3 bedrooms, a ____ with a big sofa and TV.' (bedroom is the C-3 key, so check that too), or 'Big flat: a ____ with a big sofa and TV.'"
+    }
+   ]
+  },
+  {
+   "group": "T09",
+   "targets": [
+    "placement:PL-A2-RD-03"
+   ],
+   "issue": "'a cafe near the station' and article-less 'cafe near station' not accepted",
+   "reviewers": [
+    "R2"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 4,
+     "target": "placement:PL-A2-RD-03",
+     "check": "C3",
+     "problem": "The accepted answers leave out two likely correct answers: 'a cafe near the station' and an answer with no articles, 'cafe near station'. Arabic-L1 learners often drop articles, and this is a reading item, not an article item.",
+     "fix": "Add 'a cafe near the station', 'a café near the station', 'cafe near station', 'café near station', or state that articles are ignored for this short-answer item."
+    }
+   ]
+  },
+  {
+   "group": "T10",
+   "targets": [
+    "EN-F-A1-VO-days-months",
+    "EN-F-A1-VO-days-months-A-5",
+    "EN-F-A1-VO-days-months-B-5",
+    "EN-F-A1-VO-days-months-C-5",
+    "EN-F-A1-VO-days-months-A-6",
+    "EN-F-A1-VO-days-months-B-6",
+    "EN-F-A1-VO-days-months-C-6"
+   ],
+   "issue": "prompt says 'the mistake' but sentence has spelling + capital errors",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 1,
+     "target": "EN-F-A1-VO-days-months",
+     "check": "C6",
+     "problem": "All six error-correction prompts say 'Find and correct the mistake' (singular), but each sentence has two errors (misspelling and lower-case initial: febuary, tusday, agust, wensday, septmber, thersday). A learner who fixes only the spelling gets 0 under case-sensitive matching without having been told there are two mistakes.",
+     "fix": "Change slot 5-6 prompts to 'Find and correct the mistakes (spelling and capital letter)', or capitalise the planted word so only the spelling is wrong."
+    }
+   ]
+  },
+  {
+   "group": "T11",
+   "targets": [
+    "EN-F-A1-VO-family",
+    "EN-F-A1-VO-family-A-5",
+    "EN-F-A1-VO-family-B-5",
+    "EN-F-A1-VO-family-C-5",
+    "EN-F-A1-VO-family-A-6",
+    "EN-F-A1-VO-family-B-6",
+    "EN-F-A1-VO-family-C-6"
+   ],
+   "issue": "slot 5-6 kin-word swaps are factual absurdities; MATCHING stale",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 2,
+     "target": "EN-F-A1-VO-family",
+     "check": "C7",
+     "problem": "Slots 5-6 plant kin-word swaps that are factual absurdities, not learner errors: 'My mother's mother is my aunt', 'My father's father is my uncle', 'My mother's father is my uncle', 'My father's brother is my cousin'. Arabic has precise kin terms (amm/khal/jadd), so an Arabic-L1 A1 learner who knows the relation would not plausibly write these; they test logic, not a realistic error. The MATCHING note still describes EC as Arabic periphrastic kinship ('the brother of my father'), which no item now uses (stale).",
+     "fix": "Rewrite slots 5-6 as realistic Arabic-L1 slips on the kin word (e.g. vowel omission/confusion 'cusin', 'grandmather', 'ant' for aunt, 'nefew') in a natural sentence, tag l1ErrorTypes spelling_vowel, and update the MATCHING note."
+    }
+   ]
+  },
+  {
+   "group": "T12",
+   "targets": [
+    "EN-F-A1-VO-food-drink-B-6"
+   ],
+   "issue": "B-6 yoghurt is not a plausible drink-for-eat transfer",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 3,
+     "target": "EN-F-A1-VO-food-drink",
+     "check": "C7",
+     "problem": "B-6 'My brother drinks his yoghurt with a spoon': in Egyptian Arabic spoon-eaten yoghurt (zabadi) is normally 'eaten' (yakul), so drink-for-eat is far less plausible here than for soup (A-6 soup, C-6 lentil soup). Slot 6 is therefore not equally realistic across forms.",
+     "fix": "Replace B-6 with another soup sentence (e.g. 'My brother drinks his vegetable soup with a spoon' -> eats)."
+    }
+   ]
+  },
+  {
+   "group": "T13",
+   "targets": [
+    "EN-F-A1-VO-food-drink (outcomes.json)"
+   ],
+   "issue": "l1ErrorTypes plural_s and MATCHING stale",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 4,
+     "target": "EN-F-A1-VO-food-drink",
+     "check": "C5",
+     "problem": "l1ErrorTypes = plural_s and MATCHING still says 'EC = plural_s error', but no error-correction item now plants a plural -s error (slot 5 = sound confusion, slot 6 = drink/eat). Tag is stale.",
+     "fix": "Set l1ErrorTypes to match the items (e.g. phon_vowel for soap/soup, peeper/pepper; drink/eat has no enum) and remove 'plural_s error' from MATCHING."
+    }
+   ]
+  },
+  {
+   "group": "T14",
+   "targets": [
+    "EN-F-A2-GR-much-many (outcomes.json)"
+   ],
+   "issue": "l1ErrorTypes plural_s stale",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 6,
+     "target": "EN-F-A2-GR-much-many",
+     "check": "C5",
+     "problem": "l1ErrorTypes = plural_s, but MATCHING says the plural -s item-6 design was replaced in round 1; no item now plants a plural -s error (slots 5-6 are much/many swaps).",
+     "fix": "Set l1ErrorTypes to [] (no enum for quantifier choice) or to a value that matches the items."
+    }
+   ]
+  },
+  {
+   "group": "T15",
+   "targets": [
+    "EN-F-A2-VO-weather (outcomes.json)"
+   ],
+   "issue": "l1ErrorTypes copula_omission and MATCHING stale",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 11,
+     "target": "EN-F-A2-VO-weather",
+     "check": "C5",
+     "problem": "l1ErrorTypes still = copula_omission, but round 3 removed copula omission from slot 5 and slot 6 is noun-for-adjective; no item now plants copula omission. MATCHING header also still says 'EC = copula_omission ... typical of Arabic L1'.",
+     "fix": "Set l1ErrorTypes to spelling_vowel (and the slot-6 type if an enum exists) and update the EC description at the start of MATCHING."
+    }
+   ]
+  }
+ ]
+}

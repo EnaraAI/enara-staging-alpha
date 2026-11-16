@@ -12,6 +12,9 @@ export function isEmailConfigured(): boolean {
 export async function sendEmail(params: { to: string; subject: string; html: string }): Promise<boolean> {
   const { email } = getConfig();
   if (!isEmailConfigured()) return false;
+  // Demo and test accounts use reserved .test addresses: never send to them
+  // (and a test inbox shouldn't fill up with demo-session reminders).
+  if (/\.test$/i.test(params.to.trim())) return false;
 
   const to = email.testRecipient || params.to;
   const html = email.testRecipient

@@ -1,0 +1,14 @@
+--- docs/benchmarks/language-teaching/20261109T0952-ltb-v1.0-remediation-r2/pre_edit_code_snapshot/TutorMessage.ts	2026-11-09 09:53:12.686961193 +0000
++++ backend/src/models/TutorMessage.ts	2026-11-09 09:57:24.780266334 +0000
+@@ -101,6 +101,11 @@
+           attemptsOnTask: Number,
+           offTopic: String,
+           lengthTarget: { type: { targetWords: Number, maxWords: Number, basis: String, _id: false }, default: undefined },
++          // ltc-v1-r2
++          errorRecurrence: String,
++          missingContext: { type: [String], default: undefined },
++          ageBand: String,
++          ageBandSource: String,
+           _id: false,
+         },
+         default: undefined,

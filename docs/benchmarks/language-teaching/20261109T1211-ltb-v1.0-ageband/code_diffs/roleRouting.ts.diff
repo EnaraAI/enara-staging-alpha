@@ -1,0 +1,20 @@
+--- docs/benchmarks/language-teaching/20261109T1211-ltb-v1.0-ageband/pre_edit_code_snapshot/roleRouting.ts	2026-11-09 12:11:00.631229406 +0000
++++ frontend/services/roleRouting.ts	2026-11-09 12:13:28.337971220 +0000
+@@ -35,7 +35,7 @@
+ // on their Teaching Dashboard instead of the school dashboard.
+ export const SCHOOL_ADMIN_PAGES = [
+   'dashboard', 'live-avatars', 'course-intelligence', 'institution-analytics', 'students',
+-  'credits', 'engagement', 'school-insights', 'learning-events', 'usage', 'savings', 'people',
++  'credits', 'engagement', 'school-insights', 'learning-events', 'usage', 'savings', 'people', 'age-bands',
+ ] as const;
+ 
+ export function staffPageAllowed(backendRole: string | undefined, page: string): boolean {
+@@ -49,7 +49,7 @@
+ // The pages of the academic manager portal: school-wide, read-only analytics
+ // (GET /api/analytics/*). Nothing that edits content, teaches, grades,
+ // administers users or budgets, or shows internal AI cost.
+-export const ACADEMIC_MANAGER_PAGES = [{ page: 'dashboard', label: 'School insights' }] as const;
++export const ACADEMIC_MANAGER_PAGES = [{ page: 'dashboard', label: 'School insights' }, { page: 'age-bands', label: 'Learner age bands (view)' }] as const;
+ 
+ export function academicManagerPage(page: string): string {
+   return ACADEMIC_MANAGER_PAGES.some((p) => p.page === page) ? page : 'dashboard';

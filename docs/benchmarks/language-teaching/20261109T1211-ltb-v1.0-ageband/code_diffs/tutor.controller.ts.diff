@@ -1,0 +1,11 @@
+--- docs/benchmarks/language-teaching/20261109T1211-ltb-v1.0-ageband/pre_edit_code_snapshot/tutor.controller.ts	2026-11-09 12:11:00.631150884 +0000
++++ backend/src/controllers/tutor.controller.ts	2026-11-09 12:11:45.204928026 +0000
+@@ -283,6 +283,8 @@
+     institutionId: session.institutionId,
+     curriculumId: resolvedCurriculumId,
+     lessonId: session.lessonId,
++    // Option B: the owner-checked session's student, for the trusted age band only.
++    studentId,
+     message: text.trim(),
+     history,
+     hintsOnly: tutorPolicy.policy === 'hints_only',

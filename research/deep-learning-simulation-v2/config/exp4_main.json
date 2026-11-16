@@ -1,0 +1,49 @@
+{
+ "experimentId": "exp4-main",
+ "kind": "experiment_4_main",
+ "seed": "enara-dls-v2-exp4-main",
+ "students": 50,
+ "replications": 1,
+ "maxTurns": 6,
+ "adversarialShare": 0.1,
+ "models": {
+  "student": "claude-haiku-5-5",
+  "genericTutor": "claude-opus-5-5",
+  "judge": "claude-haiku-5-5"
+ },
+ "budgetCapUsd": 150,
+ "concurrency": 18,
+ "judgeRate": 0.1,
+ "ablate": [],
+ "improve": [
+  "closing",
+  "strategy",
+  "coverage"
+ ],
+ "conditions": [
+  "A",
+  "B",
+  "C"
+ ],
+ "samples": 3,
+ "matched": true,
+ "preregFile": "preregistration_exp4.json",
+ "outcomePool": [
+  "FN-04",
+  "FN-06",
+  "FN-08",
+  "GR-02",
+  "GR-04",
+  "GR-06",
+  "LS-02",
+  "LS-05",
+  "LS-08",
+  "RD-06",
+  "RD-07",
+  "RD-08",
+  "VO-02",
+  "VO-04",
+  "WR-02",
+  "WR-06"
+ ]
+}

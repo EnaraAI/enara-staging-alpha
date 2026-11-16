@@ -5,6 +5,7 @@ import { Assignment, type IAssignment } from '../models/Assignment';
 import type { IGradingProposal } from '../models/GradingProposal';
 import { LearningObjective } from '../models/LearningObjective';
 import { gradeAnswer } from './assessmentSecurity';
+import { graderV2On, spellingIsTarget, targetFormPoints } from './graderV2';
 import { AUTO_GRADED, getVersion, questionPoints } from './assessmentVersions';
 import { isAiConfigured } from './aiJson';
 import { isFeatureEnabled } from './featureFlags';
@@ -50,7 +51,12 @@ const hasText = (v: unknown) => String(v ?? '').trim().length > 0;
 // Answers the answer key can't settle on its own.
 export function needsAiEvaluation(q: IQuestion | undefined, a: IAttemptAnswer) {
   if (!q || !hasText(a.studentAnswer)) return false;
+  // graderV2 ON: a target-form item the deterministic scorer decides needs no model.
+  if (graderV2On() && targetFormPoints(q, String(a.studentAnswer), questionPoints(q)) !== null) return false;
   if (q.type === 'open-response') return true;
+  // graderV2 ON (production safety): word-target short answers (vocabulary, spelling, case) keep the
+  // deterministic key score; no meaning check. Model path: NOT VALIDATED until run with the API.
+  if (graderV2On() && q.type === 'short-answer' && spellingIsTarget(q)) return false;
   return q.type === 'short-answer' && !a.isCorrect;
 }
 
@@ -174,7 +180,10 @@ export function validateGrading(params: { attempt: AttemptDoc; assignment: Pick<
     if (a.maxPoints !== max) fail('bad_max_points', `Question ${q.id} has the wrong maximum`);
     if (typeof a.points !== 'number' || !Number.isFinite(a.points) || a.points < 0 || a.points > max) fail('bad_points', `Question ${q.id} has points out of range`);
     if (a.method === 'rule') {
-      if (AUTO_GRADED.has(q.type) && hasText(a.studentAnswer)) {
+      const tf = graderV2On() && hasText(a.studentAnswer) ? targetFormPoints(q, String(a.studentAnswer), max) : null;
+      if (tf !== null) {
+        if (a.points !== tf) fail('rule_mismatch', `Question ${q.id} does not match its target-form score`);
+      } else if (AUTO_GRADED.has(q.type) && hasText(a.studentAnswer)) {
         const correct = gradeAnswer(q, a.studentAnswer as string);
         if (correct !== a.isCorrect || a.points !== (correct ? max : 0)) fail('rule_mismatch', `Question ${q.id} does not match its answer key`);
       } else if (!hasText(a.studentAnswer) && a.points !== 0) fail('bad_points', `Unanswered question ${q.id} has points`);

@@ -1,0 +1,612 @@
+{
+ "arm": "PP",
+ "rep": 1,
+ "learnerIdx": 400,
+ "seed": "esl4|L400|rep1",
+ "state": {
+  "form": "copula",
+  "band": "B2",
+  "primary": "W2",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 3
+  }
+ },
+ "start": {
+  "form": "copula",
+  "band": "B2",
+  "primary": "W2",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "entries": [],
+ "v2": {
+  "beliefs": [],
+  "worked": []
+ },
+ "turns": [
+  {
+   "session": 1,
+   "learner": "Hello! Can you give me an exercise on am, is and are?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "tutor": "Hello! Sure. Let's start with a sentence that has a missing verb. Rewrite it correctly, adding the missing word: \"Ahmed tired.\"",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on am, is and are?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! Sure. Let's start with a sentence that has a missing verb. Rewrite it correctly, adding the missing word: \"Ahmed tired.\"",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Ahmed is tired.",
+    "errors": {
+     "W1": "Ahmed tired."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Ahmed is tired.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Ahmed is tired."
+   },
+   "tutor": "Exactly right! \"Ahmed\" is one person (like \"he\"), so we need is, and you didn't drop the verb. Well done. Next one: Write am, is or are: We ___ in the classroom. (Answer with only the missing word.)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Sure. Let's start with a sentence that has a missing verb. Rewrite it correctly, adding the missing word: \"Ahmed tired.\"\n\nLEARNER'S LAST MESSAGE:\nAhmed is tired.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nExactly right! \"Ahmed\" is one person (like \"he\"), so we need is, and you didn't drop the verb. Well done. Next one: Write am, is or are: We ___ in the classroom. (Answer with only the missing word.)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Exactly right!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Exactly right!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Exactly right!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Exactly right!"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "are",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "are"
+   },
+   "tutor": "Correct! \"We\" is a plural subject, so it takes are: We are in the classroom. Next, a slightly harder one. Rewrite this sentence correctly, adding the missing word: \"My brother and I happy at home.\"",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExactly right! \"Ahmed\" is one person (like \"he\"), so we need is, and you didn't drop the verb. Well done. Next one: Write am, is or are: We ___ in the classroom. (Answer with only the missing word.)\n\nLEARNER'S LAST MESSAGE:\nare\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"We\" is a plural subject, so it takes are: We are in the classroom. Next, a slightly harder one. Rewrite this sentence correctly, adding the missing word: \"My brother and I happy at home.\"",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! \"We\" is a plural subject, so it takes are"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct!"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother and I are happy at home.",
+    "errors": {
+     "W1": "My brother and I happy at home.",
+     "W2": "My brother and I is happy at home."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother and I is happy at home.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "My brother and I is happy at home."
+   },
+   "tutor": "Good, you remembered to add the verb! But \"is\" isn't right here. \"My brother and I\" is two people, so the subject is plural, like \"we\". Hint: which verb goes with we? Try again: rewrite \"My brother and I happy at home.\"",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"We\" is a plural subject, so it takes are: We are in the classroom. Next, a slightly harder one. Rewrite this sentence correctly, adding the missing word: \"My brother and I happy at home.\"\n\nLEARNER'S LAST MESSAGE:\nMy brother and I is happy at home.\nFACT: the last learner message contained the error of W2 (uses \"is\" with every subject (\"They is happy\")).\n\nTUTOR TURN TO JUDGE:\nGood, you remembered to add the verb! But \"is\" isn't right here. \"My brother and I\" is two people, so the subject is plural, like \"we\". Hint: which verb goes with we? Try again: rewrite \"My brother and I happy at home.\"",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother and I are happy at home.",
+    "errors": {
+     "W1": "My brother and I happy at home.",
+     "W2": "My brother and I is happy at home."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother and I are happy at home.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother and I are happy at home."
+   },
+   "tutor": "Perfect! \"My brother and I\" is plural, like we, so it takes are: My brother and I are happy at home. Next challenge: rewrite this correctly, adding the missing words: \"I a student, and my teacher very kind.\"",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, you remembered to add the verb! But \"is\" isn't right here. \"My brother and I\" is two people, so the subject is plural, like \"we\". Hint: which verb goes with we? Try again: rewrite \"My brother and I happy at home.\"\n\nLEARNER'S LAST MESSAGE:\nMy brother and I are happy at home.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nPerfect! \"My brother and I\" is plural, like we, so it takes are: My brother and I are happy at home. Next challenge: rewrite this correctly, adding the missing words: \"I a student, and my teacher very kind.\"",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Perfect!"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am a student, and my teacher is very kind.",
+    "errors": {
+     "W1": "I a student, and my teacher very kind.",
+     "W2": "I is a student, and my teacher is very kind."
+    }
+   },
+   "applied": [
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise am, is and are again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "tutor": "Hello again! Absolutely. Since you know the basics, let's focus on never dropping the verb, which is a common slip for Arabic speakers. Here's a sentence with an error: \"Ahmed tired.\" Can you rewrite it correctly?",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise am, is and are again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello again! Absolutely. Since you know the basics, let's focus on never dropping the verb, which is a common slip for Arabic speakers. Here's a sentence with an error: \"Ahmed tired.\" Can you rewrite it correctly?",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Ahmed is tired.",
+    "errors": {
+     "W1": "Ahmed tired."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Ahmed is tired.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Ahmed is tired."
+   },
+   "tutor": "Exactly right! Arabic can leave the verb out here, but English needs is. Now try one: \"My sister and I happy today.\" Rewrite it correctly.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Absolutely. Since you know the basics, let's focus on never dropping the verb, which is a common slip for Arabic speakers. Here's a sentence with an error: \"Ahmed tired.\" Can you rewrite it correctly?\n\nLEARNER'S LAST MESSAGE:\nAhmed is tired.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nExactly right! Arabic can leave the verb out here, but English needs is. Now try one: \"My sister and I happy today.\" Rewrite it correctly.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Exactly right!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Exactly right!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "English needs is"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My sister and I are happy today.",
+    "errors": {
+     "W1": "My sister and I happy today.",
+     "W2": "My sister and I is happy today."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My sister and I are happy today.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister and I are happy today."
+   },
+   "tutor": "Spot on! \"My sister and I\" is a plural subject, like we, so it takes are, not am. Next: \"My brother a pilot, and he very tired today.\" There are two missing verbs. Rewrite the sentence correctly.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExactly right! Arabic can leave the verb out here, but English needs is. Now try one: \"My sister and I happy today.\" Rewrite it correctly.\n\nLEARNER'S LAST MESSAGE:\nMy sister and I are happy today.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nSpot on! \"My sister and I\" is a plural subject, like we, so it takes are, not am. Next: \"My brother a pilot, and he very tired today.\" There are two missing verbs. Rewrite the sentence correctly.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Spot on!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Spot on!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"My sister and I\" is a plural subject, like we, so it takes are, not am"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother is a pilot, and he is very tired today.",
+    "errors": {
+     "W1": "My brother a pilot, and he very tired today."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brother is a pilot, and he is very tired today.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother is a pilot, and he is very tired today."
+   },
+   "tutor": "Perfect! Both clauses need their own verb: \"My brother is a pilot\" and \"he is very tired\". Now a harder one with mixed subjects: \"I a nurse, my parents at home, and you my best friend.\" Rewrite it correctly.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSpot on! \"My sister and I\" is a plural subject, like we, so it takes are, not am. Next: \"My brother a pilot, and he very tired today.\" There are two missing verbs. Rewrite the sentence correctly.\n\nLEARNER'S LAST MESSAGE:\nMy brother is a pilot, and he is very tired today.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nPerfect! Both clauses need their own verb: \"My brother is a pilot\" and \"he is very tired\". Now a harder one with mixed subjects: \"I a nurse, my parents at home, and you my best friend.\" Rewrite it correctly.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Perfect! Both clauses need their own verb"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My brother is a pilot, and he is very tired today."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am a nurse, my parents are at home, and you are my best friend.",
+    "errors": {
+     "W1": "I a nurse, my parents at home, and you my best friend.",
+     "W2": "I is a nurse, my parents is at home, and you is my best friend."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I is a nurse, my parents is at home, and you is my best friend.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "I is a nurse, my parents is at home, and you is my best friend."
+   },
+   "tutor": "Good news first: you didn't drop a single verb, which was the main goal! But the verb forms need to agree with each subject. \"Is\" is only for he, she or it. Think about which form goes with I, which with a plural subject like \"my parents\", and which with you. Have another go at rewriting the sentence.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 3.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nPerfect! Both clauses need their own verb: \"My brother is a pilot\" and \"he is very tired\". Now a harder one with mixed subjects: \"I a nurse, my parents at home, and you my best friend.\" Rewrite it correctly.\n\nLEARNER'S LAST MESSAGE:\nI is a nurse, my parents is at home, and you is my best friend.\nFACT: the last learner message contained the error of W2 (uses \"is\" with every subject (\"They is happy\")).\n\nTUTOR TURN TO JUDGE:\nGood news first: you didn't drop a single verb, which was the main goal! But the verb forms need to agree with each subject. \"Is\" is only for he, she or it. Think about which form goes with I, which with a plural subject like \"my parents\", and which with you. Have another go at rewriting the sentence.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Is\" is only for he, she or it."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am a nurse, my parents are at home, and you are my best friend.",
+    "errors": {
+     "W1": "I a nurse, my parents at home, and you my best friend.",
+     "W2": "I is a nurse, my parents is at home, and you is my best friend."
+    }
+   },
+   "applied": [
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    }
+   }
+  }
+ ],
+ "stateAfterS1": {
+  "form": "copula",
+  "band": "B2",
+  "primary": "W2",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 2
+  }
+ }
+}

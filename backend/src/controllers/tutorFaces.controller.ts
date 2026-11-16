@@ -5,7 +5,8 @@ import { isGlobalAdmin } from '../auth/authorization';
 import { CourseInstance } from '../models/CourseInstance';
 import { Institution } from '../models/Institution';
 import { StudentTutorChoice, TutorFace, TutorFaceOptions } from '../models/TutorFace';
-import { listAvatarChoices, resolveTutorFace, studentFaceOptions } from '../services/tutorFaceService';
+import { faceImageSource, faceImageUrl, listAvatarChoices, resolveTutorFace, studentFaceOptions } from '../services/tutorFaceService';
+import { logger } from '../utils/logging';
 
 // School admins choose the live tutor's face: a default for the school and,
 // if they like, a different one per course.
@@ -38,8 +39,26 @@ async function institutionOf(req: AuthRequest): Promise<{ institutionId: string;
   return { institutionId, institutions };
 }
 
+// Saved choices may hold the provider's picture address: always send ENARA's.
 const toFace = (f: { avatarId: string; name: string; imageUrl?: string; gender?: string } | undefined) =>
-  f ? { avatarId: f.avatarId, name: f.name, imageUrl: f.imageUrl, gender: f.gender } : null;
+  f ? { avatarId: f.avatarId, name: f.name, imageUrl: f.imageUrl ? faceImageUrl(f.avatarId) : undefined, gender: f.gender } : null;
+
+// GET /api/tutor-faces/image/:id — a face's picture, fetched from the video
+// provider and served from ENARA's address. Public: <img> tags send no token,
+// and these are the provider's stock portraits.
+export const getTutorFaceImage = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const source = await faceImageSource(String(req.params.id));
+  if (!source) throw new AppError('Not found', 404);
+  const upstream = await fetch(source, { signal: AbortSignal.timeout(15_000) }).catch(() => undefined);
+  const type = upstream?.headers.get('content-type') || '';
+  if (!upstream?.ok || !type.startsWith('image/')) {
+    logger.warn('tutor_face_image_failed', { status: upstream?.status ?? null });
+    throw new AppError('Picture unavailable', 502, 'IMAGE_UNAVAILABLE');
+  }
+  res.setHeader('Content-Type', type);
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.send(Buffer.from(await upstream.arrayBuffer()));
+});
 
 // GET /api/tutor-faces
 export const getTutorFaces = asyncHandler(async (req: AuthRequest, res: Response) => {

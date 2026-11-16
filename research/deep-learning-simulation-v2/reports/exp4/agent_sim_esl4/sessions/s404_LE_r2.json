@@ -1,0 +1,687 @@
+{
+ "arm": "LE",
+ "rep": 2,
+ "learnerIdx": 404,
+ "seed": "esl4|L404|rep2",
+ "state": {
+  "form": "thirdS",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 5
+  }
+ },
+ "start": {
+  "form": "thirdS",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "entries": [],
+ "v2": {
+  "beliefs": [],
+  "worked": []
+ },
+ "turns": [
+  {
+   "session": 1,
+   "learner": "Hello! Can you give me an exercise on he, she and it with -s?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "present_lesson_item",
+    "fade_support",
+    "independent_practice"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Of course. Start with this one and give just the verb:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nAfter that, we'll move on to some less obvious cases, where the spelling of the ending changes.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on he, she and it with -s?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nOf course. Start with this one and give just the verb:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nAfter that, we'll move on to some less obvious cases, where the spelling of the ending changes.",
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "plays",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "plays"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "\"plays\" is correct: a vowel before the y, so the verb just takes -s.\n\nNow one of the less obvious cases, where the ending changes. Try it without hints:\n\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nOf course. Start with this one and give just the verb:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nAfter that, we'll move on to some less obvious cases, where the spelling of the ending changes.\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"plays\" is correct: a vowel before the y, so the verb just takes -s.\n\nNow one of the less obvious cases, where the ending changes. Try it without hints:\n\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"plays\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"plays\" is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "cries",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "cries"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "\"cries\" is correct: consonant plus y, so the y becomes -ies.\n\nYou have now handled plain -s and the -ies spelling. Next, a freer task that mixes the cases.\n\nWrite two or three sentences about the weekly routine of someone you know, using he or she. Include at least one verb ending in -sh, -ch, -x or -o (for example \"finish\" or \"do\") and one ordinary verb. I'll check each verb form.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"plays\" is correct: a vowel before the y, so the verb just takes -s.\n\nNow one of the less obvious cases, where the ending changes. Try it without hints:\n\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"cries\" is correct: consonant plus y, so the y becomes -ies.\n\nYou have now handled plain -s and the -ies spelling. Next, a freer task that mixes the cases.\n\nWrite two or three sentences about the weekly routine of someone you know, using he or she. Include at least one verb ending in -sh, -ch, -x or -o (for example \"finish\" or \"do\") and one ordinary verb. I'll check each verb form.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"cries\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"cries\" is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "She finishes work at five and plays tennis.",
+    "errors": {
+     "W1": "She finish work at five and play tennis.",
+     "W2": "She finishs work at five and plays tennis."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "She finishes work at five and plays tennis.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She finishes work at five and plays tennis."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "closingAsk": "deferred",
+   "profileLines": 0,
+   "tutor": "Both verb forms are correct. \"finishes\": \"finish\" ends in -sh, so -es. \"plays\": vowel plus y, so just -s.\n\nYou have now used -s, -es and -ies correctly in different tasks. You seem ready for a quick check to confirm this on your own. Would you like to try it now?",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"cries\" is correct: consonant plus y, so the y becomes -ies.\n\nYou have now handled plain -s and the -ies spelling. Next, a freer task that mixes the cases.\n\nWrite two or three sentences about the weekly routine of someone you know, using he or she. Include at least one verb ending in -sh, -ch, -x or -o (for example \"finish\" or \"do\") and one ordinary verb. I'll check each verb form.\n\nLEARNER'S LAST MESSAGE:\nShe finishes work at five and plays tennis.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nBoth verb forms are correct. \"finishes\": \"finish\" ends in -sh, so -es. \"plays\": vowel plus y, so just -s.\n\nYou have now used -s, -es and -ies correctly in different tasks. You seem ready for a quick check to confirm this on your own. Would you like to try it now?",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Both verb forms are correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Both verb forms are correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Both verb forms are correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Both verb forms are correct."
+    }
+   ],
+   "next_task": {
+    "kind": "none"
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "OK. Can I have an exercise, please?",
+   "production": {
+    "kind": "none",
+    "text": "OK. Can I have an exercise, please?"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Yes, the quick check comes next, separate from this practice.\nSo after he, she or it, the ending depends on how the verb ends.\nTell me the rule in your own words.",
+   "raw": "Yes, the quick check comes next, separate from this practice.\nFirst, a short recap from your own work: \"plays\" (vowel plus y, just -s), \"finishes\" (-sh takes -es) and \"cries\" (consonant plus y becomes -ies).\nSo after he, she or it, the ending depends on how the verb ends.\nTell me the rule in your own words.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "guardRemoved": 1,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nBoth verb forms are correct. \"finishes\": \"finish\" ends in -sh, so -es. \"plays\": vowel plus y, so just -s.\n\nYou have now used -s, -es and -ies correctly in different tasks. You seem ready for a quick check to confirm this on your own. Would you like to try it now?\n\nLEARNER'S LAST MESSAGE:\nOK. Can I have an exercise, please?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYes, the quick check comes next, separate from this practice.\nSo after he, she or it, the ending depends on how the verb ends.\nTell me the rule in your own words.",
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise he, she and it with -s again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "activate_prior_knowledge",
+    "fade_support",
+    "independent_practice"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "closingAsk": "deferred",
+   "profileLines": 0,
+   "tutor": "Sure.\nSince this is mostly secure for you, let's push it a bit further with an independent task.\nWrite two sentences about a colleague's or friend's daily routine. One should use a verb ending in -o or -ss (for example, do or miss); the other should use a verb ending in a vowel + y (for example, enjoy or stay).\nThen explain briefly: why does the vowel + y verb keep its y, unlike study?",
+   "raw": "Sure. Let's start with recall rather than a reminder: tell me the rule for the verb after he, she or it, including the spelling changes for verbs that end in -ch, -o, or a consonant + y.\nSince this is mostly secure for you, let's push it a bit further with an independent task.\nWrite two sentences about a colleague's or friend's daily routine. One should use a verb ending in -o or -ss (for example, do or miss); the other should use a verb ending in a vowel + y (for example, enjoy or stay).\nThen explain briefly: why does the vowel + y verb keep its y, unlike study?",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": true,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure.\nSince this is mostly secure for you, let's push it a bit further with an independent task.\nWrite two sentences about a colleague's or friend's daily routine. One should use a verb ending in -o or -ss (for example, do or miss); the other should use a verb ending in a vowel + y (for example, enjoy or stay).\nThen explain briefly: why does the vowel + y verb keep its y, unlike study?",
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "She does her homework every evening.",
+    "errors": {
+     "W1": "She do her homework every evening.",
+     "W2": "She dos her homework every evening."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "She does her homework every evening.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She does her homework every evening."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "\"She does her homework every evening\" is correct: do ends in -o, so it takes -es.\nThat covers the first part. The second sentence is still missing: write one about the same person's routine using a verb that ends in a vowel + y (enjoy or stay are the type I mean, but choose your own).\nThen add a short explanation of why that verb keeps its y, while a verb like study does not.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure.\nSince this is mostly secure for you, let's push it a bit further with an independent task.\nWrite two sentences about a colleague's or friend's daily routine. One should use a verb ending in -o or -ss (for example, do or miss); the other should use a verb ending in a vowel + y (for example, enjoy or stay).\nThen explain briefly: why does the vowel + y verb keep its y, unlike study?\n\nLEARNER'S LAST MESSAGE:\nShe does her homework every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She does her homework every evening\" is correct: do ends in -o, so it takes -es.\nThat covers the first part. The second sentence is still missing: write one about the same person's routine using a verb that ends in a vowel + y (enjoy or stay are the type I mean, but choose your own).\nThen add a short explanation of why that verb keeps its y, while a verb like study does not.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"She does her homework every evening\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"She does her homework every evening\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "do ends in -o, so it takes -es"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "She enjoys her job.",
+    "errors": {
+     "W1": "She enjoy her job."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "She enjoys her job.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She enjoys her job."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "\"She enjoys her job\" is correct: enjoy ends in a vowel + y, so it simply takes -s and keeps its y. Both sentences now show the spelling rules well.\nThe short explanation is still open; you can add it later if you like.\nNow a quick item from the course:\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"She does her homework every evening\" is correct: do ends in -o, so it takes -es.\nThat covers the first part. The second sentence is still missing: write one about the same person's routine using a verb that ends in a vowel + y (enjoy or stay are the type I mean, but choose your own).\nThen add a short explanation of why that verb keeps its y, while a verb like study does not.\n\nLEARNER'S LAST MESSAGE:\nShe enjoys her job.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"She enjoys her job\" is correct: enjoy ends in a vowel + y, so it simply takes -s and keeps its y. Both sentences now show the spelling rules well.\nThe short explanation is still open; you can add it later if you like.\nNow a quick item from the course:\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"She enjoys her job\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"She enjoys her job\" is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "plays",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "plays"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "\"plays\" is correct: play ends in a vowel + y, so it keeps its y and simply takes -s, just like enjoy.\nHere is the contrast case, with no help this time.\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\nIf you like, add one short line on what makes cry behave differently from play.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"She enjoys her job\" is correct: enjoy ends in a vowel + y, so it simply takes -s and keeps its y. Both sentences now show the spelling rules well.\nThe short explanation is still open; you can add it later if you like.\nNow a quick item from the course:\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"plays\" is correct: play ends in a vowel + y, so it keeps its y and simply takes -s, just like enjoy.\nHere is the contrast case, with no help this time.\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\nIf you like, add one short line on what makes cry behave differently from play.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"plays\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "plays"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "cries",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "cries"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "\"cries\" is correct: cry ends in a consonant + y, so the y changes to i and takes -es.\nThat is the contrast with play and enjoy: a vowel before the y keeps the y, and the verb simply takes -s.\nRecap: after he, she or it, the verb takes -s or -es; -o, -ss, -sh, -ch and -x verbs take -es, as in \"does\".\nA y verb depends on the letter before the y: vowel + y keeps it, consonant + y becomes -ies.\nTell me the rule in your own words.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"plays\" is correct: play ends in a vowel + y, so it keeps its y and simply takes -s, just like enjoy.\nHere is the contrast case, with no help this time.\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\nIf you like, add one short line on what makes cry behave differently from play.\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"cries\" is correct: cry ends in a consonant + y, so the y changes to i and takes -es.\nThat is the contrast with play and enjoy: a vowel before the y keeps the y, and the verb simply takes -s.\nRecap: after he, she or it, the verb takes -s or -es; -o, -ss, -sh, -ch and -x verbs take -es, as in \"does\".\nA y verb depends on the letter before the y: vowel + y keeps it, consonant + y becomes -ies.\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"cries\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "cries"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after he, she or it, the verb takes -s or -es"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "-o, -ss, -sh, -ch and -x verbs take -es... consonant + y becomes -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 5
+    }
+   }
+  }
+ ],
+ "stateAfterS1": {
+  "form": "thirdS",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 2
+  }
+ }
+}

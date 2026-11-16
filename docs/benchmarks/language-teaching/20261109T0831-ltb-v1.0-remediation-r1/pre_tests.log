@@ -1,0 +1,1090 @@
+
+ RUN  v3.2.7 /tmp/claude-0/-home-user/49a4ff52-d976-534d-8a81-a05801e1bd1b/scratchpad/enara-staging-alpha/backend
+
+8:29:28 AM [vite] (ssr) warning: invalid import "../src/models/${file}". A file extension must be included in the static part of the import. For example: import(`./foo/${bar}.js`).
+  Plugin: vite:dynamic-import-vars
+  File: /tmp/claude-0/-home-user/49a4ff52-d976-534d-8a81-a05801e1bd1b/scratchpad/enara-staging-alpha/backend/test/elie.sprint4.test.ts
+8:29:28 AM [vite] (ssr) warning: invalid import "../src/models/${name}". A file extension must be included in the static part of the import. For example: import(`./foo/${bar}.js`).
+  Plugin: vite:dynamic-import-vars
+  File: /tmp/claude-0/-home-user/49a4ff52-d976-534d-8a81-a05801e1bd1b/scratchpad/enara-staging-alpha/backend/test/languageTeachingContext.test.ts
+stdout | test/languageTeachingContext.test.ts > through the tutor route > language course: the model gets the labelled context and lesson facts; the reply stores non-mastery turn evidence
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:36.593Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0006,"costStatus":"estimated","institutionId":"ltc-school","userId":"6af1846af31a56a42a8c5687","studentId":"stu","role":"student","requestId":"a1408b74-548c-4560-803a-2b3834626bff"}
+
+stdout | test/languageTeachingContext.test.ts > through the tutor route > no direct identifiers in the provider payload (name, email, student id, institution id)
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:36.730Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0006,"costStatus":"estimated","institutionId":"ltc-school","userId":"6af1846af31a56a42a8c5687","studentId":"stu","role":"student","requestId":"c169bd75-555d-4747-89e8-e5a43edbee8c"}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:36.782Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:36.783Z","requestId":"c498ce89-1bd2-4443-950d-c4b55698bb23","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stdout | test/languageTeachingContext.test.ts > through the tutor route > lesson without a spec: unstructured, and the tutor is told not to claim specific coverage
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:36.870Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0006,"costStatus":"estimated","institutionId":"ltc-school","userId":"6af1846af31a56a42a8c5687","studentId":"stu","role":"student","requestId":"ae7f8bed-1ca7-4517-b030-0b3ce9a446c6"}
+
+stdout | test/languageTeachingContext.test.ts > through the tutor route > non-language course: no language block (existing behaviour unchanged)
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:37.040Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0006,"costStatus":"estimated","institutionId":"ltc-school","userId":"6af1846af31a56a42a8c5687","studentId":"stu","role":"student","requestId":"5f1b0576-e973-4f3e-9f8d-ae33e60d876d"}
+
+stdout | test/elie.sprint4.test.ts > the learning loop > gap → intervention → focused tutoring → independent reassessment → outcome and time to understand
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:37.037Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-test","status":"ok","latencyMs":8,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"unpriced","institutionId":"instA","userId":"6af1847043d7fbaea13f9f41","studentId":"stu1","role":"student","requestId":"f3bb79bf-ec9b-4100-895f-d6b3ebf9924f"}
+
+stderr | test/elie.sprint4.test.ts > the learning loop > gap → intervention → focused tutoring → independent reassessment → outcome and time to understand
+{"level":"warn","message":"ai_model_unpriced","timestamp":"2026-11-09T08:29:37.036Z","modelName":"claude-test","priceCatalogVersion":"v1"}
+
+stdout | test/elie.sprint4.test.ts > the learning loop > degrades to ordinary tutoring when adaptive pedagogy is off
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:37.204Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-test","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"unpriced","institutionId":"instA","userId":"6af1847143d7fbaea13fa028","studentId":"stu1","role":"student","requestId":"c023a505-7e69-400d-b30a-1fbbf79c4ee7"}
+
+stdout | test/languageTeachingContext.test.ts > through the tutor route > another school's course is never used: the course is rejected and nothing from it reaches the model
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:37.210Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0006,"costStatus":"estimated","institutionId":"ltc-other","userId":"6af1846af31a56a42a8c5697","studentId":"stu-o","role":"student","requestId":"568f3929-9685-4ae0-aa5c-d8f1859ed100"}
+
+stdout | test/languageTeachingContext.test.ts > streaming route > the stream endpoint sends the same language context; a failed stream stores no turn evidence
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:37.400Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"error","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated","institutionId":"ltc-school","userId":"6af1846af31a56a42a8c5687","studentId":"stu","role":"student","requestId":"a5111515-79d8-472e-8bce-c4663fc63c27","errorCode":"http_500"}
+
+stderr | test/languageTeachingContext.test.ts > streaming route > the stream endpoint sends the same language context; a failed stream stores no turn evidence
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:37.411Z","kind":"ai_unknown_cost_reserved","severity":"warning","delivery":"not_configured","scope":"anthropic:tutor_chat","provider":"anthropic","feature":"tutor_chat"}
+
+stdout | test/languageTeachingContext.test.ts > streaming route > the stream endpoint sends the same language context; a failed stream stores no turn evidence
+{"level":"info","message":"ai_budget_unknown_cost_retained","timestamp":"2026-11-09T08:29:37.411Z","institutionId":"__test_spend__","feature":"tutor_chat","provider":"anthropic"}
+
+stdout | test/languageTeachingContext.test.ts > streaming route > the stream endpoint sends the same language context; a failed stream stores no turn evidence
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:37.433Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"error","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated","institutionId":"ltc-school","userId":"6af1846af31a56a42a8c5687","studentId":"stu","role":"student","requestId":"a5111515-79d8-472e-8bce-c4663fc63c27","errorCode":"http_500"}
+
+stdout | test/languageTeachingContext.test.ts > streaming route > the stream endpoint sends the same language context; a failed stream stores no turn evidence
+{"level":"info","message":"ai_budget_unknown_cost_retained","timestamp":"2026-11-09T08:29:37.444Z","institutionId":"__test_spend__","feature":"tutor_chat","provider":"anthropic"}
+
+stderr | test/languageTeachingContext.test.ts > streaming route > the stream endpoint sends the same language context; a failed stream stores no turn evidence
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:37.444Z","kind":"ai_unknown_cost_reserved","severity":"warning","delivery":"not_configured","scope":"anthropic:tutor_chat","provider":"anthropic","feature":"tutor_chat"}
+
+stderr | test/languageTeachingContext.test.ts > streaming route > the stream endpoint sends the same language context; a failed stream stores no turn evidence
+{"level":"warn","message":"direct_tutor_model_failed","timestamp":"2026-11-09T08:29:37.445Z","error":{"name":"Error","message":"stream unavailable in test"}}
+
+stdout | test/languageTeachingContext.test.ts > enrolment is checked on every turn > a session whose course the student can no longer open gets no language context
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:37.593Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0006,"costStatus":"estimated","institutionId":"ltc-school","userId":"6af1846af31a56a42a8c5687","studentId":"stu","role":"student","requestId":"d86e1c2b-acef-4f40-ace0-107664afcb99"}
+
+ ❯ test/elie.sprint4.test.ts (8 tests | 1 failed) 8731ms
+   ✓ strategy selection (unit) > remediates a weak prerequisite first 83ms
+   ✓ strategy selection (unit) > responds to misconceptions and switches strategy when the first was already used 40ms
+   ✓ strategy selection (unit) > follows mastery status and teacher choices 37ms
+   × the learning loop > gap → intervention → focused tutoring → independent reassessment → outcome and time to understand 656ms
+     → expected '[{"type":"text","text":"You are Enara…' to contain 'direct instruction'
+   ✓ the learning loop > degrades to ordinary tutoring when adaptive pedagogy is off 130ms
+   ✓ teacher-assigned interventions > uses the teacher strategy, and only the teacher can cancel it 196ms
+   ✓ time to understand > counts tutor turns with a 5-minute pause cap and lesson time, not assessment time 53ms
+   ✓ time to understand > reports distributions only for the school, with caveats 86ms
+ ✓ test/languageTeachingContext.test.ts (31 tests) 8780ms
+8:29:38 AM [vite] (ssr) warning: invalid import "../src/models/${name}". A file extension must be included in the static part of the import. For example: import(`./foo/${bar}.js`).
+  Plugin: vite:dynamic-import-vars
+  File: /tmp/claude-0/-home-user/49a4ff52-d976-534d-8a81-a05801e1bd1b/scratchpad/enara-staging-alpha/backend/test/p15LearningJourney.test.ts
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.196Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.196Z","requestId":"92e36d05-1353-4bdb-b162-a3a1219c7b6d","method":"POST","path":"/api/curriculums/p149-b-demo-class/chapters/p149-b-demo-class/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.205Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.205Z","requestId":"2b4bc45e-a0ce-429d-a501-c50a5d23c6c1","method":"POST","path":"/api/curriculums/p149-b-demo-quiz/chapters/p149-b-demo-quiz/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.227Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.228Z","requestId":"18cbbc01-a30e-4d9a-96cf-264d8f2af9c8","method":"POST","path":"/api/curriculums/p149-b-demo-attempt-1/chapters/p149-b-demo-attempt-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.242Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.242Z","requestId":"fc1ea2df-266d-4c73-bc72-a76f1089776b","method":"POST","path":"/api/curriculums/p149-b-demo-stu-1/chapters/p149-b-demo-stu-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.256Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.256Z","requestId":"46ba2add-c634-4309-891d-d05dcd043e20","method":"POST","path":"/api/curriculums/p149-b-demo-batch/chapters/p149-b-demo-batch/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.268Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.268Z","requestId":"5561c175-574e-41ba-a0c0-f1d4c582c175","method":"POST","path":"/api/curriculums/p149-b-demo-tutor-1/chapters/p149-b-demo-tutor-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.284Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.284Z","requestId":"5f9eddc7-ede3-4510-9a59-918642bef1de","method":"POST","path":"/api/curriculums/p149-b-demo-course/chapters/p149-b-demo-course/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.308Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.308Z","requestId":"5f86b6b4-af5b-4e87-8b2e-43b24a4e54c2","method":"POST","path":"/api/curriculums/p149-b-demo-ch-1/chapters/p149-b-demo-ch-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.320Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.320Z","requestId":"610c0dbc-aba2-4b84-a72c-b5d28a755021","method":"POST","path":"/api/curriculums/6af1846c793bb7425925ca87/chapters/6af1846c793bb7425925ca87/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.547Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.547Z","requestId":"21157f4b-6c29-4fa1-942b-7cb6c8e8b978","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.686Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.686Z","requestId":"91a69e97-049d-440f-980b-67eae3d94bac","method":"POST","path":"/api/avatar/session/p149-b-demo-class/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.701Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.701Z","requestId":"7c0ed51c-8d56-446b-838e-9cb95ce9c63e","method":"POST","path":"/api/avatar/session/p149-b-demo-quiz/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.709Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.710Z","requestId":"5fc45326-c305-4899-9c7b-8f3df9300551","method":"POST","path":"/api/avatar/session/p149-b-demo-attempt-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.719Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.719Z","requestId":"3e7b64a5-f620-4087-b4bd-5fdafa3606ce","method":"POST","path":"/api/avatar/session/p149-b-demo-stu-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.734Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.734Z","requestId":"e6c46e23-c18f-45ca-9f7e-3bd375102208","method":"POST","path":"/api/avatar/session/p149-b-demo-batch/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.761Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.761Z","requestId":"950e1d19-a53b-47e0-b9cf-1cc2cc70320d","method":"POST","path":"/api/avatar/session/p149-b-demo-tutor-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.781Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.781Z","requestId":"b8002aa5-a215-4616-9d5c-71edb7f74b8f","method":"POST","path":"/api/avatar/session/p149-b-demo-course/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.799Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.799Z","requestId":"7217f76c-8717-4178-99e0-ca8f5b84331e","method":"POST","path":"/api/avatar/session/p149-b-demo-ch-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:38.812Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:38.813Z","requestId":"feeee575-aee8-4c05-ba7d-a3d3bbf2045a","method":"POST","path":"/api/avatar/session/6af1846c793bb7425925ca87/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:39.085Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /speak","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:39.085Z","requestId":"509b6e24-bf40-414e-8ddb-5819c94d0172","method":"POST","path":"/api/avatar/speak","statusCode":503,"error":{"name":"Error","message":"Voice is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > D. AI tutor (mocked): right context, persisted history, no cross-student access, metered
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:44.163Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":2,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a771","studentId":"p15-stu1","role":"student","requestId":"5a4962cc-48ed-4ca3-9714-894aec48bdb0"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > E. assessment: teacher-authored MCQ + rubric, publish, assign to own class only; keys never reach students
+{"level":"info","message":"assessment_published","timestamp":"2026-11-09T08:29:44.385Z","assessmentId":"ASM984354","version":1,"by":"6af18474b715bb5332a0a767"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > E. assessment: teacher-authored MCQ + rubric, publish, assign to own class only; keys never reach students
+{"level":"info","message":"assignment_created","timestamp":"2026-11-09T08:29:44.484Z","assignmentId":"asg-ccc8dec2-c8c6-4d48-85df-6931939f47ae","classId":"p15-cls1","assessmentId":"ASM984354","version":1,"by":"6af18474b715bb5332a0a767"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > E. assessment: teacher-authored MCQ + rubric, publish, assign to own class only; keys never reach students
+{"level":"info","message":"audit","timestamp":"2026-11-09T08:29:44.502Z","action":"assignment_created","actorId":"6af18474b715bb5332a0a767","institutionId":"p15-a","targetType":"assignment","targetId":"asg-ccc8dec2-c8c6-4d48-85df-6931939f47ae"}
+
+ ✓ test/tutorFallback.test.ts (3 tests) 5766ms
+   ✓ tutor reply sources > uses the default orchestrator course, without foreign section ids, when the curriculum is not linked  406ms
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > F+G. submission and autonomous grading: released without a human step; duplicates and other students refused
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:44.706Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a771","studentId":"p15-stu1","role":"student","requestId":"1b49d1b2-e175-432a-9871-0e9fa3d6839d"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > F+G. submission and autonomous grading: released without a human step; duplicates and other students refused
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:44.721Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a771","studentId":"p15-stu1","role":"student","requestId":"1b49d1b2-e175-432a-9871-0e9fa3d6839d"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > F+G. submission and autonomous grading: released without a human step; duplicates and other students refused
+{"level":"info","message":"grading_released","timestamp":"2026-11-09T08:29:44.759Z","attemptId":"att-1794212984598-mlp6","score":100,"aiAnswers":1,"version":"autograde-v1"}
+
+8:29:44 AM [vite] (ssr) warning: invalid import "../src/models/${name}". A file extension must be included in the static part of the import. For example: import(`./foo/${bar}.js`).
+  Plugin: vite:dynamic-import-vars
+  File: /tmp/claude-0/-home-user/49a4ff52-d976-534d-8a81-a05801e1bd1b/scratchpad/enara-staging-alpha/backend/test/p20TutorStream.test.ts
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:44.962Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a773","studentId":"p15-stu2","role":"student","requestId":"8cb0892d-cbd4-4e5b-abfb-788e414d279c"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:44.971Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a773","studentId":"p15-stu2","role":"student","requestId":"8cb0892d-cbd4-4e5b-abfb-788e414d279c"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:44.982Z","feature":"ai_grading","attempt":0,"error":"no JSON object"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:44.991Z","feature":"ai_grading","attempt":0,"error":"no JSON object"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.002Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a773","studentId":"p15-stu2","role":"student","requestId":"8cb0892d-cbd4-4e5b-abfb-788e414d279c"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:45.016Z","feature":"ai_grading","attempt":1,"error":"no JSON object"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"grading_evaluation_failed","timestamp":"2026-11-09T08:29:45.017Z","attemptId":"att-1794212984883-nh1x","questionId":"q2","code":"AI_BAD_OUTPUT"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.019Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a773","studentId":"p15-stu2","role":"student","requestId":"8cb0892d-cbd4-4e5b-abfb-788e414d279c"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:45.029Z","feature":"ai_grading","attempt":1,"error":"no JSON object"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"grading_evaluation_failed","timestamp":"2026-11-09T08:29:45.029Z","attemptId":"att-1794212984883-nh1x","questionId":"q2","code":"AI_BAD_OUTPUT"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"grading_failed","timestamp":"2026-11-09T08:29:45.036Z","attemptId":"att-1794212984883-nh1x","reason":"ai_invalid_output","runs":1}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.080Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.085Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:45.103Z","feature":"ai_grading","attempt":0,"error":"no JSON object"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:45.116Z","feature":"ai_grading","attempt":0,"error":"no JSON object"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.139Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.148Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:45.165Z","feature":"ai_grading","attempt":1,"error":"no JSON object"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"grading_evaluation_failed","timestamp":"2026-11-09T08:29:45.165Z","attemptId":"att-1794212984883-nh1x","questionId":"q2","code":"AI_BAD_OUTPUT"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:45.169Z","feature":"ai_grading","attempt":1,"error":"no JSON object"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"grading_evaluation_failed","timestamp":"2026-11-09T08:29:45.169Z","attemptId":"att-1794212984883-nh1x","questionId":"q2","code":"AI_BAD_OUTPUT"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"grading_failed","timestamp":"2026-11-09T08:29:45.174Z","attemptId":"att-1794212984883-nh1x","reason":"ai_invalid_output","runs":2}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.214Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.225Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:45.228Z","feature":"ai_grading","attempt":0,"error":"no JSON object"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:45.236Z","feature":"ai_grading","attempt":0,"error":"no JSON object"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.253Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.264Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:45.270Z","feature":"ai_grading","attempt":1,"error":"no JSON object"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"grading_evaluation_failed","timestamp":"2026-11-09T08:29:45.270Z","attemptId":"att-1794212984883-nh1x","questionId":"q2","code":"AI_BAD_OUTPUT"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"ai_json_invalid","timestamp":"2026-11-09T08:29:45.277Z","feature":"ai_grading","attempt":1,"error":"no JSON object"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"grading_evaluation_failed","timestamp":"2026-11-09T08:29:45.277Z","attemptId":"att-1794212984883-nh1x","questionId":"q2","code":"AI_BAD_OUTPUT"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"warn","message":"grading_exception","timestamp":"2026-11-09T08:29:45.285Z","attemptId":"att-1794212984883-nh1x","reason":"ai_invalid_output","runs":3}
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:45.285Z","kind":"grading_exception","severity":"warning","institutionId":"p15-a","delivery":"not_configured","scope":"ai_invalid_output","attemptId":"att-1794212984883-nh1x","reason":"ai_invalid_output"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.379Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a767","role":"teacher","requestId":"7f53aac1-e940-4911-a00d-20bdd8fdbbd1"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:45.384Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a767","role":"teacher","requestId":"7f53aac1-e940-4911-a00d-20bdd8fdbbd1"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once
+{"level":"info","message":"grading_released","timestamp":"2026-11-09T08:29:45.403Z","attemptId":"att-1794212984883-nh1x","score":0,"aiAnswers":1,"version":"autograde-v1"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > I. cost and usage: every provider attempt has one ledger row; the test-spend counter agrees; exhaustion blocks the next call
+{"level":"warn","message":"ai_test_spend_cap_refused","timestamp":"2026-11-09T08:29:45.782Z","feature":"tutor_chat"}
+{"level":"error","message":"alert","timestamp":"2026-11-09T08:29:45.782Z","kind":"ai_test_spend_cap_reached","severity":"critical","delivery":"not_configured","scope":"environment","feature":"tutor_chat"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > J-race. concurrent starts give one open attempt; concurrent submits record one answer set, graded once
+{"level":"info","message":"assignment_created","timestamp":"2026-11-09T08:29:45.836Z","assignmentId":"asg-9ffb8e89-f7b5-4dd4-a288-6c0722cdb1d3","classId":"p15-cls1","assessmentId":"ASM985800","version":1,"by":"6af18474b715bb5332a0a767"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > J-race. concurrent starts give one open attempt; concurrent submits record one answer set, graded once
+{"level":"info","message":"audit","timestamp":"2026-11-09T08:29:45.855Z","action":"assignment_created","actorId":"6af18474b715bb5332a0a767","institutionId":"p15-a","targetType":"assignment","targetId":"asg-9ffb8e89-f7b5-4dd4-a288-6c0722cdb1d3"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > J-race. concurrent starts give one open attempt; concurrent submits record one answer set, graded once
+{"level":"info","message":"grading_released","timestamp":"2026-11-09T08:29:45.994Z","attemptId":"att-1794212985906-sqd8","score":0,"aiAnswers":0,"version":"autograde-v1"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-K. Arabic (Modern Standard Arabic) open answer earns partial credit; feedback stays in Arabic; evidence is an exact quote
+{"level":"info","message":"assignment_created","timestamp":"2026-11-09T08:29:46.139Z","assignmentId":"asg-73cc77d5-2734-4d61-8a33-040344b3fb80","classId":"p15-cls1","assessmentId":"ASM986099","version":1,"by":"6af18474b715bb5332a0a767"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-K. Arabic (Modern Standard Arabic) open answer earns partial credit; feedback stays in Arabic; evidence is an exact quote
+{"level":"info","message":"audit","timestamp":"2026-11-09T08:29:46.158Z","action":"assignment_created","actorId":"6af18474b715bb5332a0a767","institutionId":"p15-a","targetType":"assignment","targetId":"asg-73cc77d5-2734-4d61-8a33-040344b3fb80"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-K. Arabic (Modern Standard Arabic) open answer earns partial credit; feedback stays in Arabic; evidence is an exact quote
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:46.296Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":1,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a771","studentId":"p15-stu1","role":"student","requestId":"976ca2bb-c82b-47d0-88a2-c07959f1e271"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-K. Arabic (Modern Standard Arabic) open answer earns partial credit; feedback stays in Arabic; evidence is an exact quote
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:46.300Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0.0014,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a771","studentId":"p15-stu1","role":"student","requestId":"976ca2bb-c82b-47d0-88a2-c07959f1e271"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-K. Arabic (Modern Standard Arabic) open answer earns partial credit; feedback stays in Arabic; evidence is an exact quote
+{"level":"info","message":"grading_released","timestamp":"2026-11-09T08:29:46.332Z","attemptId":"att-1794212986188-8emi","score":67,"aiAnswers":1,"version":"autograde-v1"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:46.497Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"error","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a773","studentId":"p15-stu2","role":"student","requestId":"8b4d862d-96c3-417b-a2ee-77c9c4fca29d","errorCode":"APIConnectionTimeoutError"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:46.501Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"error","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a773","studentId":"p15-stu2","role":"student","requestId":"8b4d862d-96c3-417b-a2ee-77c9c4fca29d","errorCode":"APIConnectionTimeoutError"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:46.515Z","kind":"ai_unknown_cost_reserved","severity":"warning","delivery":"not_configured","scope":"anthropic:ai_grading","provider":"anthropic","feature":"ai_grading"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_budget_unknown_cost_retained","timestamp":"2026-11-09T08:29:46.515Z","institutionId":"__test_spend__","feature":"ai_grading","provider":"anthropic"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_budget_unknown_cost_retained","timestamp":"2026-11-09T08:29:46.521Z","institutionId":"__test_spend__","feature":"ai_grading","provider":"anthropic"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:46.521Z","kind":"ai_unknown_cost_reserved","severity":"warning","delivery":"not_configured","scope":"anthropic:ai_grading","provider":"anthropic","feature":"ai_grading"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:46.545Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"error","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a773","studentId":"p15-stu2","role":"student","requestId":"8b4d862d-96c3-417b-a2ee-77c9c4fca29d","errorCode":"APIConnectionTimeoutError"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:46.559Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"error","latencyMs":1,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated","institutionId":"p15-a","userId":"6af18474b715bb5332a0a773","studentId":"p15-stu2","role":"student","requestId":"8b4d862d-96c3-417b-a2ee-77c9c4fca29d","errorCode":"APIConnectionTimeoutError"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_budget_unknown_cost_retained","timestamp":"2026-11-09T08:29:46.562Z","institutionId":"__test_spend__","feature":"ai_grading","provider":"anthropic"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:46.562Z","kind":"ai_unknown_cost_reserved","severity":"warning","delivery":"not_configured","scope":"anthropic:ai_grading","provider":"anthropic","feature":"ai_grading"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"warn","message":"grading_evaluation_failed","timestamp":"2026-11-09T08:29:46.562Z","attemptId":"att-1794212986427-f68n","questionId":"k2"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_budget_unknown_cost_retained","timestamp":"2026-11-09T08:29:46.581Z","institutionId":"__test_spend__","feature":"ai_grading","provider":"anthropic"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:46.581Z","kind":"ai_unknown_cost_reserved","severity":"warning","delivery":"not_configured","scope":"anthropic:ai_grading","provider":"anthropic","feature":"ai_grading"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"warn","message":"grading_evaluation_failed","timestamp":"2026-11-09T08:29:46.582Z","attemptId":"att-1794212986427-f68n","questionId":"k2"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"warn","message":"grading_failed","timestamp":"2026-11-09T08:29:46.589Z","attemptId":"att-1794212986427-f68n","reason":"ai_provider_error","runs":1}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:46.669Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated","institutionId":"p15-a"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:46.675Z","feature":"ai_grading","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated","institutionId":"p15-a"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_budget_unknown_cost_retained","timestamp":"2026-11-09T08:29:46.682Z","institutionId":"__test_spend__","feature":"ai_grading","provider":"anthropic"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:46.682Z","kind":"ai_unknown_cost_reserved","severity":"warning","delivery":"not_configured","scope":"anthropic:ai_grading","provider":"anthropic","feature":"ai_grading"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"ai_budget_unknown_cost_retained","timestamp":"2026-11-09T08:29:46.697Z","institutionId":"__test_spend__","feature":"ai_grading","provider":"anthropic"}
+
+stderr | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:46.697Z","kind":"ai_unknown_cost_reserved","severity":"warning","delivery":"not_configured","scope":"anthropic:ai_grading","provider":"anthropic","feature":"ai_grading"}
+
+stdout | test/p15LearningJourney.test.ts > P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown
+{"level":"info","message":"grading_released","timestamp":"2026-11-09T08:29:46.718Z","attemptId":"att-1794212986427-f68n","score":100,"aiAnswers":1,"version":"autograde-v1"}
+
+ ✓ test/p15LearningJourney.test.ts (14 tests) 8470ms
+   ✓ P15 full learning journey (sequential) > A. teacher access: real login, wrong password, no token, expired token  369ms
+   ✓ P15 full learning journey (sequential) > D. AI tutor (mocked): right context, persisted history, no cross-student access, metered  325ms
+   ✓ P15 full learning journey (sequential) > G-negative. malformed model output never becomes a released grade; a later valid run releases it once  663ms
+   ✓ P15 full learning journey (sequential) > P17-K. Arabic (Modern Standard Arabic) open answer earns partial credit; feedback stays in Arabic; evidence is an exact quote  307ms
+   ✓ P15 full learning journey (sequential) > P17-L. a provider timeout leaves no grade and schedules a retry; the retry with missing usage releases once and is ledgered usage_unknown  481ms
+8:29:47 AM [vite] (ssr) warning: invalid import "../src/models/${name}". A file extension must be included in the static part of the import. For example: import(`./foo/${bar}.js`).
+  Plugin: vite:dynamic-import-vars
+  File: /tmp/claude-0/-home-user/49a4ff52-d976-534d-8a81-a05801e1bd1b/scratchpad/enara-staging-alpha/backend/test/teachingFeatures.test.ts
+stdout | test/p20TutorStream.test.ts
+{"level":"info","message":"assessment_published","timestamp":"2026-11-09T08:29:49.764Z","assessmentId":"ASM989702","version":1,"by":"6af1847a2d48e6d6f26295a4"}
+
+stdout | test/p20TutorStream.test.ts
+{"level":"info","message":"assignment_created","timestamp":"2026-11-09T08:29:49.828Z","assignmentId":"asg-0d8efcd6-fbec-440a-a21b-0cd3629a9d64","classId":"p20q-cls1","assessmentId":"ASM989702","version":1,"by":"6af1847a2d48e6d6f26295a4"}
+
+stdout | test/p20TutorStream.test.ts
+{"level":"info","message":"audit","timestamp":"2026-11-09T08:29:49.857Z","action":"assignment_created","actorId":"6af1847a2d48e6d6f26295a4","institutionId":"p20q","targetType":"assignment","targetId":"asg-0d8efcd6-fbec-440a-a21b-0cd3629a9d64"}
+
+stdout | test/p20TutorStream.test.ts > tutor streaming endpoint > model configured but unreachable (network blocked): fallback reply, credits given back, error logged not thrown
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:50.292Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"error","latencyMs":11,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated","institutionId":"p20q","userId":"6af1847a2d48e6d6f26295a6","studentId":"p20q-stu1","role":"student","requestId":"e2de6522-39bd-4c9d-942c-9b682f8508e4","errorCode":"Error"}
+
+stderr | test/p20TutorStream.test.ts > tutor streaming endpoint > model configured but unreachable (network blocked): fallback reply, credits given back, error logged not thrown
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:50.312Z","kind":"ai_unknown_cost_reserved","severity":"warning","delivery":"not_configured","scope":"anthropic:tutor_chat","provider":"anthropic","feature":"tutor_chat"}
+
+stdout | test/p20TutorStream.test.ts > tutor streaming endpoint > model configured but unreachable (network blocked): fallback reply, credits given back, error logged not thrown
+{"level":"info","message":"ai_budget_unknown_cost_retained","timestamp":"2026-11-09T08:29:50.312Z","institutionId":"__test_spend__","feature":"tutor_chat","provider":"anthropic"}
+
+stderr | test/p20TutorStream.test.ts > tutor streaming endpoint > model configured but unreachable (network blocked): fallback reply, credits given back, error logged not thrown
+{"level":"warn","message":"Connection error.","timestamp":"2026-11-09T08:29:50.313Z"}
+
+stdout | test/p20TutorStream.test.ts > tutor streaming endpoint > model configured but unreachable (network blocked): fallback reply, credits given back, error logged not thrown
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:50.440Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"error","latencyMs":1,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated","institutionId":"p20q","userId":"6af1847a2d48e6d6f26295a6","studentId":"p20q-stu1","role":"student","requestId":"d0df50ce-5d17-48d5-9a87-852520099071","errorCode":"Error"}
+
+stdout | test/p20TutorStream.test.ts > tutor streaming endpoint > model configured but unreachable (network blocked): fallback reply, credits given back, error logged not thrown
+{"level":"info","message":"ai_budget_unknown_cost_retained","timestamp":"2026-11-09T08:29:50.451Z","institutionId":"__test_spend__","feature":"tutor_chat","provider":"anthropic"}
+
+stderr | test/p20TutorStream.test.ts > tutor streaming endpoint > model configured but unreachable (network blocked): fallback reply, credits given back, error logged not thrown
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:50.451Z","kind":"ai_unknown_cost_reserved","severity":"warning","delivery":"not_configured","scope":"anthropic:tutor_chat","provider":"anthropic","feature":"tutor_chat"}
+
+stderr | test/p20TutorStream.test.ts > tutor streaming endpoint > model configured but unreachable (network blocked): fallback reply, credits given back, error logged not thrown
+{"level":"warn","message":"Connection error.","timestamp":"2026-11-09T08:29:50.451Z"}
+
+ ✓ test/p20TutorStream.test.ts (3 tests) 5345ms
+   ✓ tutor streaming endpoint > model configured but unreachable (network blocked): fallback reply, credits given back, error logged not thrown  346ms
+8:29:51 AM [vite] (ssr) warning: invalid import "../src/models/${n}". A file extension must be included in the static part of the import. For example: import(`./foo/${bar}.js`).
+  Plugin: vite:dynamic-import-vars
+  File: /tmp/claude-0/-home-user/49a4ff52-d976-534d-8a81-a05801e1bd1b/scratchpad/enara-staging-alpha/backend/test/adultLearners.test.ts
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.553Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.553Z","requestId":"5e6ccad8-fc8b-403e-9b39-b63e0db93403","method":"GET","path":"/api/ingestion/status/p149-b-demo-class","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.564Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.564Z","requestId":"eaf13c38-e675-4373-b17d-e845fe1f254f","method":"GET","path":"/api/ingestion/status/p149-b-demo-class?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.570Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.570Z","requestId":"83181db1-77a9-4804-89b3-df6de2e95e7d","method":"GET","path":"/api/ingestion/status/p149-b-demo-quiz","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.577Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.577Z","requestId":"b2f7e4d8-22ff-4814-b48f-95cff31c5a78","method":"GET","path":"/api/ingestion/status/p149-b-demo-quiz?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.584Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.584Z","requestId":"c5e8a78b-7be4-4b9d-b94d-11480be1aa46","method":"GET","path":"/api/ingestion/status/p149-b-demo-attempt-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.594Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.595Z","requestId":"94594c87-000a-403b-a5c3-7c3f3b95f7ea","method":"GET","path":"/api/ingestion/status/p149-b-demo-attempt-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.603Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.603Z","requestId":"21b14134-6fb4-4d12-9060-d77d9f0bd402","method":"GET","path":"/api/ingestion/status/p149-b-demo-stu-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.611Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.612Z","requestId":"26cea89e-4f56-44f4-8bf7-309c0f88692a","method":"GET","path":"/api/ingestion/status/p149-b-demo-stu-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.626Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.626Z","requestId":"83aeea4d-ace0-4875-b05f-73d5f7eddf15","method":"GET","path":"/api/ingestion/status/p149-b-demo-batch","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.637Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.637Z","requestId":"45ecd1a8-510b-4e50-885d-c92ed6749b25","method":"GET","path":"/api/ingestion/status/p149-b-demo-batch?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.648Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.648Z","requestId":"03c31bce-e082-49c0-9944-24b120c21711","method":"GET","path":"/api/ingestion/status/p149-b-demo-tutor-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.654Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.655Z","requestId":"562da503-bca9-4805-bad4-baeb605d690f","method":"GET","path":"/api/ingestion/status/p149-b-demo-tutor-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.661Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.661Z","requestId":"ea270017-929a-49ad-b4cf-0c91c523a1a6","method":"GET","path":"/api/ingestion/status/p149-b-demo-course","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.673Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.673Z","requestId":"5c40092b-9027-4b17-9b13-3fd1e1e7c268","method":"GET","path":"/api/ingestion/status/p149-b-demo-course?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.679Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.679Z","requestId":"7560cc3c-06d6-4f17-8d6d-09b68f4eb047","method":"GET","path":"/api/ingestion/status/p149-b-demo-ch-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.691Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.691Z","requestId":"d126860f-1894-4d8b-9466-96be516fae16","method":"GET","path":"/api/ingestion/status/p149-b-demo-ch-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.701Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.702Z","requestId":"77219ab3-fe9b-4307-810e-ac86fa2676ca","method":"GET","path":"/api/ingestion/status/6af1846c793bb7425925ca87","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:51.709Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:51.709Z","requestId":"a6ba037b-5643-4827-9694-96a1fc3fbc82","method":"GET","path":"/api/ingestion/status/6af1846c793bb7425925ca87?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+ ✓ test/teachingFeatures.test.ts (4 tests) 4965ms
+stdout | test/directTutorModel.test.ts > direct tutor model > sends the curriculum and current lesson materials to Claude
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:53.743Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":1,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated"}
+
+stderr | test/directTutorModel.test.ts > direct tutor model > sends the curriculum and current lesson materials to Claude
+{"level":"error","message":"usage_ledger_unavailable","timestamp":"2026-11-09T08:29:53.754Z","operationKey":"ai:bg:679b17f2-3948-4af0-b04e-60e5fdbdcc83:1","feature":"tutor_chat"}
+
+stdout | test/directTutorModel.test.ts > direct tutor model > works without a curriculum
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:53.759Z","feature":"tutor_chat","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated"}
+
+stderr | test/directTutorModel.test.ts > direct tutor model > works without a curriculum
+{"level":"error","message":"usage_ledger_unavailable","timestamp":"2026-11-09T08:29:53.760Z","operationKey":"ai:bg:caf34c6c-db34-4e63-83a4-52298a7f0a81:1","feature":"tutor_chat"}
+
+stdout | test/directTutorModel.test.ts > direct tutor model > uses the faster voice model for spoken replies
+{"level":"info","message":"ai_call","timestamp":"2026-11-09T08:29:53.763Z","feature":"tutor_voice","provider":"anthropic","modelName":"claude-opus-5-5","status":"ok","latencyMs":0,"firstTokenMs":"[REDACTED]","inputTokens":"[REDACTED]","outputTokens":"[REDACTED]","cacheReadTokens":"[REDACTED]","cacheWriteTokens":"[REDACTED]","costUsd":0,"costStatus":"estimated"}
+
+stderr | test/directTutorModel.test.ts > direct tutor model > uses the faster voice model for spoken replies
+{"level":"error","message":"usage_ledger_unavailable","timestamp":"2026-11-09T08:29:53.764Z","operationKey":"ai:bg:ed0118f2-f94a-40c7-8ee1-8104610f1a67:1","feature":"tutor_voice"}
+
+ ✓ test/directTutorModel.test.ts (3 tests) 34ms
+stdout | test/p19_1LeakGuard.test.ts > P19.1 leak guard on the real P19 evaluations > the released ("chosen") evaluation of every grading run of W054 and W094 is a genuine model-answer echo, rejected by v1 (production) and v2
+P19_1_BLOCKED
+W054 chosen gp-4a25d8cf-1a19-42c9-bf42-f6d264c4e8c9: v1=feedback_leak v2=feedback_leak runs=["water particles more energy so more of them","particles more energy so more of them escape"]
+W054 chosen gp-3d0d3b0d-5d54-45b8-87f1-814ab7ea7613: v1=feedback_leak v2=feedback_leak runs=["water particles more energy so more of them"]
+W054 chosen gp-8f41e2c7-0bf2-4ea8-a241-c7808721bdf5: v1=feedback_leak v2=feedback_leak runs=["water particles more energy so more of them","particles more energy so more of them escape"]
+W054 partner gp-4e7eca09-6e69-4e2d-ad27-c5b2973f26cc (same score 0): v1=feedback_leak v2=feedback_leak
+W054 partner gp-06f4c405-6756-4ebd-8089-b03dc00b20ec (same score 0): v1=feedback_leak v2=feedback_leak
+W054 partner gp-d0e7bc8a-1b77-4866-80f0-514fab92e063 (same score 0): v1=passed v2=passed
+W094 chosen gp-1b7a0a8a-5b5e-46fd-b857-497ea03bf017: v1=feedback_leak v2=feedback_leak runs=["water particles more energy so more of them","particles more energy so more of them escape","more energy so more of them escape as"]
+W094 chosen gp-901fd84b-8d3c-4d90-befb-4eee88a8c6b0: v1=feedback_leak v2=feedback_leak runs=["water particles more energy so more of them"]
+W094 chosen gp-69596b6e-57dc-43f7-9787-6d7e53e589de: v1=feedback_leak v2=feedback_leak runs=["water particles more energy so more of them"]
+W094 partner gp-2a32b795-1435-47fc-b214-21518a9f9394 (same score 0): v1=feedback_leak v2=feedback_leak
+W094 partner gp-ec0ec347-8524-455f-93e2-6d7b9886cec1 (same score 0): v1=feedback_leak v2=feedback_leak
+W094 partner gp-4f889ed3-b104-48b9-8526-06fb60fd97c4 (same score 0): v1=feedback_leak v2=feedback_leak
+
+stdout | test/p19_1LeakGuard.test.ts > P19.1 leak guard on the real P19 evaluations > released controls (same assessment, same misconception answer): W014 and W074 pass; W034 (comma-split echo) is now blocked by v1 too (F-2 fix)
+P19_1_RELEASED
+W014: v1=passed v2=passed v1Runs=[] v2Leak=false
+W034: v1=feedback_leak v2=feedback_leak v1Runs=[] v2Leak=true
+W074: v1=passed v2=passed v1Runs=[] v2Leak=false
+
+stdout | test/p19_1LeakGuard.test.ts > P19.2 regression: the live unsafe release and the live safe releases > every live release that met the independent condition still passes (no new false positives on this sample)
+P19_2_SAFE_CONTROLS {"C2-05":"passed","C2-09":"passed","C4-03":"passed","C4-07":"passed","C2-02":"passed","C2-06":"passed","C4-04":"passed"}
+
+ ✓ test/p19_1LeakGuard.test.ts (8 tests) 40ms
+stdout | test/adultLearners.test.ts > adult education schools > can be switched on by the school admin (validated), and is read by the tutor at once
+{"level":"info","message":"learning_settings_changed","timestamp":"2026-11-09T08:29:55.260Z","institutionId":"school-new","changedBy":"6af18483d7c8542e864d0230","set":{"learningSettings.adultLearners":true}}
+{"level":"info","message":"audit","timestamp":"2026-11-09T08:29:55.260Z","action":"learning_settings_changed","actorId":"6af18483d7c8542e864d0230","institutionId":"school-new","targetType":"institution","targetId":"school-new"}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:55.381Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:55.381Z","requestId":"21291f46-9743-4052-abdb-ee7e1e45685a","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+ ✓ test/adultLearners.test.ts (2 tests) 3989ms
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.207Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.207Z","requestId":"51436aa1-7e4a-4496-b1af-7fa6e2266f5f","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.283Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.284Z","requestId":"05837f68-4d60-4c85-9375-a9b4ee9ac2a8","method":"POST","path":"/api/avatar/session/p149-b-demo-class/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.289Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.289Z","requestId":"8a662b81-28bf-4a80-a158-93a4dbee3c60","method":"POST","path":"/api/avatar/session/p149-b-demo-quiz/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.296Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.296Z","requestId":"02dbbcaf-bd22-43b9-897d-cf84b3d01afa","method":"POST","path":"/api/avatar/session/p149-b-demo-attempt-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.302Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.302Z","requestId":"6e89caab-0c4a-4bb7-acb6-d175a4da3c68","method":"POST","path":"/api/avatar/session/p149-b-demo-stu-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.308Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.308Z","requestId":"4fed9454-6ae5-445e-bb27-0e47abc6fcfb","method":"POST","path":"/api/avatar/session/p149-b-demo-batch/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.315Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.315Z","requestId":"91bb68fc-1626-4e61-be4f-9dd1080b06eb","method":"POST","path":"/api/avatar/session/p149-b-demo-tutor-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.322Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.322Z","requestId":"38ff0bc9-ed62-451b-a634-d5f568533b48","method":"POST","path":"/api/avatar/session/p149-b-demo-course/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.330Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.331Z","requestId":"1b03d520-d0a2-4991-a3f2-0b87fe241e92","method":"POST","path":"/api/avatar/session/p149-b-demo-ch-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.338Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.338Z","requestId":"a211be8a-a4e7-4e83-ab56-ebae7b1f8a4a","method":"POST","path":"/api/avatar/session/6af1846c793bb7425925ca87/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:29:56.449Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /speak","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:29:56.449Z","requestId":"4ebc28f5-3a74-47e8-90d7-06ab77144f8c","method":"POST","path":"/api/avatar/speak","statusCode":503,"error":{"name":"Error","message":"Voice is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:05.718Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:05.718Z","requestId":"3cfd091c-d0cd-490e-b78e-2a0c4f05fd58","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.441Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.441Z","requestId":"210c181d-834a-4854-94fc-66282c5cfb1d","method":"POST","path":"/api/curriculums/p149-b-demo-class/chapters/p149-b-demo-class/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.446Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.446Z","requestId":"ca7115bc-489b-45e3-b1e1-9538d405e006","method":"POST","path":"/api/curriculums/p149-b-demo-quiz/chapters/p149-b-demo-quiz/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.451Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.451Z","requestId":"a71eba6a-7b0a-4fea-99a6-c1a89f338830","method":"POST","path":"/api/curriculums/p149-b-demo-attempt-1/chapters/p149-b-demo-attempt-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.458Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.458Z","requestId":"6f168878-7138-42ec-b7be-12adebebb8af","method":"POST","path":"/api/curriculums/p149-b-demo-stu-1/chapters/p149-b-demo-stu-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.463Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.463Z","requestId":"f5082909-bfbc-472b-aabc-119ef7b4039c","method":"POST","path":"/api/curriculums/p149-b-demo-batch/chapters/p149-b-demo-batch/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.470Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.470Z","requestId":"c8ac7c26-2c83-46b1-8151-d18235f0ac3d","method":"POST","path":"/api/curriculums/p149-b-demo-tutor-1/chapters/p149-b-demo-tutor-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.475Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.475Z","requestId":"e3fbb500-697a-4a51-a61c-8bd138317da9","method":"POST","path":"/api/curriculums/p149-b-demo-course/chapters/p149-b-demo-course/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.480Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.480Z","requestId":"2d8828c5-6dba-44e2-82e4-f6cb71b85dbb","method":"POST","path":"/api/curriculums/p149-b-demo-ch-1/chapters/p149-b-demo-ch-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.485Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.486Z","requestId":"36419414-7769-4a89-8150-51b1a05f8db8","method":"POST","path":"/api/curriculums/6af1846c793bb7425925ca87/chapters/6af1846c793bb7425925ca87/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.595Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.595Z","requestId":"b67e0563-9d2d-4a9c-bf3b-ee4c88fafb5e","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.670Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.670Z","requestId":"5529b2d5-f088-40a3-8fb0-0c407f8906a4","method":"POST","path":"/api/avatar/session/p149-b-demo-class/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.676Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.676Z","requestId":"62d791ca-5553-49c2-9f9a-91b4b1644eae","method":"POST","path":"/api/avatar/session/p149-b-demo-quiz/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.681Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.681Z","requestId":"b1e68d38-d65b-4609-92fd-ccc6a7765477","method":"POST","path":"/api/avatar/session/p149-b-demo-attempt-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.687Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.687Z","requestId":"53d9df11-3ca0-49f0-b2fe-7232b115238a","method":"POST","path":"/api/avatar/session/p149-b-demo-stu-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.692Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.693Z","requestId":"8d6bb7f0-28c4-4fe8-9ed1-cdd75f66f132","method":"POST","path":"/api/avatar/session/p149-b-demo-batch/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.698Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.698Z","requestId":"9db4ac96-4016-4a92-827e-3a11aeff839e","method":"POST","path":"/api/avatar/session/p149-b-demo-tutor-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.703Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.703Z","requestId":"98f01e0d-61a5-4b5d-8896-89a35402550c","method":"POST","path":"/api/avatar/session/p149-b-demo-course/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.710Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.710Z","requestId":"46166849-401e-4da4-bc30-d833093e3ca2","method":"POST","path":"/api/avatar/session/p149-b-demo-ch-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.717Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.717Z","requestId":"df047b40-e95c-4fa2-9cbd-5fec1847c507","method":"POST","path":"/api/avatar/session/6af1846c793bb7425925ca87/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:06.858Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /speak","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:06.859Z","requestId":"f6f4e38a-63e8-438a-a670-66b80f01ddc0","method":"POST","path":"/api/avatar/speak","statusCode":503,"error":{"name":"Error","message":"Voice is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stdout | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"info","message":"learning_settings_changed","timestamp":"2026-11-09T08:30:10.767Z","institutionId":"p149-a","changedBy":"6af1846b793bb7425925ca35","set":{}}
+{"level":"info","message":"audit","timestamp":"2026-11-09T08:30:10.767Z","action":"learning_settings_changed","actorId":"6af1846b793bb7425925ca35","institutionId":"p149-a","targetType":"institution","targetId":"p149-a"}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.278Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.278Z","requestId":"61984308-2132-4a41-9532-fa6a4d403e44","method":"GET","path":"/api/ingestion/status/p149-b-demo-class","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.283Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.284Z","requestId":"6362cc62-50b1-4067-8a49-a69b1585d0f8","method":"GET","path":"/api/ingestion/status/p149-b-demo-class?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.289Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.289Z","requestId":"46ff4975-32d9-4b31-9e96-cb05a09ac93e","method":"GET","path":"/api/ingestion/status/p149-b-demo-quiz","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.294Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.294Z","requestId":"04e4acc8-4463-4108-a6b8-5731c2f62384","method":"GET","path":"/api/ingestion/status/p149-b-demo-quiz?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.301Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.301Z","requestId":"1bb6eb79-c3d9-41c6-905b-bcae21702858","method":"GET","path":"/api/ingestion/status/p149-b-demo-attempt-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.306Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.306Z","requestId":"b720cd15-a1b4-455e-8c16-5a41169bad63","method":"GET","path":"/api/ingestion/status/p149-b-demo-attempt-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.311Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.311Z","requestId":"a431d375-69bf-45a8-954a-ff724b692127","method":"GET","path":"/api/ingestion/status/p149-b-demo-stu-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.315Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.315Z","requestId":"4c2daa91-095c-4e31-baa0-1f32ff00e77c","method":"GET","path":"/api/ingestion/status/p149-b-demo-stu-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.320Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.320Z","requestId":"3037c55e-4b3c-48f3-b1fb-9bba62586a43","method":"GET","path":"/api/ingestion/status/p149-b-demo-batch","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.325Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.325Z","requestId":"5e38b1d7-853e-4a41-b33d-b366180ecf46","method":"GET","path":"/api/ingestion/status/p149-b-demo-batch?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.330Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.330Z","requestId":"d40b94aa-2d35-40d5-9e42-a14a3a56bc6e","method":"GET","path":"/api/ingestion/status/p149-b-demo-tutor-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.335Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.335Z","requestId":"9a4732d2-b138-4fd0-91d9-4bda5f7380a8","method":"GET","path":"/api/ingestion/status/p149-b-demo-tutor-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.342Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.342Z","requestId":"d24bc938-8ea6-48d0-a05d-5ec4250c7e15","method":"GET","path":"/api/ingestion/status/p149-b-demo-course","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.348Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.348Z","requestId":"2d075c4d-9a78-452b-87ee-fa1cc38a92ef","method":"GET","path":"/api/ingestion/status/p149-b-demo-course?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.354Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.354Z","requestId":"1462e6de-4673-47ab-8e69-302e7f5e6ca3","method":"GET","path":"/api/ingestion/status/p149-b-demo-ch-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.359Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.359Z","requestId":"f80585b6-4bf6-4622-a645-9c19e97b1024","method":"GET","path":"/api/ingestion/status/p149-b-demo-ch-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.365Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.365Z","requestId":"43fbb441-1211-4807-baa3-12a30b2dcc46","method":"GET","path":"/api/ingestion/status/6af1846c793bb7425925ca87","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:14.372Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:14.372Z","requestId":"1875728a-21ca-4b56-8b81-dc2192857040","method":"GET","path":"/api/ingestion/status/6af1846c793bb7425925ca87?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:16.897Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:16.897Z","requestId":"2026626a-61aa-4dc5-a85d-1d69626c605f","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.649Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.649Z","requestId":"77d64138-adc4-44dd-8796-5c4704686bb9","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.718Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.718Z","requestId":"01282ada-880b-43b3-be3f-9247e9c8723c","method":"POST","path":"/api/avatar/session/p149-b-demo-class/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.723Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.723Z","requestId":"79ee3804-48d2-4c36-ae36-479e13bc18ea","method":"POST","path":"/api/avatar/session/p149-b-demo-quiz/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.728Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.728Z","requestId":"3333d0c0-2d03-4c14-8ca9-fe2f0c215a6d","method":"POST","path":"/api/avatar/session/p149-b-demo-attempt-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.734Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.734Z","requestId":"abefadd1-c102-4e1c-a377-2a93a27d7805","method":"POST","path":"/api/avatar/session/p149-b-demo-stu-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.739Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.739Z","requestId":"7198c435-be56-4064-81ed-76be5c90a4af","method":"POST","path":"/api/avatar/session/p149-b-demo-batch/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.744Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.744Z","requestId":"963288fd-2666-41d1-b1e2-ce807224f50c","method":"POST","path":"/api/avatar/session/p149-b-demo-tutor-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.752Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.752Z","requestId":"7eb4973f-52d4-43a5-a054-9099a341e04a","method":"POST","path":"/api/avatar/session/p149-b-demo-course/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.758Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.758Z","requestId":"a0ef4da6-5896-4b4d-bab8-491cc14613fa","method":"POST","path":"/api/avatar/session/p149-b-demo-ch-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.766Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.766Z","requestId":"94a6f77a-ee87-4d9e-a806-cd0aea609324","method":"POST","path":"/api/avatar/session/6af1846c793bb7425925ca87/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:17.886Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /speak","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:17.887Z","requestId":"16ca96e7-138e-40d0-ab43-d288120fc8c0","method":"POST","path":"/api/avatar/speak","statusCode":503,"error":{"name":"Error","message":"Voice is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:29.719Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:29.719Z","requestId":"848fb740-8da3-4d82-8fd3-c260bf6c2b06","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:30.777Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:30.777Z","requestId":"c1c8e60b-9257-47ce-8927-121e35c7126d","method":"POST","path":"/api/curriculums/p149-b-demo-class/chapters/p149-b-demo-class/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:30.788Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:30.788Z","requestId":"9fc1f633-0dc9-48ac-8874-e2ad4f7c802b","method":"POST","path":"/api/curriculums/p149-b-demo-quiz/chapters/p149-b-demo-quiz/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:30.801Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:30.801Z","requestId":"5d671ca9-2b6c-47f4-9066-bf0511da6a4f","method":"POST","path":"/api/curriculums/p149-b-demo-attempt-1/chapters/p149-b-demo-attempt-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:30.818Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:30.818Z","requestId":"63810768-1ce5-40e9-a72c-105a02afe7ca","method":"POST","path":"/api/curriculums/p149-b-demo-stu-1/chapters/p149-b-demo-stu-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:30.827Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:30.828Z","requestId":"925950c8-4ce9-4aa9-8f65-9956e48b6000","method":"POST","path":"/api/curriculums/p149-b-demo-batch/chapters/p149-b-demo-batch/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:30.835Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:30.835Z","requestId":"c7b485b1-1545-4475-ad68-186029e7e6b1","method":"POST","path":"/api/curriculums/p149-b-demo-tutor-1/chapters/p149-b-demo-tutor-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:30.844Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:30.844Z","requestId":"44b7a991-a74a-4fb3-991e-3305033f3d0e","method":"POST","path":"/api/curriculums/p149-b-demo-course/chapters/p149-b-demo-course/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:30.851Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:30.851Z","requestId":"e7829194-819c-407f-84ec-e9f00c5bc280","method":"POST","path":"/api/curriculums/p149-b-demo-ch-1/chapters/p149-b-demo-ch-1/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:30.870Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /:id/chapters/:chapterId/video-uploads","statusCode":503,"code":"UPLOAD_STORAGE_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:30.870Z","requestId":"3b45ec65-a5a1-42e2-b1c6-3681494bde74","method":"POST","path":"/api/curriculums/6af1846c793bb7425925ca87/chapters/6af1846c793bb7425925ca87/video-uploads","statusCode":503,"error":{"name":"Error","message":"Video storage is not configured","code":"UPLOAD_STORAGE_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.028Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.028Z","requestId":"f3e44c5d-9611-4e26-8460-a0f6bdb06a69","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.119Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.119Z","requestId":"0a28d533-69a8-43f7-b64d-f324d9b2e3fe","method":"POST","path":"/api/avatar/session/p149-b-demo-class/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.130Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.130Z","requestId":"5f3fddf5-65ac-4efe-9fbd-0d447af60932","method":"POST","path":"/api/avatar/session/p149-b-demo-quiz/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.136Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.136Z","requestId":"a910b611-ec6a-4746-a840-e73131080397","method":"POST","path":"/api/avatar/session/p149-b-demo-attempt-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.144Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.144Z","requestId":"d5e8502a-8b35-43c2-867a-e2c3b652aee7","method":"POST","path":"/api/avatar/session/p149-b-demo-stu-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.152Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.152Z","requestId":"ba2077da-9371-440c-93ed-d1137532cdc0","method":"POST","path":"/api/avatar/session/p149-b-demo-batch/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.162Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.163Z","requestId":"72ad84f9-39e9-423e-b37c-d158f3c68920","method":"POST","path":"/api/avatar/session/p149-b-demo-tutor-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.172Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.172Z","requestId":"7a152ec0-661d-401d-85fd-5d218a1f09e7","method":"POST","path":"/api/avatar/session/p149-b-demo-course/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.182Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.182Z","requestId":"9489f09f-0cd1-4850-afc9-13914126b8d6","method":"POST","path":"/api/avatar/session/p149-b-demo-ch-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.189Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.189Z","requestId":"e1bd12bd-d22b-4851-8586-7ad8d29a86a3","method":"POST","path":"/api/avatar/session/6af1846c793bb7425925ca87/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:31.340Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /speak","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:31.340Z","requestId":"a3ad66e4-cbcb-499a-bf8b-c46297d82535","method":"POST","path":"/api/avatar/speak","statusCode":503,"error":{"name":"Error","message":"Voice is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.272Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.272Z","requestId":"f24e48f1-4c30-423c-98f7-9c56b486875d","method":"GET","path":"/api/ingestion/status/p149-b-demo-class","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.279Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.279Z","requestId":"006f9260-c201-48ef-a8be-af18c54b2bed","method":"GET","path":"/api/ingestion/status/p149-b-demo-class?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.285Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.285Z","requestId":"7a4ab5b9-ca01-4056-8c8c-d753071b6c2c","method":"GET","path":"/api/ingestion/status/p149-b-demo-quiz","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.291Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.291Z","requestId":"ea689e21-6570-4290-9332-ec5ce1e4b670","method":"GET","path":"/api/ingestion/status/p149-b-demo-quiz?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.298Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.298Z","requestId":"3db0f13d-5e74-4106-a2e0-81b0a21fc8fc","method":"GET","path":"/api/ingestion/status/p149-b-demo-attempt-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.304Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.304Z","requestId":"49efe150-8da2-48f1-96a9-a9c10c90097f","method":"GET","path":"/api/ingestion/status/p149-b-demo-attempt-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.311Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.312Z","requestId":"9070665d-0637-427f-8e63-97fd9bd13f4a","method":"GET","path":"/api/ingestion/status/p149-b-demo-stu-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.350Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.350Z","requestId":"afa77c47-0363-4007-b281-ab3b513b9b5f","method":"GET","path":"/api/ingestion/status/p149-b-demo-stu-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.357Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.357Z","requestId":"33562484-ba54-42fa-8117-d6375d0b462a","method":"GET","path":"/api/ingestion/status/p149-b-demo-batch","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.366Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.366Z","requestId":"1bfae034-235e-4c6c-a7a2-d279608420b2","method":"GET","path":"/api/ingestion/status/p149-b-demo-batch?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.372Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.372Z","requestId":"02663db4-2b09-4d0b-a4fb-784262e98eca","method":"GET","path":"/api/ingestion/status/p149-b-demo-tutor-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.378Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.378Z","requestId":"ec46ca6f-d17c-4c02-91a7-560ea45b9b2a","method":"GET","path":"/api/ingestion/status/p149-b-demo-tutor-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.383Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.383Z","requestId":"8c5b665a-fa8b-4f7b-a50c-0261b0f6796a","method":"GET","path":"/api/ingestion/status/p149-b-demo-course","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.388Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.389Z","requestId":"53063a4e-b6ac-47ca-ae68-70c8b671daae","method":"GET","path":"/api/ingestion/status/p149-b-demo-course?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.399Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.399Z","requestId":"d45c6617-913b-43df-9871-9ecbfcf1086f","method":"GET","path":"/api/ingestion/status/p149-b-demo-ch-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.405Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.405Z","requestId":"06607c5c-7aca-4394-aefa-683043d1dd85","method":"GET","path":"/api/ingestion/status/p149-b-demo-ch-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.410Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.411Z","requestId":"ad509c0d-64fe-461c-9a99-50355e49677f","method":"GET","path":"/api/ingestion/status/6af1846c793bb7425925ca87","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:40.417Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:40.417Z","requestId":"e6938993-bdea-40b0-a31a-758511295e3c","method":"GET","path":"/api/ingestion/status/6af1846c793bb7425925ca87?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:42.650Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:42.650Z","requestId":"a1285f58-e5b6-490c-9a23-486f00b01e86","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.456Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.456Z","requestId":"57409623-f218-4c94-a131-c440c2be2341","method":"POST","path":"/api/avatar/session","statusCode":503,"error":{"name":"Error","message":"The live tutor is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.531Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.531Z","requestId":"f4ea9186-bbe8-4607-bde3-2ed0570dee5c","method":"POST","path":"/api/avatar/session/p149-b-demo-class/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.537Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.537Z","requestId":"7a72da47-5bfb-4920-8381-5367d94d4052","method":"POST","path":"/api/avatar/session/p149-b-demo-quiz/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.543Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.543Z","requestId":"8bcdc04c-0f4c-4700-9fb0-c70e92d97811","method":"POST","path":"/api/avatar/session/p149-b-demo-attempt-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.548Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.548Z","requestId":"12071b69-119a-447d-88be-e0bac9087c27","method":"POST","path":"/api/avatar/session/p149-b-demo-stu-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.553Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.553Z","requestId":"38b4b2c6-d71b-431a-b0ef-82face9b7579","method":"POST","path":"/api/avatar/session/p149-b-demo-batch/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.559Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.559Z","requestId":"8372f9c1-847f-4e5d-8603-9bef63fb2691","method":"POST","path":"/api/avatar/session/p149-b-demo-tutor-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.566Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.566Z","requestId":"87b05cad-327a-45e3-85b2-87e580021641","method":"POST","path":"/api/avatar/session/p149-b-demo-course/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.571Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.571Z","requestId":"490a0242-da6c-4f2f-8ca4-50f6ce147c06","method":"POST","path":"/api/avatar/session/p149-b-demo-ch-1/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.576Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /session/:id/fallback","statusCode":503,"code":"AVATAR_FALLBACK_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.576Z","requestId":"6fdc754c-7b4f-4d4b-9175-99de04ff6d0d","method":"POST","path":"/api/avatar/session/6af1846c793bb7425925ca87/fallback","statusCode":503,"error":{"name":"Error","message":"No fallback avatar is configured","code":"AVATAR_FALLBACK_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:43.703Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"POST /speak","statusCode":503,"code":"AVATAR_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:43.703Z","requestId":"b97d632f-2420-4873-aa75-ace67ba841ba","method":"POST","path":"/api/avatar/speak","statusCode":503,"error":{"name":"Error","message":"Voice is not configured","code":"AVATAR_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:55.248Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:55.248Z","requestId":"3d4c1bae-729c-4b7e-8e17-18380e48da43","method":"GET","path":"/api/ingestion/status/p149-a-class2","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:55.253Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:55.254Z","requestId":"9262a41b-cc8f-4d3a-9fb3-691a123e902f","method":"GET","path":"/api/ingestion/status/p149-a-class2?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:55.260Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:55.260Z","requestId":"74d9b2cd-0b5f-47f3-8bae-8e3ecd687781","method":"GET","path":"/api/ingestion/status/p149-a-stu7","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:30:55.271Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:30:55.271Z","requestId":"8fa4d331-eb6e-4ff7-a9df-829b196de110","method":"GET","path":"/api/ingestion/status/p149-a-stu7?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:31:00.749Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:31:00.749Z","requestId":"d8018a75-b67b-47c0-83ab-456158a2b16e","method":"GET","path":"/api/ingestion/status/p149-a-demo-class","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:31:00.760Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:31:00.761Z","requestId":"6c540d79-0e88-43d4-95f5-61e2e2e93853","method":"GET","path":"/api/ingestion/status/p149-a-demo-class?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:31:00.767Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:31:00.767Z","requestId":"0800b4c6-5e19-4da7-a063-a6c0229e2028","method":"GET","path":"/api/ingestion/status/p149-a-demo-stu-1","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:31:00.774Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:31:00.775Z","requestId":"aeba7369-9a25-406c-a27c-515a996cb198","method":"GET","path":"/api/ingestion/status/p149-a-demo-stu-1?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:31:00.784Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:31:00.784Z","requestId":"c0b78fe5-5394-4516-9660-ee6094e707de","method":"GET","path":"/api/ingestion/status/p149-a-demo-stu-2","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:31:00.792Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:31:00.792Z","requestId":"f27faee5-221e-4df7-a61a-ac44b82cc45f","method":"GET","path":"/api/ingestion/status/p149-a-demo-stu-2?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:31:00.798Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:31:00.799Z","requestId":"9b35341a-a4d6-4393-a787-c9df932f782b","method":"GET","path":"/api/ingestion/status/p149-a-demo-course","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+stderr | test/p14_9TenantIsolation.test.ts > P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class
+{"level":"warn","message":"alert","timestamp":"2026-11-09T08:31:00.805Z","kind":"http_5xx","severity":"warning","delivery":"not_configured","scope":"GET /status/:eventId","statusCode":503,"code":"INGESTION_UNAVAILABLE"}
+{"level":"error","message":"request_error","timestamp":"2026-11-09T08:31:00.805Z","requestId":"51a7d85f-3450-4178-b967-d8ced645fb96","method":"GET","path":"/api/ingestion/status/p149-a-demo-course?origin=all","statusCode":503,"error":{"name":"Error","message":"Ingestion status is not available here","code":"INGESTION_UNAVAILABLE"}}
+
+ ✓ test/p14_9TenantIsolation.test.ts (5 tests) 96220ms
+   ✓ P14.9 tenant isolation with real foreign ids > no school-A identity reads or changes school-B data through any route, with or without ?origin=all  77384ms
+   ✓ P14.9 tenant isolation with real foreign ids > class boundary: each teacher and student of school A reaches only their own class  11293ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/elie.sprint4.test.ts > the learning loop > gap → intervention → focused tutoring → independent reassessment → outcome and time to understand
+AssertionError: expected '[{"type":"text","text":"You are Enara…' to contain 'direct instruction'
+
+Expected: [32m"direct instruction"[39m
+Received: [31m"[{"type":"text","text":"You are Enara's AI tutor for school students. Reply in the student's language (English or Arabic), keep replies concise and age-appropriate, and use Markdown for steps and formulas. Teach with the teaching method given in the learning focus below. Be a proactive tutor. After explaining a new idea, end with one short question that checks understanding. When the student answers, say clearly whether it is right; if not, name the specific mistake and give a smaller next step rather than repeating yourself. If they have answered wrong twice in a row, or ask the same thing again, slow down: one tiny step at a time, simpler words, a concrete everyday example, and encouragement. When it fits, point them to what to do next (a weak topic to practise, the next lesson).  You are Enara's AI. If anyone asks what model, company or technology you are built on or who made you, say you are Enara's AI assistant, built by Enara, and don't name any AI model, AI company or other provider."},{"type":"text","text":"This is the student's curriculum. Before answering, read it (and any lesson materials at the start of the conversation) and teach from it: use its terms, examples and level, and focus on the current lesson. If the question goes beyond the curriculum, say so briefly and still help at the right level. Don't invent content and claim it comes from the course.\n\n<curriculum>\nCourse: Algebra\nSubject: Mathematics\nSummary: s\nLessons in order:\n1. L\n</curriculum>","cache_control":{"type":"ephemeral"}},{"type":"text","text":"Where this student stands (use it to personalise and to suggest next steps; don't recite it):\nCourse \"Algebra\": 0/1 lessons done, next lesson \"L\"\nRecent tutor chats: Practice: FR.1 Add fractions\nLast active: today"},{"type":"text","text":"Learning focus for this conversation (from the school's learning records; use it, don't recite it):\n- Target objective: FR.1 \"Add fractions\". Status: emerging (little understanding shown so far).\n- Recent assessed answers on it: 0 of 2 correct.\n- Teaching method: Direct Instruction. Teach one idea at a time. Explain it in short, defined steps; model one complete example aloud; then guide a similar problem one step per turn, checking and correcting each step before moving on; then give one problem to do alone. If the student errs on several guided steps, model a different example before continuing. Do not ask the student to discover what you have not taught yet.\n- Also use: Worked Examples: Show a complete narrated solution, then fade to completion problems.\n- Readiness (adjust silently, never tell the student): lower: simpler words, concrete examples, small steps, frequent checks.\n- Feedback: say what is right or wrong in the work and the next step; never praise or criticise the person.\n- If methods disagree (for example on giving answers or how many questions to ask), follow the teaching method above.\n- Assessment integrity: never give the answers to the student's assessment or quick-check questions. If they paste one, teach the method with a different example.\n- When they seem ready, suggest a quick check to confirm (practice with you does not count as proof of understanding)."}]"[39m
+
+ ❯ test/elie.sprint4.test.ts:166:20
+    164|     const system = JSON.stringify(ai.calls.at(-1).system);
+    165|     expect(system).toContain('FR.1');
+    166|     expect(system).toContain('direct instruction');
+       |                    ^
+    167|     expect(system).toContain('never give the answers');
+    168|     expect(await M.PedagogicalDecision.countDocuments({ interventionId…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 9 passed (10)
+      Tests  1 failed | 80 passed (81)
+   Start at  08:29:27
+   Duration  97.35s (transform 3.53s, setup 0ms, collect 6.27s, tests 142.34s, environment 2ms, prepare 1.09s)
+
+vitest exit 1

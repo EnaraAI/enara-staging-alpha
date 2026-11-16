@@ -1,0 +1,126 @@
+{
+ "reviewer": "R1",
+ "checked": 186,
+ "flags": [
+  {
+   "target": "EN-F-A1-VO-family-C-4",
+   "check": "C3",
+   "problem": "targetForm is 'niece' but answerKey/acceptedAnswers are 'aunt'.",
+   "fix": "Set targetForm to 'aunt'."
+  },
+  {
+   "target": "EN-F-A1-VO-family-C-6",
+   "check": "C3",
+   "problem": "Prompt shows 'aunt', the C-4 answer word, so C-4 is cued within form C (violates the no-answer-shown rule). Also C-1 key 'grandmother' is the C-5 correction, so form C keys the same word twice.",
+   "fix": "Use another possessor in C-6 (e.g. 'My sister's man is a doctor' -> husband), and change the C-5 slip word to a kin word not keyed in form C (e.g. 'My dawghter...' style vowel slip on daughter)."
+  },
+  {
+   "target": "EN-F-A1-VO-family-A-6",
+   "check": "C3",
+   "problem": "A-6 answer 'wife' is shown in the A-4 prompt ('My uncle's wife'), and the A-6 prompt shows 'brother', the A-3 key.",
+   "fix": "Rephrase A-4 clue (e.g. 'My father's sister is my ____') and change A-6 subject (e.g. 'My cousin is married. His woman is a teacher.')."
+  },
+  {
+   "target": "EN-F-A1-VO-family",
+   "check": "C5",
+   "problem": "Slot-6 items carry l1ErrorType 'lexical_l1_polysemy'/'lexical_l1_calque', which is not a value in the docs/LEARNING_OUTCOMES.md PART 2 enum; outcome l1ErrorTypes lists only spelling_vowel, so slot 6 is untracked. Same issue in classroom-objects (A-6/B-6/C-6), days-months (A-6/B-6/C-6) and numbers-time (A-6/B-6/C-6).",
+   "fix": "Add a typed enum value (e.g. lexical_l1_polysemy, with definition) to PART 2 and to each outcome's l1ErrorTypes, or retag to an existing value."
+  },
+  {
+   "target": "EN-F-A1-VO-home-rooms",
+   "check": "C3",
+   "problem": "Answer words repeat within forms despite the round-5 note: A-1 and A-9 both key 'kitchen', A-2 key 'bedroom' = A-5 correction; B-2, B-6 and B-9 all key 'bathroom'; C-1 key 'bathroom' = C-5 correction, C-2 key 'bedroom' = C-6 correction.",
+   "fix": "Re-key so each room is answered once per form (e.g. A-9 -> dining room advert and A-6 calque on another room; B-9 -> kitchen with B-8 naming another room; C-1 -> kitchen with C-7 naming another room) and re-check options and named words."
+  },
+  {
+   "target": "EN-F-A1-VO-home-rooms-B-6",
+   "check": "C7",
+   "problem": "'path room' for bathroom is b->p, the reverse of the typical Arabic-L1 p->b merge (bencil); it is a rare hypercorrection and also forms a real word 'path'. Same in C-5.",
+   "fix": "Replace with a plausible typed slip on a room word not keyed elsewhere in form B, e.g. a vowel slip ('kitchin', 'bedrum') tagged spelling_vowel, or a p->b slip on a home word."
+  },
+  {
+   "target": "EN-F-A1-VO-home-rooms-C-5",
+   "check": "C7",
+   "problem": "Same implausible b->p 'path room' slip as B-6; also its answer 'bathroom' duplicates the C-1 key.",
+   "fix": "Replace with a plausible slip on a room word not keyed elsewhere in form C."
+  },
+  {
+   "target": "EN-F-A1-VO-home-rooms-B-5",
+   "check": "C5",
+   "problem": "l1ErrorType 'lexical_room_label' is not an enum value and outcome l1ErrorTypes ([spelling_consonant]) does not cover the room-label calques in A-5/A-6/B-5/C-6.",
+   "fix": "Add a calque enum value (see family flag) and list it on the outcome."
+  },
+  {
+   "target": "EN-F-A1-VO-days-months-A-6",
+   "check": "C2",
+   "problem": "Outcome is 'Can spell days of the week and months'; the slot-6 meaning errors (history->date, this night->tonight, yesterday night->last night in A-6/B-6/C-6) do not test spelling of a day or month. B-6/C-6 also carry a matchingNote about a day/month capital that has no day/month word.",
+   "fix": "Either widen the outcome statement to time words, or make slot 6 a day/month item; drop the irrelevant matchingNote on B-6/C-6."
+  },
+  {
+   "target": "EN-F-A1-VO-classroom-objects-B-6",
+   "check": "C2",
+   "problem": "'watch' (clock->watch) is not a classroom object, unlike A-6 page and C-6 library, so form B slot 6 does not measure the outcome and is not parallel.",
+   "fix": "Use a classroom-object polysemy/calque parallel to A-6 and C-6 (e.g. an Arabic-L1 confusion between two classroom nouns, with one correct fix not shown elsewhere in form B)."
+  },
+  {
+   "target": "EN-F-A1-GR-prepositions-time-A-6",
+   "check": "C3",
+   "problem": "acceptedAnswers include 'at 6' but not 'at 6 o'clock' (digits + o'clock), a correct learner answer. Same for B-6 ('at 8 o'clock') and C-6 ('at 9 o'clock').",
+   "fix": "Add the digit + o'clock variants to A-6, B-6, C-6."
+  },
+  {
+   "target": "EN-F-A2-FN-polite-requests",
+   "check": "C1",
+   "problem": "Outcome now cefr A1 but every item in forms A-C has vocabLevel 'A2', and wording includes above-A1 words: remote control, receipt, plasters, rolls, kiosk, cough medicine, extra towel, charger, phone case, milkshake, grilled fish, bank card, pharmacy, bakery.",
+   "fix": "Replace with A1 nouns (tea, water, bread, ticket, map, pen, bag, key, menu, apple) and set vocabLevel A1 on every item."
+  },
+  {
+   "target": "EN-F-A2-FN-polite-requests-A-4",
+   "check": "C7",
+   "problem": "Distractor 'Two tickets give.' (also B-4 'One ticket give.', C-4 'Six rolls give.') is object-verb order, not an Arabic-L1 pattern (Arabic is verb-first: 'Give me two tickets').",
+   "fix": "Replace with an Arabic-L1 plausible distractor such as 'Give me two tickets.' or 'I want two ticket.'"
+  },
+  {
+   "target": "EN-F-A2-FN-polite-requests",
+   "check": "C5",
+   "problem": "Outcome l1ErrorTypes is [] while items carry 'direct_imperative' and 'want_for_request', which are not PART 2 enum values.",
+   "fix": "Add enum values (with definitions) for these request errors and list them on the outcome, or mark the tags as untracked."
+  },
+  {
+   "target": "EN-F-A2-GR-present-continuous",
+   "check": "C1",
+   "problem": "Outcome now cefr A1 but every item has vocabLevel 'A1-A2', and wording includes above-A1 words: knock, bridge, workers, paint, climb, rest, bark, pray, match, report/sales report, 'working on'.",
+   "fix": "Use A1 verbs/nouns (play, cook, sleep, read, eat, watch TV, write, walk) and set vocabLevel A1 on all items; e.g. C-9 'What are you doing today?'."
+  },
+  {
+   "target": "EN-F-A2-GR-present-continuous",
+   "check": "C5",
+   "problem": "Item tags 'be_omission_progressive' (slot 5) and 'simple_for_progressive' (slot 6) are not enum values; the outcome lists copula_omission and tense_aspect, which are the matching enum values.",
+   "fix": "Retag slot 5 copula_omission and slot 6 tense_aspect in all forms."
+  },
+  {
+   "target": "EN-F-A2-GR-present-continuous-B-9",
+   "check": "C4",
+   "problem": "Rubric criteria differ across parallel items: A-9 'am/is/are + -ing' but B-9 and C-9 'am + -ing' (also A-8 'am'), so the same reply can score differently by form.",
+   "fix": "Use one criterion ('correct am/is/are + -ing') on all slot 7-9 items."
+  },
+  {
+   "target": "EN-F-A2-GR-third-person-s",
+   "check": "C1",
+   "problem": "Outcome now cefr A1 but every item has vocabLevel 'A1-A2', and wording includes above-A1 words: strangers, bark, mix, paint, fix, touch, weather report, garage, bake, brush, flat.",
+   "fix": "Use A1 verbs/nouns (goes, plays, watches, washes, likes, cries, studies) and set vocabLevel A1 on all items; e.g. B-4 'Our dog (sleep / sleeps) in the garden'."
+  },
+  {
+   "target": "EN-F-A2-GR-third-person-s",
+   "check": "C5",
+   "problem": "Item tags 'third_person_s_omission' (slot 5) and 'es_spelling' (slot 6) are not enum values; slot 5 should be agreement_3s; slot 6 (-es spelling) is developmental and has no enum value.",
+   "fix": "Retag slot 5 agreement_3s; tag slot 6 as untracked/developmental or add an enum value."
+  },
+  {
+   "target": "EN-F-A2-GR-imperatives",
+   "check": "C5",
+   "problem": "l1ErrorTypes = [copula_omission], but imperatives ('Open the door', 'Don't run') contain no copula; the type does not describe the expected errors (e.g. 'No run', 'Don't to run').",
+   "fix": "Remove copula_omission; leave [] or add a suitable enum value for negative-imperative form."
+  }
+ ]
+}

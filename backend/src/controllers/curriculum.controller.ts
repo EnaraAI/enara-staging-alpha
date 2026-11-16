@@ -1,4 +1,5 @@
 import { queueCurriculumProcessing } from '../services/curriculumExtraction';
+import { sanitizeLanguageSpec } from '../services/languageTeachingContext';
 import { unsignUploadPath } from '../utils/uploadSigning';
 import { ownerFromName, ownUploadsOnly, resolveUpload, schoolSlug, storedUploadName } from '../services/uploadAccess';
 import { Response } from 'express';
@@ -53,7 +54,11 @@ import {
 } from '../services/uploadStorage';
 
 function toCurriculumResponse(doc: InstanceType<typeof Curriculum>) {
-  return toPlainObject(doc);
+  const plain = toPlainObject(doc) as Record<string, unknown>;
+  // The saved link holds the address the site had when the course was
+  // published (once a hosting address): always give the current one.
+  if (plain.deploymentLink) plain.deploymentLink = buildDeploymentLink(String(plain.id));
+  return plain;
 }
 
 // Who may see or change a curriculum (P1). School content managers (admins)
@@ -141,6 +146,8 @@ export const createCurriculum = asyncHandler(async (req: AuthRequest, res: Respo
           uploads: getOptionalStringArray(ch, 'uploads', { maxItems: 100, maxLength: 512 }) || [],
           description: getOptionalString(ch, 'description', { max: 4000 }) || '',
           enaraSectionId: getOptionalId(ch, 'enaraSectionId'),
+          // Language courses: optional structured lesson facts (ltc-v1), cleaned and capped.
+          languageSpec: sanitizeLanguageSpec(ch.languageSpec),
         };
       })
     : [];
@@ -206,6 +213,8 @@ export const updateCurriculum = asyncHandler(async (req: AuthRequest, res: Respo
     body.chapters = (body.chapters as unknown[]).map((raw) => {
       if (!raw || typeof raw !== 'object') return raw;
       const { quiz: _ignored, ...rest } = raw as Record<string, unknown>;
+      // Language lesson specs are cleaned and capped like on create (ltc-v1).
+      if ('languageSpec' in rest) rest.languageSpec = sanitizeLanguageSpec(rest.languageSpec);
       const kept = typeof rest.id === 'string' ? quizzes.get(rest.id) : undefined;
       return kept && kept.questions?.length ? { ...rest, quiz: kept } : rest;
     });

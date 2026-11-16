@@ -1,0 +1,25 @@
+--- ../remed2/TutorMessage.ts	2026-11-09 14:23:25.783741809 +0000
++++ backend/src/models/TutorMessage.ts	2026-11-09 14:29:29.793696867 +0000
+@@ -106,6 +106,22 @@
+           missingContext: { type: [String], default: undefined },
+           ageBand: String,
+           ageBandSource: String,
++          // ltc-v1-r3 / r4: success streak and structured learning state (no migration:
++          // optional fields, absent on older messages, which the engine treats as unknown).
++          ageBandStatus: String,
++          confirmedSuccessStreak: Number,
++          hintLevelOffered: Number,
++          hintLevel: Number,
++          keyVerdict: String,
++          presentedLessonItemId: String,
++          activeItemBefore: { type: { id: String, source: String, lessonItemId: String, _id: false }, default: undefined },
++          activeItem: { type: { id: String, source: String, lessonItemId: String, _id: false }, default: undefined },
++          assessment: {
++            type: { verdict: String, relevance: String, criteria: { type: [Number], default: undefined }, next: String, item: String, source: String, _id: false },
++            default: undefined,
++          },
++          qualityFlags: { type: [String], default: undefined },
++          markerStatus: String,
+           _id: false,
+         },
+         default: undefined,

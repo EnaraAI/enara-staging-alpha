@@ -247,7 +247,9 @@ describe('tutor reply sources', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.assistantMessage.text).toBe('Direct model answer');
-    expect(res.body.meta).toMatchObject({ intent: 'direct_model', version: 'anthropic:claude-opus-5-5' });
+    // The school sees a neutral engine label; metering still records the real model.
+    expect(res.body.meta).toMatchObject({ intent: 'direct_model', version: 'enara-ai' });
+    expect(JSON.stringify(res.body)).not.toMatch(/anthropic|claude/i);
     const credits = await StudentCredit.findOne({ studentId: 'A1' });
     expect(credits?.usage).toBeGreaterThan(0);
   });

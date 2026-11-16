@@ -1,0 +1,69 @@
+{
+  "runId": "validation-campaign-2-2026-11-13T13-48-00-827Z",
+  "experimentId": "validation-campaign-2",
+  "kind": "validation_campaign",
+  "startedAt": "2026-11-13T13:48:00.957Z",
+  "config": {
+    "experimentId": "validation-campaign-2",
+    "kind": "validation_campaign",
+    "seed": "enara-dls-v2-validation",
+    "students": 48,
+    "replications": 1,
+    "maxTurns": 6,
+    "adversarialShare": 0.25,
+    "models": {
+      "student": "claude-haiku-5-5",
+      "genericTutor": "claude-opus-5-5",
+      "judge": "claude-haiku-5-5"
+    },
+    "budgetCapUsd": 40,
+    "concurrency": 12,
+    "judgeRate": 0.15,
+    "ablate": [
+      "diagnosis",
+      "hint_ladder",
+      "teach_rule",
+      "rule_check",
+      "learner_history",
+      "transfer_check"
+    ],
+    "conditions": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F"
+    ],
+    "samples": 3
+  },
+  "preregSha256": "5a134d40658cdbdae024ce61ba9832da2d3641ed72952d9ee14383dae0420ac3",
+  "preregLocked": false,
+  "code": {
+    "commit": "7de578fe5bd8f315cbf83084bed0beb116478915",
+    "dirty": true,
+    "branch": "claude/codebase-review-kbxqan"
+  },
+  "node": "v22.23.4",
+  "benchmarkSha256": "4b0a6daf2bc266415d69e3125e36767445f61dd77936c7c3a9bbea94121ba6ac",
+  "promptsSha256": "b32a4b0ebd49023108a69eb490fe5231c8fade90d619fe27cad05353a2f44f40",
+  "assignmentSha256": "1196c2e244a368e95e22f5a788702d99bb55b32a871f6e5d277b5b0a7183fef7",
+  "blocksPlanned": 288,
+  "populationChecksFailed": [],
+  "models": {
+    "student": "claude-haiku-5-5",
+    "genericTutor": "claude-opus-5-5",
+    "judge": "claude-haiku-5-5"
+  },
+  "enaraTutorRoute": "POST /api/me/tutor/sessions/:id/messages (real controller, in-process, throwaway DB)",
+  "tutorModelNote": "tutor/intent models are ENARA defaults from backend config; recorded per call in provider_attempts.jsonl",
+  "ablatedFeatures": [
+    "diagnosis",
+    "hint_ladder",
+    "teach_rule",
+    "rule_check",
+    "learner_history",
+    "transfer_check"
+  ],
+  "simulationOnly": true
+}

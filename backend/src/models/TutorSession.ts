@@ -42,6 +42,7 @@ export interface ITutorSession extends Document {
   // study-plan item: the minimal context the tutor gets (built server-side).
   handoff?: { kind: 'assignment' | 'result' | 'plan_item'; refId: string; prompt: string; createdAt: Date };
   lastMessageAt: Date;
+  turnLock?: { id: string; until: Date };
   // Demo/live separation (P1): seeded demo data is 'demo_seed'.
   origin?: 'live' | 'demo_seed';
 }
@@ -87,6 +88,8 @@ const tutorSessionSchema = new Schema<ITutorSession>(
     interventionId: String,
     handoff: { type: { kind: String, refId: String, prompt: String, createdAt: Date }, default: undefined, _id: false },
     lastMessageAt: { type: Date, default: Date.now },
+    // r4.3 (POST-07): one tutor turn at a time per session. Optional; expires on its own.
+    turnLock: { type: { id: String, until: Date }, default: undefined, _id: false },
     origin: { type: String, enum: ['live', 'demo_seed'], default: 'live' },
   },
   { timestamps: true }

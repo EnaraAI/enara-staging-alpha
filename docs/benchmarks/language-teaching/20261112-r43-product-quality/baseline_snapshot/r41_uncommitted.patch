@@ -1,0 +1,691 @@
+diff --git a/backend/src/app.ts b/backend/src/app.ts
+index adf44df..2d60745 100644
+--- a/backend/src/app.ts
++++ b/backend/src/app.ts
+@@ -24,6 +24,7 @@ import demoRoutes from './routes/demo.routes';
+ import { demoGuard } from './middleware/demoGuard';
+ import cronRoutes from './routes/cron.routes';
+ import tutorFacesRoutes from './routes/tutorFaces.routes';
++import learnerAgeBandRoutes from './routes/learnerAgeBand.routes';
+ import batchRoutes from './routes/batch.routes';
+ import courseInstanceRoutes from './routes/courseInstance.routes';
+ import studentRoutes from './routes/student.routes';
+@@ -281,6 +282,7 @@ export function createApp() {
+   app.use('/api/cron', cronRoutes);
+   app.use('/api/tutor-faces', tutorFacesRoutes);
+   app.use('/api/batches', batchRoutes);
++  app.use('/api/age-bands', learnerAgeBandRoutes);
+   app.use('/api/course-instances', courseInstanceRoutes);
+   app.use('/api/students', studentRoutes);
+   app.use('/api/assessments', assessmentRoutes);
+diff --git a/backend/src/controllers/avatar.controller.ts b/backend/src/controllers/avatar.controller.ts
+index 0899bd5..300177b 100644
+--- a/backend/src/controllers/avatar.controller.ts
++++ b/backend/src/controllers/avatar.controller.ts
+@@ -708,8 +708,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
+       : '',
+     kind === 'opening'
+       ? plan
+-        ? `(The call has just started and the student hasn't spoken yet. Open it yourself: greet ${learner?.firstName || 'the student'} by name in one short sentence, then begin the way your teaching plan says - a plan that explains or models first starts with a short explanation of the first step; a plan that questions starts with one question. Under 40 words. Don't list everything you know.)`
+-        : `(The call has just started and the student hasn't spoken yet. Open it yourself: greet ${learner?.firstName || 'the student'} by name in one short sentence, then make one specific offer that fits where they stand - pick up the current or next lesson, practise a weak topic from their recent quiz, or do their review questions due today - and end with a question. Under 40 words. Don't list everything you know.)`
++        ? `(The call has just started and the student hasn't spoken yet. Open it yourself: greet the student warmly in one short sentence (their name is not given to you; don't ask for it), then begin the way your teaching plan says - a plan that explains or models first starts with a short explanation of the first step; a plan that questions starts with one question. Under 40 words. Don't list everything you know.)`
++        : `(The call has just started and the student hasn't spoken yet. Open it yourself: greet the student warmly in one short sentence (their name is not given to you; don't ask for it), then make one specific offer that fits where they stand - pick up the current or next lesson, practise a weak topic from their recent quiz, or do their review questions due today - and end with a question. Under 40 words. Don't list everything you know.)`
+       : kind === 'nudge'
+         ? plan
+           ? "(The student has been quiet for a while after your last question. Help them get unstuck the way your teaching plan says: if the plan explains or models, show the next step yourself with a short example instead of asking again; if it questions, give one hint or a simpler question. One or two sentences, warm, and don't repeat the question word for word.)"
+diff --git a/backend/src/controllers/curriculum.controller.ts b/backend/src/controllers/curriculum.controller.ts
+index 4ebfe48..8f0c6f8 100644
+--- a/backend/src/controllers/curriculum.controller.ts
++++ b/backend/src/controllers/curriculum.controller.ts
+@@ -1,4 +1,5 @@
+ import { queueCurriculumProcessing } from '../services/curriculumExtraction';
++import { sanitizeLanguageSpec } from '../services/languageTeachingContext';
+ import { unsignUploadPath } from '../utils/uploadSigning';
+ import { ownerFromName, ownUploadsOnly, resolveUpload, schoolSlug, storedUploadName } from '../services/uploadAccess';
+ import { Response } from 'express';
+@@ -145,6 +146,8 @@ export const createCurriculum = asyncHandler(async (req: AuthRequest, res: Respo
+           uploads: getOptionalStringArray(ch, 'uploads', { maxItems: 100, maxLength: 512 }) || [],
+           description: getOptionalString(ch, 'description', { max: 4000 }) || '',
+           enaraSectionId: getOptionalId(ch, 'enaraSectionId'),
++          // Language courses: optional structured lesson facts (ltc-v1), cleaned and capped.
++          languageSpec: sanitizeLanguageSpec(ch.languageSpec),
+         };
+       })
+     : [];
+@@ -203,6 +206,14 @@ export const updateCurriculum = asyncHandler(async (req: AuthRequest, res: Respo
+       }
+     }
+   }
++  // Language lesson specs are cleaned and capped like on create (ltc-v1).
++  if (Array.isArray(body.chapters)) {
++    for (const raw of body.chapters as unknown[]) {
++      if (raw && typeof raw === 'object' && 'languageSpec' in raw) {
++        (raw as { languageSpec?: unknown }).languageSpec = sanitizeLanguageSpec((raw as { languageSpec?: unknown }).languageSpec);
++      }
++    }
++  }
+   for (const key of allowed) {
+     if (body[key] !== undefined) {
+       (curriculum as unknown as Record<string, unknown>)[key] = body[key];
+diff --git a/backend/src/controllers/me.controller.ts b/backend/src/controllers/me.controller.ts
+index 65eaafe..004894a 100644
+--- a/backend/src/controllers/me.controller.ts
++++ b/backend/src/controllers/me.controller.ts
+@@ -132,6 +132,15 @@ export const getMyCurriculumContext = asyncHandler(async (req: AuthRequest, res:
+     id: curriculum?.id,
+     name: curriculum?.name,
+     summary: curriculum?.summary || course.curriculumSummary,
+-    chapters: curriculum?.chapters || [],
++    // r4: lesson items reach students as id + prompt only; accepted answers and
++    // target forms (the answer key) stay staff-side.
++    chapters: (curriculum?.chapters || []).map(studentChapter),
+   });
+ });
++
++function studentChapter(ch: unknown) {
++  const c = typeof (ch as { toObject?: () => unknown })?.toObject === 'function' ? (ch as { toObject: () => Record<string, any> }).toObject() : (ch as Record<string, any>);
++  const items = c?.languageSpec?.items;
++  if (!Array.isArray(items)) return c;
++  return { ...c, languageSpec: { ...c.languageSpec, items: items.map((i: { id: string; prompt: string }) => ({ id: i.id, prompt: i.prompt })) } };
++}
+diff --git a/backend/src/controllers/tutor.controller.ts b/backend/src/controllers/tutor.controller.ts
+index e62411c..0fefc3f 100644
+--- a/backend/src/controllers/tutor.controller.ts
++++ b/backend/src/controllers/tutor.controller.ts
+@@ -3,6 +3,8 @@ import { assignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
+ import { isFeatureEnabled, isShadowMode } from '../services/featureFlags';
+ import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSource } from '../services/curriculumRetrieval';
+ import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
++import { buildLanguageTeachingContext, finalizeLanguageTurn, turnEvidence, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
++import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
+ import {
+   curriculumFromCourse,
+   isDirectTutorModelConfigured,
+@@ -167,6 +169,11 @@ interface TutorTurn {
+   orchestrator?: Parameters<typeof queryOrchestratorChat>[0];
+   // The teaching plan (ped-v2) and the metadata stored on the reply.
+   plan?: ObjectiveContext | null;
++  // Language courses (ltc-v1): context and moves for this turn.
++  language?: LanguageTeachingContext | null;
++  // r4: the hidden assessment read from the model's reply (stripped before display/storage).
++  // r4.1: plus how many markers were removed but not trusted (POST-02).
++  languageMarker?: StrippedReply;
+   // Builds the direct-model request (retrieval, objective focus, learner snapshot).
+   directParams?: () => Promise<TutorRequestParams>;
+ }
+@@ -196,10 +203,14 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
+   let enaraCourseId: string | undefined;
+   let enaraSectionId: string | undefined;
+   let curriculum: TutorCurriculum | undefined;
++  // The curriculum of a course resolved (and enrolment-checked) in this turn;
++  // the language context reads only this one, never an id stored on the session.
++  let resolvedCurriculumId: string | undefined;
+ 
+   if (courseId) {
+     try {
+       const course = await buildCourseTree(studentId, courseId);
++      resolvedCurriculumId = course.curriculumId;
+       session.courseId = course.id;
+       session.curriculumId = course.curriculumId;
+       curriculumSummary = curriculumSummary || course.curriculumSummary;
+@@ -227,6 +238,17 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
+       content: m.text,
+     }));
+ 
++  // r4: the same recent turns with their stored language-turn state, for the
++  // engine only (the model never receives metadata; it gets `history`).
++  const languageHistory = earlier
++    .filter((m) => m.role === 'user' || m.role === 'ai')
++    .slice(-12)
++    .map((m) => ({
++      role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
++      content: m.text,
++      languageTurn: (m as { meta?: { languageTurn?: LanguageTurnEvidence } }).meta?.languageTurn ?? null,
++    }));
++
+   const enrichedQuery = [
+     curriculumSummary ? `Curriculum context: ${curriculumSummary}` : '',
+     lessonTitle ? `Current lesson: ${lessonTitle}` : '',
+@@ -269,7 +291,24 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
+     tutorSessionId: session.id,
+     channel: req.path.endsWith('/stream') ? 'stream' : 'chat',
+   });
+-  if (enaraCourseId && !extraRules.length && !turn.plan) {
++  // Language course: labelled learner/lesson context and this turn's teaching
++  // moves. Built from server-side records only (session owner, enrolled course,
++  // the school's own curriculum). Like a plan, it needs the direct model.
++  turn.language = await buildLanguageTeachingContext({
++    institutionId: session.institutionId,
++    curriculumId: resolvedCurriculumId,
++    lessonId: session.lessonId,
++    // Option B: the owner-checked session's student, for the trusted age band only.
++    studentId,
++    // r4.1 (POST-03): owner-checked session and enrolment-checked course, for the state namespace.
++    sessionId: session.id,
++    courseId: resolvedCurriculumId ? session.courseId : undefined,
++    message: text.trim(),
++    history: languageHistory,
++    hintsOnly: tutorPolicy.policy === 'hints_only',
++    masteryStatus: turn.plan?.masteryStatus,
++  });
++  if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language) {
+     turn.orchestrator = {
+       course_id: enaraCourseId,
+       query: enrichedQuery,
+@@ -297,6 +336,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
+       pedagogy: [turn.plan?.prompt, ...extraRules].filter(Boolean).join('\n\n') || undefined,
+       planActive: Boolean(turn.plan),
+       sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
++      languageContext: turn.language?.prompt,
+       learner: await getLearnerSnapshot(studentId).then((l) => (l ? describeSnapshot(l) : undefined)),
+     };
+   };
+@@ -315,8 +355,23 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
+   }
+   turn.reservation = undefined;
+   const citations = citationsIn(aiResult.answer, turn.sources);
++  const assistantId = generateMessageId();
++  const languageTurn = turn.language && reply
++    ? {
++        ...turnEvidence(turn.language, turn.plan?.teaching.objectiveId),
++        ...finalizeLanguageTurn(turn.language, {
++          reply: aiResult.answer,
++          learnerText: turn.text,
++          messageId: assistantId,
++          parsed: turn.languageMarker?.assessment ?? null,
++          malformed: turn.languageMarker?.malformed,
++          untrustedMarkers: turn.languageMarker?.untrustedMarkers,
++          firstMarkerNotLeading: turn.languageMarker?.firstMarkerNotLeading,
++        }),
++      }
++    : undefined;
+   const assistantMessage = {
+-    id: generateMessageId(),
++    id: assistantId,
+     role: 'ai' as const,
+     text: aiResult.answer,
+     timestamp: new Date(),
+@@ -328,6 +383,8 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
+       ...(citations.length ? { citations } : {}),
+       // Recorded only when the plan was actually used for this reply (a model reply).
+       ...(turn.plan && reply ? { teaching: turn.plan.teaching } : {}),
++      // Recorded only for a model reply (the moves were actually given to it).
++      ...(languageTurn ? { languageTurn } : {}),
+     },
+   };
+   const { session } = turn;
+@@ -353,7 +410,15 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
+   let reply: TutorReply | null = null;
+   if (turn.orchestrator) reply = await queryOrchestratorChat(turn.orchestrator);
+   // Orchestrator down or unconfigured: answer with the direct model instead.
+-  if (!reply && turn.directParams) reply = await queryDirectTutorModel(await turn.directParams());
++  if (!reply && turn.directParams) {
++    reply = await queryDirectTutorModel(await turn.directParams());
++    // r4: the hidden assessment line is read and removed before anything is stored or sent.
++    if (reply && turn.language) {
++      const stripped = stripAssessmentMarkers(reply.answer);
++      turn.languageMarker = stripped;
++      reply = stripped.text ? { ...reply, answer: stripped.text } : null;
++    }
++  }
+   const { aiResult, assistantMessage } = await finishTutorTurn(turn, reply);
+   res.json({
+     userMessage: turn.userMessage,
+@@ -391,10 +456,23 @@ export const streamTutorMessage = asyncHandler(async (req: AuthRequest, res: Res
+       const params = await turn.directParams();
+       const status: StreamStatus = {};
+       let answer = '';
++      // r4: hidden assessment markers are held back and removed as the text streams
++      // (a marker split across chunks never reaches the student).
++      const filter = turn.language ? new AssessmentMarkerFilter() : null;
+       for await (const delta of streamDirectTutorModel(params, status)) {
+         if (!open) break; // the student left: stop generating (metered as cancelled)
+-        answer += delta;
+-        send({ type: 'token', delta });
++        const visible = filter ? filter.push(delta) : delta;
++        if (!visible) continue;
++        answer += visible;
++        send({ type: 'token', delta: visible });
++      }
++      if (filter && open) {
++        const tail = filter.end();
++        if (tail) {
++          answer += tail;
++          send({ type: 'token', delta: tail });
++        }
++        turn.languageMarker = filterSummary(filter, answer);
+       }
+       if (!open) {
+         if (turn.reservation) await releaseUsage(turn.reservation);
+diff --git a/backend/src/models/Batch.ts b/backend/src/models/Batch.ts
+index 53427ce..6c6f33f 100644
+--- a/backend/src/models/Batch.ts
++++ b/backend/src/models/Batch.ts
+@@ -1,3 +1,4 @@
++import { LEARNER_AGE_BANDS, type LearnerAgeBand } from './learnerAgeBand';
+ import { Schema, model, Document } from 'mongoose';
+ 
+ export interface IBatch extends Document {
+@@ -9,6 +10,8 @@ export interface IBatch extends Document {
+   academicYear: string;
+   groupId?: string;
+   origin?: 'live' | 'demo_seed';
++  // Class-level trusted learner age band (see Student.learnerAgeBand).
++  learnerAgeBand?: LearnerAgeBand;
+ }
+ 
+ const batchSchema = new Schema<IBatch>(
+@@ -21,6 +24,7 @@ const batchSchema = new Schema<IBatch>(
+     academicYear: { type: String, required: true },
+     groupId: { type: String },
+     origin: { type: String, enum: ['live', 'demo_seed'], default: 'live' },
++    learnerAgeBand: { type: String, enum: LEARNER_AGE_BANDS, select: false },
+   },
+   { timestamps: true }
+ );
+diff --git a/backend/src/models/Curriculum.ts b/backend/src/models/Curriculum.ts
+index c106a2d..3bdad09 100644
+--- a/backend/src/models/Curriculum.ts
++++ b/backend/src/models/Curriculum.ts
+@@ -6,6 +6,20 @@ export interface IChapter {
+   uploads: string[];
+   description?: string;
+   enaraSectionId?: string;
++  // Language courses (Phase 1, ltc-v1): optional structured lesson facts the
++  // tutor teaches from. Absent on every existing lesson; no migration needed.
++  languageSpec?: {
++    objectives?: string[];
++    successCriteria?: string[];
++    vocabulary?: string[];
++    grammar?: string[];
++    functions?: string[];
++    skills?: string[];
++    examples?: string[];
++    // r4: exercises from the course (id + prompt reach the tutor; accepted answers
++    // and target forms stay server-side). Optional; absent on existing lessons.
++    items?: { id: string; prompt: string; acceptedAnswers?: string[]; targetForms?: string[]; criteria?: number[] }[];
++  };
+ }
+ 
+ export interface ICurriculum extends Document {
+@@ -38,6 +52,23 @@ const chapterSchema = new Schema<IChapter>(
+     uploads: { type: [String], default: [] },
+     description: { type: String, default: '' },
+     enaraSectionId: { type: String },
++    languageSpec: {
++      type: {
++        objectives: { type: [String], default: undefined },
++        successCriteria: { type: [String], default: undefined },
++        vocabulary: { type: [String], default: undefined },
++        grammar: { type: [String], default: undefined },
++        functions: { type: [String], default: undefined },
++        skills: { type: [String], default: undefined },
++        examples: { type: [String], default: undefined },
++        items: {
++          type: [{ id: String, prompt: String, acceptedAnswers: { type: [String], default: undefined }, targetForms: { type: [String], default: undefined }, criteria: { type: [Number], default: undefined }, _id: false }],
++          default: undefined,
++        },
++        _id: false,
++      },
++      default: undefined,
++    },
+   },
+   { _id: false }
+ );
+diff --git a/backend/src/models/Student.ts b/backend/src/models/Student.ts
+index c3c3bf1..6fe5aea 100644
+--- a/backend/src/models/Student.ts
++++ b/backend/src/models/Student.ts
+@@ -1,3 +1,4 @@
++import { LEARNER_AGE_BANDS, type LearnerAgeBand } from './learnerAgeBand';
+ import { Schema, model, Document } from 'mongoose';
+ 
+ export interface IStudent extends Document {
+@@ -10,6 +11,10 @@ export interface IStudent extends Document {
+   batchId?: string;
+   academicYear?: string;
+   groupId?: string;
++  // Trusted, staff-set coarse learning-context category (not an exact age).
++  // Written only by Workspace Admins via /api/age-bands; never selected by
++  // default so existing reads don't expose it.
++  learnerAgeBand?: LearnerAgeBand;
+   progress?: number;
+   avgScore?: number;
+   studyTime?: string;
+@@ -73,6 +78,7 @@ const studentSchema = new Schema<IStudent>(
+     batchId: { type: String, index: true },
+     academicYear: { type: String },
+     groupId: { type: String },
++    learnerAgeBand: { type: String, enum: LEARNER_AGE_BANDS, select: false },
+     progress: { type: Number, default: 0 },
+     avgScore: { type: Number, default: 0 },
+     studyTime: { type: String, default: '0h/week' },
+diff --git a/backend/src/models/TutorMessage.ts b/backend/src/models/TutorMessage.ts
+index fe05954..8a43049 100644
+--- a/backend/src/models/TutorMessage.ts
++++ b/backend/src/models/TutorMessage.ts
+@@ -1,3 +1,4 @@
++import type { LanguageTurnEvidence } from '../services/languageTeachingContext';
+ import { Schema, model, Document } from 'mongoose';
+ import type { ChatRole, TeachingMethod } from './TutorSession';
+ 
+@@ -37,6 +38,9 @@ export interface ITutorMessageDoc extends Document {
+     citations?: { n: number; fileName: string; page: number | null; lessonId: string; chunkId: string }[];
+     // The teaching plan this reply followed (P21); absent on older messages.
+     teaching?: TeachingMeta;
++    // Language courses (ltc-v1): moves used and turn signals. Low-confidence
++    // observation, never mastery (services/languageTeachingContext.ts).
++    languageTurn?: LanguageTurnEvidence;
+   };
+ }
+ 
+@@ -74,6 +78,58 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
+         },
+         default: undefined,
+       },
++      languageTurn: {
++        type: {
++          version: String,
++          lessonId: String,
++          objectiveId: String,
++          skill: String,
++          moves: { type: [String], default: undefined },
++          reasonCodes: { type: [String], default: undefined },
++          supportRequested: Boolean,
++          confusionSignals: Number,
++          answeringCheck: Boolean,
++          proficiency: { type: { status: String, value: String, source: String, _id: false }, default: undefined },
++          nextStep: String,
++          provenance: String,
++          confidence: String,
++          masteryClaim: Boolean,
++          // ltc-v1-r1
++          policyRevision: String,
++          pendingTask: String,
++          learnerResponse: String,
++          attemptsOnTask: Number,
++          offTopic: String,
++          lengthTarget: { type: { targetWords: Number, maxWords: Number, basis: String, _id: false }, default: undefined },
++          // ltc-v1-r2
++          errorRecurrence: String,
++          missingContext: { type: [String], default: undefined },
++          ageBand: String,
++          ageBandSource: String,
++          // ltc-v1-r3 / r4: success streak and structured learning state (no migration:
++          // optional fields, absent on older messages, which the engine treats as unknown).
++          ageBandStatus: String,
++          confirmedSuccessStreak: Number,
++          hintLevelOffered: Number,
++          hintLevel: Number,
++          keyVerdict: String,
++          presentedLessonItemId: String,
++          activeItemBefore: { type: { id: String, source: String, lessonItemId: String, _id: false }, default: undefined },
++          activeItem: { type: { id: String, source: String, lessonItemId: String, _id: false }, default: undefined },
++          assessment: {
++            type: { verdict: String, relevance: String, criteria: { type: [Number], default: undefined }, next: String, item: String, source: String, _id: false },
++            default: undefined,
++          },
++          qualityFlags: { type: [String], default: undefined },
++          markerStatus: String,
++          // r4.1: opaque state namespace (POST-03) and the learner's intent class (POST-12).
++          stateScope: String,
++          learnerIntent: String,
++          revealedItemId: String,
++          _id: false,
++        },
++        default: undefined,
++      },
+     },
+   },
+   { collection: 'tutor_messages', versionKey: false },
+diff --git a/backend/src/services/demoTemplate.ts b/backend/src/services/demoTemplate.ts
+index 803d4ec..6d9313f 100644
+--- a/backend/src/services/demoTemplate.ts
++++ b/backend/src/services/demoTemplate.ts
+@@ -28,6 +28,15 @@ const LESSONS = [
+       'Greeting people and introducing yourself. Key phrases: "Hello, I\'m…", "Nice to meet you", "Where are you from?", "I\'m from Cairo", ' +
+       '"What do you do?", "I\'m a student". Good morning (until 12), good afternoon (12–6), good evening (after 6). ' +
+       'Practice: introduce yourself and a friend: "This is Mona. She is a doctor."',
++    languageSpec: {
++      objectives: ['Greet people and introduce yourself', 'Introduce a friend and say their job'],
++      successCriteria: ['Uses the right greeting for the time of day', 'Says "This is … He/She is a …" correctly'],
++      vocabulary: ['hello', 'nice to meet you', 'good morning', 'good afternoon', 'good evening', 'student', 'doctor', 'teacher'],
++      grammar: ["I'm / he's / she's (to be)", 'This is …', 'Where are you from?'],
++      functions: ['greeting', 'introducing yourself', 'introducing someone else'],
++      skills: ['writing', 'reading'],
++      examples: ["Hello, I'm Lina. Nice to meet you.", 'This is Mona. She is a doctor.'],
++    },
+   },
+   {
+     title: 'Lesson 2: My daily routine',
+@@ -35,6 +44,15 @@ const LESSONS = [
+       'Present simple for routines and habits. I/you/we/they get up; he/she/it gets up (add -s). Time phrases: every day, on Mondays, ' +
+       'at 7 o\'clock, in the morning. Adverbs of frequency go before the main verb: "I usually have breakfast at 7." ' +
+       'Practice: describe your day from morning to night in five sentences.',
++    languageSpec: {
++      objectives: ['Describe a daily routine with the present simple'],
++      successCriteria: ['Adds -s for he/she/it', 'Puts adverbs of frequency before the main verb'],
++      vocabulary: ['get up', 'have breakfast', 'go to work', 'every day', 'usually', 'always', 'sometimes', 'never'],
++      grammar: ['present simple (he/she/it + -s)', 'adverbs of frequency before the main verb'],
++      functions: ['describing habits and routines'],
++      skills: ['writing', 'reading'],
++      examples: ['I usually have breakfast at 7.', 'She gets up at 6 every day.'],
++    },
+   },
+   {
+     title: 'Lesson 3: At the café',
+@@ -42,6 +60,15 @@ const LESSONS = [
+       'Ordering food and drink politely. "Can I have a coffee, please?", "I\'d like a cheese sandwich", "How much is it?", "Here you are". ' +
+       'Countable and uncountable: a sandwich / some water, an apple / some rice. Questions: "Would you like…?" ' +
+       'Practice: a short dialogue between a customer and a waiter.',
++    languageSpec: {
++      objectives: ['Order food and drink politely'],
++      successCriteria: ['Uses "Can I have …, please?" or "I\'d like …"', 'Uses a/an with countable and some with uncountable nouns'],
++      vocabulary: ['coffee', 'tea', 'sandwich', 'water', 'rice', 'How much is it?', 'Here you are'],
++      grammar: ['Can I have …?', "I'd like …", 'a/an vs some (countable/uncountable)'],
++      functions: ['ordering', 'asking the price', 'polite requests'],
++      skills: ['writing', 'reading'],
++      examples: ['Can I have a coffee, please?', "I'd like a cheese sandwich."],
++    },
+   },
+   {
+     title: 'Lesson 4: Last weekend',
+@@ -49,6 +76,15 @@ const LESSONS = [
+       'Past simple for finished actions. Regular verbs add -ed (played, visited, watched); common irregular verbs: go → went, have → had, ' +
+       'see → saw, eat → ate. Questions with did: "What did you do last weekend?" "I went to the beach." ' +
+       'Practice: write four sentences about your last weekend.',
++    languageSpec: {
++      objectives: ['Talk about finished actions in the past'],
++      successCriteria: ['Uses -ed for regular verbs', 'Uses went, had, saw, ate correctly', 'Asks questions with did'],
++      vocabulary: ['last weekend', 'yesterday', 'played', 'visited', 'watched', 'went', 'had', 'saw', 'ate'],
++      grammar: ['past simple regular (-ed)', 'common irregular past forms', 'questions with did'],
++      functions: ['telling what happened', 'asking about the past'],
++      skills: ['writing', 'reading'],
++      examples: ['What did you do last weekend?', 'I went to the beach.'],
++    },
+   },
+ ];
+ const STUDENTS = ['Lina Hassan', 'Omar Adel', 'Sara Nabil', 'Youssef Kamal', 'Nour Samir', 'Adam Fathy'];
+@@ -118,7 +154,7 @@ export async function buildDemoTemplate(now = new Date()) {
+         summary: 'Four short lessons for adult beginners: introductions, daily routines, ordering at a café and talking about the past.',
+         description: 'An original Enara sample course for the demo.', lastUpdated: now.toISOString().slice(0, 10), subjectsCount: LESSONS.length,
+         assignedBatches: ['Everyday English A2'], status: 'deployed', createdBy: teacherId, origin: 'live',
+-        chapters: LESSONS.map((l, i) => ({ id: ID.lesson(i + 1), title: l.title, description: l.description, uploads: [] })),
++        chapters: LESSONS.map((l, i) => ({ id: ID.lesson(i + 1), title: l.title, description: l.description, uploads: [], languageSpec: l.languageSpec })),
+       },
+     },
+     { upsert: true },
+diff --git a/backend/src/services/directTutorModel.ts b/backend/src/services/directTutorModel.ts
+index 39a4402..326640b 100644
+--- a/backend/src/services/directTutorModel.ts
++++ b/backend/src/services/directTutorModel.ts
+@@ -145,6 +145,9 @@ export interface TutorRequestParams {
+   // Retrieved course passages (services/curriculumRetrieval.ts). When given,
+   // they replace sending whole lesson files.
+   sourcesPrompt?: string;
++  // Language courses (ltc-v1): labelled learner/lesson context and this turn's
++  // teaching moves (services/languageTeachingContext.ts).
++  languageContext?: string;
+ }
+ 
+ // Shown to the student's own tutor in every mode: checks understanding and
+@@ -225,6 +228,9 @@ export async function buildTutorRequest(params: TutorRequestParams) {
+   if (params.pedagogy) {
+     system.push({ type: 'text', text: params.pedagogy });
+   }
++  if (params.languageContext) {
++    system.push({ type: 'text', text: params.languageContext });
++  }
+   if (params.sourcesPrompt) {
+     system.push({ type: 'text', text: params.sourcesPrompt });
+   }
+diff --git a/backend/src/services/learnerSnapshot.ts b/backend/src/services/learnerSnapshot.ts
+index ada8ebf..25bc061 100644
+--- a/backend/src/services/learnerSnapshot.ts
++++ b/backend/src/services/learnerSnapshot.ts
+@@ -114,9 +114,10 @@ export async function buildLearnerSnapshot(studentId: string): Promise<LearnerSn
+   };
+ }
+ 
+-// Compact text for prompts.
++// Compact text for prompts. Sent to the AI provider, so it carries no direct
++// identifier: no name, email or ID (Phase 1 privacy rule, LTC-D12).
+ export function describeSnapshot(s: LearnerSnapshot): string {
+-  const lines = [`Student: ${s.firstName}`];
++  const lines: string[] = [];
+   for (const c of s.courses) {
+     lines.push(
+       `Course "${c.title}": ${c.completedLessons}/${c.totalLessons} lessons done` +
+diff --git a/backend/src/services/learningContext.ts b/backend/src/services/learningContext.ts
+index 974b7fe..845eb86 100644
+--- a/backend/src/services/learningContext.ts
++++ b/backend/src/services/learningContext.ts
+@@ -42,6 +42,8 @@ const DISENGAGED_DAYS = 7;
+ 
+ export interface ObjectiveContext {
+   decision: TeachingPlan & { id?: string };
++  // The objective's mastery status from the evidence model (read-only).
++  masteryStatus?: string;
+   prompt: string;
+   teaching: TeachingMeta;
+ }
+@@ -241,7 +243,7 @@ export async function buildObjectiveContext(params: {
+       decisionVersion: plan.decisionVersion,
+       registryVersion: plan.registryVersion,
+     };
+-    return { decision: { ...plan, id }, prompt: lines.join('\n'), teaching };
++    return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching };
+   } catch (error) {
+     logger.warn('learning_context_failed', { error: serializeError(error) });
+     return null;
+diff --git a/backend/test/p1ReviewFixes.test.ts b/backend/test/p1ReviewFixes.test.ts
+index d973406..78808a0 100644
+--- a/backend/test/p1ReviewFixes.test.ts
++++ b/backend/test/p1ReviewFixes.test.ts
+@@ -38,8 +38,10 @@ describe('portal routing (frontend services/roleRouting.ts)', () => {
+     expect(restoreUiRole(undefined, 'admin')).toBeNull();
+   });
+ 
+-  it('the academic manager portal offers only school insights; other pages fall back to it', () => {
+-    expect(ACADEMIC_MANAGER_PAGES.map((p) => p.page)).toEqual(['dashboard']);
++  // Option B (approved 9 Nov 2026): academic managers may also view learner age
++  // bands read-only; the server returns canEdit=false and rejects their writes.
++  it('the academic manager portal offers school insights and the read-only age-band view; other pages fall back to insights', () => {
++    expect(ACADEMIC_MANAGER_PAGES.map((p) => p.page)).toEqual(['dashboard', 'age-bands']);
+     for (const page of ['students', 'curriculum', 'assignments', 'grading', 'credits', 'live-avatars', 'teaching']) expect(academicManagerPage(page)).toBe('dashboard');
+   });
+ });
+diff --git a/frontend/App.tsx b/frontend/App.tsx
+index 6bf3478..2c93c7f 100644
+--- a/frontend/App.tsx
++++ b/frontend/App.tsx
+@@ -4,6 +4,7 @@ import { Login } from './pages/Login';
+ import { AccountLink, accountLinkFromLocation } from './pages/AccountLink';
+ import { DemoPortal } from './pages/DemoPortal';
+ import { People } from './pages/workspace/People';
++import { LearnerAgeBands } from './pages/workspace/LearnerAgeBands';
+ import { StudentDashboard } from './pages/StudentDashboard';
+ import { CoursePage } from './pages/CoursePage';
+ import { AdminDashboard } from './pages/AdminDashboard';
+@@ -427,6 +428,8 @@ const App: React.FC = () => {
+           {page === 'dashboard' && <InstitutionAnalytics />}
+           {/* P4: read-only school outcome aggregates (no class filter, no student timeline). */}
+           {page === 'dashboard' && <Outcomes allowClassFilter={false} showTimeline={false} />}
++          {/* Option B: read-only for academic managers (the server returns canEdit=false and rejects writes). */}
++          {page === 'age-bands' && <LearnerAgeBands />}
+         </main>
+       </div>
+     );
+@@ -522,6 +525,8 @@ const App: React.FC = () => {
+           {/* P5: Workspace Admin only; the server enforces workspace:billing too. */}
+           {state.page === 'usage' && sessionUser()?.role === 'admin' && <Usage />}
+           {state.page === 'people' && (sessionUser()?.role === 'admin' || sessionUser()?.role === 'enara-admin') && <People />}
++          {/* Option B: Workspace Admin edits learner age bands; the server enforces it. */}
++          {state.page === 'age-bands' && sessionUser()?.role === 'admin' && <LearnerAgeBands />}
+           {state.page === 'savings' && sessionUser()?.role === 'admin' && <SavingsCenter />}
+           {state.page === 'assessment-builder' && <AssessmentBuilder />}
+           {state.page === 'class-assignments' && <ClassAssignments />}
+diff --git a/frontend/components/Layout.tsx b/frontend/components/Layout.tsx
+index 06519db..3c297b1 100644
+--- a/frontend/components/Layout.tsx
++++ b/frontend/components/Layout.tsx
+@@ -210,6 +210,7 @@ export const AdminSidebar: React.FC<{
+     { id: 'outcomes', label: 'Outcomes', icon: Milestone },
+     // P5: Workspace Admin only (workspace:billing); hidden for teachers.
+     { id: 'people', label: 'People', icon: Users, workspaceAdminOnly: true },
++    { id: 'age-bands', label: 'Learner Age Bands', icon: Users, workspaceAdminOnly: true },
+     { id: 'usage', label: 'Usage', icon: Gauge, workspaceAdminOnly: true },
+     { id: 'savings', label: 'AI Savings Center', icon: PiggyBank, workspaceAdminOnly: true },
+     { id: 'learning-events', label: 'Learning Events', icon: ListChecks },
+diff --git a/frontend/services/apiService.ts b/frontend/services/apiService.ts
+index 739f811..acd0e23 100644
+--- a/frontend/services/apiService.ts
++++ b/frontend/services/apiService.ts
+@@ -1152,3 +1152,25 @@ export const setWorkspaceUserStatus = (id: string, status: 'active' | 'disabled'
+ export const fetchWorkspaceInvitations = () => request<{ invitations: WorkspaceInvitation[] }>('GET', '/api/workspace/invitations');
+ export const createWorkspaceInvitation = (email: string, role: string) => request<{ inviteLink: string; invitation: WorkspaceInvitation }>('POST', '/api/workspace/invitations', { email, role });
+ export const revokeWorkspaceInvitation = (id: string) => request<void>('DELETE', `/api/workspace/invitations/${encodeURIComponent(id)}`);
++
++// Trusted learner age band (Option B). Workspace Admin edits; Academic Manager views.
++export type LearnerAgeBandValue = 'child' | 'teen' | 'adult';
++export interface AgeBandOverview {
++  values: LearnerAgeBandValue[];
++  adultSchool: boolean;
++  canEdit: boolean;
++  classes: { id: string; name: string; ageBand: LearnerAgeBandValue | null }[];
++  students: {
++    id: string;
++    name: string;
++    classId: string | null;
++    ageBand: LearnerAgeBandValue | null;
++    classAgeBand: LearnerAgeBandValue | null;
++    effective: { ageBand: LearnerAgeBandValue | 'unknown'; source: string; status: string };
++  }[];
++}
++export const fetchAgeBands = () => request<AgeBandOverview>('GET', '/api/age-bands');
++export const setStudentAgeBand = (id: string, ageBand: LearnerAgeBandValue | null) =>
++  request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/students/${encodeURIComponent(id)}`, { ageBand });
++export const setClassAgeBand = (id: string, ageBand: LearnerAgeBandValue | null) =>
++  request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/classes/${encodeURIComponent(id)}`, { ageBand });
+diff --git a/frontend/services/roleRouting.ts b/frontend/services/roleRouting.ts
+index 80f217c..bcf46a5 100644
+--- a/frontend/services/roleRouting.ts
++++ b/frontend/services/roleRouting.ts
+@@ -35,7 +35,7 @@ export function restoreUiRole(backendRole: string | undefined, saved: string | n
+ // on their Teaching Dashboard instead of the school dashboard.
+ export const SCHOOL_ADMIN_PAGES = [
+   'dashboard', 'live-avatars', 'course-intelligence', 'institution-analytics', 'students',
+-  'credits', 'engagement', 'school-insights', 'learning-events', 'usage', 'savings', 'people',
++  'credits', 'engagement', 'school-insights', 'learning-events', 'usage', 'savings', 'people', 'age-bands',
+ ] as const;
+ 
+ export function staffPageAllowed(backendRole: string | undefined, page: string): boolean {
+@@ -49,7 +49,7 @@ export function staffLandingPage(backendRole: string | undefined): string {
+ // The pages of the academic manager portal: school-wide, read-only analytics
+ // (GET /api/analytics/*). Nothing that edits content, teaches, grades,
+ // administers users or budgets, or shows internal AI cost.
+-export const ACADEMIC_MANAGER_PAGES = [{ page: 'dashboard', label: 'School insights' }] as const;
++export const ACADEMIC_MANAGER_PAGES = [{ page: 'dashboard', label: 'School insights' }, { page: 'age-bands', label: 'Learner age bands (view)' }] as const;
+ 
+ export function academicManagerPage(page: string): string {
+   return ACADEMIC_MANAGER_PAGES.some((p) => p.page === page) ? page : 'dashboard';

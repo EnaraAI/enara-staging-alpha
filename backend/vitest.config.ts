@@ -11,6 +11,7 @@ export default defineConfig({
       R2_BUCKET: '',
       R2_ACCESS_KEY_ID: '',
       R2_SECRET_ACCESS_KEY: '',
+      RESEND_API_KEY: '',
     },
   },
 });

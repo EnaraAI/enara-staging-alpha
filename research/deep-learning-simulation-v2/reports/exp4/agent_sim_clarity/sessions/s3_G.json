@@ -1,0 +1,92 @@
+{
+ "cond": "G",
+ "studentIdx": 3,
+ "outcomeId": "LS-02",
+ "persona": "You are role-playing an English learner in Egypt (first language Arabic), course level B2. Write ONLY what the learner types; never mention being an AI or role-playing; keep each message under 25 words. You learn at a normal pace. Your confidence in your own answers is about right. You currently believe something wrong about this point: Gives the original price instead of the new price (for example you might write: \"A: It is 10 dollars. B: Now 8. -> 10\"). You hold this belief very firmly. You change it only if what you are taught - by a tutor or by study material, whichever - really convinces you; how easily you are convinced depends on how well it is explained and on your learning speed. You do not yet know this point well. Your basic prerequisite knowledge is moderate. Sometimes you are distracted (11% of the time) and sometimes you guess (18% of the time). Do not pretend to understand if the explanation did not help you; you may ask for clarification, make mistakes, guess, or fail to learn.",
+ "turns": [
+  {
+   "learner": "Hello teacher. I want to practise asking and saying prices, like how much is it.",
+   "tutor": "Hello! Prices are a good thing to practise. Read this short dialogue.\n\nA: It was 60 pounds. Now it is 20.\nB: How much is it now?\nA: It is sixty pounds.\n\nThe last answer has a mistake. Which price is right now?",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "I think sixty pounds is right. The first price is 60, so the price is sixty.",
+   "tutor": "Sixty was the first price, so it is true for before. But B asks \"How much is it now?\" and \"now\" means the new price. Look at the word \"now\" in the dialogue: the new price comes after it.\n\nWhich number comes after \"Now it is\"?",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "After Now it is comes twenty. But the question is how much, so I still think sixty.",
+   "tutor": "Yes, twenty comes after \"Now it is\". \"How much is it?\" asks for the price today. Sixty is the old price; it is true only for before.\n\nTry a new one. A: It was 90 euros. Now it is 40. B: How much is it now?\n\nWhat does A say?",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "A says it is ninety euros.",
+   "tutor": "Ninety euros is the old price, not the price now. B asks \"How much is it now?\", so we need the new price. Find the word \"now\" in A's first line. The number after it is the price now.\n\nWhich number is that?",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "It is forty. But I am not sure why the first price is not the answer.",
+   "tutor": "Yes, forty is the price now. The first price was true before. When you buy today, you pay the new price. The first price is not what you pay.\n\nHere is a new one. A: It was 70 pounds. Now it is 50. B: How much is it now?\n\nWhat does A say?",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  },
+  {
+   "learner": "A says it is fifty pounds now.",
+   "tutor": "Yes, fifty pounds is the price now. You used the number after \"Now it is\", not the old price. Fifty and fifteen sound different: fifty ends with -ty.\n\nDo you want to try a quick check to see if this is clear?",
+   "method": {
+    "primary": "error_analysis",
+    "supporting": [
+     "think_aloud"
+    ],
+    "reinforcement": null,
+    "reasonCodes": [
+     "MISINTERPRETATION"
+    ]
+   }
+  }
+ ]
+}

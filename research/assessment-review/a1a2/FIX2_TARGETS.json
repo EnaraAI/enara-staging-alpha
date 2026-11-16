@@ -1,0 +1,947 @@
+{
+  "status": "DRAFT",
+  "round": "Fix of 2+ reviewer known issues (A1-A2)",
+  "source": "docs/ASSESSMENT_REVIEW_LOG.md known-issues table K01-K19 (Final review round and close-out)",
+  "knownIssuesResolved": {
+    "K01": "slot-6/home-rooms tags -> lexical_l1_transfer (new enum)",
+    "K02": "family in-form cueing removed (A-4, A-6, C-3, C-4, C-6, C-1)",
+    "K03": "family C-1 now mother's father (grandfather)",
+    "K04": "home-rooms rebuilt: 7 distinct keys per form, no stem repeated across forms, open FP 7-8",
+    "K05": "'path room' removed",
+    "K06": "home-rooms slot 5 spelling_vowel, slot 6 lexical_l1_transfer in all forms",
+    "K07": "days-months slot 6 = numbered-month calque on month words",
+    "K08": "classroom B-6 office -> desk",
+    "K09": "polite-requests A1 words, vocabLevel A1",
+    "K10": "slot-4 distractors 'Give me ...' / 'I want ...'",
+    "K11": "polite-requests slots 5-6 -> request_directness (new enum); outcome l1ErrorTypes [request_directness]",
+    "K12": "present-continuous A1 words, vocabLevel A1",
+    "K13": "present-continuous slot 5 copula_omission, slot 6 tense_aspect",
+    "K14": "slots 8-9 same am/is/are criterion",
+    "K15": "slot-6 single error (correct -s, no be+-ing)",
+    "K16": "third-person-s A1 words, vocabLevel A1",
+    "K17": "third-person-s slots 5-6 -> agreement_3s",
+    "K18": "imperatives l1ErrorTypes copula_omission removed ([])",
+    "K19": "was-were agreement_3s -> agreement_be (new enum)"
+  },
+  "enumAdditions": [
+    "lexical_l1_transfer",
+    "request_directness",
+    "agreement_be"
+  ],
+  "outcomeMetadata": [
+    {
+      "outcome": "EN-F-A2-GR-imperatives",
+      "field": "l1ErrorTypes",
+      "resolves": "K18"
+    },
+    {
+      "outcome": "EN-F-A2-GR-was-were",
+      "field": "l1ErrorTypes",
+      "resolves": "K19"
+    },
+    {
+      "outcome": "EN-F-A2-FN-polite-requests",
+      "field": "l1ErrorTypes",
+      "resolves": "K11"
+    },
+    {
+      "outcome": "EN-F-A1-VO-family",
+      "field": "l1ErrorTypes",
+      "resolves": "K01"
+    },
+    {
+      "outcome": "EN-F-A1-VO-classroom-objects",
+      "field": "l1ErrorTypes",
+      "resolves": "K01"
+    },
+    {
+      "outcome": "EN-F-A1-VO-home-rooms",
+      "field": "l1ErrorTypes",
+      "resolves": "K01,K05,K06"
+    },
+    {
+      "outcome": "EN-F-A1-VO-numbers-time",
+      "field": "l1ErrorTypes",
+      "resolves": "K01"
+    },
+    {
+      "outcome": "EN-F-A1-VO-days-months",
+      "field": "l1ErrorTypes",
+      "resolves": "K01"
+    }
+  ],
+  "vocabLevelAllItemsA1": [
+    "EN-F-A2-FN-polite-requests",
+    "EN-F-A2-GR-present-continuous",
+    "EN-F-A2-GR-third-person-s"
+  ],
+  "items": [
+    {
+      "item": "EN-F-A1-VO-family-A-6",
+      "resolves": "K01,K02",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-family-A-4",
+      "resolves": "K02",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-family-B-6",
+      "resolves": "K01",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-family-C-6",
+      "resolves": "K01,K02",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-family-C-1",
+      "resolves": "K03,K02",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-family-C-3",
+      "resolves": "K02",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-family-C-4",
+      "resolves": "K02",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-classroom-objects-A-6",
+      "resolves": "K01",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-classroom-objects-C-6",
+      "resolves": "K01",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-classroom-objects-B-6",
+      "resolves": "K08,K01",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-classroom-objects-B-3",
+      "resolves": "K08 (B-6 key not shown in form)",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-days-months-A-6",
+      "resolves": "K07,K01",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-days-months-B-6",
+      "resolves": "K07,K01",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-days-months-C-6",
+      "resolves": "K07,K01",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-numbers-time-A-6",
+      "resolves": "K01",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-numbers-time-B-6",
+      "resolves": "K01",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-numbers-time-C-6",
+      "resolves": "K01",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-A-1",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-A-2",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-A-3",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-A-4",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-A-5",
+      "resolves": "K04,K06",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-A-6",
+      "resolves": "K01,K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-A-7",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "rubric",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-A-8",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "rubric",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-A-9",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-B-1",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-B-2",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-B-3",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-B-4",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-B-5",
+      "resolves": "K04,K05",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-B-6",
+      "resolves": "K01,K04,K05",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-B-7",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "rubric",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-B-8",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "rubric",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-B-9",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-C-1",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-C-2",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-C-3",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-C-4",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-C-5",
+      "resolves": "K04,K05",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-C-6",
+      "resolves": "K01,K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-C-7",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "rubric",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-C-8",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "rubric",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A1-VO-home-rooms-C-9",
+      "resolves": "K04",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "targetForm"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-A-4",
+      "resolves": "K10",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-B-4",
+      "resolves": "K10",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-C-4",
+      "resolves": "K09,K10",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-A-3",
+      "resolves": "K09",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-B-3",
+      "resolves": "K09",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-C-3",
+      "resolves": "K09",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-B-1",
+      "resolves": "K09",
+      "changed": [
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-A-5",
+      "resolves": "K09,K11",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-B-5",
+      "resolves": "K09,K11",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-C-5",
+      "resolves": "K11",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-A-6",
+      "resolves": "K11",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-B-6",
+      "resolves": "K09,K11",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-C-6",
+      "resolves": "K09,K11",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-A-7",
+      "resolves": "K09",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-B-7",
+      "resolves": "K09",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-C-7",
+      "resolves": "K09",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-B-8",
+      "resolves": "K09",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-C-8",
+      "resolves": "K09",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-A-9",
+      "resolves": "K09",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-FN-polite-requests-B-9",
+      "resolves": "K09",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-B-1",
+      "resolves": "K12",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-C-1",
+      "resolves": "K12",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-B-3",
+      "resolves": "K12",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-A-4",
+      "resolves": "K12",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-B-4",
+      "resolves": "K12",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-C-4",
+      "resolves": "K12",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-A-5",
+      "resolves": "K13",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-B-5",
+      "resolves": "K13",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-C-5",
+      "resolves": "K13",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-A-6",
+      "resolves": "K15,K13,K12",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-B-6",
+      "resolves": "K15,K13,K12",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-C-6",
+      "resolves": "K15,K13,K12",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-C-8",
+      "resolves": "K12,K14",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "rubric"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-C-9",
+      "resolves": "K12,K14",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt",
+        "rubric"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-A-8",
+      "resolves": "K14",
+      "changed": [
+        "rubric"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-A-9",
+      "resolves": "K14",
+      "changed": [
+        "rubric"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-B-8",
+      "resolves": "K14",
+      "changed": [
+        "rubric"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-present-continuous-B-9",
+      "resolves": "K14",
+      "changed": [
+        "rubric"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-B-2",
+      "resolves": "K16",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-C-1",
+      "resolves": "K16",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-B-4",
+      "resolves": "K16",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-A-5",
+      "resolves": "K17",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-B-5",
+      "resolves": "K17",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-C-5",
+      "resolves": "K17",
+      "changed": [
+        "l1ErrorType"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-A-6",
+      "resolves": "K16,K17",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-B-6",
+      "resolves": "K16,K17",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-C-6",
+      "resolves": "K16,K17",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "l1ErrorType",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-B-7",
+      "resolves": "K16",
+      "changed": [
+        "acceptedAnswers"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-A-9",
+      "resolves": "K16",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-B-9",
+      "resolves": "K16",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    },
+    {
+      "item": "EN-F-A2-GR-third-person-s-C-9",
+      "resolves": "K16",
+      "changed": [
+        "acceptedAnswers",
+        "answerKey",
+        "prompt"
+      ]
+    }
+  ],
+  "extraEdits": "Test-driven follow-ups (prompt length / novelty): home-rooms A-3, A-5, B-2, B-5, C-1; polite-requests A-5, A-6, A-7, B-1; present-continuous B-6 (final text in the assessment files).",
+  "evpNote": "EVP levels checked from memory, not against the EVP database."
+}

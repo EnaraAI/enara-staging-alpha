@@ -1,0 +1,808 @@
+{
+ "batch": "r4_j04",
+ "cases": {
+  "c3d6da38b7c": {
+   "events": [],
+   "next_task": {
+    "kind": "none"
+   }
+  },
+  "c6c2425f120": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Well done! She watches TV after dinner."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "When a verb ends in consonant + y, change y to -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "c3ade3bd18a": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Well done! \"She watches TV after dinner.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "watches"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "consonant + y → -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "c15297da1cd": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"a\": a doctor."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Vowel sound = an, consonant sound = a."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c9d55297a18": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "one thing needs \"a\", \"an\" or \"the\" before it"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c430b1c1136": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a singular noun like \"pen\" usually does need a word before it, \"a\" or \"an\""
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c81ae8ef201": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"is\" is only for he, she and it."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: We are late. Wrong: We is late."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c72fc84c09e": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "They goes with are: They are happy."
+    }
+   ],
+   "next_task": {
+    "kind": "none"
+   }
+  },
+  "c47d2862147": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "So: They are happy."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "ca44d3a822d": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Words ending in -sh, -ch, -s, -x or -o get -es."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: He mixes the paint. Wrong: He mixs the paint."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "fixes",
+    "errors": {
+     "W1": "fix",
+     "W2": "fixs"
+    }
+   }
+  },
+  "c7913f3d49a": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! She watches TV after dinner."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "change y to -ies. Study → studies."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "c837fb455f9": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"cries\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "cries"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My sister goes to school and studies English.",
+    "errors": {
+     "W1": "My sister go to school and study English.",
+     "W2": "My sister gos to school and studys English."
+    }
+   }
+  },
+  "cf62076fc48": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"is\" is right again."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "is"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Sara is happy.",
+    "errors": {
+     "W1": "Sara happy."
+    }
+   }
+  },
+  "cdb460d0ac8": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes! They are happy."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c7c66ae3251": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"cries\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "cries"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after he, she and it, the verb takes -s"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Verbs ending in -ch, -sh, -s, -x or -o take -es ... consonant plus y becomes -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c6a15cf2050": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"is\" goes only with he, she and it."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "cd63120e6f7": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "an"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c4f846f9c0e": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! \"a doctor\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "a"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c6acd258921": {
+   "events": [],
+   "next_task": {
+    "kind": "none"
+   }
+  },
+  "c537d48af9b": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "That's right! \"She watches TV after dinner.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "watches"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "if the verb ends in a consonant + y, we write -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "cc20df78cad": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like that needs am, is or are"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cfa11b5159f": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "With they we say are: They are happy."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "cd40abfcba2": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "With they we use are: They are happy."
+    }
+   ],
+   "next_task": {
+    "kind": "none"
+   }
+  },
+  "c489577551f": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after he, she or it, the verb gets -s or -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "drinks",
+    "errors": {
+     "W1": "drink"
+    }
+   }
+  },
+  "cf713868e1c": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"They are happy.\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "They are happy."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am happy.",
+    "errors": {
+     "W1": "I happy.",
+     "W2": "I is happy."
+    }
+   }
+  },
+  "c81b9dbf0c0": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "verbs ending in -sh, -ch, -s, -x or -o take -es"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: He fixes the car. Wrong: He fixs the car."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "washes",
+    "errors": {
+     "W1": "wash",
+     "W2": "washs"
+    }
+   }
+  },
+  "cded7bf63c0": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! \"She watches TV after dinner.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "watches"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "change y to i and add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "c9d1a229ffa": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"I am a student.\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "I am a student."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "are goes with you, we, they or two or more people"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Never leave the verb out"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cfb387b1ec2": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! She watches TV after dinner."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "watches"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "if a verb ends in consonant + y, change y to -ies"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "c5535798495": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! \"A doctor\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "a"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c830259e936": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! \"Our teacher lives near the school.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "lives"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "if the verb ends in -sh, -ch, -s, -x or -o, add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "cfc86df8525": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"watches\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "watches"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Words ending in -sh, -ch, -s, -x or -o get -es; consonant plus y changes to -ies."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: She washes the cups. Wrong: She washs the cups."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "cf3f793183e": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! They are happy."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c16d04f4b16": {
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "cd046ea28e2": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great! Our teacher lives near the school."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "lives"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "watch ends in -ch, so we add -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c61e8d848ab": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Words ending in -sh, -ch, -s, -x or -o get -es."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: She mixes the paint. Wrong: She mix the paint."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "fixes",
+    "errors": {
+     "W1": "fix",
+     "W2": "fixs"
+    }
+   }
+  }
+ }
+}

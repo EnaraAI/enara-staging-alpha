@@ -1,0 +1,51 @@
+area,criterion,status,evidence
+POST-01,Markers split across arbitrary chunks are handled; incomplete prefixes buffered,MET,Unit: 8 adversarial texts x chunk sizes 1-9 x all offsets equal whole-text output; route SSE 2- and 3-char chunks
+POST-01,Marker fragments never exposed or persisted,MET,Route SSE: no [[assess/verdict=/marker body in stream; stored == streamed; Stage A SSE 5/5; Stage C 0/219 visible
+POST-01,Malformed metadata rejected,MET,"Unclosed marker -> region dropped, malformed=true, NOT_EVALUATED, no prose verdict (unit + route)"
+POST-01,Retries and disconnections safe,MET,Existing r4 route tests: mid-stream failure stores no state; retried first attempt one reply/one assessment; disconnect releases credits
+POST-01,Streaming and non-streaming consistent,MET,One filter class; stripAssessmentMarkers = push+end; equivalence test
+POST-02,Markers in learner messages or quoted content never trusted,MET,"Learner-supplied marker text can only lower verdict (unit + route); Stage A SA-06/07 flagged, not completed"
+POST-02,Only validated metadata from the current tutor response accepted; never the last marker,MET,"Leading marker only; extras flagged assessment_marker_extra; late-only -> not_leading, nothing trusted"
+POST-02,Server-side answer key authoritative with explicit precedence,MET,answer_key > tutor_assessment > prose_fallback; key outranks contrary marker (unit); Stage C 27 key-verified
+POST-02,Historical compatibility; 6 verdicts preserved,MET,All 6 verdicts round-trip; parse unchanged except nextMissing flag; older stored turns read as before (unscoped)
+POST-03,"State namespaced by tenant, learner, session, course, lesson and item",MET,stateScope = sha256(institution|student|session|course|curriculum|lesson); item ids within scope; each field changes scope (unit)
+POST-03,No leakage across learners/tenants; no transfer between courses or lessons,MET,Route: lesson switch in one session with colliding item ids starts clean; existing session/learner isolation test
+POST-03,Hint state item-scoped and reset on new item,MET,deriveLearningState resets hint/attempt counters on active-item change (existing + r4.1 tests)
+POST-03,Reconstruction uses same namespace as live updates,MET,turnEvidence stores the scope used for reading; 219/219 Stage C turns scoped
+POST-03,Assisted and independent success distinct,MET,POST-06 fix + revealed-item fix; independent never downgraded
+POST-03,Isolation enforced server-side,MET,"Scope computed from owner-checked session, enrolment-checked course, tenant-scoped curriculum; not client-controllable"
+POST-12,Eight intent classes,MET,LEARNER_INTENTS; classifier test covers all 8; stored as learnerIntent
+POST-12,"Pressure, help requests and dont-know are not attempts",MET,"5 pressure phrasings + reply instructions; attemptsOnTask 0 (unit, route, Stage A, Stage C)"
+POST-12,Repeated demands do not advance to answer-revealing hints,MET,No-attempt ceiling L5; 7 alternating demands never reach L6 nor answer_with_reasoning; Stage C 0 reveals before attempt
+POST-12,Real answers still evaluated,MET,"Hedged answers -> PARTIAL_ANSWER_ATTEMPT, key-verified (unit, Stage A SA-08)"
+POST-12,Full disclosure follows existing policy; disclosed answers recorded as assisted,MET,answer_with_reasoning after a genuine attempt; revealedItemId -> later success assisted (fix from Stage A)
+POST-12,Six-level ladder preserved,MET,HINT_LADDER unchanged; wording tightened to forbid choices containing the answer
+POST-13,Real evaluator consumes evaluatorView,MET,"judge_v2 reads only requireEvaluatorView + visible transcript; run on Stage A, C, stability"
+POST-13,"Missing or malformed view fails explicitly, no fallback",MET,EvaluatorViewError for missing/non-v2/id mismatch/forbidden fields; all cases validated before first paid call
+POST-13,Learner-visible conversation kept; answer keys separate,MET,visibleTranscript; prompt contains no keys/runtime fields (test)
+POST-13,"Fixture, rubric and view versions recorded",MET,"fixtureSha256, rubricVersion/Sha256, viewVersion, coreVersion on every result"
+POST-13,Evidence-backed dimension scores and rubric v2 outcomes,MET,Quotes required below 3; 11 dims validated; INVALID/DOES_NOT_MEET/UNCERTAIN/MEETS/PARTIAL
+POST-13,Official and independent stored separately,MET,judge_v2_official*.jsonl vs judge_v2_independent*.jsonl
+POST-13,Critical defects not offset,MET,Unit test: all-4 scores + critical -> DOES_NOT_MEET; privacy breach -> DOES_NOT_MEET
+POST-13,Outcome logic correct,MET_AFTER_FIX,"core-1 wrongly blocked MEETS on core n/a; fixed core-2, outcomes recomputed from stored scores; both reported"
+SEC,No answer-key exposure to students or provider,MET,Existing route tests; 0 accepted answers in 286 tutor system prompts
+SEC,No learner identifiers or exact age/DOB to providers,MET,Identifier scan 0/286; only age band + CEFR estimate sent
+SEC,Permissions and tenant isolation unchanged,MET,No route/permission change; scope adds isolation only
+SEC,No migration; no env/provider/billing change,MET,Optional schema fields only; no config edits
+SEC,POST-14 pre-existing upload-path exposure,NOT_MET (out of scope),Unchanged; open P2
+ENG,Typecheck,MET,npx tsc --noEmit -p . exit 0
+ENG,Build,MET,tsc to scratch outDir exit 0
+ENG,Lint,N/A,No backend lint configured
+ENG,Targeted language/tutor/evaluator suites,MET,see test_results.md
+ENG,Full backend suite: no new failures vs 1539/16 baseline,MET,"1570 pass / 16 fail; the 16 failing test names are identical to the baseline list; 0 new"
+ENG,Frontend build,N/A,Frontend not changed
+PAID,Spend <= $10 hard limit with tracked cost,MET,$8.013; 0 unpriced; ledger
+PAID,Stage maxima A $3 / B $3 / C $4,MET_WITH_DEVIATION,"A $0.915; evaluation $2.554; C $4.012 (+$0.012, completion of last 2 cases; disclosed)"
+PAID,Stage A targeted tutor evaluation,MET,10 cases + 5-case re-check; findings fixed
+PAID,Stage B independent evaluation with separate evaluator; same-provider limitation disclosed,MET,Haiku vs Sonnet; disclosed
+PAID,Stage C frozen 120/219 re-benchmark after gates,MET,"120/120 cases, 219 turns, parity 72/72"
+PAID,Historical comparability preserved; new results separate,MET,Frozen v1 judge on copied inputs: 104/120 (not like for like); v2 reported separately
+PAID,Stability measured,MET,"12-case repeat: engine 24/24 identical; outcome 8/12 official, 9/12 independent"
+RUBRIC,Rubric/fixtures not changed to improve scores,MET,Draft rubric and fixture v2 untouched (hash-checked); machine copy verbatim; interpretations disclosed
+RUBRIC,Rubric validated by qualified educators,NOT_MET,POST-16/18/19 open; no educator approval
+QUALITY,No near-reveal on binary items,NOT_MET,POST-F1 minor residual: D7 below 3 in 44/94 Stage C cases (minor)

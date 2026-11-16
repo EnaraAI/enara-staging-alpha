@@ -1,0 +1,104 @@
+{
+  "runId": "exp5c-main-2026-11-13T18-28-03-299Z",
+  "experimentId": "exp5c-main",
+  "kind": "experiment_5c_main",
+  "startedAt": "2026-11-13T18:28:03.513Z",
+  "config": {
+    "experimentId": "exp5c-main",
+    "kind": "experiment_5c_main",
+    "seed": "enara-dls-v2-exp5c-main",
+    "students": 17,
+    "replications": 1,
+    "maxTurns": 6,
+    "adversarialShare": 0.1,
+    "models": {
+      "student": "claude-haiku-5-5",
+      "genericTutor": "claude-opus-5-5",
+      "judge": "claude-haiku-5-5"
+    },
+    "budgetCapUsd": 60,
+    "concurrency": 8,
+    "judgeRate": 0.1,
+    "ablate": [],
+    "improve": [],
+    "conditions": [
+      "A",
+      "B",
+      "C"
+    ],
+    "samples": 3,
+    "matched": true,
+    "preregFile": "preregistration_exp5c.json",
+    "outcomePool": [
+      "FN-04",
+      "FN-06",
+      "FN-08",
+      "GR-02",
+      "GR-04",
+      "GR-06",
+      "LS-02",
+      "LS-05",
+      "LS-08",
+      "RD-06",
+      "RD-07",
+      "RD-08",
+      "VO-02",
+      "VO-04",
+      "WR-02",
+      "WR-06"
+    ],
+    "seedEvidence": true,
+    "conditionEnv": {
+      "A": "all",
+      "B": "all,arbitration"
+    }
+  },
+  "preregSha256": "d39c05164cb5e22ee5af2491c91173b05b4fadc572a3e8f0a2aeab5e9e48c95f",
+  "preregLocked": true,
+  "code": {
+    "commit": "950d313349ad3196a32d7a124dc081e09693bdf2",
+    "dirty": true,
+    "branch": "claude/codebase-review-kbxqan"
+  },
+  "node": "v22.23.4",
+  "benchmarkSha256": "45c1dbea50fce7505bf314177e886679d15c2f2e91716c4d94a4f9e745e05042",
+  "promptsSha256": "7f567e074dc0197c49184345e4b77035721589ef6524caee781eb1c50fbef8fd",
+  "assignmentSha256": "8aaca4676970b53ce6fcb79f427d233cdbb6d28051f9b50a66dbfd99f5eb732d",
+  "blocksPlanned": 306,
+  "populationChecksFailed": [],
+  "models": {
+    "student": "claude-haiku-5-5",
+    "genericTutor": "claude-opus-5-5",
+    "judge": "claude-haiku-5-5"
+  },
+  "enaraTutorRoute": "POST /api/me/tutor/sessions/:id/messages (real controller, in-process, throwaway DB)",
+  "tutorModelNote": "tutor/intent models are ENARA defaults from backend config; recorded per call in provider_attempts.jsonl",
+  "ablatedFeatures": [],
+  "improvedFeatures": [],
+  "conditionEnv": {
+    "A": "all",
+    "B": "all,arbitration"
+  },
+  "engineV2": null,
+  "seedEvidence": true,
+  "outcomePool": [
+    "FN-04",
+    "FN-06",
+    "FN-08",
+    "GR-02",
+    "GR-04",
+    "GR-06",
+    "LS-02",
+    "LS-05",
+    "LS-08",
+    "RD-06",
+    "RD-07",
+    "RD-08",
+    "VO-02",
+    "VO-04",
+    "WR-02",
+    "WR-06"
+  ],
+  "matched": true,
+  "simulationOnly": true
+}

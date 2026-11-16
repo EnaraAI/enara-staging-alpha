@@ -1,0 +1,50 @@
+{
+ "experimentId": "exp5c-main",
+ "kind": "experiment_5c_main",
+ "seed": "enara-dls-v2-exp5c-main",
+ "students": 17,
+ "replications": 1,
+ "maxTurns": 6,
+ "adversarialShare": 0.1,
+ "models": {
+  "student": "claude-haiku-5-5",
+  "genericTutor": "claude-opus-5-5",
+  "judge": "claude-haiku-5-5"
+ },
+ "budgetCapUsd": 60,
+ "concurrency": 8,
+ "judgeRate": 0.1,
+ "ablate": [],
+ "improve": [],
+ "conditions": [
+  "A",
+  "B",
+  "C"
+ ],
+ "samples": 3,
+ "matched": true,
+ "preregFile": "preregistration_exp5c.json",
+ "outcomePool": [
+  "FN-04",
+  "FN-06",
+  "FN-08",
+  "GR-02",
+  "GR-04",
+  "GR-06",
+  "LS-02",
+  "LS-05",
+  "LS-08",
+  "RD-06",
+  "RD-07",
+  "RD-08",
+  "VO-02",
+  "VO-04",
+  "WR-02",
+  "WR-06"
+ ],
+ "seedEvidence": true,
+ "conditionEnv": {
+  "A": "all",
+  "B": "all,arbitration"
+ }
+}

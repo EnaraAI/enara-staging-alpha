@@ -1,0 +1,18 @@
+--- docs/benchmarks/language-teaching/20261109T0831-ltb-v1.0-remediation-r1/baseline_code_snapshot/languageTeachingContext.test.ts	2026-11-09 08:31:45.997446853 +0000
++++ backend/test/languageTeachingContext.test.ts	2026-11-09 08:35:42.981518228 +0000
+@@ -133,8 +133,13 @@
+     expect(m).not.toContain('answer_with_reasoning');
+   });
+ 
+-  it('direct answer stays available when asked and allowed (with reasoning and a follow-up item)', () => {
+-    expect(ids(selectLanguageMoves({ band: 'intermediate', lessonStatus: 'structured', signals: s({ answerRequest: true }) }))).toContain('answer_with_reasoning');
++  // ltc-v1-r1 changed LTC-D6: hint first before any attempt; the answer (with
++  // reasoning and a follow-up item) stays available once the learner has tried.
++  it('direct answer stays available when asked and allowed, after an attempt (with reasoning and a follow-up item)', () => {
++    expect(ids(selectLanguageMoves({ band: 'intermediate', lessonStatus: 'structured', signals: s({ answerRequest: true, attemptsOnTask: 1 }) }))).toContain('answer_with_reasoning');
++    const before = ids(selectLanguageMoves({ band: 'intermediate', lessonStatus: 'structured', signals: s({ answerRequest: true, attemptsOnTask: 0 }) }));
++    expect(before).toContain('scaffold_hint');
++    expect(before).not.toContain('answer_with_reasoning');
+   });
+ 
+   it('repeated confusion: reteach more simply; no insistence on questions only', () => {

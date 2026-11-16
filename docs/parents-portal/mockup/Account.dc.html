@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Parents portal: Account</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f6f7fa}
+a{color:#2f6bff}a:hover{color:#0b203c}
+.card{background:#ffffff;border:1px solid #dce2ea;border-radius:10px;box-shadow:0 1px 2px 0 rgba(0,0,0,0.05)}
+.eyebrow{font-size:12px;line-height:16px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#566376;margin:0}
+.chip{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:9999px;border:1px solid #dce2ea;background:#ffffff;text-decoration:none;color:#111c2c;min-height:44px;box-sizing:border-box;flex-shrink:0}
+.chip-on{border:2px solid #2f6bff;background:#eaf0ff}
+.navlink{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:56px;text-decoration:none;color:#566376;font-size:11px;font-weight:500}
+.navlink:hover{color:#111c2c}
+.nav-on{color:#2f6bff}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:none;background:transparent;color:#111c2c;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 1320px; box-sizing: border-box; display: flex; flex-direction: column; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif; color: #111c2c; background: #f6f7fa">
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 4px 20px">
+    <div style="display: flex; align-items: baseline; gap: 8px">
+      <span style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: #0b203c">ENARA</span>
+      <span style="font-size: 14px; font-weight: 500; color: #566376">Parents</span>
+      <span style="font-size: 11px; font-weight: 500; color: #566376; border: 1px solid #dce2ea; border-radius: 9999px; padding: 2px 8px; margin-left: 4px">Sample data</span>
+    </div>
+    <button class="iconbtn" aria-label="Notifications, 2 unread">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+    </button>
+  </header>
+
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding: 0 16px 16px 16px">
+<h1 style="margin: 8px 0 0 0; font-size: 24px; font-weight: 600; line-height: 32px; letter-spacing: -0.01em">Account</h1>
+
+    <section class="card" style="display: flex; flex-direction: column">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 8px 20px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">Learners</h2>
+        <a href="#" style="font-size: 14px; font-weight: 500">Add learner</a>
+      </div>
+      <a href="Main.dc.html" style="display: flex; gap: 12px; align-items: center; padding: 12px 20px; text-decoration: none; color: #111c2c; border-top: 1px solid #eef2f6; min-height: 56px">
+        <span style="width: 36px; height: 36px; border-radius: 9999px; background: #f59f0a; color: #08172b; display: flex; align-items: center; justify-content: center; font-weight: 600">O</span>
+        <span style="flex-grow: 1"><span style="display: block; font-size: 14px; font-weight: 600">Omar, 9</span><span style="display: block; font-size: 12px; color: #566376">Kids · you see everything, including conversations</span></span>
+      </a>
+      <a href="Teen.dc.html" style="display: flex; gap: 12px; align-items: center; padding: 12px 20px; text-decoration: none; color: #111c2c; border-top: 1px solid #eef2f6; min-height: 56px">
+        <span style="width: 36px; height: 36px; border-radius: 9999px; background: #0ea5a4; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 600">L</span>
+        <span style="flex-grow: 1"><span style="display: block; font-size: 14px; font-weight: 600">Laila, 15</span><span style="display: block; font-size: 12px; color: #566376">Teen · progress and summaries, not conversations</span></span>
+      </a>
+      <a href="Adult.dc.html" style="display: flex; gap: 12px; align-items: center; padding: 12px 20px; text-decoration: none; color: #111c2c; border-top: 1px solid #eef2f6; min-height: 56px">
+        <span style="width: 36px; height: 36px; border-radius: 9999px; background: #0b203c; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 600">Y</span>
+        <span style="flex-grow: 1"><span style="display: block; font-size: 14px; font-weight: 600">Youssef, 20</span><span style="display: block; font-size: 12px; color: #566376">Adult · progress and summaries, not conversations</span></span>
+      </a>
+    </section>
+
+    <section class="card" style="display: flex; flex-direction: column">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 8px 20px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">Guardians</h2>
+        <a href="#" style="font-size: 14px; font-weight: 500">Invite</a>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-top: 1px solid #eef2f6">
+        <span style="font-size: 14px">You</span>
+        <span style="font-size: 12px; font-weight: 500; color: #16263b; background: #eef2f6; border-radius: 9999px; padding: 3px 10px">Owner</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px 16px 20px; border-top: 1px solid #eef2f6">
+        <span style="font-size: 14px">Sara</span>
+        <span style="font-size: 12px; font-weight: 500; color: #16263b; background: #eef2f6; border-radius: 9999px; padding: 3px 10px">View only</span>
+      </div>
+    </section>
+
+    <section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">Family plan</h2>
+        <span style="font-size: 14px; font-weight: 600">[PRICE] / month</span>
+      </div>
+      <p style="margin: 0; font-size: 13px; color: #566376">3 learners · renews on 1 December</p>
+      <div style="display: flex; gap: 8px">
+        <a href="#" style="flex: 1; display: flex; align-items: center; justify-content: center; min-height: 44px; border-radius: 8px; background: #0b203c; color: #ffffff; font-size: 14px; font-weight: 500; text-decoration: none">Change plan</a>
+        <a href="#" style="flex: 1; display: flex; align-items: center; justify-content: center; min-height: 44px; border-radius: 8px; border: 1px solid #d0d8e2; color: #0b203c; font-size: 14px; font-weight: 500; text-decoration: none">Invoices</a>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #eef2f6">
+        <span style="font-size: 14px">Payment</span>
+        <span style="font-size: 13px; color: #566376">Card, Fawry or mobile wallet</span>
+      </div>
+    </section>
+
+    <section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">Preferences</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 14px">Language</span>
+        <div role="group" aria-label="Language" style="display: flex; padding: 3px; background: #f2f4f8; border-radius: 8px">
+          <sc-for list="{{langs}}" as="l" hint-placeholder-count="2"><button onClick="{{l.pick}}" aria-pressed="{{l.on}}" style="{{l.style}}">{{l.label}}</button></sc-for>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 14px">Weekly report</span>
+        <span style="font-size: 14px; font-weight: 500; color: #2f6bff">Thu 7 pm · WhatsApp</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 14px">Alerts</span>
+        <span style="font-size: 14px; font-weight: 500; color: #2f6bff">Push + WhatsApp</span>
+      </div>
+    </section>
+
+    <section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">Privacy and data</h2>
+      <a href="#" style="font-size: 14px; font-weight: 500">Download a learner's data</a>
+      <a href="#" style="font-size: 14px; font-weight: 500">Delete saved conversations</a>
+      <a href="#" style="font-size: 14px; font-weight: 500; color: #b91c1c">Close a learner's account</a>
+    </section>
+  </main>
+  <nav aria-label="Main" style="display: flex; background: #ffffff; border-top: 1px solid #dce2ea; padding: 4px 4px 12px 4px">
+    <a class="navlink" href="Main.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path></svg>Home</a>
+    <a class="navlink" href="Progress.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>Progress</a>
+    <a class="navlink" href="Activity.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>Activity</a>
+    <a class="navlink" href="Controls.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path></svg>Controls</a>
+    <a class="navlink nav-on" href="Account.dc.html" aria-current="page"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>Account</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1320}}'>
+class Component extends DCLogic {
+  renderVals() {
+var self = this;
+    var lang = (this.state && this.state.lang) || 'English';
+    var langs = ['English', 'العربية'].map(function (l) {
+      var on = l === lang;
+      return { label: l, on: on, pick: function () { self.setState({ lang: l }); },
+        style: 'min-height: 36px; padding: 0 14px; border-radius: 6px; border: none; font-family: inherit; font-size: 13px; cursor: pointer; ' + (on ? 'background: #ffffff; color: #111c2c; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08);' : 'background: transparent; color: #566376;') };
+    });
+    return { langs: langs };
+  }
+}
+</script>
+</body>
+</html>

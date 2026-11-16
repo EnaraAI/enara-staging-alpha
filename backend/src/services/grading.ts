@@ -7,6 +7,7 @@ import { recordLearningEvents } from './learningEvents';
 import { processStudentEvidenceSafely } from './evidenceProcessor';
 import { logger } from '../utils/logging';
 import { getFeatureFlags } from './featureFlags';
+import { graderV2On, targetFormPoints } from './graderV2';
 
 // Grading for assignment attempts (grading-v2). Objective questions are scored
 // here by the answer key. Everything else is graded automatically by
@@ -21,6 +22,22 @@ export function gradeAnswers(questions: IQuestion[], answers: Record<string, str
   return questions.map((q) => {
     const studentAnswer = answers[q.id] ?? '';
     const maxPoints = questionPoints(q);
+    // graderV2 ON: free sentences scored on the target form only (0/1/2), by rule.
+    const tf = graderV2On() && String(studentAnswer).trim() ? targetFormPoints(q, String(studentAnswer), maxPoints) : null;
+    if (tf !== null) {
+      return {
+        questionId: q.id,
+        questionText: q.text,
+        topic: q.topic,
+        studentAnswer,
+        ...(AUTO_GRADED.has(q.type) ? { correctAnswer: q.correctAnswer } : {}),
+        isCorrect: tf === maxPoints,
+        explanation: q.explanation,
+        points: tf,
+        maxPoints,
+        method: 'rule' as const,
+      };
+    }
     if (AUTO_GRADED.has(q.type)) {
       const isCorrect = gradeAnswer(q, answers[q.id]);
       return {

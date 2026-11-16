@@ -1,0 +1,430 @@
+{
+ "deterministic": {
+  "exact_agreement": 0.96,
+  "n_exact": 75,
+  "free_qwk": 0.914,
+  "n_free": 75,
+  "by_type": {
+   "gap_fill/exact": "20/20",
+   "error_correction/exact": "39/42",
+   "free_production/target_form_0_1_2": "40/42",
+   "transfer/target_form_0_1_2": "28/33",
+   "multiple_choice/exact": "2/2",
+   "controlled_gap_fill/exact": "11/11"
+  },
+  "disagreements": [
+   {
+    "answerId": "R5-009",
+    "outcome": "EN-F-A1-GR-article-the",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "The, a",
+    "ref": 1,
+    "grader": 2,
+    "note": "scoreTargetForm=2; gradeAnswers points 2/2; needsAiEvaluation=false"
+   },
+   {
+    "answerId": "R5-010",
+    "outcome": "EN-F-A1-GR-article-the",
+    "itemType": "free_production",
+    "scoring": "target_form_0_1_2",
+    "answer": "I found a key on the street, and I give key to police.",
+    "ref": 0,
+    "grader": 2,
+    "note": "scoreTargetForm=2; gradeAnswers points 2/2; needsAiEvaluation=false"
+   },
+   {
+    "answerId": "R5-018",
+    "outcome": "EN-F-A1-GR-capitals-full-stops",
+    "itemType": "free_production",
+    "scoring": "target_form_0_1_2",
+    "answer": "i love Alexandria very much.",
+    "ref": 1,
+    "grader": 0,
+    "note": "scoreTargetForm=0; gradeAnswers points 0/2; needsAiEvaluation=false"
+   },
+   {
+    "answerId": "R5-029",
+    "outcome": "EN-F-A1-GR-possessive-adjectives",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "her, his",
+    "ref": 1,
+    "grader": 2,
+    "note": "scoreTargetForm=2; gradeAnswers points 2/2; needsAiEvaluation=false"
+   },
+   {
+    "answerId": "R5-039",
+    "outcome": "EN-F-A1-GR-there-is-are",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "There is a cinema and two lifts.",
+    "ref": 1,
+    "grader": 2,
+    "note": "scoreTargetForm=2; gradeAnswers points 2/2; needsAiEvaluation=false"
+   },
+   {
+    "answerId": "R5-089",
+    "outcome": "EN-F-A2-GR-comparatives",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "Shop B is more expensiver than Shop A.",
+    "ref": 1,
+    "grader": 0,
+    "note": "scoreTargetForm=0; gradeAnswers points 0/2; needsAiEvaluation=false"
+   },
+   {
+    "answerId": "R5-092",
+    "outcome": "EN-F-A2-GR-conjunctions",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "We took a taxi because the bus is late.",
+    "ref": 1,
+    "grader": 0,
+    "note": "gradeAnswer(matchKeyV2)=false; direct matchKeyV2=false; needsAiEvaluation=true"
+   },
+   {
+    "answerId": "R5-096",
+    "outcome": "EN-F-A2-GR-frequency-adverbs",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "Rasha always check her phone in class.",
+    "ref": 1,
+    "grader": 0,
+    "note": "gradeAnswer(matchKeyV2)=false; direct matchKeyV2=false; needsAiEvaluation=true"
+   },
+   {
+    "answerId": "R5-100",
+    "outcome": "EN-F-A2-GR-going-to",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "Samir is going to repairs the door tonight.",
+    "ref": 0,
+    "grader": 1,
+    "note": "gradeAnswer(matchKeyV2)=true; direct matchKeyV2=true; needsAiEvaluation=false"
+   },
+   {
+    "answerId": "R5-150",
+    "outcome": "EN-F-A2-VO-weather",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "sun",
+    "ref": 1,
+    "grader": 0,
+    "note": "scoreTargetForm=0; gradeAnswers points 0/2; needsAiEvaluation=false"
+   }
+  ]
+ },
+ "det+standin": {
+  "exact_agreement": 0.8933,
+  "n_exact": 75,
+  "free_qwk": 0.955,
+  "n_free": 75,
+  "by_type": {
+   "gap_fill/exact": "19/20",
+   "error_correction/exact": "35/42",
+   "free_production/target_form_0_1_2": "42/42",
+   "transfer/target_form_0_1_2": "28/33",
+   "multiple_choice/exact": "2/2",
+   "controlled_gap_fill/exact": "11/11"
+  },
+  "disagreements": [
+   {
+    "answerId": "R5-039",
+    "outcome": "EN-F-A1-GR-there-is-are",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "There is a cinema and two lifts.",
+    "ref": 1,
+    "grader": 2,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=2; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=false -> no change; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   },
+   {
+    "answerId": "R5-052",
+    "outcome": "EN-F-A1-VO-common-adjectives",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "That building is very high. It has forty floors.",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=null"
+   },
+   {
+    "answerId": "R5-055",
+    "outcome": "EN-F-A1-VO-common-adjectives",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "My grandfather is old but my baby sister is yung.",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=null"
+   },
+   {
+    "answerId": "R5-065",
+    "outcome": "EN-F-A1-VO-family",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "Mona's housband is a doctor at the hospital.",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=null"
+   },
+   {
+    "answerId": "R5-089",
+    "outcome": "EN-F-A2-GR-comparatives",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "Shop B is more expensiver than Shop A.",
+    "ref": 1,
+    "grader": 0,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=0; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=true -> no change; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   },
+   {
+    "answerId": "R5-092",
+    "outcome": "EN-F-A2-GR-conjunctions",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "We took a taxi because the bus is late.",
+    "ref": 1,
+    "grader": 0,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=false"
+   },
+   {
+    "answerId": "R5-096",
+    "outcome": "EN-F-A2-GR-frequency-adverbs",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "Rasha always check her phone in class.",
+    "ref": 1,
+    "grader": 0,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=false"
+   },
+   {
+    "answerId": "R5-100",
+    "outcome": "EN-F-A2-GR-going-to",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "Samir is going to repairs the door tonight.",
+    "ref": 0,
+    "grader": 1,
+    "note": "gradeAnswer(matchKeyV2)=true; direct matchKeyV2=true; needsAiEvaluation=false"
+   },
+   {
+    "answerId": "R5-102",
+    "outcome": "EN-F-A2-GR-going-to",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "I going to have dinner with Aunt Mervat.",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=0; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=true -> WOULD set 0; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   },
+   {
+    "answerId": "R5-115",
+    "outcome": "EN-F-A2-GR-past-simple-regular",
+    "itemType": "gap_fill",
+    "scoring": "exact",
+    "answer": "visitted",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=false"
+   },
+   {
+    "answerId": "R5-122",
+    "outcome": "EN-F-A2-GR-present-continuous",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "I studying English now.",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=0; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=true -> WOULD set 0; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   },
+   {
+    "answerId": "R5-128",
+    "outcome": "EN-F-A2-GR-third-person-s",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "My aunt livs in a flat near the sea.",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=false"
+   },
+   {
+    "answerId": "R5-150",
+    "outcome": "EN-F-A2-VO-weather",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "sun",
+    "ref": 1,
+    "grader": 0,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=0; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=true -> no change; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   }
+  ]
+ },
+ "production_flow": {
+  "exact_agreement": 0.8933,
+  "n_exact": 75,
+  "free_qwk": 0.914,
+  "n_free": 75,
+  "by_type": {
+   "gap_fill/exact": "19/20",
+   "error_correction/exact": "35/42",
+   "free_production/target_form_0_1_2": "40/42",
+   "transfer/target_form_0_1_2": "28/33",
+   "multiple_choice/exact": "2/2",
+   "controlled_gap_fill/exact": "11/11"
+  },
+  "disagreements": [
+   {
+    "answerId": "R5-009",
+    "outcome": "EN-F-A1-GR-article-the",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "The, a",
+    "ref": 1,
+    "grader": 2,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=2; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=false -> no change; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   },
+   {
+    "answerId": "R5-010",
+    "outcome": "EN-F-A1-GR-article-the",
+    "itemType": "free_production",
+    "scoring": "target_form_0_1_2",
+    "answer": "I found a key on the street, and I give key to police.",
+    "ref": 0,
+    "grader": 2,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=2; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=false -> no change; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   },
+   {
+    "answerId": "R5-018",
+    "outcome": "EN-F-A1-GR-capitals-full-stops",
+    "itemType": "free_production",
+    "scoring": "target_form_0_1_2",
+    "answer": "i love Alexandria very much.",
+    "ref": 1,
+    "grader": 0,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=0; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=true -> WOULD set 0; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   },
+   {
+    "answerId": "R5-029",
+    "outcome": "EN-F-A1-GR-possessive-adjectives",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "her, his",
+    "ref": 1,
+    "grader": 2,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=2; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=false -> no change; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   },
+   {
+    "answerId": "R5-039",
+    "outcome": "EN-F-A1-GR-there-is-are",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "There is a cinema and two lifts.",
+    "ref": 1,
+    "grader": 2,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=2; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=false -> no change; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   },
+   {
+    "answerId": "R5-052",
+    "outcome": "EN-F-A1-VO-common-adjectives",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "That building is very high. It has forty floors.",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=null"
+   },
+   {
+    "answerId": "R5-055",
+    "outcome": "EN-F-A1-VO-common-adjectives",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "My grandfather is old but my baby sister is yung.",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=null"
+   },
+   {
+    "answerId": "R5-065",
+    "outcome": "EN-F-A1-VO-family",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "Mona's housband is a doctor at the hospital.",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=null"
+   },
+   {
+    "answerId": "R5-089",
+    "outcome": "EN-F-A2-GR-comparatives",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "Shop B is more expensiver than Shop A.",
+    "ref": 1,
+    "grader": 0,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=0; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=true -> no change; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   },
+   {
+    "answerId": "R5-092",
+    "outcome": "EN-F-A2-GR-conjunctions",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "We took a taxi because the bus is late.",
+    "ref": 1,
+    "grader": 0,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=false"
+   },
+   {
+    "answerId": "R5-096",
+    "outcome": "EN-F-A2-GR-frequency-adverbs",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "Rasha always check her phone in class.",
+    "ref": 1,
+    "grader": 0,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=false"
+   },
+   {
+    "answerId": "R5-100",
+    "outcome": "EN-F-A2-GR-going-to",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "Samir is going to repairs the door tonight.",
+    "ref": 0,
+    "grader": 1,
+    "note": "gradeAnswer(matchKeyV2)=true; direct matchKeyV2=true; needsAiEvaluation=false"
+   },
+   {
+    "answerId": "R5-115",
+    "outcome": "EN-F-A2-GR-past-simple-regular",
+    "itemType": "gap_fill",
+    "scoring": "exact",
+    "answer": "visitted",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=false"
+   },
+   {
+    "answerId": "R5-128",
+    "outcome": "EN-F-A2-GR-third-person-s",
+    "itemType": "error_correction",
+    "scoring": "exact",
+    "answer": "My aunt livs in a flat near the sea.",
+    "ref": 0,
+    "grader": 1,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: evaluateShortAnswer (eval-v2); guard: targetFormMissing=false"
+   },
+   {
+    "answerId": "R5-150",
+    "outcome": "EN-F-A2-VO-weather",
+    "itemType": "transfer",
+    "scoring": "target_form_0_1_2",
+    "answer": "sun",
+    "ref": 1,
+    "grader": 0,
+    "note": "AGENT STAND-IN \u2014 not the production grader; prompt: RUBRIC_SYSTEM (eval-v2), bank 0/1/2 rubric as one criterion; deterministic=0; agree(single run vs itself)=true (one run only; consistency not tested); guard (not applied, rubric path unwired): targetFormMissing=true -> no change; production: needsAiEvaluation=false (false = rule decides, model not called)"
+   }
+  ]
+ }
+}

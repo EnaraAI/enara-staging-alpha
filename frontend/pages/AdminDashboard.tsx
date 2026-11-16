@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { StudentAvatar } from '../components/StudentPhoto';
 import { 
   TrendingUp, 
   AlertCircle, 
@@ -333,9 +334,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, stud
                 >
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                        {s.avatar}
-                      </div>
+                      <StudentAvatar photoUrl={s.photoUrl} initials={s.avatar} name={s.name} className="w-9 h-9 rounded-full bg-teal-600 text-white font-bold text-xs shrink-0" />
                       <div className="min-w-0">
                         <p className="font-semibold text-slate-900 truncate">{s.name}</p>
                         <p className="text-xs text-slate-600 truncate">{s.email}</p>

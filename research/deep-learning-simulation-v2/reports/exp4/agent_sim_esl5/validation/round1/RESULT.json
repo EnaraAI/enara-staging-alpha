@@ -1,0 +1,198 @@
+{
+ "note": "SIMULATION ONLY",
+ "agreementRule": "same knowledge state after applying each judge's events (esl4Study.ts agreescore)",
+ "groups": {
+  "new:esl5": {
+   "cases": 30,
+   "same": 30,
+   "agreement": 1.0
+  },
+  "new:pplus": {
+   "cases": 30,
+   "same": 30,
+   "agreement": 1.0
+  },
+  "overall": {
+   "cases": 417,
+   "same": 410,
+   "agreement": 0.9832
+  },
+  "recheck:esl4_round3": {
+   "cases": 77,
+   "same": 75,
+   "agreement": 0.974
+  },
+  "recheck:esl4_round7": {
+   "cases": 88,
+   "same": 83,
+   "agreement": 0.9432
+  },
+  "session1": {
+   "cases": 299,
+   "same": 297,
+   "agreement": 0.9933
+  },
+  "session2": {
+   "cases": 118,
+   "same": 113,
+   "agreement": 0.9576
+  },
+  "source:new": {
+   "cases": 60,
+   "same": 60,
+   "agreement": 1.0
+  },
+  "source:new|session1": {
+   "cases": 30,
+   "same": 30,
+   "agreement": 1.0
+  },
+  "source:new|session2": {
+   "cases": 30,
+   "same": 30,
+   "agreement": 1.0
+  },
+  "source:recheck": {
+   "cases": 165,
+   "same": 158,
+   "agreement": 0.9576
+  },
+  "source:recheck|session1": {
+   "cases": 77,
+   "same": 75,
+   "agreement": 0.974
+  },
+  "source:recheck|session2": {
+   "cases": 88,
+   "same": 83,
+   "agreement": 0.9432
+  },
+  "source:scripted": {
+   "cases": 192,
+   "same": 192,
+   "agreement": 1.0
+  },
+  "source:scripted|session1": {
+   "cases": 192,
+   "same": 192,
+   "agreement": 1.0
+  }
+ },
+ "missing": {
+  "A": 0,
+  "B": 0
+ },
+ "missingIds": {
+  "A": [],
+  "B": []
+ },
+ "orderCheck": {
+  "A": {
+   "meanPerTutor": {
+    "a": {
+     "n": 12,
+     "expected": 0.1978,
+     "gain": 0.0
+    },
+    "b": {
+     "n": 12,
+     "expected": 0.1978,
+     "gain": 0.0
+    },
+    "c": {
+     "n": 12,
+     "expected": 0.6427,
+     "gain": 0.4449
+    },
+    "d": {
+     "n": 12,
+     "expected": 0.9157,
+     "gain": 0.7179
+    }
+   },
+   "missingCases": 0,
+   "rule": "d > c > max(a, b) and |b - a| <= 0.25 * (d - a), on mean expected post-test accuracy",
+   "tolerance": 0.1795,
+   "pass": true
+  },
+  "B": {
+   "meanPerTutor": {
+    "a": {
+     "n": 12,
+     "expected": 0.1978,
+     "gain": 0.0
+    },
+    "b": {
+     "n": 12,
+     "expected": 0.1978,
+     "gain": 0.0
+    },
+    "c": {
+     "n": 12,
+     "expected": 0.6427,
+     "gain": 0.4449
+    },
+    "d": {
+     "n": 12,
+     "expected": 0.9157,
+     "gain": 0.7179
+    }
+   },
+   "missingCases": 0,
+   "rule": "d > c > max(a, b) and |b - a| <= 0.25 * (d - a), on mean expected post-test accuracy",
+   "tolerance": 0.1795,
+   "pass": true
+  }
+ },
+ "diffs": [
+  {
+   "id": "v6e2fa8fc3f",
+   "source": "recheck",
+   "session": 1,
+   "A": "R3:C1,R4:C1",
+   "B": "R1:W2,R3:C1,R4:C1"
+  },
+  {
+   "id": "v3d90c598d0",
+   "source": "recheck",
+   "session": 1,
+   "A": "R3:C1,R3:C2",
+   "B": "R3:C2"
+  },
+  {
+   "id": "vd22a78e8cf",
+   "source": "recheck",
+   "session": 2,
+   "A": "R3:C1,R3:C2",
+   "B": "R3:C1,R3:C2,R4:C1,R4:C2"
+  },
+  {
+   "id": "v04ac76e1ab",
+   "source": "recheck",
+   "session": 2,
+   "A": "R1:W2,R3:C2",
+   "B": "R1:W2,R3:C2,R4:C2"
+  },
+  {
+   "id": "vc38efac90a",
+   "source": "recheck",
+   "session": 2,
+   "A": "R3:C1,R3:C2,R4:C1,R4:C2",
+   "B": "R1:W2,R3:C1,R3:C2"
+  },
+  {
+   "id": "v4ca8c182ca",
+   "source": "recheck",
+   "session": 2,
+   "A": "R1:W2,R3:C2",
+   "B": "R1:W2,R3:C2,R4:C2"
+  },
+  {
+   "id": "vd74a03f4e8",
+   "source": "recheck",
+   "session": 2,
+   "A": "R3:C1,R3:C2",
+   "B": "R3:C1,R3:C2,R4:C1,R4:C2"
+  }
+ ]
+}

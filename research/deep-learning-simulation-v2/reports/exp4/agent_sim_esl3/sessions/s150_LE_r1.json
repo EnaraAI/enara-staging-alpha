@@ -1,0 +1,639 @@
+{
+ "arm": "LE",
+ "rep": 1,
+ "learnerIdx": 150,
+ "seed": "esl3|L150|rep1",
+ "state": {
+  "form": "thirdS",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 3
+  }
+ },
+ "start": {
+  "form": "thirdS",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  }
+ },
+ "entries": [],
+ "v2": {
+  "beliefs": [],
+  "worked": []
+ },
+ "turns": [
+  {
+   "session": 1,
+   "learner": "Hello! Can you give me an exercise on he, she and it with -s?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "present_lesson_item",
+    "fade_support",
+    "independent_practice"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Sure. Here is the first one from this lesson. Fill the gap with the correct form of the verb in brackets:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nOnce you have it, I can give you a harder set with trickier spelling endings, or you can write two sentences of your own about someone's weekly routine.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on he, she and it with -s?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure. Here is the first one from this lesson. Fill the gap with the correct form of the verb in brackets:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nOnce you have it, I can give you a harder set with trickier spelling endings, or you can write two sentences of your own about someone's weekly routine.",
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "plays",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "plays"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"plays\". \"My sister\" works like \"she\", so the verb takes -s.\nHere is one with a different ending. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure. Here is the first one from this lesson. Fill the gap with the correct form of the verb in brackets:\n\nWrite the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nOnce you have it, I can give you a harder set with trickier spelling endings, or you can write two sentences of your own about someone's weekly routine.\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"plays\". \"My sister\" works like \"she\", so the verb takes -s.\nHere is one with a different ending. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"plays\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"plays\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"My sister\" works like \"she\", so the verb takes -s."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "watches",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "watches"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Correct: \"watches\". Verbs ending in -ch take -es in the third person singular.\nHere is a different spelling pattern. Write only the verb:\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"plays\". \"My sister\" works like \"she\", so the verb takes -s.\nHere is one with a different ending. Write only the verb:\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"watches\". Verbs ending in -ch take -es in the third person singular.\nHere is a different spelling pattern. Write only the verb:\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"watches\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"watches\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Verbs ending in -ch take -es in the third person singular."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "cries",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "cries"
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "closingAsk": "deferred",
+   "profileLines": 0,
+   "tutor": "Correct: \"cries\". A consonant before -y means y changes to -ies.\nYou have now handled -s, -es and -ies. Let's move to freer use: write two sentences about a friend's weekly routine, one with \"fix\" and one with \"study\".",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"watches\". Verbs ending in -ch take -es in the third person singular.\nHere is a different spelling pattern. Write only the verb:\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"cries\". A consonant before -y means y changes to -ies.\nYou have now handled -s, -es and -ies. Let's move to freer use: write two sentences about a friend's weekly routine, one with \"fix\" and one with \"study\".",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"cries\"."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"cries\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "cries"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "cries"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A consonant before -y means y changes to -ies."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My friend fixes his bike every Monday.",
+    "errors": {
+     "W1": "My friend fix his bike every Monday.",
+     "W2": "My friend fixs his bike every Monday."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    }
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My friend fixes his bike every Monday.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My friend fixes his bike every Monday."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "\"My friend fixes his bike every Monday\" is correct: \"fixes\" has -es after a verb ending in -x.\nRecap: third person singular adds -s, as in your \"plays\".\nTell me the rule in your own words.",
+   "raw": "\"My friend fixes his bike every Monday\" is correct: \"fixes\" has -es after a verb ending in -x.\nRecap: third person singular adds -s, as in your \"plays\".\nVerbs ending in -ch, -x and similar take -es (\"watches\", \"fixes\"); consonant + y becomes -ies (\"cries\").\nTell me the rule in your own words.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "guardRemoved": 1,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"cries\". A consonant before -y means y changes to -ies.\nYou have now handled -s, -es and -ies. Let's move to freer use: write two sentences about a friend's weekly routine, one with \"fix\" and one with \"study\".\n\nLEARNER'S LAST MESSAGE:\nMy friend fixes his bike every Monday.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My friend fixes his bike every Monday\" is correct: \"fixes\" has -es after a verb ending in -x.\nRecap: third person singular adds -s, as in your \"plays\".\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"My friend fixes his bike every Monday\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"My friend fixes his bike every Monday\" is correct"
+    },
+    {
+     "rule": "R6",
+     "belief": "C1",
+     "quote": "as in your \"plays\""
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R6"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise he, she and it with -s again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "moves": [
+    "activate_prior_knowledge",
+    "fade_support",
+    "independent_practice"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Happy to. Before I add anything, try recalling it yourself: what changes in the verb after he, she or it, and when does the ending become -es or -ies rather than plain -s?\n\nYou probably have the basic -s well in hand, so let's push on the spelling edge cases. Here is a harder independent task: write two sentences about a friend's weekly routine. In the first, use a verb ending in -sh, -ch, -x or -o; in the second, use a verb ending in a consonant plus y. Avoid the verbs from our lesson exercises so the choice is yours.\n\nAfter you write them, add one line explaining why the ending you chose is the right one. I'll check the spelling and the reasoning.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise he, she and it with -s again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHappy to. Before I add anything, try recalling it yourself: what changes in the verb after he, she or it, and when does the ending become -es or -ies rather than plain -s?\n\nYou probably have the basic -s well in hand, so let's push on the spelling edge cases. Here is a harder independent task: write two sentences about a friend's weekly routine. In the first, use a verb ending in -sh, -ch, -x or -o; in the second, use a verb ending in a consonant plus y. Avoid the verbs from our lesson exercises so the choice is yours.\n\nAfter you write them, add one line explaining why the ending you chose is the right one. I'll check the spelling and the reasoning.",
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: add -s/-es after he/she/it.",
+   "production": {
+    "kind": "rule",
+    "text": "I think: add -s/-es after he/she/it."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "closingAsk": "deferred",
+   "profileLines": 0,
+   "tutor": "That's a solid start: you've recalled that the verb takes an ending after he, she or it, and that the ending can be either -s or -es.\nBefore we go on, one question about your reasoning: what decides whether a verb takes -es rather than plain -s?",
+   "raw": "That's a solid start: you've recalled that the verb takes an ending after he, she or it, and that the ending can be either -s or -es.\nBefore we go on, one question about your reasoning: what decides whether a verb takes -es rather than plain -s? Answer in a line, in your own words, and then we can move to the sentences.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": true,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHappy to. Before I add anything, try recalling it yourself: what changes in the verb after he, she or it, and when does the ending become -es or -ies rather than plain -s?\n\nYou probably have the basic -s well in hand, so let's push on the spelling edge cases. Here is a harder independent task: write two sentences about a friend's weekly routine. In the first, use a verb ending in -sh, -ch, -x or -o; in the second, use a verb ending in a consonant plus y. Avoid the verbs from our lesson exercises so the choice is yours.\n\nAfter you write them, add one line explaining why the ending you chose is the right one. I'll check the spelling and the reasoning.\n\nLEARNER'S LAST MESSAGE:\nI think: add -s/-es after he/she/it.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat's a solid start: you've recalled that the verb takes an ending after he, she or it, and that the ending can be either -s or -es.\nBefore we go on, one question about your reasoning: what decides whether a verb takes -es rather than plain -s?",
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: add -s/-es after he/she/it.",
+   "production": {
+    "kind": "rule",
+    "text": "I think: add -s/-es after he/she/it."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Your statement is still accurate as far as it goes: after he, she or it the verb takes -s or -es. What it doesn't yet show is the choice between the two.\n\nSo let's sharpen just that part. Look at the last letters of the base verb. Compare these two pairs of my own: \"she works\" and \"she fixes\". The subject is the same in both, so the subject can't be what decides the ending.\n\nWhat is different about the end of \"work\" and the end of \"fix\"? Answer in one line: which letters at the end of a verb lead to -es?",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's a solid start: you've recalled that the verb takes an ending after he, she or it, and that the ending can be either -s or -es.\nBefore we go on, one question about your reasoning: what decides whether a verb takes -es rather than plain -s?\n\nLEARNER'S LAST MESSAGE:\nI think: add -s/-es after he/she/it.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour statement is still accurate as far as it goes: after he, she or it the verb takes -s or -es. What it doesn't yet show is the choice between the two.\n\nSo let's sharpen just that part. Look at the last letters of the base verb. Compare these two pairs of my own: \"she works\" and \"she fixes\". The subject is the same in both, so the subject can't be what decides the ending.\n\nWhat is different about the end of \"work\" and the end of \"fix\"? Answer in one line: which letters at the end of a verb lead to -es?",
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: add -s/-es after he/she/it.",
+   "production": {
+    "kind": "rule",
+    "text": "I think: add -s/-es after he/she/it."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "That line is still accurate: after he, she or it, the verb takes -s or -es. You have most of it. The missing piece is the choice between the two, so let's make it concrete instead of abstract.\n\nLook only at the last letters of these base verbs of my own: \"kiss\", \"push\", \"reach\", \"mix\", \"read\", \"sing\".\n\nSort them into two groups: the ones that take -es after she, and the ones that take plain -s. Then write the endings that the -es group shares.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour statement is still accurate as far as it goes: after he, she or it the verb takes -s or -es. What it doesn't yet show is the choice between the two.\n\nSo let's sharpen just that part. Look at the last letters of the base verb. Compare these two pairs of my own: \"she works\" and \"she fixes\". The subject is the same in both, so the subject can't be what decides the ending.\n\nWhat is different about the end of \"work\" and the end of \"fix\"? Answer in one line: which letters at the end of a verb lead to -es?\n\nLEARNER'S LAST MESSAGE:\nI think: add -s/-es after he/she/it.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThat line is still accurate: after he, she or it, the verb takes -s or -es. You have most of it. The missing piece is the choice between the two, so let's make it concrete instead of abstract.\n\nLook only at the last letters of these base verbs of my own: \"kiss\", \"push\", \"reach\", \"mix\", \"read\", \"sing\".\n\nSort them into two groups: the ones that take -es after she, and the ones that take plain -s. Then write the endings that the -es group shares.",
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I think: add -s/-es after he/she/it.",
+   "production": {
+    "kind": "rule",
+    "text": "I think: add -s/-es after he/she/it."
+   },
+   "moves": [
+    "corrective_feedback_retry",
+    "fade_support"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": false,
+   "ruleLine": false,
+   "profileLines": 0,
+   "tutor": "Let's close here. Your line is right as far as it goes: \"add -s/-es after he/she/it.\"\nThe choice depends on the end of the base verb: -es after -s, -sh, -ch, -x or -o (she fixes), -ies after a consonant plus y, and plain -s elsewhere (she works).\nTell me the rule in your own words.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat line is still accurate: after he, she or it, the verb takes -s or -es. You have most of it. The missing piece is the choice between the two, so let's make it concrete instead of abstract.\n\nLook only at the last letters of these base verbs of my own: \"kiss\", \"push\", \"reach\", \"mix\", \"read\", \"sing\".\n\nSort them into two groups: the ones that take -es after she, and the ones that take plain -s. Then write the endings that the -es group shares.\n\nLEARNER'S LAST MESSAGE:\nI think: add -s/-es after he/she/it.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nLet's close here. Your line is right as far as it goes: \"add -s/-es after he/she/it.\"\nThe choice depends on the end of the base verb: -es after -s, -sh, -ch, -x or -o (she fixes), -ies after a consonant plus y, and plain -s elsewhere (she works).\nTell me the rule in your own words.",
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Your line is right as far as it goes: \"add -s/-es after he/she/it.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "-es after -s, -sh, -ch, -x or -o (she fixes), -ies after a consonant plus y"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    }
+   }
+  }
+ ],
+ "stateAfterS1": {
+  "form": "thirdS",
+  "band": "B2",
+  "primary": "W1",
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 3
+  }
+ }
+}
