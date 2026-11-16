@@ -1,5 +1,6 @@
 import { Assessment } from '../models/Assessment';
 import { toPlainObject } from '../utils/serialize';
+import { graderV2On, matchKeyV2, type KeyItem } from './graderV2';
 
 export function stripAnswersForStudent(assessment: InstanceType<typeof Assessment>) {
   const obj = toPlainObject(assessment) as Record<string, unknown>;
@@ -52,7 +53,9 @@ export function hideAnswerKey<T extends GradedAnswer>(answers: T[]): Omit<T, 'co
 
 // The answer-key rule used everywhere answers are graded (assessments and
 // diagnostics): trimmed, case-insensitive exact match.
-export function gradeAnswer(question: { correctAnswer?: string | number }, answer: string | number | undefined): boolean {
+// graderV2 ON: normalised matching, acceptedAnswers, option letter = option text (graderV2.ts).
+export function gradeAnswer(question: { correctAnswer?: string | number } & Omit<KeyItem, 'correctAnswer'>, answer: string | number | undefined): boolean {
+  if (graderV2On()) return matchKeyV2({ ...question, prompt: question.prompt ?? question.text }, answer);
   if (answer === undefined || question.correctAnswer === undefined || question.correctAnswer === null) return false;
   return String(answer).trim().toLowerCase() === String(question.correctAnswer).trim().toLowerCase();
 }

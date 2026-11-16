@@ -4,6 +4,7 @@ import type { IQuestion } from '../models/Assessment';
 import { GradingProposal } from '../models/GradingProposal';
 import { askForJson } from './aiJson';
 import { logger } from '../utils/logging';
+import { graderV2On, targetFormMissing } from './graderV2';
 
 // AI evaluation of one answer (eval-v2). The automatic grader (autoGrading.ts)
 // calls these; every call is stored as a GradingProposal record so the grade
@@ -265,6 +266,12 @@ export async function evaluateShortAnswer(params: { attempt: AttemptRef; questio
       }),
       validate: validateShortAnswer,
     });
+    // graderV2 ON (fix 5): the meaning check cannot credit an answer that lacks a required target form.
+    if (graderV2On() && value.correct && targetFormMissing(question, answer) === true) {
+      value.correct = false;
+      value.flags = [...(value.flags || []), 'target_form_missing'];
+      value.scoreExplanation = `${value.scoreExplanation} The answer does not use the target form the question requires.`.trim();
+    }
     return GradingProposal.create({
       ...base,
       status: 'proposed',

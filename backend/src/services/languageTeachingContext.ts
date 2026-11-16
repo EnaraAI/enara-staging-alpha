@@ -6,6 +6,7 @@ import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
 import { isLearnerAgeBand } from '../models/learnerAgeBand';
 import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
+import { graderV2On } from './graderV2';
 import { engineV2, arbitrationForced } from './engineV2';
 import { logger, serializeError } from '../utils/logging';
 import {
@@ -1858,7 +1859,8 @@ export function finalizeLanguageTurn(
   }
   // v2 (selfCheck): the tutor's own CORRECT grade is not trusted for a closed item when the learner's answer contains none of its target forms
   // (for example after the tutor conceded a wrong claim). Credit is held back (AMBIGUOUS, same item); the key can still confirm success.
-  if (engineV2('selfCheck') && parsed && isSuccess(parsed.verdict) && s.answeringCheck && s.activeLessonItem && !isSuccess(s.keyVerdict ?? undefined)
+  // graderV2 ON (fix 5, lesson side): the same hold-back runs.
+  if ((engineV2('selfCheck') || graderV2On()) && parsed && isSuccess(parsed.verdict) && s.answeringCheck && s.activeLessonItem && !isSuccess(s.keyVerdict ?? undefined)
     && itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary) !== 'open' && answerHasTargetForm(input.learnerText, s.activeLessonItem) === false) {
     flags.push('self_grade_unverified');
     parsed = { ...parsed, verdict: 'AMBIGUOUS', criteria: [], next: 'SAME_ITEM' };

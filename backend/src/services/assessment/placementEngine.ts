@@ -3,6 +3,8 @@
 // Not wired into the tutor or any route. No I/O, no model calls: controlled items are
 // scored by exact/accepted-answer match; writing is scored elsewhere and passed in.
 
+import { graderV2On, matchKeyV2 } from '../graderV2';
+
 export type Level = string; // 'A1' | 'A2' | ... (order comes from the bank)
 export type ControlledSkill = 'grammar' | 'vocabulary' | 'reading';
 export type Skill = ControlledSkill | 'writing';
@@ -58,6 +60,8 @@ export function normalise(s: string): string {
 
 export function scoreControlled(item: PlacementItem, response: string): boolean {
   if (item.type === 'open-response') throw new Error(`item ${item.id} is open-response; pass a writing score instead`);
+  // graderV2 ON: normalised matching, accepted answers, option letter = option text.
+  if (graderV2On()) return matchKeyV2({ type: item.type, prompt: item.prompt, correctAnswer: item.correctAnswer, acceptedAnswers: item.acceptedAnswers }, response);
   const keys = [item.correctAnswer ?? '', ...(item.acceptedAnswers ?? [])].filter(Boolean).map(normalise);
   return keys.includes(normalise(response));
 }

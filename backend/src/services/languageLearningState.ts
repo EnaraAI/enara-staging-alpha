@@ -16,6 +16,7 @@
 //                         when neither of the above exists (older messages).
 
 import { engineV2 } from './engineV2';
+import { graderV2On, matchKeyV2 } from './graderV2';
 export const ANSWER_VERDICTS = ['NOT_EVALUATED', 'INCORRECT', 'PARTIALLY_CORRECT', 'CORRECT', 'CORRECT_WITH_EQUIVALENT_FORMULATION', 'AMBIGUOUS'] as const;
 export type AnswerVerdict = (typeof ANSWER_VERDICTS)[number];
 // Relevance of the learner's message to the task the tutor left open.
@@ -261,6 +262,8 @@ export interface LessonItem {
   targetForms?: string[];
   // 1-based success-criteria indices this item tests.
   criteria?: number[];
+  // graderV2 (draft): bank matching note (case/punctuation exceptions); read only when the switch is ON.
+  matchingNote?: string;
 }
 
 const normAnswer = (t: string) =>
@@ -293,6 +296,13 @@ export function answerHasTargetForm(answer: string, item: LessonItem | undefined
 }
 export function evaluateAgainstKey(answer: string, item: LessonItem | undefined): AnswerVerdict | null {
   if (!item?.acceptedAnswers?.length) return null;
+  // graderV2 ON: normalised matching and option letter = option text (graderV2.ts); still success-only.
+  if (graderV2On()) {
+    const key = { prompt: item.prompt, acceptedAnswers: item.acceptedAnswers, matchingNote: item.matchingNote };
+    if (matchKeyV2(key, answer)) return 'CORRECT';
+    const last = answer.split(SELF_CORRECTION_SPLIT).filter((p) => p && p.trim());
+    return last.length > 1 && matchKeyV2(key, last[last.length - 1]) ? 'CORRECT' : null;
+  }
   const nrm = engineV2('keyMatch') ? (x: string) => normAnswer(expandContractions(x)) : normAnswer;
   const accepted = item.acceptedAnswers.map(nrm).filter(Boolean);
   const whole = nrm(answer);

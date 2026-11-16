@@ -20,15 +20,16 @@
 //  fadeKnown     - ESL5 (framework §2 explicit for novices, fade for experts): when the record shows >=2 independent correct answers on a point, the full rule line and worked example for it are skipped: a quick check, then harder/mixed items; a failed quick check returns to explicit support; named-only, NOT part of "all"
 //  ownSentence   - ESL5 (framework §5 focus on form in their own sentences, §6 pushed output): from the learner's 3rd message of the session on (second half of the 5-message session the closing assumes), at most one "write one sentence about ... using ..." task per session, with feedback on the target form only; named-only, NOT part of "all"
 //  esl5          - bundle: turns on liveError, releaseAfterTwo, reviewOpen, fadeKnown and ownSentence together; itself NOT part of "all"
+//  graderV2    - SIMULATION ONLY / DRAFT: the five answer-key fixes (services/graderV2.ts): normalised matching, several accepted answers, option letter = text, target-form scorer 0/1/2, meaning-check guard; affects lessons, assignments, assessments, diagnostics and placement; named-only, NOT part of "all"
 //  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
-export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence';
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2';
 const ESL5: EngineV2Feature[] = ['liveError', 'releaseAfterTwo', 'reviewOpen', 'fadeKnown', 'ownSentence'];
 export const engineV2 = (feature: EngineV2Feature): boolean => {
   if (feature === 'socraticOff' && process.env.NODE_ENV === 'production') return false; // research-only
   const v = (process.env.ENARA_ENGINE_V2 ?? '').split(',').map((x) => x.trim());
   if (feature === 'arbitration' && v.includes('levelExplicit')) return true; // levelExplicit always runs with arbitration
   if (v.includes('esl5') && ESL5.includes(feature)) return true; // the esl5 bundle (never turned on by "all")
-  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', ...ESL5].includes(feature));
+  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', ...ESL5].includes(feature));
 };
 
 /** True when `arbitration` is on only because `levelExplicit` forced it (recorded in the turn evidence). */

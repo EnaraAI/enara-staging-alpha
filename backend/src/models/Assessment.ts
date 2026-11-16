@@ -27,6 +27,14 @@ export interface IQuestion {
   correctAnswer?: string | number;
   explanation: string;
   modelAnswer?: string;
+  // graderV2 (SIMULATION ONLY / DRAFT; used only when the switch is ON): further accepted
+  // answers, the bank's matching note (case/punctuation exceptions), and the target form
+  // with its scoring ('target_form_0_1_2' = deterministic 0/1/2 target-form scorer).
+  acceptedAnswers?: string[];
+  matchingNote?: string;
+  targetForm?: string;
+  targetForms?: string[];
+  scoring?: string;
   // Points for this question (default 1). For open responses, the rubric total.
   points?: number;
   rubric?: { criteria: IRubricCriterion[] };
@@ -94,6 +102,11 @@ const questionSchema = new Schema<IQuestion>(
     correctAnswer: Schema.Types.Mixed,
     explanation: { type: String, default: '' },
     modelAnswer: String,
+    acceptedAnswers: { type: [String], default: undefined },
+    matchingNote: String,
+    targetForm: String,
+    targetForms: { type: [String], default: undefined },
+    scoring: String,
     points: { type: Number, min: 0, max: 100 },
     rubric: {
       type: {
