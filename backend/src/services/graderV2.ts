@@ -701,19 +701,27 @@ export function scoreTargetForm(item: TargetFormItem, answer: string | undefined
 }
 
 /**
- * Round-3 fix (guard extension): an exact item whose target is the written form itself — case- or
- * spelling-sensitive matchingNote (capitals, days/months) or a vocabulary item keyed by single words.
+ * Round-3 fix (guard extension), extended for production safety (round 5): an exact item whose target is
+ * the written word itself. Decided from item data only:
+ *   - an outcome/objective id with "-VO-" (vocabulary): the item id, objectiveIds, or rubric criterion
+ *     objectiveIds (so a question with an objective id but no bank item is covered);
+ *   - a case-/spelling-sensitive matchingNote (capitals-full-stops, days-months);
+ *   - a single-word targetForm equal to a key.
+ * Open responses (rubric) and 0/1/2 target-form items are never "word is the target".
+ * With graderV2 ON these items skip the eval-v2 meaning check (needsAiEvaluation false, evaluateShortAnswer
+ * makes no model call). Model path (eval-v2 meaning check and rubric): NOT VALIDATED until run with the API.
  */
 export function spellingIsTarget(item: TargetFormItem & { objectiveIds?: string[] }): boolean {
   if (item.scoring === 'target_form_0_1_2') return false;
+  if (item.type === 'open-response' || item.type === 'transfer' || item.type === 'free_production') return false;
   if (sensitivityOf(item) !== 'none') return true;
-  if (/spelling-sensitive|spelling is (the target|scored)/i.test(`${item.matchingNote ?? ''}`)) return true;
+  if (/spelling-sensitive|spelling is (the target|scored)|capitals-full-stops|days-months/i.test(`${item.matchingNote ?? ''}`)) return true;
+  const rubricIds = ((item.rubric as { criteria?: { objectiveIds?: string[] }[] } | undefined)?.criteria ?? []).flatMap((c) => c.objectiveIds ?? []);
+  if ([item.id ?? '', ...(item.objectiveIds ?? []), ...rubricIds].some((x) => /-VO-/.test(x))) return true;
   const keys = acceptedKeys(item);
   if (!keys.length) return false;
-  const single = keys.every((k) => /^[\p{L}'-]+$/u.test(k.trim()));
-  const vocab = [item.id ?? '', ...(item.objectiveIds ?? [])].some((x) => /-VO-/.test(x));
-  const tfWord = /^[\p{L}'-]+$/u.test(String(item.targetForm ?? '').trim()) && keys.some((k) => k.trim().toLowerCase() === String(item.targetForm).trim().toLowerCase());
-  return single && (vocab || tfWord);
+  const tf = String(item.targetForm ?? '').trim().toLowerCase();
+  return /^[\p{L}'-]+$/u.test(tf) && keys.some((k) => k.trim().toLowerCase() === tf);
 }
 
 /** Fix 5. true = the item requires a target form and the answer does not show it; null = cannot tell. */

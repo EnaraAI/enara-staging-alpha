@@ -106,3 +106,4 @@ SIMULATION ONLY · DRAFT. Full detail is in `research/assessment-validation/a1a2
 - **Deterministic path, graderV2 ON, fresh answers (round 5):** 96.0% exact agreement (target ≥95%) and QWK 0.914 (target ≥0.80). **Both targets met.** It is validated in simulation, against agent scorers only, for the A1–A2 outcome assessments.
 - **Model path: NOT VALIDATED.** In the stand-in estimate, the meaning check over-credits spelling slips on vocabulary items, which lowers exact agreement to 89.3%.
 - **Recommended configuration for studies:** deterministic, graderV2 ON, model path OFF.
+- Production safety (graderV2 ON): vocabulary, spelling and case items (word is the target) are scored by the answer key only, never by the model meaning check; see docs/GRADER_FIXES.md. Model path: NOT VALIDATED until run with the API.

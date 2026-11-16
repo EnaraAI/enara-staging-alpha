@@ -158,3 +158,9 @@ Tests: `backend/test/graderV2.test.ts` "round-3 fixes" block (one test per rule,
 - The name-gender list is small.
 - Error-correction alignment is token-based.
 - Fresh answers and the real model are needed before relying on any figure.
+
+### Production safety: no meaning check for word-target items
+- With graderV2 ON, exact short answers whose target is the word itself (outcome/objective id with `-VO-`, case-/spelling-sensitive `matchingNote` such as capitals-full-stops or days-months, or a single-word `targetForm` equal to the key) are scored by the answer key only. One helper decides: `spellingIsTarget` (`backend/src/services/graderV2.ts`), which also reads objective ids on questions with no bank item.
+- Call sites: `needsAiEvaluation` (`autoGrading.ts`, assignments) returns false for them; `evaluateShortAnswer` (`gradingProposals.ts`) returns a key-only proposal without a model call. Assessments, diagnostics and lesson exercises have no meaning-check call (key only), so nothing changes there.
+- Open responses (rubric) and grammar short answers keep the model path. graderV2 OFF is unchanged (parity tests pass).
+- Model path (eval-v2 meaning check and rubric): NOT VALIDATED until run with the API.

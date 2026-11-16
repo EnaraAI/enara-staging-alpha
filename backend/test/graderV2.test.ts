@@ -271,9 +271,10 @@ describe('round-3 fixes (new examples, not round-3 answers)', () => {
     expect(targetFormMissing(item('A1-VO-days-months-C-5'), 'School starts again in september')).toBe(true);
     expect(targetFormMissing(item('A1-GR-capitals-full-stops-A-3'), 'Ahmed lives in cairo.')).toBe(true);
     const q = { id: 'v1', type: 'short-answer', text: 'Write one word: an orange vegetable', correctAnswer: 'carrot', objectiveIds: ['EN-F-A1-VO-food-drink'], explanation: '', points: 1 } as IQuestion;
-    vi.mocked(askForJson).mockResolvedValueOnce({ value: { correct: true, scoreExplanation: 'Spelling slip.', feedback: 'Good.', flags: [] }, model: 'm' } as never);
+    vi.mocked(askForJson).mockClear();
     const p = (await evaluateShortAnswer({ attempt: { id: 'a', institutionId: 'i', assignmentId: 's' } as never, question: q, answer: 'carrott', run: 1 })) as unknown as { points: number };
     expect(p.points).toBe(0);
+    expect(askForJson).not.toHaveBeenCalled(); // production safety: no model call for word-target items
     // a grammar error-correction item keeps the meaning check
     expect(spellingIsTarget(item('A2-GR-third-person-s-A-5'))).toBe(false);
   });
@@ -364,5 +365,49 @@ describe('round-4 fixes (new examples, not round-4 answers)', () => {
     expect(item('A2-VO-jobs-workplaces-B-5').targetForm).toBe('driver');
     expect(item('A2-VO-appearance-B-1').targetForm).toBe('thin');
     for (const it of BANK.values()) if (it.type === 'transfer') expect(it.scoring).toBe('target_form_0_1_2');
+  });
+});
+
+describe('production safety: no meaning check for word-target items (new examples)', () => {
+  const attempt = { id: 'ps-a', institutionId: 'ps-i', assignmentId: 'ps-s' } as never;
+  const short = (extra: Partial<IQuestion>) => ({ id: 'ps1', type: 'short-answer', text: 'Write one word.', explanation: '', points: 1, ...extra }) as IQuestion;
+  const route = (q: IQuestion, answer: string) => { const [g] = gradeAnswers([q], { [q.id]: answer }); return { g, ai: needsAiEvaluation(q, g as never) }; };
+  it('vocabulary exact miss: no model call, deterministic score kept', async () => {
+    const q = short({ text: 'Write one word: a yellow fruit', correctAnswer: 'banana', objectiveIds: ['EN-F-A1-VO-food-drink'] });
+    const { g, ai } = route(q, 'bananna');
+    expect(g).toMatchObject({ points: 0, isCorrect: false, method: 'rule' });
+    expect(ai).toBe(false);
+    vi.mocked(askForJson).mockClear();
+    const p = (await evaluateShortAnswer({ attempt, question: q, answer: 'bananna', run: 1 })) as unknown as { points: number };
+    expect(p.points).toBe(0);
+    expect(askForJson).not.toHaveBeenCalled();
+    // single-word targetForm equal to the key, no objective id
+    expect(route(short({ correctAnswer: 'kitchen', targetForm: 'kitchen' }), 'kichen').ai).toBe(false);
+  });
+  it('days-months / capitals exact miss: no model call', () => {
+    const dm = short({ text: 'Write the month after May.', correctAnswer: 'June', matchingNote: 'days-months: the day/month word is case-sensitive' });
+    expect(route(dm, 'june').ai).toBe(false);
+    const cap = short({ text: 'Write the sentence correctly: my name is sara', correctAnswer: 'My name is Sara.', matchingNote: 'capitals-full-stops: case- and punctuation-sensitive' });
+    const r = route(cap, 'my name is Sara.');
+    expect(r.g).toMatchObject({ points: 0, method: 'rule' });
+    expect(r.ai).toBe(false);
+  });
+  it('grammar short-answer miss: still routed to the model', () => {
+    const q = short({ text: 'Correct the mistake: He go to work by bus.', correctAnswer: 'He goes to work by bus.', objectiveIds: ['EN-F-A2-GR-third-person-s'] });
+    expect(route(q, 'He travels to work by bus.').ai).toBe(true);
+  });
+  it('open response: still routed to the rubric', () => {
+    const q = { id: 'ps2', type: 'open-response', text: 'Describe your kitchen.', explanation: '', objectiveIds: ['EN-F-A1-VO-home-rooms'], rubric: { criteria: [{ id: 'c', title: 'Content', maxPoints: 2, levels: [{ id: 'l0', label: '0', points: 0 }, { id: 'l2', label: '2', points: 2 }] }] } } as IQuestion;
+    expect(needsAiEvaluation(q, { questionId: 'ps2', studentAnswer: 'My kitchen is small and white.' } as never)).toBe(true);
+  });
+  it('graderV2 OFF: routing unchanged (word-target miss still goes to the model)', async () => {
+    delete process.env.ENARA_ENGINE_V2;
+    const q = short({ correctAnswer: 'banana', objectiveIds: ['EN-F-A1-VO-food-drink'] });
+    expect(route(q, 'bananna').ai).toBe(true);
+    vi.mocked(askForJson).mockClear();
+    vi.mocked(askForJson).mockResolvedValueOnce({ value: { correct: true, scoreExplanation: 'Spelling slip.', feedback: 'Good.', flags: [] }, model: 'm' } as never);
+    const p = (await evaluateShortAnswer({ attempt, question: q, answer: 'bananna', run: 1 })) as unknown as { points: number };
+    expect(askForJson).toHaveBeenCalledTimes(1);
+    expect(p.points).toBe(1);
   });
 });

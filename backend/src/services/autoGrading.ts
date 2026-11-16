@@ -5,7 +5,7 @@ import { Assignment, type IAssignment } from '../models/Assignment';
 import type { IGradingProposal } from '../models/GradingProposal';
 import { LearningObjective } from '../models/LearningObjective';
 import { gradeAnswer } from './assessmentSecurity';
-import { graderV2On, targetFormPoints } from './graderV2';
+import { graderV2On, spellingIsTarget, targetFormPoints } from './graderV2';
 import { AUTO_GRADED, getVersion, questionPoints } from './assessmentVersions';
 import { isAiConfigured } from './aiJson';
 import { isFeatureEnabled } from './featureFlags';
@@ -54,6 +54,9 @@ export function needsAiEvaluation(q: IQuestion | undefined, a: IAttemptAnswer) {
   // graderV2 ON: a target-form item the deterministic scorer decides needs no model.
   if (graderV2On() && targetFormPoints(q, String(a.studentAnswer), questionPoints(q)) !== null) return false;
   if (q.type === 'open-response') return true;
+  // graderV2 ON (production safety): word-target short answers (vocabulary, spelling, case) keep the
+  // deterministic key score; no meaning check. Model path: NOT VALIDATED until run with the API.
+  if (graderV2On() && q.type === 'short-answer' && spellingIsTarget(q)) return false;
   return q.type === 'short-answer' && !a.isCorrect;
 }
 

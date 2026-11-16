@@ -4,7 +4,7 @@ import type { IQuestion } from '../models/Assessment';
 import { GradingProposal } from '../models/GradingProposal';
 import { askForJson } from './aiJson';
 import { logger } from '../utils/logging';
-import { graderV2On, targetFormMissing } from './graderV2';
+import { graderV2On, matchKeyV2, spellingIsTarget, targetFormMissing } from './graderV2';
 
 // AI evaluation of one answer (eval-v2). The automatic grader (autoGrading.ts)
 // calls these; every call is stored as a GradingProposal record so the grade
@@ -247,6 +247,12 @@ export async function evaluateShortAnswer(params: { attempt: AttemptRef; questio
   const { attempt, question, answer } = params;
   const maxPoints = question.points ?? 1;
   const base = { id: `gp-${randomUUID()}`, institutionId: attempt.institutionId, attemptId: attempt.id, assignmentId: attempt.assignmentId, questionId: question.id, kind: 'short_answer' as const, run: params.run, maxPoints, promptVersion: PROPOSAL_VERSION };
+  // graderV2 ON (production safety): when the word itself is the target, no model call; the key decides.
+  // Model path (eval-v2 meaning check and rubric): NOT VALIDATED until run with the API.
+  if (graderV2On() && spellingIsTarget(question)) {
+    const ok = matchKeyV2({ ...question, prompt: question.text }, answer);
+    return GradingProposal.create({ ...base, status: 'proposed', points: ok ? maxPoints : 0, feedback: ok ? 'Correct.' : 'Check the spelling and capital letters of the word.', scoreExplanation: 'Scored by the answer key: the written word is the target.', flags: ['word_target_key_only'], confidence: 'high', modelName: 'answer-key' });
+  }
   try {
     const { value, model } = await askForJson({
       feature: 'ai_grading',
