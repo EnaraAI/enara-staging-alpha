@@ -5,7 +5,6 @@ import {
   TEMPLATE_REGISTRY,
   isTemplateAlias,
   type TemplateAlias,
-  type TemplateVariables,
 } from './templateRegistry';
 import {
   LOGO_CONTENT_ID,
@@ -15,6 +14,7 @@ import {
   LOGO_WHITE_FILENAME,
   LOGO_WHITE_PNG_BASE64,
 } from './logoInline';
+import { MissingAppUrlError, TEMPLATE_LINKS, buildActionUrl, isLinkedAlias, type TemplateSendVariables } from './links';
 
 export type SendTemplateResult =
   | { ok: true; id: string }
@@ -53,11 +53,16 @@ function fail(alias: string, code: string, message: string): SendTemplateResult 
 export async function sendTemplate<A extends TemplateAlias>(
   alias: A,
   to: string | string[],
-  variables: TemplateVariables<A>,
+  variables: TemplateSendVariables<A>,
 ): Promise<SendTemplateResult> {
   if (!isTemplateAlias(alias)) return fail(String(alias), 'unknown_template', 'Unknown template alias');
   const entry = TEMPLATE_REGISTRY[alias];
-  const expected: readonly string[] = entry.variables;
+  const linked = isLinkedAlias(alias);
+  // Linked aliases take link params instead of ACTION_URL; the URL is built here.
+  const linkParams: readonly string[] = linked ? TEMPLATE_LINKS[alias].params : [];
+  const expected: readonly string[] = linked
+    ? [...entry.variables.filter((k) => k !== 'ACTION_URL'), ...linkParams]
+    : entry.variables;
   const given = Object.keys(variables ?? {});
   const missing = expected.filter((k) => !given.includes(k));
   const extra = given.filter((k) => !expected.includes(k));
@@ -69,6 +74,25 @@ export async function sendTemplate<A extends TemplateAlias>(
     );
   }
 
+  const input = variables as Record<string, string | number>;
+  const emptyParams = linkParams.filter((k) => typeof input[k] !== 'string' || !String(input[k]).trim());
+  if (emptyParams.length) {
+    return fail(alias, 'invalid_variables', `Link params must be non-empty strings (${emptyParams.join(',')})`);
+  }
+  let templateVariables: Record<string, string | number> = input;
+  if (linked) {
+    try {
+      const actionUrl = buildActionUrl(alias, input as never);
+      templateVariables = Object.fromEntries([
+        ...Object.entries(input).filter(([k]) => !linkParams.includes(k)),
+        ['ACTION_URL', actionUrl],
+      ]);
+    } catch (err) {
+      if (err instanceof MissingAppUrlError) return fail(alias, err.code, err.message);
+      throw err;
+    }
+  }
+
   const resend = getClient();
   if (!resend) return fail(alias, 'missing_api_key', 'RESEND_API_KEY is not set');
 
@@ -76,7 +100,7 @@ export async function sendTemplate<A extends TemplateAlias>(
     const { data, error } = await resend.emails.send({
       from: EMAIL_SENDER,
       to,
-      template: { id: entry.id, variables: variables as Record<string, string | number> },
+      template: { id: entry.id, variables: templateVariables },
       // Every template references cid:enara-logo (light) and cid:enara-logo-white (dark mode), so both are always attached.
       attachments: [
         { filename: LOGO_FILENAME, content: LOGO_PNG_BASE64, contentType: 'image/png', contentId: LOGO_CONTENT_ID },

@@ -5,6 +5,11 @@ vi.mock('resend', () => ({
   Resend: vi.fn().mockImplementation(() => ({ emails: { send: sendMock } })),
 }));
 
+vi.mock('../src/config/env', async (orig) => ({
+  ...(await orig<typeof import('../src/config/env')>()),
+  getConfig: () => ({ appUrl: 'https://app.example.org/' }),
+}));
+
 import { logger } from '../src/utils/logging';
 import { sendTemplate, resetEmailClientForTests } from '../src/email/sendTemplate';
 import { EMAIL_SENDER, TEMPLATE_REGISTRY } from '../src/email/templateRegistry';
@@ -29,26 +34,47 @@ describe('sendTemplate', () => {
 
   it('type-level: requires exactly the registry variables', () => {
     const typeOnly = () => {
-      // @ts-expect-error missing ACTION_URL
-      void sendTemplate('enara-welcome', EMAIL, { NAME });
       // @ts-expect-error extra variable
-      void sendTemplate('enara-welcome', EMAIL, { NAME, ACTION_URL: 'x', EXTRA: 'y' });
+      void sendTemplate('enara-welcome', EMAIL, { NAME, EXTRA: 'y' });
       // @ts-expect-error unknown alias
       void sendTemplate('enara-nope', EMAIL, { NAME });
+      // @ts-expect-error ACTION_URL is built in code for linked aliases
+      void sendTemplate('enara-welcome', EMAIL, { NAME, ACTION_URL: 'x' });
+      // @ts-expect-error ACTION_URL instead of token
       void sendTemplate('enara-password-reset', EMAIL, { NAME, ACTION_URL: 'x', EXPIRES_IN: '1 hour' });
+      // @ts-expect-error missing token
+      void sendTemplate('enara-password-reset', EMAIL, { NAME, EXPIRES_IN: '1 hour' });
+      // @ts-expect-error missing token
+      void sendTemplate('enara-class-invitation', EMAIL, { NAME, TEACHER_NAME: 'T', CLASS_NAME: 'C', EXPIRES_IN: '7 days' });
+      // @ts-expect-error missing assessmentId
+      void sendTemplate('enara-assessment-results', EMAIL, { NAME, CHILD_NAME: 'c', TEST_NAME: 't', SCORE: 1, LEVEL: 'l', SUMMARY: 's' });
+      // @ts-expect-error missing courseId
+      void sendTemplate('enara-lesson-reminder', EMAIL, { NAME, LESSON_TITLE: 'L' });
+      // @ts-expect-error verify-email has no page: ACTION_URL stays required
+      void sendTemplate('enara-verify-email', EMAIL, { NAME, EXPIRES_IN: '1 day' });
+      void sendTemplate('enara-welcome', EMAIL, { NAME });
+      void sendTemplate('enara-password-reset', EMAIL, { NAME, EXPIRES_IN: '1 hour', token: 't' });
+      void sendTemplate('enara-assessment-results', EMAIL, { NAME, CHILD_NAME: 'c', TEST_NAME: 't', SCORE: 1, LEVEL: 'l', SUMMARY: 's', assessmentId: 'a' });
+      void sendTemplate('enara-lesson-reminder', EMAIL, { NAME, LESSON_TITLE: 'L', courseId: 'c' });
+      void sendTemplate('enara-verify-email', EMAIL, { NAME, ACTION_URL: 'https://x', EXPIRES_IN: '1 day' });
+      void sendTemplate('enara-parent-consent', EMAIL, { NAME, CHILD_NAME: 'c', ACTION_URL: 'https://x', EXPIRES_IN: '1 day' });
     };
     expect(typeof typeOnly).toBe('function');
   });
 
   it('sends by template id with the sender and variables (success path)', async () => {
     sendMock.mockResolvedValue({ data: { id: 'email_123' }, error: null });
-    const vars = { NAME, ACTION_URL: 'https://enara.app/r', EXPIRES_IN: '1 hour' };
+    const vars = { NAME, EXPIRES_IN: '1 hour', token: 'a b/c' };
     const result = await sendTemplate('enara-password-reset', EMAIL, vars);
+    const app = 'https://app.example.org';
     expect(result).toEqual({ ok: true, id: 'email_123' });
     expect(sendMock).toHaveBeenCalledWith({
       from: EMAIL_SENDER,
       to: EMAIL,
-      template: { id: '15397fc6-acaa-453d-a103-b80d9e0f6394', variables: vars },
+      template: {
+        id: '15397fc6-acaa-453d-a103-b80d9e0f6394',
+        variables: { NAME, EXPIRES_IN: '1 hour', ACTION_URL: `${app}/reset-password?token=a%20b%2Fc` },
+      },
       attachments: [
         expect.objectContaining({ contentId: 'enara-logo', contentType: 'image/png', filename: 'enara-logo.png' }),
         expect.objectContaining({ contentId: 'enara-logo-white', contentType: 'image/png', filename: 'enara-logo-white.png' }),
@@ -78,7 +104,10 @@ describe('sendTemplate', () => {
   it('maps every alias to its registry id', async () => {
     sendMock.mockResolvedValue({ data: { id: 'e' }, error: null });
     for (const [alias, entry] of Object.entries(TEMPLATE_REGISTRY)) {
-      const vars = Object.fromEntries(entry.variables.map((k) => [k, 'v']));
+      const { TEMPLATE_LINKS } = await import('../src/email/links');
+      const linkParams: readonly string[] = (TEMPLATE_LINKS as Record<string, { params: readonly string[] }>)[alias]?.params ?? [];
+      const keys = alias in TEMPLATE_LINKS ? [...entry.variables.filter((k) => k !== 'ACTION_URL'), ...linkParams] : [...entry.variables];
+      const vars = Object.fromEntries(keys.map((k) => [k, 'v']));
       await sendTemplate(alias as any, EMAIL, vars as any);
       expect(sendMock.mock.lastCall![0].template.id).toBe(entry.id);
     }
@@ -86,10 +115,15 @@ describe('sendTemplate', () => {
   });
 
   it('rejects missing and extra variables at runtime without calling Resend', async () => {
-    const missing = await sendTemplate('enara-welcome', EMAIL, { NAME } as any);
+    const missing = await sendTemplate('enara-password-reset', EMAIL, { NAME, EXPIRES_IN: '1 hour' } as any);
     expect(missing).toMatchObject({ ok: false, code: 'invalid_variables' });
-    expect((missing as any).message).toContain('ACTION_URL');
-    const extra = await sendTemplate('enara-welcome', EMAIL, { NAME, ACTION_URL: 'x', FOO: 'y' } as any);
+    expect((missing as any).message).toContain('token');
+    const handUrl = await sendTemplate('enara-welcome', EMAIL, { NAME, ACTION_URL: 'x' } as any);
+    expect(handUrl).toMatchObject({ ok: false, code: 'invalid_variables' });
+    expect((handUrl as any).message).toContain('ACTION_URL');
+    const empty = await sendTemplate('enara-lesson-reminder', EMAIL, { NAME, LESSON_TITLE: 'L', courseId: ' ' });
+    expect(empty).toMatchObject({ ok: false, code: 'invalid_variables' });
+    const extra = await sendTemplate('enara-welcome', EMAIL, { NAME, FOO: 'y' } as any);
     expect(extra).toMatchObject({ ok: false, code: 'invalid_variables' });
     expect((extra as any).message).toContain('FOO');
     expect(sendMock).not.toHaveBeenCalled();
@@ -101,7 +135,7 @@ describe('sendTemplate', () => {
       data: null,
       error: { name: 'validation_error', message: `Invalid \`to\` field: ${EMAIL}`, statusCode: 422 },
     });
-    const result = await sendTemplate('enara-welcome', EMAIL, { NAME, ACTION_URL: 'https://enara.app' });
+    const result = await sendTemplate('enara-welcome', EMAIL, { NAME });
     expect(result).toMatchObject({ ok: false, code: 'validation_error' });
     expect(errorSpy).toHaveBeenCalledTimes(1);
     expect(errorSpy.mock.calls[0][1]).toMatchObject({ alias: 'enara-welcome', code: 'validation_error' });
@@ -112,7 +146,7 @@ describe('sendTemplate', () => {
 
   it('handles thrown exceptions without PII', async () => {
     sendMock.mockRejectedValue(Object.assign(new Error(`network down for ${EMAIL}`), { code: 'ECONNRESET' }));
-    const result = await sendTemplate('enara-welcome', [EMAIL], { NAME, ACTION_URL: 'x' });
+    const result = await sendTemplate('enara-welcome', [EMAIL], { NAME });
     expect(result).toMatchObject({ ok: false, code: 'ECONNRESET' });
     expect(loggedText()).not.toContain(EMAIL);
     expect(loggedText()).not.toContain(NAME);
@@ -120,7 +154,7 @@ describe('sendTemplate', () => {
 
   it('returns missing_api_key when RESEND_API_KEY is unset', async () => {
     delete process.env.RESEND_API_KEY;
-    const result = await sendTemplate('enara-welcome', EMAIL, { NAME, ACTION_URL: 'x' });
+    const result = await sendTemplate('enara-welcome', EMAIL, { NAME });
     expect(result).toMatchObject({ ok: false, code: 'missing_api_key' });
     expect(sendMock).not.toHaveBeenCalled();
     expect(loggedText()).not.toContain(EMAIL);

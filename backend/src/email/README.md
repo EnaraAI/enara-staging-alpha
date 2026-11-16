@@ -50,22 +50,49 @@ clients that block remote images (Roundcube, Outlook desktop, many school mail s
 - A hosted copy also exists at `https://assets.enara.app/email/enara-logo.png` (Cloudflare R2 bucket
   `enara-email-assets`), for previews and other uses. The templates no longer reference it.
 
+## Links (ACTION_URL is built in code)
+
+Callers never pass `ACTION_URL` for aliases that have a page in the app: they pass link params and
+[`links.ts`](./links.ts) builds the URL from `getConfig().appUrl` (`APP_URL`, trailing slashes trimmed,
+params URL-encoded). Without an app URL `sendTemplate` returns `{ ok: false, code: 'missing_app_url' }` and sends nothing.
+
+| Alias | Caller passes | ACTION_URL |
+|---|---|---|
+| enara-welcome | – | `${APP_URL}/` |
+| enara-weekly-progress | – | `${APP_URL}/` |
+| enara-password-reset | `token` | `${APP_URL}/reset-password?token=…` |
+| enara-class-invitation | `token` | `${APP_URL}/accept-invitation?token=…` |
+| enara-assessment-results | `assessmentId` | `${APP_URL}/?assessment=…` |
+| enara-lesson-reminder | `courseId` | `${APP_URL}/?course=…` |
+| enara-verify-email | `ACTION_URL` (caller-supplied) | no page in the app yet |
+| enara-parent-consent | `ACTION_URL` (caller-supplied) | no page in the app yet |
+
+When pages for email verification and parent consent exist, add them to `TEMPLATE_LINKS` in `links.ts`.
+
 ## Sending
 
 ```ts
 import { sendTemplate } from './email/sendTemplate';
 
 const result = await sendTemplate('enara-password-reset', user.email, {
-  NAME: user.firstName, ACTION_URL: resetUrl, EXPIRES_IN: '1 hour',
+  NAME: user.name, EXPIRES_IN: '30 minutes', token,
 }); // { ok: true, id } | { ok: false, code, message }
 ```
 
-Variables are type-checked per alias (all required, no extras) and re-checked at runtime. Failures are logged
+Variables are type-checked per alias (template variables minus `ACTION_URL` plus the link params above;
+all required, no extras) and re-checked at runtime. Failures are logged
 with alias + error code/message only (email addresses are scrubbed). The Resend client is created lazily from
 `RESEND_API_KEY`; without it the call returns `{ ok: false, code: 'missing_api_key' }`.
 
 Test email (from `backend/`, key exported, to an inbox you own):
 
 ```bash
-npx tsx -e "import('./src/email/sendTemplate').then(m => m.sendTemplate('enara-welcome', 'you@example.com', { NAME: 'Test', ACTION_URL: 'https://enara.app' })).then(console.log)"
+npx tsx -e "import('./src/email/sendTemplate').then(m => m.sendTemplate('enara-welcome', 'you@example.com', { NAME: 'Test' })).then(console.log)"
 ```
+
+## Account emails
+
+`services/accountTokens.ts` sends the password reset (`enara-password-reset`, expiry from `PASSWORD_RESET_TTL_MS`)
+and staff invitation (`enara-class-invitation`, expiry from `INVITATION_TTL_MS`) through `sendTemplate` when
+`RESEND_API_KEY` is set (still skipping `.test` addresses and honouring `REMINDER_TEST_RECIPIENT`). Without the key
+the previous inline-HTML `sendEmail` path runs unchanged.
