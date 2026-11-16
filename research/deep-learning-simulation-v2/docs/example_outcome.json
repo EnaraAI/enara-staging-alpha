@@ -1,0 +1,56 @@
+{
+  "outcomes": [
+    {
+      "id": "GR-01", "area": "grammar", "title": "Present simple -s/-es after he/she/it",
+      "objective": "Add -s or -es to the verb after he, she or it in present simple sentences about routines.",
+      "prerequisites": ["Knows common base verbs", "Knows the pronouns he, she and it"],
+      "difficulty": 2, "cefr": "A2", "modality": "text", "audioListening": false,
+      "misconceptions": [
+        { "id": "GR-01-M1", "description": "The verb is the same for every person", "exampleWrong": "She go to school at seven." },
+        { "id": "GR-01-M2", "description": "Adds -s to the wrong word or doubles it", "exampleWrong": "She goes to schools at seven. / He gos." }
+      ],
+      "teachingSuccessCriteria": ["Adds -s/-es to the main verb after he/she/it", "Uses -es after -ch, -sh, -s, -x, -o endings"],
+      "mastery": { "postMinCorrect": 1, "transferMinCorrect": 0.5 },
+      "lesson": {
+        "title": "My daily routine", "objective": "Describe a daily routine with the present simple.",
+        "spec": {
+          "objectives": ["Describe a daily routine with the present simple"],
+          "successCriteria": ["Adds -s for he/she/it", "Uses -es after ch, sh, s, x, o"],
+          "vocabulary": ["get up", "have breakfast", "go to work", "every day"], "grammar": ["present simple he/she/it + -s/-es"], "functions": ["describing habits"],
+          "skills": ["writing", "reading"], "examples": ["She gets up at six every day.", "My brother goes to work by bus."],
+          "items": [
+            { "id": "p1", "prompt": "Correct the verb: \"My mother cook dinner every evening.\"", "acceptedAnswers": ["cooks"], "targetForms": ["cooks"], "criteria": [1] },
+            { "id": "p2", "prompt": "Correct the verb: \"He teach English at a school.\"", "acceptedAnswers": ["teaches"], "targetForms": ["teaches"], "criteria": [2] }
+          ]
+        }
+      },
+      "studyNotes": "In the present simple we talk about things we do every day. With I, you, we and they the verb stays the same: I get up at six. With he, she and it we add -s: She gets up at six. If the verb ends in -ch, -sh, -s, -x or -o we add -es: He watches TV. She goes to work.",
+      "scriptedTutor": {
+        "explanation": "In the present simple the verb changes with he, she and it. We add -s, or -es after ch, sh, s, x and o.",
+        "hints": ["Look at the subject. Is it he, she or it?", "With he, she or it, the verb needs an ending."],
+        "correctFeedback": "Yes, that is correct.", "incorrectFeedback": "Not quite. Look at the end of the verb.", "closing": "Good work. Remember: he, she, it takes -s or -es."
+      },
+      "prereqProbe": { "id": "GR-01-PR", "stage": "pre", "prompt": "Which word is a pronoun for one woman: she, they or we?", "scoring": { "type": "key", "accepted": ["she"], "mode": "exact" }, "right": ["she"], "wrong": ["they", "we"] },
+      "items": {
+        "pre": [
+          { "id": "GR-01-PRE1", "stage": "pre", "prompt": "Correct the verb: \"My brother play football on Fridays.\" Write the correct verb.", "scoring": { "type": "key", "accepted": ["plays"] }, "right": ["plays"], "wrong": ["play"], "misconceptionId": "GR-01-M1" },
+          { "id": "GR-01-PRE2", "stage": "pre", "prompt": "Correct the verb: \"She watch TV every evening.\" Write the correct verb.", "scoring": { "type": "key", "accepted": ["watches"] }, "right": ["watches"], "wrong": ["watch", "watchs"], "misconceptionId": "GR-01-M2" }
+        ],
+        "post": [
+          { "id": "GR-01-POST1", "stage": "post", "prompt": "Correct the verb: \"My father drive to work.\" Write the correct verb.", "scoring": { "type": "key", "accepted": ["drives"] }, "right": ["drives"], "wrong": ["drive"], "misconceptionId": "GR-01-M1" },
+          { "id": "GR-01-POST2", "stage": "post", "prompt": "Correct the verb: \"He wash his car on Sundays.\" Write the correct verb.", "scoring": { "type": "key", "accepted": ["washes"] }, "right": ["washes"], "wrong": ["wash", "washs"], "misconceptionId": "GR-01-M2" }
+        ],
+        "transfer": [
+          { "id": "GR-01-TR1", "stage": "transfer", "prompt": "Complete about your pet: \"My cat ___ (sleep) on the sofa all day.\"", "scoring": { "type": "key", "accepted": ["sleeps"] }, "right": ["sleeps"], "wrong": ["sleep"] },
+          { "id": "GR-01-TR2", "stage": "transfer", "prompt": "Complete about a shop: \"The shop ___ (close) at nine o'clock.\"", "scoring": { "type": "key", "accepted": ["closes"] }, "right": ["closes"], "wrong": ["close"] }
+        ],
+        "delayed": [
+          { "id": "GR-01-D1", "stage": "delayed", "prompt": "Correct the verb: \"My sister cook dinner.\" Write the correct verb.", "scoring": { "type": "key", "accepted": ["cooks"] }, "right": ["cooks"], "wrong": ["cook"] },
+          { "id": "GR-01-D2", "stage": "delayed", "prompt": "Correct the verb: \"He catch the bus at seven.\" Write the correct verb.", "scoring": { "type": "key", "accepted": ["catches"] }, "right": ["catches"], "wrong": ["catch"] },
+          { "id": "GR-01-D3", "stage": "delayed", "prompt": "Complete: \"The baby ___ (cry) at night.\"", "scoring": { "type": "key", "accepted": ["cries"] }, "right": ["cries"], "wrong": ["cry"] },
+          { "id": "GR-01-D4", "stage": "delayed", "prompt": "Complete: \"My mum ___ (teach) maths at a school.\"", "scoring": { "type": "key", "accepted": ["teaches"] }, "right": ["teaches"], "wrong": ["teach"] }
+        ]
+      }
+    }
+  ]
+}

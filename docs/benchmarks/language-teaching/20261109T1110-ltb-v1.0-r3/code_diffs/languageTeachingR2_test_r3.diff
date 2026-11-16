@@ -1,0 +1,30 @@
+--- docs/benchmarks/language-teaching/20261109T1110-ltb-v1.0-r3/pre_edit_code_snapshot/languageTeachingR2.test.ts	2026-11-09 11:11:48.177191247 +0000
++++ backend/test/languageTeachingR2.test.ts	2026-11-09 11:15:40.289644090 +0000
+@@ -257,7 +257,7 @@
+   it('turn evidence records the band that reached the engine and its source (category only)', () => {
+     const r = plan('hello there', []);
+     const ev = turnEvidence({ version: 'ltc-v1', learner: learner(false, 'A2'), lesson: { status: 'structured', ...ROUTINE }, signals: r.signals, moves: r.moves, prompt: '' });
+-    expect(ev).toMatchObject({ ageBand: 'unknown', ageBandSource: 'not_collected', policyRevision: LANGUAGE_POLICY_REVISION, masteryClaim: false });
++    expect(ev).toMatchObject({ ageBand: 'unknown', ageBandSource: 'no_trusted_learner_age_source', policyRevision: LANGUAGE_POLICY_REVISION, masteryClaim: false });
+   });
+ });
+ 
+@@ -274,7 +274,8 @@
+ 
+   it('P2: feedback deals with the most important error only', () => {
+     const r = plan('Yesterday she go school', [u('x'), TASK]);
+-    expect(moveText(r.moves.find((x) => x.id === 'corrective_feedback_retry')!)).toContain('deal only with the most important one now');
++    // r3 revised the r2 wording: priority by meaning and lesson target, small slips light.
++    expect(moveText(r.moves.find((x) => x.id === 'corrective_feedback_retry')!)).toContain('focus on the one that matters most for meaning and for this lesson');
+   });
+ });
+ 
+@@ -369,7 +370,7 @@
+     expect(adult.body.assistantMessage.meta.languageTurn).toMatchObject({ ageBand: 'adult', ageBandSource: 'school_setting_adult_learners' });
+     expect(payload()).toContain('never childish');
+     const school = await turn('school', 'hi, help me with english');
+-    expect(school.body.assistantMessage.meta.languageTurn).toMatchObject({ ageBand: 'unknown', ageBandSource: 'not_collected' });
++    expect(school.body.assistantMessage.meta.languageTurn).toMatchObject({ ageBand: 'unknown', ageBandSource: 'no_trusted_learner_age_source' });
+     expect(payload()).toContain('age is not known');
+   });
+ 

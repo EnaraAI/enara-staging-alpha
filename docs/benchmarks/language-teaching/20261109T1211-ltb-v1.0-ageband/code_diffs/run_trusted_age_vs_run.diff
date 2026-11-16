@@ -1,0 +1,66 @@
+--- backend/benchmarks/ltc-v1/run.ts	2026-11-09 07:50:08.708683046 +0000
++++ backend/benchmarks/ltc-v1/run_trusted_age.ts	2026-11-09 12:34:51.172414694 +0000
+@@ -1,3 +1,14 @@
++// ENARA Language Teaching Benchmark v1.0 — tutor harness, TRUSTED-AGE variant.
++//
++// Identical to run.ts (frozen, unchanged) except for fixture construction: each
++// synthetic school gets a Workspace Admin account, and the cohort's age band is
++// set through the product's own server-side contract over HTTP:
++//   adult  → PUT /api/learning/settings {adultLearners: true}   (school setting)
++//   child/teen → PUT /api/age-bands/classes/:batchId {ageBand}   (class band)
++// Nothing is injected into the resolver or engine; the HTTP status of each
++// fixture call is recorded per case (fixtureAgeBand) and must be 200.
++//
++// Original header follows.
+ // ENARA Language Teaching Benchmark v1.0 — tutor harness.
+ //
+ // Runs the frozen benchmark cases through the REAL tutor route
+@@ -166,7 +177,7 @@
+   const app = (await import('../../src/app')).createApp();
+   const cfg = getConfig();
+   const runConfig = {
+-    benchmarkVersion: 'ltb-v1.0', harness: 'backend/benchmarks/ltc-v1/run.ts', mode: MODE, startedAt: new Date().toISOString(),
++    benchmarkVersion: 'ltb-v1.0', harness: 'backend/benchmarks/ltc-v1/run_trusted_age.ts (run.ts + trusted-age fixtures)', mode: MODE, startedAt: new Date().toISOString(),
+     route: 'POST /api/me/tutor/sessions/:id/messages (real controller, in-process)',
+     tutorModel: cfg.anthropicTutorModel, tutorEffort: cfg.anthropicTutorEffort, intentModel: cfg.anthropicIntentModel,
+     maxOutputTokensTutor: 4000, sdkTimeoutMs: 25_000, gatewayMaxAttempts: 2, sdkMaxRetries: 0, concurrency: 1,
+@@ -193,7 +204,7 @@
+     await M.Institution.create({
+       id: inst, name: `Synthetic School ${k}`,
+       features: { teaching_workflow_enabled: true, learning_intelligence_enabled: true, adaptive_pedagogy_enabled: true, mastery_tracking_enabled: true, misconception_detection_enabled: true },
+-      learningSettings: { adultLearners: c.learner.adultSchool },
++      learningSettings: { adultLearners: false },
+     });
+     await M.Batch.create({ id: `ltb-b-${k}`, name: `Batch ${k}`, institutionId: inst, academicYear: '2026', studentCount: 1 });
+     await M.Student.create({ id: sid, name, email, grade: c.learner.grade ?? '', institutionId: inst, batchId: `ltb-b-${k}` });
+@@ -221,9 +232,20 @@
+     // limiters (login) would treat 120 learners as one client. Each case stands for
+     // a different learner, so the counters in the throwaway DB are cleared per case.
+     await mongoose.connection.collection('rate_limits').deleteMany({});
++    // Trusted-age fixture: a Workspace Admin of this synthetic school sets the band via the product API.
++    const adminEmail = `ltb-admin-${k}@bench.invalid`;
++    await M.User.create({ email: adminEmail, password: hash, role: 'admin', name: `Bench Admin ${k}`, status: 'active', institutionId: inst });
++    const adminLogin = await request(app).post('/api/auth/login').send({ email: adminEmail, password: PW });
++    const adminAuth = `Bearer ${adminLogin.body.token}`;
++    const fixtureCall = c.cohort === 'adult'
++      ? await request(app).put('/api/learning/settings').set('Authorization', adminAuth).send({ adultLearners: true })
++      : await request(app).put(`/api/age-bands/classes/ltb-b-${k}`).set('Authorization', adminAuth).send({ ageBand: c.cohort });
++    const fixtureAgeBand = { cohort: c.cohort, method: c.cohort === 'adult' ? 'PUT /api/learning/settings adultLearners=true' : `PUT /api/age-bands/classes/:batch ageBand=${c.cohort}`, httpStatus: fixtureCall.status };
++    if (fixtureCall.status !== 200) throw new Error(`trusted-age fixture failed for ${c.id}: HTTP ${fixtureCall.status}`);
++    await mongoose.connection.collection('rate_limits').deleteMany({});
+     const login = await request(app).post('/api/auth/login').send({ email, password: PW });
+     const auth = `Bearer ${login.body.token}`;
+-    const identifiers = [name, email, sid, inst, `Synthetic School ${k}`, String(login.body.user?.id ?? '')].filter((v) => v.length > 3);
++    const identifiers = [name, email, sid, inst, `Synthetic School ${k}`, String(login.body.user?.id ?? ''), adminEmail, `Bench Admin ${k}`, `ltb-b-${k}`].filter((v) => v.length > 3);
+     const sess = await request(app).post('/api/me/tutor/sessions').set('Authorization', auth).send({ courseId, ...(c.lesson ? { lessonId } : {}), title: `Benchmark ${c.id}` });
+     const sessionId = sess.body.id ?? sess.body.session?.id;
+     const turns: Record<string, unknown>[] = [];
+@@ -247,7 +269,7 @@
+       cursor = null;
+       flushAttempts();
+     }
+-    const rec = { caseId: c.id, cohort: c.cohort, cefr: c.cefr, caseType: c.caseType, sessionCreated: sess.status, loginStatus: login.status, turns, meteredUsdAfter: Number(meteredUsd.toFixed(6)) };
++    const rec = { caseId: c.id, cohort: c.cohort, cefr: c.cefr, caseType: c.caseType, sessionCreated: sess.status, loginStatus: login.status, fixtureAgeBand, turns, meteredUsdAfter: Number(meteredUsd.toFixed(6)) };
+     appendFileSync(OUT, JSON.stringify(rec) + '\n');
+     const summary = turns.map((x) => `${x.httpStatus}/${(x.languageTurn as { moves?: string[] } | null)?.moves?.join('+') ?? '-'}`).join(' | ');
+     console.log(`${c.id} ${summary} $${meteredUsd.toFixed(4)}`);

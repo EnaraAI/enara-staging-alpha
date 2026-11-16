@@ -1,0 +1,452 @@
+{
+  "status": "DRAFT",
+  "outcomeId": "EN-F-A2-VO-weather",
+  "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+  "matching": "Items 1-2 gap-fill weather adjective from a noun clue (sun/rain/wind/snow/cloud); 3-4 choice adjective vs noun; EC = Arabic-L1 vowel spelling slip on a weather adjective (slot 5) and noun-for-adjective ('It is rain today', slot 6); FP = one sentence describing weather with a given adjective; transfer = forecast/postcard. Adjectives EVP A1-A2 (-y adjectives), prompts 8-13 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 3: slot 5 copula omission (a grammar error) replaced by a weather-adjective spelling error (-ey for final -y: foggey/cloudey/snowey, spelling_vowel); slot 6 unchanged (noun for adjective). Each slot-5 adjective is not shown elsewhere in its form. Review round 4: the '-ey' spellings are not a typical Arabic-L1 slip and 'foggy' is above A2, so slot 5 is now a vowel slip on an A1-A2 weather adjective not shown elsewhere in its form: wit for wet (A, i/e), clody for cloudy (B, vowel left out), hut for hot (C, short-vowel confusion). The slot-6 tag no longer says copula_omission. outcomes.json l1ErrorTypes = [spelling_vowel]; noun-for-adjective has no enum value. Review round 5: no item's answer word is shown elsewhere in its form. A-3 key sunny -> snowy (sunny is the A-9 key); A-7 names hot/warm; A-9 no longer accepts 'hot' ('warm and hot'); B-6 wind -> sun (sunny), so 'windy' is shown only in its own B-3 options; B-7/B-8 name wet/warm; C-7 names dry.",
+  "forms": {
+    "A": [
+      {
+        "id": "EN-F-A2-VO-weather-A-1",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: There is a lot of rain today. It is ____ .",
+        "answerKey": "rainy",
+        "acceptedAnswers": [
+          "rainy",
+          "wet"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "rainy",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-A-2",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: The wind is very strong. It is ____ .",
+        "answerKey": "windy",
+        "acceptedAnswers": [
+          "windy"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "windy",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-A-3",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (snowy / snow / sun): Wear your gloves and scarf. It is ____ in the mountains.",
+        "answerKey": "snowy",
+        "acceptedAnswers": [
+          "snowy"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "snowy",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-A-4",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (cloudy / cloud / clouds): No sun this morning. It is ____ .",
+        "answerKey": "cloudy",
+        "acceptedAnswers": [
+          "cloudy"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "cloudy",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-A-5",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Wear your boots, the streets are very wit today.",
+        "answerKey": "Wear your boots, the streets are very wet today.",
+        "acceptedAnswers": [
+          "Wear your boots, the streets are very wet today."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "Wear your boots, the streets are very wet today.",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "l1ErrorType": "spelling_vowel (i/e confusion: wit for wet)"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-A-6",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Take an umbrella, it is rain this afternoon.",
+        "answerKey": "Take an umbrella, it is rainy this afternoon.",
+        "acceptedAnswers": [
+          "Take an umbrella, it is rainy this afternoon.",
+          "Take an umbrella, it is raining this afternoon.",
+          "Take an umbrella, it's raining this afternoon.",
+          "Take an umbrella, it's rainy this afternoon.",
+          "Take an umbrella, it will rain this afternoon.",
+          "Take an umbrella, it is going to rain this afternoon.",
+          "Take an umbrella, it's going to rain this afternoon."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "Take an umbrella, it is rainy this afternoon.",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "l1ErrorType": "noun_for_adjective"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-A-7",
+        "type": "free_production",
+        "prompt": "Write one sentence about the weather this morning. Use 'hot' or 'warm'.",
+        "answerKey": "hot/warm",
+        "acceptedAnswers": [
+          "hot",
+          "warm"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "hot/warm",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A2-VO-weather-A-8",
+        "type": "free_production",
+        "prompt": "Write one sentence about the weather in winter. Use 'cold'.",
+        "answerKey": "cold",
+        "acceptedAnswers": [
+          "cold"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "cold",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A2-VO-weather-A-9",
+        "type": "transfer",
+        "prompt": "Postcard from Alexandria: 'The sea is calm. No wind, no clouds. It's warm and ____ .'",
+        "answerKey": "sunny",
+        "acceptedAnswers": [
+          "sunny",
+          "clear"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "sunny",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "rubric": "VOCABULARY variant (transfer, SCORING_RUBRIC §2.3/§2.4): 2 = the target word (answerKey or a variant listed in acceptedAnswers) used with the right meaning for the task; 1 = the right word misspelt or in the wrong form; 0 = no target word, the word used with the wrong meaning, or the task not done. Other errors are not scored."
+      }
+    ],
+    "B": [
+      {
+        "id": "EN-F-A2-VO-weather-B-1",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: The sun is shining all day. It is ____ .",
+        "answerKey": "sunny",
+        "acceptedAnswers": [
+          "sunny"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "sunny",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-B-2",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: There is snow on the cars. It is ____ .",
+        "answerKey": "snowy",
+        "acceptedAnswers": [
+          "snowy",
+          "cold"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "snowy",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-B-3",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (windy / wind / winds): Don't fly your kite today. It is not ____ .",
+        "answerKey": "windy",
+        "acceptedAnswers": [
+          "windy"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "windy",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-B-4",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (rainy / rain / sun): Take your umbrella. It is a ____ day.",
+        "answerKey": "rainy",
+        "acceptedAnswers": [
+          "rainy"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "rainy",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-B-5",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Take a jacket, it is very clody today.",
+        "answerKey": "Take a jacket, it is very cloudy today.",
+        "acceptedAnswers": [
+          "Take a jacket, it is very cloudy today.",
+          "Take a jacket, it's very cloudy today."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "Take a jacket, it is very cloudy today.",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "l1ErrorType": "spelling_vowel (vowel left out: clody for cloudy)"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-B-6",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Wear a hat, it is sun this morning.",
+        "answerKey": "Wear a hat, it is sunny this morning.",
+        "acceptedAnswers": [
+          "Wear a hat, it is sunny this morning.",
+          "Wear a hat, it's sunny this morning."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "Wear a hat, it is sunny this morning.",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "l1ErrorType": "noun_for_adjective"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-B-7",
+        "type": "free_production",
+        "prompt": "Write one sentence about the weather after rain. Use 'wet'.",
+        "answerKey": "wet",
+        "acceptedAnswers": [
+          "wet"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "wet",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A2-VO-weather-B-8",
+        "type": "free_production",
+        "prompt": "Write one sentence about the weather in spring. Use 'warm'.",
+        "answerKey": "warm",
+        "acceptedAnswers": [
+          "warm"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "warm",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A2-VO-weather-B-9",
+        "type": "transfer",
+        "prompt": "Postcard from Siwa: 'We are in the desert. There's no rain, only sun. It's very ____ .'",
+        "answerKey": "hot",
+        "acceptedAnswers": [
+          "hot",
+          "sunny",
+          "dry"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "hot",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "rubric": "VOCABULARY variant (transfer, SCORING_RUBRIC §2.3/§2.4): 2 = the target word (answerKey or a variant listed in acceptedAnswers) used with the right meaning for the task; 1 = the right word misspelt or in the wrong form; 0 = no target word, the word used with the wrong meaning, or the task not done. Other errors are not scored."
+      }
+    ],
+    "C": [
+      {
+        "id": "EN-F-A2-VO-weather-C-1",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: There are grey clouds everywhere. It is ____ .",
+        "answerKey": "cloudy",
+        "acceptedAnswers": [
+          "cloudy"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "cloudy",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-C-2",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: You need a coat and a scarf. It is ____ .",
+        "answerKey": "cold",
+        "acceptedAnswers": [
+          "cold",
+          "freezing"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "cold",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-C-3",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (sunny / sun / snow): We can swim. It is warm and ____ .",
+        "answerKey": "sunny",
+        "acceptedAnswers": [
+          "sunny"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "sunny",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-C-4",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (windy / wind / cloud): Hold your hat! It is very ____ .",
+        "answerKey": "windy",
+        "acceptedAnswers": [
+          "windy"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "windy",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-C-5",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Drink lots of water, it is very hut in Aswan.",
+        "answerKey": "Drink lots of water, it is very hot in Aswan.",
+        "acceptedAnswers": [
+          "Drink lots of water, it is very hot in Aswan.",
+          "Drink lots of water, it's very hot in Aswan."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "Drink lots of water, it is very hot in Aswan.",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "l1ErrorType": "spelling_vowel (short-vowel confusion: hut for hot)"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-C-6",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: We can't see the sun, it is cloud today.",
+        "answerKey": "We can't see the sun, it is cloudy today.",
+        "acceptedAnswers": [
+          "We can't see the sun, it is cloudy today.",
+          "We can't see the sun, it's cloudy today."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "We can't see the sun, it is cloudy today.",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "l1ErrorType": "noun_for_adjective"
+      },
+      {
+        "id": "EN-F-A2-VO-weather-C-7",
+        "type": "free_production",
+        "prompt": "Write one sentence about the weather in the desert. Use 'dry'.",
+        "answerKey": "dry",
+        "acceptedAnswers": [
+          "dry"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "dry",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A2-VO-weather-C-8",
+        "type": "free_production",
+        "prompt": "Write one sentence about the weather in spring. Use 'warm'.",
+        "answerKey": "warm",
+        "acceptedAnswers": [
+          "warm"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "warm",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A2-VO-weather-C-9",
+        "type": "transfer",
+        "prompt": "Postcard from London: 'Bring your umbrella! There's rain every single day. It's very ____ here.'",
+        "answerKey": "rainy",
+        "acceptedAnswers": [
+          "rainy",
+          "wet"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "rainy",
+        "level": "A2",
+        "vocabLevel": "A1-A2",
+        "reference": "English Vocabulary Profile A1-A2 (weather adjectives); Cambridge A2 Key-style gap-fill",
+        "rubric": "VOCABULARY variant (transfer, SCORING_RUBRIC §2.3/§2.4): 2 = the target word (answerKey or a variant listed in acceptedAnswers) used with the right meaning for the task; 1 = the right word misspelt or in the wrong form; 0 = no target word, the word used with the wrong meaning, or the task not done. Other errors are not scored."
+      }
+    ]
+  }
+}

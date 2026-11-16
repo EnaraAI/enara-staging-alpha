@@ -1,0 +1,101 @@
+{
+  "runId": "exp4-main-2026-11-13T15-44-03-693Z",
+  "experimentId": "exp4-main",
+  "kind": "experiment_4_main",
+  "startedAt": "2026-11-13T15:44:03.899Z",
+  "config": {
+    "experimentId": "exp4-main",
+    "kind": "experiment_4_main",
+    "seed": "enara-dls-v2-exp4-main",
+    "students": 50,
+    "replications": 1,
+    "maxTurns": 6,
+    "adversarialShare": 0.1,
+    "models": {
+      "student": "claude-haiku-5-5",
+      "genericTutor": "claude-opus-5-5",
+      "judge": "claude-haiku-5-5"
+    },
+    "budgetCapUsd": 150,
+    "concurrency": 18,
+    "judgeRate": 0.1,
+    "ablate": [],
+    "improve": [
+      "closing",
+      "strategy",
+      "coverage"
+    ],
+    "conditions": [
+      "A",
+      "B",
+      "C"
+    ],
+    "samples": 3,
+    "matched": true,
+    "preregFile": "preregistration_exp4.json",
+    "outcomePool": [
+      "FN-04",
+      "FN-06",
+      "FN-08",
+      "GR-02",
+      "GR-04",
+      "GR-06",
+      "LS-02",
+      "LS-05",
+      "LS-08",
+      "RD-06",
+      "RD-07",
+      "RD-08",
+      "VO-02",
+      "VO-04",
+      "WR-02",
+      "WR-06"
+    ]
+  },
+  "preregSha256": "6b35965fe3670edfc7a2d67fddf0d7c2767c19fabeed24ffecbe95df785929bd",
+  "preregLocked": true,
+  "code": {
+    "commit": "95fd576e266665ddb0939c6d09579e3a79b53815",
+    "dirty": false,
+    "branch": "claude/codebase-review-kbxqan"
+  },
+  "node": "v22.23.4",
+  "benchmarkSha256": "45c1dbea50fce7505bf314177e886679d15c2f2e91716c4d94a4f9e745e05042",
+  "promptsSha256": "8f6268d7c3fd50f2c413030bc8383052468fff4ab27e4485f2bdf47f7626df6f",
+  "assignmentSha256": "721072eb8391af27bbf919fd6bb399c4681f2265ff73700f34ca85f1c1c43f86",
+  "blocksPlanned": 900,
+  "populationChecksFailed": [],
+  "models": {
+    "student": "claude-haiku-5-5",
+    "genericTutor": "claude-opus-5-5",
+    "judge": "claude-haiku-5-5"
+  },
+  "enaraTutorRoute": "POST /api/me/tutor/sessions/:id/messages (real controller, in-process, throwaway DB)",
+  "tutorModelNote": "tutor/intent models are ENARA defaults from backend config; recorded per call in provider_attempts.jsonl",
+  "ablatedFeatures": [],
+  "improvedFeatures": [
+    "closing",
+    "strategy",
+    "coverage"
+  ],
+  "outcomePool": [
+    "FN-04",
+    "FN-06",
+    "FN-08",
+    "GR-02",
+    "GR-04",
+    "GR-06",
+    "LS-02",
+    "LS-05",
+    "LS-08",
+    "RD-06",
+    "RD-07",
+    "RD-08",
+    "VO-02",
+    "VO-04",
+    "WR-02",
+    "WR-06"
+  ],
+  "matched": true,
+  "simulationOnly": true
+}

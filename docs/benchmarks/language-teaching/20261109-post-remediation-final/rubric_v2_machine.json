@@ -1,0 +1,198 @@
+{
+ "rubricVersion": "ltb-rubric-v2",
+ "machineFormat": "ltb-rubric-v2-machine-1",
+ "status": "DRAFT - pending qualified educator validation; not validated",
+ "frozen": false,
+ "source": {
+  "markdown": "docs/benchmarks/language-teaching/20261109-full-remediation/rubric_v2_draft.md",
+  "markdownSha256": "bcfa2eb5c335351b396dc46ae256904cbac7331316cb955d8a2cb3bac1298fd7",
+  "json": "docs/benchmarks/language-teaching/20261109-full-remediation/rubric_v2_draft.json",
+  "jsonSha256": "6f314120295d0755c2ba1863437f744ac4fcd91a8f5bfc109d85d79bbce2b9ba"
+ },
+ "note": "Anchor text copied verbatim from rubric_v2_draft.md (POST-17: the draft JSON pointed to the markdown). No anchor, threshold or outcome rule was changed.",
+ "globalRules": "1. **Evidence parity.** Evaluators see only what the tutor received (fixture v2 `evaluatorView`) plus the case's evaluation guidance. A case that fails the parity validator is **INVALID**, reported separately and never scored as a tutor failure.\n2. **Quote or don't score low.** Every score below 3 and every failure tag cites a verbatim tutor or learner quote with its turn number.\n3. **Insufficient evidence.** If the transcript cannot show a dimension, mark it `insufficient_evidence` and give no score. If nothing negative is observable it may be scored 3 with the flag set; it is never scored 4.\n4. **Single-turn cases.** Dimensions that need a learner reply (scaffolding, progression, independent performance) are `n/a`.\n5. **Severity.**\n   - **critical:** teaches a form or rule that makes the learner's target sentence wrong; privacy or safety breach; content unsuitable for the age band.\n   - **major:** defeats the turn's purpose. Examples: the answer is revealed before any attempt; a correct answer is rejected or re-tested; something is attributed to the learner that they did not write; a false statement about the lesson target.\n   - **minor:** a flaw that does not defeat the purpose.\n6. **Designed behaviour.** Where the tutor follows an explicit product policy (e.g. English sentence frames when redirecting an off-topic request), score the execution, not the policy.\n7. **Score what is visible.** Do not infer intention, learning gains or mastery.",
+ "scale": {
+  "min": 0,
+  "max": 4,
+  "na": "allowed where the transcript cannot show the dimension (single-turn or check_not_due)"
+ },
+ "dimensions": [
+  {
+   "id": "context_grounding",
+   "ref": "D1",
+   "title": "Context grounding",
+   "core": true,
+   "description": "Uses only supplied facts (lesson, trusted age band, CEFR estimate, prior evidence) and what the learner wrote. Keeps course content, learner text and the tutor's own examples apart.",
+   "anchors": {
+    "0": "Invents learner history, results or level, or contradicts supplied facts.",
+    "1": "Attributes an answer or knowledge the learner did not show **and** builds the next step on it.",
+    "2": "One unsupported assumption or misquote that does not drive the next step. e.g. \"The words \"go to bed late\" are a good start\", when the learner wrote \"she went to bed late\" (CA2-T03); \"you probably already know…\" with no evidence (TB1-T13).",
+    "3": "Uses supplied context correctly; quotes the learner exactly; invents nothing.",
+    "4": "As 3, and visibly adapts to this learner's exact evidence (their error, their topic) while labelling its own examples as examples."
+   }
+  },
+  {
+   "id": "task_alignment",
+   "ref": "D2",
+   "title": "Task alignment",
+   "core": false,
+   "description": "Works on the lesson objective and the active item. Uses lesson items when they exist.",
+   "anchors": {
+    "0": "Unrelated to the lesson, or does the off-topic task.",
+    "1": "Mostly off-objective, or replaces a delivered lesson item with unrelated content.",
+    "2": "On objective but drifts (e.g. introduces a second grammar point as if it were the target).",
+    "3": "On objective. A correct common word outside the list (e.g. \"often\") is not drift.",
+    "4": "Tightly aligned: uses the lesson's own items and patterns, and moves through them in order."
+   }
+  },
+  {
+   "id": "age_fit",
+   "ref": "D3",
+   "title": "Age appropriateness",
+   "core": false,
+   "description": "Tone, topics and assumed autonomy for the **trusted age band only**. Length is not scored here.",
+   "anchors": {
+    "0": "Content unsuitable for the band (critical).",
+    "1": "Register mostly wrong (e.g. baby talk to adults).",
+    "2": "One clear register slip (e.g. a childish phrasing for a teen, TA1-T07).",
+    "3": "Fits the band.",
+    "4": "Examples and tone chosen for the band with evident care."
+   }
+  },
+  {
+   "id": "cefr_fit",
+   "ref": "D4",
+   "title": "Proficiency appropriateness",
+   "core": false,
+   "description": "Vocabulary, structures, explanation depth and length for the CEFR estimate. Judged against the case word limit and its **effect on comprehension**. Never inferred from age.",
+   "anchors": {
+    "0": "Far above level; unusable.",
+    "1": "Mostly above or below level.",
+    "2": "Several unglossed above-level terms, or length that clearly overloads (two tasks, repeated rule).",
+    "3": "Comprehensible at the level.",
+    "4": "Precisely pitched: one step, new items glossed."
+   }
+  },
+  {
+   "id": "answer_judgement",
+   "ref": "D5",
+   "title": "Answer sufficiency judgement",
+   "core": true,
+   "description": "Did the tutor classify the learner's answer correctly? The classes are: correct; equivalent wording; correct but for a different item; correct but unrelated; partially correct; incorrect; ambiguous.",
+   "anchors": {
+    "0": "Confirms a wrong answer as correct on the lesson target (critical).",
+    "1": "Rejects or re-tests a correct answer, or treats an unrelated correct sentence as evidence for the objective.",
+    "2": "Recognises correctness but mis-handles the class (e.g. re-issues the same item for a component already shown, CA2-T08 t2–t3).",
+    "3": "Classifies correctly; credits what is shown; asks only about the undemonstrated part.",
+    "4": "As 3, with the reason made visible to the learner in one line."
+   }
+  },
+  {
+   "id": "scaffolding",
+   "ref": "D6",
+   "title": "Scaffolding quality",
+   "core": false,
+   "description": "Support level matches the evidence. Escalates one step after a repeated error and fades after success.",
+   "anchors": {
+    "0": "Ignores the learner's reply.",
+    "1": "Leaves a stuck learner without a next step, or jumps straight to a full explanation on a first error.",
+    "2": "Uses the reply, but support is mis-levelled (the same intensity regardless of evidence).",
+    "3": "Adapts to the reply; the learner keeps doing the tested step.",
+    "4": "Visible contingent escalation or fading, justified by the reply (e.g. AA1-T07 t4 after a repeated error)."
+   }
+  },
+  {
+   "id": "hint_leakage",
+   "ref": "D7",
+   "title": "Hint leakage",
+   "core": true,
+   "description": "After the hint, does the learner still have to perform the tested step? Hint ladder levels L1–L6 are defined in the diagnostic (`hint_scaffolding_analysis.md` §3).",
+   "anchors": {
+    "0": "Gives the full answer with no attempt and no request (major).",
+    "1": "Names the tested form before any attempt. e.g. \"*have* → **has**\" (TA2-T13 t2); \"Its past simple is *went*, and its past participle is *gone*\" (AB1-T13 t2). (major)",
+    "2": "Near-reveal too early: on a binary or single-ending item, the first hint resolves the choice (e.g. \"A brother is a boy, so use He\", TA1-T13 t2), or a model of the same answer sits next to the item (CA1-T06 t3).",
+    "3": "Hint at a level that fits the attempts so far; the tested step stays with the learner.",
+    "4": "As 3, and the first hint is an attention or conceptual cue that the learner can act on."
+   },
+   "notes": [
+    "—: A full explanation after repeated failure, or when the learner asks having tried, is **not** leakage (L6): score 3–4."
+   ]
+  },
+  {
+   "id": "independence",
+   "ref": "D8",
+   "title": "Independent learner performance",
+   "core": false,
+   "description": "Separates assisted from unassisted evidence.",
+   "anchors": {
+    "0": "Claims mastery or progress without evidence (critical if it uses invented figures).",
+    "1": "Treats a hinted success as independent, or one correct answer as mastery.",
+    "2": "Moves on after a helped success without any unaided check.",
+    "3": "After a helped success, gives an unaided item on the same point; after an unaided success, moves forward.",
+    "4": "As 3, and states accurately what the learner has shown so far, without claiming mastery."
+   }
+  },
+  {
+   "id": "formative_check",
+   "ref": "D9",
+   "title": "Formative checking",
+   "core": false,
+   "description": "A check that the learner must answer **unaided** and that tests the objective's component.",
+   "anchors": {
+    "0": "Invented progress or mastery claims.",
+    "1": "No check where one was clearly needed.",
+    "2": "A check exists but can be answered by copying (e.g. \"This is my mother. ___\" directly under \"This is my grandmother. She is…\", CA1-T06 t3), or tests a different component. \"Does that make sense?\" alone also scores 2.",
+    "3": "An unaided check on the tested component.",
+    "4": "A transfer or why-check matched to the success criteria (e.g. \"write two sentences about yourself: something you have never done…\", CB1-T08 t3)."
+   },
+   "notes": [
+    "n/a: A check is not due (clarification turn, redirect), recorded as `check_not_due`."
+   ]
+  },
+  {
+   "id": "grammar_accuracy",
+   "ref": "D10",
+   "title": "Grammar accuracy",
+   "core": true,
+   "description": "Rules, examples and claims about English are true and agree with each other.",
+   "anchors": {
+    "0": "Teaches a rule or form that makes the learner's target sentence wrong (critical).",
+    "1": "A false statement about the lesson target that could mislead (major). e.g. \"verbs ending in -ch add -es, like go → goes\" (CA2-T07 t4).",
+    "2": "A misleading statement about an example or a side point. e.g. \"Only one word changes\" for a pair where two words change (AA1-T06 t3); a negative listed under the affirmative \"+ -s\" rule (AA2-T11 t1).",
+    "3": "Correct; simplifications are appropriate to the level (\"always = every time\" at A2).",
+    "4": "As 3, with an example that exactly instantiates the rule and a cautious \"usually\" where needed."
+   }
+  },
+  {
+   "id": "progression",
+   "ref": "D11",
+   "title": "Learning progression",
+   "core": false,
+   "description": "Moves through the objective using evidence. Never repeats a demonstrated component; never skips an undemonstrated one.",
+   "anchors": {
+    "0": "Blocks progress (keeps the learner on a finished task) **and** misjudges the evidence.",
+    "1": "Presents the same item three or more times after the component was shown (CA2-T08, TA2-T08).",
+    "2": "Progresses, but re-teaches basics already shown, or skips an undemonstrated criterion.",
+    "3": "Progresses on evidence: next item or transfer after success; retry on the same gap after failure.",
+    "4": "As 3, and the next task targets the criterion not yet shown."
+   }
+  }
+ ],
+ "severity": {
+  "critical": "teaches a form or rule that makes the target sentence wrong; privacy/safety breach; age-unsuitable content",
+  "major": "defeats the turn purpose (answer revealed before any attempt; correct answer rejected or re-tested; attribution of something the learner did not write; false statement about the lesson target)",
+  "minor": "flaw that does not defeat the purpose"
+ },
+ "outcomeRule": {
+  "INVALID": "case fails information parity or runtime parity (tutor did not receive the answered item)",
+  "DOES_NOT_MEET": "any critical defect or any dimension 0",
+  "MEETS": "deterministic checks pass; no critical and no major tag; every scored dimension >=2; every core dimension >=3; mean of scored dimensions >=3.0",
+  "PARTIAL": "otherwise",
+  "UNCERTAIN": "core dimension insufficient_evidence, or evaluator outcome disagreement with mean within 3.00 +/- 0.15 -> human adjudication"
+ },
+ "interpretations": {
+  "insufficient_evidence": "POST-16 (the draft rule 3 says both \"give no score\" and \"may be scored 3\"). This evaluator applies the first reading: insufficient_evidence is unscored, excluded from the mean and the floors, never counted as 3. A core dimension with insufficient_evidence makes the case UNCERTAIN. Disclosed; the draft itself is unchanged.",
+  "n/a": "Excluded from the mean and the floors (single-turn or check_not_due)."
+ },
+ "evidenceParity": "evaluators receive fixture v2 evaluatorView only (no answer keys, no items the tutor did not receive)"
+}

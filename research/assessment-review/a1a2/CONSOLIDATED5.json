@@ -1,0 +1,336 @@
+{
+ "source": [
+  "rereview4_R1.json",
+  "rereview4_R2.json",
+  "rereview4_R3.json"
+ ],
+ "rule": "revise=true when >=2 distinct reviewers flagged the same target+issue; clear single-reviewer fixes also revised (singleReviewerFactual)",
+ "totals": {
+  "flagsPerReviewer": {
+   "R1": 6,
+   "R2": 2,
+   "R3": 6
+  },
+  "flags": 14,
+  "groups": 11,
+  "revise": 2,
+  "singleReviewerFactual": 6,
+  "noted": 3
+ },
+ "mergeDecisions": [
+  "R1-4, R2-0 and R3-3 (family C-6 niece) merged as G01.",
+  "R2-1 (weather B-6 windy cued) and R3-0 (weather slot 7-8 cueing) merged as G02: one fix (no answer word shown elsewhere in its form).",
+  "R3-1 (home-rooms) and R3-2 (family) cueing are single-reviewer but the same rule as G02; applied across all three forms."
+ ],
+ "groups": [
+  {
+   "group": "G01",
+   "targets": [
+    "EN-F-A1-VO-family-C-6"
+   ],
+   "issue": "C-6 'nece'/niece is EVP A2 (above A1) and not parallel to A-6/B-6",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 4,
+     "target": "EN-F-A1-VO-family-C-6",
+     "check": "C1/C4",
+     "problem": "'niece' (nece) is EVP A2, not A1, and is harder and less frequent than the slot-6 words in forms A (husband) and B (brother). That breaks the matching note's 'all words EVP A1' and makes the forms unequal. 'nephew/niece' also appear as distractors in A-4 and B-4.",
+     "fix": "Use an A1 kin word with a vowel slip in C-6, e.g. 'My sistar lives in Alexandria with her husband.' -> sister."
+    },
+    {
+     "reviewer": "R2",
+     "index": 0,
+     "target": "EN-F-A1-VO-family-C-6",
+     "check": "C1/C4",
+     "problem": "The slot-6 kin word 'niece' is EVP A2, not A1, while the matching note says all words are EVP A1 and the parallel slot-5/6 words in A and B (daughter, husband, parents, brother) are all A1. Form C's error correction is harder than A and B.",
+     "fix": "Use an A1 kin word not shown elsewhere in form C, e.g. 'My sistar lives in Alexandria with her husband.' -> sister (spelling_vowel), and keep the rest of the sentence."
+    },
+    {
+     "reviewer": "R3",
+     "index": 3,
+     "target": "EN-F-A1-VO-family-C-6",
+     "check": "C1",
+     "problem": "'niece' is above A1 in EVP (A2/B1); the outcome is A1 and the other slot-6 words (husband, brother) are A1.",
+     "fix": "Use a vowel slip on an A1 kin word not keyed in form C, e.g. 'My childrin go to school near our house.' -> children."
+    }
+   ]
+  },
+  {
+   "group": "G02",
+   "targets": [
+    "EN-F-A2-VO-weather",
+    "EN-F-A2-VO-weather-B-6",
+    "EN-F-A2-VO-weather-A-7",
+    "EN-F-A2-VO-weather-B-7",
+    "EN-F-A2-VO-weather-C-7",
+    "EN-F-A2-VO-weather-B-8"
+   ],
+   "issue": "in-form cueing: B-6 'windy' shown in B-3/B-7; A-7, B-7, B-8, C-7 name other items' answers",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 1,
+     "target": "EN-F-A2-VO-weather-B-6",
+     "check": "C4",
+     "problem": "The correction 'windy' appears in form B before the item: B-3 lists it as an option (windy / wind / winds) and B-7 names it ('Use windy or rainy'). The slot-6 fixes in A (rainy) and C (cloudy) are not shown in their forms, so B-6 is cued and easier.",
+     "fix": "Keep B-6 and take 'windy' out of the rest of form B. Change B-3 to a warm/hot choice, e.g. 'Choose the correct word (warm / warmth / warms): Spring is nice here. It is ____ .' Change B-7 to 'Use sunny or rainy'. Neither cloudy (B-5) nor windy (B-6) then appears elsewhere in form B."
+    },
+    {
+     "reviewer": "R3",
+     "index": 0,
+     "target": "EN-F-A2-VO-weather",
+     "check": "C2",
+     "problem": "Slot 7-8 free-production prompts name words that are the keys of controlled/transfer items in the same form, so the answers are cued: A-7 'cloudy' = A-4 key; B-7 'windy'/'rainy' = B-3/B-4 keys; B-8 'hot' = B-9 key; C-7 'rainy'/'windy' = C-4 and C-9 keys.",
+     "fix": "Name weather words in slots 7-8 that are not keyed in the same form (e.g. A-7 windy/rainy, B-7 cloudy/cold, B-8 warm, C-7 hot/cold), or rotate the controlled keys."
+    }
+   ]
+  },
+  {
+   "group": "G03",
+   "targets": [
+    "EN-F-A1-VO-classroom-objects (outcomes.json)"
+   ],
+   "issue": "p/b slips need a consonant-spelling enum value",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (enum change = user decision; carried from round 4)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 0,
+     "target": "EN-F-A1-VO-classroom-objects (outcomes.json)",
+     "check": "C5",
+     "problem": "l1ErrorTypes = [spelling_vowel], but error-correction slots A-5 (bencil), B-5 (ben), C-5 (baper) plant a /p/-/b/ consonant substitution, not a vowel slip; only C-6 (notbook) is vowel-related.",
+     "fix": "Add the p/b confusion error type (e.g. spelling_p_b) to l1ErrorTypes alongside spelling_vowel."
+    }
+   ]
+  },
+  {
+   "group": "G04",
+   "targets": [
+    "EN-F-A2-VO-weather (outcomes.json)"
+   ],
+   "issue": "slot-6 noun-for-adjective not in l1ErrorTypes",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (no enum value; user decision, carried from round 4)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 1,
+     "target": "EN-F-A2-VO-weather (outcomes.json)",
+     "check": "C5",
+     "problem": "l1ErrorTypes = [spelling_vowel], but slots A-6 (it is rain), B-6 (it is wind), C-6 (it is cloud) plant a noun used for an adjective (word-form error), which is not covered.",
+     "fix": "Add a word-form / noun-for-adjective error type to l1ErrorTypes, or make slot 6 a vowel slip as well."
+    }
+   ]
+  },
+  {
+   "group": "G05",
+   "targets": [
+    "EN-F-A1-VO-home-rooms",
+    "EN-F-A1-VO-home-rooms-B-5",
+    "EN-F-A1-VO-home-rooms-B-6"
+   ],
+   "issue": "B-5 'cooking room' not a real Arabic calque; B-6 contrived double error; l1ErrorTypes empty",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise items (B-5 eating room, B-6 path room); l1_calque/spelling_p_b enum = user decision (single-reviewer)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 2,
+     "target": "EN-F-A1-VO-home-rooms",
+     "check": "C7",
+     "problem": "B-5 'Our cooking room has a big window.' is not a realistic Arabic-L1 error: Arabic has a single word for kitchen (matbakh), so there is no calque for 'cooking room', unlike sleeping room (ghurfat al-nawm) or eating room (ghurfat al-ta'am). B-6 'The guests sit in the sitting room of guests' is a contrived double error, and its key accepts 'sitting room', so the only fix is deleting 'of guests'. outcomes.json l1ErrorTypes for home-rooms is [] even though the forms plant calques and the p/b slip (C-5 'path room').",
+     "fix": "Replace B-5 with a real calque or p/b slip (e.g. 'The bath room is next to the kitchen' -> 'path room', or 'The guests room is big' -> 'living room'). Rewrite B-6 as a single natural error (e.g. 'We sit in the guests room after dinner' -> living room). Set l1ErrorTypes to [l1_calque, spelling_p_b]."
+    }
+   ]
+  },
+  {
+   "group": "G06",
+   "targets": [
+    "EN-F-A1-VO-home-rooms-C-9"
+   ],
+   "issue": "C-9 'Two words' vs one-word key 'lounge'",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (prompt 'One or two words') (single-reviewer)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 3,
+     "target": "EN-F-A1-VO-home-rooms-C-9",
+     "check": "C3",
+     "problem": "The prompt says 'Two words', but acceptedAnswers include 'lounge' (one word) and 'living-room' (hyphenated), so the instruction and the key disagree.",
+     "fix": "Change the prompt to 'One or two words', or remove 'lounge' from acceptedAnswers."
+    }
+   ]
+  },
+  {
+   "group": "G07",
+   "targets": [
+    "EN-F-A2-VO-weather-A-9"
+   ],
+   "issue": "A-9 'warm and hot' accepted",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (remove 'hot') (single-reviewer)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 5,
+     "target": "EN-F-A2-VO-weather-A-9",
+     "check": "C3",
+     "problem": "The text is 'It's warm and ____', and the key accepts 'hot', which makes 'warm and hot' (contradictory or redundant).",
+     "fix": "Remove 'hot' from acceptedAnswers (keep sunny, clear)."
+    }
+   ]
+  },
+  {
+   "group": "G08",
+   "targets": [
+    "EN-F-A1-VO-home-rooms",
+    "EN-F-A1-VO-home-rooms-A-7",
+    "EN-F-A1-VO-home-rooms-B-7",
+    "EN-F-A1-VO-home-rooms-C-7",
+    "EN-F-A1-VO-home-rooms-A-8",
+    "EN-F-A1-VO-home-rooms-B-8",
+    "EN-F-A1-VO-home-rooms-C-8",
+    "EN-F-A1-VO-home-rooms-C-3"
+   ],
+   "issue": "in-form cueing in slots 7-8 and C-3 options",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (no-cueing rule across all forms) (single-reviewer)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 1,
+     "target": "EN-F-A1-VO-home-rooms",
+     "check": "C2",
+     "problem": "Same-form cueing: A-7 'kitchen' = A-1/A-9 key; A-8 'bedroom' = A-5 correction (also A-3 option); B-7 'bathroom' = B-3/B-9 keys; B-8 'living room' = B-6 key; C-7 'garden' = C-4 key; C-3 options show 'bathroom'/'bedroom', the C-5/C-6 corrections.",
+     "fix": "Choose named rooms in slots 7-8 that are not keyed/corrected in the same form, and avoid showing the slot 5-6 correction as a slot 3-4 option."
+    }
+   ]
+  },
+  {
+   "group": "G09",
+   "targets": [
+    "EN-F-A1-VO-family",
+    "EN-F-A1-VO-family-A-8",
+    "EN-F-A1-VO-family-B-8",
+    "EN-F-A1-VO-family-C-8",
+    "EN-F-A1-VO-family-C-7"
+   ],
+   "issue": "in-form cueing in slot 8 / C-3 options",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (no-cueing rule across all forms) (single-reviewer)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 2,
+     "target": "EN-F-A1-VO-family",
+     "check": "C2",
+     "problem": "Same-form cueing: A-8 'cousin' = A-2 key; B-8 'uncle' = B-4 key; C-8 'aunt' = C-4 key (C-7 'brother' is also a C-3 option).",
+     "fix": "Name kin words in slots 7-8 that are not keyed in the same form (e.g. A-8 uncle, B-8 aunt, C-8 cousin)."
+    }
+   ]
+  },
+  {
+   "group": "G10",
+   "targets": [
+    "EN-F-A2-VO-jobs-workplaces-A-6"
+   ],
+   "issue": "A-6 'pharmacist' likely EVP B1",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (artest -> artist) (single-reviewer)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 4,
+     "target": "EN-F-A2-VO-jobs-workplaces-A-6",
+     "check": "C1",
+     "problem": "'pharmacist' is likely above A2 in EVP (B1), unlike dentist/engineer in B-6/C-6.",
+     "fix": "Verify EVP level; if B1, use an i/e slip on an A2 job noun not in form A, e.g. 'artest' -> artist."
+    }
+   ]
+  },
+  {
+   "group": "G11",
+   "targets": [
+    "EN-F-A1-VO-days-months"
+   ],
+   "issue": "slot 5-6 corrections repeat slot 1-2 keys (low severity)",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (low severity: corrections are not shown to the learner, so no cueing; resampling would re-balance spelling difficulty set in round 4)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 5,
+     "target": "EN-F-A1-VO-days-months",
+     "check": "C2",
+     "problem": "Each slot 5-6 correction repeats a slot 1-2 gap-fill key in the same form (A: February/Tuesday; B: August/Wednesday; C: September/Thursday), so a form samples only ~4 distinct words and one spelling weakness is double-counted.",
+     "fix": "Make slot 5-6 words differ from slot 1-2 keys (e.g. A-1 key Thursday, B-2 key December), keeping spelling difficulty matched."
+    }
+   ]
+  }
+ ]
+}

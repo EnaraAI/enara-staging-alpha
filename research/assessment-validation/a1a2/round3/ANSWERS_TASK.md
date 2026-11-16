@@ -1,0 +1,7 @@
+# Round 3 answer set (DRAFT, SIMULATION ONLY)
+No API calls, no git, no sub-agents. Do NOT open backend/ code, docs/GRADER_*.md, or any round-2 / round-1 answer, scorer or reference file (research/assessment-validation/a1a2/*.json, round2/).
+Use the FINAL item bank: data/assessments/outcomes/*.json (only outcomes with status passed_review_draft in research/assessment-review/a1a2/OUTCOME_STATUS.json) and docs/SCORING_RUBRIC.md.
+Build 150 simulated Arabic-L1 learner answers: ~75 controlled (exact 0/1 items: gap-fill, choice, error-correction) and ~75 free/transfer (0/1/2 items). Cover EVERY outcome with forms (at least 3 answers per outcome), spread across forms A/B/C.
+Mix realistic answer types: fully correct; correct with case/punctuation/spacing/apostrophe/contraction variation (both on sensitive items — capitals-full-stops, days-months — and ordinary items); choice answered by option letter; acceptable alternative wording; slips outside the target form; target form wrong; target form missing but meaning OK; off-topic; blank or "I don't know". Roughly: 40% should deserve full credit, 30% partial or debatable, 30% zero.
+Write answers.json: [{"answerId":"R3-001","outcomeId","form","itemId","itemType","scoring":"exact"|"target_form_0_1_2","answer":"..."}]. Do NOT include intended scores in that file. Write answers_design.json separately with your intended category per answerId (kept away from scorers).
+Validate with python3 json.load; reply with counts by itemType and outcome coverage.

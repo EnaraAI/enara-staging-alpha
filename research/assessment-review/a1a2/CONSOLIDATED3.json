@@ -1,0 +1,700 @@
+{
+ "source": [
+  "rereview2_R1.json",
+  "rereview2_R2.json",
+  "rereview2_R3.json"
+ ],
+ "rule": "revise=true when >=2 distinct reviewers flagged the same target+issue; single-reviewer clear factual key errors also revised (singleReviewerFactual)",
+ "totals": {
+  "flagsPerReviewer": {
+   "R1": 12,
+   "R2": 14,
+   "R3": 12
+  },
+  "flags": 38,
+  "groups": 21,
+  "revise": 6,
+  "singleReviewerFactual": 9,
+  "noted": 6
+ },
+ "mergeDecisions": [
+  "R1-1/2/3, R2-0..5 and R3-0 all say the classroom-objects slot 5-6 object swaps are invented errors; merged as T01 (outcome-level).",
+  "R1-10, R2-13 and R3-11 (PL-A2-RD-03 mapping) merged as T04; R1-11 (accepted short answers) kept separate as T07.",
+  "R1-5 and R1-6 (B-8/C-8 climate lists) are one reviewer, one problem: T08. R3-2 and R3-3 (B-9/C-9 cueing) likewise: T14."
+ ],
+ "groups": [
+  {
+   "group": "T01",
+   "targets": [
+    "EN-F-A1-VO-classroom-objects",
+    "EN-F-A1-VO-classroom-objects-A-5",
+    "EN-F-A1-VO-classroom-objects-B-5",
+    "EN-F-A1-VO-classroom-objects-C-5",
+    "EN-F-A1-VO-classroom-objects-A-6",
+    "EN-F-A1-VO-classroom-objects-B-6",
+    "EN-F-A1-VO-classroom-objects-C-6"
+   ],
+   "issue": "slots 5-6 wrong-object swaps (cut with ruler, tell time with calendar, stick with scissors ...) are invented, not Arabic-L1 A1 errors",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 1,
+     "target": "EN-F-A1-VO-classroom-objects-A-6",
+     "check": "C7",
+     "problem": "'I tell the time with my calendar' is not a learner error. Arabic saa'a covers clock/watch, and taqweem (calendar) is never confused with it. It reads as a nonsense sentence, not as L1 transfer.",
+     "fix": "Plant a realistic error, e.g. 'I tell the time with my hour' (Arabic saa'a = hour/clock), and key 'clock'/'watch'."
+    },
+    {
+     "reviewer": "R1",
+     "index": 2,
+     "target": "EN-F-A1-VO-classroom-objects-C-6",
+     "check": "C7",
+     "problem": "'I stick the pictures with my scissors' does not come from any L1 source (no form or meaning link between scissors and glue). It is the 'drinks eggs' type of planted error.",
+     "fix": "Replace it with a realistic slip. A form-based confusion works, e.g. 'I cut the paper with my sizers' -> scissors (spelling), or a word Egyptian learners transfer, e.g. 'I stick the pictures with my paste/'kolla'' -> glue."
+    },
+    {
+     "reviewer": "R1",
+     "index": 3,
+     "target": "EN-F-A1-VO-classroom-objects-B-5",
+     "check": "C7",
+     "problem": "'I measure the line with my eraser' is a weak planted error. Ruler/rubber confusion (similar forms, both with r-) is realistic, but eraser/ruler is not. B-6 ('sharpen my pencil with my rubber') is also arbitrary.",
+     "fix": "B-5: 'I measure the line with my rubber' (ruler/rubber form confusion). B-6: plant 'sharpner'/'pencil sharp' or 'I sharpen my pencil with my cutter' (Egyptian 'barraya'/'cutter' is a realistic transfer)."
+    },
+    {
+     "reviewer": "R2",
+     "index": 0,
+     "target": "EN-F-A1-VO-classroom-objects-A-5",
+     "check": "C7",
+     "problem": "Planted error 'I cut the paper with my ruler (ruler for scissors)' is a semantic absurdity, not a real Arabic-L1 A1 error; Arabic L1 has distinct, well-known words for these objects, so learners do not swap them. Same 'drinks eggs' pattern.",
+     "fix": "Replace with a realistic classroom-object error: spelling/vowel (rular, sizzors, pensil, rubbar), p/b confusion (bencil), or count error (a scissor -> scissors)."
+    },
+    {
+     "reviewer": "R2",
+     "index": 1,
+     "target": "EN-F-A1-VO-classroom-objects-B-5",
+     "check": "C7",
+     "problem": "Planted error 'I measure the line with my eraser (eraser for ruler)' is a semantic absurdity, not a real Arabic-L1 A1 error; Arabic L1 has distinct, well-known words for these objects, so learners do not swap them. Same 'drinks eggs' pattern.",
+     "fix": "Replace with a realistic classroom-object error: spelling/vowel (rular, sizzors, pensil, rubbar), p/b confusion (bencil), or count error (a scissor -> scissors)."
+    },
+    {
+     "reviewer": "R2",
+     "index": 2,
+     "target": "EN-F-A1-VO-classroom-objects-C-5",
+     "check": "C7",
+     "problem": "Planted error 'I rub out the mistake with my ruler (ruler for rubber)' is a semantic absurdity, not a real Arabic-L1 A1 error; Arabic L1 has distinct, well-known words for these objects, so learners do not swap them. Same 'drinks eggs' pattern.",
+     "fix": "Replace with a realistic classroom-object error: spelling/vowel (rular, sizzors, pensil, rubbar), p/b confusion (bencil), or count error (a scissor -> scissors)."
+    },
+    {
+     "reviewer": "R2",
+     "index": 3,
+     "target": "EN-F-A1-VO-classroom-objects-A-6",
+     "check": "C7",
+     "problem": "Planted error 'tell the time with my calendar' is an object-function swap that real Arabic-L1 learners do not make; it tests world knowledge more than vocabulary.",
+     "fix": "Use a realistic error, e.g. 'pencil sharper', 'a scissor', 'blackboard' p/b ('board' fine), or vowel spelling of calculator/notebook; keep the same type across forms."
+    },
+    {
+     "reviewer": "R2",
+     "index": 4,
+     "target": "EN-F-A1-VO-classroom-objects-B-6",
+     "check": "C7",
+     "problem": "Planted error 'sharpen my pencil with my rubber' is an object-function swap that real Arabic-L1 learners do not make; it tests world knowledge more than vocabulary.",
+     "fix": "Use a realistic error, e.g. 'pencil sharper', 'a scissor', 'blackboard' p/b ('board' fine), or vowel spelling of calculator/notebook; keep the same type across forms."
+    },
+    {
+     "reviewer": "R2",
+     "index": 5,
+     "target": "EN-F-A1-VO-classroom-objects-C-6",
+     "check": "C7",
+     "problem": "Planted error 'stick the pictures with my scissors' is an object-function swap that real Arabic-L1 learners do not make; it tests world knowledge more than vocabulary.",
+     "fix": "Use a realistic error, e.g. 'pencil sharper', 'a scissor', 'blackboard' p/b ('board' fine), or vowel spelling of calculator/notebook; keep the same type across forms."
+    },
+    {
+     "reviewer": "R3",
+     "index": 0,
+     "target": "EN-F-A1-VO-classroom-objects-C-6",
+     "check": "C7",
+     "problem": "'I stick the pictures with my scissors' is not an error a real A1 learner makes: scissors and glue are not alike in form or use. It works like the 'drinks eggs' type. A-5 (cut with a ruler) and B-6 (sharpen with a rubber) are weaker cases of the same thing.",
+     "fix": "Use a confusion learners really make, such as rubber/ruler (shape and sound) or pencil/pen. Example: 'I write in my notebook with my rubber.' -> pencil/pen. Or confirm with local teachers that the pair happens."
+    }
+   ]
+  },
+  {
+   "group": "T02",
+   "targets": [
+    "EN-F-A1-VO-food-drink-C-6"
+   ],
+   "issue": "'drinks her ice cream' not a real transfer; not parallel to A/B soup/yoghurt",
+   "reviewers": [
+    "R1",
+    "R2"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 0,
+     "target": "EN-F-A1-VO-food-drink-C-6",
+     "check": "C7",
+     "problem": "'My sister drinks her ice cream with a spoon' is not a plausible Arabic-L1 error: Arabic uses akala (eat) for ice cream, so learners do not transfer 'drink' here. A-6 (soup, Arabic yashrab shurba) is realistic; C-6 is an invented error and is not parallel to A-6.",
+     "fix": "Use a noun that Arabic pairs with 'drink' but English pairs with 'eat', e.g. 'My sister drinks her soup/lentil soup with a spoon' (or 'drinks her yoghurt' to match B-6)."
+    },
+    {
+     "reviewer": "R2",
+     "index": 6,
+     "target": "EN-F-A1-VO-food-drink-C-6",
+     "check": "C7/C4",
+     "problem": "'My sister drinks her ice cream with a spoon' is not a plausible Arabic-L1 transfer (Arabic eats ice cream; drink-for-eat transfer applies to soup/laban as in A-6/B-6). Form C is therefore weaker as a planted error and not parallel.",
+     "fix": "Use a food Arabic 'drinks': e.g. 'My sister drinks her lentil soup with a spoon' or 'drinks her porridge'/'drinks her milk with cereal' -> eats."
+    }
+   ]
+  },
+  {
+   "group": "T03",
+   "targets": [
+    "EN-F-A2-VO-jobs-workplaces-A-6",
+    "EN-F-A2-VO-jobs-workplaces-B-6",
+    "EN-F-A2-VO-jobs-workplaces-C-6"
+   ],
+   "issue": "slot 6 job/workplace mismatches are factual absurdities with two fix directions",
+   "reviewers": [
+    "R1",
+    "R2"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 4,
+     "target": "EN-F-A2-VO-jobs-workplaces",
+     "check": "C7",
+     "problem": "Items A-6, B-6 and C-6 ('A pilot works in a hospital', 'A waiter works in a garage', 'A farmer works in an office') are factual nonsense, not Arabic-L1 errors. The fix is also ambiguous (change the job or the place), which A-6's 4 accepted answers show.",
+     "fix": "Replace them with realistic workplace collocation and preposition errors, e.g. 'A farmer works in a farm' -> on; 'My sister works in a bank as accountant' -> an accountant (article omission, which the matching note already names). Key one change only."
+    },
+    {
+     "reviewer": "R2",
+     "index": 7,
+     "target": "EN-F-A2-VO-jobs-workplaces",
+     "check": "C7/C4",
+     "problem": "Items A-6/B-6/C-6 ('A pilot works in a hospital', 'A waiter works in a garage', 'A farmer works in an office') are factual absurdities, not Arabic-L1 errors. Also the fix direction differs (A/B key changes the job, C key changes the place), weakening parallelism.",
+     "fix": "Plant realistic errors instead: preposition transfer ('works in a farm' -> on, 'works in the airport' -> at an airport), or article omission ('My father works in bank'); use the same error type in all three forms."
+    }
+   ]
+  },
+  {
+   "group": "T04",
+   "targets": [
+    "placement:PL-A2-RD-03"
+   ],
+   "issue": "detail item mapped to EN-L-A2-RD-main-idea",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 10,
+     "target": "placement:PL-A2-RD-03",
+     "check": "C2",
+     "problem": "The item asks for a stated detail (the meeting place), which is scanning for specific information, but it is mapped to EN-L-A2-RD-main-idea.",
+     "fix": "Map it to a specific-information/detail reading outcome (or add one), not main-idea."
+    },
+    {
+     "reviewer": "R2",
+     "index": 13,
+     "target": "placement:PL-A2-RD-03",
+     "check": "C2",
+     "problem": "Item asks for a specific detail (meeting place) but is tagged EN-L-A2-RD-main-idea; it measures detail retrieval, not main idea.",
+     "fix": "Retag to the A2 reading-for-specific-information/detail outcome, or rewrite to ask the purpose of the email (e.g. to change the meeting day)."
+    },
+    {
+     "reviewer": "R3",
+     "index": 11,
+     "target": "placement:PL-A2-RD-03",
+     "check": "C2",
+     "problem": "The question asks for one detail (where they will meet), but the item is tagged to EN-L-A2-RD-main-idea.",
+     "fix": "Tag it to a reading outcome for specific information or detail, or change the question to a gist question (for example, why Nour is writing)."
+    }
+   ]
+  },
+  {
+   "group": "T05",
+   "targets": [
+    "EN-F-A1-GR-possessive-s"
+   ],
+   "issue": "l1ErrorTypes empty",
+   "reviewers": [
+    "R1",
+    "R2"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 8,
+     "target": "EN-F-A1-GR-possessive-s",
+     "check": "C5",
+     "problem": "l1ErrorTypes is empty. The main Arabic-L1 error (the idafa periphrasis 'the car of my father' / 'the house my uncle') is not recorded, so future EC items have no L1 anchor.",
+     "fix": "Add an error type such as 'possessive_of_periphrasis' (idafa transfer) and plan EC items on it."
+    },
+    {
+     "reviewer": "R2",
+     "index": 11,
+     "target": "EN-F-A1-GR-possessive-s",
+     "check": "C5",
+     "problem": "l1ErrorTypes is empty; Arabic-L1 learners typically use the 'of' construct calque ('the car of Ali') or drop 's ('Ali car') from the idafa construction.",
+     "fix": "Add an idafa/genitive-transfer error type so future forms plant 'the car of my father' / 'Ali car' errors."
+    }
+   ]
+  },
+  {
+   "group": "T06",
+   "targets": [
+    "EN-F-A1-GR-prepositions-place"
+   ],
+   "issue": "l1ErrorTypes empty",
+   "reviewers": [
+    "R1",
+    "R2"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 9,
+     "target": "EN-F-A1-GR-prepositions-place",
+     "check": "C5",
+     "problem": "l1ErrorTypes is empty although Arabic 'fi' covers both in and on, so 'in the table' / 'in the wall' is a well-attested Arabic-L1 error.",
+     "fix": "Add a 'preposition_in_on_fi' (or existing prep error type) to l1ErrorTypes."
+    },
+    {
+     "reviewer": "R2",
+     "index": 10,
+     "target": "EN-F-A1-GR-prepositions-place",
+     "check": "C5",
+     "problem": "l1ErrorTypes is empty although in/on confusion ('the book is in the table', from Arabic fi/3ala overlap) is a documented Arabic-L1 error (framework §9).",
+     "fix": "Add the preposition-transfer error type (e.g. 'preposition_transfer') before forms are written."
+    }
+   ]
+  },
+  {
+   "group": "T07",
+   "targets": [
+    "placement:PL-A2-RD-03"
+   ],
+   "issue": "short answers 'at the cafe'/'at the café' not accepted",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (added 'at the cafe'/'at the café'; bare forms already accepted) (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 11,
+     "target": "placement:PL-A2-RD-03",
+     "check": "C3",
+     "problem": "The accepted answers include 'at the cafe near the station' but not 'at the cafe' / 'at the café', which is a likely short answer.",
+     "fix": "Add 'at the cafe' and 'at the café'."
+    }
+   ]
+  },
+  {
+   "group": "T08",
+   "targets": [
+    "EN-F-A1-VO-days-months-B-8",
+    "EN-F-A1-VO-days-months-C-8"
+   ],
+   "issue": "hot/cold-month lists score climate, not month vocabulary",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 5,
+     "target": "EN-F-A1-VO-days-months-B-8",
+     "check": "C3",
+     "problem": "The 'month with hot weather' accepted list (May-September) rejects April and October, which are hot in Egypt and the Gulf. This item measures day/month vocabulary, not climate.",
+     "fix": "Accept any of the 12 correctly spelled month names (as A-8 does); keep 'hot weather' only as a prompt."
+    },
+    {
+     "reviewer": "R1",
+     "index": 6,
+     "target": "EN-F-A1-VO-days-months-C-8",
+     "check": "C3",
+     "problem": "The 'month with cold weather' list (November-February) rejects March and October and any learner in the southern hemisphere, so it scores climate rather than spelling. It is not parallel with A-8, which accepts all 12 months.",
+     "fix": "Accept all 12 correctly capitalised and spelled month names."
+    }
+   ]
+  },
+  {
+   "group": "T09",
+   "targets": [
+    "EN-F-A2-GR-imperatives"
+   ],
+   "issue": "cefr A2 vs EGP reference A1",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "user decision (CEFR level not changed in this pass)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 7,
+     "target": "EN-F-A2-GR-imperatives",
+     "check": "C1",
+     "problem": "The outcome is placed at cefr A2, but its own reference says 'English Grammar Profile: Clause structure / imperatives, A1'. The level and the reference disagree.",
+     "fix": "Move the outcome to A1 (EN-F-A1-GR-imperatives), or cite the A2 EGP point (e.g. negative imperatives with 'Don't' + 'please' in instructions)."
+    }
+   ]
+  },
+  {
+   "group": "T10",
+   "targets": [
+    "EN-F-A2-GR-was-were"
+   ],
+   "issue": "l1ErrorTypes agreement_3s does not fit be-agreement",
+   "reviewers": [
+    "R2"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "user decision (was-were outcome flags held with its level question; not changed)",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 12,
+     "target": "EN-F-A2-GR-was-were",
+     "check": "C5",
+     "problem": "l1ErrorTypes lists agreement_3s, which is a present-simple verb -s error; the relevant Arabic-L1 errors are copula omission and was/were subject agreement ('they was').",
+     "fix": "Replace agreement_3s with a subject-verb (be) agreement type, or document that agreement_3s covers be-agreement."
+    }
+   ]
+  },
+  {
+   "group": "T11",
+   "targets": [
+    "EN-F-A2-VO-weather-A-5",
+    "EN-F-A2-VO-weather-B-5",
+    "EN-F-A2-VO-weather-C-5"
+   ],
+   "issue": "slot 5 tests copula omission (grammar), not weather vocabulary",
+   "reviewers": [
+    "R2"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 8,
+     "target": "EN-F-A2-VO-weather",
+     "check": "C2",
+     "problem": "Error-correction items 5 (A-5/B-5/C-5: 'Today it very hot', 'In August it very sunny', 'Tonight it very cold') test copula omission (grammar), not weather vocabulary; the weather word is already correct.",
+     "fix": "Keep item 6 noun/adjective errors (rain->rainy) and replace item 5 with a vocab error, e.g. 'It is very sun today' -> sunny, or 'fogy'/'cloudly' spelling."
+    }
+   ]
+  },
+  {
+   "group": "T12",
+   "targets": [
+    "EN-F-A2-VO-clothes-shopping-B-4"
+   ],
+   "issue": "B-4 is/are agreement is grammar, not shop vocabulary",
+   "reviewers": [
+    "R2"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 9,
+     "target": "EN-F-A2-VO-clothes-shopping-B-4",
+     "check": "C2/C4",
+     "problem": "'How much ___ this jacket' (is/are/cost) is a grammar (be-agreement) item, while A-4/C-4 test clothing-shop vocabulary (try on, fit).",
+     "fix": "Replace with a vocab choice, e.g. 'Can I ___ by card?' (pay/buy/give) or 'Where is the ___ room?' (changing/dressing/trying)."
+    }
+   ]
+  },
+  {
+   "group": "T13",
+   "targets": [
+    "EN-F-A1-VO-common-adjectives"
+   ],
+   "issue": "statement 'give the opposite' does not cover slots 5, 7-8",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (statement wording is an outcome-definition decision; keys correct)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 1,
+     "target": "EN-F-A1-VO-common-adjectives",
+     "check": "C2",
+     "problem": "The outcome says 'give the opposite of common adjectives', but slot 5 tests the polysemy long/tall and big/old, and slots 7-8 only ask the learner to use one named adjective. None of these needs an opposite.",
+     "fix": "Either widen the statement (for example 'choose and use common adjectives, including opposites'), or rewrite slots 5 and 7-8 so each one needs an opposite. Example for 7-8: 'Write one sentence with the opposite of expensive.'"
+    }
+   ]
+  },
+  {
+   "group": "T14",
+   "targets": [
+    "EN-F-A1-VO-days-months-B-9",
+    "EN-F-A1-VO-days-months-C-9"
+   ],
+   "issue": "B-9/C-9 answer repeated/cued elsewhere in the form",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 2,
+     "target": "EN-F-A1-VO-days-months-C-9",
+     "check": "C4",
+     "problem": "The answer is cued inside the form. C-3 shows 'Tuesday' spelled correctly as an option, and C-9 asks for 'Tuesday' again. Form B has the same kind of overlap: Wednesday is the answer to B-1, B-6 and B-9. Form A has no such cueing, so the three forms are not equally hard.",
+     "fix": "Change the C-9 day, for example 'Sat' -> Saturday. Change the B-9 day to one the form does not use elsewhere, for example 'Fri' -> Friday."
+    },
+    {
+     "reviewer": "R3",
+     "index": 3,
+     "target": "EN-F-A1-VO-days-months-B-9",
+     "check": "C4",
+     "problem": "Wednesday is already tested in B-1 and B-6, so B-9 adds no new evidence and is easier than A-9 (Thursday is not used elsewhere in form A).",
+     "fix": "Replace 'Wed' with a day that form B does not use elsewhere, for example 'Fri 4/6' -> Friday."
+    }
+   ]
+  },
+  {
+   "group": "T15",
+   "targets": [
+    "EN-F-A1-VO-family-A-7",
+    "EN-F-A1-VO-family-B-7",
+    "EN-F-A1-VO-family-C-7",
+    "EN-F-A1-VO-family-A-8",
+    "EN-F-A1-VO-family-B-8",
+    "EN-F-A1-VO-family-C-8"
+   ],
+   "issue": "named-word prompts scored with open-field rubric (C-7 differs)",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 4,
+     "target": "EN-F-A1-VO-family-A-7",
+     "check": "C6",
+     "problem": "A-7, A-8, B-7, B-8 and C-8 say 'Use the word X' but are scored with the open-field VOCABULARY rubric, so a learner who writes a different kin word ('uncle' when asked for 'aunt') still scores 2. C-7 uses the named-word variant, so the forms are scored differently.",
+     "fix": "Switch A-7, A-8, B-7, B-8 and C-8 to the 'VOCABULARY variant, named word' rubric, as C-7 already does."
+    }
+   ]
+  },
+  {
+   "group": "T16",
+   "targets": [
+    "EN-F-A1-VO-home-rooms-C-2"
+   ],
+   "issue": "C-2 has several correct rooms",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 5,
+     "target": "EN-F-A1-VO-home-rooms-C-2",
+     "check": "C3",
+     "problem": "'The family sits together in the ____' has more than one right answer: dining room, kitchen and garden all fit, but only living room, sitting room and lounge are accepted.",
+     "fix": "Add a clue, for example 'The family sits together on the sofa and watches TV in the ____'. Or add dining room to the accepted answers."
+    }
+   ]
+  },
+  {
+   "group": "T17",
+   "targets": [
+    "EN-F-A1-VO-numbers-time-A-7",
+    "EN-F-A1-VO-numbers-time-B-7",
+    "EN-F-A1-VO-numbers-time-C-7"
+   ],
+   "issue": "criterion gives <2 for 'at seven'/'seven thirty'",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (rubric criterion change; keys correct)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 6,
+     "target": "EN-F-A1-VO-numbers-time-A-7",
+     "check": "C6",
+     "problem": "The criterion gives 2 only for 'hour word + o'clock' or 'past/to' times. 'I get up at seven' and 'at seven thirty' are correct clock times in words and are common at A1, but they would score less than 2. This applies to B-7 and C-7 too.",
+     "fix": "Add to the criterion: an hour word alone after 'at' (at seven) and 'hour + minutes' (seven thirty) also score 2."
+    }
+   ]
+  },
+  {
+   "group": "T18",
+   "targets": [
+    "EN-F-A1-GR-capitals-full-stops-A-6",
+    "EN-F-A1-GR-capitals-full-stops-B-6",
+    "EN-F-A1-GR-capitals-full-stops-C-6"
+   ],
+   "issue": "'Fix the mistake' admits the 'and' join as a second correct answer",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 7,
+     "target": "EN-F-A1-GR-capitals-full-stops-C-6",
+     "check": "C3",
+     "problem": "The only accepted answer is the full-stop version. The prompt just says 'Fix the mistake', so 'We played cards after lunch and it was great fun.' also fixes the run-on but is marked wrong.",
+     "fix": "Change the prompt to 'Add a full stop and a capital letter', or accept the version joined with 'and' as well."
+    }
+   ]
+  },
+  {
+   "group": "T19",
+   "targets": [
+    "EN-F-A2-VO-make-do-A-9",
+    "EN-F-A2-VO-make-do-B-9",
+    "EN-F-A2-VO-make-do-C-9"
+   ],
+   "issue": "open-field rubric does not say what earns 1 for make/do",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (rubric design change; keys correct)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 8,
+     "target": "EN-F-A2-VO-make-do-A-9",
+     "check": "C6",
+     "problem": "Items A-9, B-9 and C-9 use the open-field VOCABULARY rubric ('word misspelt = 1') and add 'any sentence that uses the target form correctly scores 2'. The rubric does not say what earns 1 here, for example 'Ali does the beds' (the wrong verb) against 'Ali make the beds' (an agreement error).",
+     "fix": "Use a make/do rubric: 2 = correct make/do collocation; 1 = right verb with a form error (makes/make, did); 0 = wrong verb (do the beds / make the dishes)."
+    }
+   ]
+  },
+  {
+   "group": "T20",
+   "targets": [
+    "EN-F-A2-VO-clothes-shopping-A-7",
+    "EN-F-A2-VO-clothes-shopping-B-7",
+    "EN-F-A2-VO-clothes-shopping-C-7"
+   ],
+   "issue": "colour asked for but not scored",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (repeat of round-2 H24; scoring scope)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 9,
+     "target": "EN-F-A2-VO-clothes-shopping-A-7",
+     "check": "C6",
+     "problem": "The prompts for A-7, B-7 and C-7 say 'Name one item and its colour', but the rubric scores only the clothing noun, so the colour that was asked for is never scored.",
+     "fix": "Either remove 'and its colour' from the prompt, or make the rubric 2 = clothing noun + colour word, 1 = only one of the two."
+    }
+   ]
+  },
+  {
+   "group": "T21",
+   "targets": [
+    "EN-F-A2-GR-much-many"
+   ],
+   "issue": "matching note contradicts itself about item 6",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 10,
+     "target": "EN-F-A2-GR-much-many",
+     "check": "C6",
+     "problem": "The matching note contradicts itself. It first says 'item 6 many + singular (missing plural -s)' and then says that after review round 1 item 6 is 'many with an uncountable noun'.",
+     "fix": "Rewrite the item-6 description to match the current items and delete the old text."
+    }
+   ]
+  }
+ ]
+}

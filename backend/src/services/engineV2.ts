@@ -1,0 +1,39 @@
+// Language-engine v2 switches. Default OFF everywhere. ENARA_ENGINE_V2="wrongAnswer,belief,memory,cache" (or "all") turns features on.
+// These are production-capable (not research-only): they exist so each change can be compared against the current engine and enabled per environment once it has earned it.
+//  wrongAnswer - teach the rule after a recorded wrong attempt (the key can only confirm success, so the old wrong-answer path never ran)
+//  belief      - the tutor names the learner's mistaken idea in its hidden marker; repeated ideas trigger hold-the-line + scope-rule teaching
+//  memory      - beliefs, what worked and due reviews persist across sessions; an opening review check; due-review endpoint
+//  cache       - stable instructions first with a cache breakpoint, volatile state last (same content, cheaper input)
+//  keyMatch    - the answer key treats contractions as their full forms (doesn't = does not); named-only, NOT part of "all"
+//  closing     - production version of the closing recap: from the learner's 5th message (or when every success criterion has been shown) recap the rule, ask for it in their own words, and the engine appends that ask if the model left it out; named-only, NOT part of "all"
+//  selfCheck   - an independent check on the tutor's own CORRECT grade for closed items: if the learner's answer contains none of the item's target forms, the grade is held back (no credit) instead of trusted; named-only, NOT part of "all"
+//  clarity     - when the learner is stuck or asks why, explain plainly: the rule first in one everyday sentence, then a right/wrong contrast example with other words, then ask them to apply it; named-only, NOT part of "all"
+//  hints       - when the tutor's last two replies were the same kind of hint question, change the form (state the rule + contrast, then ask them to try again); named-only, NOT part of "all"
+//  ruleFirst   - first exposure to a rule (once per rule per session), inside whichever teaching method is selected: the rule in one plain sentence (<=20 words), one right and one wrong example, then apply it to a new item; never the answer; named-only, NOT part of "all"
+//  shortRecap  - replaces the closing "tell me the rule in your own words" ask with: the rule in one line, then one new example from the learner; once per session; named-only, NOT part of "all"
+//  socraticOff - RESEARCH ONLY, ignored when NODE_ENV=production: removes the two "no rule before the first try" instructions of the language engine (exercise presentation, hint level 1) and nothing else; answer-hiding stays
+//  strandLog   - tag every language turn with its Nation strand (input, output, language_focused, fluency) so the split can be reported per learner and per course; tags and counts only, never learner text; named-only, NOT part of "all"
+//  levelExplicit - level-based explicitness: learners who are A1-A2, or whose record for the objective is not_assessed/emerging, get the rule stated plainly BEFORE their first try (once per rule per session), a hint ladder whose level 1 states the rule in general terms and level 2 shows a right/wrong pair, and below B1 the open-ended methods (Socratic, inquiry, problem, case, project, Bloom's) are not the primary method; everyone else is unchanged. Always runs with arbitration (turned on automatically, recorded in the turn evidence); named-only, NOT part of "all"
+//  liveError     - ESL5 (framework §3 explicit correction tied to this learner, §9 library of expected Arabic L1 errors): two more error types, article_omitted ("I saw apple") and copula_omitted ("She teacher"), detected conservatively in the learner's own message; when the latest message shows one, the rule line, the right/wrong contrast and the next item target THAT error type instead of the lesson's next sub-rule; the learner record keeps the error types seen (codes and counts only, never text); named-only, NOT part of "all"
+//  releaseAfterTwo - ESL5 (framework §3, §4): after two GENUINE failed attempts on the same item (empty replies, "I don't know" and copies of the prompt do not count) the tutor states the answer with a one-line reason and a right/wrong pair, then gives a NEW item on the same point; never before two; answerReleased is recorded in the turn evidence; named-only, NOT part of "all"
+//  reviewOpen    - ESL5 (framework §7 spaced retrieval as recall attempts): a later session (learner record from an earlier session, no learner message yet in this one) opens with 1-2 recall items on error types still live in the record, attempted from memory with no re-explanation; the routine "tell me the rule in your own words" closing becomes one new item in a new context on a live error type (still once, still one task); named-only, NOT part of "all"
+//  fadeKnown     - ESL5 (framework §2 explicit for novices, fade for experts): when the record shows >=2 independent correct answers on a point, the full rule line and worked example for it are skipped: a quick check, then harder/mixed items; a failed quick check returns to explicit support; named-only, NOT part of "all"
+//  ownSentence   - ESL5 (framework §5 focus on form in their own sentences, §6 pushed output): from the learner's 3rd message of the session on (second half of the 5-message session the closing assumes), at most one "write one sentence about ... using ..." task per session, with feedback on the target form only; named-only, NOT part of "all"
+//  esl5          - bundle: turns on liveError, releaseAfterTwo, reviewOpen, fadeKnown and ownSentence together; itself NOT part of "all"
+//  graderV2    - SIMULATION ONLY / DRAFT: the five answer-key fixes (services/graderV2.ts): normalised matching, several accepted answers, option letter = text, target-form scorer 0/1/2, meaning-check guard; affects lessons, assignments, assessments, diagnostics and placement; named-only, NOT part of "all"
+//  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2';
+const ESL5: EngineV2Feature[] = ['liveError', 'releaseAfterTwo', 'reviewOpen', 'fadeKnown', 'ownSentence'];
+export const engineV2 = (feature: EngineV2Feature): boolean => {
+  if (feature === 'socraticOff' && process.env.NODE_ENV === 'production') return false; // research-only
+  const v = (process.env.ENARA_ENGINE_V2 ?? '').split(',').map((x) => x.trim());
+  if (feature === 'arbitration' && v.includes('levelExplicit')) return true; // levelExplicit always runs with arbitration
+  if (v.includes('esl5') && ESL5.includes(feature)) return true; // the esl5 bundle (never turned on by "all")
+  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', ...ESL5].includes(feature));
+};
+
+/** True when `arbitration` is on only because `levelExplicit` forced it (recorded in the turn evidence). */
+export const arbitrationForced = (): boolean => {
+  const v = (process.env.ENARA_ENGINE_V2 ?? '').split(',').map((x) => x.trim());
+  return v.includes('levelExplicit') && !v.includes('arbitration');
+};

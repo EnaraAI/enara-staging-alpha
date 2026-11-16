@@ -672,7 +672,7 @@ export const MOCK_USAGE_EVENTS: UsageEvent[] = [
     organizationId: 'ORG-1',
     subAccountId: 'b1',
     feature: 'chat',
-    model: 'gemini-3-flash-preview',
+    model: 'enara-ai',
     requestId: 'req-1',
     sessionId: 'sess-1',
     tokensIn: 500,
@@ -687,7 +687,7 @@ export const MOCK_USAGE_EVENTS: UsageEvent[] = [
     organizationId: 'ORG-1',
     subAccountId: 'b1',
     feature: 'voice',
-    model: 'gemini-2.5-flash-preview-tts',
+    model: 'enara-voice',
     requestId: 'req-2',
     sessionId: 'sess-2',
     creditsUsed: 450,
@@ -747,7 +747,7 @@ export const MOCK_AVATARS: LiveAvatar[] = [
     subject: 'All Disciplines & Socratic Guided Learning',
     provider: 'enara-webrtc',
     avatarModelId: 'Athena_Expressive_Interactive_v3',
-    voiceId: 'en-US-JennyNeural',
+    voiceId: 'enara-voice-jenny',
     avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=600',
     accent: 'American (Clear Academic)',
     personalityPrompt: 'Encouraging, highly structured, uses Socratic questioning to guide students to discovery without immediately giving answers.',
@@ -766,7 +766,7 @@ export const MOCK_AVATARS: LiveAvatar[] = [
     subject: 'Physics, Calculus, Advanced Algebra',
     provider: 'enara-webrtc',
     avatarModelId: 'Marcus_STEM_Pro_v2',
-    voiceId: 'en-US-GuyNeural',
+    voiceId: 'enara-voice-guy',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=600',
     accent: 'British (Academic Precision)',
     personalityPrompt: 'Analytical, calm, breaks down complex equations into step-by-step physical intuition with clear diagrams and examples.',
@@ -785,7 +785,7 @@ export const MOCK_AVATARS: LiveAvatar[] = [
     subject: 'Literature, History, Essay Writing & Debate',
     provider: 'enara-webrtc',
     avatarModelId: 'Sofia_Humanities_v1',
-    voiceId: 'en-US-AriaNeural',
+    voiceId: 'enara-voice-aria',
     avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=600',
     accent: 'Mid-Atlantic (Articulate & Engaging)',
     personalityPrompt: 'Warm, expressive, passionate about historical context, critical analysis, and vocabulary development.',
@@ -802,9 +802,9 @@ export const MOCK_AVATARS: LiveAvatar[] = [
     name: 'Dr. Alistair',
     title: 'Higher Ed & Research Professor',
     subject: 'Computer Science, Data Science, Biology',
-    provider: 'tavus',
+    provider: 'enara-webrtc',
     avatarModelId: 'Alistair_Professor_Interactive',
-    voiceId: 'en-GB-RyanNeural',
+    voiceId: 'enara-voice-ryan',
     avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=600',
     accent: 'British (Oxbridge)',
     personalityPrompt: 'Formal yet engaging university level professor focusing on research methodologies, rigorous logic, and algorithmic thinking.',
@@ -821,9 +821,9 @@ export const MOCK_AVATARS: LiveAvatar[] = [
     name: 'Maya',
     title: 'Interactive Study Coach',
     subject: 'Exam Preparation & Active Recall',
-    provider: 'elevenlabs-did',
+    provider: 'enara-webrtc',
     avatarModelId: 'Maya_Coach_v2',
-    voiceId: 'en-US-SaraNeural',
+    voiceId: 'enara-voice-sara',
     avatarUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=600',
     accent: 'Australian (Friendly & Energetic)',
     personalityPrompt: 'Dynamic, supportive, uses flashcards, quiz prompts, and spaced repetition techniques to build confidence before exams.',
@@ -860,8 +860,8 @@ export const MOCK_AVATAR_ANALYTICS: AvatarStreamAnalytics = {
   tokenExpenditureMonthly: 34200,
   providerStatus: {
     enaraAvatar: 'operational',
-    elevenlabs: 'operational',
-    tavus: 'operational'
+    enaraVoice: 'operational',
+    enaraVideo: 'operational'
   },
   recentSessions: [
     {
@@ -910,7 +910,7 @@ export const MOCK_AVATAR_ANALYTICS: AvatarStreamAnalytics = {
       durationSeconds: 2520,
       status: 'ended',
       latencyMs: 192,
-      provider: 'Tavus'
+      provider: 'Enara Live'
     }
   ]
 };

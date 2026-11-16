@@ -1,3 +1,4 @@
+import multer from 'multer';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { AppError } from '../middleware/errorHandler';
@@ -163,3 +164,50 @@ export function directUploadContentType(fileName: string): string | null {
   const type = ALLOWED_TYPES[path.extname(sanitizeFileName(fileName)).toLowerCase()];
   return type && type.kind === 'document' ? type.mimeTypes[0] : null;
 }
+
+// Student profile photos: common image types, checked by extension, declared
+// type and magic bytes. Same size limit as other uploads (MAX_UPLOAD_BYTES).
+export const IMAGE_TYPES: Record<string, string[]> = {
+  '.jpg': ['image/jpeg'],
+  '.jpeg': ['image/jpeg'],
+  '.png': ['image/png'],
+  '.gif': ['image/gif'],
+  '.webp': ['image/webp'],
+};
+
+export function isImageFileName(name: string): boolean {
+  return path.extname(name).toLowerCase() in IMAGE_TYPES;
+}
+
+function hasImageSignature(extension: string, buffer: Buffer): boolean {
+  if (extension === '.jpg' || extension === '.jpeg') return buffer.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]));
+  if (extension === '.png') return buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+  if (extension === '.gif') return ['GIF87a', 'GIF89a'].includes(buffer.subarray(0, 6).toString());
+  if (extension === '.webp') return buffer.subarray(0, 4).toString() === 'RIFF' && buffer.subarray(8, 12).toString() === 'WEBP';
+  return false;
+}
+
+export function validateImageUpload(file: { originalname: string; mimetype: string; size: number; buffer: Buffer } | undefined): {
+  safeFileName: string;
+  contentType: string;
+} {
+  if (!file) throw new AppError('No file uploaded', 400, 'UPLOAD_REQUIRED');
+  if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
+    throw new AppError('File size is not allowed', 413, 'UPLOAD_SIZE_NOT_ALLOWED');
+  }
+  const safeFileName = sanitizeFileName(file.originalname);
+  const extension = path.extname(safeFileName).toLowerCase();
+  const mimeTypes = IMAGE_TYPES[extension];
+  if (!mimeTypes) throw new AppError('Photo must be a JPEG, PNG, GIF or WebP image', 415, 'UPLOAD_TYPE_NOT_ALLOWED');
+  const contentType = (file.mimetype || '').toLowerCase();
+  if (!mimeTypes.includes(contentType)) {
+    throw new AppError('File content type is not allowed', 415, 'UPLOAD_MIME_NOT_ALLOWED');
+  }
+  if (!hasImageSignature(extension, file.buffer)) {
+    throw new AppError('File content does not match the declared type', 415, 'UPLOAD_SIGNATURE_MISMATCH');
+  }
+  return { safeFileName, contentType };
+}
+
+// Multipart parser for one profile photo (field "photo"), kept in memory.
+export const photoUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_UPLOAD_BYTES, files: 1, fields: 5 } });

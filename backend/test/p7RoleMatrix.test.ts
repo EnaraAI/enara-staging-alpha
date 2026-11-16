@@ -74,7 +74,11 @@ afterAll(async () => {
   await mongo.stop();
 });
 
-const PUBLIC = [/^\/health$/, /^\/ready$/, /^\/$/, /^\/api-docs/, /^\/api\/auth\/(login|register|demo-login|password-reset|refresh|logout|invitations)/, /^\/api\/workspace\/invitations\/(accept|lookup|[^/]+$)/];
+const PUBLIC = [/^\/health$/, /^\/ready$/, /^\/$/, /^\/api-docs/, /^\/api\/auth\/(login|register|demo-login|password-reset|refresh|logout|invitations)/, /^\/api\/workspace\/invitations\/(accept|lookup|[^/]+$)/,
+  // Partner demo (one-click): status, start (a fresh demo school, rate limited) and end (only with a demo session's own token).
+  /^\/api\/demo\/(status|start|end)$/,
+  // Parents Portal: which sign-in methods to offer (public config; the Google client ID is public by design).
+  /^\/api\/parents\/auth-config$/];
 const isPublic = (p: string) => PUBLIC.some((r) => r.test(p));
 const fill = (p: string) => p.replace(/:([A-Za-z]+)/g, 'qa-nonexistent');
 let sent = 0;
@@ -112,8 +116,8 @@ describe('P7 feature x role sweep', () => {
     const v: string[] = [];
     for (const o of observed) {
       if (o.status === 429) v.push(`rate-limited ${o.role} ${o.method} ${o.path}`);
-      // 503 *_UNAVAILABLE: an external dependency is not configured here (avatar, video storage); reported, not a defect.
-      if (o.status >= 500 && !(o.status === 503 && /_UNAVAILABLE$/.test(o.code))) v.push(`5xx ${o.role} ${o.method} ${o.path} ${o.status} ${o.code}`);
+      // 503 *_UNAVAILABLE / google_not_configured: an external dependency is not configured here (avatar, video storage, Google sign-in); reported, not a defect.
+      if (o.status >= 500 && !(o.status === 503 && (/_UNAVAILABLE$/.test(o.code) || o.code === 'google_not_configured'))) v.push(`5xx ${o.role} ${o.method} ${o.path} ${o.status} ${o.code}`);
       if ((o.role === 'anonymous' || o.role === 'disabled_teacher') && ok(o.status) && !isPublic(o.path)) v.push(`unauthenticated-access ${o.role} ${o.method} ${o.path}`);
       if (o.role.startsWith('academic_manager') && o.method !== 'GET' && ok(o.status) && !isPublic(o.path)) v.push(`academic-manager-write ${o.method} ${o.path}`);
       if (o.role.startsWith('student') && ok(o.status) && /^\/api\/(students|documents|usage\/(report|budget|plan|current-tools|savings)|ai-controls|workspace|educator-chat|lesson-plans|grading|learning\/flags|analytics\/overview|credits)/.test(o.path)) v.push(`student-staff-access ${o.method} ${o.path}`);

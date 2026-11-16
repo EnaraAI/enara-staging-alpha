@@ -20,8 +20,11 @@ import { captureRawBody, requestContext, requestLogger } from './middleware/requ
 import authRoutes from './routes/auth.routes';
 import curriculumRoutes from './routes/curriculum.routes';
 import avatarRoutes from './routes/avatar.routes';
+import demoRoutes from './routes/demo.routes';
+import { demoGuard } from './middleware/demoGuard';
 import cronRoutes from './routes/cron.routes';
 import tutorFacesRoutes from './routes/tutorFaces.routes';
+import learnerAgeBandRoutes from './routes/learnerAgeBand.routes';
 import batchRoutes from './routes/batch.routes';
 import courseInstanceRoutes from './routes/courseInstance.routes';
 import studentRoutes from './routes/student.routes';
@@ -45,6 +48,7 @@ import documentsRoutes from './routes/documents.routes';
 import educatorChatRoutes from './routes/educatorChat.routes';
 import speakingRoutes from './routes/speaking.routes';
 import usageRoutes from './routes/usage.routes';
+import parentsRoutes from './parents/routes';
 import { getPostgresPool } from './config/postgres';
 import mongoose from 'mongoose';
 
@@ -136,6 +140,10 @@ export function createApp() {
   app.use('/api/auth/register', makeLimiter('register', 60 * 60 * 1000, 10, 'Too many registration attempts'));
   app.use('/api/auth/demo-login', makeLimiter('demo-login', 60 * 1000, 10, 'Too many demo login attempts'));
   app.use('/api/auth/password-reset', makeLimiter('password-reset', 15 * 60 * 1000, 10, 'Too many password reset requests'));
+  // Parents Portal: sign-up and link-code redemption, per IP (the per-account lockout is in parents/codes.ts).
+  app.use('/api/parents/register', makeLimiter('parent-register', 60 * 60 * 1000, 10, 'Too many registration attempts'));
+  app.use('/api/parents/google', makeLimiter('parent-google', 15 * 60 * 1000, 30, 'Too many sign-in attempts'));
+  app.use('/api/parents/link', makeLimiter('parent-link', 15 * 60 * 1000, 30, 'Too many code attempts'));
   app.use('/api/workspace/invitations/accept', makeLimiter('invitation-accept', 15 * 60 * 1000, 20, 'Too many invitation attempts'));
   app.use('/api/upload', makeLimiter('upload', 60 * 60 * 1000, 30, 'Too many upload requests'));
   app.post('/api/documents', makeLimiter('documents', 60 * 60 * 1000, 60, 'Too many document uploads', true));
@@ -155,6 +163,8 @@ export function createApp() {
   app.use('/api/avatar/session/:id/stt-token', makeLimiter('stt-token', 60 * 1000, 60, 'Too many transcription requests', true));
   app.use('/api/avatar/query-stream', makeLimiter('avatar-query', 60 * 1000, 30, 'Too many AI requests', true));
   app.use('/api/avatar/speak', makeLimiter('speak', 60 * 1000, 120, 'Too many speech requests', true));
+  // Public one-click demo: a coarse per-address limit on top of the 3-a-day rule.
+  app.post('/api/demo/start', makeLimiter('demo-start', 60 * 60 * 1000, 10, 'Too many demo sessions'));
   // /api/learning is limited per verified user instead (learning.routes.ts):
   // a class doing diagnostics shares the school's IP address.
   // P19-1: 300/min per verified user (a class behind one school IP no longer
@@ -269,12 +279,15 @@ export function createApp() {
     res.redirect('/api-docs');
   });
 
+  app.use('/api', demoGuard);
   app.use('/api/auth', authRoutes);
   app.use('/api/curriculums', curriculumRoutes);
+  app.use('/api/demo', demoRoutes);
   app.use('/api/avatar', avatarRoutes);
   app.use('/api/cron', cronRoutes);
   app.use('/api/tutor-faces', tutorFacesRoutes);
   app.use('/api/batches', batchRoutes);
+  app.use('/api/age-bands', learnerAgeBandRoutes);
   app.use('/api/course-instances', courseInstanceRoutes);
   app.use('/api/students', studentRoutes);
   app.use('/api/assessments', assessmentRoutes);
@@ -297,6 +310,7 @@ export function createApp() {
   app.use('/api/speaking', speakingRoutes);
   app.use('/api/usage', usageRoutes);
   app.use('/api/analytics', analyticsRoutes);
+  app.use('/api/parents', parentsRoutes);
 
   app.use((_req, _res, next) => {
     next(new AppError('Route not found', 404, 'NOT_FOUND'));

@@ -78,11 +78,24 @@
 .si-card[dir="rtl"] .si-head h2{font-family:var(--arabic);font-weight:700}
 .si-head p{color:var(--muted);margin:4px 0 0}
 
-.si-seg{position:relative;display:grid;grid-template-columns:repeat(3,1fr);background:var(--brand-50);border-radius:12px;padding:4px}
-.si-seg .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/3);border-radius:9px;background:var(--surface);box-shadow:0 2px 8px -2px rgba(7,21,48,.2);transform:translateX(calc(var(--i,0) * 100%));transition:transform 380ms var(--e-spring)}
+.si-seg{position:relative;display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));background:var(--brand-50);border-radius:12px;padding:4px}
+.si-seg .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/var(--n,3));border-radius:9px;background:var(--surface);box-shadow:0 2px 8px -2px rgba(7,21,48,.2);transform:translateX(calc(var(--i,0) * 100%));transition:transform 380ms var(--e-spring)}
 .si-card[dir="rtl"] .si-seg .thumb{left:auto;right:4px;transform:translateX(calc(var(--i,0) * -100%))}
-.si-seg button{position:relative;z-index:1;border:0;background:transparent;padding:9px 6px;font-size:13.5px;font-weight:650;color:var(--muted);cursor:pointer;border-radius:9px;transition:color 180ms var(--e-out)}
-.si-seg button[aria-pressed="true"]{color:var(--text)}
+.si-seg button{position:relative;z-index:1;border:0;background:transparent;padding:6px 4px;min-height:44px;line-height:1.15;font-size:13px;font-weight:650;color:var(--muted);cursor:pointer;border-radius:9px;transition:color 180ms var(--e-out)}
+.si-seg button[aria-pressed="true"],.si-seg button[aria-selected="true"]{color:var(--text)}
+.si-seg button:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+/* Parents tab (Parents Portal) */
+.si-panel{display:flex;flex-direction:column;gap:inherit}
+.si-parent-links{display:flex;flex-direction:column;gap:8px}
+/* Parents tab: official Google button (rendered by Google Identity Services) + "or" divider. */
+.si-google{display:flex;justify-content:center;align-items:center;min-height:44px;width:100%}
+.si-google-btn{display:flex;justify-content:center;align-items:center;width:100%;max-width:400px;min-height:44px}
+.si-or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;font-weight:600;margin:2px 0}
+.si-or::before,.si-or::after{content:"";flex:1;height:1px;background:var(--line-2)}
+.si-ghost{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface);color:var(--brand);font-size:14px;font-weight:650;cursor:pointer;padding:8px 12px;text-align:center}
+.si-ghost:hover{background:var(--brand-50)}
+.si-ghost[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-50)}
+.si-ghost:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
 .si-field{display:flex;flex-direction:column;gap:6px}
 .si-field label{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;font-weight:650}
@@ -124,3 +137,20 @@
   .enara-signin *,.enara-signin *::before,.enara-signin *::after{animation:none!important;transition:none!important}
   .si-stage{transform:none!important}
 }
+
+/* One-click partner demo */
+.si-demo{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.si-demo-title{margin:0;font-weight:700;color:var(--text);font-size:15px}
+.si-demo-sub{margin:4px 0 12px;color:var(--muted);font-size:13px}
+.si-demo-roles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.si-demo-roles button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:44px;padding:8px 6px;white-space:nowrap;border-radius:12px;border:1px solid var(--brand-200);background:var(--brand-50);color:var(--brand);font-weight:700;font-size:13.5px;cursor:pointer;transition:background .15s,border-color .15s}
+.si-demo-roles button:hover:not(:disabled){background:var(--brand-100);border-color:var(--brand-300)}
+.si-demo-roles button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.si-demo-roles button:disabled{opacity:.6;cursor:wait}
+@media (max-width:420px){.si-demo-roles{grid-template-columns:1fr}}
+
+/* Touch targets >= 44px (Parents Portal a11y pass): language toggle, links, show-password. */
+.si-lang button{min-inline-size:44px;min-block-size:44px}
+.si-link{min-block-size:44px;padding-inline:4px}
+.si-input button{min-inline-size:44px;min-block-size:44px}
+.si-field label{min-block-size:24px}

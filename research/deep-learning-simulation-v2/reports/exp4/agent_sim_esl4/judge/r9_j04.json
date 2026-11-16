@@ -1,0 +1,803 @@
+{
+ "batch": "r9_j04",
+ "cases": {
+  "ca8736c1db7": {
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "\"He obeys the rules\" (right) versus \"He obeies the rules\" (wrong)"
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "ce783b186ad": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"is\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"is\" is right."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: a sentence like this always needs am, is or are."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"The door is open.\" Wrong: \"The door open.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c43048a3a60": {
+   "events": [],
+   "next_task": {
+    "kind": "none"
+   }
+  },
+  "ce4994441b8": {
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"The\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c40b23dad70": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes! My father is one person, like he, so we use is"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes! My father is one person, like he, so we use is"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c1adad2bf3b": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Watches\" is spelled correctly"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"Watches\" is spelled correctly"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother studies every night.",
+    "errors": {
+     "W1": "My brother study every night.",
+     "W2": "My brother studys every night."
+    }
+   }
+  },
+  "c2d45fe08e9": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English, one thing usually needs a or an before it."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "'I have a car.' Not: 'I have car.'"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c4f4316110c": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Perfect! Ahmed is one person, like he, so we add is."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Perfect! Ahmed is one person, like he, so we add is."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c27b57fa8d6": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct now."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c25b64ad324": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! \"Go\" ends in -o, so it takes -es: goes."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct! \"Go\" ends in -o, so it takes -es: goes."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c34475128d8": {
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "He fixes his bike every Saturday.",
+    "errors": {
+     "W1": "He fix his bike every Saturday.",
+     "W2": "He fixs his bike every Saturday."
+    }
+   }
+  },
+  "c1725ccabcc": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct, and you did it with no help."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct, and you did it with no help."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c41acf7e5a6": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Excellent! Ahmed is one person, so we use is"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Excellent! Ahmed is one person, so we use is"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am happy today.",
+    "errors": {
+     "W1": "I happy today.",
+     "W2": "I is happy today."
+    }
+   }
+  },
+  "c1dd85bdf56": {
+   "events": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c20d7c840ee": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! ... so we say \"the door\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! ... so we say \"the door\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c74f96bbcc5": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"My brother\" is \"he\", so the verb needs an ending here; \"go\" alone is for I, you, we and they."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "goes",
+    "errors": {
+     "W1": "go",
+     "W2": "gos"
+    }
+   }
+  },
+  "c0c833aa603": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct. ... so \"the\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct. ... so \"the\" is right."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c7bcbe6522e": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"are\" is right with they. You did it alone."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"are\" is right with they. You did it alone."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c0ceb4aa53b": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"are\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"are\" is right."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c0be7ce3cb4": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Both correct: 'an honest man' ... 'a university'"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Both correct: 'an honest man' ... 'a university'"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "the",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c2501410919": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"teaches\" is right."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play",
+     "W2": "plaies"
+    }
+   }
+  },
+  "c98055fd581": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! \"the door\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! \"the door\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c8a3c39072d": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great job! Ahmed is one person, so we use is"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Great job! Ahmed is one person, so we use is"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My father is a teacher.",
+    "errors": {
+     "W1": "My father a teacher."
+    }
+   }
+  },
+  "c6dd1224414": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c879da9b642": {
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"The chair is broken.\" Wrong: \"The chair broken.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c6a08df86cb": {
+   "events": [],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "ceffeeee471": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"are\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"are\" is correct"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My father is tired.",
+    "errors": {
+     "W1": "My father tired."
+    }
+   }
+  },
+  "cb75100fc13": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct, \"are\" is right. You found we on your own."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct, \"are\" is right. You found we on your own."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "We are happy.",
+    "errors": {
+     "W1": "We happy.",
+     "W2": "We is happy."
+    }
+   }
+  },
+  "c4c310ac9ca": {
+   "events": [],
+   "next_task": {
+    "kind": "none"
+   }
+  },
+  "c76de3f0740": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is correct, with no steps from me."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is correct, with no steps from me."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "She goes to the park every Friday.",
+    "errors": {
+     "W1": "She go to the park every Friday.",
+     "W2": "She gos to the park every Friday."
+    }
+   }
+  },
+  "c4d30a71cfd": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Perfect! \"Watch\" ends in -ch, so it takes -es: watches."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Perfect! \"Watch\" ends in -ch, so it takes -es: watches."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My mother watches TV every evening.",
+    "errors": {
+     "W1": "My mother watch TV every evening.",
+     "W2": "My mother watchs TV every evening."
+    }
+   }
+  },
+  "c5382432e8d": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "cd27c9adc47": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! ... \"the book\" because we already mentioned it."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! ... \"the book\" because we already mentioned it."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "the",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c030409f4ba": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! We is more than one person, so it takes are"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct! We is more than one person, so it takes are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "cd94a52d285": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Right. \"The door\" works"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Right. \"The door\" works"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c4e334f4091": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Well done! ... cries."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Well done! ... cries."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play",
+     "W2": "plaies"
+    }
+   }
+  }
+ }
+}

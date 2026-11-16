@@ -1,0 +1,785 @@
+# Assessment review log
+
+**DRAFT** - not yet reviewed by a human assessor.
+
+## Automated checks
+
+Tests: `backend/test/assessmentNovelty.test.ts`, `backend/test/assessmentSeparation.test.ts`, `backend/test/assessmentForms.test.ts` (run with `cd backend && npx vitest run test/assessment`).
+
+Allowlisted instruction frames (cut before shingling, see `backend/test/helpers/assessmentText.ts`): "write one sentence about", "use a or an", "use am, is or are", "write the correct form of the verb", "fill the gap with ..." and similar. Content around a frame is still checked.
+
+Data fixed (first run, 2026-11-16):
+
+| Item | Problem | Before | After |
+|---|---|---|---|
+| EN-F-A1-GR-article-a-an (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-GR-article-the (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-GR-can-ability (9 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-GR-copula-be (9 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-GR-prepositions-time (9 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-GR-there-is-are (9 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-VO-classroom-objects (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-VO-common-adjectives (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-VO-days-months (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-VO-family (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-VO-food-drink (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-VO-home-rooms (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-VO-numbers-time (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A2-GR-past-questions-did (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A2-GR-past-simple-irregular (9 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A2-GR-past-simple-regular (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A2-GR-present-continuous (9 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A2-GR-third-person-s (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A2-VO-appearance (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A2-VO-clothes-shopping (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A2-VO-jobs-workplaces (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A2-VO-weather (6 items) | missing rubric on target_form item; added standard 0/1/2 rubric | - | rubric added |
+| EN-F-A1-GR-word-order-svo-C-1 | prompt length >±2 words across forms (22/22/25) | the dishes | dishes |
+| EN-F-A1-VO-food-drink-B-2 | prompt length >±2 words across forms (16/19/17) | it is round and grows on trees | it grows on trees |
+| EN-F-A1-VO-food-drink-B-6 | prompt length >±2 words across forms (14/17/16) | My little brother | My brother |
+| EN-F-A1-VO-food-drink-B-9 | prompt length >±2 words across forms (16/19/18) | No coffee for me. | No coffee. |
+| EN-F-A2-FN-polite-requests-A-9 | prompt length >±2 words across forms (14/11/11) | an extra towel in your room. | an extra towel. |
+| EN-F-A2-GR-comparatives-C-7 | prompt length >±2 words across forms (10/10/13) | two members of your family | two family members |
+| EN-F-A2-GR-comparatives-B-9 | prompt length >±2 words across forms (15/11/15) | Ahmed: 170 cm. Hany: 182 cm. | Ahmed is 170 cm tall. Hany is 182 cm tall. |
+| EN-F-A2-VO-appearance-B-2 | prompt length >±2 words across forms (15/18/17) | are the colour of the sky | are like the sky |
+| EN-F-A2-VO-clothes-shopping-B-4 | prompt length >±2 words across forms (16/14/18) | this jacket? | this jacket, please? |
+| EN-F-A2-VO-clothes-shopping-C-4 | prompt length >±2 words across forms (16/14/18) | too tight. | tight. |
+| EN-F-A2-VO-clothes-shopping-C-6 | prompt length >±2 words across forms (15/17/19) | I like this shirt but it is big size for me. | This shirt is big size for me. |
+| EN-F-A2-VO-clothes-shopping-C-6 | prompt length >±2 words across forms (answers follow new prompt) | I like this shirt but it | This shirt |
+| EN-F-A2-VO-make-do-C-7 | prompt length >±2 words across forms (16/15/12) | friends, breakfast, noise. | some friends, breakfast, a noise. |
+| EN-F-A2-VO-weather-C-3 | prompt length >±2 words across forms (17/19/21) | We can swim in the sea. | We can swim. |
+| EN-F-A2-VO-weather-C-9 | prompt length >±2 words across forms (16/17/14) | Every day there's rain. | There's rain every single day. |
+| EN-F-A1-GR-article-a-an-A-2 | copied text (novelty/separation check): 6-word shingle in ESL1 eslFixtures.ts | at the station | at the airport |
+| EN-F-A1-GR-copula-be-A-7 | copied text (novelty/separation check): sentence in research benchmark/outcomes/writing.json | the weather today | the weather this morning |
+| EN-F-A1-GR-there-is-are-B-4 | copied text (novelty/separation check): shingle in research writing.json | many cars | many bikes |
+| EN-F-A1-VO-classroom-objects-A-4 | copied text (novelty/separation check): sentence in research listening.json | Can I borrow your ____ ? | Can I use your ____ , please? |
+| EN-F-A1-VO-classroom-objects-C-4 | copied text (novelty/separation check): sentence in research functional.json | Can you open the ____ ? | Please open the ____ . |
+| EN-F-A1-VO-common-adjectives-A-5 | copied text (novelty/separation check): accepted answer sentence in ESL5 cases_new.json | Our flat | Our house |
+| EN-F-A1-VO-common-adjectives-C-5 | copied text (novelty/separation check): accepted answer sentence in research writing.json | The test was | The quiz was |
+| EN-F-A1-VO-food-drink-A-4 | copied text (novelty/separation check): shingle in research functional.json | Can I have a glass of orange | I would like some orange |
+| EN-F-A2-FN-polite-requests-A-1 | copied text (novelty/separation check): sentence in research functional.json | a glass of water | a cup of tea |
+| EN-F-A2-FN-polite-requests-B-8 | copied text (novelty/separation check): sentence in research functional.json | You are in a restaurant. | You are at a restaurant. |
+| EN-F-A2-FN-polite-requests-C-3 | copied text (novelty/separation check): shingle in research functional.json | (a) I want plaster. (b) Give me a plaster. (c) Can I have a plaster, please? | (a) I want plasters. (b) Give me plasters. (c) Can I have some plasters, please? |
+| EN-F-A2-GR-comparatives-A-1 | copied text (novelty/separation check): sentence in research grammar.json | A bus is slow. A train is ___ (fast) than a bus. | A bike is slow. A car is ___ (fast) than a bike. |
+| EN-F-A2-GR-conjunctions-A-7 | copied text (novelty/separation check): answer key shingle in research writing.json | because I want a better job. | because I want to travel. |
+| EN-F-A2-GR-conjunctions-A-8 | copied text (novelty/separation check): wording equal to research benchmark/outcomes/writing.json | one good thing and one bad thing | say one thing you like and one thing you don't |
+| EN-F-A2-GR-conjunctions-B-8 | copied text (novelty/separation check): wording equal to research benchmark/outcomes/writing.json | one good thing and one bad thing | say one thing you like and one thing you don't |
+| EN-F-A2-GR-conjunctions-C-8 | copied text (novelty/separation check): wording equal to research benchmark/outcomes/writing.json | one good thing and one bad thing | say one thing you like and one thing you don't |
+| EN-F-A2-GR-much-many-A-2 | copied text (novelty/separation check): shingle in research grammar.json | milk in the jug | juice in the jug |
+| EN-F-A2-VO-make-do-A-5 | copied text (novelty/separation check): answer shingle in research vocabulary.json | to my manager | to my boss |
+| EN-F-A2-VO-make-do-A-5 | copied text (novelty/separation check): answer shingle in research vocabulary.json | I need to | I have to |
+| EN-F-A2-VO-weather-A-3 | copied text (novelty/separation check): sentence in outcome-sim-v2 outcome_cases.jsonl | It is very ____ today. | It is so ____ outside. |
+| EN-F-A2-VO-weather-B-4 | copied text (novelty/separation check): sentence in outcome-sim-v2 outcome_cases.jsonl | It is very ____ today. | It is a ____ day. |
+| EN-F-A2-VO-weather-A-4 | copied text (novelty/separation check): shingle in outcome-sim-v1 outcome_cases.jsonl | I can't see the sun. | No sun this morning. |
+| EN-F-A2-VO-weather-A-7 | copied text (novelty/separation check): sentence in research writing.json | the weather today | the weather this morning |
+| EN-F-A2-VO-weather-C-5 | copied text (novelty/separation check): answer shingle in research writing.json | in the mountains | up in the hills |
+| PL-A1-VO-04 | copied text (novelty/separation check): sentence in research vocabulary.json | We cook in the ___. | We cook dinner in the ___. |
+| PL-A1-RD-* | copied text (novelty/separation check): passage sentence in ESL1 eslFixtures.ts | I have a cat. | I have a small cat. |
+| PL-A1-RD-05 | copied text (novelty/separation check): sentence in research listening.json | What time does the shop close? | When does the shop close? |
+| PL-A2-VO-03 | copied text (novelty/separation check): shingle in research functional.json | Do you have this shirt | Have you got this shirt |
+| PL-A2-VO-06 | copied text (novelty/separation check): sentence in research writing.json | She has long ___ hair. | My aunt has long ___ hair. |
+| PL-A2-RD-* | copied text (novelty/separation check): passage shingle in research functional.json | I'm sorry I didn't reply sooner. | Sorry for my late reply. |
+| PL-A2-RD-03 | copied text (novelty/separation check): sentence in research listening.json | Where do they meet? | Where will they meet? |
+| PL-A2-WR-01 | copied text (novelty/separation check): model answer shingle in backend/src demoTemplate.ts and lo_cases.jsonl | Last weekend I went to the market with my mum and we bought fruit. | Last weekend my mum and I went to the market and bought fruit. |
+
+Data fixed (acceptedAnswers notes, 2026-11-16; see `research/assessment-validation/a1a2/REPORT.md` §3 #8):
+
+- 568 items in 23 outcome files changed; placement.json had none left. `acceptedAnswers` now holds only literal answers.
+- Normalisation notes ("Case-insensitive; ignore final punctuation and extra spaces", "case-SENSITIVE ...; final full stop required") moved to a new per-item `matchingNote`.
+- target_form_0_1_2 items: criteria ("Any sentence with ...", "Model answer; ... scores 2 (...)", "(any order; 2 = ...)", "Yes/No answers count only with ...") appended to `rubric` as "Criterion: ..."; `acceptedAnswers` now holds ≥2 literal example answers (answerKey without "e.g." plus new examples; slash/"..." patterns expanded, e.g. `I am single.`, `I'm married.`). Vocabulary items whose `acceptedAnswersNote` says acceptedAnswers lists target words were left as keyword lists.
+- exact items: contraction variants added both ways (can't/cannot/can not, don't/do not, I'm/I am, there's/there is, ...), not for choice items; no punctuation variants. Special cases: "commas optional" → list with and without commas; "The ... the" → `The the`; "She can cook very well biryani (accept; ...)" → literal + `scoringNote`; `...tall; he plays...` → `...tall. He plays...`.
+- New examples that collided with lesson/benchmark text in the novelty check were replaced.
+- New check in `backend/test/assessmentForms.test.ts` (outcomes + placement): fails if an acceptedAnswers entry contains ";", "ignore", "must", "e.g.", "rubric", an instruction-style "any " (at start or after "("), "case-"/"case(in)sensitive", or has >25 words. "any"/"case" are matched as phrases so literal answers like `We don't have any bread.` and `pencil case` pass. Result: 108/108 tests pass.
+
+## Review round 1 (A1–A2)
+
+*16 Nov 2026. Three independent reviews (`research/assessment-review/a1a2/review_R1.json`, `review_R2.json`, `review_R3.json`) consolidated by `research/assessment-review/a1a2/consolidate.py` into `CONSOLIDATED.json`. No API call; tutor/grader code not changed.*
+
+Totals: 93 flags → 56 groups; 27 revised (≥2 reviewers, same target + issue), 9 revised as single-reviewer, factual (key error), 20 noted, not changed. CEFR levels were not changed (EGP level flags G31–G33, G50 had 1 reviewer: noted). Re-review list: `research/assessment-review/a1a2/REVISED_TARGETS.json`.
+
+### Merge decisions
+
+- R1-9 is one outcome-level flag naming three outcomes (classroom-objects 5-6, jobs-workplaces 5-6, food-drink 5); it is counted in G10, G11 and G12.
+- R3-18 names two problems (jobs 5-6 article slots; jobs 7-8 keyed on the given job word); counted in G11 and G13.
+- R3-10 names two problems (slot-1 'May'; slot-6 'Could I have' missing); counted in G21 and G22 (G22 single-reviewer, factual).
+- R1-7 names A-6 'drink soup' (merged with R2-21/R3-29 as G08) and B-6/C-6 realism (G56, single, noted).
+- R2-11 names capitals-full-stops, word-order-svo and frequency-adverbs type swaps; R3-1 and R3-2 match the first two (G34, G35); frequency-adverbs is R2 only (G36, noted).
+- R2-0 (stated as rubric:all) and R1-20 (outcomes:A1-A2) are the same criterion problem (G25).
+- R1-22 (rubric:all), R2-1 (rubric:exact), R3-0 (rubric:all) are the same normalise-vs-capitals problem (G27).
+- R1-23 and R2-2 (rubric:free_production / rubric:free) both ask for a vocabulary variant of the 0/1/2 levels (G28); R2-3 (tf1 text) is a different problem (G29).
+- R1-21, R2-4, R3-33 (missing banks for 8 gap outcomes, 'outcomes:missing banks' / 'outcomes:coverage' / 'outcomes:A1-A2') merged (G26).
+- R1-14, R2-18, R3-24 (family C-6 sister-in-law, C-4 niece, slot level) merged (G17). R2-17 and R3-23 (periphrasis not an error) merged (G18); R2-17 is targeted at A-5 but names A-6..C-6.
+- R1-13, R2-24, R3-28 (appearance slot 1) merged even though R2 targets C-1 only: all three name the C-1 giveaway (G16).
+- R1-6, R2-23, R3-26 (f/v tagged spelling_vowel) merged (G07).
+- R2-19, R3-22 (common-adjectives slot 5) merged (G38).
+
+### Every flag
+
+| Reviewer | # | Target | Check | Problem | Group |
+|---|---|---|---|---|---|
+| R1 | 0 | EN-F-A1-GR-can-ability-A-6 | C3 | acceptedAnswers includes 'She can cook very well biryani.' which is ungrammatical (adverb between verb and object). | G01 |
+| R1 | 1 | EN-F-A2-GR-past-simple-irregular-B-6 | C3 | Key 'Last week we drank tea at that café every day.' changes 'the café daily' to 'that café every day'; the minimal correction 'Last week we drank tea at the café daily.' is not accepted. | G02 |
+| R1 | 2 | EN-F-A1-GR-word-order-svo-A-9 | C3 | Task is a text TO Hany but first accepted answer is 'I meet Hany at the café at six.' (third-person reference to the addressee); present simple 'I meet you at six' is unnatural for an arrangement, and natural answers ('I'm meeting you at the café at six', 'See you at the café at six') are absent. Same in B-9 and C-9. | G03 |
+| R1 | 3 | EN-F-A1-VO-numbers-time-A-7 | C3 | Keyword list includes 'to' and 'past'; 'to' matches almost any sentence ('I go to bed...'), so the item is passed without writing a time in words. Same list in B-7 and C-7 (C-7 'go to bed' prompt makes it trivial). | G04 |
+| R1 | 4 | EN-F-A1-VO-numbers-time-A-8 | C3 | Number-word keyword lists are incomplete and differ by form (A-8 lacks thirteen, fourteen, sixteen..nineteen, forty, sixty etc.; B-8/C-8 lack many numbers too), so correct answers score 0. | G05 |
+| R1 | 5 | EN-F-A1-VO-numbers-time-C-5 | C4 | Slot 5 tests -teen spelling in A ('fivteen') and B ('forteen') but C uses 'nin' (nine), an easier, non-teen word; C-5 is not parallel. | G06 |
+| R1 | 6 | EN-F-A1-VO-numbers-time-A-5 | C5 | Tag spelling_vowel but 'fivteen' is a consonant (f/v) error; Arabic has no /v/, so the realistic Arabic-L1 confusion goes the other way (v written as f). | G07 |
+| R1 | 7 | EN-F-A1-VO-food-drink-B-6 | C5 | 'drinks his rice' (B-6) and 'drinks bread and cheese' (C-6) are not realistic Arabic-L1 errors; the real transfer is drink/eat with soup (Arabic 'yashrab shurba'). A-6 itself is weak because 'drink soup' is acceptable English from a cup. | G08, G56 |
+| R1 | 8 | EN-F-A1-VO-food-drink-A-4 | C2 | Prompt 'I would like some orange ____ , please?' is a statement ending with a question mark: a model-error in the stem. | G09 |
+| R1 | 9 | EN-F-A1-VO-classroom-objects | C2 | Error-correction slots 5-6 in all forms test indefinite article omission ('I have ruler'), not naming classroom objects; same in EN-F-A2-VO-jobs-workplaces slots 5-6 and EN-F-A1-VO-food-drink slot 5 (plural -s). These measure grammar outcomes already covered elsewhere. | G10, G11, G12 |
+| R1 | 10 | EN-F-A2-VO-jobs-workplaces-A-7 | C2 | Slots 7-8 accept any sentence containing the job word that the prompt itself gives ('Use waiter'), so the workplace (the outcome) is never checked. | G13 |
+| R1 | 11 | EN-F-A2-GR-much-many | C2 | Slot 6 in all forms ('There are many shop') tests plural -s, not the much/many choice; 'many' is already given correctly. | G14 |
+| R1 | 12 | EN-F-A2-VO-appearance-B-4 | C3 | 'The baby is not tall. She is ____' (short / small / little): 'small' is also correct for a baby, so the item has two right answers. | G15 |
+| R1 | 13 | EN-F-A2-VO-appearance-C-1 | C4 | C-1 'she has a ____ haircut' with key 'short'/'boyish' repeats the word in the stem and uses a B2 word; A-1 'tall', B-1 'bald' (B1 in EVP) are not equal difficulty either. | G16 |
+| R1 | 14 | EN-F-A1-VO-family-C-6 | C4 | Slot 6 asks for 'sister-in-law' in C (B1 word, hyphenated) but niece/nephew in A/B; C-4 'niece' vs A-4 'aunt' / B-4 'uncle' is also harder (niece/nephew are A2). | G17 |
+| R1 | 15 | EN-F-A1-VO-days-months-A-2 | C4 | Slot 2 keys are February (A), August (B), September (C); February is much harder to spell than August, so forms differ in difficulty. | G19 |
+| R1 | 16 | EN-F-A2-FN-polite-requests-B-1 | C4 | B-1 prompt is identical to A-1 ('___ I have a cup of tea, please?'): a learner who retakes with form B sees the same item. | G20 |
+| R1 | 17 | EN-F-A2-FN-polite-requests-A-1 | C3 | 'May' is a correct polite answer to '___ I have a cup of tea, please?' but only Can/Could are accepted (same B-1, C-1). | G21 |
+| R1 | 18 | EN-F-A1-GR-possessive-adjectives | C2 | Outcome lists my, your, his, her, our, their but no item in any form tests my or your (or its). | G23 |
+| R1 | 19 | EN-F-A2-VO-weather-A-6 | C5 | Slot 6 tagged copula_omission/noun_for_adj but the copula is present ('it is rain'); it is only noun-for-adjective. | G24 |
+| R1 | 20 | outcomes:A1-A2 form outcomes | C6 | Every form outcome has criterion '8 of 10 correct' but each form has 9 items with mixed 0/1 and 0/1/2 scoring (max 13 points), so the criterion cannot be applied as written. | G25 |
+| R1 | 21 | outcomes:missing banks | C2 | 8 A1-A2 form outcomes have no item bank file: was-were, plural-nouns, prepositions-place, possessive-s, subject-object-pronouns, superlatives, imperatives, transport-travel; some are used by placement items (PL-A1-GR-06, PL-A1-GR-07, PL-A2-VO-05). | G26 |
+| R1 | 22 | rubric:all | C6 | Rule 1 says capitals, punctuation and spelling of other words are always ignored, but for EN-F-A1-GR-capitals-full-stops and EN-F-A1-VO-days-months (e.g. 'tusday' -> 'Tuesday') the capital is the target or part of it; the rubric does not say whether a lowercase 'tuesday' scores 1. | G27 |
+| R1 | 23 | rubric:free_production | C6 | The 0/1/2 target_form rubric is defined for grammar forms; vocabulary free items store keyword lists in acceptedAnswers and the rubric does not say whether a keyword alone (wrong meaning, e.g. 'My grandfather is cheap') scores 2. | G28 |
+| R1 | 24 | placement:PL-A1-VO-07 | C3 | 'Write the number in words: 15' accepts '15', which is just copying the prompt. | G30 |
+| R2 | 0 | rubric:all | C6 | Every EN-F outcome uses the criterion '8 of 10 correct', but each form has 9 items, and items 7-9 are scored 0/1/2 (max 12 points). The mastery threshold cannot be applied as written. | G25 |
+| R2 | 1 | rubric:exact | C6 | Rubric rule 2 ignores case and punctuation, and rule 1 ignores capitals and punctuation. That makes every EN-F-A1-GR-capitals-full-stops item impossible to fail on its own target: 'ahmed lives in cairo' would match 'Ahmed lives in Cairo.' after normalising. | G27 |
+| R2 | 2 | rubric:free | C6 | The tf0/tf1/tf2 levels are defined for grammar forms. For the vocabulary free items (key such as 'classroom noun', 'clothing noun' or 'hair adjective + hair', with acceptedAnswers that are word lists) the rubric does not say what a slip is, whether a word missing from the list but valid counts, or whether a misspelt target word gets tf1. | G28 |
+| R2 | 3 | rubric:free | C6 | Section 6 notes the passes split on a correct auxiliary followed by a wrong verb form ('I can swimming'), but the tf1 description only says 'going to travels, boughted'. This is not yet put into the level text for can, did or be + -ing. | G29 |
+| R2 | 4 | outcomes:coverage | C2 | 8 A1-A2 form outcomes have no item file: was-were, plural-nouns, prepositions-place, possessive-s, subject-object-pronouns, superlatives, imperatives and transport-travel. Placement items PL-A1-GR-06 and PL-A1-GR-07 point at outcomes that cannot be assessed after placement. | G26 |
+| R2 | 5 | EN-F-A2-FN-polite-requests | C1 | 'Can I have ... please' and 'I would like ...' are A1 in the EGP and Cambridge Pre A1/A1. The parent lesson outcome EN-L-A1-FN-polite-requests is A1, and the items match A1 difficulty. | G31 |
+| R2 | 6 | EN-F-A2-GR-third-person-s | C1 | Present simple with he/she/it -s is A1 in the EGP. It is late-acquired, but it is taught and assessed at A1 (Cambridge Pre A1/A1 Movers). | G32 |
+| R2 | 7 | EN-F-A2-GR-present-continuous | C1 | Present continuous for actions happening now is A1 in the EGP and in Cambridge Movers. | G33 |
+| R2 | 8 | EN-F-A2-FN-polite-requests-A-1 | C4 | A-1 and B-1 have the same prompt ('___ I have a cup of tea, please?'), so form B is not a parallel item. | G20 |
+| R2 | 9 | EN-F-A2-FN-polite-requests-A-1 | C3 | 'May' is also correct in A-1, B-1 and C-1 but is not accepted. | G21 |
+| R2 | 10 | EN-F-A1-GR-can-ability-A-6 | C3 | acceptedAnswers includes 'She can cook very well biryani.', which is ungrammatical (adverb between verb and object, the same kind of error as the frequency-adverb outcome). | G01 |
+| R2 | 11 | EN-F-A1-GR-capitals-full-stops | C2 | Item types are mislabelled. Items 1-2 are 'which is correct' choices but are typed gap_fill. Items 3-4 are rewrite tasks but are typed multiple_choice (all forms). The same swap is in word-order-svo items 1-4 and frequency-adverbs items 1-2. The type decides how the grader maps the item (letter/text equivalence). | G34, G35, G36 |
+| R2 | 12 | EN-F-A1-GR-word-order-svo-A-9 | C3 | In a text to Hany, the key 'I meet Hany at the café at six' refers to the reader in the third person, and the bare present for a future arrangement is unnatural. The same applies to B-9 (Rasha) and C-9 (Mazen). | G03 |
+| R2 | 13 | EN-F-A1-GR-article-the-A-9 | C4 | A-9 lists 'The the' as accepted but B-9 and C-9 do not, so the key format differs across parallel forms. | G37 |
+| R2 | 14 | EN-F-A1-VO-classroom-objects | C2 | Error-correction items 5-6 in all forms test article omission ('I have ruler'). The classroom noun is already given, so they measure grammar (EN-F-A1-GR-article-a-an), not naming classroom objects. | G10 |
+| R2 | 15 | EN-F-A2-VO-jobs-workplaces | C2 | Error-correction items 5-6 in all forms test only a/an before a job ('My uncle is mechanic'). This is the a/an outcome again, not matching jobs to workplaces. | G11 |
+| R2 | 16 | EN-F-A2-GR-much-many | C2 | Item 6 in all forms ('There are many shop') tests plural -s, not the much/many choice. | G14 |
+| R2 | 17 | EN-F-A1-VO-family-A-5 | C2 | 'The brother of my father lives in Aswan' and the other periphrasis items (A-6, B-5, B-6, C-5, C-6) are grammatical English, not mistakes. Telling learners to 'find and correct the mistake' in a correct sentence is misleading, and the 's-genitive alternative shows the item does not force the target word. | G18 |
+| R2 | 18 | EN-F-A1-VO-family-C-6 | C4 | C-6 targets sister-in-law (EVP B1). A-6 and B-6 target niece and nephew, and C-4 targets niece. These are above A1, and B-4 (uncle) and A-4 (aunt) are easier than C-4 (niece). | G17 |
+| R2 | 19 | EN-F-A1-VO-common-adjectives-A-5 | C5 | 'it is a little room', 'it is a little clean' and 'it was a little easy', tagged lexical_opposite_negation, are not a documented Arabic-L1 pattern. 'it is a little clean' and 'it was a little easy' are also grammatical English, so B-5 and C-5 have no clear error. | G38 |
+| R2 | 20 | EN-F-A1-VO-common-adjectives-A-9 | C3 | In the transfer items 'Box A is ____', 'Bag A is ____' and 'River A is ____', the comparatives 'lighter', 'cheaper' and 'shorter' are natural correct answers but are not accepted. | G39 |
+| R2 | 21 | EN-F-A1-VO-food-drink-A-6 | C3 | 'My grandfather drinks soup every night' is acceptable English (soup is commonly drunk from a cup or bowl), so it is not a clear eat/drink error. | G08 |
+| R2 | 22 | EN-F-A1-VO-food-drink-A-4 | C2 | The prompt 'I would like some orange ____ , please?' puts a question mark on a statement. | G09 |
+| R2 | 23 | EN-F-A1-VO-numbers-time-A-5 | C5 | 'fivteen', 'fivty' and 'forteen' are tagged spelling_vowel, but f/v confusion is a consonant/phonological transfer (Arabic has no /v/), not vowel omission. | G07 |
+| R2 | 24 | EN-F-A2-VO-appearance-C-1 | C2 | 'Her hair is very short; she has a ____ haircut' asks for a word ('short') that is already in the prompt, and accepts 'boyish' (above A2). It does not measure the outcome and is much easier than A-1 and B-1. | G16 |
+| R2 | 25 | EN-F-A2-VO-appearance-B-4 | C3 | 'The baby is not tall. She is ____ (short / small / little)': 'small' and 'little' are the natural words for a baby, so the item has three defensible answers. | G15 |
+| R2 | 26 | EN-F-A2-VO-clothes-shopping-C-6 | C3 | The accepted answer 'This shirt is a big size for me.' does not fix the collocation error (the target is 'too big'). | G40 |
+| R2 | 27 | EN-F-A2-VO-clothes-shopping-B-4 | C2 | 'How much ____ this jacket (is / are / cost)' tests be agreement, not clothes, colours or sizes vocabulary, while A-4 (try on) and C-4 (fit) test vocabulary. The forms are not parallel. | G41 |
+| R2 | 28 | EN-F-A2-GR-past-simple-irregular-B-6 | C3 | The key changes words outside the target ('the café' to 'that café', 'daily' to 'every day'), so the plain correction 'Last week we drank tea at the café daily.' would fail an exact match. | G02 |
+| R2 | 29 | EN-F-A2-VO-weather-A-6 | C3 | For a forecast ('Take an umbrella, it is rain this afternoon') the most natural correction, 'it is going to rain', is missing, while 'it will rain' is accepted. | G42 |
+| R2 | 30 | placement:PL-A1-GR-06 | C2 | The parenthesis '(It is on top.)' gives the answer away. | G43 |
+| R2 | 31 | placement:PL-A1-VO-07 | C3 | The item asks for the number in words, but '15' is accepted. | G30 |
+| R2 | 32 | placement:PL-A2-RD-03 | C3 | 'near the station' alone is accepted for 'Where will they meet? (Write the place.)'. It does not name the place. | G44 |
+| R2 | 33 | placement:PL-A1-RD-04 | C2 | Two-option yes/no items (PL-A1-RD-04 and PL-A2-RD-06) give a 50% chance of guessing right, which weakens placement decisions based on a few items. | G45 |
+| R3 | 0 | rubric:all | C6 | Rubric rule 2 says final and inner punctuation and case never change the score. Applied to EN-F-A1-GR-capitals-full-stops, the target form IS capitals and full stops, so every item in that outcome would score 1 for an unpunctuated, lowercase answer. | G27 |
+| R3 | 1 | EN-F-A1-GR-capitals-full-stops | C6 | Item types are mislabelled: slots 1-2 (pick a, b or c) are typed gap_fill, and slots 3-4 (rewrite the sentence) are typed multiple_choice. The grader mapping in rubric §2 depends on type, so a rewrite scored as a choice item would expect a letter. | G34 |
+| R3 | 2 | EN-F-A1-GR-word-order-svo | C6 | Slots 1-2 are 'choose the correct sentence (a/b/c)' items but are typed gap_fill; slots 3-4 are word-ordering items typed multiple_choice. | G35 |
+| R3 | 3 | EN-F-A1-GR-can-ability-A-6 | C3 | acceptedAnswers includes 'She can cook very well biryani.', which is ungrammatical (adverb between verb and object). | G01 |
+| R3 | 4 | EN-F-A2-GR-past-simple-irregular-B-6 | C3 | The key 'Last week we drank tea at that café every day.' changes 'the café daily' to 'that café every day'. The correct minimal fix 'Last week we drank tea at the café daily.' is not in the key. | G02 |
+| R3 | 5 | EN-F-A1-GR-possessive-adjectives-A-4 | C3 | The options are his/our/their, and 'our' gives a grammatical, meaningful sentence in all three forms ('The twins love our grandmother', B: 'painted our classroom', C: 'fixed our garden gate'). That gives two correct answers. | G46 |
+| R3 | 6 | EN-F-A2-GR-conjunctions-A-1 | C3 | There is no option list, and 'and' is also grammatical and natural ('I like tea, and my sister likes coffee'). The same applies to B-1 and C-1, but only 'but' is accepted. | G47 |
+| R3 | 7 | EN-F-A1-GR-article-the-A-2 | C3 | 'Can you open a window, please? It is hot.' is natural English, so 'a' is also correct. The same applies to B-2 ('turn off a light') and, less strongly, C-2. | G48 |
+| R3 | 8 | EN-F-A2-VO-appearance-B-4 | C3 | 'The baby is not tall. She is ____ (short / small / little)': 'small' and 'little' are the most natural answers for a baby, but only 'short' is keyed. | G15 |
+| R3 | 9 | EN-F-A2-VO-clothes-shopping-C-6 | C3 | The accepted answer 'This shirt is a big size for me.' keeps the error the item targets (big size for 'too big') with only an article added. | G40 |
+| R3 | 10 | EN-F-A2-FN-polite-requests-A-6 | C3 | A-5/B-5/C-5 accept 'Could I have ...', but A-6/B-6/C-6 do not, and none of the slot-1 gaps accept 'May'. Keys are inconsistent within the outcome. | G21, G22 |
+| R3 | 11 | EN-F-A2-FN-polite-requests-B-1 | C4 | B-1 is word for word the same as A-1 ('___ I have a cup of tea, please?'). The forms are no longer independent: a learner who retakes the test sees the same item. | G20 |
+| R3 | 12 | EN-F-A1-GR-word-order-svo-A-9 | C3 | The task is a text to Hany, but the accepted answers include 'I meet Hany at the café at six.' (third person, addressed to Hany himself). Under rubric §2.4 this does not do the task. The same applies to B-9 and C-9. | G03 |
+| R3 | 13 | EN-F-A1-VO-numbers-time-A-8 | C3 | The token list of accepted number words leaves out common prices (e.g. forty, sixty, seventy, eighty, hundred in A; one to four, six to nine and sixty+ in B/C), so correct answers may fail a key check. | G05 |
+| R3 | 14 | placement:PL-A1-VO-07 | C3 | 'Write the number in words: 15' accepts '15', which does not do the task. | G30 |
+| R3 | 15 | placement:PL-A1-GR-01 | C3 | 'I have ___ apple in my bag.' with option 'the' is grammatical (a known apple), so there are two possible answers. | G49 |
+| R3 | 16 | placement:PL-A2-VO-07 | C1 | 'A person who teaches is a ___ (teacher)' is A1 vocabulary (EVP A1). It does not separate A2 from A1 in an A2 band. | G50 |
+| R3 | 17 | EN-F-A1-VO-classroom-objects | C2 | Slots 5-6 (all forms) are article-omission corrections ('I have ruler...'). They measure a/an, not classroom-object vocabulary; the noun is already given. | G10 |
+| R3 | 18 | EN-F-A2-VO-jobs-workplaces | C2 | Slots 5-6 (all forms) are article-omission corrections ('My uncle is mechanic...'). They test a/an, not job or workplace vocabulary. Slots 7-8 key only the job word that the prompt gives ('Use waiter'), so the workplace, which is the outcome, is not checked. | G11, G13 |
+| R3 | 19 | EN-F-A2-GR-much-many | C2 | Slot 6 (all forms: 'There are many shop/tree/car') tests the plural -s, not the much/many choice. | G14 |
+| R3 | 20 | EN-F-A1-VO-food-drink | C2 | Slot 5 (all forms: 'three orange', 'four tomato') tests plural -s grammar, not food vocabulary. | G12 |
+| R3 | 21 | EN-F-A1-VO-common-adjectives | C2 | Slots 7-8 (all forms) ask for any sentence using a given word ('cheap', 'dirty'), with the word itself as the key. The outcome is giving the opposite; copying the given word shows nothing. | G51 |
+| R3 | 22 | EN-F-A1-VO-common-adjectives-A-5 | C5 | 'Our house is not big, it is a little room' / 'a little clean' / 'a little easy' is not a documented Arabic-L1 pattern and is mislabelled 'lexical_opposite_negation'. A-5 also differs from B/C (noun phrase versus adjective). | G38 |
+| R3 | 23 | EN-F-A1-VO-family | C2 | Slots 5-6 correct 'The brother of my father' and similar. This is grammatical English, only less natural, and the key accepts "My father's brother", so the target word (uncle) need not appear. The items do not measure kinship vocabulary. | G18 |
+| R3 | 24 | EN-F-A1-VO-family-C-6 | C4 | C-6 targets 'sister-in-law' (EVP B1), against 'niece' and 'nephew' in A/B. C-4 targets 'niece' against 'aunt' and 'uncle' in A-4/B-4. These are above A1 and not of equal difficulty. | G17 |
+| R3 | 25 | EN-F-A1-VO-home-rooms-C-5 | C4 | C-5 'path room' is a spelling/phonology error (b/p), while A-5 and B-5 are lexical calques ('sleeping room', 'cooking room'). The slots test different things. The p-for-b direction is also the reverse of the usual Arabic-L1 substitution (b for p). | G52 |
+| R3 | 26 | EN-F-A1-VO-numbers-time-A-5 | C5 | 'fivteen' (A-5) and 'fivty' (B-6) are f/v consonant errors but are labelled spelling_vowel. Arabic has no /v/, so learners usually write f for v, not v for f. | G07 |
+| R3 | 27 | EN-F-A1-VO-numbers-time-C-3 | C4 | 'quarter to' (C-3, C-9) needs counting back to the next hour and is harder than 'half past' (A-3) or 'quarter past' (B-3). Slot 9 has the same imbalance (A 'quarter', B 'half', C 'to'). | G53 |
+| R3 | 28 | EN-F-A2-VO-appearance-C-1 | C4 | C-1 gives the answer in the prompt ('Her hair is very short; she has a ____ haircut' with key 'short'). B-1 'bald' is EVP B1. A-1 'tall' is A1. The slot difficulties are very uneven. | G16 |
+| R3 | 29 | EN-F-A1-VO-food-drink-A-6 | C3 | 'My grandfather drinks soup every night.' is acceptable English (soup can be drunk from a cup or bowl), so the planted error is not clearly an error, unlike B-6 (rice) and C-6 (bread). This also makes the forms unequal. | G08 |
+| R3 | 30 | EN-F-A2-GR-going-to | C2 | The free items A-7 to C-8 ('Write one sentence about your plan for this evening') never ask for 'going to'. A correct 'I will...' or 'I'm meeting...' scores 0 under rule 3, so the score reflects the instruction, not ability. | G54 |
+| R3 | 31 | EN-F-A2-GR-past-questions-did | C2 | The free items A-7 to C-7 do not ask for 'did'. 'Were you at home?' or 'Was it fun?' are correct past questions but would score 0. | G55 |
+| R3 | 32 | EN-F-A1-VO-food-drink-A-4 | C6 | The prompt 'I would like some orange ____ , please?' ends with a question mark after a statement, so it is a faulty model sentence. | G09 |
+| R3 | 33 | outcomes:A1-A2 | C2 | 8 A1-A2 outcomes in outcomes.json have no item file in data/assessments/outcomes: was-were, plural-nouns, prepositions-place, possessive-s, subject-object-pronouns, superlatives, imperatives, transport-travel. Several are used by placement items (e.g. PL-A1-GR-06, PL-A1-GR-07, PL-A2-VO-05). | G26 |
+
+### Consolidated decisions
+
+| Group | Targets | Issue | Reviewers | Decision |
+|---|---|---|---|---|
+| G01 | EN-F-A1-GR-can-ability-A-6 | ungrammatical accepted answer 'She can cook very well biryani.' | R1, R2, R3 | revise |
+| G02 | EN-F-A2-GR-past-simple-irregular-B-6 | key rewrites words outside the target; minimal correction not accepted | R1, R2, R3 | revise |
+| G03 | EN-F-A1-GR-word-order-svo-A-9, EN-F-A1-GR-word-order-svo-B-9, EN-F-A1-GR-word-order-svo-C-9 | text to the addressee keyed in third person / unnatural present; natural answers missing | R1, R2, R3 | revise |
+| G04 | EN-F-A1-VO-numbers-time-A-7, EN-F-A1-VO-numbers-time-B-7, EN-F-A1-VO-numbers-time-C-7 | bare 'to'/'past' keywords accept answers with no time in words | R1 | revise (single-reviewer, factual) |
+| G05 | EN-F-A1-VO-numbers-time-A-8, EN-F-A1-VO-numbers-time-B-8, EN-F-A1-VO-numbers-time-C-8 | number-word keyword lists incomplete and different per form | R1, R3 | revise |
+| G06 | EN-F-A1-VO-numbers-time-C-5 | C-5 is not a -teen spelling error | R1 | noted |
+| G07 | EN-F-A1-VO-numbers-time-A-5, EN-F-A1-VO-numbers-time-B-6 | f/v error tagged spelling_vowel | R1, R2, R3 | revise |
+| G08 | EN-F-A1-VO-food-drink-A-6 | 'drinks soup' is acceptable English, so A-6 has no clear error | R1, R2, R3 | revise |
+| G09 | EN-F-A1-VO-food-drink-A-4 | statement stem ends with a question mark | R1, R2, R3 | revise |
+| G10 | EN-F-A1-VO-classroom-objects-A-5, EN-F-A1-VO-classroom-objects-B-5, EN-F-A1-VO-classroom-objects-C-5 … (6 targets) | error slots test article omission, not classroom-object vocabulary | R1, R2, R3 | revise |
+| G11 | EN-F-A2-VO-jobs-workplaces-A-5, EN-F-A2-VO-jobs-workplaces-B-5, EN-F-A2-VO-jobs-workplaces-C-5 … (6 targets) | error slots test article omission, not job/workplace vocabulary | R1, R2, R3 | revise |
+| G12 | EN-F-A1-VO-food-drink-A-5, EN-F-A1-VO-food-drink-B-5, EN-F-A1-VO-food-drink-C-5 | error slot tests plural -s, not food vocabulary | R1, R3 | revise |
+| G13 | EN-F-A2-VO-jobs-workplaces-A-7, EN-F-A2-VO-jobs-workplaces-B-7, EN-F-A2-VO-jobs-workplaces-C-7 … (6 targets) | free items key only the job word given in the prompt; the workplace is never checked | R1, R3 | revise |
+| G14 | EN-F-A2-GR-much-many-A-6, EN-F-A2-GR-much-many-B-6, EN-F-A2-GR-much-many-C-6 | slot 6 tests plural -s, not much/many | R1, R2, R3 | revise |
+| G15 | EN-F-A2-VO-appearance-B-4 | 'small'/'little' also correct for a baby | R1, R2, R3 | revise |
+| G16 | EN-F-A2-VO-appearance-A-1, EN-F-A2-VO-appearance-B-1, EN-F-A2-VO-appearance-C-1 | slot 1 uneven: C-1 gives answer in stem + accepts 'boyish'; B-1 'bald' above A2 | R1, R2, R3 | revise |
+| G17 | EN-F-A1-VO-family-C-4, EN-F-A1-VO-family-A-6, EN-F-A1-VO-family-B-6, EN-F-A1-VO-family-C-6 | kinship words above A1 / unequal across forms (sister-in-law, niece, nephew) | R1, R2, R3 | revise |
+| G18 | EN-F-A1-VO-family-A-5, EN-F-A1-VO-family-B-5, EN-F-A1-VO-family-C-5 … (6 targets) | periphrasis 'the brother of my father' is grammatical; 's-genitive accepted so kin word not required | R2, R3 | revise |
+| G19 | EN-F-A1-VO-days-months-A-2, EN-F-A1-VO-days-months-B-2, EN-F-A1-VO-days-months-C-2 | February harder to spell than August/September | R1 | noted |
+| G20 | EN-F-A2-FN-polite-requests-B-1 | B-1 prompt identical to A-1 | R1, R2, R3 | revise |
+| G21 | EN-F-A2-FN-polite-requests-A-1, EN-F-A2-FN-polite-requests-B-1, EN-F-A2-FN-polite-requests-C-1 | 'May' correct but not accepted | R1, R2, R3 | revise |
+| G22 | EN-F-A2-FN-polite-requests-A-6, EN-F-A2-FN-polite-requests-B-6, EN-F-A2-FN-polite-requests-C-6 | 'Could I have ..., please?' correct but not accepted (slot 5 accepts it) | R3 | revise (single-reviewer, factual) |
+| G23 | EN-F-A1-GR-possessive-adjectives | no item tests my/your | R1 | noted |
+| G24 | EN-F-A2-VO-weather-A-6 | tag copula_omission wrong (copula present) | R1 | noted |
+| G25 | outcomes:A1-A2 form criterion | criterion '8 of 10 correct' vs 9 items with mixed 0/1 and 0/1/2 scoring | R1, R2 | revise |
+| G26 | EN-F-A2-GR-was-were, EN-F-A1-GR-plural-nouns, EN-F-A1-GR-prepositions-place … (11 targets) | 8 gap outcomes have no bank; placement items point at them | R1, R2, R3 | revise |
+| G27 | rubric:exact, EN-F-A1-GR-capitals-full-stops, EN-F-A1-VO-days-months | normalise rule (case/punctuation ignored) defeats capitals-full-stops and day/month capitals | R1, R2, R3 | revise |
+| G28 | rubric:free_production (vocabulary) | 0/1/2 levels defined for grammar; vocabulary keyword items undefined | R1, R2 | revise |
+| G29 | rubric:free_production tf1 | tf1 text lacks 'can swimming / did went / is play' | R2 | noted |
+| G30 | placement:PL-A1-VO-07 | '15' accepted for 'write in words' | R1, R2, R3 | revise |
+| G31 | EN-F-A2-FN-polite-requests | EGP: Can I have / I would like is A1, not A2 | R2 | noted (CEFR level not changed: 1 reviewer) |
+| G32 | EN-F-A2-GR-third-person-s | EGP: third person -s is A1 | R2 | noted (CEFR level not changed: 1 reviewer) |
+| G33 | EN-F-A2-GR-present-continuous | EGP: present continuous is A1 | R2 | noted (CEFR level not changed: 1 reviewer) |
+| G34 | EN-F-A1-GR-capitals-full-stops-A-1, EN-F-A1-GR-capitals-full-stops-B-1, EN-F-A1-GR-capitals-full-stops-C-1 … (12 targets) | item types swapped (choice typed gap_fill; rewrite typed multiple_choice) | R2, R3 | revise |
+| G35 | EN-F-A1-GR-word-order-svo-A-1, EN-F-A1-GR-word-order-svo-B-1, EN-F-A1-GR-word-order-svo-C-1 … (12 targets) | item types swapped (choice typed gap_fill; ordering typed multiple_choice) | R2, R3 | revise |
+| G36 | EN-F-A2-GR-frequency-adverbs-A-1, EN-F-A2-GR-frequency-adverbs-B-1, EN-F-A2-GR-frequency-adverbs-C-1 … (6 targets) | slot-position choice typed gap_fill | R2 | noted |
+| G37 | EN-F-A1-GR-article-the-A-9, EN-F-A1-GR-article-the-B-9, EN-F-A1-GR-article-the-C-9 | 'The the' accepted only in A-9 (key format differs) | R2 | noted |
+| G38 | EN-F-A1-VO-common-adjectives-A-5, EN-F-A1-VO-common-adjectives-B-5, EN-F-A1-VO-common-adjectives-C-5 | 'a little room/clean/easy' not an Arabic-L1 pattern; B/C grammatical | R2, R3 | revise |
+| G39 | EN-F-A1-VO-common-adjectives-A-9, EN-F-A1-VO-common-adjectives-B-9, EN-F-A1-VO-common-adjectives-C-9 | comparatives lighter/cheaper/shorter correct but not accepted | R2 | revise (single-reviewer, factual) |
+| G40 | EN-F-A2-VO-clothes-shopping-C-6 | accepted 'a big size' keeps the target error | R2, R3 | revise |
+| G41 | EN-F-A2-VO-clothes-shopping-B-4 | B-4 tests be agreement, not vocabulary | R2 | noted |
+| G42 | EN-F-A2-VO-weather-A-6 | 'it is going to rain' correct but not accepted | R2 | revise (single-reviewer, factual) |
+| G43 | placement:PL-A1-GR-06 | '(It is on top.)' gives the answer away | R2 | noted |
+| G44 | placement:PL-A2-RD-03 | 'near the station' accepted but does not name the place | R2 | revise (single-reviewer, factual) |
+| G45 | placement:PL-A1-RD-04, placement:PL-A2-RD-06 | two-option yes/no items (50% guess) | R2 | noted |
+| G46 | EN-F-A1-GR-possessive-adjectives-A-4, EN-F-A1-GR-possessive-adjectives-B-4, EN-F-A1-GR-possessive-adjectives-C-4 | distractor 'our' also correct (two right answers) | R3 | revise (single-reviewer, factual) |
+| G47 | EN-F-A2-GR-conjunctions-A-1, EN-F-A2-GR-conjunctions-B-1, EN-F-A2-GR-conjunctions-C-1 | 'and' also correct; only 'but' accepted | R3 | revise (single-reviewer, factual) |
+| G48 | EN-F-A1-GR-article-the-A-2, EN-F-A1-GR-article-the-B-2, EN-F-A1-GR-article-the-C-2 | 'a' also correct (referent not unique) | R3 | revise (single-reviewer, factual) |
+| G49 | placement:PL-A1-GR-01 | option 'the' also grammatical (two answers) | R3 | revise (single-reviewer, factual) |
+| G50 | placement:PL-A2-VO-07 | 'teacher' is A1 vocabulary in an A2 item | R3 | noted (CEFR level not changed: 1 reviewer) |
+| G51 | EN-F-A1-VO-common-adjectives-A-7, EN-F-A1-VO-common-adjectives-B-7, EN-F-A1-VO-common-adjectives-C-7 … (6 targets) | free items key the given word; opposite not elicited | R3 | noted |
+| G52 | EN-F-A1-VO-home-rooms-C-5 | C-5 b/p spelling vs calques in A/B | R3 | noted |
+| G53 | EN-F-A1-VO-numbers-time-C-3, EN-F-A1-VO-numbers-time-C-9 | 'quarter to' harder than half/quarter past | R3 | noted |
+| G54 | EN-F-A2-GR-going-to-A-7, EN-F-A2-GR-going-to-B-7, EN-F-A2-GR-going-to-C-7 … (6 targets) | free prompts do not ask for 'going to' | R3 | noted |
+| G55 | EN-F-A2-GR-past-questions-did-A-7, EN-F-A2-GR-past-questions-did-B-7, EN-F-A2-GR-past-questions-did-C-7 | free prompt does not ask for 'did' | R3 | noted |
+| G56 | EN-F-A1-VO-food-drink-B-6, EN-F-A1-VO-food-drink-C-6 | 'drinks his rice' / 'drinks bread' not realistic L1 errors | R1 | noted |
+
+### Revisions (before → after)
+
+- **G25 criterion** (41 A1–A2 form outcomes in `data/outcomes/outcomes.json`): `8 of 10 correct` → `Per delayed form: at least 80% of the available points (exact items 1 point, 0/1/2 items 2 points) and at least 3 of the 4 controlled items (1-4) correct.` Outcomes: EN-F-A1-GR-article-a-an, EN-F-A1-GR-article-the, EN-F-A1-GR-copula-be, EN-F-A2-GR-third-person-s, EN-F-A2-GR-present-continuous, EN-F-A2-GR-past-simple-regular, EN-F-A2-GR-past-simple-irregular, EN-F-A2-GR-past-questions-did, EN-F-A2-GR-was-were, EN-F-A1-GR-plural-nouns, EN-F-A1-GR-prepositions-place, EN-F-A1-GR-prepositions-time, EN-F-A1-GR-there-is-are, EN-F-A1-GR-can-ability, EN-F-A1-GR-possessive-adjectives, EN-F-A1-GR-possessive-s, EN-F-A1-GR-subject-object-pronouns, EN-F-A1-GR-word-order-svo, EN-F-A2-GR-frequency-adverbs, EN-F-A2-GR-comparatives, EN-F-A2-GR-superlatives, EN-F-A2-GR-going-to, EN-F-A2-GR-much-many, EN-F-A2-GR-some-any, EN-F-A2-GR-conjunctions, EN-F-A1-GR-capitals-full-stops, EN-F-A2-GR-imperatives, EN-F-A1-VO-family, EN-F-A1-VO-food-drink, EN-F-A1-VO-classroom-objects, EN-F-A1-VO-home-rooms, EN-F-A1-VO-numbers-time, EN-F-A1-VO-days-months, EN-F-A1-VO-common-adjectives, EN-F-A2-VO-jobs-workplaces, EN-F-A2-VO-weather, EN-F-A2-VO-clothes-shopping, EN-F-A2-VO-appearance, EN-F-A2-VO-make-do, EN-F-A2-VO-transport-travel, EN-F-A2-FN-polite-requests.
+- **G27 case/punctuation** (48 items): capitals-full-stops matchingNote → case- and punctuation-sensitive (and rubric text on its 0/1/2 items says capitals/full stops are the target); days-months exact items matchingNote (was empty) → case-sensitive for the day/month word. `docs/SCORING_RUBRIC.md` rule 2 gets an exception paragraph.
+- **G28 vocabulary rubric** (75 free/transfer 0/1/2 items in all EN-F-*-VO-* files): grammar 0/1/2 text → vocabulary variant (2 = target-field word with right meaning, open list; 1 = misspelt/wrong form; 0 = none or wrong meaning), keeping each item's Criterion. Days-months adds the capital-letter rule. Added to `docs/SCORING_RUBRIC.md` §2.3 with the new mastery criterion.
+- **G26 gap outcomes**: no banks written (brief: only outcomes with a lesson). Placement items re-pointed (see rows below); the 8 gap outcomes stay in outcomes.json with hasLesson=false.
+- **G34/G35 types**: `rewrite` added to the exact/controlled type list in `docs/SCORING_RUBRIC.md` §2.1.
+
+| Target | Group | Why | Before | After |
+|---|---|---|---|---|
+| EN-F-A1-GR-can-ability-A-6 | G01 | remove ungrammatical accepted answer | error_correction \| Correct the mistake: She can cooks very good biryani. \| key: She can cook very good biryani. \| acc: ['She can cook very good biryani.', 'She can cook very well biryani.'] \| l1: can_plus_s | error_correction \| Correct the mistake: She can cooks very good biryani. \| key: She can cook very good biryani. \| acc: ['She can cook very good biryani.', 'She can cook biryani very well.'] \| l1: can_plus_s |
+| EN-F-A2-GR-past-simple-irregular-B-6 | G02 | key = minimal correction | error_correction \| Correct the mistake: Last week we drink tea at the café daily. \| key: Last week we drank tea at that café every day. \| acc: ['Last week we drank tea at that café every day.'] \| l1: present_for_past | error_correction \| Correct the mistake: Last week we drink tea at the café daily. \| key: Last week we drank tea at the café daily. \| acc: ['Last week we drank tea at the café daily.', 'Last week we drank tea at the cafe daily.', 'Last week we drank tea at the café every day.', 'Last week we drank tea at that café every day.'] \| l1: present_for_past |
+| EN-F-A1-GR-word-order-svo-A-9 | G03 | second-person keys only; arrangement forms added | transfer \| Text your friend Hany: you meet him at the café at six. Start with 'I'. \| key: I meet Hany at the café at six. \| acc: ['I meet Hany at the café at six.', 'I meet you at the café at six.', 'I will meet you at the café at six.', "I'll meet Hany at the cafe at six."] | transfer \| Text your friend Hany: you meet him at the café at six. Start with 'I'. \| key: I'll meet you at the café at six. \| acc: ["I'll meet you at the café at six.", 'I will meet you at the café at six.', "I'm meeting you at the café at six.", 'I am meeting you at the café at six.', 'I meet you at the café at six.'] |
+| EN-F-A1-GR-word-order-svo-B-9 | G03 | second-person keys only; arrangement forms added | transfer \| Text your friend Rasha: you see her at the station at nine. Start with 'I'. \| key: I see Rasha at the station at nine. \| acc: ['I see Rasha at the station at nine.', 'I see you at the station at nine.', 'I will see you at the station at nine.', "I'll see you at the station at nine."] | transfer \| Text your friend Rasha: you see her at the station at nine. Start with 'I'. \| key: I'll see you at the station at nine. \| acc: ["I'll see you at the station at nine.", 'I will see you at the station at nine.', "I'm seeing you at the station at nine.", 'I am seeing you at the station at nine.', 'I see you at the station at nine.'] |
+| EN-F-A1-GR-word-order-svo-C-9 | G03 | second-person keys only; arrangement forms added | transfer \| Text your friend Mazen: you wait for him at the bus stop at eight. Start with 'I'. \| key: I wait for Mazen at the bus stop at eight. \| acc: ['I wait for Mazen at the bus stop at eight.', 'I wait for you at the bus stop at eight.', 'I will wait for you at the bus stop at eight.', "I'll wait for you at the bus stop at eight."] | transfer \| Text your friend Mazen: you wait for him at the bus stop at eight. Start with 'I'. \| key: I'll wait for you at the bus stop at eight. \| acc: ["I'll wait for you at the bus stop at eight.", 'I will wait for you at the bus stop at eight.', "I'm waiting for you at the bus stop at eight.", 'I am waiting for you at the bus stop at eight.', 'I wait for you at the bus stop at eight.'] |
+| EN-F-A1-GR-word-order-svo-A-1 | G35 | item type corrected | gap_fill \| Choose the correct sentence: (a) Every day eats Lina bread. (b) Lina eats bread every day. (c) Lina every day eats bread. \| key: b \| acc: ['b', 'Lina eats bread every day.'] | multiple_choice \| Choose the correct sentence: (a) Every day eats Lina bread. (b) Lina eats bread every day. (c) Lina every day eats bread. \| key: b \| acc: ['b', 'Lina eats bread every day.'] |
+| EN-F-A1-GR-word-order-svo-B-1 | G35 | item type corrected | gap_fill \| Choose the correct sentence: (a) Every night reads Hala books. (b) Hala every night reads books. (c) Hala reads books every night. \| key: c \| acc: ['c', 'Hala reads books every night.'] | multiple_choice \| Choose the correct sentence: (a) Every night reads Hala books. (b) Hala every night reads books. (c) Hala reads books every night. \| key: c \| acc: ['c', 'Hala reads books every night.'] |
+| EN-F-A1-GR-word-order-svo-C-1 | G35 | item type corrected | gap_fill \| Choose the correct sentence: (a) Walid washes dishes after dinner. (b) After dinner washes Walid dishes. (c) Walid after dinner washes dishes. \| key: a \| acc: ['a', 'Walid washes dishes after dinner.'] | multiple_choice \| Choose the correct sentence: (a) Walid washes dishes after dinner. (b) After dinner washes Walid dishes. (c) Walid after dinner washes dishes. \| key: a \| acc: ['a', 'Walid washes dishes after dinner.'] |
+| EN-F-A1-GR-word-order-svo-A-2 | G35 | item type corrected | gap_fill \| Choose the correct sentence: (a) Sami drinks tea in the kitchen. (b) In the kitchen drinks Sami tea. (c) Sami in the kitchen drinks tea. \| key: a \| acc: ['a', 'Sami drinks tea in the kitchen.'] | multiple_choice \| Choose the correct sentence: (a) Sami drinks tea in the kitchen. (b) In the kitchen drinks Sami tea. (c) Sami in the kitchen drinks tea. \| key: a \| acc: ['a', 'Sami drinks tea in the kitchen.'] |
+| EN-F-A1-GR-word-order-svo-B-2 | G35 | item type corrected | gap_fill \| Choose the correct sentence: (a) In the garden plays Fadi football. (b) Fadi plays football in the garden. (c) Fadi in the garden plays football. \| key: b \| acc: ['b', 'Fadi plays football in the garden.'] | multiple_choice \| Choose the correct sentence: (a) In the garden plays Fadi football. (b) Fadi plays football in the garden. (c) Fadi in the garden plays football. \| key: b \| acc: ['b', 'Fadi plays football in the garden.'] |
+| EN-F-A1-GR-word-order-svo-C-2 | G35 | item type corrected | gap_fill \| Choose the correct sentence: (a) Amira in the library studies English. (b) In the library studies Amira English. (c) Amira studies English in the library. \| key: c \| acc: ['c', 'Amira studies English in the library.'] | multiple_choice \| Choose the correct sentence: (a) Amira in the library studies English. (b) In the library studies Amira English. (c) Amira studies English in the library. \| key: c \| acc: ['c', 'Amira studies English in the library.'] |
+| EN-F-A1-GR-word-order-svo-A-3 | G35 | item type corrected | multiple_choice \| Put the words in order: reads / my uncle / the newspaper / at night \| key: My uncle reads the newspaper at night. \| acc: ['My uncle reads the newspaper at night.'] | rewrite \| Put the words in order: reads / my uncle / the newspaper / at night \| key: My uncle reads the newspaper at night. \| acc: ['My uncle reads the newspaper at night.'] |
+| EN-F-A1-GR-word-order-svo-B-3 | G35 | item type corrected | multiple_choice \| Put the words in order: cleans / my aunt / the windows / on Mondays \| key: My aunt cleans the windows on Mondays. \| acc: ['My aunt cleans the windows on Mondays.'] | rewrite \| Put the words in order: cleans / my aunt / the windows / on Mondays \| key: My aunt cleans the windows on Mondays. \| acc: ['My aunt cleans the windows on Mondays.'] |
+| EN-F-A1-GR-word-order-svo-C-3 | G35 | item type corrected | multiple_choice \| Put the words in order: feeds / my grandfather / the birds / every morning \| key: My grandfather feeds the birds every morning. \| acc: ['My grandfather feeds the birds every morning.'] | rewrite \| Put the words in order: feeds / my grandfather / the birds / every morning \| key: My grandfather feeds the birds every morning. \| acc: ['My grandfather feeds the birds every morning.'] |
+| EN-F-A1-GR-word-order-svo-A-4 | G35 | item type corrected | multiple_choice \| Put the words in order: watch / we / films / on Fridays \| key: We watch films on Fridays. \| acc: ['We watch films on Fridays.'] | rewrite \| Put the words in order: watch / we / films / on Fridays \| key: We watch films on Fridays. \| acc: ['We watch films on Fridays.'] |
+| EN-F-A1-GR-word-order-svo-B-4 | G35 | item type corrected | multiple_choice \| Put the words in order: visit / we / our grandparents / in summer \| key: We visit our grandparents in summer. \| acc: ['We visit our grandparents in summer.', 'We visit our grandparents in the summer.'] | rewrite \| Put the words in order: visit / we / our grandparents / in summer \| key: We visit our grandparents in summer. \| acc: ['We visit our grandparents in summer.', 'We visit our grandparents in the summer.'] |
+| EN-F-A1-GR-word-order-svo-C-4 | G35 | item type corrected | multiple_choice \| Put the words in order: play / we / cards / at the weekend \| key: We play cards at the weekend. \| acc: ['We play cards at the weekend.'] | rewrite \| Put the words in order: play / we / cards / at the weekend \| key: We play cards at the weekend. \| acc: ['We play cards at the weekend.'] |
+| EN-F-A1-GR-capitals-full-stops-A-1 | G34 | item type corrected | gap_fill \| Which is correct? (a) my name is Yara. (b) My name is Yara. (c) My name is yara \| key: b \| acc: ['b'] | multiple_choice \| Which is correct? (a) my name is Yara. (b) My name is Yara. (c) My name is yara \| key: b \| acc: ['b'] |
+| EN-F-A1-GR-capitals-full-stops-B-1 | G34 | item type corrected | gap_fill \| Which is correct? (a) My name is Sherine. (b) my name is Sherine. (c) My name is sherine \| key: a \| acc: ['a'] | multiple_choice \| Which is correct? (a) My name is Sherine. (b) my name is Sherine. (c) My name is sherine \| key: a \| acc: ['a'] |
+| EN-F-A1-GR-capitals-full-stops-C-1 | G34 | item type corrected | gap_fill \| Which is correct? (a) My name is hazem (b) my name is Hazem. (c) My name is Hazem. \| key: c \| acc: ['c'] | multiple_choice \| Which is correct? (a) My name is hazem (b) my name is Hazem. (c) My name is Hazem. \| key: c \| acc: ['c'] |
+| EN-F-A1-GR-capitals-full-stops-A-2 | G34 | item type corrected | gap_fill \| Which is correct? (a) On Monday i go to the gym. (b) on Monday I go to the gym (c) On Monday I go to the gym. \| key: c \| acc: ['c'] | multiple_choice \| Which is correct? (a) On Monday i go to the gym. (b) on Monday I go to the gym (c) On Monday I go to the gym. \| key: c \| acc: ['c'] |
+| EN-F-A1-GR-capitals-full-stops-B-2 | G34 | item type corrected | gap_fill \| Which is correct? (a) on Tuesday I go to the club (b) On Tuesday I go to the club. (c) On Tuesday i go to the club. \| key: b \| acc: ['b'] | multiple_choice \| Which is correct? (a) on Tuesday I go to the club (b) On Tuesday I go to the club. (c) On Tuesday i go to the club. \| key: b \| acc: ['b'] |
+| EN-F-A1-GR-capitals-full-stops-C-2 | G34 | item type corrected | gap_fill \| Which is correct? (a) On Sunday I go to the market. (b) On Sunday i go to the market. (c) on Sunday I go to the market \| key: a \| acc: ['a'] | multiple_choice \| Which is correct? (a) On Sunday I go to the market. (b) On Sunday i go to the market. (c) on Sunday I go to the market \| key: a \| acc: ['a'] |
+| EN-F-A1-GR-capitals-full-stops-A-3 | G34 | item type corrected | multiple_choice \| Rewrite with capitals and a full stop: ahmed lives in cairo \| key: Ahmed lives in Cairo. \| acc: ['Ahmed lives in Cairo.'] | rewrite \| Rewrite with capitals and a full stop: ahmed lives in cairo \| key: Ahmed lives in Cairo. \| acc: ['Ahmed lives in Cairo.'] |
+| EN-F-A1-GR-capitals-full-stops-B-3 | G34 | item type corrected | multiple_choice \| Rewrite with capitals and a full stop: karim works in giza \| key: Karim works in Giza. \| acc: ['Karim works in Giza.'] | rewrite \| Rewrite with capitals and a full stop: karim works in giza \| key: Karim works in Giza. \| acc: ['Karim works in Giza.'] |
+| EN-F-A1-GR-capitals-full-stops-C-3 | G34 | item type corrected | multiple_choice \| Rewrite with capitals and a full stop: nadia lives in tanta \| key: Nadia lives in Tanta. \| acc: ['Nadia lives in Tanta.'] | rewrite \| Rewrite with capitals and a full stop: nadia lives in tanta \| key: Nadia lives in Tanta. \| acc: ['Nadia lives in Tanta.'] |
+| EN-F-A1-GR-capitals-full-stops-A-4 | G34 | item type corrected | multiple_choice \| Rewrite with capitals and a full stop: my friend and i like music \| key: My friend and I like music. \| acc: ['My friend and I like music.'] | rewrite \| Rewrite with capitals and a full stop: my friend and i like music \| key: My friend and I like music. \| acc: ['My friend and I like music.'] |
+| EN-F-A1-GR-capitals-full-stops-B-4 | G34 | item type corrected | multiple_choice \| Rewrite with capitals and a full stop: my sister and i like kites \| key: My sister and I like kites. \| acc: ['My sister and I like kites.'] | rewrite \| Rewrite with capitals and a full stop: my sister and i like kites \| key: My sister and I like kites. \| acc: ['My sister and I like kites.'] |
+| EN-F-A1-GR-capitals-full-stops-C-4 | G34 | item type corrected | multiple_choice \| Rewrite with capitals and a full stop: my cousin and i like football \| key: My cousin and I like football. \| acc: ['My cousin and I like football.'] | rewrite \| Rewrite with capitals and a full stop: my cousin and i like football \| key: My cousin and I like football. \| acc: ['My cousin and I like football.'] |
+| EN-F-A1-VO-numbers-time-A-7 | G04 | remove bare 'to'/'past'; time phrases only (single-reviewer, factual) | free_production \| Write one sentence: what time do you get up? Write the time in words. \| key: clock time in words \| acc: ["o'clock", 'half past', 'quarter past', 'quarter to', 'past', 'to'] | free_production \| Write one sentence: what time do you get up? Write the time in words. \| key: clock time in words \| acc: ["o'clock", 'half past', 'quarter past', 'quarter to', 'five past', 'ten past', 'twenty past', 'twenty-five past', 'five to', 'ten to', 'twenty to', 'twenty-five to'] |
+| EN-F-A1-VO-numbers-time-B-7 | G04 | remove bare 'to'/'past'; time phrases only (single-reviewer, factual) | free_production \| Write one sentence: what time do you have lunch? Write the time in words. \| key: clock time in words \| acc: ["o'clock", 'half past', 'quarter past', 'quarter to', 'past', 'to'] | free_production \| Write one sentence: what time do you have lunch? Write the time in words. \| key: clock time in words \| acc: ["o'clock", 'half past', 'quarter past', 'quarter to', 'five past', 'ten past', 'twenty past', 'twenty-five past', 'five to', 'ten to', 'twenty to', 'twenty-five to'] |
+| EN-F-A1-VO-numbers-time-C-7 | G04 | remove bare 'to'/'past'; time phrases only (single-reviewer, factual) | free_production \| Write one sentence: what time do you go to bed? Write the time in words. \| key: clock time in words \| acc: ["o'clock", 'half past', 'quarter past', 'quarter to', 'past', 'to'] | free_production \| Write one sentence: what time do you go to bed? Write the time in words. \| key: clock time in words \| acc: ["o'clock", 'half past', 'quarter past', 'quarter to', 'five past', 'ten past', 'twenty past', 'twenty-five past', 'five to', 'ten to', 'twenty to', 'twenty-five to'] |
+| EN-F-A1-VO-numbers-time-A-8 | G05 | full number-word list, same in all forms | free_production \| Write one sentence about the price of a drink. Write the number in words. \| key: number in words \| acc: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'fifteen', 'twenty', 'thirty', 'fifty'] | free_production \| Write one sentence about the price of a drink. Write the number in words. \| key: number in words \| acc: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety', 'hundred'] |
+| EN-F-A1-VO-numbers-time-B-8 | G05 | full number-word list, same in all forms | free_production \| Write one sentence about the price of a book. Write the number in words. \| key: number in words \| acc: ['five', 'ten', 'twelve', 'fifteen', 'twenty', 'thirty', 'forty', 'fifty', 'hundred'] | free_production \| Write one sentence about the price of a book. Write the number in words. \| key: number in words \| acc: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety', 'hundred'] |
+| EN-F-A1-VO-numbers-time-C-8 | G05 | full number-word list, same in all forms | free_production \| Write one sentence about the price of a T-shirt. Write the number in words. \| key: number in words \| acc: ['ten', 'twelve', 'fifteen', 'twenty', 'thirty', 'forty', 'fifty', 'hundred'] | free_production \| Write one sentence about the price of a T-shirt. Write the number in words. \| key: number in words \| acc: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety', 'hundred'] |
+| EN-F-A1-VO-numbers-time-A-5 | G07 | retag f/v error | error_correction \| Find and correct the mistake. Rewrite the sentence: The bus comes at fivteen past eight. \| key: The bus comes at fifteen past eight. \| acc: ['The bus comes at fifteen past eight.', 'The bus comes at a quarter past eight.'] \| l1: spelling_vowel | error_correction \| Find and correct the mistake. Rewrite the sentence: The bus comes at fivteen past eight. \| key: The bus comes at fifteen past eight. \| acc: ['The bus comes at fifteen past eight.', 'The bus comes at a quarter past eight.'] \| l1: spelling_consonant_f_v |
+| EN-F-A1-VO-numbers-time-B-6 | G07 | retag f/v error | error_correction \| Find and correct the mistake. Rewrite the sentence: My aunt is fivty years old. \| key: My aunt is fifty years old. \| acc: ['My aunt is fifty years old.'] \| l1: spelling_vowel | error_correction \| Find and correct the mistake. Rewrite the sentence: My aunt is fivty years old. \| key: My aunt is fifty years old. \| acc: ['My aunt is fifty years old.'] \| l1: spelling_consonant_f_v |
+| EN-F-A1-VO-food-drink-A-4 | G09 | statement ends with full stop | controlled_choice \| Choose the correct word (juice / bread / cheese): I would like some orange ____ , please? \| key: juice \| acc: ['juice'] | controlled_choice \| Choose the correct word (juice / bread / cheese): I would like some orange ____ , please. \| key: juice \| acc: ['juice'] |
+| EN-F-A1-VO-food-drink-A-5 | G12 | food-word error instead of plural -s | error_correction \| Find and correct the mistake. Rewrite the sentence: I bought three orange at the market. \| key: I bought three oranges at the market. \| acc: ['I bought three oranges at the market.'] \| l1: plural_s | error_correction \| Find and correct the mistake. Rewrite the sentence: We had kitchen and rice for lunch. \| key: We had chicken and rice for lunch. \| acc: ['We had chicken and rice for lunch.'] \| l1: lexical_sound_confusion (Arabic-L1 vowel/consonant confusion between food and non-food words) |
+| EN-F-A1-VO-food-drink-B-5 | G12 | food-word error instead of plural -s | error_correction \| Find and correct the mistake. Rewrite the sentence: She put four tomato in the salad. \| key: She put four tomatoes in the salad. \| acc: ['She put four tomatoes in the salad.'] \| l1: plural_s | error_correction \| Find and correct the mistake. Rewrite the sentence: My mother makes soap for dinner on Fridays. \| key: My mother makes soup for dinner on Fridays. \| acc: ['My mother makes soup for dinner on Fridays.'] \| l1: lexical_sound_confusion (Arabic-L1 vowel/consonant confusion between food and non-food words) |
+| EN-F-A1-VO-food-drink-C-5 | G12 | food-word error instead of plural -s | error_correction \| Find and correct the mistake. Rewrite the sentence: We need five banana for the cake. \| key: We need five bananas for the cake. \| acc: ['We need five bananas for the cake.'] \| l1: plural_s | error_correction \| Find and correct the mistake. Rewrite the sentence: I put peeper on my eggs every morning. \| key: I put pepper on my eggs every morning. \| acc: ['I put pepper on my eggs every morning.'] \| l1: lexical_sound_confusion (Arabic-L1 vowel/consonant confusion between food and non-food words) |
+| EN-F-A1-VO-food-drink-A-6 | G08 | solid food so drink is a clear error | error_correction \| Find and correct the mistake. Rewrite the sentence: My grandfather drinks soup every night. \| key: My grandfather eats soup every night. \| acc: ['My grandfather eats soup every night.', 'My grandfather has soup every night.'] \| l1: lexical_eat_drink | error_correction \| Find and correct the mistake. Rewrite the sentence: My grandfather drinks eggs every night. \| key: My grandfather eats eggs every night. \| acc: ['My grandfather eats eggs every night.', 'My grandfather has eggs every night.'] \| l1: lexical_eat_drink |
+| EN-F-A1-VO-classroom-objects-A-5 | G10 | classroom-object word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: I have ruler in my pencil case. \| key: I have a ruler in my pencil case. \| acc: ['I have a ruler in my pencil case.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: I cut the paper with my ruler. \| key: I cut the paper with my scissors. \| acc: ['I cut the paper with my scissors.', 'I cut the paper with scissors.'] \| l1: lexical_object_confusion (wrong classroom noun for the use) |
+| EN-F-A1-VO-classroom-objects-B-5 | G10 | classroom-object word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: She has eraser in her bag. \| key: She has an eraser in her bag. \| acc: ['She has an eraser in her bag.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: I measure the line with my eraser. \| key: I measure the line with my ruler. \| acc: ['I measure the line with my ruler.', 'I measure the line with a ruler.'] \| l1: lexical_object_confusion (wrong classroom noun for the use) |
+| EN-F-A1-VO-classroom-objects-C-5 | G10 | classroom-object word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: He has calculator on his desk. \| key: He has a calculator on his desk. \| acc: ['He has a calculator on his desk.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: I rub out the mistake with my ruler. \| key: I rub out the mistake with my rubber. \| acc: ['I rub out the mistake with my rubber.', 'I rub out the mistake with my eraser.'] \| l1: lexical_object_confusion (wrong classroom noun for the use) |
+| EN-F-A1-VO-classroom-objects-A-6 | G10 | classroom-object word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: There is clock above the door. \| key: There is a clock above the door. \| acc: ['There is a clock above the door.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: I tell the time with my calendar. \| key: I tell the time with my clock. \| acc: ['I tell the time with my clock.', 'I tell the time with my watch.'] \| l1: lexical_object_confusion (wrong classroom noun for the use) |
+| EN-F-A1-VO-classroom-objects-B-6 | G10 | classroom-object word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: There is map next to the window. \| key: There is a map next to the window. \| acc: ['There is a map next to the window.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: I keep my pens in my notebook. \| key: I keep my pens in my pencil case. \| acc: ['I keep my pens in my pencil case.', 'I keep my pens in my bag.'] \| l1: lexical_object_confusion (wrong classroom noun for the use) |
+| EN-F-A1-VO-classroom-objects-C-6 | G10 | classroom-object word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: There is poster behind the teacher. \| key: There is a poster behind the teacher. \| acc: ['There is a poster behind the teacher.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: Please close the board, it is cold. \| key: Please close the window, it is cold. \| acc: ['Please close the window, it is cold.', 'Please close the door, it is cold.'] \| l1: lexical_object_confusion (wrong classroom noun for the use) |
+| EN-F-A2-VO-jobs-workplaces-A-5 | G11 | job/workplace word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: My uncle is mechanic in a garage. \| key: My uncle is a mechanic in a garage. \| acc: ['My uncle is a mechanic in a garage.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: My father is a cooker in a hotel. \| key: My father is a cook in a hotel. \| acc: ['My father is a cook in a hotel.', 'My father is a chef in a hotel.'] \| l1: lexical_agent_noun (cooker for cook) |
+| EN-F-A2-VO-jobs-workplaces-B-5 | G11 | job/workplace word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: Her brother is pilot for a small airline. \| key: Her brother is a pilot for a small airline. \| acc: ['Her brother is a pilot for a small airline.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: My uncle is a drive for a bus company. \| key: My uncle is a driver for a bus company. \| acc: ['My uncle is a driver for a bus company.'] \| l1: lexical_agent_noun (verb for job noun) |
+| EN-F-A2-VO-jobs-workplaces-C-5 | G11 | job/workplace word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: My father is driver for a big company. \| key: My father is a driver for a big company. \| acc: ['My father is a driver for a big company.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: My sister is a teach at a primary school. \| key: My sister is a teacher at a primary school. \| acc: ['My sister is a teacher at a primary school.'] \| l1: lexical_agent_noun (verb for job noun) |
+| EN-F-A2-VO-jobs-workplaces-A-6 | G11 | job/workplace word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: My cousin is engineer at a factory in Suez. \| key: My cousin is an engineer at a factory in Suez. \| acc: ['My cousin is an engineer at a factory in Suez.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: A pilot works in a hospital. \| key: A doctor works in a hospital. \| acc: ['A doctor works in a hospital.', 'A nurse works in a hospital.', 'A pilot works at an airport.', 'A pilot works on a plane.'] \| l1: lexical_job_workplace_mismatch |
+| EN-F-A2-VO-jobs-workplaces-B-6 | G11 | job/workplace word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: My neighbour is artist in a studio near the river. \| key: My neighbour is an artist in a studio near the river. \| acc: ['My neighbour is an artist in a studio near the river.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: A waiter works in a garage. \| key: A mechanic works in a garage. \| acc: ['A mechanic works in a garage.', 'A waiter works in a restaurant.', 'A waiter works in a café.', 'A waiter works in a cafe.'] \| l1: lexical_job_workplace_mismatch |
+| EN-F-A2-VO-jobs-workplaces-C-6 | G11 | job/workplace word error instead of article omission | error_correction \| Find and correct the mistake. Rewrite the sentence: Their daughter is accountant in an office in Alexandria. \| key: Their daughter is an accountant in an office in Alexandria. \| acc: ['Their daughter is an accountant in an office in Alexandria.'] \| l1: article_indef_omission | error_correction \| Find and correct the mistake. Rewrite the sentence: A farmer works in an office. \| key: A farmer works on a farm. \| acc: ['A farmer works on a farm.', 'A secretary works in an office.', 'An accountant works in an office.', 'A manager works in an office.'] \| l1: lexical_job_workplace_mismatch |
+| EN-F-A2-VO-jobs-workplaces-A-7 | G13 | key checks the workplace, not the given job word | free_production \| Write one sentence: where does a waiter work? Use 'waiter'. \| key: waiter + workplace \| acc: ['waiter'] | free_production \| Write one sentence: where does a waiter work? Use 'waiter'. \| key: waiter + workplace \| acc: ['restaurant', 'café', 'cafe', 'hotel'] |
+| EN-F-A2-VO-jobs-workplaces-B-7 | G13 | key checks the workplace, not the given job word | free_production \| Write one sentence: where does a nurse work? Use 'nurse'. \| key: nurse + workplace \| acc: ['nurse'] | free_production \| Write one sentence: where does a nurse work? Use 'nurse'. \| key: nurse + workplace \| acc: ['hospital', 'clinic'] |
+| EN-F-A2-VO-jobs-workplaces-C-7 | G13 | key checks the workplace, not the given job word | free_production \| Write one sentence: where does a mechanic work? Use 'mechanic'. \| key: mechanic + workplace \| acc: ['mechanic'] | free_production \| Write one sentence: where does a mechanic work? Use 'mechanic'. \| key: mechanic + workplace \| acc: ['garage', 'workshop'] |
+| EN-F-A2-VO-jobs-workplaces-A-8 | G13 | key checks the workplace, not the given job word | free_production \| Write one sentence: where does a dentist work? Use 'dentist'. \| key: dentist + workplace \| acc: ['dentist'] | free_production \| Write one sentence: where does a dentist work? Use 'dentist'. \| key: dentist + workplace \| acc: ['dental clinic', 'clinic', 'surgery', 'hospital'] |
+| EN-F-A2-VO-jobs-workplaces-B-8 | G13 | key checks the workplace, not the given job word | free_production \| Write one sentence: where does a farmer work? Use 'farmer'. \| key: farmer + workplace \| acc: ['farmer'] | free_production \| Write one sentence: where does a farmer work? Use 'farmer'. \| key: farmer + workplace \| acc: ['farm', 'field', 'fields'] |
+| EN-F-A2-VO-jobs-workplaces-C-8 | G13 | key checks the workplace, not the given job word | free_production \| Write one sentence: where does a pilot work? Use 'pilot'. \| key: pilot + workplace \| acc: ['pilot'] | free_production \| Write one sentence: where does a pilot work? Use 'pilot'. \| key: pilot + workplace \| acc: ['airport', 'plane', 'aeroplane', 'airplane'] |
+| EN-F-A2-GR-much-many-A-6 | G14 | many with uncountable instead of plural -s | error_correction \| Fix the mistake: There are many shop in our street. \| key: There are many shops in our street. \| acc: ['There are many shops in our street.', 'There are many shops on our street.'] \| l1: plural_s | error_correction \| Fix the mistake: There isn't many traffic in our street. \| key: There isn't much traffic in our street. \| acc: ["There isn't much traffic in our street.", 'There is not much traffic in our street.'] \| l1: many_with_uncountable (countability) |
+| EN-F-A2-GR-much-many-B-6 | G14 | many with uncountable instead of plural -s | error_correction \| Fix the mistake: There are many tree in our village. \| key: There are many trees in our village. \| acc: ['There are many trees in our village.'] \| l1: plural_s | error_correction \| Fix the mistake: There isn't many bread in our kitchen. \| key: There isn't much bread in our kitchen. \| acc: ["There isn't much bread in our kitchen.", 'There is not much bread in our kitchen.'] \| l1: many_with_uncountable (countability) |
+| EN-F-A2-GR-much-many-C-6 | G14 | many with uncountable instead of plural -s | error_correction \| Fix the mistake: There are many car in our garage. \| key: There are many cars in our garage. \| acc: ['There are many cars in our garage.'] \| l1: plural_s | error_correction \| Fix the mistake: There isn't many petrol in our car. \| key: There isn't much petrol in our car. \| acc: ["There isn't much petrol in our car.", 'There is not much petrol in our car.'] \| l1: many_with_uncountable (countability) |
+| EN-F-A2-VO-appearance-B-1 | G16 | A2 word, numeric clue like A-1 | controlled_gap_fill \| Write one word in the gap: My grandfather has no hair on his head. He is ____ . \| key: bald \| acc: ['bald'] | controlled_gap_fill \| Write one word in the gap: My uncle weighs only 55 kilos. He is very ____ . \| key: thin \| acc: ['thin', 'slim'] |
+| EN-F-A2-VO-appearance-C-1 | G16 | no giveaway; A2 hair word | controlled_gap_fill \| Write one word in the gap: Her hair is very short; she has a ____ haircut. \| key: short \| acc: ['short', 'boyish'] | controlled_gap_fill \| Write one word in the gap: Her hair is not dark. It is ____ . \| key: fair \| acc: ['fair', 'blonde', 'blond', 'light'] |
+| EN-F-A2-VO-appearance-B-4 | G15 | adult subject; non-height distractors | controlled_choice \| Choose the correct word (short / small / little): The baby is not tall. She is ____ . \| key: short \| acc: ['short'] | controlled_choice \| Choose the correct word (short / long / young): My aunt is not tall. She is ____ . \| key: short \| acc: ['short'] |
+| EN-F-A1-VO-family-C-4 | G17 | A1 kin word as in A-4/B-4 | controlled_choice \| Choose the correct word (niece / aunt / cousin): My brother's daughter is my ____ . \| key: niece \| acc: ['niece'] | controlled_choice \| Choose the correct word (aunt / uncle / cousin): My father's sister is my ____ . \| key: aunt \| acc: ['aunt'] |
+| EN-F-A1-VO-family-A-5 | G17/G18 | real kin-word error, A1 words, kin word required | error_correction \| Find and correct the mistake. Rewrite the sentence: The brother of my father lives in Aswan. \| key: My uncle lives in Aswan. \| acc: ['My uncle lives in Aswan.', "My father's brother lives in Aswan."] \| l1: lexical_kinship_periphrasis | error_correction \| Find and correct the mistake. Rewrite the sentence: My father's brother is my cousin. \| key: My father's brother is my uncle. \| acc: ["My father's brother is my uncle."] \| l1: lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word) |
+| EN-F-A1-VO-family-B-5 | G17/G18 | real kin-word error, A1 words, kin word required | error_correction \| Find and correct the mistake. Rewrite the sentence: The sister of my mother works in a bank. \| key: My aunt works in a bank. \| acc: ['My aunt works in a bank.', "My mother's sister works in a bank."] \| l1: lexical_kinship_periphrasis | error_correction \| Find and correct the mistake. Rewrite the sentence: My mother's sister is my cousin. \| key: My mother's sister is my aunt. \| acc: ["My mother's sister is my aunt."] \| l1: lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word) |
+| EN-F-A1-VO-family-C-5 | G17/G18 | real kin-word error, A1 words, kin word required | error_correction \| Find and correct the mistake. Rewrite the sentence: The son of my uncle plays football every Friday. \| key: My cousin plays football every Friday. \| acc: ['My cousin plays football every Friday.', "My uncle's son plays football every Friday."] \| l1: lexical_kinship_periphrasis | error_correction \| Find and correct the mistake. Rewrite the sentence: My uncle's son is my brother. \| key: My uncle's son is my cousin. \| acc: ["My uncle's son is my cousin."] \| l1: lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word) |
+| EN-F-A1-VO-family-A-6 | G17/G18 | real kin-word error, A1 words, kin word required | error_correction \| Find and correct the mistake. Rewrite the sentence: The daughter of my sister is three years old. \| key: My niece is three years old. \| acc: ['My niece is three years old.', "My sister's daughter is three years old."] \| l1: lexical_kinship_periphrasis | error_correction \| Find and correct the mistake. Rewrite the sentence: My mother's mother is my aunt. \| key: My mother's mother is my grandmother. \| acc: ["My mother's mother is my grandmother."] \| l1: lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word) |
+| EN-F-A1-VO-family-B-6 | G17/G18 | real kin-word error, A1 words, kin word required | error_correction \| Find and correct the mistake. Rewrite the sentence: The son of my brother is four years old. \| key: My nephew is four years old. \| acc: ['My nephew is four years old.', "My brother's son is four years old."] \| l1: lexical_kinship_periphrasis | error_correction \| Find and correct the mistake. Rewrite the sentence: My father's father is my uncle. \| key: My father's father is my grandfather. \| acc: ["My father's father is my grandfather."] \| l1: lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word) |
+| EN-F-A1-VO-family-C-6 | G17/G18 | real kin-word error, A1 words, kin word required | error_correction \| Find and correct the mistake. Rewrite the sentence: The wife of my brother is very kind. \| key: My sister-in-law is very kind. \| acc: ['My sister-in-law is very kind.', "My brother's wife is very kind.", 'My sister in law is very kind.'] \| l1: lexical_kinship_periphrasis | error_correction \| Find and correct the mistake. Rewrite the sentence: My mother's father is my uncle. \| key: My mother's father is my grandfather. \| acc: ["My mother's father is my grandfather."] \| l1: lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word) |
+| EN-F-A2-FN-polite-requests-B-1 | G20 | different noun from A-1 | gap_fill \| ___ I have a cup of tea, please? \| key: Can \| acc: ['Can', 'Could'] | gap_fill \| ___ I have a slice of bread, please? \| key: Can \| acc: ['Can', 'Could', 'May'] |
+| EN-F-A2-FN-polite-requests-A-1 | G21 | add May | gap_fill \| ___ I have a cup of tea, please? \| key: Can \| acc: ['Can', 'Could'] | gap_fill \| ___ I have a cup of tea, please? \| key: Can \| acc: ['Can', 'Could', 'May'] |
+| EN-F-A2-FN-polite-requests-B-1 | G21 | add May | gap_fill \| ___ I have a glass of water, please? \| key: Can \| acc: ['Can', 'Could'] | gap_fill \| ___ I have a glass of water, please? \| key: Can \| acc: ['Can', 'Could', 'May'] |
+| EN-F-A2-FN-polite-requests-C-1 | G21 | add May | gap_fill \| ___ I have a piece of cake, please? \| key: Can \| acc: ['Can', 'Could'] | gap_fill \| ___ I have a piece of cake, please? \| key: Can \| acc: ['Can', 'Could', 'May'] |
+| EN-F-A2-FN-polite-requests-A-6 | G22 | add 'Could I have' (single-reviewer, factual) | error_correction \| Make it polite: I want a bottle of juice. \| key: I would like a bottle of juice, please. \| acc: ['I would like a bottle of juice, please.', "I'd like a bottle of juice, please.", 'Can I have a bottle of juice, please?'] \| l1: want_for_request | error_correction \| Make it polite: I want a bottle of juice. \| key: I would like a bottle of juice, please. \| acc: ['I would like a bottle of juice, please.', "I'd like a bottle of juice, please.", 'Can I have a bottle of juice, please?', 'Could I have a bottle of juice, please?'] \| l1: want_for_request |
+| EN-F-A2-FN-polite-requests-B-6 | G22 | add 'Could I have' (single-reviewer, factual) | error_correction \| Make it polite: I want a plate of rice. \| key: I would like a plate of rice, please. \| acc: ['I would like a plate of rice, please.', "I'd like a plate of rice, please.", 'Can I have a plate of rice, please?'] \| l1: want_for_request | error_correction \| Make it polite: I want a plate of rice. \| key: I would like a plate of rice, please. \| acc: ['I would like a plate of rice, please.', "I'd like a plate of rice, please.", 'Can I have a plate of rice, please?', 'Could I have a plate of rice, please?'] \| l1: want_for_request |
+| EN-F-A2-FN-polite-requests-C-6 | G22 | add 'Could I have' (single-reviewer, factual) | error_correction \| Make it polite: I want a bowl of soup. \| key: I would like a bowl of soup, please. \| acc: ['I would like a bowl of soup, please.', "I'd like a bowl of soup, please.", 'Can I have a bowl of soup, please?'] \| l1: want_for_request | error_correction \| Make it polite: I want a bowl of soup. \| key: I would like a bowl of soup, please. \| acc: ['I would like a bowl of soup, please.', "I'd like a bowl of soup, please.", 'Can I have a bowl of soup, please?', 'Could I have a bowl of soup, please?'] \| l1: want_for_request |
+| EN-F-A1-VO-common-adjectives-A-5 | G38 | documented Arabic-L1 polysemy error (tawil long/tall; kabir big/old) | error_correction \| Find and correct the mistake. Rewrite the sentence: Our house is not big, it is a little room. \| key: Our house is not big, it is small. \| acc: ['Our house is not big, it is small.', 'Our house is small.'] \| l1: lexical_opposite_negation | error_correction \| Find and correct the mistake. Rewrite the sentence: My brother is very long, he plays basketball. \| key: My brother is very tall, he plays basketball. \| acc: ['My brother is very tall, he plays basketball.', 'My brother is very tall. he plays basketball.'] \| l1: lexical_l1_polysemy (Arabic tawil = long/tall; kabir = big/old) |
+| EN-F-A1-VO-common-adjectives-B-5 | G38 | documented Arabic-L1 polysemy error (tawil long/tall; kabir big/old) | error_correction \| Find and correct the mistake. Rewrite the sentence: Your room is not dirty, it is a little clean. \| key: Your room is not dirty, it is clean. \| acc: ['Your room is not dirty, it is clean.', 'Your room is clean.'] \| l1: lexical_opposite_negation | error_correction \| Find and correct the mistake. Rewrite the sentence: My grandfather is very big, he is eighty. \| key: My grandfather is very old, he is eighty. \| acc: ['My grandfather is very old, he is eighty.', 'My grandfather is very old. he is eighty.'] \| l1: lexical_l1_polysemy (Arabic tawil = long/tall; kabir = big/old) |
+| EN-F-A1-VO-common-adjectives-C-5 | G38 | documented Arabic-L1 polysemy error (tawil long/tall; kabir big/old) | error_correction \| Find and correct the mistake. Rewrite the sentence: The quiz was not difficult, it was a little easy. \| key: The quiz was not difficult, it was easy. \| acc: ['The quiz was not difficult, it was easy.', 'The quiz was easy.'] \| l1: lexical_opposite_negation | error_correction \| Find and correct the mistake. Rewrite the sentence: This road is very tall, it goes to Cairo. \| key: This road is very long, it goes to Cairo. \| acc: ['This road is very long, it goes to Cairo.', 'This road is very long. it goes to Cairo.'] \| l1: lexical_l1_polysemy (Arabic tawil = long/tall; kabir = big/old) |
+| EN-F-A1-VO-common-adjectives-A-9 | G39 | accept comparative (single-reviewer, factual) | transfer \| Two boxes: box A is 1 kg, box B is 20 kg. Box A is ____ . \| key: light \| acc: ['light'] | transfer \| Two boxes: box A is 1 kg, box B is 20 kg. Box A is ____ . \| key: light \| acc: ['light', 'lighter'] |
+| EN-F-A1-VO-common-adjectives-B-9 | G39 | accept comparative (single-reviewer, factual) | transfer \| Two bags: bag A costs 5 pounds, bag B costs 500 pounds. Bag A is ____ . \| key: cheap \| acc: ['cheap'] | transfer \| Two bags: bag A costs 5 pounds, bag B costs 500 pounds. Bag A is ____ . \| key: cheap \| acc: ['cheap', 'cheaper'] |
+| EN-F-A1-VO-common-adjectives-C-9 | G39 | accept comparative (single-reviewer, factual) | transfer \| Two rivers: river A is 50 km, river B is 6,000 km. River A is ____ . \| key: short \| acc: ['short'] | transfer \| Two rivers: river A is 50 km, river B is 6,000 km. River A is ____ . \| key: short \| acc: ['short', 'shorter'] |
+| EN-F-A2-VO-clothes-shopping-C-6 | G40 | remove 'a big size' (keeps the error) | error_correction \| Find and correct the mistake. Rewrite the sentence: This shirt is big size for me. \| key: This shirt is too big for me. \| acc: ['This shirt is too big for me.', "This shirt's too big for me.", 'This shirt is a big size for me.'] \| l1: lexical_clothes_collocation | error_correction \| Find and correct the mistake. Rewrite the sentence: This shirt is big size for me. \| key: This shirt is too big for me. \| acc: ['This shirt is too big for me.', "This shirt's too big for me."] \| l1: lexical_clothes_collocation |
+| EN-F-A2-VO-weather-A-6 | G42 | add going to (single-reviewer, factual) | error_correction \| Find and correct the mistake. Rewrite the sentence: Take an umbrella, it is rain this afternoon. \| key: Take an umbrella, it is rainy this afternoon. \| acc: ['Take an umbrella, it is rainy this afternoon.', 'Take an umbrella, it is raining this afternoon.', "Take an umbrella, it's raining this afternoon.", "Take an umbrella, it's rainy this afternoon.", 'Take an umbrella, it will rain this afternoon.'] \| l1: copula_omission/noun_for_adj | error_correction \| Find and correct the mistake. Rewrite the sentence: Take an umbrella, it is rain this afternoon. \| key: Take an umbrella, it is rainy this afternoon. \| acc: ['Take an umbrella, it is rainy this afternoon.', 'Take an umbrella, it is raining this afternoon.', "Take an umbrella, it's raining this afternoon.", "Take an umbrella, it's rainy this afternoon.", 'Take an umbrella, it will rain this afternoon.', 'Take an umbrella, it is going to rain this afternoon.', "Take an umbrella, it's going to rain this afternoon."] \| l1: copula_omission/noun_for_adj |
+| EN-F-A1-GR-possessive-adjectives-A-4 | G46 | distractor 'our' -> 'its' (single-reviewer, factual) | multiple_choice \| The twins love ___ grandmother. (his / our / their) \| key: their \| acc: ['their'] | multiple_choice \| The twins love ___ grandmother. (his / its / their) \| key: their \| acc: ['their'] |
+| EN-F-A1-GR-possessive-adjectives-B-4 | G46 | distractor 'our' -> 'its' (single-reviewer, factual) | multiple_choice \| The children painted ___ classroom. (his / our / their) \| key: their \| acc: ['their'] | multiple_choice \| The children painted ___ classroom. (his / its / their) \| key: their \| acc: ['their'] |
+| EN-F-A1-GR-possessive-adjectives-C-4 | G46 | distractor 'our' -> 'its' (single-reviewer, factual) | multiple_choice \| The neighbours fixed ___ garden gate. (his / our / their) \| key: their \| acc: ['their'] | multiple_choice \| The neighbours fixed ___ garden gate. (his / its / their) \| key: their \| acc: ['their'] |
+| EN-F-A2-GR-conjunctions-A-1 | G47 | second clause negative so only 'but' fits (single-reviewer, factual) | gap_fill \| I like tea, ___ my sister likes coffee. \| key: but \| acc: ['but'] | gap_fill \| I like tea, ___ my sister doesn't. \| key: but \| acc: ['but'] |
+| EN-F-A2-GR-conjunctions-B-1 | G47 | second clause negative so only 'but' fits (single-reviewer, factual) | gap_fill \| I like summer, ___ my brother likes winter. \| key: but \| acc: ['but'] | gap_fill \| I like summer, ___ my brother doesn't. \| key: but \| acc: ['but'] |
+| EN-F-A2-GR-conjunctions-C-1 | G47 | second clause negative so only 'but' fits (single-reviewer, factual) | gap_fill \| I like rice, ___ my father likes bread. \| key: but \| acc: ['but'] | gap_fill \| I like rice, ___ my father doesn't. \| key: but \| acc: ['but'] |
+| EN-F-A1-GR-article-the-A-2 | G48 | unique referent so 'a' is wrong (single-reviewer, factual) | gap_fill \| Fill the gap with a or the: Can you open ___ window, please? It is hot. \| key: the \| acc: ['the'] | gap_fill \| Fill the gap with a or the: This room has one window. Can you open ___ window, please? \| key: the \| acc: ['the'] |
+| EN-F-A1-GR-article-the-B-2 | G48 | unique referent so 'a' is wrong (single-reviewer, factual) | gap_fill \| Fill the gap with a or the: Can you turn off ___ light, please? I am tired. \| key: the \| acc: ['the'] | gap_fill \| Fill the gap with a or the: This room has one light. Can you turn off ___ light, please? \| key: the \| acc: ['the'] |
+| EN-F-A1-GR-article-the-C-2 | G48 | unique referent so 'a' is wrong (single-reviewer, factual) | gap_fill \| Fill the gap with a or the: Can you close ___ door, please? It is cold. \| key: the \| acc: ['the'] | gap_fill \| Fill the gap with a or the: This room has one door. Can you close ___ door, please? \| key: the \| acc: ['the'] |
+| placement:PL-A1-VO-07 | G30 | remove '15' | {"acceptedAnswers": ["fifteen", "15"]} | {"acceptedAnswers": ["fifteen"]} |
+| placement:PL-A2-RD-03 | G44 | remove 'near the station' (single-reviewer, factual) | {"acceptedAnswers": ["the cafe near the station", "cafe near the station", "the cafe", "cafe", "at the cafe near the station", "near the station"]} | {"acceptedAnswers": ["the cafe near the station", "cafe near the station", "the cafe", "cafe", "at the cafe near the station"]} |
+| placement:PL-A1-GR-01 | G49 | distractor 'the' -> 'some' (single-reviewer, factual) | {"options": ["a", "an", "the", "-"]} | {"options": ["a", "an", "some", "-"]} |
+| placement:PL-A1-GR-06 | G26 | gap outcome (no lesson) -> parent course outcome | {"outcomeIds": ["EN-F-A1-GR-prepositions-place"]} | {"outcomeIds": ["EN-C-A1-WR-simple-sentences"]} |
+| placement:PL-A1-GR-07 | G26 | gap outcome (no lesson) -> parent course outcome | {"outcomeIds": ["EN-F-A1-GR-plural-nouns"]} | {"outcomeIds": ["EN-C-A1-WR-simple-sentences"]} |
+| placement:PL-A2-VO-05 | G26 | gap outcome (no lesson) -> parent course outcome | {"outcomeIds": ["EN-F-A2-VO-transport-travel"]} | {"outcomeIds": ["EN-C-A2-WR-linked-short-text"]} |
+
+## Re-review round 2 (A1–A2)
+
+Status: **DRAFT** (not signed off). Sources: `research/assessment-review/a1a2/rereview_R1.json`, `rereview_R2.json`, `rereview_R3.json`. Grouping: `consolidate2.py` → `CONSOLIDATED2.json`. Changed targets: `REVISED_TARGETS2.json` (160 targets: item ids, outcome ids, placement ids).
+
+### Counts
+
+| Reviewer | Flags |
+|---|---|
+| R1 | 7 |
+| R2 | 8 |
+| R3 | 37 |
+| Total | 52 → 32 groups: 11 flagged by ≥2 reviewers (revised), 9 single-reviewer factual (revised), 12 single-reviewer noted |
+
+Merge notes: R3-21..28 are eight per-outcome copies of R2-6 (H06). R1-4, R2-2 and R3-7 are one classroom-objects problem (H09). R1-1, R3-4 and R3-12 all hit common-adjectives slot 5 (H10). R2-1 and R3-35 are the same vocabulary-rubric problem (H11).
+
+### ≥2-reviewer groups and fixes
+
+| Group | Target | Reviewers | Fix |
+|---|---|---|---|
+| H01 | condition of 33 banked form outcomes | R1, R2 | Condition replaced with the real form: "Delayed parallel 9-item form, no help, items not seen in lessons: 1-4 controlled (gap-fill/choice/rewrite as used), 5-6 error correction, 7-8 one free sentence each, 9 transfer. Items 1-6 score 0/1, 7-8 score 0/1/2, 9 scores 0/1 or 0/1/2" (taken from each bank's item 9 scoring). |
+| H02 | EN-F-A1-VO-days-months, 21 exact items | R2, R3 | Item `acceptedAnswersNote` "Case-insensitive…" replaced with the case-sensitive wording of the matchingNote (capital on the day/month word required). |
+| H03–H05 | PL-A1-GR-06, PL-A1-GR-07, PL-A2-VO-05 | R2, R3 | **Not re-pointed; umbrella mapping kept, with reason.** The three specific outcomes are gap outcomes: no lesson and no form. They are now NOT_MEASURABLE_YET (H06), and `outcomesSchema.test.ts` does not let placement items point at outcomes that are not measurable. Placement evidence on a gap outcome would also send the learner nowhere because there is no lesson to route to. Re-point them once the gap outcomes have forms and lessons. |
+| H06 | 8 gap outcomes (was-were, plural-nouns, prepositions-place, possessive-s, subject-object-pronouns, superlatives, imperatives, transport-travel) | R2, R3 | `measurable` → NOT_MEASURABLE_YET with `notMeasurableReason` (gap outcome, no lesson, no form); condition/criterion → "Not set…" until 3 parallel forms exist. `hasLesson` stays false. |
+| H07 | capitals-full-stops C-6 | R1, R3 | "very fun" → "It was great fun." (prompt and key). |
+| H08 | food-drink A/B/C-6 | R1, R3 | Replaced "drinks eggs/rice/bread" with soft spoon food (soup, yoghurt, ice cream) "… with a spoon", where Arabic-L1 learners transfer shariba and "with a spoon" leaves eat/have as the only standard verbs. |
+| H09 | classroom-objects 5-6 + outcome | R1, R2, R3 | B-6 (pens in notebook) → "sharpen my pencil with my rubber" → sharpener; C-6 (close the board) → "stick the pictures with my scissors" → glue; stale `targetForm` fields set to the keys; matching note now says EC = wrong classroom noun for its use; outcome `l1ErrorTypes` cleared (lexical object confusion has no schema enum value, article omission is no longer tested). |
+| H10 | common-adjectives A/B/C-5 | R1, R3 | Two-sentence keys (no comma splice); A-5 "My father is very long. He can touch the ceiling." (no longer repeats appearance A-6); B-5 big→old kept; C-5 "That building is very long. It has forty floors." → tall (L1 direction). |
+| H11 | VO free-production items with a named word | R2, R3 | Named-word prompts (common-adjectives 7-8, family 7-8, home-rooms 7-8, weather 7-8, appearance 8, clothes-shopping A-8) get a "named word" rubric: another word from the field scores 0. The old `acceptedAnswersNote` on VO free items now points to the rubric field, so the two texts no longer disagree. Jobs-workplaces and make-do keep their own criteria. |
+
+### Single-reviewer decisions
+
+Revised (clear factual key errors):
+- H14 article-the 9: second gap took zero article; now a singular countable noun known from context (owner / big gate / manager), "Fill both gaps with an article".
+- H15 possessive-adjectives 5: added owner context ("It is Salma's car.") so "his" is a certain mistake.
+- H18 food-drink C-1: removed "egg" (ungrammatical in the sentence).
+- H19 home-rooms C-2: instruction "one or two words" to fit the two-word key.
+- H21 conjunctions 5: "(the second part is the reason)" so "and" is a certain mistake.
+- H22 going-to 7-9 and H26 make-do 9: added "Use going to." / "Use make or do." (prompt allowed avoiding the target form).
+- H28 PL-A1-GR-01: distractor "some" → "any" ("some apple" is defensible).
+- H29 PL-A2-RD-03: accented "café" variants added; mapping to main-idea noted, not changed.
+
+Not revised (keys correct; noted for a later pass): H12 numbers-time f/v direction; H13 weather A-6 error label; H16 possessive-adjectives 7 gender check / B-8 wording; H17 common-adjectives 6 label and realism; H20 comparatives l1ErrorTypes (no fitting schema enum); H23 clothes B-4 parallelism; H24 clothes 7 colour not scored; H25 jobs l1ErrorTypes; H27 weather C-2 parallelism; H30 choice items letter-only (rubric/grader level, grader not changed); H31 criterion point count for exact transfer (conditions now state per-item scoring; criterion text unchanged); H32 family EC kin swaps vs matching note. CEFR level of imperatives and was-were (R3) not changed: single reviewer.
+
+### Tests
+
+Parallel forms kept matched (word counts within ±2 per slot, novelty and separation checks). `cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. Three prompt-length and one novelty failure during the pass were fixed in the data, not the tests.
+
+## Review round 3 (A1–A2)
+
+Status: **DRAFT**. Sources: `research/assessment-review/a1a2/rereview2_R1/R2/R3.json`; grouping in `consolidate3.py` → `CONSOLIDATED3.json`; changed targets in `REVISED_TARGETS3.json` (41). No grader or tutor code changed. No CEFR level changed.
+
+| Reviewer | Flags |
+|---|---|
+| R1 | 12 |
+| R2 | 14 |
+| R3 | 12 |
+| Total | 38 → 21 groups: 6 flagged by ≥2 reviewers (revised), 9 single-reviewer clear key/parallelism errors (revised), 6 single-reviewer noted or left to the user |
+
+Merge notes: R1-1/2/3, R2-0..5 and R3-0 are one classroom-objects problem (T01). R1-10, R2-13 and R3-11 are the PL-A2-RD-03 mapping (T04). R1-11 (accepted answers) is kept separate as T07.
+
+### ≥2-reviewer groups and fixes
+
+| Group | Target | Reviewers | Fix |
+|---|---|---|---|
+| T01 | classroom-objects A/B/C-5, A/B/C-6 + outcome | R1, R2, R3 | The object swaps (cut with a ruler, tell the time with a calendar, measure with an eraser, sharpen with a rubber, rub out with a ruler, stick with scissors) are replaced by realistic Arabic-L1 spelling slips on a classroom noun. Slot 5 is `phon_p_b`: bencil→pencil, ben→pen, baper→paper. Slot 6 is `spelling_vowel` (vowel left out): calculter→calculator, dictionry→dictionary, notbook→notebook. The corrected noun does not appear anywhere else in the same form. Outcome `l1ErrorTypes` = [phon_p_b, spelling_vowel]. |
+| T02 | food-drink C-6 | R1, R2 | "drinks her ice cream" → "drinks her lentil soup with a spoon" → eats/has, parallel to A-6 soup and B-6 yoghurt. |
+| T03 | jobs-workplaces A/B/C-6 | R1, R2 | The factual absurdities (pilot in a hospital and so on) are replaced in every form by `article_indef_omission` before the job noun: "My mother is nurse in a big hospital", "My brother is waiter in a small restaurant", "My aunt is farmer on a farm near Fayoum" → a nurse / a waiter / a farmer. There is now one fix direction and one key. This error type also matches the outcome's existing `l1ErrorTypes` (round-2 H25). |
+| T04 | PL-A2-RD-03 | R1, R2, R3 | Re-tagged to `EN-C-A2-RD-short-everyday-texts`. Its statement covers "specific details in short everyday texts such as emails", so it is a detail-reading outcome. No lesson-level A2 detail outcome fits an email: dialogue-details and timetable are narrower. The item text is unchanged. |
+| T05 | possessive-s `l1ErrorTypes` | R1, R2 | Set to [article_def_misuse], the closest schema enum value. Idafa transfer ("the car of the teacher") brings article misuse with it. The schema has no possessive/idafa type, and adding one is a user decision. |
+| T06 | prepositions-place `l1ErrorTypes` | R1, R2 | Set to [article_def_misuse], the closest schema enum value ("on table"). The schema has no preposition type for the in/on transfer from Arabic fi, and adding one is a user decision. |
+
+### Single-reviewer decisions
+
+Revised (clear key, cueing or parallelism errors):
+- T07 PL-A2-RD-03: added "at the cafe" and "at the café". The forms "the cafe", "cafe", "the café" and "café" were already accepted.
+- T08 days-months B-8/C-8: the prompts no longer depend on climate ("a month with a school holiday" / "a month you like"). Both now accept all 12 months, as A-8 does.
+- T11 weather A/B/C-5: copula omission is a grammar error. It is replaced by a weather-adjective spelling slip (-ey for final -y: foggey, cloudey, snowey; `spelling_vowel`). The adjective is not shown elsewhere in its form.
+- T12 clothes-shopping B-4: the is/are item is replaced by a vocabulary choice, "changing / sleeping / waiting … room", parallel to A-4 (try on) and C-4 (fit).
+- T14 days-months B-9/C-9: Wed→Fri and Tue→Sat, so the answer is not cued or repeated elsewhere in the form.
+- T15 family A-7, A-8, B-7, B-8, C-8: now use the "named word" rubric, as C-7 already does.
+- T16 home-rooms C-2: "family sits together" had several right answers, and living room was also the C-9 answer. It is now "We wash the dishes in the ____" → kitchen, which is parallel to A-1/B-2.
+- T18 capitals-full-stops A/B/C-6: the prompt now reads "Add a full stop and a capital letter:", so the join with 'and' is no longer a second correct answer. All forms were changed so they stay parallel.
+- T21 much-many: removed the stale item-6 description from the matching note.
+
+Left to the user (not changed): T09 imperatives CEFR A2 vs EGP A1 (level); T10 was-were `l1ErrorTypes` agreement_3s (held with the was-were level question).
+
+Noted, keys correct: T13 common-adjectives statement vs slots 5 and 7-8 (outcome wording); T17 numbers-time 7 criterion ('at seven', 'seven thirty'); T19 make-do 9 rubric for 1 point; T20 clothes-shopping 7 colour not scored (repeat of round-2 H24).
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. During the pass three prompt-length failures (days-months slot 8, home-rooms slot 2, clothes-shopping slot 4) and one novelty overlap (classroom B-6 "check new words in a dictionary") were fixed in the data, not the tests.
+
+## Review round 4 (A1–A2)
+
+Status: **DRAFT**. Sources: `research/assessment-review/a1a2/rereview3_R1/R2/R3.json`; grouping in `consolidate4.py` → `CONSOLIDATED4.json`; changed targets in `REVISED_TARGETS4.json` (40). No grader or tutor code changed. No CEFR level changed. No schema enum changed.
+
+| Reviewer | Flags |
+|---|---|
+| R1 | 6 |
+| R2 | 6 |
+| R3 | 12 |
+| Total | 24 → 15 groups: 5 flagged by ≥2 reviewers (revised), 10 single-reviewer clear errors (revised), 0 noted only |
+
+Independence note: R1 showed a partial-independence slip on round-3 groups T05/T06 (possessive-s / prepositions-place `l1ErrorTypes`), so its agreement on those earlier items is not fully independent evidence. The round-4 ≥2 groups do not rely on R1 alone.
+
+### ≥2-reviewer groups and fixes
+
+| Group | Target | Reviewers | Fix |
+|---|---|---|---|
+| T01 | clothes-shopping B-4 | R1, R2, R3 | Shop context added: "Clothes shops have a ____ room for trying on." Only "changing" fits. |
+| T02 | classroom-objects C-6 | R1, R2, R3 | Also accepts "I do my homework in a notebook.", like the other slot 5–6 items. |
+| T03 | jobs-workplaces A/B/C-6 + outcome | R2, R3 | Article omission (grammar) replaced by an Arabic-L1 i/e spelling slip on a job noun in every form: pharmacest (A), dentest (B), engeneer (C). The job is not keyed or shown elsewhere in its form, which also removes the A-6 nurse/hospital cue for A-1. `l1ErrorTypes` = [spelling_vowel]; MATCHING updated. |
+| T04 | prepositions-place `l1ErrorTypes` | R2, R3 | Emptied (article_def_misuse did not fit). The reason is in `notMeasurableReason`: in/on transfer has no enum value. |
+| T05 | weather A/B/C-5 + outcome | R1, R3 | The "-ey" spellings and "foggy" are replaced by A1–A2 vowel slips: wit→wet (A, i/e), clody→cloudy (B, vowel left out), hut→hot (C, short vowel). The slot-6 tag no longer says copula_omission. MATCHING EC note updated. `l1ErrorTypes` = [spelling_vowel]. |
+
+### Single-reviewer decisions (all revised)
+
+- T06 classroom-objects slot 5 (R1): `docs/LEARNING_OUTCOMES.md` lists phon_p_b as audio-only. The typed slips bencil/ben/baper are now tagged spelling_vowel, the only typed-spelling enum value, with a note that it is a consonant slip. Outcome `l1ErrorTypes` = [spelling_vowel].
+- T07 capitals-full-stops A/B/C-6 (R1): item tag is now `run_on_and`.
+- T08 home-rooms C-9 (R2): the advert now starts "Big flat, a ____ …", so "bathrooms" is not shown.
+- T09 PL-A2-RD-03 (R2): added "a cafe/café near the station" and "cafe/café near station".
+- T10 days-months slots 5–6 (R3): the misspelled word now has its capital letter (Febuary, Tusday, Agust, Wensday, Septmber, Thersday), so there is one mistake, as the prompt says.
+- T11 family slots 5–6 (R3): kin-word swaps replaced by vowel slips in natural sentences (doughter, hasband / parints, brather / grandmather, nece). `l1ErrorTypes` = [spelling_vowel]; MATCHING updated.
+- T12 food-drink B-6 (R3): yoghurt → vegetable soup, parallel to A-6/C-6.
+- T13 food-drink `l1ErrorTypes` (R3): cleared (no plural -s item); MATCHING updated.
+- T14 much-many `l1ErrorTypes` (R3): cleared.
+- T15 weather `l1ErrorTypes`/MATCHING (R3): fixed with T05.
+
+### User decisions (not changed)
+
+- Add a preposition-transfer enum value (e.g. `prep_place_transfer`) for prepositions-place.
+- Add a typed consonant-spelling enum value (p/b slips are tagged spelling_vowel for now).
+- Whether eat/drink, sound-confusion, noun-for-adjective and quantifier choice get enum values (food-drink and much-many `l1ErrorTypes` are empty for now).
+- Carried over: T09/T10 from round 3 (imperatives CEFR level; was-were `l1ErrorTypes`).
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. During the pass, two prompt-length failures (family slot 5, clothes-shopping slot 4) were fixed in the data, not the tests.
+
+## Review round 5 (A1–A2)
+
+Status: DRAFT. Sources: `research/assessment-review/a1a2/rereview4_R1/R2/R3.json` → `consolidate5.py` → `CONSOLIDATED5.json` (14 flags, 11 groups, 2 flagged by ≥2 reviewers). Revised targets: `REVISED_TARGETS5.json` (48).
+
+Rule used for cueing: no item's answer word (gap-fill, choice, error-correction correction, transfer key) is shown in any other item's prompt or options in the same form. Words named in slot 7–8 prompts and choice distractors use only rooms, kin words and weather words that are not keyed in that form. Repeated keys that are never shown (e.g. a correction that is also a gap-fill key) are allowed. The check was run on home-rooms, family and weather, and it reports no hits.
+
+### ≥2-reviewer groups (revised)
+
+| Group | Target | Reviewers | Change |
+|---|---|---|---|
+| G01 | family C-6 | R1, R2, R3 | 'nece' (niece, EVP A2) → 'childrin' (children, A1, not used elsewhere in form C). |
+| G02 | weather slots 3/6/7/8 | R2, R3 | B-6 wind→sun (sunny), so 'windy' now appears only in B-3's own options. A-3 key sunny→snowy (sunny is the A-9 key). The free-production prompts name hot/warm (A-7), wet (B-7), warm (B-8) and dry (C-7). |
+
+### Single-reviewer decisions
+
+- G05 home-rooms B-5/B-6 (R1): 'cooking room' → 'eating room' (dining room). The double error 'sitting room of guests' → a single p/b slip, 'path room' (bathroom). Revised. Setting `l1ErrorTypes` to l1_calque/spelling_p_b needs new enum values, so it is a user decision.
+- G06 home-rooms C-9 (R1): prompt now says "One or two words" (lounge stays accepted). Revised.
+- G07 weather A-9 (R1): 'hot' removed from the accepted answers. Revised.
+- G08 home-rooms cueing (R3): the no-cueing rule is applied to all forms. Choice keys, distractors, named rooms in slots 7–8 and some gap-fill keys were rebalanced. The adverts no longer show 'bedrooms'. Revised.
+- G09 family cueing (R3): the no-cueing rule is applied to all forms. Definitions, options and slot-8 kin words were changed. The 'niece' distractor was removed. B-9 now asks for daughter, and C-9 no longer shows 'son'. Revised.
+- G10 jobs A-6 (R3): 'pharmacest' (pharmacist, EVP B1) → 'artest' (artist, A2). Revised. B-4 'pharmacist/pharmacy' was not flagged and is left as it is.
+- G03 classroom p/b and G04 weather noun-for-adjective (R1): these need new enum values. They are user decisions, carried over from round 4.
+- G11 days-months repetition (R3): noted, low severity. The repeated words are never shown to the learner, so they do not cue answers, and resampling them would undo the spelling-difficulty matching from round 4.
+
+### User decisions (not changed)
+
+- Enum values for an L1 calque, a typed consonant (p/b) spelling slip and noun-for-adjective (home-rooms, classroom-objects and weather `l1ErrorTypes`).
+- Carried over from round 4: preposition-transfer, eat/drink and quantifier enum values, imperatives CEFR level, and was-were `l1ErrorTypes`.
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. Prompt-length (±2 words) failures in home-rooms slots 3/4/5/9 and family slot 9 came up during the pass and were fixed in the data, not the tests.
+
+## User decisions (A1–A2)
+
+Status: DRAFT. Task: `research/assessment-review/a1a2/DECISIONS_TASK.md`. Revised targets: `REVISED_TARGETS6.json` (186: the 48 round-5 targets, not yet re-reviewed, merged with these changes, no duplicates).
+
+### CEFR level moves
+
+- `cefr` A2 → A1 (EGP basis): EN-F-A2-GR-third-person-s, EN-F-A2-GR-present-continuous, EN-F-A2-FN-polite-requests, EN-F-A2-GR-imperatives; also EN-F-A2-GR-was-were (below). Item `level` fields in the three existing form files set to A1.
+- Ids not changed: the `schema.json` id pattern allows A1|A2 independently of `cefr`, and no test requires the id level to match `cefr` (`assessmentForms.test.ts` reads the level from the file name only for item count and the vocabLevel ceiling; A1 and A2 both have 9 items). So no references (outcomes.json links, file names, placement.json, docs, tests, research inputs) needed updating; the LEARNING_OUTCOMES.md PART 6 example record now shows `cefr` A1.
+- Not moved: the lesson outcomes EN-L-A2-GR-third-person-s / EN-L-A2-GR-present-continuous and the A2 course parents (the task named the form outcomes only). Follow-up: many items in the moved forms keep vocabLevel A1-A2 / A2, now above the outcome level; not re-rated here.
+
+### was/were
+
+- Evidence (EGP, from memory, not re-checked against the live EGP site): past simple of *be* (was/were) is listed at A1; the record's own reference already said "past simple of be, A1". Decision: `cefr` A1.
+- `l1ErrorTypes` [copula_omission, agreement_3s] → [agreement_3s, tense_aspect]. Arabic marks past *be* with *kaana*, so omission is less typical in the past than in the present; the expected Arabic-L1 errors are subject agreement (*they was*, *he were*) and present for past (*Yesterday I am at home*).
+
+### Enum additions
+
+`schema.json` l1ErrorTypes: prep_place_transfer, spelling_consonant, lexical_eat_drink, noun_for_adjective, quantifier_countability. Definitions with Arabic-L1 examples are in `docs/LEARNING_OUTCOMES.md` PART 2 (error types); the schema description points there.
+
+### Outcome l1ErrorTypes
+
+- classroom-objects [spelling_consonant]; numbers-time [spelling_consonant, spelling_vowel]; weather [spelling_vowel, noun_for_adjective]; food-drink [lexical_eat_drink]; much-many and some-any [quantifier_countability]; prepositions-place, prepositions-time, EN-L-A1-GR-time-prepositions, transport-travel [prep_place_transfer]; home-rooms [spelling_consonant]; capitals-full-stops and EN-L-A1-WR-sentence-mechanics [run_on_and]; clothes-shopping [adj_noun_order]; imperatives [copula_omission] (*Don't late*).
+- Still empty (no enum value fits): possessive-adjectives, common-adjectives, make-do, polite-requests (form), and several lesson/reading outcomes. possessive-s is left as article_def_misuse (no new value fits).
+
+### Item retags (31)
+
+| Item | Old | New |
+|---|---|---|
+| EN-F-A1-GR-prepositions-time-A-5 | in_for_on_day | prep_place_transfer (in_for_on_day; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-GR-prepositions-time-A-6 | in_for_at_clock | prep_place_transfer (in_for_at_clock; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-GR-prepositions-time-B-5 | in_for_on_day | prep_place_transfer (in_for_on_day; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-GR-prepositions-time-B-6 | in_for_at_clock | prep_place_transfer (in_for_at_clock; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-GR-prepositions-time-C-5 | in_for_on_day | prep_place_transfer (in_for_on_day; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-GR-prepositions-time-C-6 | in_for_at_clock | prep_place_transfer (in_for_at_clock; Arabic fi for in/on/at, time phrase) |
+| EN-F-A1-VO-classroom-objects-A-5 | spelling_vowel (nearest typed-spelling enum value; the slip is a consonant spelling slip, p written as b: bencil for pencil) | spelling_consonant (p written as b: bencil for pencil) |
+| EN-F-A1-VO-classroom-objects-B-5 | spelling_vowel (nearest typed-spelling enum value; the slip is a consonant spelling slip, p written as b: ben for pen) | spelling_consonant (p written as b: ben for pen) |
+| EN-F-A1-VO-classroom-objects-C-5 | spelling_vowel (nearest typed-spelling enum value; the slip is a consonant spelling slip, p written as b: baper for paper) | spelling_consonant (p written as b: baper for paper) |
+| EN-F-A1-VO-food-drink-A-6 | lexical_eat_drink (Arabic shariba is used for soup and soft spoon food; English uses eat with a spoon) | lexical_eat_drink |
+| EN-F-A1-VO-food-drink-B-6 | lexical_eat_drink (Arabic shariba is used for soup and soft spoon food; English uses eat with a spoon) | lexical_eat_drink |
+| EN-F-A1-VO-food-drink-C-6 | lexical_eat_drink (Arabic shariba is used for soup and soft spoon food; English uses eat with a spoon) | lexical_eat_drink |
+| EN-F-A1-VO-home-rooms-B-6 | lexical_room_label | spelling_consonant (b written as p: path room for bathroom) |
+| EN-F-A1-VO-home-rooms-C-5 | lexical_room_label | spelling_consonant (b written as p: path room for bathroom) |
+| EN-F-A1-VO-numbers-time-A-5 | spelling_consonant_f_v | spelling_consonant (f/v: fivteen for fifteen) |
+| EN-F-A1-VO-numbers-time-B-6 | spelling_consonant_f_v | spelling_consonant (f/v: fivty for fifty) |
+| EN-F-A2-GR-much-many-A-5 | much_with_countable (countability) | quantifier_countability (much_with_countable) |
+| EN-F-A2-GR-much-many-A-6 | many_with_uncountable (countability) | quantifier_countability (many_with_uncountable) |
+| EN-F-A2-GR-much-many-B-5 | much_with_countable (countability) | quantifier_countability (much_with_countable) |
+| EN-F-A2-GR-much-many-B-6 | many_with_uncountable (countability) | quantifier_countability (many_with_uncountable) |
+| EN-F-A2-GR-much-many-C-5 | much_with_countable (countability) | quantifier_countability (much_with_countable) |
+| EN-F-A2-GR-much-many-C-6 | many_with_uncountable (countability) | quantifier_countability (many_with_uncountable) |
+| EN-F-A2-GR-some-any-A-5 | some_in_negative (Arabic single quantifier) | quantifier_countability (some_in_negative; nearest enum value) |
+| EN-F-A2-GR-some-any-A-6 | any_in_positive | quantifier_countability (any_in_positive; nearest enum value) |
+| EN-F-A2-GR-some-any-B-5 | some_in_negative (Arabic single quantifier) | quantifier_countability (some_in_negative; nearest enum value) |
+| EN-F-A2-GR-some-any-B-6 | any_in_positive | quantifier_countability (any_in_positive; nearest enum value) |
+| EN-F-A2-GR-some-any-C-5 | some_in_negative (Arabic single quantifier) | quantifier_countability (some_in_negative; nearest enum value) |
+| EN-F-A2-GR-some-any-C-6 | any_in_positive | quantifier_countability (any_in_positive; nearest enum value) |
+| EN-F-A2-VO-weather-A-6 | noun_for_adj (no schema enum value: weather noun used for the adjective) | noun_for_adjective |
+| EN-F-A2-VO-weather-B-6 | noun_for_adj (no schema enum value: weather noun used for the adjective) | noun_for_adjective |
+| EN-F-A2-VO-weather-C-6 | noun_for_adj (no schema enum value: weather noun used for the adjective) | noun_for_adjective |
+
+### Vocabulary validity: items changed (12)
+
+Each vocabulary form now has at most one spelling error-correction item (slot 5 kept). Slot 6 in classroom-objects, days-months, family and numbers-time (where both slots were spelling) is now a meaning error: Arabic-L1 polysemy or calque, one correct fix, A1 words, the answer word not shown elsewhere in the form, prompts within ±2 words. The other vocabulary files already had at most one spelling EC item per form.
+
+| Item | Old (sentence → key) | New (sentence → key) | Tag |
+|---|---|---|---|
+| EN-F-A1-VO-classroom-objects-A-6 | I do my maths sums with my calculter. → I do my maths sums with my calculator. | Open your books at paper ten, please. → Open your books at page ten, please. | lexical_l1_polysemy (Arabic waraqa = paper/page: paper for page) |
+| EN-F-A1-VO-classroom-objects-B-6 | I look up the word in my dictionry. → I look up the word in my dictionary. | I always wear my clock on my arm. → I always wear my watch on my arm. | lexical_l1_polysemy (Arabic saa'a = clock/watch: clock for watch) |
+| EN-F-A1-VO-classroom-objects-C-6 | I do my homework in my notbook. → I do my homework in my notebook. | I borrow books from the school bookshop every week. → I borrow books from the school library every week. | lexical_l1_polysemy (Arabic maktaba = library/bookshop: bookshop for library) |
+| EN-F-A1-VO-days-months-A-6 | We have English on Tusday. → We have English on Tuesday. | What is the history today? It is 5 May. → What is the date today? It is 5 May. | lexical_l1_calque (Arabic tarikh = date/history: history for date) |
+| EN-F-A1-VO-days-months-B-6 | My cousin visits us every Wensday. → My cousin visits us every Wednesday. | We have a family party this night. → We have a family party tonight. | lexical_l1_calque (Arabic al-layla = this night: this night for tonight) |
+| EN-F-A1-VO-days-months-C-6 | We visit grandma every Thersday. → We visit grandma every Thursday. | I watched a film with my brother yesterday night. → I watched a film with my brother last night. | lexical_l1_calque (Arabic ams bil-layl = yesterday night: yesterday night for last night) |
+| EN-F-A1-VO-family-A-6 | My hasband works in a big bank. → My husband works in a big bank. | My brother is married. His woman is a teacher. → My brother is married. His wife is a teacher. | lexical_l1_polysemy (Arabic imra'a = woman/wife: woman for wife) |
+| EN-F-A1-VO-family-B-6 | My little brather goes to school by bus. → My little brother goes to school by bus. | My aunt has three sons: two girls, one boy. → My aunt has three children: two girls, one boy. | lexical_l1_polysemy (Arabic awlad = sons/children: sons for children) |
+| EN-F-A1-VO-family-C-6 | My childrin go to school near our house. → My children go to school near our house. | My aunt's man is a doctor at the hospital. → My aunt's husband is a doctor at the hospital. | lexical_l1_polysemy (Egyptian Arabic ragil = man/husband: man for husband) |
+| EN-F-A1-VO-numbers-time-A-6 | My grandfather is sevnty years old. → My grandfather is seventy years old. | The English lesson is one clock long. → The English lesson is one hour long. | lexical_l1_polysemy (Arabic saa'a = clock/hour: clock for hour) |
+| EN-F-A1-VO-numbers-time-B-6 | My aunt is fivty years old. → My aunt is fifty years old. | The film is two clocks long. → The film is two hours long. | lexical_l1_polysemy (Arabic saa'a = clock/hour: clocks for hours) |
+| EN-F-A1-VO-numbers-time-C-6 | There are ninty students in our school. → There are ninety students in our school. | We waited for three clocks at the station. → We waited for three hours at the station. | lexical_l1_polysemy (Arabic saa'a = clock/hour: clocks for hours) |
+
+### New test
+
+`backend/test/assessmentVocabValidity.test.ts`: fails if every error-correction item in a vocabulary form (EN-F-*-VO-*) is tagged spelling (any l1ErrorType starting with `spelling`), or if a form has more than one spelling EC item.
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed. No existing tests were changed.
+
+## Final review round and close-out (A1–A2)
+
+Status: DRAFT. This was the last review round (user stopping rule): after it only factual key errors (wrong key / wrong key field, or a missing correct accepted answer) are fixed, with no further round. All other flags, whatever the reviewer count, are recorded below as known issues and were not fixed.
+
+### Flags
+
+R1 20, R2 37, R3 16 (73 flags). Consolidated by hand in `research/assessment-review/a1a2/consolidate_final.py` into 22 groups (`CONSOLIDATED_FINAL.json`); 16 groups were flagged by ≥2 reviewers. Categories: 1 key_error, 1 missing_answer, 20 other.
+
+Independence slips: in round 4, R1's grep reached this log, and in the final round R2's grep reached this log. In both cases no flag depended on the log content (each flag cites item text in the assessment files or the PART 2 enum).
+
+### Key fixes made
+
+| Group | Item | Change | Reviewers |
+|---|---|---|---|
+| F01 | EN-F-A1-VO-family-C-4 | targetForm `niece` -> `aunt` (matches answerKey/acceptedAnswers) | R1, R3 |
+| F02 | EN-F-A1-GR-prepositions-time-A-6 / B-6 / C-6 | added `at 6 o'clock` / `at 8 o'clock` / `at 9 o'clock` (digit + o'clock) and `at six` / `at eight` / `at nine` (word, no o'clock) as accepted answers, parallel to the existing `at 6`-style variant | R1 |
+
+No other flag was a wrong key or missing correct answer. Prompts, distractors, error tags, vocabulary and other items were not changed.
+
+### Known issues (not fixed)
+
+Severity: high = flagged by ≥2 reviewers or affects validity; medium/low = single reviewer, no direct validity impact.
+
+| Group | Reviewers | Outcomes | Items | Issue | Severity |
+|---|---|---|---|---|---|
+| K01 | 3 (R1, R2, R3) | A1-VO-family, A1-VO-classroom-objects, A1-VO-days-months, A1-VO-numbers-time, A1-VO-home-rooms | slot 6 all forms; home-rooms A-5/A-6/B-5/C-6 | slot-6 tags lexical_l1_polysemy / lexical_l1_calque / lexical_room_label not in PART 2 enum nor outcome l1ErrorTypes | high |
+| K02 | 1 (R1) | A1-VO-family | A-4/A-6, C-1/C-5, C-4/C-6 | in-form cueing and repeated keys within forms A and C | high |
+| K03 | 2 (R2, R3) | A1-VO-family | C-1 = A-1 | C-1 verbatim copy of A-1 (not parallel) | high |
+| K04 | 2 (R1, R2) | A1-VO-home-rooms | A-1/A-9, A-2/A-5, B-2/B-6/B-9, C-1/C-5, C-2/C-6, B-3~A-4, B-7=A-7, C-7=B-8 | repeated keys within forms and repeated/identical stems across forms | high |
+| K05 | 2 (R1, R3) | A1-VO-home-rooms | B-6, C-5 | 'path room' (b->p) implausible Arabic-L1 slip, real word 'path', reused in two forms | high |
+| K06 | 1 (R3) | A1-VO-home-rooms | slots 5-6 all forms | slot 5-6 error types not parallel across forms; form A has no spelling_consonant item | medium |
+| K07 | 2 (R1, R3) | A1-VO-days-months | A-6, B-6, C-6 | slot 6 tests time-expression meaning, not spelling of days/months; stray matchingNote on B-6/C-6 | high |
+| K08 | 2 (R1, R3) | A1-VO-classroom-objects | B-6 | watch/clock is not a classroom object; 'on my arm' unnatural; not parallel to A-6/C-6 | high |
+| K09 | 3 (R1, R2, R3) | A2-FN-polite-requests | all 27 items (A-5, B-5, B-3, C-3, C-4, B-9, C-7, C-8, B-8, A-9, B-1) | outcome now A1 but vocabLevel A2 and above-A1 words (receipt, kiosk, plasters, charger, milkshake, ...) | high |
+| K10 | 2 (R1, R3) | A2-FN-polite-requests | A-4, B-4, C-4 | 'Two tickets give.'-type OV distractors are not Arabic-L1 plausible | high |
+| K11 | 3 (R1, R2, R3) | A2-FN-polite-requests | slots 5-6 | tags direct_imperative / want_for_request not in enum; outcome l1ErrorTypes [] | high |
+| K12 | 3 (R1, R2, R3) | A2-GR-present-continuous | all 27 items (B-1, C-1, A-4, C-4, B-3, C-6, C-8, C-9) | outcome now A1 but vocabLevel A1-A2 and above-A1 words (knock, bridge, workers, climb, sales report, probably) | high |
+| K13 | 3 (R1, R2, R3) | A2-GR-present-continuous | slots 5-6 | tags be_omission_progressive / simple_for_progressive not in enum (outcome lists copula_omission, tense_aspect) | high |
+| K14 | 1 (R1) | A2-GR-present-continuous | A-8, A-9, B-9, C-9 | rubric criterion differs across parallel items (am/is/are vs am) | medium |
+| K15 | 1 (R2) | A2-GR-present-continuous | A-6, B-6, C-6 | planted sentence has two errors (no be+-ing and no 3rd-person -s) | high |
+| K16 | 3 (R1, R2, R3) | A2-GR-third-person-s | all 27 items (B-4, B-6, A-6, C-6, B-2, C-9, C-1, C-2) | outcome now A1 but vocabLevel A1-A2 and above-A1 words (strangers, mix, paint, fix, bake, weather report) | high |
+| K17 | 3 (R1, R2, R3) | A2-GR-third-person-s | slots 5-6 | tags third_person_s_omission / es_spelling not in enum (outcome lists agreement_3s) | high |
+| K18 | 2 (R1, R2) | A2-GR-imperatives | outcomes.json | l1ErrorTypes copula_omission does not fit imperatives | high |
+| K19 | 2 (R2, R3) | A2-GR-was-were | outcomes.json | agreement_3s (present 3rd-person -s) used for was/were number agreement | high |
+| K20 | 1 (R3) | A1-VO-food-drink | outcomes.json / matching note | stale matching note ('l1ErrorTypes cleared'); slot-5 sound slips untagged | low |
+
+### Per-outcome status (`research/assessment-review/a1a2/OUTCOME_STATUS.json`)
+
+Passed review — DRAFT pending human expert review and pilot (25; no ≥2-reviewer known issue): EN-F-A1-GR-article-a-an, EN-F-A1-GR-article-the, EN-F-A1-GR-can-ability, EN-F-A1-GR-capitals-full-stops, EN-F-A1-GR-copula-be, EN-F-A1-GR-possessive-adjectives, EN-F-A1-GR-prepositions-time, EN-F-A1-GR-there-is-are, EN-F-A1-GR-word-order-svo, EN-F-A1-VO-common-adjectives, EN-F-A1-VO-food-drink, EN-F-A2-GR-comparatives, EN-F-A2-GR-conjunctions, EN-F-A2-GR-frequency-adverbs, EN-F-A2-GR-going-to, EN-F-A2-GR-much-many, EN-F-A2-GR-past-questions-did, EN-F-A2-GR-past-simple-irregular, EN-F-A2-GR-past-simple-regular, EN-F-A2-GR-some-any, EN-F-A2-VO-appearance, EN-F-A2-VO-clothes-shopping, EN-F-A2-VO-jobs-workplaces, EN-F-A2-VO-make-do, EN-F-A2-VO-weather.
+
+DRAFT — not passed; do not use as a confirmatory measure until fixed and re-reviewed (10; ≥2-reviewer known issue): EN-F-A1-VO-classroom-objects, EN-F-A1-VO-days-months, EN-F-A1-VO-family, EN-F-A1-VO-home-rooms, EN-F-A1-VO-numbers-time, EN-F-A2-FN-polite-requests, EN-F-A2-GR-imperatives, EN-F-A2-GR-present-continuous, EN-F-A2-GR-third-person-s, EN-F-A2-GR-was-were. (imperatives and was-were have no assessment forms; their issue is outcome-level l1ErrorTypes metadata.)
+
+### Limits
+
+- No human expert review: all reviewers were model reviewers. Every outcome remains DRAFT.
+- Item analysis is required after the first pilot cohort.
+- Item-removal rule, fixed in advance of the pilot: remove or revise an item if its facility p < 0.20 or p > 0.95, or its point-biserial (corrected item-total) < 0.20; revise a form set if the parallel-form mean difference is > 10 points (on a 0–100 scale).
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed.
+
+## Fix of 2+ reviewer known issues (A1–A2)
+
+Status: DRAFT. User instruction: fix every known issue from the close-out table flagged by ≥2 reviewers (K01, K03, K04, K05, K07–K13, K16–K19), plus the high-severity present-continuous double-error items (K15). K02 (family cueing), K06 (home-rooms slot parallelism) and K14 (present-continuous slot 8–9 criterion) were fixed alongside because the same items were rewritten. K20 was not touched. Targets: `research/assessment-review/a1a2/FIX2_TARGETS.json` (95 items + outcome metadata, each with the known issue it resolves). `OUTCOME_STATUS.json` is unchanged; a verification check follows. No CEFR levels changed.
+
+### Enum additions (data/outcomes/schema.json, docs/LEARNING_OUTCOMES.md PART 2, pending user approval)
+
+| Value | Why no existing value fits | Used by |
+|---|---|---|
+| `lexical_l1_transfer` | polysemy/calque meaning errors (woman→wife, clock→hour, sleeping room→bedroom, month five→May) had no lexical tag except `lexical_eat_drink` | family, classroom-objects, days-months, numbers-time, home-rooms slot 6 |
+| `request_directness` | bare imperative / "I want" requests are pragmatic, not grammatical | polite-requests slots 5–6 |
+| `agreement_be` | `agreement_3s` is present 3rd-person -s, not was/were number agreement | was-were outcome |
+
+### Changes
+
+- K01: all undefined tags retagged: lexical_l1_polysemy / lexical_l1_calque / lexical_room_label → `lexical_l1_transfer`; direct_imperative / want_for_request → `request_directness`; be_omission_progressive → `copula_omission`; simple_for_progressive → `tense_aspect`; third_person_s_omission / es_spelling → `agreement_3s`. Outcome l1ErrorTypes now match their items (polite-requests `[request_directness]`; imperatives `[]`, copula_omission dropped, K18; was-were `[agreement_be, tense_aspect]`, K19; vocabulary outcomes add `lexical_l1_transfer`; home-rooms `[spelling_vowel, lexical_l1_transfer]`).
+- K02/K03 family: C-1 → "My mother's father" (grandfather; no longer a copy of A-1 or the same answer as C-5); A-4 stem "My mum's sister" (no 'wife'); A-6 "Tamer is married. His woman …" (no 'brother'); C-6 "Mona's man …" (no 'aunt'); C-3/C-4 options no longer show C-7/C-8 named words.
+- K04/K05/K06 home-rooms rebuilt: per form the seven keyed slots use seven different rooms; choice distractors are non-home places (office/shop/school/hotel); slot 5 vowel slip (bedrum / leving room / kitchin), slot 6 calque (eating room ×2 with different stems, sleeping room); 'path room' removed; slots 7–8 open "name the room" production (VOCABULARY open-field rubric); no stem repeated across forms.
+- K07 days-months slot 6: Arabic numbered-month calque on a month word ("in month five" → May / June / October), one fix each, month-word matchingNote now fits.
+- K08 classroom-objects B-6: "I put my books on my office" → desk (Arabic maktab); B-3 no longer shows 'desk'.
+- K09/K10/K11 polite-requests: A1 words only, all vocabLevel A1; slot-4 distractors are "Give me …" / "I want …"; slots 5–6 `request_directness`.
+- K12/K13/K14/K15 present-continuous: A1 words only (vocabLevel A1); slot 6 single error ("Shh, my father watches TV at the moment." → is watching); slots 8–9 criterion am/is/are + -ing in every form.
+- K16/K17 third-person-s: A1 words only (vocabLevel A1); slot 6 -chs/-shs (watchs, washs, teachs); slot 9 go/watch/do.
+- EVP levels were checked from memory, not against the EVP database.
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed (data changed, not tests; first run caught prompt-length and benchmark-overlap hits, fixed in the items).
+
+## User decision: new error types (A1–A2)
+The user approved keeping the three error types the agent added during the fix of the 2+ reviewer issues: `lexical_l1_transfer`, `request_directness`, `agreement_be`. The "added by agent" label in docs/LEARNING_OUTCOMES.md PART 2 will be changed to "approved by user" once the verification check finishes, so the reviewers' input does not change while they work. Imperatives still has no error type (none fits).
+
+## Verification and final status (A1–A2)
+
+Status: DRAFT. Three model reviewers checked the 103 targets of the fix round (`research/assessment-review/a1a2/verify_R1.json`, `verify_R2.json`, `verify_R3.json`).
+
+### Verification counts (unresolved / targets flagged)
+
+| Reviewer | Unresolved | New issues |
+|---|---|---|
+| R1 | 0/8 | 8 |
+| R2 | 0/5 | 5 |
+| R3 | 1/5 (classroom-objects B-6: key 'desk' still in B-7 prompt) | 5 |
+
+### Fixes
+
+- V01 (3 reviewers) classroom-objects B-7: prompt "something on your desk now" → "something you use in class every day" (B-6 key no longer shown).
+- V02 (2 reviewers) home-rooms C-3: distractor 'shop' → 'school' (garage / office / school).
+- V03 (2 reviewers) home-rooms A-6/B-6: note now "calque of Arabic ghurfat al-akl, 'eating room'".
+- V04 (2 reviewers) polite-requests slots 5–6, all forms: added "May I have X, please?", "Can/Could you give me X, please?", "Please give me X." and no-comma "... please" variants. The grader (`normalise` in placementEngine.ts) strips only final punctuation, so variants are listed explicitly; no matchingNote change.
+- V06 (2 reviewers) third-person-s B-7: 'neighbour' (EVP A2) → 'your uncle'; acceptedAnswers updated.
+- V05 (1 reviewer, key errors) home-rooms: C-1 "I wash my hands" → "I brush my teeth" (kitchen no longer fits); B-2 "Our dog plays behind our house in the ____" (park no longer fits); C-4 distractor 'hotel' → 'office'.
+- docs/LEARNING_OUTCOMES.md PART 2: `lexical_l1_transfer`, `request_directness`, `agreement_be` now labelled "approved by user".
+
+### Remaining known issues (1 reviewer each)
+
+| ID | Outcome | Issue |
+|---|---|---|
+| K20 | food-drink | stale matching note; slot-5 sound slips untagged |
+| K21 | family | C-1 stem shows 'father', weakly cues C-3 key (3-option choice) |
+| K22 | classroom-objects | C-6 'borrow' and planted 'bookshop' are EVP A2 in an A1 item |
+| K23 | polite-requests | slots 3–4 options and 7–8 prompts show "Can I have" / "I would like", cueing slot 1–2 answers |
+| K24 | third-person-s | A/B/C-6 watchs/washs/teachs tagged `agreement_3s`; the error is the -es spelling rule, but `spelling_vowel` / `spelling_consonant` do not fit, so the tag is kept |
+
+### Final per-outcome status
+
+`research/assessment-review/a1a2/OUTCOME_STATUS.json`: 35 outcomes; 33 passed_review_draft (no unresolved issue flagged by ≥2 reviewers after these fixes), 0 not_passed_draft, 2 no_forms_gap (imperatives, was-were: no assessment forms).
+
+### Limits
+
+- No human expert review: all reviewers were model reviewers. Every outcome remains DRAFT; "passed_review_draft" is not validation.
+- Item analysis is required after the first pilot cohort; the item-removal rule fixed in advance is in the "Final review round and close-out" section above.
+- EVP levels were checked from memory, not against the EVP database.
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed (first run caught a slot-4 prompt-length mismatch in home-rooms C-4, fixed in the data).

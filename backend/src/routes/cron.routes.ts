@@ -1,3 +1,4 @@
+import { sweepDemoSessions } from '../services/demoSandbox';
 import { Router, Request, Response, NextFunction } from 'express';
 import { getConfig } from '../config/env';
 import { sendReminders } from '../services/reminderService';
@@ -66,6 +67,8 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     await run('documentRetention', () => sweepDocumentRetention());
     // Speaking exams (P4): remove transcripts past the teacher's retention period.
     await run('speakingTranscripts', () => sweepSpeakingTranscripts());
+    // Demo sessions left open (browser closed without saying so).
+    await run('demoSessions', () => sweepDemoSessions({ limit: 200 }));
     await run('reminders', () => sendReminders({}));
     if (new Date().getUTCDay() === 1) await run('weekly', () => sendWeeklySummaries());
     logger.info('cron_daily', { ...results, failed });

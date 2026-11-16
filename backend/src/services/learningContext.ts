@@ -12,7 +12,8 @@ import type { TeachingMeta } from '../models/TutorMessage';
 import { logger, serializeError } from '../utils/logging';
 import { applicationGapFrom, examContextFor } from './assessmentEvidenceContext';
 import { isAdultSchool, isFeatureEnabled, isShadowMode } from './featureFlags';
-import { PEDAGOGY_PLAN_VERSION, selectTeachingPlan, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
+import { engineV2 } from './engineV2';
+import { PEDAGOGY_PLAN_VERSION, selectTeachingPlan, belowB1, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { REGISTRY_VERSION, STRATEGY_BY_ID } from './strategyRegistry';
 
 // The level used for adult learners: above every method's minimum grade, and
@@ -21,7 +22,7 @@ export const ADULT_GRADE_LEVEL = 18;
 
 const MET = new Set(['proficient', 'mastered']);
 const INDEPENDENT = new Set(['independent_assessment', 'diagnostic', 'retention_review', 'teacher_verified']);
-const STATUS_WORDS: Record<string, string> = {
+export const STATUS_WORDS: Record<string, string> = {
   not_assessed: 'not assessed yet',
   emerging: 'emerging (little understanding shown so far)',
   developing: 'developing (partly understood)',
@@ -42,6 +43,8 @@ const DISENGAGED_DAYS = 7;
 
 export interface ObjectiveContext {
   decision: TeachingPlan & { id?: string };
+  // The objective's mastery status from the evidence model (read-only).
+  masteryStatus?: string;
   prompt: string;
   teaching: TeachingMeta;
 }
@@ -156,6 +159,7 @@ export async function buildObjectiveContext(params: {
       gradeLevel: adult ? ADULT_GRADE_LEVEL : gradeMatch ? Number(gradeMatch[1]) : undefined,
       disengaged: lastActivity ? Date.now() - new Date(lastActivity.at).getTime() > DISENGAGED_DAYS * 86_400_000 : false,
       subject,
+      ...(engineV2('levelExplicit') && objective.curriculumId && belowB1((await Curriculum.findOne({ id: objective.curriculumId }).select('level').lean())?.level) ? { belowB1: true } : {}),
       relatedSecureObjectives: relatedObjectives.length
         ? await StudentObjectiveMastery.countDocuments({ studentId: params.studentId, objectiveId: { $in: relatedObjectives.map((o) => o.id) }, masteryStatus: { $in: [...MET] } })
         : 0,
@@ -241,7 +245,7 @@ export async function buildObjectiveContext(params: {
       decisionVersion: plan.decisionVersion,
       registryVersion: plan.registryVersion,
     };
-    return { decision: { ...plan, id }, prompt: lines.join('\n'), teaching };
+    return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching };
   } catch (error) {
     logger.warn('learning_context_failed', { error: serializeError(error) });
     return null;
@@ -251,7 +255,7 @@ export async function buildObjectiveContext(params: {
 // The plan as tutor instructions: the primary method's full instructions; one
 // line per supporting / reinforcement method; readiness for differentiation; the
 // rule that resolves conflicts between methods (the primary's rules win).
-function planLines(plan: TeachingPlan, prerequisite: string | undefined, status: string, compact?: boolean): string[] {
+export function planLines(plan: TeachingPlan, prerequisite: string | undefined, status: string, compact?: boolean): string[] {
   const p = STRATEGY_BY_ID.get(plan.primary)!;
   const brief = (id: string) => {
     const m = STRATEGY_BY_ID.get(id)!;

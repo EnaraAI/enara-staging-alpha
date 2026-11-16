@@ -1,0 +1,932 @@
+{
+ "batch": "r3_j03",
+ "cases": {
+  "c79279ec94d": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"an\" is right."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is right."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c98c32d2ad4": {
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"We are friends.\" Wrong: \"We friends.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c2f38be41cb": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"watches\"."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"watches\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"watches\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"watches\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Verbs ending in -ch take -es."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My friend watches TV every evening.",
+    "errors": {
+     "W1": "My friend watch TV every evening.",
+     "W2": "My friend watchs TV every evening."
+    }
+   }
+  },
+  "cfd95b875e7": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: after he, she or it, add -s to the verb."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "plays",
+    "errors": {
+     "W1": "play"
+    }
+   }
+  },
+  "ca70741a8c9": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is correct."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c55167ae366": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"an\""
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"an\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"an\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"an\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"an\", because \"umbrella\" starts with a vowel sound"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c61301b5006": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after he, we add -s"
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "I drink, but he drinks."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "drinks",
+    "errors": {
+     "W1": "drink"
+    }
+   }
+  },
+  "c144cd729b6": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Very good! Yes, she is at home."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Very good! Yes, she is at home."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c36d1447755": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great job! Yes: He drinks tea"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Great job! Yes: He drinks tea"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, we add -s."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c836660555c": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is right."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "He is the subject, so the verb gets -s."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "lives",
+    "errors": {
+     "W1": "live"
+    }
+   }
+  },
+  "c5dd6fee883": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Very good! Yes, a doctor"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Very good! Yes, a doctor"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c9afc1bffb7": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"an\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c7da1a62401": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"drinks\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"drinks\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The subject \"He\" takes -s."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c1030956cef": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great job! Yes: My uncle is a doctor."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Great job! Yes: My uncle is a doctor."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "cb25de9c510": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Use an before a, e, i, o, u sounds. Use a before other sounds."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c2677b4ad3e": {
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: He sings at night. Wrong: He sing at night."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "drinks",
+    "errors": {
+     "W1": "drink"
+    }
+   }
+  },
+  "c071f24030b": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, the verb gets -s."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My sister goes to the market on Fridays.",
+    "errors": {
+     "W1": "My sister go to the market on Fridays.",
+     "W2": "My sister gos to the market on Fridays."
+    }
+   }
+  },
+  "c49c0937e3d": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"an elephant\"."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"an elephant\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"an elephant\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"an elephant\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"elephant\" starts with a vowel sound, so it is an, not a"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c5eeea4cf74": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"am\" is right this time."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"am\" is right this time."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c57ebef8163": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Very good! Yes, a doctor"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Very good! Yes, a doctor"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c5b389ee765": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, the verb gets -s."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My sister goes to the market on Fridays.",
+    "errors": {
+     "W1": "My sister go to the market on Fridays.",
+     "W2": "My sister gos to the market on Fridays."
+    }
+   }
+  },
+  "c1a942003d2": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great job! Yes, he drinks tea."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Great job! Yes, he drinks tea."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c136ce49afc": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"an umbrella\"."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"an umbrella\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"an umbrella\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"an umbrella\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "c8a741e6e54": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"the\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"the\"."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I have a cat. The cat is black.",
+    "errors": {
+     "W1": "I have cat. The cat is black."
+    }
+   }
+  },
+  "c3923c614ef": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"plays\" is right."
+    }
+   ],
+   "next_task": {
+    "kind": "rule"
+   }
+  },
+  "c5356de7c49": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A consonant sound takes a. A vowel sound takes an."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c768e23dc31": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"Ahmed is tired.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"Ahmed is tired.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "c04ab358140": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Vowel sound: \"an\". Other sound: \"a\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "ca16bc43f71": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "with they, we use \"are\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   }
+  },
+  "ca663127452": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"drinks\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"drinks\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The subject \"He\" takes -s."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c1cfda50c7e": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A consonant sound takes a. A vowel sound takes an."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   }
+  },
+  "c5983721b18": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"watches\""
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"watches\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"watches\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"watches\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "verbs ending in -ch take -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   }
+  },
+  "cf6edb7f082": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"drinks\" is correct."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c71f3b518aa": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great job! Yes: He drinks tea"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Great job! Yes: He drinks tea"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, we add -s."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   }
+  },
+  "c558147e3bd": {
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great job! Yes, I am a student."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Great job! Yes, I am a student."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   }
+  },
+  "ce7efdab5ae": {
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a sentence like this needs a form of be between the person and the describing word"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Ahmed is tired.",
+    "errors": {
+     "W1": "Ahmed tired."
+    }
+   }
+  }
+ }
+}

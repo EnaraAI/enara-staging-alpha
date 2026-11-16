@@ -38,8 +38,10 @@ describe('portal routing (frontend services/roleRouting.ts)', () => {
     expect(restoreUiRole(undefined, 'admin')).toBeNull();
   });
 
-  it('the academic manager portal offers only school insights; other pages fall back to it', () => {
-    expect(ACADEMIC_MANAGER_PAGES.map((p) => p.page)).toEqual(['dashboard']);
+  // Option B (approved 9 Nov 2026): academic managers may also view learner age
+  // bands read-only; the server returns canEdit=false and rejects their writes.
+  it('the academic manager portal offers school insights and the read-only age-band view; other pages fall back to insights', () => {
+    expect(ACADEMIC_MANAGER_PAGES.map((p) => p.page)).toEqual(['dashboard', 'age-bands']);
     for (const page of ['students', 'curriculum', 'assignments', 'grading', 'credits', 'live-avatars', 'teaching']) expect(academicManagerPage(page)).toBe('dashboard');
   });
 });

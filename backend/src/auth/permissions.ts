@@ -31,6 +31,7 @@ export type Permission = (typeof PERMISSIONS)[number];
 // is no separate content-creator role.
 export const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
   student: [],
+  parent: [],
   teacher: ['content:author', 'content:publish', 'class:teach'],
   academic_manager: ['insights:read_school'],
   admin: ['content:author', 'content:publish', 'content:manage_school', 'class:teach', 'insights:read_school', 'workspace:users', 'workspace:billing'],
@@ -49,7 +50,7 @@ export function permissionsFor(user: { role: UserRole; permissions?: readonly st
   if (!user) return new Set();
   const granted = (user.permissions ?? []).filter(isPermission);
   // Students never hold staff permissions, whatever is stored on the user.
-  if (user.role === 'student') return new Set();
+  if (user.role === 'student' || user.role === 'parent') return new Set();
   // cost:internal stays with ENARA admins even if granted to someone else.
   return new Set([...ROLE_PERMISSIONS[user.role], ...granted.filter((p) => p !== 'cost:internal' || user.role === 'enara-admin')]);
 }

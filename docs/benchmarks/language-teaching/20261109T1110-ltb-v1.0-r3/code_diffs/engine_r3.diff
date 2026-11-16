@@ -1,0 +1,325 @@
+--- docs/benchmarks/language-teaching/20261109T1110-ltb-v1.0-r3/pre_edit_code_snapshot/languageTeachingContext.ts	2026-11-09 11:11:48.177014813 +0000
++++ backend/src/services/languageTeachingContext.ts	2026-11-09 11:14:58.163866513 +0000
+@@ -16,7 +16,11 @@
+ // bounded exit, targeted clarification of missing context (no stacked teaching,
+ // no placeholder lessons), feedback that models on a different example and
+ // handles one error at a time, and age-band observability.
+-export const LANGUAGE_POLICY_REVISION = 'ltc-v1-r2';
++// r3: trusted age-band contract (resolver with provenance; child/teen bands
++// only from a trusted runtime source, none of which exists yet), minor-slip and
++// self-correction triage, progression after confirmed success, evaluation of a
++// volunteered first sentence (record vs current evidence), revised r2 wording.
++export const LANGUAGE_POLICY_REVISION = 'ltc-v1-r3';
+ 
+ export type KnowledgeStatus = 'known' | 'inferred' | 'not_assessed' | 'unknown';
+ 
+@@ -37,11 +41,34 @@
+   // Proficiency is never 'known' in this phase: ENARA holds no validated
+   // placement result (LTC-D1).
+   proficiency: Fact<string> & { band: LevelBand };
+-  ageBand: Fact<'adult' | 'school'>;
++  ageBand: Fact<AgeBand>;
+   // From the existing evidence model, passed through unchanged.
+   objectiveStatus?: Fact<string>;
+ }
+ 
++// r3: coarse age band. Only resolveTrustedAgeBand() produces it, from server-side
++// records; never from grade, CEFR, writing, names, client input or benchmark labels.
++export type AgeBand = 'child' | 'teen' | 'adult' | 'unknown';
++export type AgeBandSource = 'school_setting_adult_learners' | 'no_trusted_learner_age_source' | 'invalid_school_setting';
++export interface TrustedAgeBand {
++  band: AgeBand;
++  status: 'known' | 'unknown';
++  source: AgeBandSource;
++}
++
++// The only trusted runtime source today is the school-level adult-learners
++// setting, whose documented policy (models/Institution.ts) is that every
++// student of such a school is taught as an adult. ENARA stores no learner-level
++// age, date of birth or age band, so child and teen cannot be resolved: they
++// stay 'unknown' (BLOCKED pending a product decision; see r3 report). A
++// non-boolean setting is treated as invalid, never as adult.
++export function resolveTrustedAgeBand(learningSettings: unknown): TrustedAgeBand {
++  const raw = learningSettings && typeof learningSettings === 'object' ? (learningSettings as Record<string, unknown>).adultLearners : undefined;
++  if (raw === true) return { band: 'adult', status: 'known', source: 'school_setting_adult_learners' };
++  if (raw !== undefined && raw !== null && typeof raw !== 'boolean') return { band: 'unknown', status: 'unknown', source: 'invalid_school_setting' };
++  return { band: 'unknown', status: 'unknown', source: 'no_trusted_learner_age_source' };
++}
++
+ export interface LanguageSpec {
+   objectives?: string[];
+   successCriteria?: string[];
+@@ -116,6 +143,12 @@
+   learnerGoal?: string;
+   goalAmbiguous?: boolean;
+   goalAsked?: boolean;
++  // r3
++  selfCorrected?: boolean;
++  // Consecutive earlier answers in this task chain that the tutor confirmed as correct.
++  confirmedSuccessStreak?: number;
++  // A first message that is the learner's own sentence (not a request): evaluated as an answer.
++  unpromptedSentence?: boolean;
+ }
+ 
+ export type MoveId =
+@@ -188,6 +221,9 @@
+   missingContext?: string[];
+   ageBand?: string;
+   ageBandSource?: string;
++  // r3
++  ageBandStatus?: string;
++  confirmedSuccessStreak?: number;
+ }
+ 
+ // ---------------------------------------------------------------------------
+@@ -242,7 +278,9 @@
+   courseLevel?: string;
+   courseLanguages?: string[];
+   adultSchool: boolean;
+-  grade?: string;
++  // r3: the resolver's output (preferred); adultSchool is the legacy form.
++  trustedAgeBand?: TrustedAgeBand;
++  grade?: string; // ignored for age (kept for call compatibility)
+   learnerMessages: string[];
+   objectiveStatus?: string;
+ }): LanguageLearnerContext {
+@@ -256,11 +294,12 @@
+     arabicWriting && !/arabic/i.test(target.value ?? '')
+       ? { status: 'inferred', value: 'Arabic', source: 'learner_messages' }
+       : { status: 'unknown', source: 'not_collected' };
+-  const ageBand: Fact<'adult' | 'school'> = input.adultSchool
+-    ? { status: 'known', value: 'adult', source: 'school_setting_adult_learners' }
+-    : /\d/.test(input.grade ?? '')
+-      ? { status: 'known', value: 'school', source: 'student_grade' }
+-      : { status: 'unknown', source: 'not_collected' };
++  // r3: age band only from the trusted resolver; grade is never used (it was
++  // never passed at runtime; the r3 brief forbids grade as an age source).
++  const trusted = input.trustedAgeBand ?? resolveTrustedAgeBand({ adultLearners: input.adultSchool });
++  const ageBand: Fact<AgeBand> = trusted.status === 'known'
++    ? { status: 'known', value: trusted.band, source: trusted.source }
++    : { status: 'unknown', value: 'unknown', source: trusted.source };
+   return {
+     targetLanguage: target,
+     supportLanguage,
+@@ -511,6 +550,38 @@
+   return content.length ? text.trim().replace(/\s+/g, ' ').slice(0, 120) : undefined;
+ }
+ 
++// r3: did the tutor's feedback confirm the previous answer as correct? Read from
++// the opening sentence only, and never when it also carries an error cue.
++const CONFIRM = /\b(correct|right|well done|perfect|excellent|exactly|great job|spot on)\b|^\W*yes\b|✅|✓/i;
++const NOT_CONFIRM = /\b(not (quite )?(correct|right)|almost|nearly|but|however|one thing|good (start|try))\b/i;
++export function confirmsCorrect(feedback: string): boolean {
++  const t = feedback.trim();
++  const first = t.split(/(?<=[.!?])\s+|\n+/)[0] ?? '';
++  // Praise in the opening sentence, and no error talk anywhere in the opening part
++  // ("'This is my sister.' is correct. But 'He is nine' is not right" is not a confirmation).
++  const opening = t.slice(0, 250);
++  return CONFIRM.test(first) && !ERROR_CUE.test(opening) && !NOT_CONFIRM.test(opening);
++}
++
++function confirmedStreak(history: Turn[]): number {
++  let streak = 0;
++  for (let i = history.length - 1; i >= 1; i -= 1) {
++    const h = history[i];
++    if (h.role !== 'user') continue;
++    const prev = [...history.slice(0, i)].reverse().find((x) => x.role === 'assistant');
++    if (classifyLearnerResponse(h.content, prev ? taskInvitation(prev.content) : undefined) !== 'answer') break;
++    const next = history.slice(i + 1).find((x) => x.role === 'assistant');
++    if (!next || !confirmsCorrect(next.content)) break;
++    streak += 1;
++  }
++  return streak;
++}
++
++// r3: the learner corrected themselves in the same message ("— sorry, She goes…").
++const SELF_CORRECTION = /\b(sorry|i mean|i meant|oops|correction|i mean to say)\b|\*\s*\w+/i;
++// Words that make a first message a request about language, not a sentence to evaluate.
++const META_REQUEST = /\b(know|word|words|say|mean|meaning|help|explain|example|exercise|practi[cs]e|learn|teach|lesson|answer|question|homework)\b/i;
++
+ export function detectTurnSignals(message: string, history: Turn[], lesson?: { title?: string; spec?: LanguageSpec }): TurnSignals {
+   const text = message.trim();
+   const learner = [...history.filter((h) => h.role === 'user').map((h) => h.content), text].slice(-3);
+@@ -544,12 +615,20 @@
+ function r2Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, firstTurn: boolean, offTopic?: OffTopicKind): Partial<TurnSignals> {
+   const out: Partial<TurnSignals> = {};
+   if (learnerResponse === 'answer') {
++    out.selfCorrected = SELF_CORRECTION.test(text);
++    out.confirmedSuccessStreak = confirmedStreak(history);
+     const rec = chainRecurrences(history, text);
+     if (rec.length) {
+       out.errorRecurrence = rec[rec.length - 1];
+       out.priorStrategyShifts = rec.slice(0, -1).filter((r) => r === 'repeated').length;
+     }
+   }
++  // r3: a first message that is the learner's own sentence (no request, greeting
++  // or question) in a lesson is their attempt: evaluate it, don't lecture.
++  if (firstTurn && lesson && learnerResponse === 'no_pending_task' && !offTopic && !GREETING.test(text) && !/[?؟]/.test(text) && !META_REQUEST.test(text) && norm(text).split(' ').length >= 3) {
++    out.unpromptedSentence = true;
++    out.selfCorrected = SELF_CORRECTION.test(text);
++  }
+   // No lesson: the goal is the essential missing field. It was asked on the
+   // learner's first message if that message stated none; the next learner
+   // message is the answer, used from then on (never asked again).
+@@ -597,7 +676,7 @@
+   const missing = missingContext({ targetLanguage: input.targetLanguage, lessonStatus: input.lessonStatus, signals: s });
+   const clarifying = s.offTopic !== 'unrelated' && missing.length > 0 && !s.goalAsked && (s.firstTurn || s.vague);
+   if (clarifying) add('clarify_goal', [`missing_${missing[0]}`], ['LTC-D13']);
+-  else if (s.firstTurn && (input.lessonStatus === 'structured' || (input.lessonStatus === 'unstructured' && s.vague)) && !s.helpRequest && !s.answerRequest && !s.exampleRequest && s.offTopic !== 'unrelated') add('activate_prior_knowledge', [s.vague ? 'vague_message_lesson_known' : 'first_turn_with_lesson_spec'], ['LTC-D3']);
++  else if (s.firstTurn && !s.unpromptedSentence && (input.lessonStatus === 'structured' || (input.lessonStatus === 'unstructured' && s.vague)) && !s.helpRequest && !s.answerRequest && !s.exampleRequest && s.offTopic !== 'unrelated') add('activate_prior_knowledge', [s.vague ? 'vague_message_lesson_known' : 'first_turn_with_lesson_spec'], ['LTC-D3']);
+   if (input.lessonStatus === 'none' && s.goalAsked && s.goalAmbiguous && s.offTopic !== 'unrelated' && !s.helpRequest) add('general_practice', ['goal_answer_ambiguous'], ['LTC-D13']);
+ 
+   // r1: an unrelated request (another subject's homework, a finished text for
+@@ -606,6 +685,12 @@
+   if (offTopic) add('redirect_to_lesson', [input.lessonStatus === 'none' ? 'off_topic_no_lesson' : 'off_topic_request'], ['LTC-D14']);
+ 
+   if (s.confusionCount >= 2) add('reteach_simpler', [`confusion_signals_${s.confusionCount}`], ['LTC-D7']);
++  if (s.unpromptedSentence) {
++    // r3 (T12-type): the learner's own sentence, possibly against an evidence
++    // record that says the point is secure. Evaluate it; when the record and the
++    // sentence disagree, check once rather than trusting either.
++    add('corrective_feedback_retry', ['unprompted_learner_sentence', ...(strong ? ['record_vs_current_check'] : []), ...(s.selfCorrected ? ['self_corrected'] : [])], ['LTC-D4']);
++  }
+   if (s.answeringCheck && !s.answerRequest) {
+     const n = (s.attemptsOnTask ?? 0) + 1;
+     // r2 (replaces r1's "show the correct form on attempt 2"): a repeated
+@@ -620,6 +705,8 @@
+         `answer_to_${s.pendingTask ?? 'check'}`,
+         novice ? 'level_novice_prompt_first' : 'level_strong_reformulation_ok',
+         ...(n >= 2 ? [s.errorRecurrence === 'changed' ? 'flagged_error_not_repeated' : (s.priorStrategyShifts ?? 0) > 0 ? 'recurrence_unknown_after_shift' : 'recurrence_unknown'] : []),
++        ...(s.selfCorrected ? ['self_corrected'] : []),
++        ...((s.confirmedSuccessStreak ?? 0) >= 1 ? ['after_confirmed_success'] : []),
+       ], ['LTC-D4']);
+     }
+   }
+@@ -639,13 +726,13 @@
+   // open, an example request is an ordinary request for a model and explanation.
+   if (s.exampleRequest && s.pendingTask) add('distinct_example', ['example_requested_task_open'], ['LTC-D3']);
+   const exampleNoTask = Boolean(s.exampleRequest && !s.pendingTask);
+-  const supportOnly = hintFirst || s.dontKnow || s.hintRequest || s.repeatRequest || offTopic || clarifying;
++  const supportOnly = hintFirst || s.dontKnow || s.hintRequest || s.repeatRequest || offTopic || clarifying || s.unpromptedSentence;
+   if (s.helpRequest || exampleNoTask || (novice && !s.answeringCheck && !s.vague && !supportOnly)) add('short_explanation', [s.helpRequest ? 'help_requested' : exampleNoTask ? 'example_requested' : 'novice_level'], ['LTC-D3']);
+   if (s.confusionCount === 1 || (input.hintsOnly && !s.answerRequest)) add('scaffold_hint', [s.confusionCount === 1 ? 'confusion_signal' : 'hints_only_policy'], ['LTC-D6']);
+-  const feedbackTurn = moves.some((m) => ['corrective_feedback_retry', 'reteach_simpler'].includes(m.id) && m.reasons.some((r) => r.startsWith('answer_to_') || r.startsWith('repeated_')));
++  const feedbackTurn = moves.some((m) => ['corrective_feedback_retry', 'reteach_simpler'].includes(m.id) && m.reasons.some((r) => r.startsWith('answer_to_') || r.startsWith('repeated_') || r === 'unprompted_learner_sentence'));
+   if (novice && !clarifying) add('comprehensible_model', [band === 'unknown' ? 'level_unknown_start_simple' : 'level_beginner', ...(feedbackTurn ? ['during_feedback'] : [])], ['LTC-D2']);
+   if (novice && s.writesInArabicScript && !/arabic/i.test(input.targetLanguage ?? '')) add('l1_support', ['learner_writes_arabic_script', 'novice_level'], ['LTC-D8']);
+-  if (strong && s.confusionCount === 0 && !offTopic) {
++  if (strong && s.confusionCount === 0 && !offTopic && !s.unpromptedSentence) {
+     add('fade_support', [band === 'advanced' ? 'level_advanced' : `mastery_${input.masteryStatus}`], ['LTC-D3']);
+     if (!s.answeringCheck && !hintFirst) add('independent_practice', ['strong_and_not_confused'], ['LTC-D3']);
+   }
+@@ -676,7 +763,7 @@
+   short_explanation: 'Give a short, direct explanation with one example in context. Do not answer with only questions.',
+   comprehension_check: 'End with one short, focused check (a question or a mini task) tied to the lesson objective.',
+   corrective_feedback_retry:
+-    'They are answering your task: say specifically what is right and what is wrong in their answer (quote the part). Keep what is correct; if there are several errors, deal only with the most important one now; if something is wrong, give one hint aimed only at the gap and ask them to try again before you show the correct form; for strong learners a brief correct reformulation is enough. Never call one correct answer mastery.',
++    'They are answering your task: say specifically what is right and what is wrong in their answer (quote the part). First decide whether it is essentially correct: if the only issues are small surface slips (a capital letter, punctuation, spelling of a word that is not the lesson target) or they already corrected themselves, confirm it clearly, mention the slip in a few words at most, and move on to the next step, with no reteaching and no retry. Otherwise keep what is correct; if there are several errors, focus on the one that matters most for meaning and for this lesson\'s target, and mention small slips briefly or not at all; if something is wrong, give one hint aimed only at the gap and ask them to try again before you show the correct form; for strong learners a brief correct reformulation is enough. Never call one correct answer mastery.',
+   scaffold_hint: 'Give a hint matched to their last reply (one step), not the full answer.',
+   restate_task: 'They did not understand the task: restate it in one simpler line and show the format with a different example (not the answer). Then ask them to try.',
+   distinct_example: 'They asked for an example: give a new example of the same pattern that is different from their current exercise, so the exercise answer stays theirs to find.',
+@@ -717,6 +804,15 @@
+   if (m.id === 'comprehensible_model' && m.reasons.includes('during_feedback')) {
+     return 'Use short sentences and common words. Any model sentence must use a different example, never the corrected version of their own answer.';
+   }
++  if (m.id === 'corrective_feedback_retry' && m.reasons.includes('unprompted_learner_sentence')) {
++    const record = m.reasons.includes('record_vs_current_check')
++      ? ' Their school record suggests this point is usually secure, but judge this sentence on its own: if it has an error in the lesson target, don\'t assume either the record or the slip is the truth; point to the part to check and ask them to fix it themselves (one quick check), without giving the corrected sentence and without any mastery claims.'
++      : '';
++    return `They wrote their own sentence: treat it as an attempt and give feedback on it; don't start a lesson or explanation first.${record} ${MOVE_TEXT.corrective_feedback_retry}`;
++  }
++  if (m.id === 'corrective_feedback_retry' && m.reasons.includes('after_confirmed_success')) {
++    return `${MOVE_TEXT.corrective_feedback_retry} Their previous answer on this task was correct: if this one is also correct, say so briefly (no mastery or percentage claims), don't give another item of the same kind, and move on to a harder or freer transfer task (e.g. two or three sentences of their own). If this one has an error, give one targeted check rather than assuming either way.`;
++  }
+   if (m.id === 'corrective_feedback_retry' && m.reasons.includes('recurrence_unknown')) {
+     return `${MOVE_TEXT.corrective_feedback_retry} If this repeats the same mistake as their last answer, don't repeat your explanation or give the corrected sentence: change approach (a contrasting pair on a different example, or a smaller step) and ask them to try again.`;
+   }
+@@ -738,18 +834,37 @@
+   return m ? m[1].toLowerCase().replace('-', '') : undefined;
+ }
+ 
+-const LENGTH: Record<'adult' | 'unknown', Record<string, [number, number]>> = {
++// Target/max words per reply, by age band (rows) and CEFR step (columns).
++// 'unknown' and 'adult' are unchanged since r1. 'child' and 'teen' are
++// reachable only from a trusted source, which does not exist yet (BLOCKED):
++// child is never longer than 'unknown'; teen sits between unknown and adult.
++const LENGTH: Record<AgeBand, Record<string, [number, number]>> = {
+   unknown: { prea1: [50, 75], a1: [55, 80], a2: [70, 100], b1: [90, 130], b2: [110, 160], c1: [130, 190], c2: [130, 190], none: [70, 100] },
++  child: { prea1: [40, 60], a1: [45, 70], a2: [60, 90], b1: [80, 120], b2: [100, 150], c1: [110, 160], c2: [110, 160], none: [60, 90] },
++  teen: { prea1: [55, 85], a1: [60, 90], a2: [80, 120], b1: [100, 150], b2: [120, 180], c1: [140, 200], c2: [140, 200], none: [80, 120] },
+   adult: { prea1: [60, 100], a1: [70, 110], a2: [90, 140], b1: [120, 180], b2: [140, 210], c1: [160, 240], c2: [160, 240], none: [90, 140] },
+ };
+ 
+-export function lengthTarget(ageBand: Fact<'adult' | 'school'>, level?: string): LengthTarget {
+-  const age = ageBand.status === 'known' && ageBand.value === 'adult' ? 'adult' : 'unknown';
++export function lengthTarget(ageBand: Fact<AgeBand>, level?: string): LengthTarget {
++  const age: AgeBand = ageBand.status === 'known' && ageBand.value ? ageBand.value : 'unknown';
+   const step = cefrStep(level) ?? 'none';
+   const [targetWords, maxWords] = LENGTH[age][step] ?? LENGTH[age].none;
+-  return { targetWords, maxWords, basis: `${age === 'adult' ? 'adult' : 'age_unknown'}:${step}` };
++  return { targetWords, maxWords, basis: `${age === 'unknown' ? 'age_unknown' : age}:${step}` };
+ }
+ 
++// Register by age band: tone, contexts for examples, how much is asked at once
++// and how much independence is expected. Independent of CEFR (see REGISTER for
++// the level axis): the same objective and level target hold for every band.
++const AGE_REGISTER: Record<AgeBand, string> = {
++  child:
++    'Register: a child - warm, simple and concrete; examples from family, school, games and animals; one instruction at a time; praise effort specifically; short guided tasks before independent ones; nothing adult or frightening.',
++  teen:
++    'Register: a teenager - friendly and direct, never childish; examples from school, friends, hobbies, sport and apps; up to two steps at a time; expect some independent work; specific, honest feedback.',
++  adult: 'Register: adults - respectful and practical, everyday adult contexts; never childish.',
++  unknown:
++    'Register: the learner\'s age is not known - plain, friendly and respectful language that suits a school-age learner or an adult; no baby talk, no slang, no academic grammar terms unless they use them.',
++};
++
+ const REGISTER: Record<string, string> = {
+   prea1: 'Very short, concrete sentences; high-frequency words; one clear step; give a sentence frame or model.',
+   a1: 'Very short, concrete sentences; high-frequency words; one clear step; give a sentence frame or model.',
+@@ -769,7 +884,7 @@
+     factLine('Target language', l.targetLanguage),
+     factLine('Learner level', l.proficiency) + ' - an estimate, not a test result: never tell them their level; calibrate from their actual replies.',
+     factLine('Learner\'s own language', l.supportLanguage),
+-    ...(l.ageBand.status === 'known' ? [`- Learners: ${l.ageBand.value === 'adult' ? 'adults' : 'school students'}.`] : []),
++    ...(l.ageBand.status === 'known' && l.ageBand.value !== 'unknown' ? [`- Learner age band: ${l.ageBand.value} [known; source: ${l.ageBand.source}].`] : []),
+     ...(l.objectiveStatus ? [factLine('Objective status (assessed evidence)', l.objectiveStatus)] : []),
+   ];
+   if (lesson.status === 'structured' && lesson.spec) {
+@@ -793,16 +908,14 @@
+     if (ctx.signals.learnerGoal) lines.push(`What the learner said they want to practise (their words, not a course lesson): "${ctx.signals.learnerGoal.replace(/["<>]/g, '')}". Work on that; don't ask again.`);
+   }
+   const len = ctx.length ?? lengthTarget(l.ageBand, l.proficiency.value);
+-  const adult = len.basis.startsWith('adult');
++  const band: AgeBand = l.ageBand.status === 'known' && l.ageBand.value ? l.ageBand.value : 'unknown';
+   const step = cefrStep(l.proficiency.value);
+   lines.push(
+     'Teaching moves for this reply:',
+     ...ctx.moves.map((m) => `- ${moveText(m)}`),
+     `Length and style (policy ${LANGUAGE_POLICY_REVISION}): about ${len.targetWords} words, never more than ${len.maxWords} (count only your own words). One step per reply: one idea, one instruction, one task. Plain short lines; no tables, no headings, at most one short list. If more is needed, give the first part and offer to continue.`,
+     ...(step && REGISTER[step] ? [`Level: ${REGISTER[step]}`] : []),
+-    adult
+-      ? 'Register: adults - respectful and practical, everyday adult contexts; never childish.'
+-      : 'Register: the learner\'s age is not known - plain, friendly and respectful language that suits a school-age learner or an adult; no baby talk, no slang, no academic grammar terms unless they use them.',
++    AGE_REGISTER[band],
+     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
+     '</language_teaching_context>',
+   );
+@@ -852,6 +965,7 @@
+     // Observability (non-identifying category only): the age band that reached
+     // the engine and where it came from.
+     ageBand: ctx.learner.ageBand.status === 'known' ? ctx.learner.ageBand.value : 'unknown',
++    ageBandStatus: ctx.learner.ageBand.status,
+     ageBandSource: ctx.learner.ageBand.source,
+   };
+ }
+@@ -881,7 +995,9 @@
+     const learner = deriveLearnerContext({
+       courseLevel: curriculum.level,
+       courseLanguages: curriculum.languages,
+-      adultSchool: Boolean((institution as { learningSettings?: { adultLearners?: boolean } } | null)?.learningSettings?.adultLearners),
++      adultSchool: false,
++      // r3: tenant-scoped server read (institutionId from the owner-checked session).
++      trustedAgeBand: resolveTrustedAgeBand((institution as { learningSettings?: unknown } | null)?.learningSettings),
+       grade: params.grade,
+       learnerMessages,
+       objectiveStatus: params.masteryStatus,

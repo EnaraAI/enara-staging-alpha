@@ -1,3 +1,4 @@
+import { LEARNER_AGE_BANDS, type LearnerAgeBand } from './learnerAgeBand';
 import { Schema, model, Document } from 'mongoose';
 
 export const STUDENT_UI_MODES = ['standard', 'kids'] as const;
@@ -13,6 +14,14 @@ export interface IStudent extends Document {
   batchId?: string;
   academicYear?: string;
   groupId?: string;
+  // Trusted, staff-set coarse learning-context category (not an exact age).
+  // Written only by Workspace Admins via /api/age-bands; never selected by
+  // default so existing reads don't expose it.
+  learnerAgeBand?: LearnerAgeBand;
+  // Optional exact birth date (Parents Portal). When set it decides the
+  // parent-portal tier (age < 13 = kid); otherwise learnerAgeBand does.
+  // Never selected by default.
+  birthDate?: Date;
   progress?: number;
   avgScore?: number;
   studyTime?: string;
@@ -65,6 +74,13 @@ export interface IStudent extends Document {
   origin?: 'live' | 'demo_seed';
   // 'kids' shows this student the Enara Kids interface (set per student by school staff).
   uiMode?: StudentUiMode;
+  // Profile photo (approved) and a student's own upload awaiting a school admin.
+  // Urls are plain /uploads/<key> paths, signed per response (uploadSigning).
+  photoUrl?: string;
+  photoKey?: string;
+  pendingPhotoUrl?: string;
+  pendingPhotoKey?: string;
+  pendingPhotoAt?: Date;
 }
 
 const studentSchema = new Schema<IStudent>(
@@ -75,10 +91,17 @@ const studentSchema = new Schema<IStudent>(
     grade: { type: String, default: '' },
     uiMode: { type: String, enum: STUDENT_UI_MODES, default: 'standard' },
     avatar: { type: String, default: '' },
+    photoUrl: { type: String },
+    photoKey: { type: String },
+    pendingPhotoUrl: { type: String },
+    pendingPhotoKey: { type: String },
+    pendingPhotoAt: { type: Date, index: true },
     institutionId: { type: String, index: true },
     batchId: { type: String, index: true },
     academicYear: { type: String },
     groupId: { type: String },
+    learnerAgeBand: { type: String, enum: LEARNER_AGE_BANDS, select: false },
+    birthDate: { type: Date, select: false },
     progress: { type: Number, default: 0 },
     avgScore: { type: Number, default: 0 },
     studyTime: { type: String, default: '0h/week' },

@@ -16,6 +16,8 @@ export interface IAvatarSession extends Document {
   pinnedLanguage?: 'english' | 'arabic';
   // The chosen face's gender; the tutor's voice matches it.
   voiceGender?: 'woman' | 'man';
+  // 'server': ENARA listens and speaks; 'avatar': the video tutor does both.
+  speech?: 'server' | 'avatar';
   avatarId?: string;
   // Latest visual aid for the side panel; replaced after each answer that needs one.
   artifactHtml?: string;
@@ -71,6 +73,7 @@ const avatarSessionSchema = new Schema<IAvatarSession>(
     visualSeq: { type: Number, default: 0 },
     pinnedLanguage: { type: String, enum: ['english', 'arabic'] },
     voiceGender: { type: String, enum: ['woman', 'man'] },
+    speech: { type: String, enum: ['server', 'avatar'] },
     avatarId: String,
     openingUsed: { type: Boolean, default: false },
     freeNudgesLeft: { type: Number, default: 0 },

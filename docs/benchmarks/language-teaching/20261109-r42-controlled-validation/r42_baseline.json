@@ -1,0 +1,50 @@
+{
+ "campaign": "r4.2 controlled quality validation",
+ "baseline": "r4.1 (ltc-v1-r4.1)",
+ "commit": "fc6a487d287762a5f17ceadaf451f6c990347215",
+ "branch": "claude/codebase-review-kbxqan",
+ "workingTree": "uncommitted r4.1 changes on top of the commit (identical to the r4.1 manifest)",
+ "gitStatusLines": 39,
+ "r41ManifestSha256": "72203c079e0de6c0b2da838c205b177541bdac3095f22ee9cd2cc00eaef0399d",
+ "engineAndMeteringFiles": {
+  "backend/src/services/languageLearningState.ts": "e59dfac5ec33305ff8152a922a47857adcf63c80e8ab519c6a1c1ae851a2c657",
+  "backend/src/services/languageTeachingContext.ts": "e200a603ffe2dc8d4b12b2f04e2d5488879f282c017726d314fcf357f1cec51b",
+  "backend/src/controllers/tutor.controller.ts": "417e45419700938f58f783cd119f3be222f3a4f22eeb83300fc6eeecf836293f",
+  "backend/src/models/TutorMessage.ts": "85aaa2153d91589a57d3764273f4161118a6644532f0b783e85a7756a18ef030",
+  "backend/src/services/directTutorModel.ts": "8c69cdd826de04da7bb9b2834de875ef48d8627c0f827de4095a9dc7e93dc24e",
+  "backend/src/services/aiGateway.ts": "1e28c85634ef288a910a80b625567dbe351a630d4eb0aa0c5cea542067a76eb5",
+  "backend/src/services/priceCatalog.ts": "6f7857670e7acc908ab36287efe57828a4a74f59c2b251d3d53b87c3cc38831d",
+  "backend/src/services/usageLedger.ts": "d2a80fb7900b9d14598f921edc0bc75b6642e1371599f446ef69b9bbcc55e091",
+  "backend/src/services/aiCalls.ts": "0f617f31e8e9138bdd7abbc4e9e385c81a65f84423874feb12f8e5cc2cef706c",
+  "backend/src/config/env.ts": "5fc5f1a772b2c78ab5b1716c47544d5fb2cc05d3a7ca97b835982aeba85a36d8"
+ },
+ "benchmarkFiles": {
+  "backend/benchmarks/ltc-v2/run_fixture_v2.ts": "8470a60a25819df590a705dcc28ceb25241625c37524ecc68f48f1abaf31b48a",
+  "backend/benchmarks/ltc-v2/judge_v2.ts": "44a26743f477509b4bbd084716d74d9e92c66450d473fa6ab61bdc329263b52d",
+  "backend/benchmarks/ltc-v2/judge_v2_core.ts": "07efd01edaff84389c76c631359561f4d4b4dab19571cff751aa071ab898aaed"
+ },
+ "dataFiles": {
+  "docs/benchmarks/language-teaching/20261109-full-remediation/fixture_v2/fixture_v2_cases.jsonl": "e72d2a6d3c083240efc0513055c1670a2dea5f12c5e17d3a832746a86713c0c2",
+  "docs/benchmarks/language-teaching/20261109-post-remediation-final/rubric_v2_machine.json": "2f60cf7ffad38a6aaaecea25013231d335b338eb67aa004374291879561e0e07"
+ },
+ "config": {
+  "route": "POST /api/me/tutor/sessions/:id/messages (JSON), real controller in-process",
+  "tutorModel": "as configured (claude-opus-5-5)",
+  "officialEvaluator": "claude-sonnet-5-5 effort medium",
+  "independentEvaluator": "claude-haiku-5-5 effort low",
+  "evaluatorCore": "ltb-judge-v2-core-2",
+  "viewVersion": "ltb-fixture-v2/evaluatorView",
+  "cases": 120,
+  "turns": 219,
+  "concurrency": 1,
+  "freshDatabasePerRun": true,
+  "sampling": "provider default sampling; each run uses fresh sessions, fresh DB and independent requests (no seed control is exposed by the route)"
+ },
+ "caps": {
+  "perRunUsd": 10,
+  "campaignUsd": 30,
+  "tutorHarnessCapPerRun": 5.5,
+  "officialEvaluatorCapPerRun": 1.5,
+  "independentEvaluatorCapPerRun": 0.3
+ }
+}

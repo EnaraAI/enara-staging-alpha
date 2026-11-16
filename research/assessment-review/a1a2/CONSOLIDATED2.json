@@ -1,0 +1,1021 @@
+{
+ "source": [
+  "rereview_R1.json",
+  "rereview_R2.json",
+  "rereview_R3.json"
+ ],
+ "rule": "revise=true when >=2 distinct reviewers flagged the same target+issue; single-reviewer clear factual key errors also revised (singleReviewerFactual)",
+ "totals": {
+  "flagsPerReviewer": {
+   "R1": 7,
+   "R2": 8,
+   "R3": 37
+  },
+  "flags": 52,
+  "groups": 32,
+  "revise": 11,
+  "singleReviewerFactual": 9,
+  "noted": 12
+ },
+ "mergeDecisions": [
+  "R3-21..R3-28 are eight per-outcome flags for the same problem R2-6 states once (gap outcomes measurable 'yes'); merged as H06. R3-25/R3-27 also question the CEFR level of imperatives and was-were (single reviewer, noted, not changed).",
+  "R1-4 (classroom B-6), R2-2 (l1ErrorTypes + C-6) and R3-7 (l1ErrorTypes + C-6) are one outcome-level problem (EC slots no longer match the stated error type and two items are not certain errors); merged as H09.",
+  "R1-1 (C-5 direction), R3-4 (comma-splice keys) and R3-12 (A-5 duplicate of appearance A-6) all target common-adjectives slot 5; merged as H10 and fixed together.",
+  "R2-1 and R3-35 both say named-word VO prompts are scored with the open-field rubric; merged as H11.",
+  "R1-6 and R2-7 (condition text) merged as H01; R3-36 (points count) is a different criterion problem (H31)."
+ ],
+ "groups": [
+  {
+   "group": "H01",
+   "targets": [
+    "rubric:mastery-criterion (outcome conditions)"
+   ],
+   "issue": "conditions still say 'Gap-fill or choice items' while forms have EC/FP/transfer scored 0/1/2",
+   "reviewers": [
+    "R1",
+    "R2"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 6,
+     "target": "rubric:mastery-criterion",
+     "check": "C6",
+     "problem": "Every target outcome in outcomes.json still has condition 'Gap-fill or choice items, no help...', but the criterion and the forms include error correction, free production (0/1/2) and transfer items, so condition and criterion disagree.",
+     "fix": "Update the outcome condition to e.g. 'Delayed form of 9 items: controlled, error correction, free sentence and transfer; no help; items not seen in lessons'."
+    },
+    {
+     "reviewer": "R2",
+     "index": 7,
+     "target": "rubric:mastery-criterion",
+     "check": "C6",
+     "problem": "Every A1-A2 outcome in outcomes.json still has condition 'Gap-fill or choice items, no help...', while the forms and the new criterion include error-correction, free-production and transfer items scored 0/1/2.",
+     "fix": "Update condition to 'Delayed parallel form: 4 controlled items, 2 error-correction, 2 free sentences, 1 transfer; no help; items not seen in lessons'."
+    }
+   ]
+  },
+  {
+   "group": "H02",
+   "targets": [
+    "EN-F-A1-VO-days-months"
+   ],
+   "issue": "item acceptedAnswersNote 'Case-insensitive' contradicts case-sensitive matchingNote / rubric rule 2 exception",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 0,
+     "target": "EN-F-A1-VO-days-months",
+     "check": "C6",
+     "problem": "All 21 exact items (1-6, 9 in A/B/C) carry an item-level acceptedAnswersNote 'Case-insensitive; ignore final punctuation...' that contradicts their matchingNote and SCORING_RUBRIC rule 2 exception (day/month word is case-sensitive). The error-correction items (e.g. A-5 'febuary', B-6 'wensday') depend on the capital being scored.",
+     "fix": "Replace acceptedAnswersNote on these items with the case-sensitive wording of the matchingNote (day/month word case-sensitive; other case, final punctuation and spaces normalised)."
+    },
+    {
+     "reviewer": "R3",
+     "index": 6,
+     "target": "EN-F-A1-VO-days-months",
+     "check": "C6",
+     "problem": "Every item (A-1 to C-9) still carries acceptedAnswersNote 'Case-insensitive...' while matchingNote and SCORING_RUBRIC rule 2 say the day/month word is case-sensitive. The grader gets two opposite instructions, and EC items 5-6 ('febuary', 'tusday') depend on the capital.",
+     "fix": "Replace acceptedAnswersNote with the case-sensitive wording on all 27 items."
+    }
+   ]
+  },
+  {
+   "group": "H03",
+   "targets": [
+    "placement:PL-A1-GR-06"
+   ],
+   "issue": "mapped to umbrella course outcome although EN-F-A1-GR-prepositions-place exists",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 3,
+     "target": "placement:PL-A1-GR-06",
+     "check": "C2",
+     "problem": "Prepositions-of-place item is mapped to EN-C-A1-WR-simple-sentences although EN-F-A1-GR-prepositions-place exists in outcomes.json; placement evidence will not reach the outcome it measures.",
+     "fix": "Set outcomeIds to ['EN-F-A1-GR-prepositions-place'] (optionally keep the course outcome as a second id)."
+    },
+    {
+     "reviewer": "R3",
+     "index": 30,
+     "target": "placement:PL-A1-GR-06",
+     "check": "C2",
+     "problem": "outcomeIds points to the umbrella EN-C-A1-WR-simple-sentences although EN-F-A1-GR-prepositions-place exists for exactly this form.",
+     "fix": "Set outcomeIds to ['EN-F-A1-GR-prepositions-place']."
+    }
+   ]
+  },
+  {
+   "group": "H04",
+   "targets": [
+    "placement:PL-A1-GR-07"
+   ],
+   "issue": "mapped to umbrella course outcome although EN-F-A1-GR-plural-nouns exists",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 4,
+     "target": "placement:PL-A1-GR-07",
+     "check": "C2",
+     "problem": "Plural item (box -> boxes) is mapped to EN-C-A1-WR-simple-sentences instead of EN-F-A1-GR-plural-nouns, which exists.",
+     "fix": "Set outcomeIds to ['EN-F-A1-GR-plural-nouns']."
+    },
+    {
+     "reviewer": "R3",
+     "index": 31,
+     "target": "placement:PL-A1-GR-07",
+     "check": "C2",
+     "problem": "outcomeIds points to EN-C-A1-WR-simple-sentences although EN-F-A1-GR-plural-nouns exists.",
+     "fix": "Set outcomeIds to ['EN-F-A1-GR-plural-nouns']."
+    }
+   ]
+  },
+  {
+   "group": "H05",
+   "targets": [
+    "placement:PL-A2-VO-05"
+   ],
+   "issue": "mapped to umbrella course outcome although EN-F-A2-VO-transport-travel exists",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 5,
+     "target": "placement:PL-A2-VO-05",
+     "check": "C2",
+     "problem": "Transport vocabulary item (ticket at the station) is mapped to EN-C-A2-WR-linked-short-text instead of EN-F-A2-VO-transport-travel, which exists.",
+     "fix": "Set outcomeIds to ['EN-F-A2-VO-transport-travel']."
+    },
+    {
+     "reviewer": "R3",
+     "index": 32,
+     "target": "placement:PL-A2-VO-05",
+     "check": "C2",
+     "problem": "outcomeIds points to EN-C-A2-WR-linked-short-text although EN-F-A2-VO-transport-travel exists.",
+     "fix": "Set outcomeIds to ['EN-F-A2-VO-transport-travel']."
+    }
+   ]
+  },
+  {
+   "group": "H06",
+   "targets": [
+    "EN-F-A2-GR-was-were",
+    "EN-F-A1-GR-plural-nouns",
+    "EN-F-A1-GR-prepositions-place",
+    "EN-F-A1-GR-possessive-s",
+    "EN-F-A1-GR-subject-object-pronouns",
+    "EN-F-A2-GR-superlatives",
+    "EN-F-A2-GR-imperatives",
+    "EN-F-A2-VO-transport-travel"
+   ],
+   "issue": "8 gap outcomes (no lesson, no form) carry measurable 'yes' and a criterion that cannot be applied",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 6,
+     "target": "rubric:mastery-criterion",
+     "check": "C2",
+     "problem": "The new criterion ('per delayed form ... at least 3 of the 4 controlled items (1-4)') is written into outcomes.json for EN-F-A1-GR-plural-nouns, possessive-s, prepositions-place, subject-object-pronouns, EN-F-A2-GR-was-were, imperatives, superlatives and EN-F-A2-VO-transport-travel, but none of these has a form file in data/assessments/outcomes, so the criterion cannot be applied.",
+     "fix": "Either build A/B/C 9-item forms for these outcomes or mark their mastery as pending/not-yet-measurable until forms exist."
+    },
+    {
+     "reviewer": "R3",
+     "index": 21,
+     "target": "EN-F-A1-GR-plural-nouns",
+     "check": "C2",
+     "problem": "measurable = 'yes' and the criterion refers to 'controlled items (1-4)', but there is no item bank file and no lesson, so the outcome cannot be measured.",
+     "fix": "Set measurable to 'not yet' until 3 parallel forms exist, or write the forms."
+    },
+    {
+     "reviewer": "R3",
+     "index": 22,
+     "target": "EN-F-A1-GR-possessive-s",
+     "check": "C2",
+     "problem": "measurable = 'yes', but there is no item bank file and no lesson. l1ErrorTypes is empty, although the Arabic idafa calque ('the car of my father') is the classic error for this form.",
+     "fix": "Set measurable to 'not yet' or write the forms, and add an idafa_of_genitive l1ErrorType."
+    },
+    {
+     "reviewer": "R3",
+     "index": 23,
+     "target": "EN-F-A1-GR-prepositions-place",
+     "check": "C2",
+     "problem": "measurable = 'yes', but there is no item bank file and no lesson.",
+     "fix": "Set measurable to 'not yet' or write the forms."
+    },
+    {
+     "reviewer": "R3",
+     "index": 24,
+     "target": "EN-F-A1-GR-subject-object-pronouns",
+     "check": "C2",
+     "problem": "measurable = 'yes', but there is no item bank file and no lesson.",
+     "fix": "Set measurable to 'not yet' or write the forms."
+    },
+    {
+     "reviewer": "R3",
+     "index": 25,
+     "target": "EN-F-A2-GR-imperatives",
+     "check": "C1",
+     "problem": "Tagged cefr A2, but its own reference says 'EGP ... imperatives, A1'. It also has no item bank or lesson, yet measurable = 'yes'.",
+     "fix": "Move to A1 (or note why A2) and set measurable to 'not yet' until forms exist."
+    },
+    {
+     "reviewer": "R3",
+     "index": 26,
+     "target": "EN-F-A2-GR-superlatives",
+     "check": "C2",
+     "problem": "measurable = 'yes', but there is no item bank file and no lesson.",
+     "fix": "Set measurable to 'not yet' or write the forms."
+    },
+    {
+     "reviewer": "R3",
+     "index": 27,
+     "target": "EN-F-A2-GR-was-were",
+     "check": "C1",
+     "problem": "Tagged cefr A2, but the reference says 'EGP past simple of be, A1'. l1ErrorTypes includes agreement_3s, which does not apply to was/were. There is no item bank, yet measurable = 'yes'.",
+     "fix": "Align the level with EGP (A1) or justify A2; replace agreement_3s with be_agreement_plural; set measurable to 'not yet'."
+    },
+    {
+     "reviewer": "R3",
+     "index": 28,
+     "target": "EN-F-A2-VO-transport-travel",
+     "check": "C2",
+     "problem": "measurable = 'yes', but there is no item bank file and no lesson.",
+     "fix": "Set measurable to 'not yet' or write the forms."
+    }
+   ]
+  },
+  {
+   "group": "H07",
+   "targets": [
+    "EN-F-A1-GR-capitals-full-stops-C-6"
+   ],
+   "issue": "key models non-standard 'very fun'",
+   "reviewers": [
+    "R1",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 0,
+     "target": "EN-F-A1-GR-capitals-full-stops-C-6",
+     "check": "C3",
+     "problem": "Key and only accepted answer 'It was very fun.' is non-standard model English ('very fun'); parallel items A-6/B-6 use 'very good'/'very funny'.",
+     "fix": "Change prompt and key to '...after lunch. It was a lot of fun.' or 'It was very nice.'"
+    },
+    {
+     "reviewer": "R3",
+     "index": 1,
+     "target": "EN-F-A1-GR-capitals-full-stops-C-6",
+     "check": "C3",
+     "problem": "Key models 'It was very fun.', a non-standard collocation, in a case/punctuation-exact item where the whole sentence must match.",
+     "fix": "Change prompt and key to 'It was great fun.' or 'It was very good.' to match A-6/B-6."
+    }
+   ]
+  },
+  {
+   "group": "H08",
+   "targets": [
+    "EN-F-A1-VO-food-drink-A-6",
+    "EN-F-A1-VO-food-drink-B-6",
+    "EN-F-A1-VO-food-drink-C-6"
+   ],
+   "issue": "'drinks eggs/rice/bread' not a realistic Arabic-L1 eat/drink transfer",
+   "reviewers": [
+    "R1",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 2,
+     "target": "EN-F-A1-VO-food-drink-A-6",
+     "check": "C5",
+     "problem": "'drinks eggs' is not a documented Arabic-L1 eat/drink transfer; the real one is 'drink soup' (and 'drink a cigarette'), which Arabic expresses with shariba.",
+     "fix": "Use 'My grandfather drinks soup every night.' -> 'eats/has soup'."
+    },
+    {
+     "reviewer": "R3",
+     "index": 9,
+     "target": "EN-F-A1-VO-food-drink",
+     "check": "C5",
+     "problem": "Items 6 ('drinks eggs', 'drinks his rice', 'drinks bread and cheese') are not realistic. Arabic shariba extends to soup, medicine and smoking, not to solid food.",
+     "fix": "Use 'drink soup' -> 'have/eat soup', or 'I drink my medicine' -> 'take my medicine'."
+    }
+   ]
+  },
+  {
+   "group": "H09",
+   "targets": [
+    "EN-F-A1-VO-classroom-objects",
+    "EN-F-A1-VO-classroom-objects-A-5",
+    "EN-F-A1-VO-classroom-objects-B-5",
+    "EN-F-A1-VO-classroom-objects-C-5",
+    "EN-F-A1-VO-classroom-objects-A-6",
+    "EN-F-A1-VO-classroom-objects-B-6",
+    "EN-F-A1-VO-classroom-objects-C-6"
+   ],
+   "issue": "l1ErrorTypes/matching say article omission but EC items are object swaps; C-6 'close the board' / B-6 'pens in notebook' not certain errors",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 4,
+     "target": "EN-F-A1-VO-classroom-objects-B-6",
+     "check": "C2",
+     "problem": "'I keep my pens in my notebook' is not clearly wrong (pens can be kept in a notebook), so the item does not reliably target a lexical error; A-5/C-5 have unambiguous wrong objects.",
+     "fix": "Use an unambiguous mismatch, e.g. 'I sharpen my pencil with my ruler.' -> 'sharpener'."
+    },
+    {
+     "reviewer": "R2",
+     "index": 2,
+     "target": "EN-F-A1-VO-classroom-objects",
+     "check": "C5",
+     "problem": "Error-correction slots were changed to wrong-object confusions, but outcomes.json l1ErrorTypes still lists only article_indef_omission, and C-6 'Please close the board, it is cold' is not a plausible learner error (board/window are not confusable in form or L1 meaning).",
+     "fix": "Update outcomes.json l1ErrorTypes to the lexical confusion type (or restore an article-omission slot); replace C-6 with a plausible confusion parallel to A-6/B-6 (e.g. 'I keep my pencils in my ruler' -> pencil case)."
+    },
+    {
+     "reviewer": "R3",
+     "index": 7,
+     "target": "EN-F-A1-VO-classroom-objects",
+     "check": "C5",
+     "problem": "Matching note and l1ErrorTypes say the error-correction items are article_indef_omission, but items 5-6 test lexical object swaps (ruler for scissors, calendar for clock, notebook for pencil case, 'close the board'). These are not Arabic-L1 patterns, and C-6 is implausible.",
+     "fix": "Either rewrite items 5-6 as article omission ('I need ruler.' -> 'I need a ruler.') or correct the matching note and l1 tags and replace C-6."
+    }
+   ]
+  },
+  {
+   "group": "H10",
+   "targets": [
+    "EN-F-A1-VO-common-adjectives-A-5",
+    "EN-F-A1-VO-common-adjectives-B-5",
+    "EN-F-A1-VO-common-adjectives-C-5"
+   ],
+   "issue": "slot 5: C-5 reverses the tawil transfer; keys model comma splice; A-5 near-duplicate of appearance A-6",
+   "reviewers": [
+    "R1",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 1,
+     "target": "EN-F-A1-VO-common-adjectives-C-5",
+     "check": "C5",
+     "problem": "'This road is very tall' reverses the Arabic tawil transfer (Arabic-L1 learners say 'long' for tall, as in A-5), so the error is not a realistic Arabic-L1 error; forms not equal in what they test.",
+     "fix": "Use a tall/long error in the L1 direction, e.g. 'That building is very long, it has 40 floors.' -> 'tall', or a kabir error ('My sister is bigger than me, she is 20' -> older)."
+    },
+    {
+     "reviewer": "R3",
+     "index": 4,
+     "target": "EN-F-A1-VO-common-adjectives-A-5",
+     "check": "C3",
+     "problem": "Keys for A-5/B-5/C-5 model a comma splice ('My brother is very tall, he plays basketball.'); Framework §9 lists run-ons as an Arabic-L1 error, so the key should not model one.",
+     "fix": "Use 'My brother is very tall. He plays basketball.' (and the same in B-5/C-5) or 'because he plays basketball'."
+    },
+    {
+     "reviewer": "R3",
+     "index": 12,
+     "target": "EN-F-A1-VO-common-adjectives",
+     "check": "C4",
+     "problem": "common-adjectives A-5 'My brother is very long, he plays basketball.' is nearly identical to appearance A-6 'My cousin is very long, he plays basketball.' A learner taking both outcomes meets the same item twice.",
+     "fix": "Change one of them (e.g. appearance A-6 -> 'The new player is very long; he is two metres.')."
+    }
+   ]
+  },
+  {
+   "group": "H11",
+   "targets": [
+    "rubric:free_production (vocabulary)",
+    "EN-F-A1-VO-common-adjectives-A-7",
+    "EN-F-A1-VO-common-adjectives-A-8",
+    "EN-F-A1-VO-common-adjectives-B-7",
+    "EN-F-A1-VO-common-adjectives-B-8",
+    "EN-F-A1-VO-common-adjectives-C-7",
+    "EN-F-A1-VO-common-adjectives-C-8"
+   ],
+   "issue": "single-word prompts get the open 'any target-field word' rubric; old acceptedAnswersNote disagrees with rubric",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "revise": true,
+   "singleReviewerFactual": false,
+   "decision": "revise",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 1,
+     "target": "EN-F-A1-VO-common-adjectives-A-7",
+     "check": "C6",
+     "problem": "Prompt requires a specific word ('cheap'), but the attached VOCABULARY-variant rubric says 'a word from the target field ... the list is open', so a sentence using a different adjective could be scored 2. Same for A-8, B-7, B-8, C-7, C-8 (clean, expensive, dirty, quiet, empty); similar single-word prompts in VO-weather A-8/B-8/C-8 and VO-home-rooms A-7..C-8.",
+     "fix": "For single-word prompts add a criterion line: 2 only if the named word is used with the right meaning; another adjective/word = 0."
+    },
+    {
+     "reviewer": "R3",
+     "index": 35,
+     "target": "rubric:free_production (vocabulary)",
+     "check": "C6",
+     "problem": "VO items carry two scoring texts that disagree: acceptedAnswersNote gives '1 = ... meaning unclear; 0 = target word missing', while the rubric variant gives '0 = wrong meaning' and 'list is open'. 'Any target-field word' also conflicts with prompts that require a named word ('Use the word cheap/grandfather'), where 'expensive' or 'grandpa' would score 2.",
+     "fix": "Delete the old acceptedAnswersNote on VO free items, and add: when the prompt names a word, that word (or a listed variant) is required."
+    }
+   ]
+  },
+  {
+   "group": "H12",
+   "targets": [
+    "EN-F-A1-VO-numbers-time-A-5",
+    "EN-F-A1-VO-numbers-time-B-6"
+   ],
+   "issue": "f->v spelling is hypercorrection; Arabic-L1 error is v->f",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (error realism, key correct)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 3,
+     "target": "EN-F-A1-VO-numbers-time-A-5",
+     "check": "C5",
+     "problem": "l1ErrorType spelling_consonant_f_v: Arabic lacks /v/, so the expected error is v->f ('fery', 'elefen'); writing v for f ('fivteen', also B-6 'fivty') is hypercorrection and much less typical.",
+     "fix": "Use a v->f error, e.g. 'The bus comes at seven' misspelt 'sefen', or 'elefen' -> 'eleven'; apply the same to B-6."
+    }
+   ]
+  },
+  {
+   "group": "H13",
+   "targets": [
+    "EN-F-A2-VO-weather-A-6"
+   ],
+   "issue": "l1ErrorType label 'copula_omission/noun_for_adj' wrong (copula present)",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (metadata label, key correct)",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 5,
+     "target": "EN-F-A2-VO-weather-A-6",
+     "check": "C5",
+     "problem": "l1ErrorType 'copula_omission/noun_for_adj' is wrong: the sentence has the copula ('it is rain'); the error is noun for adjective/verb only.",
+     "fix": "Relabel l1ErrorType to 'noun_for_adj (rain for rainy/raining)'."
+    }
+   ]
+  },
+  {
+   "group": "H14",
+   "targets": [
+    "EN-F-A1-GR-article-the-A-9",
+    "EN-F-A1-GR-article-the-B-9",
+    "EN-F-A1-GR-article-the-C-9"
+   ],
+   "issue": "second gap also takes zero article (generic); only 'the' keyed",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 0,
+     "target": "EN-F-A1-GR-article-the",
+     "check": "C3",
+     "problem": "Item 9 (A/B/C): the second gap ('___ bread is very fresh', '___ trees are very old', '___ fruit is cheap') also takes zero article (generic reading), which item 6 teaches as correct; only 'the' is keyed. B-9 and C-9 also lack the 'The the' (no comma) variant that A-9 accepts.",
+     "fix": "Make the second gap clearly associative/specific (e.g. 'The bakery opens at six, and ___ baker is very kind') or accept 'The, -'; add 'The the' to B-9 and C-9 acceptedAnswers."
+    }
+   ]
+  },
+  {
+   "group": "H15",
+   "targets": [
+    "EN-F-A1-GR-possessive-adjectives-A-5",
+    "EN-F-A1-GR-possessive-adjectives-B-5",
+    "EN-F-A1-GR-possessive-adjectives-C-5"
+   ],
+   "issue": "'his' may refer to another man, so no certain mistake",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 2,
+     "target": "EN-F-A1-GR-possessive-adjectives",
+     "check": "C3",
+     "problem": "Items 5 (A/B/C) 'Salma washed his car', 'Mona called his uncle', 'Hoda found his glasses' are grammatical if 'his' refers to another man, so the 'mistake' is not certain.",
+     "fix": "Add context that fixes the owner, e.g. 'Salma has a new car. She washed his car on Friday.' or 'Salma washed his own car'-style cue."
+    }
+   ]
+  },
+  {
+   "group": "H16",
+   "targets": [
+    "EN-F-A1-GR-possessive-adjectives-A-7",
+    "EN-F-A1-GR-possessive-adjectives-B-7",
+    "EN-F-A1-GR-possessive-adjectives-C-7",
+    "EN-F-A1-GR-possessive-adjectives-B-8"
+   ],
+   "issue": "his/her gender uncheckable; B-8 unnatural",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (grader policy, not a key error)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 3,
+     "target": "EN-F-A1-GR-possessive-adjectives",
+     "check": "C6",
+     "problem": "Items 7 (A/B/C) criterion 'his/her matches the friend/teacher/neighbour' cannot be checked: the grader does not know the person's gender. B-8 prompt 'your class's room' is unnatural.",
+     "fix": "Score 2 for his or her + noun; reword B-8 to 'Write one sentence about your classroom. Use our.'"
+    }
+   ]
+  },
+  {
+   "group": "H17",
+   "targets": [
+    "EN-F-A1-VO-common-adjectives-A-6",
+    "EN-F-A1-VO-common-adjectives-B-6",
+    "EN-F-A1-VO-common-adjectives-C-6"
+   ],
+   "issue": "items 6 tagged lexical_opposite_negation but no 'not'; 'young' for objects atypical",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (error realism/label, key correct)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 5,
+     "target": "EN-F-A1-VO-common-adjectives",
+     "check": "C5",
+     "problem": "Items 6 ('baby sister is new', 'brother's phone is young', 'my bag is young') are tagged lexical_opposite_negation but contain no 'not' opposite (the matching note's type), and 'young' for objects is not a typical Arabic-L1 error (Arabic jadid = new; saghir = small/young).",
+     "fix": "Use the saghir polysemy: 'My sister is very small, she is five.' -> young (same in B/C), or rewrite to the 'not big' type in the matching note; fix the l1ErrorType."
+    }
+   ]
+  },
+  {
+   "group": "H18",
+   "targets": [
+    "EN-F-A1-VO-food-drink-C-1"
+   ],
+   "issue": "'egg' accepted gives ungrammatical sentence",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 10,
+     "target": "EN-F-A1-VO-food-drink",
+     "check": "C3",
+     "problem": "C-1 accepts 'egg', which gives the ungrammatical 'Chickens give us egg for breakfast.'",
+     "fix": "Remove 'egg' from C-1 acceptedAnswers."
+    }
+   ]
+  },
+  {
+   "group": "H19",
+   "targets": [
+    "EN-F-A1-VO-home-rooms-C-2"
+   ],
+   "issue": "instruction 'one word' but key is two words",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 11,
+     "target": "EN-F-A1-VO-home-rooms",
+     "check": "C3",
+     "problem": "C-2 says 'Write one word in the gap' but the key and two accepted answers ('living room', 'sitting room') are two words.",
+     "fix": "Change the instruction to 'one or two words' (as in C-9), or use a one-word target."
+    }
+   ]
+  },
+  {
+   "group": "H20",
+   "targets": [
+    "EN-F-A2-GR-comparatives"
+   ],
+   "issue": "l1ErrorTypes do not match items 5-6",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (schema enum has no fitting value; key correct)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 13,
+     "target": "EN-F-A2-GR-comparatives",
+     "check": "C5",
+     "problem": "l1ErrorTypes = ['spelling_vowel'], but item 5 is consonant doubling (not a vowel error) and item 6 is a double comparative ('more cheaper'), which is not listed.",
+     "fix": "Set l1ErrorTypes to ['spelling_consonant_doubling','double_comparative'] and fix the item-5 tags."
+    }
+   ]
+  },
+  {
+   "group": "H21",
+   "targets": [
+    "EN-F-A2-GR-conjunctions-A-5",
+    "EN-F-A2-GR-conjunctions-B-5",
+    "EN-F-A2-GR-conjunctions-C-5"
+   ],
+   "issue": "'and' sentences are grammatical, so no certain mistake",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 14,
+     "target": "EN-F-A2-GR-conjunctions",
+     "check": "C3",
+     "problem": "Items 5 ('I stayed at home and it was raining', 'We took a taxi and the bus was late', 'I wore a scarf and it was windy') are grammatical English, so there is no certain 'mistake' to correct.",
+     "fix": "Make the needed meaning explicit (e.g. 'Fix the mistake: give the reason.') or use a run-on that is ungrammatical."
+    }
+   ]
+  },
+  {
+   "group": "H22",
+   "targets": [
+    "EN-F-A2-GR-going-to-A-7",
+    "EN-F-A2-GR-going-to-B-7",
+    "EN-F-A2-GR-going-to-C-7",
+    "EN-F-A2-GR-going-to-A-8",
+    "EN-F-A2-GR-going-to-B-8",
+    "EN-F-A2-GR-going-to-C-8",
+    "EN-F-A2-GR-going-to-A-9",
+    "EN-F-A2-GR-going-to-B-9",
+    "EN-F-A2-GR-going-to-C-9"
+   ],
+   "issue": "prompts let the learner avoid going to",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 15,
+     "target": "EN-F-A2-GR-going-to",
+     "check": "C2",
+     "problem": "Items 7-9 (A/B/C) do not say 'Use going to'. 'I'm watching the match tonight' or 'I will...' is correct English for a plan, but it scores 0 under rubric rule 3.",
+     "fix": "Add 'Use going to.' to the prompts of items 7, 8 and 9 in all forms."
+    }
+   ]
+  },
+  {
+   "group": "H23",
+   "targets": [
+    "EN-F-A2-VO-clothes-shopping-B-4"
+   ],
+   "issue": "B-4 tests agreement, not vocabulary",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (parallelism, key correct)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 16,
+     "target": "EN-F-A2-VO-clothes-shopping",
+     "check": "C2",
+     "problem": "B-4 '(is / are / cost): How much ____ this jacket' tests subject-verb agreement, not clothes or shopping vocabulary; A-4 (try on) and C-4 (fit) test vocabulary.",
+     "fix": "Replace it with a vocabulary choice, e.g. '(receipt / size / price): What ____ are these shoes?' -> size."
+    }
+   ]
+  },
+  {
+   "group": "H24",
+   "targets": [
+    "EN-F-A2-VO-clothes-shopping-A-7",
+    "EN-F-A2-VO-clothes-shopping-B-7",
+    "EN-F-A2-VO-clothes-shopping-C-7"
+   ],
+   "issue": "prompt asks for colour but colour not scored",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (scoring scope, key correct)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 17,
+     "target": "EN-F-A2-VO-clothes-shopping-C-7",
+     "check": "C6",
+     "problem": "Items 7 (A/B/C) ask for 'one item and its colour', but the rubric and acceptedAnswers score only the clothing noun. A missing or wrong colour is not covered.",
+     "fix": "Either drop 'and its colour' from the prompts or state in the rubric that the colour is not scored."
+    }
+   ]
+  },
+  {
+   "group": "H25",
+   "targets": [
+    "EN-F-A2-VO-jobs-workplaces"
+   ],
+   "issue": "l1ErrorTypes/matching say article omission but no item tests it",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (metadata, key correct)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 18,
+     "target": "EN-F-A2-VO-jobs-workplaces",
+     "check": "C5",
+     "problem": "l1ErrorTypes and the matching note say the EC items test article_indef_omission before a job noun, but no item does (A-5/B-5/C-5 already have 'a').",
+     "fix": "Make one EC item per form an article omission ('My uncle is driver.' -> 'a driver'), or correct the l1 tags and matching note."
+    }
+   ]
+  },
+  {
+   "group": "H26",
+   "targets": [
+    "EN-F-A2-VO-make-do-A-9",
+    "EN-F-A2-VO-make-do-B-9",
+    "EN-F-A2-VO-make-do-C-9"
+   ],
+   "issue": "chore-chart prompt lets the learner avoid make/do",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 19,
+     "target": "EN-F-A2-VO-make-do-A-9",
+     "check": "C2",
+     "problem": "Chore-chart items 9 (A/B/C) do not require make/do. 'Omar cooks dinner', 'Hoda washes the dishes' and 'Nour cleans the house' are correct but score 0 by rule 3.",
+     "fix": "Add 'Use make or do.' to the prompts of A-9, B-9 and C-9."
+    }
+   ]
+  },
+  {
+   "group": "H27",
+   "targets": [
+    "EN-F-A2-VO-weather-C-2"
+   ],
+   "issue": "C-2 breaks slot-2 match (no weather noun, non -y adjective)",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (parallelism, key correct)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 20,
+     "target": "EN-F-A2-VO-weather",
+     "check": "C4",
+     "problem": "C-2 ('You need a coat and a scarf. It is ____' -> cold) gives no weather-noun clue and a non -y adjective. This breaks the item-2 match with A-2 (wind -> windy) and B-2 (snow -> snowy).",
+     "fix": "Use 'There is a lot of fog. It is ____ .' -> foggy."
+    }
+   ]
+  },
+  {
+   "group": "H28",
+   "targets": [
+    "placement:PL-A1-GR-01"
+   ],
+   "issue": "'some apple' defensible, two options correct",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 29,
+     "target": "placement:PL-A1-GR-01",
+     "check": "C3",
+     "problem": "Distractor 'some' gives 'I have some apple in my bag', which is grammatical (mass reading, e.g. pieces of apple), so two options can be defended.",
+     "fix": "Replace 'some' with 'any' (or 'the' is also defensible, so prefer 'any')."
+    }
+   ]
+  },
+  {
+   "group": "H29",
+   "targets": [
+    "placement:PL-A2-RD-03"
+   ],
+   "issue": "detail item mapped to main-idea outcome; accented 'café' not accepted",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": true,
+   "decision": "revise (accepted answers only; mapping noted) (single-reviewer, factual)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 33,
+     "target": "placement:PL-A2-RD-03",
+     "check": "C2",
+     "problem": "A specific-detail question ('Where will they meet?') is mapped to EN-L-A2-RD-main-idea. acceptedAnswers also have no 'café' (accented) form, and rule 2 does not normalise accents.",
+     "fix": "Map to a reading-for-detail outcome; add 'café' variants (or add accent folding to rule 2)."
+    }
+   ]
+  },
+  {
+   "group": "H30",
+   "targets": [
+    "rubric:exact"
+   ],
+   "issue": "choice items list only the letter; option text would be marked wrong",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (rubric/grader-level, no grader change in this pass)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 34,
+     "target": "rubric:exact",
+     "check": "C6",
+     "problem": "§2.1 says a choice item scores 1 for 'its letter or its text', but most multiple_choice items list only the letter in acceptedAnswers (e.g. capitals 1-2, polite-requests 3-4, frequency-adverbs 3-4), and §2 says the assignment grader reads one correctAnswer. Option text will be marked wrong.",
+     "fix": "Add the option text to acceptedAnswers on every choice item (as word-order 1-2 already do), or state that only the letter is accepted."
+    }
+   ]
+  },
+  {
+   "group": "H32",
+   "targets": [
+    "EN-F-A1-VO-family-A-5",
+    "EN-F-A1-VO-family-B-5",
+    "EN-F-A1-VO-family-C-5",
+    "EN-F-A1-VO-family-A-6",
+    "EN-F-A1-VO-family-B-6",
+    "EN-F-A1-VO-family-C-6"
+   ],
+   "issue": "EC kin swaps are not the periphrastic pattern the matching note names",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (realism/matching-note wording, keys correct)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 8,
+     "target": "EN-F-A1-VO-family",
+     "check": "C5",
+     "problem": "EC items (A-5..C-6: 'father's brother is my cousin', 'mother's mother is my aunt', 'father's father is my uncle') are random kin swaps, not the Arabic periphrastic pattern given in the matching note ('the brother of my father'). Arabic separates these relations, so the errors are not transfer errors.",
+     "fix": "Use periphrastic sentences: 'The brother of my father lives in Tanta.' -> 'My uncle lives in Tanta.'; 'The son of my aunt is ten.' -> 'My cousin is ten.'"
+    }
+   ]
+  },
+  {
+   "group": "H31",
+   "targets": [
+    "rubric:mastery-criterion"
+   ],
+   "issue": "exact-scored transfer counted 1 or 2 points ambiguously",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "revise": false,
+   "singleReviewerFactual": false,
+   "decision": "noted (conditions now state per-item scoring; criterion text not changed)",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 36,
+     "target": "rubric:mastery-criterion",
+     "check": "C6",
+     "problem": "The criterion counts 'exact items 1 point', but §2.4 says transfer items whose bank scoring is 'exact' are scored 0/1/2. Item 9 in a-an, possessive-adjectives, days-months, third-person-s and others is therefore 1 or 2 points, and the 80% total is ambiguous (13 vs 14).",
+     "fix": "State that item 9 always counts 2 points (0/1/2), or that exact-scored transfer counts 1, and apply the same rule in both sections."
+    }
+   ]
+  }
+ ]
+}

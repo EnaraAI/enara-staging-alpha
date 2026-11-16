@@ -1,6 +1,7 @@
 import { QUICK_CLOSE_MS, transcriptionReconnectDelayMs } from './retryPolicy';
 import { CommitStrategy, RealtimeEvents, Scribe, type RealtimeConnection } from '@elevenlabs/client';
 import { avatarFetch } from './apiService';
+import { markRelayDown, relayBase, relayWsBase } from './relay';
 
 import { isEcho, isOffLanguage, isRepeatUtterance, languageOfText, REPEAT_WINDOW_MS, toVoiceLanguage, voiceWords as words, type VoiceLanguage } from './voiceText';
 
@@ -28,6 +29,9 @@ export interface VoiceCallbacks {
   onInterrupt?(): void;
   // Speech that came back in neither English nor Arabic: ask again, don't answer it.
   onNotCaught?(): void;
+  // ENARA's voice was refused (account blocked or out of credit): the call
+  // switches to the video tutor's own voice.
+  onVoiceUnavailable?(): void;
   onError(message: string): void;
 }
 
@@ -85,8 +89,11 @@ export class AvatarVoice {
     const res = await avatarFetch(`/session/${this.sessionId}/stt-token`, { method: 'POST' });
     if (!res.ok) throw new Error(`Transcription token failed (${res.status})`);
     const { token, model_id } = await res.json();
+    // Through Enara's relay when it answers; directly otherwise.
+    const relay = await relayBase();
 
     const connection = Scribe.connect({
+      ...(relay ? { baseUri: `${relayWsBase(relay)}/s` } : {}),
       token,
       modelId: model_id,
       commitStrategy: CommitStrategy.VAD,
@@ -142,11 +149,17 @@ export class AvatarVoice {
     const openedAt = performance.now();
     // Resolve once the session is live (or after 3 s), so a rotation only
     // closes the previous session when this one is already listening.
+    let live = false;
     const started = new Promise<void>((resolve) => {
-      connection.on(RealtimeEvents.SESSION_STARTED, () => resolve());
+      connection.on(RealtimeEvents.SESSION_STARTED, () => {
+        live = true;
+        resolve();
+      });
       setTimeout(resolve, 3000);
     });
     connection.on(RealtimeEvents.CLOSE, () => {
+      // Never started through the relay: reconnect directly instead.
+      if (relay && !live) markRelayDown();
       if (this.connection !== connection) return;
       this.connection = null;
       // Tokens and sessions are time-limited: reconnect while the call is open,
@@ -249,6 +262,10 @@ export class AvatarVoice {
 
   private async play(audio: Promise<Response>, generation: number): Promise<void> {
     const res = await audio;
+    if (res.status === 503) {
+      const body = await res.clone().json().catch(() => null);
+      if (body?.error?.code === 'AVATAR_VOICE_UNAVAILABLE') this.callbacks.onVoiceUnavailable?.();
+    }
     if (!res.ok || !res.body || this.stopped || generation !== this.generation) return;
     const reader = res.body.getReader();
     await this.playChunks(

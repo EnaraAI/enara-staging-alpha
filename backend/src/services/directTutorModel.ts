@@ -1,3 +1,4 @@
+import { IDENTITY_RULE } from '../utils/vendorNeutral';
 import Anthropic from '@anthropic-ai/sdk';
 import path from 'path';
 import { getConfig } from '../config/env';
@@ -144,6 +145,12 @@ export interface TutorRequestParams {
   // Retrieved course passages (services/curriculumRetrieval.ts). When given,
   // they replace sending whole lesson files.
   sourcesPrompt?: string;
+  // Language courses (ltc-v1): labelled learner/lesson context and this turn's
+  // teaching moves (services/languageTeachingContext.ts).
+  languageContext?: string;
+  // v2 cache layout: the language context split into a part that is identical every turn (placed early, with the cache breakpoint) and a per-turn part (placed last).
+  languageContextStable?: string;
+  languageContextDynamic?: string;
 }
 
 // Shown to the student's own tutor in every mode: checks understanding and
@@ -196,7 +203,9 @@ export async function buildTutorRequest(params: TutorRequestParams) {
         style +
         (params.planActive ? PLAN_GUIDANCE : METHOD_GUIDANCE[params.teachingMethod]) +
         ' ' +
-        PROACTIVE_TEACHING,
+        PROACTIVE_TEACHING +
+        ' ' +
+        IDENTITY_RULE,
     },
   ];
   if (curriculum) {
@@ -208,8 +217,12 @@ export async function buildTutorRequest(params: TutorRequestParams) {
         'If the question goes beyond the curriculum, say so briefly and still help at the right level. ' +
         "Don't invent content and claim it comes from the course.\n\n" +
         describeCurriculum(curriculum),
-      cache_control: { type: 'ephemeral' },
+      ...(params.languageContextStable ? {} : { cache_control: { type: 'ephemeral' as const } }),
     });
+  }
+  // v2 cache layout: base + curriculum + stable language rules form one cached prefix (about 1,800+ tokens, above the model's minimum cacheable size).
+  if (params.languageContextStable) {
+    system.push({ type: 'text', text: params.languageContextStable, cache_control: { type: 'ephemeral' } });
   }
   if (params.learner) {
     system.push({
@@ -221,6 +234,12 @@ export async function buildTutorRequest(params: TutorRequestParams) {
   }
   if (params.pedagogy) {
     system.push({ type: 'text', text: params.pedagogy });
+  }
+  if (params.languageContext && !params.languageContextStable) {
+    system.push({ type: 'text', text: params.languageContext });
+  }
+  if (params.languageContextDynamic) {
+    system.push({ type: 'text', text: params.languageContextDynamic });
   }
   if (params.sourcesPrompt) {
     system.push({ type: 'text', text: params.sourcesPrompt });

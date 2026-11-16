@@ -26,7 +26,7 @@ import {
 import { DEMO_INSTITUTION_ID, DEMO_USER_EMAILS, isDemoRole } from '../config/demo';
 import { confirmPasswordReset, requestPasswordReset } from '../services/accountTokens';
 
-function signToken(user: {
+export function signToken(user: {
   _id: { toString(): string };
   email: string;
   role: UserRole;
@@ -100,7 +100,7 @@ export async function uiModeFor(user: { role: string; studentId?: string }): Pro
   return student?.uiMode === 'kids' ? 'kids' : 'standard';
 }
 
-async function sessionUser(user: InstanceType<typeof User>) {
+export async function sessionUser(user: InstanceType<typeof User>) {
   return {
     email: user.email,
     role: user.role,

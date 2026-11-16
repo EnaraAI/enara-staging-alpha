@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Parents portal: Home, Omar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f6f7fa}
+a{color:#2f6bff}a:hover{color:#0b203c}
+.card{background:#ffffff;border:1px solid #dce2ea;border-radius:10px;box-shadow:0 1px 2px 0 rgba(0,0,0,0.05)}
+.eyebrow{font-size:12px;line-height:16px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#566376;margin:0}
+.chip{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:9999px;border:1px solid #dce2ea;background:#ffffff;text-decoration:none;color:#111c2c;min-height:44px;box-sizing:border-box;flex-shrink:0}
+.chip-on{border:2px solid #2f6bff;background:#eaf0ff}
+.navlink{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:56px;text-decoration:none;color:#566376;font-size:11px;font-weight:500}
+.navlink:hover{color:#111c2c}
+.nav-on{color:#2f6bff}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:none;background:transparent;color:#111c2c;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 1320px; box-sizing: border-box; display: flex; flex-direction: column; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif; color: #111c2c; background: #f6f7fa">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 4px 20px">
+    <div style="display: flex; align-items: baseline; gap: 8px">
+      <span style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: #0b203c">ENARA</span>
+      <span style="font-size: 14px; font-weight: 500; color: #566376">Parents</span>
+      <span style="font-size: 11px; font-weight: 500; color: #566376; border: 1px solid #dce2ea; border-radius: 9999px; padding: 2px 8px; margin-left: 4px">Sample data</span>
+    </div>
+    <button class="iconbtn" aria-label="Notifications, 2 unread">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+    </button>
+  </header>
+
+  <nav aria-label="Choose learner" style="display: flex; gap: 8px; padding: 8px 16px 12px 16px; overflow-x: auto">
+    <a class="chip chip-on" href="Main.dc.html" aria-current="page">
+      <span style="width: 32px; height: 32px; border-radius: 9999px; background: #f59f0a; color: #08172b; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px">O</span>
+      <span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600; line-height: 18px">Omar</span><span style="font-size: 11px; color: #566376; line-height: 14px">Age 9</span></span>
+    </a>
+    <a class="chip" href="Teen.dc.html">
+      <span style="width: 32px; height: 32px; border-radius: 9999px; background: #0ea5a4; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px">L</span>
+      <span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600; line-height: 18px">Laila</span><span style="font-size: 11px; color: #566376; line-height: 14px">Age 15</span></span>
+    </a>
+    <a class="chip" href="Adult.dc.html">
+      <span style="width: 32px; height: 32px; border-radius: 9999px; background: #0b203c; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px">Y</span>
+      <span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600; line-height: 18px">Youssef</span><span style="font-size: 11px; color: #566376; line-height: 14px">Age 20</span></span>
+    </a>
+  </nav>
+
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding: 0 16px 16px 16px">
+
+    <section style="display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 10px; background: #eaf0ff; border: 1px solid #c9d8ff">
+      <span style="width: 10px; height: 10px; border-radius: 9999px; background: #2f6bff; margin-top: 6px; flex-shrink: 0"></span>
+      <div>
+        <p style="margin: 0; font-size: 16px; font-weight: 600; line-height: 22px">On track this week</p>
+        <p style="margin: 2px 0 0 0; font-size: 14px; line-height: 20px; color: #16263b">Omar has done 72 of his 90 minutes, with 3 days left.</p>
+      </div>
+    </section>
+
+    <section class="card" style="padding: 20px; display: flex; gap: 20px; align-items: center">
+      <svg width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="72 of 90 minutes, 80 percent">
+        <circle cx="48" cy="48" r="40" fill="none" stroke="#f2f4f8" stroke-width="10"></circle>
+        <circle cx="48" cy="48" r="40" fill="none" stroke="#f59f0a" stroke-width="10" stroke-linecap="round" stroke-dasharray="201 251" transform="rotate(-90 48 48)"></circle>
+        <text x="48" y="46" text-anchor="middle" font-size="22" font-weight="600" fill="#111c2c" font-family="Inter, sans-serif">72</text>
+        <text x="48" y="64" text-anchor="middle" font-size="11" fill="#566376" font-family="Inter, sans-serif">of 90 min</text>
+      </svg>
+      <div style="display: flex; flex-direction: column; gap: 10px; flex-grow: 1">
+        <p class="eyebrow">This week</p>
+        <div style="display: flex; justify-content: space-between">
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+              <span style="{{d.dotStyle}}"></span>
+              <span style="font-size: 11px; color: #566376">{{d.label}}</span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin: 0; font-size: 14px; line-height: 20px"><strong style="font-weight: 600">4-day streak</strong> <span style="color: #566376">· 5 sessions</span></p>
+      </div>
+    </section>
+
+    <a class="card" href="Progress.dc.html" style="padding: 20px; display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: #111c2c">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <p class="eyebrow">Level</p>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" style="color: #566376"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </div>
+      <p style="margin: 0; font-size: 20px; font-weight: 600; line-height: 28px">Beginner <span style="font-weight: 500; color: #566376">· A1</span></p>
+      <div style="height: 8px; border-radius: 9999px; background: #f2f4f8; overflow: hidden"><div style="width: 60%; height: 8px; background: #f59f0a; border-radius: 9999px"></div></div>
+      <p style="margin: 0; font-size: 13px; color: #566376">60% of the way to Elementary (A2)</p>
+      <div style="display: flex; gap: 8px; align-items: center; padding: 10px 12px; border-radius: 8px; background: #ecfdf5">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" style="color: #047857; width: 18px; height: 18px"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <p style="margin: 0; font-size: 13px; line-height: 18px; color: #047857"><strong style="font-weight: 600">New can-do:</strong> introduces his family in simple sentences</p>
+      </div>
+    </a>
+
+    <section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">This week Omar learned</h2>
+        <span style="display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; color: #6d4aff; background: #f1edff; border-radius: 9999px; padding: 3px 8px">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: #6d4aff"><path d="M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2z"></path></svg>ENARA summary</span>
+      </div>
+      <ul style="margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 20px">
+        <li>Talking about his family: who they are and what they like</li>
+        <li>18 new words, including <em>kitchen</em>, <em>hungry</em> and <em>favourite</em></li>
+        <li>His longest answer yet: 4 sentences without switching to Arabic</li>
+      </ul>
+    </section>
+
+    <section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+      <div>
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600; line-height: 20px">Hear the progress</h2>
+        <p style="margin: 2px 0 0 0; font-size: 13px; color: #566376">Omar introducing himself, 10 seconds each</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px">
+        <button aria-label="Play recording from today" style="width: 44px; height: 44px; border-radius: 9999px; border: none; background: #0b203c; color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: #ffffff"><polygon points="7 4 20 12 7 20 7 4"></polygon></svg>
+        </button>
+        <div style="flex-grow: 1">
+          <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 600">Now</p>
+          <div style="display: flex; align-items: center; gap: 3px; height: 24px">
+            <sc-for list="{{waveNow}}" as="h" hint-placeholder-count="28"><span style="{{h.style}}"></span></sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px">
+        <button aria-label="Play recording from 4 weeks ago" style="width: 44px; height: 44px; border-radius: 9999px; border: 1px solid #d0d8e2; background: #ffffff; color: #0b203c; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: #0b203c"><polygon points="7 4 20 12 7 20 7 4"></polygon></svg>
+        </button>
+        <div style="flex-grow: 1">
+          <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 600; color: #566376">4 weeks ago</p>
+          <div style="display: flex; align-items: center; gap: 3px; height: 24px">
+            <sc-for list="{{waveThen}}" as="h" hint-placeholder-count="28"><span style="{{h.style}}"></span></sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px; background: #fffbeb; border-color: #fde7b0">
+      <p class="eyebrow" style="color: #92400e">Try this at home</p>
+      <p style="margin: 0; font-size: 15px; line-height: 22px">At dinner, ask Omar to introduce the family in English. He practiced exactly this on Tuesday.</p>
+    </section>
+
+    <section class="card" style="display: flex; flex-direction: column">
+      <div style="display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-bottom: 1px solid #dce2ea">
+        <span style="width: 8px; height: 8px; border-radius: 9999px; background: #db7706; flex-shrink: 0"></span>
+        <p style="margin: 0; font-size: 14px; line-height: 20px; flex-grow: 1">Checkpoint quiz on Thursday</p>
+        <span style="font-size: 12px; color: #566376">Unit 4</span>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center; padding: 14px 16px">
+        <span style="width: 8px; height: 8px; border-radius: 9999px; background: #566376; flex-shrink: 0"></span>
+        <p style="margin: 0; font-size: 14px; line-height: 20px; flex-grow: 1">Plan renews on 1 December</p>
+        <a href="Account.dc.html" style="font-size: 13px; font-weight: 500">Manage</a>
+      </div>
+    </section>
+  </main>
+
+  <nav aria-label="Main" style="display: flex; background: #ffffff; border-top: 1px solid #dce2ea; padding: 4px 4px 12px 4px">
+    <a class="navlink nav-on" href="Main.dc.html" aria-current="page"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path></svg>Home</a>
+    <a class="navlink" href="Progress.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>Progress</a>
+    <a class="navlink" href="Activity.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>Activity</a>
+    <a class="navlink" href="Controls.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path></svg>Controls</a>
+    <a class="navlink" href="Account.dc.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>Account</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1320}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var labels = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    var done = [true, true, true, true, false, false, false];
+    var days = labels.map(function (l, i) {
+      var base = 'width: 18px; height: 18px; border-radius: 9999px; box-sizing: border-box; ';
+      var s = done[i] ? base + 'background: #f59f0a;' : (i === 4 ? base + 'border: 2px solid #2f6bff;' : base + 'background: #f2f4f8;');
+      return { label: l, dotStyle: s };
+    });
+    var now = [6, 12, 18, 10, 22, 16, 8, 20, 24, 14, 18, 10, 22, 18, 12, 20, 16, 24, 10, 14, 20, 18, 8, 16, 22, 12, 18, 10];
+    var then = [4, 8, 6, 3, 10, 4, 2, 3, 8, 5, 2, 3, 6, 10, 4, 2, 3, 2, 6, 4, 3, 2, 5, 3, 2, 4, 3, 2];
+    var bar = function (c) { return function (h) { return { style: 'display: block; width: 4px; border-radius: 2px; height: ' + h + 'px; background: ' + c + ';' }; }; };
+    return { days: days, waveNow: now.map(bar('#0b203c')), waveThen: then.map(bar('#a3adbb')) };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+{
+  "status": "DRAFT",
+  "outcomeId": "EN-F-A1-VO-family",
+  "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic-L1 vowel spelling slip on a kin word in a natural sentence; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 now contain a wrong kin word that must be replaced (uncle/aunt/cousin/grandmother/grandfather, all A1); C-4 now aunt. Review round 3: all items 7-8 use the 'VOCABULARY variant, named word' rubric (as C-7 already did), since each prompt names the kin word. Review round 4: the kin-word swaps (my mother's mother is my aunt ...) were factual absurdities, not learner errors. Slots 5-6 are now vowel slips on an A1 kin word: doughter/hasband (A), parints/brather (B), grandmather/nece (C). outcomes.json l1ErrorTypes = [spelling_vowel]. Review round 5: C-6 'nece' (niece, EVP A2) -> 'childrin' (children, A1, not used elsewhere in form C); 'niece' distractor removed from A-4. No item's answer word is shown elsewhere in its form: gap-fill definitions, slot 3-4 options and slot 7-8 named kin words use only words not keyed in that form; C-9 no longer shows 'son'. User decisions (A1-A2): vocabulary validity - each form keeps one spelling error-correction item (slot 5); slot 6 is now a meaning error (Arabic-L1 polysemy or calque on an A1 word), with exactly one correct fix and the answer word not shown elsewhere in the form. Fix of 2+ reviewer known issues: slot-6 tag -> lexical_l1_transfer (PART 2); C-1 now mother's father (grandfather), no longer a copy of A-1 nor the same answer as C-5; A-4 stem no longer shows 'wife' (A-6 key); A-6/C-6 use names, not 'brother'/'aunt' (form keys); C-3/C-4 options no longer show C-7/C-8 named words.",
+  "forms": {
+    "A": [
+      {
+        "id": "EN-F-A1-VO-family-A-1",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: My mother's mother is my ____ .",
+        "answerKey": "grandmother",
+        "acceptedAnswers": [
+          "grandmother",
+          "grandma",
+          "granny"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "grandmother",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-A-2",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: My uncle's son is my ____ .",
+        "answerKey": "cousin",
+        "acceptedAnswers": [
+          "cousin"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "cousin",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-A-3",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (brother / sister / son): Rania is Omar's sister, and Omar is Rania's ____ .",
+        "answerKey": "brother",
+        "acceptedAnswers": [
+          "brother"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "brother",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-A-4",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (aunt / sister / mother): My mum's sister is my ____ .",
+        "answerKey": "aunt",
+        "acceptedAnswers": [
+          "aunt"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "aunt",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-A-5",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My doughter is five years old today.",
+        "answerKey": "My daughter is five years old today.",
+        "acceptedAnswers": [
+          "My daughter is five years old today."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "My daughter is five years old today.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: doughter for daughter)"
+      },
+      {
+        "id": "EN-F-A1-VO-family-A-6",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Tamer is married. His woman is a teacher.",
+        "answerKey": "Tamer is married. His wife is a teacher.",
+        "acceptedAnswers": [
+          "Tamer is married. His wife is a teacher.",
+          "Tamer's married. His wife is a teacher."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "Tamer is married. His wife is a teacher.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "l1ErrorType": "lexical_l1_transfer (Arabic imra'a = woman/wife: woman for wife)"
+      },
+      {
+        "id": "EN-F-A1-VO-family-A-7",
+        "type": "free_production",
+        "prompt": "Write one sentence about your grandfather. Use the word 'grandfather'.",
+        "answerKey": "grandfather",
+        "acceptedAnswers": [
+          "grandfather",
+          "grandad",
+          "granddad",
+          "grandpa"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "grandfather",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-family-A-8",
+        "type": "free_production",
+        "prompt": "Write one sentence about an uncle. Use the word 'uncle'.",
+        "answerKey": "uncle",
+        "acceptedAnswers": [
+          "uncle",
+          "uncles"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "uncle",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-family-A-9",
+        "type": "transfer",
+        "prompt": "Hoda is married to Sami. Their son is Karim. What is Sami to Karim? One word.",
+        "answerKey": "father",
+        "acceptedAnswers": [
+          "father",
+          "dad",
+          "daddy"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "father",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "rubric": "VOCABULARY variant (transfer, SCORING_RUBRIC §2.3/§2.4): 2 = the target word (answerKey or a variant listed in acceptedAnswers) used with the right meaning for the task; 1 = the right word misspelt or in the wrong form; 0 = no target word, the word used with the wrong meaning, or the task not done. Other errors are not scored."
+      }
+    ],
+    "B": [
+      {
+        "id": "EN-F-A1-VO-family-B-1",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: My father's father is my ____ .",
+        "answerKey": "grandfather",
+        "acceptedAnswers": [
+          "grandfather",
+          "grandpa",
+          "grandad",
+          "granddad"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "grandfather",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-B-2",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: My aunt's son is my ____ .",
+        "answerKey": "cousin",
+        "acceptedAnswers": [
+          "cousin"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "cousin",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-B-3",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (mother / sister / aunt): Tarek is Mona's son, and Mona is Tarek's ____ .",
+        "answerKey": "mother",
+        "acceptedAnswers": [
+          "mother"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "mother",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-B-4",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (uncle / father / son): My aunt's husband is my ____ .",
+        "answerKey": "uncle",
+        "acceptedAnswers": [
+          "uncle"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "uncle",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-B-5",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My parints live in Cairo now.",
+        "answerKey": "My parents live in Cairo now.",
+        "acceptedAnswers": [
+          "My parents live in Cairo now."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "My parents live in Cairo now.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: parints for parents)"
+      },
+      {
+        "id": "EN-F-A1-VO-family-B-6",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My aunt has three sons: two girls, one boy.",
+        "answerKey": "My aunt has three children: two girls, one boy.",
+        "acceptedAnswers": [
+          "My aunt has three children: two girls, one boy.",
+          "My aunt has three kids: two girls, one boy."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "My aunt has three children: two girls, one boy.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "l1ErrorType": "lexical_l1_transfer (Arabic awlad = sons/children: sons for children)"
+      },
+      {
+        "id": "EN-F-A1-VO-family-B-7",
+        "type": "free_production",
+        "prompt": "Write one sentence about your grandmother. Use the word 'grandmother'.",
+        "answerKey": "grandmother",
+        "acceptedAnswers": [
+          "grandmother",
+          "grandma",
+          "granny"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "grandmother",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-family-B-8",
+        "type": "free_production",
+        "prompt": "Write one sentence about an aunt. Use the word 'aunt'.",
+        "answerKey": "aunt",
+        "acceptedAnswers": [
+          "aunt",
+          "aunts",
+          "auntie"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "aunt",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-family-B-9",
+        "type": "transfer",
+        "prompt": "Laila and Adel have a girl, Nour. What is Nour to Laila? One word.",
+        "answerKey": "daughter",
+        "acceptedAnswers": [
+          "daughter"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "daughter",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "rubric": "VOCABULARY variant (transfer, SCORING_RUBRIC §2.3/§2.4): 2 = the target word (answerKey or a variant listed in acceptedAnswers) used with the right meaning for the task; 1 = the right word misspelt or in the wrong form; 0 = no target word, the word used with the wrong meaning, or the task not done. Other errors are not scored."
+      }
+    ],
+    "C": [
+      {
+        "id": "EN-F-A1-VO-family-C-1",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: My mother's father is my ____ .",
+        "answerKey": "grandfather",
+        "acceptedAnswers": [
+          "grandfather",
+          "grandpa",
+          "grandad",
+          "granddad"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "grandfather",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-C-2",
+        "type": "controlled_gap_fill",
+        "prompt": "Write one word in the gap: My mother's brother is my ____ .",
+        "answerKey": "uncle",
+        "acceptedAnswers": [
+          "uncle"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "uncle",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-C-3",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (father / mother / wife): Salma is Hany's daughter, and Hany is Salma's ____ .",
+        "answerKey": "father",
+        "acceptedAnswers": [
+          "father"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "father",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-C-4",
+        "type": "controlled_choice",
+        "prompt": "Choose the correct word (aunt / mother / wife): My mother's sister is my ____ .",
+        "answerKey": "aunt",
+        "acceptedAnswers": [
+          "aunt"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "aunt",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
+      },
+      {
+        "id": "EN-F-A1-VO-family-C-5",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My grandmather makes bread every Friday.",
+        "answerKey": "My grandmother makes bread every Friday.",
+        "acceptedAnswers": [
+          "My grandmother makes bread every Friday."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "My grandmother makes bread every Friday.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: grandmather for grandmother)"
+      },
+      {
+        "id": "EN-F-A1-VO-family-C-6",
+        "type": "error_correction",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Mona's man is a doctor at the hospital.",
+        "answerKey": "Mona's husband is a doctor at the hospital.",
+        "acceptedAnswers": [
+          "Mona's husband is a doctor at the hospital."
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "exact",
+        "targetForm": "Mona's husband is a doctor at the hospital.",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "l1ErrorType": "lexical_l1_transfer (Egyptian Arabic ragil = man/husband: man for husband)"
+      },
+      {
+        "id": "EN-F-A1-VO-family-C-7",
+        "type": "free_production",
+        "prompt": "Write one sentence about your brother or sister. Use 'brother' or 'sister'.",
+        "answerKey": "brother/sister",
+        "acceptedAnswers": [
+          "brother",
+          "sister",
+          "brothers",
+          "sisters"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "brother/sister",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-family-C-8",
+        "type": "free_production",
+        "prompt": "Write one sentence about a cousin. Use the word 'cousin'.",
+        "answerKey": "cousin",
+        "acceptedAnswers": [
+          "cousin",
+          "cousins"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "cousin",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-family-C-9",
+        "type": "transfer",
+        "prompt": "Amal and Fady have a little boy, Ziad. What is Ziad to Amal? One word.",
+        "answerKey": "son",
+        "acceptedAnswers": [
+          "son"
+        ],
+        "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "son",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
+        "rubric": "VOCABULARY variant (transfer, SCORING_RUBRIC §2.3/§2.4): 2 = the target word (answerKey or a variant listed in acceptedAnswers) used with the right meaning for the task; 1 = the right word misspelt or in the wrong form; 0 = no target word, the word used with the wrong meaning, or the task not done. Other errors are not scored."
+      }
+    ]
+  }
+}

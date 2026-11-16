@@ -1,3 +1,4 @@
+import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
 import mongoose from 'mongoose';
 import { getConfig } from '../config/env';
 import { AppError } from '../middleware/errorHandler';
@@ -317,6 +318,8 @@ async function ensureEnvironmentCounter(): Promise<void> {
 // Reserves the attempt's bound on the deployment's cumulative test-spend
 // counter. Returns the reservation key, or undefined when no cap is set.
 async function reserveTestSpend(input: ReserveInput): Promise<string | undefined> {
+  // Demo sessions have their own monthly ceiling instead of the test cap.
+  if (isDemoSessionInstitution(input.institutionId)) return reserveDemoSpend(input);
   const cap = getConfig().aiTestSpend;
   if (!cap) return undefined;
   if (TEST_SPEND_EXEMPT.has(input.feature)) {
@@ -372,6 +375,55 @@ async function reserveTestSpend(input: ReserveInput): Promise<string | undefined
   } catch (error) {
     if (error instanceof AiBudgetError) throw error;
     storeAlert('ai_test_spend_unavailable', { what: 'test_spend', error: serializeError(error) });
+    throw new AiBudgetError('AI_BUDGET_UNAVAILABLE');
+  }
+}
+
+export const DEMO_SPEND_TENANT = '__demo_spend__';
+
+// Demo sessions: every bounded call is held on one counter for all demo
+// sessions this month (DEMO_LIMITS.monthlyCapUsd). Same reservation records
+// as the test cap, so settling and releasing work unchanged. Live-avatar and
+// speaking-exam calls are exempt here as from the test cap; demo calls are
+// limited by count and length instead.
+async function reserveDemoSpend(input: ReserveInput): Promise<string | undefined> {
+  if (TEST_SPEND_EXEMPT.has(input.feature)) return undefined;
+  const key = testSpendKey(input.key);
+  let bound = typeof input.upperBoundUsd === 'number' && Number.isFinite(input.upperBoundUsd) ? input.upperBoundUsd : undefined;
+  try {
+    if (bound === undefined && input.institutionId) {
+      const school = await schoolConfig(input.institutionId);
+      bound = school.value?.maxReservationUsdPerCall[`${input.provider}:${input.feature}`];
+    }
+    const amount = bound === undefined ? 0 : toMicros(bound);
+    if (amount <= 0) {
+      logger.warn('ai_demo_spend_unbounded_refused', { feature: input.feature, provider: input.provider });
+      throw new AiBudgetError('AI_BUDGET_EXCEEDED');
+    }
+    if (!connected()) throw new Error('database not connected');
+    const now = input.now ?? new Date();
+    const counter: CounterSpec = { id: `demo_spend:${month(now)}`, capMicros: toMicros(DEMO_LIMITS.monthlyCapUsd), window: 'test_spend', expiresAt: new Date(now.getTime() + 400 * 86400_000) };
+    try {
+      await BudgetReservation.create({
+        _id: key, institutionId: DEMO_SPEND_TENANT, userId: input.userId, feature: input.feature, provider: input.provider,
+        kind: 'test_spend', amountMicros: amount, counters: [], status: 'reserving', createdAt: now,
+        expiresAt: new Date(now.getTime() + (input.ttlMs ?? DEFAULT_RESERVATION_TTL_MS)),
+      });
+    } catch (error) {
+      if ((error as { code?: number }).code !== 11000) throw error;
+      throw new AiBudgetError('AI_BUDGET_EXCEEDED');
+    }
+    if (!(await reserveOn(DEMO_SPEND_TENANT, counter, amount))) {
+      await BudgetReservation.updateOne({ _id: key }, { $set: { status: 'released', amountMicros: 0 } });
+      logger.warn('ai_demo_spend_cap_refused', { feature: input.feature });
+      void recordAlert('ai_demo_spend_cap_reached', 'warning', { scope: 'demo', feature: input.feature });
+      throw new AiBudgetError('AI_BUDGET_EXCEEDED');
+    }
+    await BudgetReservation.updateOne({ _id: key }, { $set: { status: 'reserved', counters: [counter.id] } });
+    return key;
+  } catch (error) {
+    if (error instanceof AiBudgetError) throw error;
+    storeAlert('ai_demo_spend_unavailable', { what: 'demo_spend', error: serializeError(error) });
     throw new AiBudgetError('AI_BUDGET_UNAVAILABLE');
   }
 }

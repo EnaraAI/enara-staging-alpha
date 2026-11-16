@@ -1,0 +1,131 @@
+{
+ "audit": "20261109-post-remediation-validation",
+ "generatedAt": "2026-11-09T18:00:05Z",
+ "git": {
+  "branch": "claude/codebase-review-kbxqan",
+  "head": "fc6a487d287762a5f17ceadaf451f6c990347215"
+ },
+ "decision": "NOT_READY_REQUIRES_REMEDIATION",
+ "gates": {
+  "A": "FAIL",
+  "B": "PARTIAL",
+  "C": "PARTIAL",
+  "D": "PARTIAL",
+  "regression": "PASS",
+  "liveBenchmarkReadiness": "BLOCKED"
+ },
+ "historicalIntegrity": {
+  "docsFilesVerified": 304,
+  "expected": 304,
+  "agebandManifestArtifacts": 50,
+  "aiReviewDeliverables": 5,
+  "diagnosticOutputs": 10,
+  "v1CaseSetSha256": "725edb2bcabeb316a388b702b2baba6dc35ed178c80f8de7727c9768c356a2bb"
+ },
+ "productFilesUnchangedByAudit": true,
+ "productFiles": {
+  "backend/src/services/languageTeachingContext.ts": {
+   "sha256": "04eac56d4e04e87bb002ef971f6430d74794fd6895c626f693dfa01ce5f6b0dc",
+   "matchesRemediationManifest": true
+  },
+  "backend/src/controllers/tutor.controller.ts": {
+   "sha256": "ab726883b789aca14efb9b4a079f3513f1eb654687c6595bfb402b3da1235302",
+   "matchesRemediationManifest": true
+  },
+  "backend/src/models/TutorMessage.ts": {
+   "sha256": "86948d8d2bc8f7740103bf17266d1b563c9e07c04e82b9ae3c1e10c195d59395",
+   "matchesRemediationManifest": true
+  },
+  "backend/src/models/Curriculum.ts": {
+   "sha256": "8e750a1c7234ce56ad1cc6bdecd3b3144314a3af832ac19af6447696f5cefc5e",
+   "matchesRemediationManifest": true
+  },
+  "backend/src/controllers/me.controller.ts": {
+   "sha256": "8bc822250ed05c95f348306c0c6e9dbfa448b70201013f0975cf7c3727ce0729",
+   "matchesRemediationManifest": true
+  },
+  "backend/test/languageTeachingR3.test.ts": {
+   "sha256": "4e1490075baf47447882c611cdd9537c4f4839133560157de80153a35776aa5c",
+   "matchesRemediationManifest": true
+  },
+  "backend/src/services/languageLearningState.ts": {
+   "sha256": "ffe52ccaff41ba43d6a5cd73222771ffa2d96cba7279a5dc32b0fa0a90c973e4",
+   "matchesRemediationManifest": true
+  },
+  "backend/test/languageTeachingR4.test.ts": {
+   "sha256": "4924191ee9875a95306d9d3bc65031f9d358520ae8e472978024b41d9236163e",
+   "matchesRemediationManifest": true
+  },
+  "backend/test/benchmarkFixtureV2.test.ts": {
+   "sha256": "ad8217c8116b122757b288a65612252cdfc2243e30dcb5d85333cafb4ec4467e",
+   "matchesRemediationManifest": true
+  },
+  "backend/benchmarks/ltc-v2/build_fixture_v2.mjs": {
+   "sha256": "0157028a18e8ef6e862adb21515eaefc48c8dc74896a3211d75cb21c0b49609f",
+   "matchesRemediationManifest": true
+  },
+  "backend/benchmarks/ltc-v2/validate_parity.mjs": {
+   "sha256": "dacbe3dc129975677e17593104f7645bf08ead927d2a806e29332419b9fdf076",
+   "matchesRemediationManifest": true
+  },
+  "backend/benchmarks/ltc-v2/run_fixture_v2.ts": {
+   "sha256": "9d2b2ec8a6cf58014800d2123faa04233a31b0f9b58c5fc221bde5d40817f13d",
+   "matchesRemediationManifest": true
+  }
+ },
+ "scenarios": {
+  "total": 158,
+  "pass": 129,
+  "fail": 29
+ },
+ "tests": {
+  "typecheck": "exit 0",
+  "build": "exit 0",
+  "targeted": "273/273",
+  "full": "1539 pass / 16 fail (identical pre-existing set)",
+  "auditSuite": "132 pass / 20 fail (findings)",
+  "dryRunReproduction": "219/219, 72/72, $0"
+ },
+ "findings": {
+  "P0": 0,
+  "P1": 5,
+  "P2": 9,
+  "P3": 7,
+  "verifiedFixed": 6
+ },
+ "auditTestFiles": {
+  "backend/test/audit-post-remediation/vitest.audit.config.ts": "805b917cecb54a683a0e6a4eca11a6f42370892ab352f0dd88296ad1d43ca093",
+  "backend/test/audit-post-remediation/pure.audit.ts": "c874230adfd6ac827e2003a6e005663b2fe1d844b2a37f11859c89b3c55b8c24",
+  "backend/test/audit-post-remediation/recorder.ts": "efa1f3c7a3b7f282b102f3c30bbc599899fe4b8c4e178549059ffecf083be604",
+  "backend/test/audit-post-remediation/parity.audit.ts": "1645082493e551702908f8f8e182a4e3c0cb0dd0a1a20a18f75a9d5fe0d121e3",
+  "backend/test/audit-post-remediation/route.audit.ts": "10dfaac4a587ab6f2beb31e56f2ba6164c8524a819ca563b3df9900dae5e7cd0"
+ },
+ "outputs": {
+  "hint_leakage_adversarial_report.md": "75916da22d8b006e6812c75e577e872efd2487f553d2915f293cbd11b9cf849f",
+  "runtime_security_audit.md": "20f23fbcc48adadb2e559bc3bfde8f55445ced81323478c064b3051343c3515d",
+  "release_gate_decision.md": "503bff2443e1d38759d41a5e8169bf82608cc3a6b222bada456f524fb893e503",
+  "findings.csv": "8dbeb3d7a93c359a2c38f4f4e64a6d399962c0e136519a49703f0cb2190f7f5f",
+  "structured_assessment_audit.md": "bed5dd48d662def7e141d7a447058bd20a2079493673b0c5d7f2931b73db9de3",
+  "evaluator_rubric_readiness_report.md": "f07a1b1e08377d4aa14b62203152af457561fac96eed69195573a19aab1f6647",
+  "regression_test_results.md": "77744fb33e1e5ab3a2616a9a5a4b23d97a0ff4d301372ccae2dccc55896f340e",
+  "preflight_integrity_report.md": "a79f00b70496bebabd66307917751ec999d02089232413a68bd5d483faef2617",
+  "lesson_context_and_parity_audit.md": "3113e1051f59f82ed98e22a1d2e415bbfed5d410c6d072b77d3dbaa89ecae861",
+  "dry_run_reproduction/dry_run_results.jsonl": "3b8a0e7bae5e771ed4bcd997a70430eae30b79d81ff927e63c0c890ef816ae14",
+  "dry_run_reproduction/dry_run_config.json": "df7fb1c3a8717d49385adb4226f2e324e6a89a6610ebcf7ad93618bd38707083",
+  "dry_run_reproduction/dry_run_attempts.jsonl": "ad21fed9cd84e973eccf467b97a732b5750c1a6c89b198c25c21c17b37817862",
+  "dry_run_reproduction/dry_run_status.json": "d497f1a9ff825f614910f9507b42fc31b11f0eb24fbc71ea74e80a8ae35f4067",
+  "scenarios/pure.json": "56cb19286c3aaee0df9f2ca15b371cf0c696791c8f19c2bf1bce191c951f534a",
+  "scenarios/parity.json": "f4d5054ca5b9edd63fb1b1c9957f05c25cc082308f246a7a810ab00cb984c056",
+  "scenarios/route.json": "68736e6645f58c8e2d88684ae110567c62c4060047d1f2351f81e68a9d0d6dc5"
+ },
+ "safety": {
+  "productCodeModified": false,
+  "historicalArtifactsModified": false,
+  "paidAiCalls": 0,
+  "stagingOrProduction": false,
+  "deployment": false,
+  "commitPushMerge": false,
+  "migrations": false,
+  "envOrProviderOrBudgetChanges": false
+ }
+}

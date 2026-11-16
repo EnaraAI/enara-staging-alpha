@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler } from '../middleware/errorHandler';
 import { toPlainObject } from '../utils/serialize';
+import { ownStudentView } from './studentPhoto.controller';
 import { Assessment } from '../models/Assessment';
 import { AssessmentAttempt } from '../models/AssessmentAttempt';
 import { LessonProgress } from '../models/LessonProgress';
@@ -91,7 +92,7 @@ export const getDashboard = asyncHandler(async (req: AuthRequest, res: Response)
     .limit(5);
 
   res.json({
-    student: toPlainObject(student),
+    student: ownStudentView(toPlainObject(student)),
     continueLearning,
     learningPath,
     recentActivity,
@@ -168,7 +169,7 @@ export const getAnalyticsOverview = asyncHandler(async (req: AuthRequest, res: R
   });
 
   res.json({
-    student: toPlainObject(student),
+    student: ownStudentView(toPlainObject(student)),
     metrics: {
       avgScore: student.avgScore || 0,
       streak: student.streak || 0,
