@@ -385,3 +385,50 @@ Totals: 93 flags → 56 groups; 27 revised (≥2 reviewers, same target + issue)
 | placement:PL-A1-GR-06 | G26 | gap outcome (no lesson) -> parent course outcome | {"outcomeIds": ["EN-F-A1-GR-prepositions-place"]} | {"outcomeIds": ["EN-C-A1-WR-simple-sentences"]} |
 | placement:PL-A1-GR-07 | G26 | gap outcome (no lesson) -> parent course outcome | {"outcomeIds": ["EN-F-A1-GR-plural-nouns"]} | {"outcomeIds": ["EN-C-A1-WR-simple-sentences"]} |
 | placement:PL-A2-VO-05 | G26 | gap outcome (no lesson) -> parent course outcome | {"outcomeIds": ["EN-F-A2-VO-transport-travel"]} | {"outcomeIds": ["EN-C-A2-WR-linked-short-text"]} |
+
+## Re-review round 2 (A1–A2)
+
+Status: **DRAFT** (not signed off). Sources: `research/assessment-review/a1a2/rereview_R1.json`, `rereview_R2.json`, `rereview_R3.json`. Grouping: `consolidate2.py` → `CONSOLIDATED2.json`. Changed targets: `REVISED_TARGETS2.json` (160 targets: item ids, outcome ids, placement ids).
+
+### Counts
+
+| Reviewer | Flags |
+|---|---|
+| R1 | 7 |
+| R2 | 8 |
+| R3 | 37 |
+| Total | 52 → 32 groups: 11 flagged by ≥2 reviewers (revised), 9 single-reviewer factual (revised), 12 single-reviewer noted |
+
+Merge notes: R3-21..28 are eight per-outcome copies of R2-6 (H06). R1-4, R2-2 and R3-7 are one classroom-objects problem (H09). R1-1, R3-4 and R3-12 all hit common-adjectives slot 5 (H10). R2-1 and R3-35 are the same vocabulary-rubric problem (H11).
+
+### ≥2-reviewer groups and fixes
+
+| Group | Target | Reviewers | Fix |
+|---|---|---|---|
+| H01 | condition of 33 banked form outcomes | R1, R2 | Condition replaced with the real form: "Delayed parallel 9-item form, no help, items not seen in lessons: 1-4 controlled (gap-fill/choice/rewrite as used), 5-6 error correction, 7-8 one free sentence each, 9 transfer. Items 1-6 score 0/1, 7-8 score 0/1/2, 9 scores 0/1 or 0/1/2" (taken from each bank's item 9 scoring). |
+| H02 | EN-F-A1-VO-days-months, 21 exact items | R2, R3 | Item `acceptedAnswersNote` "Case-insensitive…" replaced with the case-sensitive wording of the matchingNote (capital on the day/month word required). |
+| H03–H05 | PL-A1-GR-06, PL-A1-GR-07, PL-A2-VO-05 | R2, R3 | **Not re-pointed; umbrella mapping kept, with reason.** The three specific outcomes are gap outcomes: no lesson and no form. They are now NOT_MEASURABLE_YET (H06), and `outcomesSchema.test.ts` does not let placement items point at outcomes that are not measurable. Placement evidence on a gap outcome would also send the learner nowhere because there is no lesson to route to. Re-point them once the gap outcomes have forms and lessons. |
+| H06 | 8 gap outcomes (was-were, plural-nouns, prepositions-place, possessive-s, subject-object-pronouns, superlatives, imperatives, transport-travel) | R2, R3 | `measurable` → NOT_MEASURABLE_YET with `notMeasurableReason` (gap outcome, no lesson, no form); condition/criterion → "Not set…" until 3 parallel forms exist. `hasLesson` stays false. |
+| H07 | capitals-full-stops C-6 | R1, R3 | "very fun" → "It was great fun." (prompt and key). |
+| H08 | food-drink A/B/C-6 | R1, R3 | Replaced "drinks eggs/rice/bread" with soft spoon food (soup, yoghurt, ice cream) "… with a spoon", where Arabic-L1 learners transfer shariba and "with a spoon" leaves eat/have as the only standard verbs. |
+| H09 | classroom-objects 5-6 + outcome | R1, R2, R3 | B-6 (pens in notebook) → "sharpen my pencil with my rubber" → sharpener; C-6 (close the board) → "stick the pictures with my scissors" → glue; stale `targetForm` fields set to the keys; matching note now says EC = wrong classroom noun for its use; outcome `l1ErrorTypes` cleared (lexical object confusion has no schema enum value, article omission is no longer tested). |
+| H10 | common-adjectives A/B/C-5 | R1, R3 | Two-sentence keys (no comma splice); A-5 "My father is very long. He can touch the ceiling." (no longer repeats appearance A-6); B-5 big→old kept; C-5 "That building is very long. It has forty floors." → tall (L1 direction). |
+| H11 | VO free-production items with a named word | R2, R3 | Named-word prompts (common-adjectives 7-8, family 7-8, home-rooms 7-8, weather 7-8, appearance 8, clothes-shopping A-8) get a "named word" rubric: another word from the field scores 0. The old `acceptedAnswersNote` on VO free items now points to the rubric field, so the two texts no longer disagree. Jobs-workplaces and make-do keep their own criteria. |
+
+### Single-reviewer decisions
+
+Revised (clear factual key errors):
+- H14 article-the 9: second gap took zero article; now a singular countable noun known from context (owner / big gate / manager), "Fill both gaps with an article".
+- H15 possessive-adjectives 5: added owner context ("It is Salma's car.") so "his" is a certain mistake.
+- H18 food-drink C-1: removed "egg" (ungrammatical in the sentence).
+- H19 home-rooms C-2: instruction "one or two words" to fit the two-word key.
+- H21 conjunctions 5: "(the second part is the reason)" so "and" is a certain mistake.
+- H22 going-to 7-9 and H26 make-do 9: added "Use going to." / "Use make or do." (prompt allowed avoiding the target form).
+- H28 PL-A1-GR-01: distractor "some" → "any" ("some apple" is defensible).
+- H29 PL-A2-RD-03: accented "café" variants added; mapping to main-idea noted, not changed.
+
+Not revised (keys correct; noted for a later pass): H12 numbers-time f/v direction; H13 weather A-6 error label; H16 possessive-adjectives 7 gender check / B-8 wording; H17 common-adjectives 6 label and realism; H20 comparatives l1ErrorTypes (no fitting schema enum); H23 clothes B-4 parallelism; H24 clothes 7 colour not scored; H25 jobs l1ErrorTypes; H27 weather C-2 parallelism; H30 choice items letter-only (rubric/grader level, grader not changed); H31 criterion point count for exact transfer (conditions now state per-item scoring; criterion text unchanged); H32 family EC kin swaps vs matching note. CEFR level of imperatives and was-were (R3) not changed: single reviewer.
+
+### Tests
+
+Parallel forms kept matched (word counts within ±2 per slot, novelty and separation checks). `cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. Three prompt-length and one novelty failure during the pass were fixed in the data, not the tests.
