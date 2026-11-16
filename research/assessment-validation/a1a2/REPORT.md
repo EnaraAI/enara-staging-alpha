@@ -267,3 +267,75 @@ SIMULATION ONLY · DRAFT.
 - R6-039 there-is-are, "There is a pool and two restaurants.": reference 1, grader 2. A two-slot transfer item gets full credit with only one slot right. This is pre-existing; round 5 showed the same pattern.
 
 **Status: STOPPED, per the user's rule ("If the re-check misses a target, stop and tell me"). ESL6 is not pre-registered and has not started.** The grader change is committed behind the graderV2 switch, which defaults to OFF.
+
+## Round 7: FINAL re-check (last round; grader fixing stops here)
+
+SIMULATION ONLY · DRAFT.
+
+**Fix (commit 7ca3594):** the graderV2 target-form scorer now:
+- checks every verb in a he/she/it clause, not only the first;
+- applies "to be" agreement for singular subjects, including was/were;
+- skips the words between a subject and its verb when checking agreement;
+- gives 1 point on two-slot there-is-are items when one slot is right.
+
+Details are in `round7/FIX_RESULT.md`.
+
+**Regression checks:**
+- ESL6 safety check: 0 failures across 810 items; the graderBlind count is unchanged at 15.
+- Round-5 rerun: 1 of 150 scores changed (R5-039, now matching the reference). Exact agreement 96.0%; QWK 0.921.
+- Round-6 rerun: 4 of 40 scores changed, all now matching the reference. Exact agreement 100%; QWK 1.000. The fix was built on these 40 answers, so this rerun is not independent.
+
+**Final re-check: 150 NEW answers covering all 33 outcomes**
+- 75 exact items and 75 free/transfer items; 33% of answers are partial or debatable.
+- 3 new independent agent scorers; the reference is the majority score (all 3 agreed on 148 of 150).
+- The grader was run blind: deterministic path, graderV2 ON, model path off (`round7/GRADER_DET.json`, `AGREEMENT7.json`).
+
+| | Result | Target |
+|---|---|---|
+| **Controlled / exact items (75)** | **92.0%** (69/75) | ≥95%: **FAIL** |
+| Free/transfer items (75), QWK | 0.845 | ≥0.80: pass |
+
+**By item type:**
+
+| Item type | Agreement |
+|---|---|
+| multiple choice | 14/14 |
+| controlled choice | 7/7 |
+| controlled gap-fill | 9/9 |
+| gap-fill | 17/20 |
+| error correction | 22/25 |
+| free production | 46/50 |
+| transfer | 20/25 |
+
+**Controlled disagreements (6), all cases where the grader is stricter than the reference:**
+- **Gap answer that includes the next word from the sentence:** reference 1, grader 0.
+  - R7-001 article-a-an "an old"
+  - R7-006 article-the "The restaurant"
+  - R7-031 prepositions-time "at half past nine"
+- **Error correction where the target is fixed but other words were also changed:** reference 1, grader 0.
+  - R7-042 word-order "…in the market"
+  - R7-111 past-irregular "…for me"
+  - R7-124 some-any "some eggs from the shop"
+
+**Free/transfer disagreements (9):**
+- **Over-credit, scored 2 where the reference gave less:**
+  - R7-009 article in the second clause
+  - R7-010 and R7-029 two-slot items with one slot wrong (article, possessive)
+  - R7-019 lowercase town name
+  - R7-030 "My friend phone"
+  - R7-074 "living room"
+- **Under-credit, scored 0 where the reference gave 1:**
+  - R7-075 "bed room"
+  - R7-089 "newer then"
+  - R7-138 "sail" for "sale"
+
+**Verdict:**
+- **The deterministic grader with graderV2 ON is NOT validated on controlled items.** On a fresh answer set it agreed 92.0%, against a target of 95%.
+- On free/transfer items it **meets the target** (QWK 0.845).
+- **The model path remains NOT VALIDATED.**
+- The user's rule applies: grader fixing has stopped, and because the re-check failed on CONTROLLED items, **ESL6 is not pre-registered and has not started.**
+
+**Limits:**
+- the reference scorers are agents only, with no human raters;
+- n = 75 per group;
+- the scoring rules are hand-written.
