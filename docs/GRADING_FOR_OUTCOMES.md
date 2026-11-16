@@ -88,3 +88,16 @@ The research post-tests (`backend/benchmarks/ltc-v2/outcome_quiz.ts`, `lo_assess
 - Results show whether the rubric is usable, not how the production model would score.
 
 The real check of the model parts must wait for an approved API run (e.g. `backend/src/scripts/gradingBenchmark.ts`).
+
+## Validation status (A1–A2), after graderV2 rounds 3–4
+
+SIMULATION ONLY · DRAFT. Full detail is in `research/assessment-validation/a1a2/REPORT.md`.
+
+- **graderV2:** one switch, default OFF (`ENARA_ENGINE_V2=graderV2`). With it OFF, output is identical to before. Docs: `docs/GRADER_FIXES.md`, `docs/GRADER_USAGE_MAP.md`.
+  - With it ON, it changes lesson exercises, assignments, assessments and placement scoring.
+- **Deterministic path, graderV2 ON, on a fresh answer set (round 4):**
+  - controlled items: 93.3% exact agreement, against a target of 95%. **Not met.**
+  - free/transfer items: QWK 0.819, against a target of 0.80. **Met, narrowly.**
+- **Model path (eval-v2): NOT VALIDATED.** Only agent stand-in estimates exist: 92.0% controlled, QWK 0.923 free. A real run needs the API.
+- **Status: the grader is not validated for confirmatory use with these assessments.** The remaining causes are listed in REPORT.md round 4.
+- **Use in studies:** a study that uses this grader must either report grader agreement as a limit, or treat a blind recheck below target as a failed guard.

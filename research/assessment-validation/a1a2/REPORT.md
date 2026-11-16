@@ -102,3 +102,74 @@ Every disagreement, with its outcome, answer and cause, is in `round3/AGREEMENT3
 **Action:** round-4 fixes for these causes are in progress (see `round4/FIX_TASK.md`). They will be checked on a NEW set of 150 answers (round 4). Per the stopping rule, that is the last round.
 
 **Model path: NOT VALIDATED.** Its numbers come from an agent stand-in and are estimates only. Validation needs a run with the API.
+
+## Round 4 — after the round-3 cause fixes, NEW answer set (final round)
+
+SIMULATION ONLY · DRAFT. This is the last round under the stopping rule (at most 2 rounds after the fix).
+
+- **Answers:** 150 new answers (`round4/answers.json`) covering all 33 outcomes that passed review: 75 exact and 75 target-form.
+  - Weakness: 17% of the answers are partial or debatable, against a planned 30%. The partial-credit fix was therefore tested on fewer cases than planned.
+  - 10 short answers (for example "many", "I don't know") also appeared in round 3.
+- **Reference:** 3 new independent scorers. All 3 agreed on 148 of 150 answers; the reference is the majority score.
+- **Grader:** production code with `ENARA_ENGINE_V2=graderV2`, including the round-3 fixes (commit ffaab29). It ran blind, with no fallbacks. The model path was an AGENT STAND-IN, as in round 3.
+
+| Path | Exact (75): agreement, target ≥95% | Free/transfer (75): QWK, target ≥0.80 |
+|---|---|---|
+| Deterministic, graderV2 ON | **93.3%** (70/75): **fail** | **0.819**: **pass** |
+| Deterministic + model-path stand-in | 92.0%: fail | 0.923: pass (estimate) |
+
+**Agreement by item type (deterministic):**
+- multiple choice 9/9, controlled gap-fill 11/11, rewrite 3/3;
+- gap-fill 23/25;
+- error correction 24/27;
+- free production 56/60, transfer (0/1/2) 11/15.
+
+Every disagreement, by outcome, is in `round4/AGREEMENT4.json`.
+
+**Disagreements and causes (deterministic, 13):**
+
+*Controlled items (5): the grader is too strict.*
+- R4-007 (article-the): a valid correction is not in the accepted list. The accepted-answer list needs wider coverage.
+- R4-036 (there-is-are), "theres": a missing apostrophe is not normalised.
+- R4-060 (family), "My parents lives…": the kin word is right and the slip is in another word. The exact items have no target-only scoring.
+- R4-080 (comparatives), "longer then": the target is fixed, but "then"/"than" is debatable. 2 of 3 scorers gave 1.
+- R4-115 (present-continuous), "I'm reading" in a gap that already shows "I": the gap answer repeats the subject.
+
+*Free/transfer items (8).*
+- Over-credit, scored 2 where the reference gave 0:
+  - R4-082 and R4-083 (comparatives): "more big", "more new" are not detected.
+  - R4-092 (frequency adverbs): the adverb position is not checked.
+  - R4-122 (some/any): "some" in a question is not detected.
+  - R4-029 (possessive adjectives): "Laila… his phone". The scorer cannot know the gender of a name.
+- R4-113 (past simple regular): scored 2, reference 1. The second verb ("wash") is not checked.
+- Under-credit, scored 0 where the reference gave 1:
+  - R4-110 (past simple irregular): "buyed" counts as a slip.
+  - R4-149 (weather): "wett" counts as a slip.
+
+**Model-path stand-in:**
+- The graderV2 guard blocked the misspellings on spelling-sensitive items ("thursday", "hony").
+- It also blocked "theres", which the reference accepts.
+- In production the guard is wired only to the short-answer check. The stand-in also applied it to 6 rubric answers, so its free-item estimate is slightly stricter than production would be.
+
+### Final verdict (A1–A2, after 2 rounds)
+- **Deterministic path, graderV2 ON:**
+  - Free/transfer: **meets the target** in round 4 (QWK 0.819). It failed in round 3 (0.754), before the fixes. 0.819 is close to the 0.80 line, and n = 75.
+  - Controlled: **does not meet the target** in round 4 (93.3%). It met it in round 3 (96.0%), but that round's answers were later used to design the fixes.
+  - Overall: **not validated**, because the controlled target was missed on the fresh answer set.
+- **Model path: NOT VALIDATED.** The numbers above are agent stand-in estimates. Validation needs a run with the real model, which means the API.
+- **Remaining causes, not fixed (the stopping rule was reached):**
+  1. Accepted-answer coverage on error-correction items.
+  2. Apostrophe-less contractions ("theres", "cant").
+  3. Target-only scoring for exact error-correction items.
+  4. Comparative "more + short adjective".
+  5. Adverb position.
+  6. "some" in questions.
+  7. Second-verb checks in the past simple.
+  8. Irregular-past over-regularisation scored as a slip.
+  9. Gender of named people.
+- **Item bank faults** found by scorers: `targetForm` fields that don't match the prompt/key in food-drink C-5 ("five bananas" vs pepper), jobs-workplaces B-5 ("a pilot" vs driver) and the round-3 item ("bald" vs "thin").
+- **Limits:**
+  - agent scorers only, very likely sharing biases (147/150 and 148/150 unanimous);
+  - no human raters;
+  - n = 75 per item group;
+  - the rules are hand-written word lists.
