@@ -160,3 +160,10 @@ New conflicts found and fixed:
   - educatorAnalytics chart render (flaky).
 
   There are no new failures. `tsc --noEmit` is clean.
+
+## Follow-up: the levelExplicit closing-turn conflict (fixed)
+
+The "found, not fixed" conflict above is now fixed, as an approved, deliberate `levelExplicit` change. In plain `levelExplicit` (no esl5 switch), on a closing turn where a rule is first introduced, step (3) of the rule line now reads `RULE_LINE_TASK_BELOW` ("the task for this reply is the one set by the instruction below (one task only)") instead of "ask them to apply the rule to a new item". The recap closing ("Tell me the rule in your own words", "Do not set a new exercise this turn") is then the reply's one task. The change is in `ruleTaskElsewhere` (`levelExplicit` or `reviewOpen`, on a closing turn with the closing on).
+
+- `esl5InstructionMatrix` has no exemptions left and asserts zero conflicts over all 576 prompts.
+- `esl5OffParity` hash changed (`dd94aa40…` → `1d46f988…`). Only the 328 of 6810 matrix keys whose switch set includes `levelExplicit` changed; all switches-off keys are byte-identical. `levelExplicitOffParity` (no `levelExplicit` in its matrix) keeps its hash.

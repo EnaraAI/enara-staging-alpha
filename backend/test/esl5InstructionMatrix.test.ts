@@ -55,11 +55,8 @@ describe('ESL5 instruction matrix (64 switch combinations x 9 situations)', () =
     const hits: string[] = [];
     for (const { env, sit, prompt } of prompts()) for (const [name, x, y] of PAIRS) if (x.test(prompt) && y.test(prompt)) hits.push(`${name} | ${sit} | ${env}`);
     if (process.env.MATRIX_REPORT) console.log([...new Set(hits.map((h) => h.split(' | ').slice(0, 2).join(' | ')))].join('\n'), `\n${hits.length} hits`);
-    // Known, NOT fixed: levelExplicit's rule line ("(3) ask them to apply the rule to a new item") next to the recap closing ("Do not set a new
-    // exercise this turn") exists in plain levelExplicit today (no esl5 switch). Changing it would change levelExplicit output that the off-parity
-    // hash protects; reviewOpen (the ESL5 closing) does not have it. Reported in docs/ESL5_INSTRUCTION_FIXES.md.
-    const known = (h: string) => h.startsWith('no new exercise + rule-line new item | closing') && !h.includes('reviewOpen');
-    expect(hits.filter((h) => !known(h))).toEqual([]);
-    expect(hits.some((h) => known(h) && h.endsWith(`| ${BASE},levelExplicit`))).toBe(true);
+    // No exemptions. The former known conflict (plain levelExplicit: rule line "(3) ... a new item" next to the recap closing "Do not set a new
+    // exercise this turn") is fixed as a deliberate levelExplicit change: on a closing turn the rule line now uses RULE_LINE_TASK_BELOW.
+    expect(hits).toEqual([]);
   });
 });

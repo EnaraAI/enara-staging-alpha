@@ -1328,7 +1328,8 @@ const RULE_STYLE: Record<string, string> = {
 };
 export const ruleFirstLine = (rf: { texts: string[] }, planPrimary?: string, hasNext?: boolean, taskBelow?: boolean) => taskBelow ? ruleFirstLine0(rf, planPrimary, hasNext).replace(RULE_LINE_TASK(hasNext), RULE_LINE_TASK_BELOW) : ruleFirstLine0(rf, planPrimary, hasNext);
 const RULE_LINE_TASK = (hasNext?: boolean) => `(3) ask them to apply the rule to a new item${hasNext ? ' (if their answer was right, present the next lesson item given below exactly as written; otherwise one short new item)' : ': one short new item you write'} made of words that appear in no lesson exercise.`;
-/** Conflict scan (ESL5): when another instruction below sets this reply's one task (answer release, own sentence, reviewOpen closing item), the rule line sets none. */
+/** Conflict scan (ESL5): when another instruction below sets this reply's one task (answer release, own sentence, reviewOpen closing item, or under
+ *  levelExplicit the recap closing, which says "Do not set a new exercise this turn"), the rule line sets none. */
 export const RULE_LINE_TASK_BELOW = '(3) the task for this reply is the one set by the instruction below (one task only): set no other item.';
 const ruleFirstLine0 = (rf: { texts: string[] }, planPrimary?: string, hasNext?: boolean) =>
   `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). In this reply, inside the teaching method above: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) ask them to apply the rule to a new item${hasNext ? ' (if their answer was right, present the next lesson item given below exactly as written; otherwise one short new item)' : ': one short new item you write'} made of words that appear in no lesson exercise. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule, and the hint-level limits on stating the rule. Never write the answer to the exercise you are asking about or any part of it, never show its target form, never model on the learner's own answer.`;
@@ -1559,7 +1560,7 @@ const targetPoint = (ctx: Pick<LanguageTeachingContext, 'signals' | 'lesson'>): 
 export const RELEASED_EXCEPT = 'Apart from the item whose answer is released above, never write the answer to an open lesson exercise.';
 /** Conflict scan (ESL5): another instruction sets this reply's one task, so the levelExplicit/ruleFirst rule line must not add a second one. */
 const ruleTaskElsewhere = (ctx: Omit<LanguageTeachingContext, 'prompt'>): boolean =>
-  releasing(ctx) || ownSentenceNow(ctx) === 'ask' || Boolean(engineV2('reviewOpen') && ctx.research && isClosingTurn(ctx.research) && closingOn());
+  releasing(ctx) || ownSentenceNow(ctx) === 'ask' || Boolean((engineV2('reviewOpen') || engineV2('levelExplicit')) && ctx.research && isClosingTurn(ctx.research) && closingOn());
 /** releaseAfterTwo: this reply gives the answer after two genuine failed attempts. */
 export const releasing = (ctx: Pick<LanguageTeachingContext, 'moves'>): boolean => engineV2('releaseAfterTwo') && ctx.moves.some((m) => m.reasons.includes('release_after_two_genuine_attempts'));
 function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {

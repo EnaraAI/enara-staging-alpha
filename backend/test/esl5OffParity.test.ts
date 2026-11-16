@@ -9,7 +9,11 @@ import { applyTurn, summarizeProfile, summarizeProfileV2 } from '../src/services
 // byte-for-byte what it was before ESL5: prompts (both renderings), turn evidence, finalized turns, guarded items and replies, error diagnoses and
 // learner-record updates/summaries, over a matrix that includes ENARA_ENGINE_V2='levelExplicit'. The hash was taken from the code at commit 927f4b4
 // (before ESL5). If you change a prompt on purpose, update the hash and say why in the commit.
-const BASELINE_SHA256 = 'dd94aa402487af4cbfade0069df605e1af5687ed9a533d630049522c2fa59241';
+// Deliberate change (hash dd94aa40... -> 1d46f988...): under levelExplicit, on a closing turn where a rule is first introduced, the rule line's
+// step (3) now reads RULE_LINE_TASK_BELOW instead of "apply the rule to a new item", so it no longer contradicts the recap closing's "Do not set a
+// new exercise this turn". Only keys whose switch set includes levelExplicit changed (328 of 6810); every switches-off key is byte-identical, and
+// levelExplicitOffParity (no levelExplicit in its matrix) keeps its hash. See docs/ESL5_INSTRUCTION_FIXES.md, "Follow-up".
+const BASELINE_SHA256 = '1d46f9884aab8148da2fa76ee8e7220deaa62c0ba5ec198055337586a4224c7f';
 const SPEC: LanguageSpec = { objectives: ['Articles a/an'], successCriteria: ['Uses a before a consonant sound', 'Uses an before a vowel sound'], items: [
   { id: 'a1', prompt: 'Complete: I saw ___ apple.', acceptedAnswers: ['an'], targetForms: ['an'], criteria: [2] },
   { id: 'a2', prompt: 'Complete: He is ___ doctor.', acceptedAnswers: ['a'], targetForms: ['a'], criteria: [1] },
