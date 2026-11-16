@@ -2,7 +2,7 @@
   "status": "DRAFT",
   "outcomeId": "EN-F-A1-VO-family",
   "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic periphrastic kinship ('the brother of my father' / 'the son of my aunt') replaced by single English word; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 now contain a wrong kin word that must be replaced (uncle/aunt/cousin/grandmother/grandfather, all A1); C-4 now aunt. Review round 3: all items 7-8 use the 'VOCABULARY variant, named word' rubric (as C-7 already did), since each prompt names the kin word.",
+  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic-L1 vowel spelling slip on a kin word in a natural sentence; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 now contain a wrong kin word that must be replaced (uncle/aunt/cousin/grandmother/grandfather, all A1); C-4 now aunt. Review round 3: all items 7-8 use the 'VOCABULARY variant, named word' rubric (as C-7 already did), since each prompt names the kin word. Review round 4: the kin-word swaps (my mother's mother is my aunt ...) were factual absurdities, not learner errors. Slots 5-6 are now vowel slips on an A1 kin word: doughter/hasband (A), parints/brather (B), grandmather/nece (C). outcomes.json l1ErrorTypes = [spelling_vowel].",
   "forms": {
     "A": [
       {
@@ -70,34 +70,34 @@
       {
         "id": "EN-F-A1-VO-family-A-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My father's brother is my cousin.",
-        "answerKey": "My father's brother is my uncle.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My doughter is five years old today.",
+        "answerKey": "My daughter is five years old today.",
         "acceptedAnswers": [
-          "My father's brother is my uncle."
+          "My daughter is five years old today."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My uncle lives in Aswan.",
+        "targetForm": "My daughter is five years old today.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
+        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: doughter for daughter)"
       },
       {
         "id": "EN-F-A1-VO-family-A-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My mother's mother is my aunt.",
-        "answerKey": "My mother's mother is my grandmother.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My hasband works in a big bank.",
+        "answerKey": "My husband works in a big bank.",
         "acceptedAnswers": [
-          "My mother's mother is my grandmother."
+          "My husband works in a big bank."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My niece is three years old.",
+        "targetForm": "My husband works in a big bank.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
+        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: hasband for husband)"
       },
       {
         "id": "EN-F-A1-VO-family-A-7",
@@ -220,34 +220,34 @@
       {
         "id": "EN-F-A1-VO-family-B-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My mother's sister is my cousin.",
-        "answerKey": "My mother's sister is my aunt.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My parints live in Cairo now.",
+        "answerKey": "My parents live in Cairo now.",
         "acceptedAnswers": [
-          "My mother's sister is my aunt."
+          "My parents live in Cairo now."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My aunt works in a bank.",
+        "targetForm": "My parents live in Cairo now.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
+        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: parints for parents)"
       },
       {
         "id": "EN-F-A1-VO-family-B-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My father's father is my uncle.",
-        "answerKey": "My father's father is my grandfather.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My little brather goes to school by bus.",
+        "answerKey": "My little brother goes to school by bus.",
         "acceptedAnswers": [
-          "My father's father is my grandfather."
+          "My little brother goes to school by bus."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My nephew is four years old.",
+        "targetForm": "My little brother goes to school by bus.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
+        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: brather for brother)"
       },
       {
         "id": "EN-F-A1-VO-family-B-7",
@@ -370,34 +370,34 @@
       {
         "id": "EN-F-A1-VO-family-C-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My uncle's son is my brother.",
-        "answerKey": "My uncle's son is my cousin.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My grandmather makes bread every Friday.",
+        "answerKey": "My grandmother makes bread every Friday.",
         "acceptedAnswers": [
-          "My uncle's son is my cousin."
+          "My grandmother makes bread every Friday."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My cousin plays football every Friday.",
+        "targetForm": "My grandmother makes bread every Friday.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
+        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: grandmather for grandmother)"
       },
       {
         "id": "EN-F-A1-VO-family-C-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My mother's father is my uncle.",
-        "answerKey": "My mother's father is my grandfather.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My nece lives in Alexandria with her parents.",
+        "answerKey": "My niece lives in Alexandria with her parents.",
         "acceptedAnswers": [
-          "My mother's father is my grandfather."
+          "My niece lives in Alexandria with her parents."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My sister-in-law is very kind.",
+        "targetForm": "My niece lives in Alexandria with her parents.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
+        "l1ErrorType": "spelling_vowel (vowel slip on a kin word: nece for niece)"
       },
       {
         "id": "EN-F-A1-VO-family-C-7",

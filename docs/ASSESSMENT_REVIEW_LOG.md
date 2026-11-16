@@ -477,3 +477,50 @@ Noted, keys correct: T13 common-adjectives statement vs slots 5 and 7-8 (outcome
 ### Tests
 
 `cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. During the pass three prompt-length failures (days-months slot 8, home-rooms slot 2, clothes-shopping slot 4) and one novelty overlap (classroom B-6 "check new words in a dictionary") were fixed in the data, not the tests.
+
+## Review round 4 (A1–A2)
+
+Status: **DRAFT**. Sources: `research/assessment-review/a1a2/rereview3_R1/R2/R3.json`; grouping in `consolidate4.py` → `CONSOLIDATED4.json`; changed targets in `REVISED_TARGETS4.json` (40). No grader or tutor code changed. No CEFR level changed. No schema enum changed.
+
+| Reviewer | Flags |
+|---|---|
+| R1 | 6 |
+| R2 | 6 |
+| R3 | 12 |
+| Total | 24 → 15 groups: 5 flagged by ≥2 reviewers (revised), 10 single-reviewer clear errors (revised), 0 noted only |
+
+Independence note: R1 showed a partial-independence slip on round-3 groups T05/T06 (possessive-s / prepositions-place `l1ErrorTypes`), so its agreement on those earlier items is not fully independent evidence. The round-4 ≥2 groups do not rely on R1 alone.
+
+### ≥2-reviewer groups and fixes
+
+| Group | Target | Reviewers | Fix |
+|---|---|---|---|
+| T01 | clothes-shopping B-4 | R1, R2, R3 | Shop context added: "Clothes shops have a ____ room for trying on." Only "changing" fits. |
+| T02 | classroom-objects C-6 | R1, R2, R3 | Also accepts "I do my homework in a notebook.", like the other slot 5–6 items. |
+| T03 | jobs-workplaces A/B/C-6 + outcome | R2, R3 | Article omission (grammar) replaced by an Arabic-L1 i/e spelling slip on a job noun in every form: pharmacest (A), dentest (B), engeneer (C). The job is not keyed or shown elsewhere in its form, which also removes the A-6 nurse/hospital cue for A-1. `l1ErrorTypes` = [spelling_vowel]; MATCHING updated. |
+| T04 | prepositions-place `l1ErrorTypes` | R2, R3 | Emptied (article_def_misuse did not fit). The reason is in `notMeasurableReason`: in/on transfer has no enum value. |
+| T05 | weather A/B/C-5 + outcome | R1, R3 | The "-ey" spellings and "foggy" are replaced by A1–A2 vowel slips: wit→wet (A, i/e), clody→cloudy (B, vowel left out), hut→hot (C, short vowel). The slot-6 tag no longer says copula_omission. MATCHING EC note updated. `l1ErrorTypes` = [spelling_vowel]. |
+
+### Single-reviewer decisions (all revised)
+
+- T06 classroom-objects slot 5 (R1): `docs/LEARNING_OUTCOMES.md` lists phon_p_b as audio-only. The typed slips bencil/ben/baper are now tagged spelling_vowel, the only typed-spelling enum value, with a note that it is a consonant slip. Outcome `l1ErrorTypes` = [spelling_vowel].
+- T07 capitals-full-stops A/B/C-6 (R1): item tag is now `run_on_and`.
+- T08 home-rooms C-9 (R2): the advert now starts "Big flat, a ____ …", so "bathrooms" is not shown.
+- T09 PL-A2-RD-03 (R2): added "a cafe/café near the station" and "cafe/café near station".
+- T10 days-months slots 5–6 (R3): the misspelled word now has its capital letter (Febuary, Tusday, Agust, Wensday, Septmber, Thersday), so there is one mistake, as the prompt says.
+- T11 family slots 5–6 (R3): kin-word swaps replaced by vowel slips in natural sentences (doughter, hasband / parints, brather / grandmather, nece). `l1ErrorTypes` = [spelling_vowel]; MATCHING updated.
+- T12 food-drink B-6 (R3): yoghurt → vegetable soup, parallel to A-6/C-6.
+- T13 food-drink `l1ErrorTypes` (R3): cleared (no plural -s item); MATCHING updated.
+- T14 much-many `l1ErrorTypes` (R3): cleared.
+- T15 weather `l1ErrorTypes`/MATCHING (R3): fixed with T05.
+
+### User decisions (not changed)
+
+- Add a preposition-transfer enum value (e.g. `prep_place_transfer`) for prepositions-place.
+- Add a typed consonant-spelling enum value (p/b slips are tagged spelling_vowel for now).
+- Whether eat/drink, sound-confusion, noun-for-adjective and quantifier choice get enum values (food-drink and much-many `l1ErrorTypes` are empty for now).
+- Carried over: T09/T10 from round 3 (imperatives CEFR level; was-were `l1ErrorTypes`).
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts`: 5 files, 129 tests passed. During the pass, two prompt-length failures (family slot 5, clothes-shopping slot 4) were fixed in the data, not the tests.
