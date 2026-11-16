@@ -49,7 +49,10 @@ describe('sendTemplate', () => {
       from: EMAIL_SENDER,
       to: EMAIL,
       template: { id: '15397fc6-acaa-453d-a103-b80d9e0f6394', variables: vars },
-      attachments: [expect.objectContaining({ contentId: 'enara-logo', contentType: 'image/png', filename: 'enara-logo.png' })],
+      attachments: [
+        expect.objectContaining({ contentId: 'enara-logo', contentType: 'image/png', filename: 'enara-logo.png' }),
+        expect.objectContaining({ contentId: 'enara-logo-white', contentType: 'image/png', filename: 'enara-logo-white.png' }),
+      ],
     });
     expect(sendMock.mock.calls[0][0]).not.toHaveProperty('html');
   });
@@ -57,13 +60,17 @@ describe('sendTemplate', () => {
   it('attaches the inline logo that every template references as cid:enara-logo', async () => {
     const fs = await import('fs');
     const path = await import('path');
-    const { LOGO_PNG_BASE64 } = await import('../src/email/logoInline');
+    const { LOGO_PNG_BASE64, LOGO_WHITE_PNG_BASE64 } = await import('../src/email/logoInline');
     const png = fs.readFileSync(path.join(__dirname, '../src/email/assets/enara-logo.png'));
     expect(Buffer.from(LOGO_PNG_BASE64, 'base64').equals(png)).toBe(true);
+    const white = fs.readFileSync(path.join(__dirname, '../src/email/assets/enara-logo-white.png'));
+    expect(Buffer.from(LOGO_WHITE_PNG_BASE64, 'base64').equals(white)).toBe(true);
     const dir = path.join(__dirname, '../src/email/templates');
     for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.html'))) {
       const html = fs.readFileSync(path.join(dir, f), 'utf8');
       expect(html, f).toContain('src="cid:enara-logo"');
+      expect(html, f).toContain('src="cid:enara-logo-white"');
+      expect(html, f).toContain('prefers-color-scheme: dark');
       expect(html, f).not.toContain('assets.enara.app/email/enara-logo.png');
     }
   });

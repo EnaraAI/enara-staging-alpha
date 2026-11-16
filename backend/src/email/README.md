@@ -39,8 +39,10 @@ When adding or renaming variables, update `templateRegistry.ts` too — `sendTem
 The logo is **embedded in every email** as an inline (CID) attachment, so it shows even in mail
 clients that block remote images (Roundcube, Outlook desktop, many school mail systems).
 
-- Every template uses `<img src="cid:enara-logo" …>`.
-- `sendTemplate` always attaches the logo with content ID `enara-logo`, from `logoInline.ts`
+- Every template uses `<img src="cid:enara-logo" …>` (black, 120×55, left-aligned) and a white
+  version `cid:enara-logo-white` that replaces it in dark mode (`prefers-color-scheme: dark`;
+  Apple Mail, iOS/macOS Outlook and Outlook.com). Gmail ignores this and keeps the black logo.
+- `sendTemplate` always attaches both logos (content IDs `enara-logo` and `enara-logo-white`), from `logoInline.ts`
   (base64 of [`assets/enara-logo.png`](./assets/enara-logo.png)). **Send these templates only through
   `sendTemplate`**; an email sent to a template without the attachment shows no logo.
 - To change the logo: replace `assets/enara-logo.png`, regenerate `logoInline.ts` from it (the test
