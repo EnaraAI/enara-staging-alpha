@@ -102,3 +102,16 @@ There is also an extra check over the 38 further files that import `languageTeac
 
 ## Base-failure check (added after the run)
 The 2 `phase0.test.ts > upload links` failures were checked on the unmodified code (changes stashed, suite run, changes restored): both fail there too (2 failed, 10 passed). They are pre-existing and unrelated to graderV2. All 7 failures are therefore known base failures.
+
+## Round-3 fixes
+
+*DRAFT. After round 3 (deterministic exact 96.0%; free/transfer QWK 0.754, below 0.8). General rules, not answer patches; round-3 answers are not hard-coded and the new tests use other examples. All changes are in `backend/src/services/graderV2.ts` and run only with graderV2 ON; the OFF path is unchanged (`graderV2Parity.test.ts` passes).*
+
+1. **Partial credit (tf1).** An attempted, recognisable form with one slip scores 1: a wrong form after a correct `can` (`can to …`, `can …s`, `can …ing`, per the §6 clarification); regular past spelling slips (`…d` without e, doubled consonant after two vowels, missing doubling for stop/plan/shop…, `-yed`); `be` + base verb for the continuous; a misspelt target word or conjunction, with a swapped pair of letters counted as one edit (`quite`/`quiet`).
+2. **Every occurrence is checked.** Third person: each he/she/it clause (`… and he correct it` = 1) and `-es` spelling (`visites` = 1). Copula: each be form against its subject, plural and `X and Y` subjects need `are`. Past regular: each `-ed` word. Clock time: the number word before `o'clock` / after `past`/`to` (misspelt = 1). Frequency adverbs: `not never` = 1. Capitals: a title before a name (`mr`, `mrs`, `dr`) needs a capital. Conjunctions: the part after the conjunction needs a verb (`but not the money` = 1).
+3. **Not a sentence.** Where the prompt asks for a sentence, an answer of up to 4 words with no verb scores 0.
+4. **make / do.** Each make/do verb is paired with its head noun and checked against a collocation list plus the item's accepted examples; wrong verb = 0 (1 if another pair in the answer is right). Auxiliary `do` is skipped.
+5. **Word order.** New rule for `Subject + verb + object + place/time at the end; adjective before noun` (no fallback): fronted place/time or no verb after the subject = 0; one fault (place/time between verb and object, adjective after noun, required place/time missing) = 1.
+6. **Guard extension.** `spellingIsTarget()`: an exact item whose matchingNote is case- or day/month-sensitive, or a vocabulary item keyed by single words (or keyed by its own single-word target form). For these, `targetFormMissing()` is true unless the key matches, so the meaning check cannot credit `carot`, `fourty`, `grand father`, lowercase month/day names.
+
+Tests: `backend/test/graderV2.test.ts` "round-3 fixes" block (one test per rule, new examples). One earlier expectation changed: `I can to swim.` is now 1 (was 0), following the rubric clarification. Limits: the rules are still heuristics (word lists for verbs, collocations and number words); a run with graderV2 ON on fresh answers is needed before relying on the numbers.

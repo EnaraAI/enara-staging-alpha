@@ -13,7 +13,7 @@ import { needsAiEvaluation } from '../src/services/autoGrading';
 import { evaluateShortAnswer } from '../src/services/gradingProposals';
 import { evaluateAgainstKey } from '../src/services/languageLearningState';
 import { scoreControlled } from '../src/services/assessment/placementEngine';
-import { graderV2On, matchKeyV2, scoreTargetForm, targetFormMissing, type TargetFormItem } from '../src/services/graderV2';
+import { graderV2On, matchKeyV2, scoreTargetForm, spellingIsTarget, targetFormMissing, type TargetFormItem } from '../src/services/graderV2';
 import type { IQuestion } from '../src/models/Assessment';
 
 const DIR = join(__dirname, '../../data/assessments/outcomes');
@@ -153,7 +153,7 @@ describe('fix 4: target-form scorer 0/1/2 (docs/SCORING_RUBRIC.md §3 examples)'
     expect(tf('A2-GR-comparatives-A-7', 'Cairo is bigger than Ismailia.')).toBe(2);
     expect(tf('A2-GR-past-simple-irregular-A-7', 'I goed to Alexandria.')).toBe(0);
     expect(tf('A2-GR-past-simple-irregular-A-7', 'I went to Alexandria with my cusin.')).toBe(2);
-    expect(tf('A1-GR-can-ability-A-7', 'I can to swim.')).toBe(0);
+    expect(tf('A1-GR-can-ability-A-7', 'I can to swim.')).toBe(1); // round-3 fix: wrong form after a correct can = slip (rubric §6)
     expect(tf('A1-GR-can-ability-A-8', "I cann't drive.")).toBe(1);
     expect(tf('A2-GR-going-to-A-7', 'I going to cook.')).toBe(0);
     expect(tf('A2-GR-going-to-A-7', "I'm going to cook dinner.")).toBe(2);
@@ -205,5 +205,74 @@ describe('fix 5: meaning-check guard', () => {
     expect(targetFormMissing({ targetForms: ['goes'] }, 'She go to school')).toBe(true);
     expect(targetFormMissing({ targetForms: ['goes'] }, 'She goes to school')).toBe(false);
     expect(targetFormMissing({}, 'anything')).toBeNull();
+  });
+});
+
+describe('round-3 fixes (new examples, not round-3 answers)', () => {
+  it('1. partial credit: target form attempted with one slip = 1', () => {
+    expect(tf('A1-GR-can-ability-A-8', 'My sister can cooks rice.')).toBe(1);
+    expect(tf('A1-GR-can-ability-A-8', 'My sister can cooking rice.')).toBe(1);
+    expect(tf('A1-GR-can-ability-A-8', 'My sister can cook rice.')).toBe(2);
+    expect(tf('A2-GR-past-simple-regular-A-7', 'On Monday I playd football.')).toBe(1);
+    expect(tf('A2-GR-past-simple-regular-A-7', 'On Monday I played football.')).toBe(2);
+    expect(tf('A2-GR-present-continuous-A-7', 'My uncle is work in the garden.')).toBe(1);
+    expect(tf('A2-GR-present-continuous-A-7', 'My uncle working in the garden.')).toBe(0);
+    expect(tf('A1-VO-common-adjectives-C-7', 'My street is very quiet.')).toBe(2);
+    expect(tf('A1-VO-common-adjectives-C-7', 'My street is very queit.')).toBe(1);
+    expect(tf('A2-GR-conjunctions-C-8', 'I stay home becase it is raining.')).toBe(1);
+  });
+  it('2. every occurrence of the form is checked', () => {
+    expect(tf('A2-GR-third-person-s-A-7', 'My brother cooks dinner and he wash the plates.')).toBe(1);
+    expect(tf('A2-GR-third-person-s-A-7', 'My brother cooks dinner and he washes the plates.')).toBe(2);
+    expect(tf('A2-GR-third-person-s-A-7', 'My aunt cookes fish on Fridays.')).toBe(1);
+    expect(tf('A1-GR-copula-be-C-8', 'My uncle and my aunt is teachers.')).toBe(0);
+    expect(tf('A1-GR-copula-be-C-8', 'My cousins is very noisy.')).toBe(0);
+    expect(tf('A1-GR-copula-be-C-8', 'My uncle and my aunt are teachers.')).toBe(2);
+    expect(tf('A2-GR-past-simple-regular-A-7', 'Yesterday we opened the windows and we cleanned the floor.')).toBe(1);
+    expect(tf('A2-GR-past-simple-regular-A-7', 'Last week I stoped smoking.')).toBe(1);
+    expect(tf('A1-VO-numbers-time-C-7', 'I wake up at sevn o\'clock.')).toBe(1);
+    expect(tf('A1-VO-numbers-time-C-7', 'I wake up at seven o\'clock.')).toBe(2);
+    expect(tf('A1-VO-numbers-time-C-7', 'I wake up at half past six.')).toBe(2);
+    expect(tf('A2-GR-frequency-adverbs-C-8', "My father doesn't never drink coffee.")).toBe(1);
+    expect(tf('A2-GR-frequency-adverbs-C-8', 'My father never drinks coffee.')).toBe(2);
+    expect(tf('A1-GR-capitals-full-stops-C-8', 'My teacher is mr Karim.')).toBe(1);
+    expect(tf('A2-GR-conjunctions-C-8', 'I like cooking but not the washing.')).toBe(1);
+    expect(tf('A2-GR-conjunctions-C-8', 'I like cooking but I hate the washing.')).toBe(2);
+  });
+  it('3. a non-sentence answer scores 0 where a sentence is required', () => {
+    expect(tf('A1-VO-family-C-8', 'Her cousin Laila.')).toBe(0);
+    expect(tf('A1-VO-family-C-8', 'My cousin lives in Amman.')).toBe(2);
+  });
+  it('4. make/do: the verb-noun pair is checked', () => {
+    expect(tf('A2-VO-make-do-B-9', 'Salma makes the ironing on Sunday.')).toBe(0);
+    expect(tf('A2-VO-make-do-B-9', 'Salma does the ironing on Sunday.')).toBe(2);
+    expect(tf('A2-VO-make-do-B-9', 'Omar does dinner on Sunday.')).toBe(0);
+    expect(tf('A2-VO-make-do-B-7', 'We made a big mess in the kitchen.')).toBe(2);
+    expect(tf('A2-VO-make-do-B-7', 'We did a big mess and made some tea.')).toBe(1);
+  });
+  it('5. word order has a rule (no fallback)', () => {
+    expect(tf('A1-GR-word-order-svo-B-9', 'I see you at the station at nine.')).toBe(2);
+    expect(tf('A1-GR-word-order-svo-A-8', 'At school I play basketball.')).toBe(0);
+    expect(tf('A1-GR-word-order-svo-A-8', 'I basketball play at school.')).toBe(0);
+    expect(tf('A1-GR-word-order-svo-A-8', 'I play at school basketball.')).toBe(1);
+    expect(tf('A1-GR-word-order-svo-A-8', 'I play basketball at school.')).toBe(2);
+    expect(tf('A1-GR-word-order-svo-A-7', 'I eat bread.')).toBe(1);
+  });
+  it('6. guard: no meaning-check credit when the written form is the target', async () => {
+    expect(spellingIsTarget(item('A1-VO-food-drink-C-2'))).toBe(true);
+    expect(targetFormMissing(item('A1-VO-food-drink-C-2'), 'carrots')).toBe(true);
+    expect(targetFormMissing(item('A1-VO-food-drink-C-2'), 'carrot')).toBe(false);
+    expect(targetFormMissing(item('A1-VO-numbers-time-A-2'), 'fourtey')).toBe(true);
+    expect(targetFormMissing(item('A1-VO-family-B-1'), 'grand pa')).toBe(true);
+    expect(targetFormMissing(item('A1-VO-family-B-1'), 'grandpa')).toBe(false);
+    expect(targetFormMissing(item('A1-VO-days-months-A-9'), 'THURSDAY')).toBe(true);
+    expect(targetFormMissing(item('A1-VO-days-months-C-5'), 'School starts again in september')).toBe(true);
+    expect(targetFormMissing(item('A1-GR-capitals-full-stops-A-3'), 'Ahmed lives in cairo.')).toBe(true);
+    const q = { id: 'v1', type: 'short-answer', text: 'Write one word: an orange vegetable', correctAnswer: 'carrot', objectiveIds: ['EN-F-A1-VO-food-drink'], explanation: '', points: 1 } as IQuestion;
+    vi.mocked(askForJson).mockResolvedValueOnce({ value: { correct: true, scoreExplanation: 'Spelling slip.', feedback: 'Good.', flags: [] }, model: 'm' } as never);
+    const p = (await evaluateShortAnswer({ attempt: { id: 'a', institutionId: 'i', assignmentId: 's' } as never, question: q, answer: 'carrott', run: 1 })) as unknown as { points: number };
+    expect(p.points).toBe(0);
+    // a grammar error-correction item keeps the meaning check
+    expect(spellingIsTarget(item('A2-GR-third-person-s-A-5'))).toBe(false);
   });
 });
