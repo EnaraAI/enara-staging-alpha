@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 4
+   "C1": 3,
+   "C2": 5
   }
  },
  "start": {
@@ -784,7 +784,87 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's correct now: \"The keys to my car are on the table.\" The verb agrees with the head noun \"keys\", which is plural, and \"to my car\" doesn't change that. This is exactly the trap in long subjects, and your rewrite handles it.\n\nBefore we come back to the \"There\" sentence, here is a different task.\n\nThink of a real person you know, such as a colleague, a friend or a relative. Write one sentence of your own about that person using am, is or are. Make it a genuine description of them, and I'll check the agreement.\n\nLEARNER'S LAST MESSAGE:\nMy colleague is very organised.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's correct: in \"My colleague is very organised.\", \"is\" agrees with the singular subject \"My colleague\". Together with your rewrite of the keys sentence, you are now matching the verb to the real subject in both short and long subjects.\n\nThink of a different person you know, such as a relative or a neighbour.\n\nWrite one sentence about a person you know using am, is or are correctly. Make the subject a little longer this time, for example a group of people or a noun with a phrase after it, so the agreement is less obvious."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's correct now: \"The keys to my car are on the table.\" The verb agrees with the head noun \"keys\", which is plural, and \"to my car\" doesn't change that. This is exactly the trap in long subjects, and your rewrite handles it.\n\nBefore we come back to the \"There\" sentence, here is a different task.\n\nThink of a real person you know, such as a colleague, a friend or a relative. Write one sentence of your own about that person using am, is or are. Make it a genuine description of them, and I'll check the agreement.\n\nLEARNER'S LAST MESSAGE:\nMy colleague is very organised.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's correct: in \"My colleague is very organised.\", \"is\" agrees with the singular subject \"My colleague\". Together with your rewrite of the keys sentence, you are now matching the verb to the real subject in both short and long subjects.\n\nThink of a different person you know, such as a relative or a neighbour.\n\nWrite one sentence about a person you know using am, is or are correctly. Make the subject a little longer this time, for example a group of people or a noun with a phrase after it, so the agreement is less obvious.",
+   "stateBefore": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "That's correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "That's correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My colleague is very organised."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My colleague is very organised."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brothers are engineers.",
+    "errors": {
+     "W1": "My brothers engineers.",
+     "W2": "My brothers is engineers."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 5
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brothers are engineers.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brothers are engineers."
+   }
   }
  ],
  "stateAfterS1": {

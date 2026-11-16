@@ -790,7 +790,69 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"am\" is right here.\nNow, instead of another gap-fill, write one real sentence of your own about a person you know, using am, is or are correctly. Something a little more complex than a simple subject is welcome.\n\nLEARNER'S LAST MESSAGE:\nMy parents teachers.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nNot quite yet. \"My parents teachers.\" has a subject and a noun that describes it, but nothing links them.\nThe idea: in English, a sentence that says what someone is needs a form of \"be\" between the subject and the description. Many languages can drop it in the present; English cannot, even when the meaning is clear.\nLook at your subject, decide which form of \"be\" it needs, and write the sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"am\" is right here.\nNow, instead of another gap-fill, write one real sentence of your own about a person you know, using am, is or are correctly. Something a little more complex than a simple subject is welcome.\n\nLEARNER'S LAST MESSAGE:\nMy parents teachers.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are (\"She teacher\")).\n\nTUTOR TURN TO JUDGE:\nNot quite yet. \"My parents teachers.\" has a subject and a noun that describes it, but nothing links them.\nThe idea: in English, a sentence that says what someone is needs a form of \"be\" between the subject and the description. Many languages can drop it in the present; English cannot, even when the meaning is clear.\nLook at your subject, decide which form of \"be\" it needs, and write the sentence again.",
+   "stateBefore": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 6
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "in English, a sentence that says what someone is needs a form of \"be\" between the subject and the description"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My parents are teachers.",
+    "errors": {
+     "W1": "My parents teachers.",
+     "W2": "My parents is teachers."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 6
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My parents are teachers.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My parents are teachers."
+   }
   }
  ],
  "stateAfterS1": {

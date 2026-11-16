@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 5
+   "C1": 3,
+   "C2": 6
   }
  },
  "start": {
@@ -821,7 +821,91 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect, \"an\" is right. The next word begins with a vowel sound, so \"an\" is the right choice.\nNow a real sentence from you.\nWrite one sentence about a person you know: a friend, a neighbour or someone at work. Use \"a\" before a consonant sound or \"an\" before a vowel sound.\n\nLEARNER'S LAST MESSAGE:\nMy uncle is an engineer.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"an engineer\" is right: \"engineer\" begins with a vowel sound.\nNow try one more gap on your own.\nWrite a or an: My uncle is ___ doctor. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect, \"an\" is right. The next word begins with a vowel sound, so \"an\" is the right choice.\nNow a real sentence from you.\nWrite one sentence about a person you know: a friend, a neighbour or someone at work. Use \"a\" before a consonant sound or \"an\" before a vowel sound.\n\nLEARNER'S LAST MESSAGE:\nMy uncle is an engineer.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"an engineer\" is right: \"engineer\" begins with a vowel sound.\nNow try one more gap on your own.\nWrite a or an: My uncle is ___ doctor. (answer with only the missing word)",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 5
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"an engineer\" is right"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an engineer\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My uncle is an engineer."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My uncle is an engineer."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"engineer\" begins with a vowel sound"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "a",
+    "errors": {
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 6
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "a"
+   }
   }
  ],
  "stateAfterS1": {

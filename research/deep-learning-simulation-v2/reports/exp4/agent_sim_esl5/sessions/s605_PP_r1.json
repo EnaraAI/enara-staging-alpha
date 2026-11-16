@@ -8,7 +8,7 @@
   "band": "A2",
   "primary": "W2",
   "s": {
-   "W2": 1,
+   "W2": 0,
    "W1": 1,
    "C1": 3,
    "C2": 3
@@ -590,7 +590,82 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 1: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot quite. \"A\" is right before consonant sounds, like \"a doctor\". But say \"umbrella\" out loud: it starts with \"uh\", a vowel sound. Which article goes before a vowel sound? Try again: He wants ___ umbrella.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that's it! \"Umbrella\" starts with a vowel sound, so \"an umbrella\". Good fixing! Next: We saw ___ elephant at the zoo. Write only the missing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 1: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot quite. \"A\" is right before consonant sounds, like \"a doctor\". But say \"umbrella\" out loud: it starts with \"uh\", a vowel sound. Which article goes before a vowel sound? Try again: He wants ___ umbrella.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that's it! \"Umbrella\" starts with a vowel sound, so \"an umbrella\". Good fixing! Next: We saw ___ elephant at the zoo. Write only the missing word.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 1,
+     "W1": 1,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, that's it!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, that's it!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Umbrella\" starts with a vowel sound, so \"an umbrella\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "(I leave it empty, no word)",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "(I leave it empty, no word)"
+   }
   }
  ],
  "stateAfterS1": {

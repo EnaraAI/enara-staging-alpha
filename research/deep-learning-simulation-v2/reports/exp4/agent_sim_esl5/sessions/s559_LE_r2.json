@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 5,
-   "C2": 2
+   "C1": 6,
+   "C2": 3
   }
  },
  "start": {
@@ -846,7 +846,93 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is correct. \"My sister\" is one person, so the verb takes -s, and \"play\" keeps its y because a vowel comes before it.\n\nNow I'd like a sentence from your own life. Think of a family member or friend and something they do every week.\n\nWrite one sentence about a person you know, using he or she with -s or -es on the verb.\n\nLEARNER'S LAST MESSAGE:\nMy mother watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"watches\" is correct in your sentence. \"Watch\" ends in -ch, so it needs -es, and you chose that ending yourself.\n\nNow let's check one more point on your own, without any help from me this time. Write the correct form:\n\nThe baby ___ (cry) at night. (answer with only the verb)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is correct. \"My sister\" is one person, so the verb takes -s, and \"play\" keeps its y because a vowel comes before it.\n\nNow I'd like a sentence from your own life. Think of a family member or friend and something they do every week.\n\nWrite one sentence about a person you know, using he or she with -s or -es on the verb.\n\nLEARNER'S LAST MESSAGE:\nMy mother watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"watches\" is correct in your sentence. \"Watch\" ends in -ch, so it needs -es, and you chose that ending yourself.\n\nNow let's check one more point on your own, without any help from me this time. Write the correct form:\n\nThe baby ___ (cry) at night. (answer with only the verb)",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 2
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"watches\" is correct in your sentence."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"watches\" is correct in your sentence."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My mother watches TV every evening."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My mother watches TV every evening."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Watch\" ends in -ch, so it needs -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "cries",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "cries"
+   }
   }
  ],
  "stateAfterS1": {

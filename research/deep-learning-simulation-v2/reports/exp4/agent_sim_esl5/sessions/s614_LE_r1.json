@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 4
+   "C1": 3,
+   "C2": 5
   }
  },
  "start": {
@@ -740,7 +740,93 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"The key was very old.\" is correct: the refers back to the key you already introduced, so both of you know which one.\n\nNext, write one sentence about a person you know, choosing a or an by the sound of the next word.\n\nLEARNER'S LAST MESSAGE:\nMy uncle is an engineer.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"an engineer\" follows the vowel sound at the start of \"engineer\".\n\nNow a short independent task. Write two sentences: in the first, introduce something with a or an before a word that starts with the letter u (watch the sound). In the second, refer back to it with the."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"The key was very old.\" is correct: the refers back to the key you already introduced, so both of you know which one.\n\nNext, write one sentence about a person you know, choosing a or an by the sound of the next word.\n\nLEARNER'S LAST MESSAGE:\nMy uncle is an engineer.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"an engineer\" follows the vowel sound at the start of \"engineer\".\n\nNow a short independent task. Write two sentences: in the first, introduce something with a or an before a word that starts with the letter u (watch the sound). In the second, refer back to it with the.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"an engineer\""
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"an engineer\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My uncle is an engineer."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My uncle is an engineer."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"an engineer\" follows the vowel sound at the start of \"engineer\""
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I bought an umbrella.",
+    "errors": {
+     "W1": "I bought umbrella.",
+     "W2": "I bought a umbrella."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 5
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I bought an umbrella.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I bought an umbrella."
+   }
   }
  ],
  "stateAfterS1": {

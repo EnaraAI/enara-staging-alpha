@@ -8,14 +8,14 @@
   "band": "A2",
   "primary": "W1",
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 3
   },
   "indep": {
    "C1": 0,
-   "C2": 3
+   "C2": 4
   }
  },
  "start": {
@@ -606,7 +606,75 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 2: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExactly! Everyone in the room knows which door we mean, so we use \"the\". Next: My uncle is ___ doctor. Write a or an.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Doctor\" begins with a consonant sound, so it is \"a doctor\". Remember, in English we always need an article before a job. Next: I bought a book. ___ book is very good. Write a, an or the."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 2: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExactly! Everyone in the room knows which door we mean, so we use \"the\". Next: My uncle is ___ doctor. Write a or an.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Doctor\" begins with a consonant sound, so it is \"a doctor\". Remember, in English we always need an article before a job. Next: I bought a book. ___ book is very good. Write a, an or the.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "a"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "in English we always need an article before a job"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "The",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "The"
+   }
   }
  ],
  "stateAfterS1": {

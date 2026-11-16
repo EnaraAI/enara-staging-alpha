@@ -796,7 +796,70 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"an\" is right. You checked the first sound, as with \"apron\".\n\nNow write one sentence about a person you know. Use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy brother is a engineer.\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\n\"My brother is\" is fine. The small word before \"engineer\" needs another look.\n\nCompare this pair.\nRight: She has an onion. Wrong: She has a onion. The wrong one is wrong because \"onion\" starts with a vowel sound.\n\nLook at your sentence again and write it once more."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"an\" is right. You checked the first sound, as with \"apron\".\n\nNow write one sentence about a person you know. Use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy brother is a engineer.\nFACT: the last learner message contained the error of W2 (uses \"a\" where \"an\" is needed (\"a apple\")).\n\nTUTOR TURN TO JUDGE:\n\"My brother is\" is fine. The small word before \"engineer\" needs another look.\n\nCompare this pair.\nRight: She has an onion. Wrong: She has a onion. The wrong one is wrong because \"onion\" starts with a vowel sound.\n\nLook at your sentence again and write it once more.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 6
+    }
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: She has an onion. Wrong: She has a onion."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother is an engineer.",
+    "errors": {
+     "W1": "My brother is engineer.",
+     "W2": "My brother is a engineer."
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 6
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brother is engineer.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My brother is engineer."
+   }
   }
  ],
  "stateAfterS1": {

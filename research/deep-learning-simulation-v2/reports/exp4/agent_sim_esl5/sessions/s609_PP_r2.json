@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 5,
-   "C2": 5
+   "C1": 6,
+   "C2": 6
   }
  },
  "start": {
@@ -734,7 +734,93 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 5.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExactly right. \"We\" is a plural subject, so it takes are, and the verb is there. Now a challenge with feelings: write a sentence about yourself using \"I\" and the word \"happy\" or \"tired\". Don't forget the verb be.\n\nLEARNER'S LAST MESSAGE:\nI am happy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGreat. \"I\" always takes am, and you kept the verb in, so the sentence is complete. Next challenge: write one sentence about someone in your family using the word \"pilot\" or \"student\". Watch the subject and choose am, is or are carefully."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 5.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExactly right. \"We\" is a plural subject, so it takes are, and the verb is there. Now a challenge with feelings: write a sentence about yourself using \"I\" and the word \"happy\" or \"tired\". Don't forget the verb be.\n\nLEARNER'S LAST MESSAGE:\nI am happy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGreat. \"I\" always takes am, and you kept the verb in, so the sentence is complete. Next challenge: write one sentence about someone in your family using the word \"pilot\" or \"student\". Watch the subject and choose am, is or are carefully.",
+   "stateBefore": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 5
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Great."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Great."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "I am happy."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "I am happy."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"I\" always takes am"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brothers are students.",
+    "errors": {
+     "W1": "My brothers students.",
+     "W2": "My brothers is students."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 6
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brothers are students.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brothers are students."
+   }
   }
  ],
  "stateAfterS1": {

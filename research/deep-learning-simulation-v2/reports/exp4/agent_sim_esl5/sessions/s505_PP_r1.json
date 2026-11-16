@@ -14,7 +14,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 3,
+   "C1": 4,
    "C2": 0
   }
  },
@@ -657,7 +657,82 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGreat! \"Drinks\" is correct: the subject is he, so drink gets -s. Now a new one: Our teacher ___ (live) near the school. Write only the verb.\n\nLEARNER'S LAST MESSAGE:\nlives\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nVery good! \"Our teacher\" is he or she, so live gets -s: lives. Now a new spelling: some verbs take -es. Watch ends in -ch. Try: She ___ (watch) TV after dinner. Write only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGreat! \"Drinks\" is correct: the subject is he, so drink gets -s. Now a new one: Our teacher ___ (live) near the school. Write only the verb.\n\nLEARNER'S LAST MESSAGE:\nlives\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nVery good! \"Our teacher\" is he or she, so live gets -s: lives. Now a new spelling: some verbs take -es. Watch ends in -ch. Try: She ___ (watch) TV after dinner. Write only the verb.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 3,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Very good!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "lives"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"Our teacher\" is he or she, so live gets -s"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "watches",
+    "errors": {
+     "W1": "watch",
+     "W2": "watchs"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 3,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "watchs",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W2",
+    "text": "watchs"
+   }
   }
  ],
  "stateAfterS1": {

@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 3,
-   "C2": 5
+   "C1": 4,
+   "C2": 6
   }
  },
  "start": {
@@ -682,7 +682,93 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 3.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nPerfect. Ahmed is a third-person singular subject, so he needs is, and the verb can't be dropped. Now write your own sentence using \"they\" and the word \"home\". Make sure the verb be is in it.\n\nLEARNER'S LAST MESSAGE:\nThey are at home.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect. \"They\" is a plural subject, so it takes are, and the verb is there. Now try a sentence with two parts: write one sentence saying how you feel and how a friend feels, using \"I\", \"my friend\" and the words \"happy\" or \"tired\". Both parts need the verb be."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 3.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nPerfect. Ahmed is a third-person singular subject, so he needs is, and the verb can't be dropped. Now write your own sentence using \"they\" and the word \"home\". Make sure the verb be is in it.\n\nLEARNER'S LAST MESSAGE:\nThey are at home.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect. \"They\" is a plural subject, so it takes are, and the verb is there. Now try a sentence with two parts: write one sentence saying how you feel and how a friend feels, using \"I\", \"my friend\" and the words \"happy\" or \"tired\". Both parts need the verb be.",
+   "stateBefore": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 5
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "They are at home."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "They are at home."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"They\" is a plural subject, so it takes are"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am tired and my friend is happy.",
+    "errors": {
+     "W1": "I tired and my friend happy.",
+     "W2": "I is tired and my friend is happy."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 6
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I am tired and my friend is happy.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I am tired and my friend is happy."
+   }
   }
  ],
  "stateAfterS1": {

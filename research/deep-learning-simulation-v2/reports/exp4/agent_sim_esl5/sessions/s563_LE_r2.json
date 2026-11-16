@@ -9,7 +9,7 @@
   "primary": "W2",
   "s": {
    "W2": 0,
-   "W1": 1,
+   "W1": 0,
    "C1": 3,
    "C2": 3
   },
@@ -805,7 +805,73 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! an is right here, because 'orange' starts with a vowel sound. You used the rule the same way as with 'owl'.\n\nNow let's use it in your own writing. Think of a person you know, like a friend or someone in your family. Write one sentence about this person, and use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy sister is engineer.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\n\"My sister is\" is a good start, but one small word is missing before \"engineer\".\n\nIn English, we usually put a small word (a, an or the) before one thing we can count.\n\nRight: My cousin is a nurse.\nWrong: My cousin is nurse.\n\nNow put the missing word into this new sentence and write it out in full: I have new bike."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! an is right here, because 'orange' starts with a vowel sound. You used the rule the same way as with 'owl'.\n\nNow let's use it in your own writing. Think of a person you know, like a friend or someone in your family. Write one sentence about this person, and use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy sister is engineer.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\n\"My sister is\" is a good start, but one small word is missing before \"engineer\".\n\nIn English, we usually put a small word (a, an or the) before one thing we can count.\n\nRight: My cousin is a nurse.\nWrong: My cousin is nurse.\n\nNow put the missing word into this new sentence and write it out in full: I have new bike.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 6
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English, we usually put a small word (a, an or the) before one thing we can count."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: My cousin is a nurse. Wrong: My cousin is nurse."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I have a new bike.",
+    "errors": {
+     "W1": "I have new bike."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 6
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I have a new bike.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I have a new bike."
+   }
   }
  ],
  "stateAfterS1": {

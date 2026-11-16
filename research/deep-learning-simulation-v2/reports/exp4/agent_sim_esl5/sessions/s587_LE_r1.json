@@ -9,7 +9,7 @@
   "primary": "W2",
   "s": {
    "W2": 0,
-   "W1": 1,
+   "W1": 0,
    "C1": 3,
    "C2": 3
   },
@@ -791,7 +791,73 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an\" is correct. You looked at the sound right after the gap, and it is a vowel sound.\nNow let's use the rule in your own writing.\nWrite one sentence about a person you know, for example a teacher or a classmate. Use \"a\" or \"an\" before one thing, and choose it by the first sound.\n\nLEARNER'S LAST MESSAGE:\nMy teacher is artist.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence needs one more small word before \"artist\".\nIn English, we put a small word (a, an or the) before one countable thing.\nRight: \"She has a cat.\" Wrong: \"She has cat.\"\nNow write this sentence again and add the missing word:\nMy friend has bike."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an\" is correct. You looked at the sound right after the gap, and it is a vowel sound.\nNow let's use the rule in your own writing.\nWrite one sentence about a person you know, for example a teacher or a classmate. Use \"a\" or \"an\" before one thing, and choose it by the first sound.\n\nLEARNER'S LAST MESSAGE:\nMy teacher is artist.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence needs one more small word before \"artist\".\nIn English, we put a small word (a, an or the) before one countable thing.\nRight: \"She has a cat.\" Wrong: \"She has cat.\"\nNow write this sentence again and add the missing word:\nMy friend has bike.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 1,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English, we put a small word (a, an or the) before one countable thing."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"She has a cat.\" Wrong: \"She has cat.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "a"
+   }
   }
  ],
  "stateAfterS1": {

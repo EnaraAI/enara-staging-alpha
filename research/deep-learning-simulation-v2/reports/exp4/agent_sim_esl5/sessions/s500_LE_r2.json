@@ -780,7 +780,61 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's okay. Let's take one small step.\n\nLook at this sentence again:\n\nI have cat at home.\n\nOne word here is the thing you can count. Write only that one word.\n\nLEARNER'S LAST MESSAGE:\ncat\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"cat\" is the thing you can count. Well found.\n\nNow a new task. Write one sentence about a person you know. Use a or an in it."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's okay. Let's take one small step.\n\nLook at this sentence again:\n\nI have cat at home.\n\nOne word here is the thing you can count. Write only that one word.\n\nLEARNER'S LAST MESSAGE:\ncat\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"cat\" is the thing you can count. Well found.\n\nNow a new task. Write one sentence about a person you know. Use a or an in it.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   },
+   "events": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother is an engineer.",
+    "errors": {
+     "W1": "My brother is engineer.",
+     "W2": "My brother is a engineer."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brother is an engineer.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother is an engineer."
+   }
   }
  ],
  "stateAfterS1": {

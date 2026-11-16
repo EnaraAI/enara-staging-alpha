@@ -11,7 +11,7 @@
    "W2": 0,
    "W1": 0,
    "C1": 3,
-   "C2": 0
+   "C2": 1
   },
   "indep": {
    "C1": 2,
@@ -669,7 +669,81 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try! You added an ending, that is right. But watch ends in -ch, and after -ch we add -es, not just -s. Try again: She ___ (watch) TV after dinner.\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, now it is right! Watch ends in -ch, so we add -es: watches. Next: The baby ___ (cry) at night. Write only the verb. Be careful with the y!"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try! You added an ending, that is right. But watch ends in -ch, and after -ch we add -es, not just -s. Try again: She ___ (watch) TV after dinner.\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, now it is right! Watch ends in -ch, so we add -es: watches. Next: The baby ___ (cry) at night. Write only the verb. Be careful with the y!",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, now it is right!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, now it is right!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Watch ends in -ch, so we add -es: watches."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "cries",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "cries"
+   }
   }
  ],
  "stateAfterS1": {

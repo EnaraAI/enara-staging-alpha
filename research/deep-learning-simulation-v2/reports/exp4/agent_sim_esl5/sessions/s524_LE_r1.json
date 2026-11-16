@@ -10,12 +10,12 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 2,
+   "C1": 3,
    "C2": 3
   },
   "indep": {
-   "C1": 1,
-   "C2": 4
+   "C1": 2,
+   "C2": 5
   }
  },
  "start": {
@@ -809,7 +809,87 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an\" is the right word.\n\nNow you write. Make one sentence about a person you know. Use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy sister is an engineer.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"an engineer\" is correct.\n\nNow write one more sentence of your own, about a different person you know. Use a or an in it."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an\" is the right word.\n\nNow you write. Make one sentence about a person you know. Use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy sister is an engineer.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"an engineer\" is correct.\n\nNow write one more sentence of your own, about a different person you know. Use a or an in it.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"an engineer\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an engineer\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My sister is an engineer."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My sister is an engineer."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My aunt is an artist.",
+    "errors": {
+     "W1": "My aunt is artist.",
+     "W2": "My aunt is a artist."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 5
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My aunt is an artist.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My aunt is an artist."
+   }
   }
  ],
  "stateAfterS1": {

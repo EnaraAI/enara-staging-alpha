@@ -8,7 +8,7 @@
   "band": "A1",
   "primary": "W2",
   "s": {
-   "W2": 1,
+   "W2": 0,
    "W1": 0,
    "C1": 3,
    "C2": 2
@@ -810,7 +810,69 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 2: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is right. \"My sister\" is one person, so -s goes on the verb.\n\nNow a sentence of your own. Think of a real person you know.\n\nWrite one sentence about them with he or she. Add -s or -es to the verb.\n\nLEARNER'S LAST MESSAGE:\nMy mother watchs TV every evening.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\n\"My mother\" is one person, so an ending is needed. You added one. Now check its spelling.\n\nRight: He mixes the paint.\nWrong: He mixs the paint.\nThe wrong one has only -s after \"x\".\n\nLook at how your verb ends. Write your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 2: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is right. \"My sister\" is one person, so -s goes on the verb.\n\nNow a sentence of your own. Think of a real person you know.\n\nWrite one sentence about them with he or she. Add -s or -es to the verb.\n\nLEARNER'S LAST MESSAGE:\nMy mother watchs TV every evening.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\n\"My mother\" is one person, so an ending is needed. You added one. Now check its spelling.\n\nRight: He mixes the paint.\nWrong: He mixs the paint.\nThe wrong one has only -s after \"x\".\n\nLook at how your verb ends. Write your sentence again.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 1,
+     "W1": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 1
+    }
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: He mixes the paint. Wrong: He mixs the paint."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My mother watches TV every evening.",
+    "errors": {
+     "W1": "My mother watch TV every evening.",
+     "W2": "My mother watchs TV every evening."
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 1
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My mother watches TV every evening.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My mother watches TV every evening."
+   }
   }
  ],
  "stateAfterS1": {

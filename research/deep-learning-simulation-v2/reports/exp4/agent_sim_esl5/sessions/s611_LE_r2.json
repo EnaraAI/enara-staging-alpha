@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 0,
-   "C2": 3
+   "C1": 1,
+   "C2": 4
   }
  },
  "start": {
@@ -749,7 +749,91 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's right: 'an hour' is correct, since the h is silent and the word begins with a vowel sound. Your sentence now shows exactly the point about sound over spelling.\n\nLet's take this into a different context. Write one sentence about a person you know, choosing a or an by sound. If you like, push yourself with a noun where spelling could mislead, such as a job title or a description beginning with u, h or o.\n\nLEARNER'S LAST MESSAGE:\nMy cousin is an honest man.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"an honest man\" is right. You picked a word where the h is silent, and the article follows the sound, not the letter. That is the same point as before, now shown in a new context.\n\nNext, a quick one:\n\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's right: 'an hour' is correct, since the h is silent and the word begins with a vowel sound. Your sentence now shows exactly the point about sound over spelling.\n\nLet's take this into a different context. Write one sentence about a person you know, choosing a or an by sound. If you like, push yourself with a noun where spelling could mislead, such as a job title or a description beginning with u, h or o.\n\nLEARNER'S LAST MESSAGE:\nMy cousin is an honest man.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"an honest man\" is right. You picked a word where the h is silent, and the article follows the sound, not the letter. That is the same point as before, now shown in a new context.\n\nNext, a quick one:\n\nWrite a or an: She has ___ orange in her bag. (answer with only the missing word)",
+   "stateBefore": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"an honest man\" is right."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"an honest man\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My cousin is an honest man."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My cousin is an honest man."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the article follows the sound, not the letter"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "B2",
+    "primary": "W2",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   }
   }
  ],
  "stateAfterS1": {

@@ -805,7 +805,85 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot quite yet. Compare this pair.\n\nRight: He ate an egg roll. Wrong: He ate a egg roll. The wrong one is wrong because \"egg\" starts with a vowel sound.\n\nWhat were you thinking when you chose your word? Tell me in a few words, then try the gap again.\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYou are right that one thing we can count needs a, an or the.\n\nThe answer here is \"an\": \"orange\" starts with a vowel sound, so we use an.\n\nRight: I ate an apple. Wrong: I ate a apple.\n\nNow you, on your own:\n\nWrite a or an: We saw ___ owl in the tree."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot quite yet. Compare this pair.\n\nRight: He ate an egg roll. Wrong: He ate a egg roll. The wrong one is wrong because \"egg\" starts with a vowel sound.\n\nWhat were you thinking when you chose your word? Tell me in a few words, then try the gap again.\n\nLEARNER'S LAST MESSAGE:\nI think: a singular countable noun needs a/an (or the).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYou are right that one thing we can count needs a, an or the.\n\nThe answer here is \"an\": \"orange\" starts with a vowel sound, so we use an.\n\nRight: I ate an apple. Wrong: I ate a apple.\n\nNow you, on your own:\n\nWrite a or an: We saw ___ owl in the tree.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "one thing we can count needs a, an or the"
+    },
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer here is \"an\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"orange\" starts with a vowel sound, so we use an"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: I ate an apple. Wrong: I ate a apple."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "an",
+    "errors": {
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5",
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an"
+   }
   }
  ],
  "stateAfterS1": {

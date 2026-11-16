@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 1,
-   "C2": 4
+   "C1": 2,
+   "C2": 5
   }
  },
  "start": {
@@ -813,7 +813,91 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, an is correct. 'Orange' starts with a vowel sound, so an fits.\n\nNow a sentence of your own. Think of a person you know, like a friend or someone in your family. Write one full sentence about this person, and use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy sister is an engineer.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My sister is an engineer.\" is correct. An goes well before the vowel sound at the start of \"engineer\".\n\nNow one more for you to do on your own:\n\nWrite a or an: My uncle is ___ doctor. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, an is correct. 'Orange' starts with a vowel sound, so an fits.\n\nNow a sentence of your own. Think of a person you know, like a friend or someone in your family. Write one full sentence about this person, and use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy sister is an engineer.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My sister is an engineer.\" is correct. An goes well before the vowel sound at the start of \"engineer\".\n\nNow one more for you to do on your own:\n\nWrite a or an: My uncle is ___ doctor. (answer with only the missing word)",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My sister is an engineer.\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"My sister is an engineer.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My sister is an engineer."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My sister is an engineer."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "An goes well before the vowel sound at the start of \"engineer\"."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "a",
+    "errors": {
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 5
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "a"
+   }
   }
  ],
  "stateAfterS1": {

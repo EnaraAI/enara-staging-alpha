@@ -8,7 +8,7 @@
   "band": "A1",
   "primary": "W2",
   "s": {
-   "W2": 3,
+   "W2": 2,
    "W1": 0,
    "C1": 3,
    "C2": 0
@@ -807,7 +807,70 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 6.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nRight: \"plays\". \"My sister\" is like \"she\", so the verb has -s.\n\nNow a new step. Think of one real person you know.\n\nWrite one sentence about this person with he or she. Put -s or -es on the verb.\n\nLEARNER'S LAST MESSAGE:\nMy brother watchs football every Sunday.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\n\"My brother\" needs an ending on the verb, and you added one. The spelling of the ending is not right yet.\n\nRight: He fixes the door.\nWrong: He fixs the door.\nThe wrong one has only -s after \"x\".\n\nLook at the last letters of your verb. Write your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 3: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 6.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nRight: \"plays\". \"My sister\" is like \"she\", so the verb has -s.\n\nNow a new step. Think of one real person you know.\n\nWrite one sentence about this person with he or she. Put -s or -es on the verb.\n\nLEARNER'S LAST MESSAGE:\nMy brother watchs football every Sunday.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\n\"My brother\" needs an ending on the verb, and you added one. The spelling of the ending is not right yet.\n\nRight: He fixes the door.\nWrong: He fixs the door.\nThe wrong one has only -s after \"x\".\n\nLook at the last letters of your verb. Write your sentence again.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 3,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: He fixes the door. Wrong: He fixs the door."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother watches football every Sunday.",
+    "errors": {
+     "W1": "My brother watch football every Sunday.",
+     "W2": "My brother watchs football every Sunday."
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brother watch football every Sunday.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My brother watch football every Sunday."
+   }
   }
  ],
  "stateAfterS1": {

@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 6,
-   "C2": 3
+   "C1": 7,
+   "C2": 4
   }
  },
  "start": {
@@ -826,7 +826,93 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 6.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"plays\" is correct: a vowel + y verb simply takes -s, unlike consonant + y verbs, which change to -ies. Clearly secure.\n\nSince the gap-fill items are not stretching you, let's switch to free production. Write one sentence about a real person you know, describing a habit or routine of theirs, using the third-person singular present simple. To make it more demanding, try to choose a subject or verb that is easy to get wrong: a collective noun such as \"my family\", a subject separated from its verb by a phrase, or a verb ending in -o, -x or -sh. Just one sentence.\n\nLEARNER'S LAST MESSAGE:\nMy mother watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"watches\" is correct: singular subject, and a verb ending in -ch takes -es.\n\nHere is an unaided check with a less obvious subject:\n\nNeither of my brothers ___ (fix) his own bike.\n\nWrite only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level B2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 6.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"plays\" is correct: a vowel + y verb simply takes -s, unlike consonant + y verbs, which change to -ies. Clearly secure.\n\nSince the gap-fill items are not stretching you, let's switch to free production. Write one sentence about a real person you know, describing a habit or routine of theirs, using the third-person singular present simple. To make it more demanding, try to choose a subject or verb that is easy to get wrong: a collective noun such as \"my family\", a subject separated from its verb by a phrase, or a verb ending in -o, -x or -sh. Just one sentence.\n\nLEARNER'S LAST MESSAGE:\nMy mother watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"watches\" is correct: singular subject, and a verb ending in -ch takes -es.\n\nHere is an unaided check with a less obvious subject:\n\nNeither of my brothers ___ (fix) his own bike.\n\nWrite only the verb.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 3
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"watches\" is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"watches\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My mother watches TV every evening."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My mother watches TV every evening."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "a verb ending in -ch takes -es"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "fixes",
+    "errors": {
+     "W1": "fix",
+     "W2": "fixs"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "B2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 7,
+     "C2": 4
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "fixes",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "fixes"
+   }
   }
  ],
  "stateAfterS1": {

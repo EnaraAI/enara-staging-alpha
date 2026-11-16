@@ -8,7 +8,7 @@
   "band": "A1",
   "primary": "W1",
   "s": {
-   "W1": 3,
+   "W1": 1,
    "W2": 0,
    "C1": 2,
    "C2": 3
@@ -786,7 +786,75 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an\" is right. You looked at the first sound again.\n\nNow write your own sentence. Write one sentence about a person you know. Use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy sister is engineer.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nOne small word is missing in your sentence.\n\nIn English, we put a small word (a, an or the) before one thing we can count.\n\nRight: \"He has a bike.\" Wrong: \"He has bike.\"\n\nNow write this sentence again with the missing word: \"My friend has dog.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 3: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an\" is right. You looked at the first sound again.\n\nNow write your own sentence. Write one sentence about a person you know. Use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy sister is engineer.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nOne small word is missing in your sentence.\n\nIn English, we put a small word (a, an or the) before one thing we can count.\n\nRight: \"He has a bike.\" Wrong: \"He has bike.\"\n\nNow write this sentence again with the missing word: \"My friend has dog.\"",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 5
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "we put a small word (a, an or the) before one thing we can count"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"He has a bike.\" Wrong: \"He has bike.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": "",
+     "W2": "a"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 5
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "a"
+   }
   }
  ],
  "stateAfterS1": {

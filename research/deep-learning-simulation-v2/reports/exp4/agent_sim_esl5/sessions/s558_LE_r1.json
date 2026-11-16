@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 6
+   "C1": 3,
+   "C2": 7
   }
  },
  "start": {
@@ -817,7 +817,87 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's correct. \"I\" goes with \"am\", so your answer is right.\n\nYou have now done gaps with different words. Let's try something a little more open.\n\nThink of a person you know, like a friend or someone in your family. Write one full sentence about that person, using am, is or are correctly.\n\nLEARNER'S LAST MESSAGE:\nMy parents are teachers.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"My parents are teachers.\" More than one person takes are, and you did not leave it out.\n\nNow one short gap to do alone.\n\nWrite am, is or are: She ___ at home today. (answer with only the missing word)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat's correct. \"I\" goes with \"am\", so your answer is right.\n\nYou have now done gaps with different words. Let's try something a little more open.\n\nThink of a person you know, like a friend or someone in your family. Write one full sentence about that person, using am, is or are correctly.\n\nLEARNER'S LAST MESSAGE:\nMy parents are teachers.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"My parents are teachers.\" More than one person takes are, and you did not leave it out.\n\nNow one short gap to do alone.\n\nWrite am, is or are: She ___ at home today. (answer with only the missing word)",
+   "stateBefore": {
+    "form": "copula",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 6
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"My parents are teachers.\""
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"My parents are teachers.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My parents are teachers."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My parents are teachers."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "More than one person takes are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "is",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 7
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "is",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "is"
+   }
   }
  ],
  "stateAfterS1": {

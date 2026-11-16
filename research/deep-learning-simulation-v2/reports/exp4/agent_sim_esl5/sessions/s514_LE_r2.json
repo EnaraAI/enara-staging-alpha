@@ -756,7 +756,69 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is correct. Good work with this one.\n\nNow I want your own sentence. Think of a person you know. Write one sentence about a thing he or she does often. Remember the ending on the verb.\n\nLEARNER'S LAST MESSAGE:\nMy mother watch TV every evening.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe verb in your sentence needs a look.\n\nCompare this pair:\nRight: He reads a book.\nWrong: He read a book.\nThe wrong one has no ending after \"he\".\n\n\"My mother\" is one person. Look at your verb again and write your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is correct. Good work with this one.\n\nNow I want your own sentence. Think of a person you know. Write one sentence about a thing he or she does often. Remember the ending on the verb.\n\nLEARNER'S LAST MESSAGE:\nMy mother watch TV every evening.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe verb in your sentence needs a look.\n\nCompare this pair:\nRight: He reads a book.\nWrong: He read a book.\nThe wrong one has no ending after \"he\".\n\n\"My mother\" is one person. Look at your verb again and write your sentence again.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: He reads a book. Wrong: He read a book."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My mother watches TV every evening.",
+    "errors": {
+     "W1": "My mother watch TV every evening.",
+     "W2": "My mother watchs TV every evening."
+    }
+   },
+   "applied": [
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    }
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My mother watches TV every evening.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My mother watches TV every evening."
+   }
   }
  ],
  "stateAfterS1": {
