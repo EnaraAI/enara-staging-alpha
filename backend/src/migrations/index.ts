@@ -26,6 +26,7 @@ import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
 import { LMS_MODELS, LmsGradeSyncJob, LmsPlatform, LmsToolKey } from '../integrations/lms/models';
+import { ClassEnrollment } from '../models/ClassEnrollment';
 import type { Migration } from './runner';
 
 // Inserts events with fixed ids, so re-running adds nothing twice.
@@ -392,6 +393,15 @@ export const MIGRATIONS: Migration[] = [
       if (!(await names(LmsToolKey)).some((i) => i.name === 'one_active_key' && i.unique)) throw new Error('lms_tool_keys one_active_key index missing');
       if (!(await names(LmsGradeSyncJob)).some((i) => i.key.idempotencyKey === 1 && i.unique)) throw new Error('lms_grade_sync_jobs idempotencyKey unique index missing');
       if (!(await names(LmsPlatform)).some((i) => i.key.issuer === 1 && i.key.clientId === 1 && i.unique)) throw new Error('lms_platforms issuer+clientId unique index missing');
+    },
+  },
+  {
+    id: '2026-11-17-class-enrollments-step1',
+    description: 'Multi-class step 1: create the empty class_enrollments collection and its indexes (additive; no rows written or changed)',
+    up: async () => {
+      await ClassEnrollment.createIndexes();
+      const idx = await ClassEnrollment.collection.indexes();
+      if (!idx.some((i) => i.name === 'one_enrollment_per_target' && i.unique)) throw new Error('class_enrollments unique index missing');
     },
   },
 ];
