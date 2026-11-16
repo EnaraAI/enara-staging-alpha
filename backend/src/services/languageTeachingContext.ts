@@ -938,10 +938,15 @@ export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<Tur
     }
     if (active !== target) continue;
     const next = history.slice(i + 1).find((x) => x.role === 'assistant');
-    const verdict = next && inScope(next.languageTurn, scope) ? next.languageTurn?.assessment?.verdict : undefined;
+    const lt = next && inScope(next.languageTurn, scope) ? next.languageTurn as (StoredLearningFields & { answerReleased?: boolean; ownSentence?: string; closingAsk?: string }) | null | undefined : undefined;
+    const verdict = lt?.assessment?.verdict;
     const item = items.find((x) => `lesson:${x.id}` === active);
     const kind = classifyLearnerResponse(h.content, taskInvitation(prevTutor) ?? 'instruction');
     if (isFailure(verdict) && genuineAttempt(h.content, prevTutor, item, kind)) n += 1;
+    // ESL5 fix 2: attempts count on ONE task only. A success on it, or a reply that set a different task (the answer was released with a new item,
+    // the own-sentence task was set or answered, the reviewOpen closing item was set), starts the count again, even when the stored open item
+    // was not moved on (a reply without a marker keeps the old item).
+    if (isSuccess(verdict) || lt?.answerReleased || lt?.ownSentence || (lt?.closingAsk === 'added' && engineV2('reviewOpen'))) n = 0;
   }
   const ok = s.keyVerdict === 'CORRECT' || s.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
   if (!ok && genuineAttempt(text, prevTutor, s.activeLessonItem, s.learnerResponse ?? 'no_pending_task')) n += 1;
@@ -1508,6 +1513,20 @@ const fadedNow = (s: TurnSignals): number[] => (engineV2('fadeKnown') ? s.fade?.
 export const REVIEW_OPEN_LINE = (codes: string[]) => `This is a later session and their record from earlier sessions shows these error types still live: ${codes.map((c, k) => `(${k + 1}) ${errorTypeLabel(c)}`).join('; ')}. Open with recall, not re-teaching: greet them in a few words, then give ONE short recall item on (1) for them to answer from memory: a new sentence to complete or correct, made of words that appear in no lesson exercise. No rule, no explanation and no example before it; no exercise from today's lesson in this reply (it comes after the recall).${codes.length > 1 ? ' The second recall item comes in your next reply.' : ''} This replaces the opening question about what they already know.`;
 export const REVIEW_SECOND_LINE = (code: string) => `They have just answered the first recall item. Give feedback in one line (if it is wrong, show the right form with a one-line reason; no rule lecture), then give the second and last recall item, on ${errorTypeLabel(code)}: one new sentence to complete or correct, answered from memory, with no rule or example before it. Today's lesson continues after it.`;
 export const REVIEW_CLOSE_LINE = (code?: string) => `This is the point to close the lesson unit. This overrides the "next task" instructions above and replaces the usual rule recap: do NOT ask them to tell you the rule in their own words and do not recap the rule. (1) Answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) give ONE new item in a new situation (new words, a different topic from today's exercises) on ${code ? errorTypeLabel(code) : 'the point they found hardest today'}, for them to answer without help. One task only; never write a completed answer to an open exercise.`;
+// ESL5 fix 2 (reviewOpen closing vs hint ladder and release). The closing item is NEW: one task, one unaided try, no answer before a genuine attempt
+// (releaseAfterTwo then applies to it like any item). When the closing turn answers an open task, a wrong answer or a help request keeps the hint/retry
+// (what the ESL5 agents did); on a release, the release's new item IS the closing item.
+export const REVIEW_CLOSE_ONE_TRY = ' It is the only task in this reply: they get one try at it on their own, and you never give its answer before they have made a genuine attempt.';
+export const REVIEW_CLOSE_HOLD = 'If their latest message answers the open task wrongly, or asks for help with it, the closing item does NOT replace the hint/retry: follow the hint instructions above for that task (they try it again themselves; no answer before two real tries) and give no new item in this reply. Only if their answer is right: confirm it in a few words and give the closing item.';
+export const REVIEW_CLOSE_RELEASE_LINE = (code?: string) => `This is also the point to close the lesson unit. The ONE new item in the answer-release instruction above is the closing item: set it in a new situation (new words, a different topic from today's exercises) on ${code ? errorTypeLabel(code) : 'the point they found hardest today'}. No other task, no rule recap, and do not ask them to tell you the rule in their own words.`;
+/** reviewOpen: the closing line for this reply (release, open task, or plain closing). */
+export function reviewCloseLine(ctx: Omit<LanguageTeachingContext, 'prompt'>): string {
+  const code = reviewCloseCode(ctx);
+  if (releasing(ctx)) return REVIEW_CLOSE_RELEASE_LINE(code);
+  const s = ctx.signals;
+  const openTask = Boolean(s.learning?.activeItem) && (s.answeringCheck || s.hintRequest || s.dontKnow || s.answerRequest || s.whyAfterAttempt) && !(s.keyVerdict && isSuccess(s.keyVerdict));
+  return `${REVIEW_CLOSE_LINE(code)}${REVIEW_CLOSE_ONE_TRY}${openTask ? ` ${REVIEW_CLOSE_HOLD}` : ''}`;
+}
 /** reviewOpen: the error type the closing item targets (this session's live error first, then the record). */
 export const reviewCloseCode = (ctx: Pick<LanguageTeachingContext, 'signals' | 'record'>): string | undefined => ctx.signals.liveError?.code ?? ctx.signals.liveTarget ?? ctx.record?.live[0];
 /** ownSentence: what this reply does about the session's one own-sentence task (never on a release, closing or recall turn). */
@@ -1591,7 +1610,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     if (r.stuck && researchImproved('strategy')) out.push(`- ${STRATEGY_SHIFT}`);
     if (r.hintRepeat && engineV2('hints') && s.activeLessonItem && !(isClosingTurn(r) && closingOn())) out.push(`- ${HINT_VARY}`);
     if (r.uncovered.length && r.turnNo >= 2 && researchImproved('coverage')) out.push(`- ${coverageRule(r.uncovered)}`);
-    if (isClosingTurn(r) && closingOn()) out.push(`- ${engineV2('reviewOpen') ? REVIEW_CLOSE_LINE(reviewCloseCode(ctx)) : engineV2('shortRecap') ? SHORT_RECAP : CLOSING_RECAP}`);
+    if (isClosingTurn(r) && closingOn()) out.push(`- ${engineV2('reviewOpen') ? reviewCloseLine(ctx) : engineV2('shortRecap') ? SHORT_RECAP : CLOSING_RECAP}`);
   }
   return out;
 }
