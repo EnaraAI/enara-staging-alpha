@@ -14,6 +14,7 @@ See section 6. In short: on 100 synthetic Arabic-L1 answers, the **deterministic
 
 1. **Score the target form only.** Each item has a `targetForm`. Errors in anything else (spelling of other words, capitals, punctuation, word order outside the form, articles in a tense item, Arabic-L1 resumptive pronouns like "My grandmother she is…") are **ignored**.
 2. **Normalise before you compare.** Case, final and inner punctuation, extra spaces, straight vs curly apostrophes, contraction vs full form (`'re` = `are`, `don't` = `do not`, `can't` = `cannot` = `can not`), and a missing apostrophe in a contraction (`cant`, `dont`) do not change the score.
+   **Exception (review round 1):** when the target *is* case or punctuation, it is not normalised. For `EN-F-A1-GR-capitals-full-stops` every item is case- and punctuation-sensitive (capital letters, capital I and the final full stop are scored; a choice answered by letter stays case-insensitive). For `EN-F-A1-VO-days-months` the day/month word is case-sensitive (`tuesday` ≠ `Tuesday`); other case and punctuation are still normalised. The item's `matchingNote` states this.
 3. **Avoiding the form is not using it.** A grammatical answer that does not contain the target form scores 0 (e.g. "My village has a small mosque." for a *there is* item).
 4. **Over-regularised forms are wrong, not slips.** `goed`, `buyed`, `eated` = wrong form (0). `boughted` (right irregular stem, extra ending) = slip.
 5. **Blank, "I don't know", copying the prompt unchanged** = 0.
@@ -23,7 +24,9 @@ See section 6. In short: on 100 synthetic Arabic-L1 answers, the **deterministic
 
 The assignment grader reads an `IQuestion` (`backend/src/models/Assessment.ts`). Controlled items map to `short-answer` (answer key, then the model meaning check `evaluateShortAnswer` if the key misses). Free and transfer items map to `open-response` with one rubric criterion scored by `evaluateRubricAnswer` (eval-v2, `RUBRIC_SYSTEM`), checked by `validateProposal` and `agree`. Only the fields below are consumed by the grader. `acceptedAnswers` is **not** read by the assignment grader today (one `correctAnswer` only); it is read by the tutor's `evaluateAgainstKey`.
 
-### 2.1 Exact / controlled (gap fill, choice, controlled gap fill, controlled choice) — 0/1
+### 2.1 Exact / controlled (gap fill, choice, controlled gap fill, controlled choice, rewrite) — 0/1
+
+`rewrite` = rewrite or reorder a given sentence (e.g. capitals-full-stops 3-4, word-order-svo 3-4); scored against the accepted sentences like a gap fill. Choice items are typed `multiple_choice`.
 
 ```json
 {
@@ -76,6 +79,10 @@ Same `short-answer` shape; `correctAnswer` is the corrected sentence.
 ```
 
 The grader needs an exact quote for levels above 0 (`validateProposal`): the quote is the target form as written (e.g. `"drinks"`).
+
+**Vocabulary variant (review round 1).** For vocabulary outcomes (`EN-F-*-VO-*`) the free/transfer 0/1/2 levels are: 2 = a word from the target field used with the right meaning in a sentence; 1 = the right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning (e.g. "My grandfather is cheap."). `acceptedAnswers` on these items are example keywords; the list is open, not closed. Day and month names need a capital letter (lower case = 1).
+
+**Mastery criterion (review round 1).** Every A1–A2 form outcome uses: *per delayed form, at least 80% of the available points (exact items 1 point, 0/1/2 items 2 points) and at least 3 of the 4 controlled items (1–4) correct.* This replaces "8 of 10 correct", which did not fit 9 items with mixed scoring.
 
 ### 2.4 Transfer — 0/1/2
 

@@ -2,7 +2,7 @@
   "status": "DRAFT",
   "outcomeId": "EN-F-A2-VO-jobs-workplaces",
   "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-  "matching": "Items 1-2 gap-fill job from workplace + task; 3-4 choice of workplace for a job; EC = article_indef_omission before a job noun (Arabic 'huwa muhandis') and job/workplace lexical confusion; FP = one sentence linking a given job to its workplace; transfer = a job advert line. Jobs/workplaces EVP A1-A2, prompts 9-15 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer.",
+  "matching": "Items 1-2 gap-fill job from workplace + task; 3-4 choice of workplace for a job; EC = article_indef_omission before a job noun (Arabic 'huwa muhandis') and job/workplace lexical confusion; FP = one sentence linking a given job to its workplace; transfer = a job advert line. Jobs/workplaces EVP A1-A2, prompts 9-15 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slot 5 = wrong job-noun form, slot 6 = job/workplace mismatch; slots 7-8 keyed on the workplace.",
   "forms": {
     "A": [
       {
@@ -69,10 +69,11 @@
       {
         "id": "EN-F-A2-VO-jobs-workplaces-A-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My uncle is mechanic in a garage.",
-        "answerKey": "My uncle is a mechanic in a garage.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My father is a cooker in a hotel.",
+        "answerKey": "My father is a cook in a hotel.",
         "acceptedAnswers": [
-          "My uncle is a mechanic in a garage."
+          "My father is a cook in a hotel.",
+          "My father is a chef in a hotel."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -80,15 +81,18 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "l1ErrorType": "article_indef_omission"
+        "l1ErrorType": "lexical_agent_noun (cooker for cook)"
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-A-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My cousin is engineer at a factory in Suez.",
-        "answerKey": "My cousin is an engineer at a factory in Suez.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: A pilot works in a hospital.",
+        "answerKey": "A doctor works in a hospital.",
         "acceptedAnswers": [
-          "My cousin is an engineer at a factory in Suez."
+          "A doctor works in a hospital.",
+          "A nurse works in a hospital.",
+          "A pilot works at an airport.",
+          "A pilot works on a plane."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -96,7 +100,7 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "l1ErrorType": "article_indef_omission"
+        "l1ErrorType": "lexical_job_workplace_mismatch"
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-A-7",
@@ -104,7 +108,10 @@
         "prompt": "Write one sentence: where does a waiter work? Use 'waiter'.",
         "answerKey": "waiter + workplace",
         "acceptedAnswers": [
-          "waiter"
+          "restaurant",
+          "café",
+          "cafe",
+          "hotel"
         ],
         "acceptedAnswersNote": "Score 2 = target word used correctly with right meaning and form in a sentence; 1 = target word present but with spelling/form error or meaning unclear; 0 = target word missing or wrong word. Other errors in the sentence are ignored. acceptedAnswers lists acceptable target words.",
         "scoring": "target_form_0_1_2",
@@ -112,7 +119,7 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored. Criterion: 2 = the sentence names a correct workplace for a waiter (e.g. restaurant, café); the job word alone scores 0."
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-A-8",
@@ -120,7 +127,10 @@
         "prompt": "Write one sentence: where does a dentist work? Use 'dentist'.",
         "answerKey": "dentist + workplace",
         "acceptedAnswers": [
-          "dentist"
+          "dental clinic",
+          "clinic",
+          "surgery",
+          "hospital"
         ],
         "acceptedAnswersNote": "Score 2 = target word used correctly with right meaning and form in a sentence; 1 = target word present but with spelling/form error or meaning unclear; 0 = target word missing or wrong word. Other errors in the sentence are ignored. acceptedAnswers lists acceptable target words.",
         "scoring": "target_form_0_1_2",
@@ -128,7 +138,7 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored. Criterion: 2 = the sentence names a correct workplace for a dentist (e.g. dental clinic, clinic); the job word alone scores 0."
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-A-9",
@@ -213,10 +223,10 @@
       {
         "id": "EN-F-A2-VO-jobs-workplaces-B-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: Her brother is pilot for a small airline.",
-        "answerKey": "Her brother is a pilot for a small airline.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My uncle is a drive for a bus company.",
+        "answerKey": "My uncle is a driver for a bus company.",
         "acceptedAnswers": [
-          "Her brother is a pilot for a small airline."
+          "My uncle is a driver for a bus company."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -224,15 +234,18 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "l1ErrorType": "article_indef_omission"
+        "l1ErrorType": "lexical_agent_noun (verb for job noun)"
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-B-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My neighbour is artist in a studio near the river.",
-        "answerKey": "My neighbour is an artist in a studio near the river.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: A waiter works in a garage.",
+        "answerKey": "A mechanic works in a garage.",
         "acceptedAnswers": [
-          "My neighbour is an artist in a studio near the river."
+          "A mechanic works in a garage.",
+          "A waiter works in a restaurant.",
+          "A waiter works in a café.",
+          "A waiter works in a cafe."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -240,7 +253,7 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "l1ErrorType": "article_indef_omission"
+        "l1ErrorType": "lexical_job_workplace_mismatch"
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-B-7",
@@ -248,7 +261,8 @@
         "prompt": "Write one sentence: where does a nurse work? Use 'nurse'.",
         "answerKey": "nurse + workplace",
         "acceptedAnswers": [
-          "nurse"
+          "hospital",
+          "clinic"
         ],
         "acceptedAnswersNote": "Score 2 = target word used correctly with right meaning and form in a sentence; 1 = target word present but with spelling/form error or meaning unclear; 0 = target word missing or wrong word. Other errors in the sentence are ignored. acceptedAnswers lists acceptable target words.",
         "scoring": "target_form_0_1_2",
@@ -256,7 +270,7 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored. Criterion: 2 = the sentence names a correct workplace for a nurse (e.g. hospital, clinic); the job word alone scores 0."
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-B-8",
@@ -264,7 +278,9 @@
         "prompt": "Write one sentence: where does a farmer work? Use 'farmer'.",
         "answerKey": "farmer + workplace",
         "acceptedAnswers": [
-          "farmer"
+          "farm",
+          "field",
+          "fields"
         ],
         "acceptedAnswersNote": "Score 2 = target word used correctly with right meaning and form in a sentence; 1 = target word present but with spelling/form error or meaning unclear; 0 = target word missing or wrong word. Other errors in the sentence are ignored. acceptedAnswers lists acceptable target words.",
         "scoring": "target_form_0_1_2",
@@ -272,7 +288,7 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored. Criterion: 2 = the sentence names a correct workplace for a farmer (e.g. farm, field); the job word alone scores 0."
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-B-9",
@@ -355,10 +371,10 @@
       {
         "id": "EN-F-A2-VO-jobs-workplaces-C-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My father is driver for a big company.",
-        "answerKey": "My father is a driver for a big company.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My sister is a teach at a primary school.",
+        "answerKey": "My sister is a teacher at a primary school.",
         "acceptedAnswers": [
-          "My father is a driver for a big company."
+          "My sister is a teacher at a primary school."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -366,15 +382,18 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "l1ErrorType": "article_indef_omission"
+        "l1ErrorType": "lexical_agent_noun (verb for job noun)"
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-C-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: Their daughter is accountant in an office in Alexandria.",
-        "answerKey": "Their daughter is an accountant in an office in Alexandria.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: A farmer works in an office.",
+        "answerKey": "A farmer works on a farm.",
         "acceptedAnswers": [
-          "Their daughter is an accountant in an office in Alexandria."
+          "A farmer works on a farm.",
+          "A secretary works in an office.",
+          "An accountant works in an office.",
+          "A manager works in an office."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -382,7 +401,7 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "l1ErrorType": "article_indef_omission"
+        "l1ErrorType": "lexical_job_workplace_mismatch"
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-C-7",
@@ -390,7 +409,8 @@
         "prompt": "Write one sentence: where does a mechanic work? Use 'mechanic'.",
         "answerKey": "mechanic + workplace",
         "acceptedAnswers": [
-          "mechanic"
+          "garage",
+          "workshop"
         ],
         "acceptedAnswersNote": "Score 2 = target word used correctly with right meaning and form in a sentence; 1 = target word present but with spelling/form error or meaning unclear; 0 = target word missing or wrong word. Other errors in the sentence are ignored. acceptedAnswers lists acceptable target words.",
         "scoring": "target_form_0_1_2",
@@ -398,7 +418,7 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored. Criterion: 2 = the sentence names a correct workplace for a mechanic (e.g. garage, workshop); the job word alone scores 0."
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-C-8",
@@ -406,7 +426,10 @@
         "prompt": "Write one sentence: where does a pilot work? Use 'pilot'.",
         "answerKey": "pilot + workplace",
         "acceptedAnswers": [
-          "pilot"
+          "airport",
+          "plane",
+          "aeroplane",
+          "airplane"
         ],
         "acceptedAnswersNote": "Score 2 = target word used correctly with right meaning and form in a sentence; 1 = target word present but with spelling/form error or meaning unclear; 0 = target word missing or wrong word. Other errors in the sentence are ignored. acceptedAnswers lists acceptable target words.",
         "scoring": "target_form_0_1_2",
@@ -414,7 +437,7 @@
         "level": "A2",
         "vocabLevel": "A1-A2",
         "reference": "English Vocabulary Profile A1-A2 (jobs, workplaces); Cambridge A2 Key-style gap-fill and matching",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored. Criterion: 2 = the sentence names a correct workplace for a pilot (e.g. airport, plane); the job word alone scores 0."
       },
       {
         "id": "EN-F-A2-VO-jobs-workplaces-C-9",

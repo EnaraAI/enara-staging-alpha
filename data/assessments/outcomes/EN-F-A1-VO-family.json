@@ -2,7 +2,7 @@
   "status": "DRAFT",
   "outcomeId": "EN-F-A1-VO-family",
   "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic periphrastic kinship ('the brother of my father' / 'the son of my aunt') replaced by single English word; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer.",
+  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic periphrastic kinship ('the brother of my father' / 'the son of my aunt') replaced by single English word; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 now contain a wrong kin word that must be replaced (uncle/aunt/cousin/grandmother/grandfather, all A1); C-4 now aunt.",
   "forms": {
     "A": [
       {
@@ -70,11 +70,10 @@
       {
         "id": "EN-F-A1-VO-family-A-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: The brother of my father lives in Aswan.",
-        "answerKey": "My uncle lives in Aswan.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My father's brother is my cousin.",
+        "answerKey": "My father's brother is my uncle.",
         "acceptedAnswers": [
-          "My uncle lives in Aswan.",
-          "My father's brother lives in Aswan."
+          "My father's brother is my uncle."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -82,16 +81,15 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_periphrasis"
+        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
       },
       {
         "id": "EN-F-A1-VO-family-A-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: The daughter of my sister is three years old.",
-        "answerKey": "My niece is three years old.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My mother's mother is my aunt.",
+        "answerKey": "My mother's mother is my grandmother.",
         "acceptedAnswers": [
-          "My niece is three years old.",
-          "My sister's daughter is three years old."
+          "My mother's mother is my grandmother."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -99,7 +97,7 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_periphrasis"
+        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
       },
       {
         "id": "EN-F-A1-VO-family-A-7",
@@ -118,7 +116,7 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-family-A-8",
@@ -135,7 +133,7 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-family-A-9",
@@ -222,11 +220,10 @@
       {
         "id": "EN-F-A1-VO-family-B-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: The sister of my mother works in a bank.",
-        "answerKey": "My aunt works in a bank.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My mother's sister is my cousin.",
+        "answerKey": "My mother's sister is my aunt.",
         "acceptedAnswers": [
-          "My aunt works in a bank.",
-          "My mother's sister works in a bank."
+          "My mother's sister is my aunt."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -234,16 +231,15 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_periphrasis"
+        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
       },
       {
         "id": "EN-F-A1-VO-family-B-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: The son of my brother is four years old.",
-        "answerKey": "My nephew is four years old.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My father's father is my uncle.",
+        "answerKey": "My father's father is my grandfather.",
         "acceptedAnswers": [
-          "My nephew is four years old.",
-          "My brother's son is four years old."
+          "My father's father is my grandfather."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -251,7 +247,7 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_periphrasis"
+        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
       },
       {
         "id": "EN-F-A1-VO-family-B-7",
@@ -269,7 +265,7 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-family-B-8",
@@ -286,7 +282,7 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-family-B-9",
@@ -359,10 +355,10 @@
       {
         "id": "EN-F-A1-VO-family-C-4",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (niece / aunt / cousin): My brother's daughter is my ____ .",
-        "answerKey": "niece",
+        "prompt": "Choose the correct word (aunt / uncle / cousin): My father's sister is my ____ .",
+        "answerKey": "aunt",
         "acceptedAnswers": [
-          "niece"
+          "aunt"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -374,11 +370,10 @@
       {
         "id": "EN-F-A1-VO-family-C-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: The son of my uncle plays football every Friday.",
-        "answerKey": "My cousin plays football every Friday.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My uncle's son is my brother.",
+        "answerKey": "My uncle's son is my cousin.",
         "acceptedAnswers": [
-          "My cousin plays football every Friday.",
-          "My uncle's son plays football every Friday."
+          "My uncle's son is my cousin."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -386,17 +381,15 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_periphrasis"
+        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
       },
       {
         "id": "EN-F-A1-VO-family-C-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: The wife of my brother is very kind.",
-        "answerKey": "My sister-in-law is very kind.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My mother's father is my uncle.",
+        "answerKey": "My mother's father is my grandfather.",
         "acceptedAnswers": [
-          "My sister-in-law is very kind.",
-          "My brother's wife is very kind.",
-          "My sister in law is very kind."
+          "My mother's father is my grandfather."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
@@ -404,7 +397,7 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_kinship_periphrasis"
+        "l1ErrorType": "lexical_kinship_confusion (Arabic paternal/maternal kin terms mapped to the wrong English word)"
       },
       {
         "id": "EN-F-A1-VO-family-C-7",
@@ -423,7 +416,7 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-family-C-8",
@@ -441,7 +434,7 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "rubric": "2 = target form correct in a complete sentence; 1 = target form attempted with one error; 0 = target form missing or wrong. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-family-C-9",
