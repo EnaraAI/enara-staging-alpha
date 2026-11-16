@@ -81,3 +81,12 @@ Data fixed (first run, 2026-11-16):
 | PL-A2-RD-* | copied text (novelty/separation check): passage shingle in research functional.json | I'm sorry I didn't reply sooner. | Sorry for my late reply. |
 | PL-A2-RD-03 | copied text (novelty/separation check): sentence in research listening.json | Where do they meet? | Where will they meet? |
 | PL-A2-WR-01 | copied text (novelty/separation check): model answer shingle in backend/src demoTemplate.ts and lo_cases.jsonl | Last weekend I went to the market with my mum and we bought fruit. | Last weekend my mum and I went to the market and bought fruit. |
+
+Data fixed (acceptedAnswers notes, 2026-11-16; see `research/assessment-validation/a1a2/REPORT.md` §3 #8):
+
+- 568 items in 23 outcome files changed; placement.json had none left. `acceptedAnswers` now holds only literal answers.
+- Normalisation notes ("Case-insensitive; ignore final punctuation and extra spaces", "case-SENSITIVE ...; final full stop required") moved to a new per-item `matchingNote`.
+- target_form_0_1_2 items: criteria ("Any sentence with ...", "Model answer; ... scores 2 (...)", "(any order; 2 = ...)", "Yes/No answers count only with ...") appended to `rubric` as "Criterion: ..."; `acceptedAnswers` now holds ≥2 literal example answers (answerKey without "e.g." plus new examples; slash/"..." patterns expanded, e.g. `I am single.`, `I'm married.`). Vocabulary items whose `acceptedAnswersNote` says acceptedAnswers lists target words were left as keyword lists.
+- exact items: contraction variants added both ways (can't/cannot/can not, don't/do not, I'm/I am, there's/there is, ...), not for choice items; no punctuation variants. Special cases: "commas optional" → list with and without commas; "The ... the" → `The the`; "She can cook very well biryani (accept; ...)" → literal + `scoringNote`; `...tall; he plays...` → `...tall. He plays...`.
+- New examples that collided with lesson/benchmark text in the novelty check were replaced.
+- New check in `backend/test/assessmentForms.test.ts` (outcomes + placement): fails if an acceptedAnswers entry contains ";", "ignore", "must", "e.g.", "rubric", an instruction-style "any " (at start or after "("), "case-"/"case(in)sensitive", or has >25 words. "any"/"case" are matched as phrases so literal answers like `We don't have any bread.` and `pencil case` pass. Result: 108/108 tests pass.
