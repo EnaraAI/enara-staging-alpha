@@ -1,0 +1,42 @@
+{
+  "note": "SIMULATION ONLY. Forgetting rule F1 for ESL6 learner simulator; fixed before any ESL6 session. See LEARNING_RULES.md section 6.",
+  "version": "F1-v1",
+  "runs": "once per simulated day outside a session; never inside a session; order per day: correct_decay then wrong_return",
+  "timing": {
+    "days_session1_to_session2": 2,
+    "days_last_session_to_delayed_posttest": 7,
+    "immediate_posttest_state": "end_of_session_2_no_F1",
+    "delayed_posttest_state": "after_7_days_F1"
+  },
+  "correct_decay": {
+    "base_per_day": 0.15,
+    "floor": "band_starting_strength",
+    "floor_values": {"A1": {"C1": 0, "C2": 0}, "A2": {"C1": 1, "C2": 0}, "B2": {"C1": 3, "C2": 3}},
+    "rate_formula": "base_per_day * retrieval_multiplier ** r"
+  },
+  "retrieval": {
+    "definition": "recall item from an earlier session answered from memory (right or wrong) for each tested correct belief; not if previous turn settled the answer; post-test items and session-1 items do not count",
+    "retrieval_multiplier": 0.5,
+    "max_counted_per_belief_per_session": 1,
+    "r_cap": 2,
+    "rates_per_day_by_r": {"0": 0.15, "1": 0.075, "2": 0.0375}
+  },
+  "wrong_return": {
+    "applies_to": "wrong belief below band starting strength at end of last session and not reset to 0 by R4 (count reached 2)",
+    "removed_beliefs_return": false,
+    "fraction_of_drop_per_day": 0.10,
+    "drop": "starting_strength - strength_at_end_of_last_session",
+    "cap_fraction_of_drop_per_gap": 0.5,
+    "never_above": "band_starting_strength"
+  },
+  "answering": {
+    "wrong_strength_rounding": "round half up: >=1.5 -> 0.8; >=0.5 -> 0.4; <0.5 -> 0.05",
+    "correct_retrieval_threshold": 1.0,
+    "min_error_prob_if_tested_correct_below_threshold": 0.4,
+    "applies_from": "session 2 onward (any answer after at least one F1 interval)"
+  },
+  "worked_example": {
+    "start": {"band": "A1", "C1_after_session2": 2.0, "W1_after_session2": 1, "W1_start": 3},
+    "day7": {"C1_not_retrieved": 0.95, "C1_retrieved_once": 1.475, "W1": 2.0}
+  }
+}
