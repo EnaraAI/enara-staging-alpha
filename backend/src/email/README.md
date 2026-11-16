@@ -16,9 +16,8 @@ Sender: `The Enara Team <noreply@test.enara.app>` (`EMAIL_SENDER`).
 | enara-assessment-results | 732d6b7a-77cb-4c51-be8f-22278fb4e70f | NAME, CHILD_NAME, TEST_NAME, SCORE, LEVEL, SUMMARY, ACTION_URL |
 | enara-class-invitation | 4fc89699-5d97-40e1-8c9f-906c2846f97d | NAME, TEACHER_NAME, CLASS_NAME, ACTION_URL, EXPIRES_IN |
 
-> **Status:** the templates are **not yet pulled into the repo** — the `RESEND_API_KEY` for the
-> test.enara.app Resend account is not configured in this environment. Run `pull-templates.ts`
-> once with the key to populate `templates/`.
+> **Status:** all 8 templates were pulled from the test.enara.app Resend account on 2026-11-16
+> and are in `templates/`. Edit them here and push with `push-templates.ts --confirm`.
 
 ## Pull / edit / push
 
