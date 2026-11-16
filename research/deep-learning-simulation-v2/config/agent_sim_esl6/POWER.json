@@ -1,0 +1,47 @@
+{
+ "_label": "SIMULATION ONLY",
+ "source": "ESL5 per-learner LE - P+ controlled diffs (explicit-first, mean of 2 reps, n=108, reports/exp4/agent_sim_esl5/POST.json)",
+ "sdDiffESL5": 0.3072,
+ "meanDiffESL5": 0.1516,
+ "noise": {
+  "source": "reports/exp4/agent_sim_esl6/validation/NOISE_RESULT.json, delayed score, run2-run1 per learner (30)",
+  "sdRun2MinusRun1": 0.219,
+  "perRunJudgingSD": 0.1549,
+  "addedVarianceForArmDiffOfRepMeans": "2 arms x sigma^2/2 = sigma^2"
+ },
+ "sdDiffUsed": 0.344,
+ "sdFormula": "sqrt(sdDiffESL5^2 + perRunJudgingSD^2)",
+ "target": 0.06,
+ "alpha": 0.05,
+ "twoSided": true,
+ "normalApproxNfor80": 259,
+ "normalApprox": {
+  "120": 0.48,
+  "150": 0.57,
+  "180": 0.648,
+  "200": 0.694
+ },
+ "simPower": {
+  "120": 0.4625,
+  "150": 0.5375,
+  "180": 0.653,
+  "200": 0.6915
+ },
+ "simMethod": "2000 simulated studies per n; per-learner diffs = 0.06 + sdDiffUsed x (ESL5 diff standardised, resampled); Monte Carlo sign-flip 2000 draws per study; seed 6",
+ "simPowerAtESL5SD": {
+  "120": 0.565,
+  "150": 0.6595,
+  "180": 0.7665,
+  "200": 0.8085
+ },
+ "range": {
+  "min": 120,
+  "max": 200,
+  "multipleOf": 30
+ },
+ "chosenN": 180,
+ "chosenNPowerSim": 0.653,
+ "reaches80WithinRange": false,
+ "nFor80InflatedNormalApprox_roundedTo30": 270,
+ "status": "PENDING USER DECISION: 80% at +0.06 is not reachable within 120-200; 180 is the largest multiple of 30 in range"
+}
