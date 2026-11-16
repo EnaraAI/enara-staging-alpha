@@ -101,3 +101,8 @@ SIMULATION ONLY · DRAFT. Full detail is in `research/assessment-validation/a1a2
 - **Model path (eval-v2): NOT VALIDATED.** Only agent stand-in estimates exist: 92.0% controlled, QWK 0.923 free. A real run needs the API.
 - **Status: the grader is not validated for confirmatory use with these assessments.** The remaining causes are listed in REPORT.md round 4.
 - **Use in studies:** a study that uses this grader must either report grader agreement as a limit, or treat a blind recheck below target as a failed guard.
+
+### Update after round 5 (supersedes the status above)
+- **Deterministic path, graderV2 ON, fresh answers (round 5):** 96.0% exact agreement (target ≥95%) and QWK 0.914 (target ≥0.80). **Both targets met.** It is validated in simulation, against agent scorers only, for the A1–A2 outcome assessments.
+- **Model path: NOT VALIDATED.** In the stand-in estimate, the meaning check over-credits spelling slips on vocabulary items, which lowers exact agreement to 89.3%.
+- **Recommended configuration for studies:** deterministic, graderV2 ON, model path OFF.

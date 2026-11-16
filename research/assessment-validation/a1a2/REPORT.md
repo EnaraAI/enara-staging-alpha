@@ -173,3 +173,72 @@ Every disagreement, by outcome, is in `round4/AGREEMENT4.json`.
   - no human raters;
   - n = 75 per item group;
   - the rules are hand-written word lists.
+
+## Round 5: after the round-4 cause fixes, NEW answer set (extra round, user-authorised)
+
+SIMULATION ONLY · DRAFT. The user approved this round on top of the 2-round limit: "Fix the remaining causes first, then ESL6".
+
+**Answers:** 150 new answers (`round5/answers.json`), split 75 exact and 75 target-form, covering all 33 outcomes that passed review. The intended mix was 35% full credit, 35% partial or debatable and 30% zero.
+
+**Bank fixes made before scoring:**
+- the `targetForm` field of 3 items: food-drink C-5, jobs-workplaces B-5 and appearance B-1;
+- 54 transfer items moved to 0/1/2 scoring, as rubric §2.4 requires. The answers' `scoring` field was synced to match.
+
+**Reference:** 3 new independent scorers, who agreed on all 150 answers. Agreement this complete strongly suggests shared bias, because they are same-model agents reading the same rubric. The reference measures fidelity to the rubric, not human judgement.
+
+**Grader:** production code with `ENARA_ENGINE_V2=graderV2`, commit 48f9bdb. It ran blind, with no fallbacks. The model path used an AGENT STAND-IN, with the guard applied only where production wires it (the short-answer path).
+
+| Path | Exact (75): agreement, target ≥95% | Free/transfer (75): QWK, target ≥0.80 |
+|---|---|---|
+| **Deterministic, graderV2 ON** | **96.0%** (72/75): **pass** | **0.914**: **pass** |
+| Production flow (exact misses go to the meaning-check stand-in) | 89.3%: fail | 0.914: pass |
+| Deterministic + stand-in on all items (not production) | 89.3% | 0.955 |
+
+**By item type (deterministic):**
+
+| Item type | Agreement |
+|---|---|
+| Gap fill | 20/20 |
+| Controlled gap fill | 11/11 |
+| Multiple choice | 2/2 |
+| Error correction | 39/42 |
+| Free production | 40/42 |
+| Transfer | 28/33 |
+
+All disagreements are in `round5/AGREEMENT5.json`.
+
+**Deterministic disagreements (10):**
+- **Multi-slot transfer, over-credit:** R5-009 article-the ("The, a"), R5-029 possessive ("her, his") and R5-039 there-is-are. The reference gives 1 for half-right; the grader gives 2.
+- **Free production:**
+  - R5-010 article-the: over-credit. The grader misses the missing article in the second clause.
+  - R5-018 capitals: under-credit. Lowercase "i" scores 0; the reference gives 1.
+- **Transfer:**
+  - R5-089: "more expensiver" scores 0; the reference gives 1.
+  - R5-150: "sun" for "sunny" scores 0; the reference gives 1.
+- **Error correction:**
+  - R5-092 and R5-096: a correct fix with a slip outside the target scores 0; the reference gives 1.
+  - R5-100: "going to repairs" scores 1; the reference gives 0.
+
+**Model path, meaning-check stand-in:** on vocabulary and spelling-form items it credits slips that the rubric scores 0:
+- "high" for "tall";
+- "yung", "housband", "visitted", "livs".
+
+The graderV2 guard caught "thursday", "grand mother", "bath room", "cheapper" and "jaket", but not these. That is why the production flow, with model calls on exact misses, falls to 89.3%.
+
+### Final verdict (A1–A2, after round 5)
+- **Deterministic path with graderV2 ON: meets both targets on a fresh answer set.**
+  - 96.0% exact agreement against a ≥95% target.
+  - QWK 0.914 against a ≥0.80 target.
+  - It is validated, in simulation and against agent reference scorers only, for scoring the A1–A2 outcome assessments.
+  - The margin on exact items is small: 72/75 correct, so 1 more miss would fail.
+- **Model path (eval-v2 meaning check and rubric): NOT VALIDATED.** The stand-in estimate shows it lowers exact agreement to 89.3%. Recommendations:
+  - do not use the meaning check for exact items on vocabulary or spelling-form outcomes;
+  - or widen the guard to every item whose target is the word itself.
+  - Validation needs a run with the API.
+- **Recommendation for studies (ESL6):** score with the deterministic path, graderV2 ON, and the model path OFF, which needs no API. Report the 10% blind recheck against the same targets.
+- **Limits:**
+  - agent reference scorers only (unanimous on 150/150, so shared bias is likely);
+  - no human raters;
+  - n = 75 per group;
+  - the rules are hand-written word lists;
+  - this is the third fix-and-test round, so some fitting to the error types seen in rounds 3–4 is possible even on new answers.
