@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { syncStudentDeleted, syncStudentGroup } from '../services/enrollmentSync';
 import { Student, STUDENT_UI_MODES, StudentUiMode } from '../models/Student';
 import { Batch } from '../models/Batch';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -91,6 +92,7 @@ export const createStudent = asyncHandler(async (req: AuthRequest, res: Response
 
   if (batchId) {
     await Batch.updateOne(scopedFilter(req, { id: batchId }), { $inc: { studentCount: 1 } });
+    await syncStudentGroup({ institutionId: student.institutionId, studentId: student.id, toGroupId: batchId, by: req.user?.id });
   }
 
   res.status(201).json(toPlainObject(student));
@@ -125,7 +127,9 @@ export const updateStudent = asyncHandler(async (req: AuthRequest, res: Response
   if (academicYear !== undefined) student.academicYear = academicYear || undefined;
   if (groupId !== undefined) student.groupId = groupId || undefined;
 
+  let groupMove: { fromGroupId?: string; toGroupId?: string } | undefined;
   if (batchId !== undefined && batchId !== student.batchId) {
+    groupMove = { fromGroupId: student.batchId || undefined, toGroupId: batchId || undefined };
     if (batchId) {
       const batch = await Batch.findOne(scopedFilter(req, { id: batchId }));
       if (!batch) throw new AppError('Batch not found', 404);
@@ -140,6 +144,7 @@ export const updateStudent = asyncHandler(async (req: AuthRequest, res: Response
   }
 
   await student.save();
+  if (groupMove) await syncStudentGroup({ institutionId: student.institutionId, studentId: student.id, ...groupMove, by: req.user?.id });
   res.json(toPlainObject(student));
 });
 
@@ -152,5 +157,6 @@ export const deleteStudent = asyncHandler(async (req: AuthRequest, res: Response
   }
 
   await Student.deleteOne(scopedFilter(req, { id: req.params.id }));
+  await syncStudentDeleted({ studentId: student.id, by: req.user?.id });
   res.json({ message: 'Student deleted' });
 });

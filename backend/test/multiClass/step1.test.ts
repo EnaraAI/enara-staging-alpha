@@ -122,17 +122,17 @@ describe('migration and isolation from the app', () => {
     expect(names).toEqual(expect.arrayContaining(['one_enrollment_per_target', 'roster', 'student_classes', 'backfilled']));
   });
 
-  it('nothing in the app imports the enrollment service yet (step 1 changes no behaviour)', () => {
+  it('only the step 2 write-both helper imports the enrollment service (no reads are switched yet)', () => {
     const src = path.resolve(__dirname, '../../src');
     const hits: string[] = [];
     const walk = (dir: string) => {
       for (const f of fs.readdirSync(dir, { withFileTypes: true })) {
         const p = path.join(dir, f.name);
         if (f.isDirectory()) walk(p);
-        else if (p.endsWith('.ts') && !p.endsWith(path.join('services', 'enrollment.ts')) && /services\/enrollment['"]/.test(fs.readFileSync(p, 'utf8'))) hits.push(path.relative(src, p));
+        else if (p.endsWith('.ts') && !p.endsWith(path.join('services', 'enrollment.ts')) && /(services\/|\.\/)enrollment['"]/.test(fs.readFileSync(p, 'utf8'))) hits.push(path.relative(src, p));
       }
     };
     walk(src);
-    expect(hits).toEqual([]);
+    expect(hits).toEqual([path.join('services', 'enrollmentSync.ts')]);
   });
 });

@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { syncClassDeleted, syncClassMember } from '../services/enrollmentSync';
 import { CourseInstance } from '../models/CourseInstance';
 import { Student } from '../models/Student';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -140,6 +141,7 @@ export const deleteCourseInstance = asyncHandler(async (req: AuthRequest, res: R
   if (!instance) throw new AppError('Course instance not found', 404);
 
   await CourseInstance.deleteOne(scopedFilter(req, { id: req.params.id }));
+  await syncClassDeleted({ classId: instance.id, by: req.user?.id });
   res.json({ message: 'Course instance deleted' });
 });
 
@@ -173,6 +175,7 @@ export const assignStudent = asyncHandler(async (req: AuthRequest, res: Response
 
   instance.studentIds.push(studentId);
   await instance.save();
+  await syncClassMember({ institutionId: student.institutionId, studentId, classId: instance.id, action: 'add', by: req.user?.id });
 
   res.json(toInstanceResponse(instance));
 });
@@ -181,8 +184,11 @@ export const removeStudent = asyncHandler(async (req: AuthRequest, res: Response
   const instance = await CourseInstance.findOne(scopedFilter(req, { id: req.params.id }));
   if (!instance) throw new AppError('Course instance not found', 404);
 
+  const removedId = String(req.params.studentId);
+  const wasMember = instance.studentIds.includes(removedId);
   instance.studentIds = instance.studentIds.filter((id) => id !== req.params.studentId);
   await instance.save();
+  if (wasMember) await syncClassMember({ institutionId: instance.institutionId, studentId: removedId, classId: instance.id, action: 'remove', by: req.user?.id });
 
   res.json(toInstanceResponse(instance));
 });

@@ -118,6 +118,9 @@ export interface AppConfig {
   };
   r2?: { accountId: string; bucket: string; accessKeyId: string; secretAccessKey: string };
   lms: LmsConfig;
+  // Multi-class enrollment (docs/multi-class/PLAN.md). Every switch defaults to
+  // off; turning one on needs the owner's OK.
+  enrollment: { dualWrite: boolean };
 }
 
 // LMS integration (docs/lms/IMPLEMENTATION_PLAN.md). Every flag defaults to off.
@@ -546,6 +549,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     googleClientId: readString(source, "GOOGLE_CLIENT_ID") || undefined,
     cronSecret: readString(source, "CRON_SECRET"),
     lms: parseLmsConfig(source),
+    enrollment: { dualWrite: readBoolean(source, 'ENROLLMENT_DUAL_WRITE', false) },
     // Staging starts with AI paused and invite-only registration unless set explicitly.
     aiPaused: readBoolean(source, "AI_PAUSED", staging),
     registrationInviteOnly: readBoolean(source, "REGISTRATION_INVITE_ONLY", staging),

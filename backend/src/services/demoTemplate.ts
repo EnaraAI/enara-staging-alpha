@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { syncClassMember, syncStudentGroup } from './enrollmentSync';
 import bcrypt from 'bcryptjs';
 import { DEMO_TEMPLATE_ID as T, type DemoRole } from '../config/demo';
 import { Batch } from '../models/Batch';
@@ -169,5 +170,11 @@ export async function buildDemoTemplate(now = new Date()) {
     },
     { upsert: true },
   );
+  // Multi-class step 2: mirror the template's group and class membership
+  // (no-op unless ENROLLMENT_DUAL_WRITE is on; idempotent on re-runs).
+  for (const s of students) {
+    await syncStudentGroup({ institutionId: T, studentId: s.id, toGroupId: ID.batch });
+    await syncClassMember({ institutionId: T, studentId: s.id, classId: ID.klass, action: 'add' });
+  }
   return { institutionId: T, students: students.length, lessons: LESSONS.length, accounts: Object.keys(DEMO_TEMPLATE_EMAILS) as DemoRole[] };
 }
