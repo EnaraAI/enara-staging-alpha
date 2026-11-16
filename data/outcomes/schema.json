@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "enara/outcomes/schema.json",
+  "title": "ENARA English learning outcome (DRAFT - not yet reviewed, see docs/ASSESSMENT_REVIEW_LOG.md)",
+  "description": "One outcome record. Design in docs/LEARNING_OUTCOMES.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "level", "cefr", "skill", "statement", "verb", "condition", "criterion", "lessonIds", "l1ErrorTypes", "evidenceTypes", "measurable", "mastery"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^EN-(C|L|F)-(A1|A2|B1|B2|C1|C2)-(RD|WR|LS|SP|GR|VO|FN)-[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 60 },
+    "level": { "enum": ["course", "lesson", "form"] },
+    "cefr": { "enum": ["A1", "A2", "B1", "B2", "C1", "C2"] },
+    "skill": { "enum": ["reading", "writing", "listening", "speaking", "grammar", "vocabulary", "function"] },
+    "statement": { "type": "string", "pattern": "^Can ", "minLength": 10, "maxLength": 300,
+      "not": { "pattern": "(?i)\\b(understand|know|learn|appreciate|be aware of|be familiar with|grasp|feel confident|master|internalise|internalize|think about)\\b" } },
+    "verb": { "enum": ["write", "complete", "choose", "match", "order", "identify", "underline", "correct", "rewrite", "combine", "answer", "ask", "say", "name", "list", "describe", "compare", "explain", "summarise", "give", "use", "spell", "transform", "punctuate"] },
+    "condition": { "type": "string", "minLength": 3, "maxLength": 300 },
+    "criterion": { "type": "string", "minLength": 3, "maxLength": 300 },
+    "lessonIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "parentIds": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "l1ErrorTypes": { "type": "array", "uniqueItems": true, "items": { "enum": [
+      "article_indef_omission", "article_def_misuse", "copula_omission", "verb_subject_order", "adj_noun_order",
+      "resumptive_pronoun", "run_on_and", "present_perfect_avoidance", "tense_aspect", "agreement_3s", "plural_s",
+      "spelling_vowel", "phon_p_b", "phon_vowel", "phon_cluster", "phon_th" ] } },
+    "evidenceTypes": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": [
+      "controlled_item", "guided_production", "free_production", "reading_item", "transcript_speaking", "audio" ] } },
+    "measurable": { "enum": ["yes", "NOT_MEASURABLE_YET"] },
+    "notMeasurableReason": { "type": "string" },
+    "mastery": {
+      "type": "object", "additionalProperties": false, "required": ["rule", "delayDays"],
+      "properties": { "rule": { "const": "criterion_on_delayed" }, "delayDays": { "const": 7 } }
+    },
+    "replaces": { "type": "string" }
+  },
+  "allOf": [
+    { "if": { "properties": { "measurable": { "const": "NOT_MEASURABLE_YET" } } }, "then": { "required": ["notMeasurableReason"] } },
+    { "if": { "properties": { "skill": { "const": "listening" } } }, "then": { "properties": { "measurable": { "const": "NOT_MEASURABLE_YET" } } } },
+    { "if": { "properties": { "level": { "enum": ["lesson", "form"] } } }, "then": { "required": ["parentIds"] } }
+  ]
+}
