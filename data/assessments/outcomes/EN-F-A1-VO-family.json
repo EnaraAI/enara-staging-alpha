@@ -2,7 +2,7 @@
   "status": "DRAFT",
   "outcomeId": "EN-F-A1-VO-family",
   "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic-L1 vowel spelling slip on a kin word in a natural sentence; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 now contain a wrong kin word that must be replaced (uncle/aunt/cousin/grandmother/grandfather, all A1); C-4 now aunt. Review round 3: all items 7-8 use the 'VOCABULARY variant, named word' rubric (as C-7 already did), since each prompt names the kin word. Review round 4: the kin-word swaps (my mother's mother is my aunt ...) were factual absurdities, not learner errors. Slots 5-6 are now vowel slips on an A1 kin word: doughter/hasband (A), parints/brather (B), grandmather/nece (C). outcomes.json l1ErrorTypes = [spelling_vowel]. Review round 5: C-6 'nece' (niece, EVP A2) -> 'childrin' (children, A1, not used elsewhere in form C); 'niece' distractor removed from A-4. No item's answer word is shown elsewhere in its form: gap-fill definitions, slot 3-4 options and slot 7-8 named kin words use only words not keyed in that form; C-9 no longer shows 'son'. User decisions (A1-A2): vocabulary validity - each form keeps one spelling error-correction item (slot 5); slot 6 is now a meaning error (Arabic-L1 polysemy or calque on an A1 word), with exactly one correct fix and the answer word not shown elsewhere in the form.",
+  "matching": "Each form: items 1-2 kinship gap-fill from a definition (parent's sibling / sibling's child style), 3-4 choice between gender pairs; EC = Arabic-L1 vowel spelling slip on a kin word in a natural sentence; FP = name a named family member in one sentence; transfer = read a short family tree description and name the relation. All words EVP A1, prompts 8-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 1: slots 5-6 now contain a wrong kin word that must be replaced (uncle/aunt/cousin/grandmother/grandfather, all A1); C-4 now aunt. Review round 3: all items 7-8 use the 'VOCABULARY variant, named word' rubric (as C-7 already did), since each prompt names the kin word. Review round 4: the kin-word swaps (my mother's mother is my aunt ...) were factual absurdities, not learner errors. Slots 5-6 are now vowel slips on an A1 kin word: doughter/hasband (A), parints/brather (B), grandmather/nece (C). outcomes.json l1ErrorTypes = [spelling_vowel]. Review round 5: C-6 'nece' (niece, EVP A2) -> 'childrin' (children, A1, not used elsewhere in form C); 'niece' distractor removed from A-4. No item's answer word is shown elsewhere in its form: gap-fill definitions, slot 3-4 options and slot 7-8 named kin words use only words not keyed in that form; C-9 no longer shows 'son'. User decisions (A1-A2): vocabulary validity - each form keeps one spelling error-correction item (slot 5); slot 6 is now a meaning error (Arabic-L1 polysemy or calque on an A1 word), with exactly one correct fix and the answer word not shown elsewhere in the form. Fix of 2+ reviewer known issues: slot-6 tag -> lexical_l1_transfer (PART 2); C-1 now mother's father (grandfather), no longer a copy of A-1 nor the same answer as C-5; A-4 stem no longer shows 'wife' (A-6 key); A-6/C-6 use names, not 'brother'/'aunt' (form keys); C-3/C-4 options no longer show C-7/C-8 named words.",
   "forms": {
     "A": [
       {
@@ -55,7 +55,7 @@
       {
         "id": "EN-F-A1-VO-family-A-4",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (aunt / sister / mother): My uncle's wife is my ____ .",
+        "prompt": "Choose the correct word (aunt / sister / mother): My mum's sister is my ____ .",
         "answerKey": "aunt",
         "acceptedAnswers": [
           "aunt"
@@ -86,19 +86,19 @@
       {
         "id": "EN-F-A1-VO-family-A-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My brother is married. His woman is a teacher.",
-        "answerKey": "My brother is married. His wife is a teacher.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Tamer is married. His woman is a teacher.",
+        "answerKey": "Tamer is married. His wife is a teacher.",
         "acceptedAnswers": [
-          "My brother is married. His wife is a teacher.",
-          "My brother's married. His wife is a teacher."
+          "Tamer is married. His wife is a teacher.",
+          "Tamer's married. His wife is a teacher."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My brother is married. His wife is a teacher.",
+        "targetForm": "Tamer is married. His wife is a teacher.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_l1_polysemy (Arabic imra'a = woman/wife: woman for wife)"
+        "l1ErrorType": "lexical_l1_transfer (Arabic imra'a = woman/wife: woman for wife)"
       },
       {
         "id": "EN-F-A1-VO-family-A-7",
@@ -249,7 +249,7 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_l1_polysemy (Arabic awlad = sons/children: sons for children)"
+        "l1ErrorType": "lexical_l1_transfer (Arabic awlad = sons/children: sons for children)"
       },
       {
         "id": "EN-F-A1-VO-family-B-7",
@@ -307,16 +307,17 @@
       {
         "id": "EN-F-A1-VO-family-C-1",
         "type": "controlled_gap_fill",
-        "prompt": "Write one word in the gap: My mother's mother is my ____ .",
-        "answerKey": "grandmother",
+        "prompt": "Write one word in the gap: My mother's father is my ____ .",
+        "answerKey": "grandfather",
         "acceptedAnswers": [
-          "grandmother",
-          "grandma",
-          "granny"
+          "grandfather",
+          "grandpa",
+          "grandad",
+          "granddad"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "grandmother",
+        "targetForm": "grandfather",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill"
@@ -339,7 +340,7 @@
       {
         "id": "EN-F-A1-VO-family-C-3",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (father / brother / cousin): Salma is Hany's daughter, and Hany is Salma's ____ .",
+        "prompt": "Choose the correct word (father / mother / wife): Salma is Hany's daughter, and Hany is Salma's ____ .",
         "answerKey": "father",
         "acceptedAnswers": [
           "father"
@@ -354,7 +355,7 @@
       {
         "id": "EN-F-A1-VO-family-C-4",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (aunt / cousin / wife): My mother's sister is my ____ .",
+        "prompt": "Choose the correct word (aunt / mother / wife): My mother's sister is my ____ .",
         "answerKey": "aunt",
         "acceptedAnswers": [
           "aunt"
@@ -385,18 +386,18 @@
       {
         "id": "EN-F-A1-VO-family-C-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My aunt's man is a doctor at the hospital.",
-        "answerKey": "My aunt's husband is a doctor at the hospital.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Mona's man is a doctor at the hospital.",
+        "answerKey": "Mona's husband is a doctor at the hospital.",
         "acceptedAnswers": [
-          "My aunt's husband is a doctor at the hospital."
+          "Mona's husband is a doctor at the hospital."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My aunt's husband is a doctor at the hospital.",
+        "targetForm": "Mona's husband is a doctor at the hospital.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (family words); Cambridge A1 Movers/KET-style gap-fill",
-        "l1ErrorType": "lexical_l1_polysemy (Egyptian Arabic ragil = man/husband: man for husband)"
+        "l1ErrorType": "lexical_l1_transfer (Egyptian Arabic ragil = man/husband: man for husband)"
       },
       {
         "id": "EN-F-A1-VO-family-C-7",

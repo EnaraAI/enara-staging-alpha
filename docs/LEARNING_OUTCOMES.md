@@ -38,7 +38,7 @@ Each lesson outcome links up to a course outcome; each form outcome links up to 
 **Banned verbs (not observable):** understand, know, learn, appreciate, be aware of, be familiar with, grasp, feel confident, master, internalise, think about.
 
 **Arabic-L1 error types (framework §9; hypotheses, check against real errors):**
-`article_indef_omission`, `article_def_misuse`, `copula_omission`, `verb_subject_order`, `adj_noun_order`, `resumptive_pronoun`, `run_on_and`, `present_perfect_avoidance`, `tense_aspect`, `agreement_3s`, `plural_s`, `spelling_vowel` (typed text), `spelling_consonant`, `prep_place_transfer`, `lexical_eat_drink`, `noun_for_adjective`, `quantifier_countability` (typed text; defined below), and audio-only `phon_p_b`, `phon_vowel`, `phon_cluster`, `phon_th` (NOT MEASURABLE YET).
+`article_indef_omission`, `article_def_misuse`, `copula_omission`, `verb_subject_order`, `adj_noun_order`, `resumptive_pronoun`, `run_on_and`, `present_perfect_avoidance`, `tense_aspect`, `agreement_3s`, `plural_s`, `spelling_vowel` (typed text), `spelling_consonant`, `prep_place_transfer`, `lexical_eat_drink`, `noun_for_adjective`, `quantifier_countability`, `lexical_l1_transfer`, `request_directness`, `agreement_be` (typed text; defined below), and audio-only `phon_p_b`, `phon_vowel`, `phon_cluster`, `phon_th` (NOT MEASURABLE YET).
 
 Typed error types added by user decision (A1–A2, DRAFT):
 - `prep_place_transfer`: preposition chosen by transfer from Arabic *fi* / *ʿala* (one word for in/on/at); used for place, and as nearest value for time phrases. Example: "He is in the bus." → on the bus; "The lesson is in 9 o'clock." → at.
@@ -46,6 +46,11 @@ Typed error types added by user decision (A1–A2, DRAFT):
 - `lexical_eat_drink`: *drink* used for soup or spoon food (Arabic *shariba* covers soup). Example: "I drink my soup." → eat.
 - `noun_for_adjective`: weather (or other) noun used where an adjective is needed. Example: "It is rain today." → rainy; "It is sun." → sunny.
 - `quantifier_countability`: quantifier not matched to a countable/uncountable noun (or to polarity, nearest value for some/any); Arabic *kathir* covers much/many. Example: "How much books?" → many; "many water" → much.
+
+Typed error types added in the fix of 2+ reviewer known issues (A1–A2, DRAFT; added by the agent, pending user approval):
+- `lexical_l1_transfer`: wrong English word chosen by transfer from Arabic, either because one Arabic word covers two English words (polysemy) or because an Arabic phrase is translated word for word (calque). Example: "His woman is a teacher." → wife (Arabic *imraʾa*); "one clock long" → one hour (*saʿa*); "the sleeping room" → bedroom (*ghurfat al-nawm*); "in month five" → in May.
+- `request_directness`: request made with a bare imperative or "I want", transferred from Arabic request forms (*aʿtini* "give me", *ana ʿayiz* / *biddi* "I want"), where English needs Can I have ... / I would like ..., please. Example: "Give me the key." → Can I have the key, please?; "I want a cup of tea." → I would like a cup of tea, please.
+- `agreement_be`: form of *be* not matched to the subject's number/person (Arabic past *kana* has no was/were contrast in learner use, and the copula is often dropped in the present). Example: "They was at home." → were; "We was late." → were.
 
 **Evidence types:** `controlled_item` (exact / accepted answers), `guided_production` (sentence with a target), `free_production` (paragraph or longer, rubric), `reading_item`, `transcript_speaking` (speaking exam transcript; content only), `audio` (not available).
 

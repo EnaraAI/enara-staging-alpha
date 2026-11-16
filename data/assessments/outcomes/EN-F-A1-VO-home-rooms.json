@@ -2,7 +2,7 @@
   "status": "DRAFT",
   "outcomeId": "EN-F-A1-VO-home-rooms",
   "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-  "matching": "Items 1-2 gap-fill: room from an activity; 3-4 choice matching activity to room; EC = Arabic-transfer room label/collocation errors ('sleeping room', 'eating room', 'path room') replaced by the English room word; FP = one sentence matching a named room to an activity; transfer = a house-tour/plan description. All words EVP A1, prompts 9-14 words. Item order identical across forms: 1-2 controlled gap-fill, 3-4 controlled choice, 5-6 error correction, 7-8 free production (target_form_0_1_2), 9 transfer. Review round 3: C-2 ('family sits together', several right rooms; also repeated C-9 living room) replaced by a kitchen clue, parallel to A-1/B-2. Review round 4: C-9 advert no longer shows 'bathrooms' (the C-1 key and C-5 correction). Review round 5: no item's answer word is shown elsewhere in its form (slot 3-4 options and slot 7-8 named rooms use only rooms that are not keyed or corrected in that form; advert lines no longer show 'bedrooms'). B-5 'cooking room' (no Arabic calque) -> 'eating room' (dining room); B-6 double error 'sitting room of guests' -> single p/b slip 'path room' (bathroom). C-9 prompt 'One or two words' (accepts lounge).",
+  "matching": "Each form: items 1-2 gap-fill, 3-4 choice (distractors are non-home places, so no option is a key in the form), 5 vowel spelling slip on a room word, 6 Arabic-L1 calque room label (eating room / sleeping room), 7-8 open free production naming a room (VOCABULARY variant, open field rubric), 9 transfer from a flat/house advert. Within each form the seven keyed slots (1-6, 9) use seven different room words (kitchen, bedroom, bathroom, living room, dining room, garden, garage) and no key is shown in another item of the form; no stem is repeated across forms. All words EVP A1 (checked from memory). Fix of 2+ reviewer known issues: replaced repeated/cued keys and repeated stems (K04), removed 'path room' (K05), slot 5 spelling_vowel and slot 6 lexical_l1_transfer in every form (K06, K01).",
   "forms": {
     "A": [
       {
@@ -23,14 +23,14 @@
       {
         "id": "EN-F-A1-VO-home-rooms-A-2",
         "type": "controlled_gap_fill",
-        "prompt": "Write one word in the gap: I go to bed and sleep in my ____ .",
-        "answerKey": "bedroom",
+        "prompt": "Write one word in the gap: I have a shower every morning in the ____ .",
+        "answerKey": "bathroom",
         "acceptedAnswers": [
-          "bedroom"
+          "bathroom"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "bedroom",
+        "targetForm": "bathroom",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching"
@@ -38,7 +38,7 @@
       {
         "id": "EN-F-A1-VO-home-rooms-A-3",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (garage / garden / bathroom): We park our big family car in the ____ .",
+        "prompt": "Choose the correct word (garage / office / shop): We park our family car in the ____ .",
         "answerKey": "garage",
         "acceptedAnswers": [
           "garage"
@@ -53,7 +53,7 @@
       {
         "id": "EN-F-A1-VO-home-rooms-A-4",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (living room / bathroom / garden): We watch TV on the sofa in the ____ .",
+        "prompt": "Choose the correct word (living room / school / hotel): We watch TV on the sofa in the ____ .",
         "answerKey": "living room",
         "acceptedAnswers": [
           "living room"
@@ -68,18 +68,18 @@
       {
         "id": "EN-F-A1-VO-home-rooms-A-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: My sleeping room is very small.",
-        "answerKey": "My bedroom is very small.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My bedrum is very small and blue.",
+        "answerKey": "My bedroom is very small and blue.",
         "acceptedAnswers": [
-          "My bedroom is very small."
+          "My bedroom is very small and blue."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "My bedroom is very small.",
+        "targetForm": "My bedroom is very small and blue.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "l1ErrorType": "lexical_room_label"
+        "l1ErrorType": "spelling_vowel (vowel slip on a room word: bedrum for bedroom)"
       },
       {
         "id": "EN-F-A1-VO-home-rooms-A-6",
@@ -95,51 +95,67 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "l1ErrorType": "lexical_room_label"
+        "l1ErrorType": "lexical_l1_transfer (calque of Arabic ghurfat al-taam, 'food room': eating room for dining room)"
       },
       {
         "id": "EN-F-A1-VO-home-rooms-A-7",
         "type": "free_production",
-        "prompt": "Write one sentence: what do you do in the garden? Use 'garden'.",
-        "answerKey": "garden",
+        "prompt": "Write one sentence about your favourite room at home. Name the room.",
+        "answerKey": "room name",
         "acceptedAnswers": [
-          "garden"
+          "kitchen",
+          "bedroom",
+          "bathroom",
+          "living room",
+          "dining room",
+          "garden",
+          "garage",
+          "toilet",
+          "hall"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "garden",
+        "targetForm": "room name",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-home-rooms-A-8",
         "type": "free_production",
-        "prompt": "Write one sentence: what do you do in the bathroom? Use 'bathroom'.",
-        "answerKey": "bathroom",
+        "prompt": "Write one sentence about a room you clean every week. Name the room.",
+        "answerKey": "room name",
         "acceptedAnswers": [
-          "bathroom"
+          "kitchen",
+          "bedroom",
+          "bathroom",
+          "living room",
+          "dining room",
+          "garden",
+          "garage",
+          "toilet",
+          "hall"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "bathroom",
+        "targetForm": "room name",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-home-rooms-A-9",
         "type": "transfer",
-        "prompt": "Flat advert: 'Small flat, a ____ with a cooker and fridge.' One word.",
-        "answerKey": "kitchen",
+        "prompt": "House advert: 'Family house, a big ____ with trees and flowers.' One word.",
+        "answerKey": "garden",
         "acceptedAnswers": [
-          "kitchen"
+          "garden"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "kitchen",
+        "targetForm": "garden",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching"
@@ -164,14 +180,14 @@
       {
         "id": "EN-F-A1-VO-home-rooms-B-2",
         "type": "controlled_gap_fill",
-        "prompt": "Write one word in the gap: I have a shower every morning in the ____ .",
-        "answerKey": "bathroom",
+        "prompt": "Write one word in the gap: Our dog runs and plays in the ____ .",
+        "answerKey": "garden",
         "acceptedAnswers": [
-          "bathroom"
+          "garden"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "bathroom",
+        "targetForm": "garden",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching"
@@ -179,14 +195,14 @@
       {
         "id": "EN-F-A1-VO-home-rooms-B-3",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (living room / kitchen / garden): We watch TV on the sofa in the ____ .",
-        "answerKey": "living room",
+        "prompt": "Choose the correct word (kitchen / office / shop): My mother makes breakfast in the ____ .",
+        "answerKey": "kitchen",
         "acceptedAnswers": [
-          "living room"
+          "kitchen"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "living room",
+        "targetForm": "kitchen",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching"
@@ -194,7 +210,7 @@
       {
         "id": "EN-F-A1-VO-home-rooms-B-4",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (garage / kitchen / garden): We always park the family car in the ____ .",
+        "prompt": "Choose the correct word (garage / office / school): My father keeps his car in the ____ .",
         "answerKey": "garage",
         "acceptedAnswers": [
           "garage"
@@ -209,67 +225,82 @@
       {
         "id": "EN-F-A1-VO-home-rooms-B-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: We eat dinner in the eating room.",
-        "answerKey": "We eat dinner in the dining room.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: We watch TV in the leving room.",
+        "answerKey": "We watch TV in the living room.",
         "acceptedAnswers": [
-          "We eat dinner in the dining room."
+          "We watch TV in the living room."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "We eat dinner in the dining room.",
+        "targetForm": "We watch TV in the living room.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "l1ErrorType": "lexical_room_label"
+        "l1ErrorType": "spelling_vowel (vowel slip on a room word: leving for living)"
       },
       {
         "id": "EN-F-A1-VO-home-rooms-B-6",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: Our path room has a big white bath.",
-        "answerKey": "Our bathroom has a big white bath.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: Our guests have dinner in the eating room tonight.",
+        "answerKey": "Our guests have dinner in the dining room tonight.",
         "acceptedAnswers": [
-          "Our bathroom has a big white bath.",
-          "Our bath room has a big white bath."
+          "Our guests have dinner in the dining room tonight."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "Our bathroom has a big white bath.",
+        "targetForm": "Our guests have dinner in the dining room tonight.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "l1ErrorType": "spelling_consonant (b written as p: path room for bathroom)"
+        "l1ErrorType": "lexical_l1_transfer (calque of Arabic ghurfat al-taam, 'food room': eating room for dining room)"
       },
       {
         "id": "EN-F-A1-VO-home-rooms-B-7",
         "type": "free_production",
-        "prompt": "Write one sentence: what do you do in the garden? Use 'garden'.",
-        "answerKey": "garden",
+        "prompt": "Write one sentence about the biggest room in your home. Name the room.",
+        "answerKey": "room name",
         "acceptedAnswers": [
-          "garden"
+          "kitchen",
+          "bedroom",
+          "bathroom",
+          "living room",
+          "dining room",
+          "garden",
+          "garage",
+          "toilet",
+          "hall"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "garden",
+        "targetForm": "room name",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-home-rooms-B-8",
         "type": "free_production",
-        "prompt": "Write one sentence: what do you do in the kitchen? Use 'kitchen'.",
-        "answerKey": "kitchen",
+        "prompt": "Write one sentence about a room you use every morning. Name the room.",
+        "answerKey": "room name",
         "acceptedAnswers": [
-          "kitchen"
+          "kitchen",
+          "bedroom",
+          "bathroom",
+          "living room",
+          "dining room",
+          "garden",
+          "garage",
+          "toilet",
+          "hall"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "kitchen",
+        "targetForm": "room name",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-home-rooms-B-9",
@@ -291,7 +322,7 @@
       {
         "id": "EN-F-A1-VO-home-rooms-C-1",
         "type": "controlled_gap_fill",
-        "prompt": "Write one word in the gap: We have a shower in the ____ .",
+        "prompt": "Write one word in the gap: I wash my hands in the ____ .",
         "answerKey": "bathroom",
         "acceptedAnswers": [
           "bathroom"
@@ -306,14 +337,14 @@
       {
         "id": "EN-F-A1-VO-home-rooms-C-2",
         "type": "controlled_gap_fill",
-        "prompt": "Write one word in the gap: My little brother sleeps in his bed in the ____ .",
-        "answerKey": "bedroom",
+        "prompt": "Write one word in the gap: My grandmother grows flowers in the ____ .",
+        "answerKey": "garden",
         "acceptedAnswers": [
-          "bedroom"
+          "garden"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "bedroom",
+        "targetForm": "garden",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching"
@@ -321,7 +352,7 @@
       {
         "id": "EN-F-A1-VO-home-rooms-C-3",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (garage / kitchen / dining room): My father keeps his car in the ____ .",
+        "prompt": "Choose the correct word (garage / office / shop): Our car is in the ____ .",
         "answerKey": "garage",
         "acceptedAnswers": [
           "garage"
@@ -336,14 +367,14 @@
       {
         "id": "EN-F-A1-VO-home-rooms-C-4",
         "type": "controlled_choice",
-        "prompt": "Choose the correct word (garden / kitchen / dining room): We plant flowers and play outside in the ____ .",
-        "answerKey": "garden",
+        "prompt": "Choose the correct word (living room / school / hotel): Our guests sit and drink tea in the ____ .",
+        "answerKey": "living room",
         "acceptedAnswers": [
-          "garden"
+          "living room"
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "garden",
+        "targetForm": "living room",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching"
@@ -351,18 +382,18 @@
       {
         "id": "EN-F-A1-VO-home-rooms-C-5",
         "type": "error_correction",
-        "prompt": "Find and correct the mistake. Rewrite the sentence: The path room is next to my room.",
-        "answerKey": "The bathroom is next to my room.",
+        "prompt": "Find and correct the mistake. Rewrite the sentence: My mother is in the kitchin now.",
+        "answerKey": "My mother is in the kitchen now.",
         "acceptedAnswers": [
-          "The bathroom is next to my room."
+          "My mother is in the kitchen now."
         ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "The bathroom is next to my room.",
+        "targetForm": "My mother is in the kitchen now.",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "l1ErrorType": "spelling_consonant (b written as p: path room for bathroom)"
+        "l1ErrorType": "spelling_vowel (vowel slip on a room word: kitchin for kitchen)"
       },
       {
         "id": "EN-F-A1-VO-home-rooms-C-6",
@@ -378,55 +409,68 @@
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "l1ErrorType": "lexical_room_label"
+        "l1ErrorType": "lexical_l1_transfer (calque of Arabic ghurfat al-nawm, 'sleeping room': sleeping room for bedroom)"
       },
       {
         "id": "EN-F-A1-VO-home-rooms-C-7",
         "type": "free_production",
-        "prompt": "Write one sentence: what do you do in the kitchen? Use 'kitchen'.",
-        "answerKey": "kitchen",
+        "prompt": "Write one sentence about the smallest room in your home. Name the room.",
+        "answerKey": "room name",
         "acceptedAnswers": [
-          "kitchen"
+          "kitchen",
+          "bedroom",
+          "bathroom",
+          "living room",
+          "dining room",
+          "garden",
+          "garage",
+          "toilet",
+          "hall"
         ],
         "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
         "scoring": "target_form_0_1_2",
-        "targetForm": "kitchen",
+        "targetForm": "room name",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
       },
       {
         "id": "EN-F-A1-VO-home-rooms-C-8",
         "type": "free_production",
-        "prompt": "Write one sentence: what do you do in the dining room? Use 'dining room'.",
+        "prompt": "Write one sentence about a room you use in the evening. Name the room.",
+        "answerKey": "room name",
+        "acceptedAnswers": [
+          "kitchen",
+          "bedroom",
+          "bathroom",
+          "living room",
+          "dining room",
+          "garden",
+          "garage",
+          "toilet",
+          "hall"
+        ],
+        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
+        "scoring": "target_form_0_1_2",
+        "targetForm": "room name",
+        "level": "A1",
+        "vocabLevel": "A1",
+        "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
+        "rubric": "VOCABULARY variant: 2 = a word from the target field used with the right meaning in a sentence (acceptedAnswers are examples; the list is open); 1 = right word misspelt or in the wrong form; 0 = no target-field word, or the word used with the wrong meaning. Other errors are not scored."
+      },
+      {
+        "id": "EN-F-A1-VO-home-rooms-C-9",
+        "type": "transfer",
+        "prompt": "Flat advert: 'Big flat, a ____ with a table for eight.' One or two words.",
         "answerKey": "dining room",
         "acceptedAnswers": [
           "dining room",
           "dining-room"
         ],
-        "acceptedAnswersNote": "Scored by the rubric field (0/1/2); acceptedAnswers lists acceptable words.",
-        "scoring": "target_form_0_1_2",
-        "targetForm": "dining room",
-        "level": "A1",
-        "vocabLevel": "A1",
-        "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching",
-        "rubric": "VOCABULARY variant, named word: 2 = the word named in the prompt (or a variant listed in acceptedAnswers) used with the right meaning in a sentence; 1 = the named word misspelt or in the wrong form; 0 = the named word missing (another word, even from the same field, scores 0) or used with the wrong meaning. Other errors are not scored."
-      },
-      {
-        "id": "EN-F-A1-VO-home-rooms-C-9",
-        "type": "transfer",
-        "prompt": "Flat advert: 'A ____ with a big sofa and TV.' One or two words.",
-        "answerKey": "living room",
-        "acceptedAnswers": [
-          "living room",
-          "sitting room",
-          "living-room",
-          "lounge"
-        ],
         "acceptedAnswersNote": "Case-insensitive; ignore final punctuation and extra spaces; contractions (it's/it is, isn't/is not, I'm/I am) equivalent.",
         "scoring": "exact",
-        "targetForm": "living room",
+        "targetForm": "dining room",
         "level": "A1",
         "vocabLevel": "A1",
         "reference": "English Vocabulary Profile A1 (house and home); Cambridge A1 Movers-style matching"

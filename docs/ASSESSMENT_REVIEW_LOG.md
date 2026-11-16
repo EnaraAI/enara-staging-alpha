@@ -706,3 +706,31 @@ DRAFT — not passed; do not use as a confirmatory measure until fixed and re-re
 ### Tests
 
 `cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed.
+
+## Fix of 2+ reviewer known issues (A1–A2)
+
+Status: DRAFT. User instruction: fix every known issue from the close-out table flagged by ≥2 reviewers (K01, K03, K04, K05, K07–K13, K16–K19), plus the high-severity present-continuous double-error items (K15). K02 (family cueing), K06 (home-rooms slot parallelism) and K14 (present-continuous slot 8–9 criterion) were fixed alongside because the same items were rewritten. K20 was not touched. Targets: `research/assessment-review/a1a2/FIX2_TARGETS.json` (95 items + outcome metadata, each with the known issue it resolves). `OUTCOME_STATUS.json` is unchanged; a verification check follows. No CEFR levels changed.
+
+### Enum additions (data/outcomes/schema.json, docs/LEARNING_OUTCOMES.md PART 2, pending user approval)
+
+| Value | Why no existing value fits | Used by |
+|---|---|---|
+| `lexical_l1_transfer` | polysemy/calque meaning errors (woman→wife, clock→hour, sleeping room→bedroom, month five→May) had no lexical tag except `lexical_eat_drink` | family, classroom-objects, days-months, numbers-time, home-rooms slot 6 |
+| `request_directness` | bare imperative / "I want" requests are pragmatic, not grammatical | polite-requests slots 5–6 |
+| `agreement_be` | `agreement_3s` is present 3rd-person -s, not was/were number agreement | was-were outcome |
+
+### Changes
+
+- K01: all undefined tags retagged: lexical_l1_polysemy / lexical_l1_calque / lexical_room_label → `lexical_l1_transfer`; direct_imperative / want_for_request → `request_directness`; be_omission_progressive → `copula_omission`; simple_for_progressive → `tense_aspect`; third_person_s_omission / es_spelling → `agreement_3s`. Outcome l1ErrorTypes now match their items (polite-requests `[request_directness]`; imperatives `[]`, copula_omission dropped, K18; was-were `[agreement_be, tense_aspect]`, K19; vocabulary outcomes add `lexical_l1_transfer`; home-rooms `[spelling_vowel, lexical_l1_transfer]`).
+- K02/K03 family: C-1 → "My mother's father" (grandfather; no longer a copy of A-1 or the same answer as C-5); A-4 stem "My mum's sister" (no 'wife'); A-6 "Tamer is married. His woman …" (no 'brother'); C-6 "Mona's man …" (no 'aunt'); C-3/C-4 options no longer show C-7/C-8 named words.
+- K04/K05/K06 home-rooms rebuilt: per form the seven keyed slots use seven different rooms; choice distractors are non-home places (office/shop/school/hotel); slot 5 vowel slip (bedrum / leving room / kitchin), slot 6 calque (eating room ×2 with different stems, sleeping room); 'path room' removed; slots 7–8 open "name the room" production (VOCABULARY open-field rubric); no stem repeated across forms.
+- K07 days-months slot 6: Arabic numbered-month calque on a month word ("in month five" → May / June / October), one fix each, month-word matchingNote now fits.
+- K08 classroom-objects B-6: "I put my books on my office" → desk (Arabic maktab); B-3 no longer shows 'desk'.
+- K09/K10/K11 polite-requests: A1 words only, all vocabLevel A1; slot-4 distractors are "Give me …" / "I want …"; slots 5–6 `request_directness`.
+- K12/K13/K14/K15 present-continuous: A1 words only (vocabLevel A1); slot 6 single error ("Shh, my father watches TV at the moment." → is watching); slots 8–9 criterion am/is/are + -ing in every form.
+- K16/K17 third-person-s: A1 words only (vocabLevel A1); slot 6 -chs/-shs (watchs, washs, teachs); slot 9 go/watch/do.
+- EVP levels were checked from memory, not against the EVP database.
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed (data changed, not tests; first run caught prompt-length and benchmark-overlap hits, fixed in the items).
