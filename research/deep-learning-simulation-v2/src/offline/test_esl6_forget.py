@@ -1,4 +1,4 @@
-# SIMULATION ONLY. NO API.  Unit tests for esl6_forget.py (F1 + section 2a).  Run: python3 -m unittest src/offline/test_esl6_forget.py -v
+# SIMULATION ONLY. NO API.  Unit tests for esl6_forget.py (F1 v2 + section 2a v2).  Run: python3 -m unittest src/offline/test_esl6_forget.py -v
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import esl6_forget as F  # noqa: E402
@@ -13,7 +13,8 @@ def worked(retrieved=False, w1_removed=False):
 
 class Params(unittest.TestCase):
     def test_params_match_rules(self):
-        self.assertEqual((F.BASE, F.MULT, F.R_CAP, F.FRAC, F.CAP, F.THRESH, F.MIN_ERR, F.DAYS_GAP, F.DAYS_DELAY), (0.15, 0.5, 2, 0.10, 0.5, 1.0, 0.4, 2, 7))
+        self.assertEqual((F.BASE, F.MULT, F.R_CAP, F.FRAC, F.CAP, F.RET_MULT, F.MIN_ERR, F.FULL_RECALL, F.DAYS_GAP, F.DAYS_DELAY), (0.15, 0.5, 2, 0.10, 0.5, 0.5, 0.4, 2.0, 2, 7))
+        self.assertEqual([F.return_factor(r) for r in (0, 1, 2, 3)], [1, 0.5, 0.25, 0.25])
         self.assertEqual([F.decay_rate(r) for r in (0, 1, 2, 3)], [0.15, 0.075, 0.0375, 0.0375])
 
 
@@ -22,18 +23,18 @@ class WorkedExample(unittest.TestCase):
         d = F.f1_gap(worked(), 7); self.assertAlmostEqual(d['s']['C1'], 0.95); self.assertAlmostEqual(d['s']['W1'], 2.0)
 
     def test_day7_retrieved_once(self):
-        d = F.f1_gap(worked(True), 7); self.assertAlmostEqual(d['s']['C1'], 1.475); self.assertAlmostEqual(d['s']['W1'], 2.0)
+        d = F.f1_gap(worked(True), 7); self.assertAlmostEqual(d['s']['C1'], 1.475); self.assertAlmostEqual(d['s']['W1'], 1.5)   # v2: return halved (cap 0.5)
 
     def test_intermediate_days(self):
-        for days, c0, c1, w in ((1, 1.85, 1.925, 1.2), (3, 1.55, 1.775, 1.6), (5, 1.25, 1.625, 2.0)):
+        for days, c0, c1, w0, w1 in ((1, 1.85, 1.925, 1.2, 1.1), (3, 1.55, 1.775, 1.6, 1.3), (5, 1.25, 1.625, 2.0, 1.5)):
             self.assertAlmostEqual(F.f1_gap(worked(), days)['s']['C1'], c0); self.assertAlmostEqual(F.f1_gap(worked(True), days)['s']['C1'], c1)
-            self.assertAlmostEqual(F.f1_gap(worked(), days)['s']['W1'], w)
+            self.assertAlmostEqual(F.f1_gap(worked(), days)['s']['W1'], w0); self.assertAlmostEqual(F.f1_gap(worked(True), days)['s']['W1'], w1)
 
     def test_removed_w1_and_threshold(self):
         a, b = F.f1_gap(worked(False, True), 7), F.f1_gap(worked(True, True), 7)
         self.assertEqual(a['s']['W1'], 0); self.assertEqual(b['s']['W1'], 0)
-        self.assertAlmostEqual(F.item_error_prob(a, 'W1'), 0.4); self.assertAlmostEqual(F.item_error_prob(b, 'W1'), 0.05)
-        self.assertAlmostEqual(F.item_error_prob(F.f1_gap(worked(), 7), 'W1'), 0.8)
+        self.assertAlmostEqual(F.item_error_prob(a, 'W1'), 0.21); self.assertAlmostEqual(F.item_error_prob(b, 'W1'), 0.105)   # v2 graded floor
+        self.assertAlmostEqual(F.item_error_prob(F.f1_gap(worked(), 7), 'W1'), 0.8); self.assertAlmostEqual(F.item_error_prob(F.f1_gap(worked(True), 7), 'W1'), 0.8)
 
 
 class Decay(unittest.TestCase):
@@ -82,10 +83,16 @@ class Answering(unittest.TestCase):
     def test_rounding_half_up(self):
         self.assertEqual([F.p_wrong(x) for x in (0, 0.49, 0.5, 1, 1.49, 1.5, 2, 3)], [0.05, 0.05, 0.4, 0.4, 0.4, 0.8, 0.8, 0.8])
 
-    def test_threshold_only_after_f1(self):
+    def test_graded_floor_only_after_f1(self):
         k = F.initial_state('x', 'A1', 'W1'); k['s']['W1'] = 0
-        self.assertEqual(F.item_error_prob(k, 'W1'), 0.05); k['afterF1'] = True; self.assertEqual(F.item_error_prob(k, 'W1'), 0.4)
-        k['s']['C1'] = 1.0; self.assertEqual(F.item_error_prob(k, 'W1'), 0.05)
+        self.assertEqual(F.item_error_prob(k, 'W1'), 0.05); k['afterF1'] = True; self.assertAlmostEqual(F.item_error_prob(k, 'W1'), 0.4)
+        for c, p in ((0.5, 0.3), (1.0, 0.2), (1.5, 0.1), (1.8, 0.05), (2.0, 0.05), (3, 0.05)):
+            k['s']['C1'] = c; self.assertAlmostEqual(F.item_error_prob(k, 'W1'), p)
+
+    def test_retrieval_limits_return(self):
+        k = F.initial_state('x', 'A1', 'W1'); k['s']['W1'] = 0.0; k['indep']['C1'] = 1   # drop 3
+        self.assertAlmostEqual(F.f1_gap(k, 7)['s']['W1'], 1.5); k['retr']['C1'] = [2]; self.assertAlmostEqual(F.f1_gap(k, 7)['s']['W1'], 0.75)
+        k['retr']['C1'] = [2, 3]; self.assertAlmostEqual(F.f1_gap(k, 7)['s']['W1'], 0.375); k['retr']['C1'] = [1]; self.assertAlmostEqual(F.f1_gap(k, 7)['s']['W1'], 1.5)
 
     def test_one_belief_outcome_probes(self):
         k = F.initial_state('x', 'A1', 'W1', ws=['W1']); self.assertEqual(k['s']['W2'], 0); self.assertEqual(F.post_probes(k), [['W1']] * 6)

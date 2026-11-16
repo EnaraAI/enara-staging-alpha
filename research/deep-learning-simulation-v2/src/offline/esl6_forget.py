@@ -18,8 +18,9 @@ MULT = PARAMS['retrieval']['retrieval_multiplier']             # 0.5
 R_CAP = PARAMS['retrieval']['r_cap']                           # 2
 FRAC = PARAMS['wrong_return']['fraction_of_drop_per_day']      # 0.10
 CAP = PARAMS['wrong_return']['cap_fraction_of_drop_per_gap']   # 0.5
-THRESH = PARAMS['answering']['correct_retrieval_threshold']   # 1.0
-MIN_ERR = PARAMS['answering']['min_error_prob_if_tested_correct_below_threshold']  # 0.4
+RET_MULT = PARAMS['wrong_return']['retrieval_multiplier']     # 0.5 (F1 v2)
+MIN_ERR = PARAMS['answering']['max_floor_error_prob']        # 0.4 (F1 v2: floor at Ck = 0)
+FULL_RECALL = PARAMS['answering']['full_recall_strength']     # 2.0 (F1 v2: floor reaches 0 at Ck >= 2)
 DAYS_GAP = PARAMS['timing']['days_session1_to_session2']       # 2
 DAYS_DELAY = PARAMS['timing']['days_last_session_to_delayed_posttest']  # 7
 EPS = 1e-9
@@ -65,20 +66,24 @@ def r_of(k, c):
 def decay_rate(r): return BASE * MULT ** min(R_CAP, r)
 
 
+def return_factor(r): return RET_MULT ** min(R_CAP, r)
+
+
 def f1_gap(k, days):
     """Run F1 for `days` simulated days outside a session, starting from the end-of-session state k. Returns a new state."""
     st = copy.deepcopy(k)
     if days <= 0: return st
-    drop = {}; budget = {}
+    drop = {}; budget = {}; fr = {}
     for w in st['ws']:
         d = st['start'][w] - st['s'][w]
-        if d > EPS and not removed(st, w): drop[w] = d; budget[w] = CAP * d
+        g = return_factor(r_of(st, PAIR[w]))                            # 6b v2: retrieval of Ck also slows/limits Wk's return
+        if d > EPS and not removed(st, w): drop[w] = d; budget[w] = CAP * g * d; fr[w] = FRAC * g
     rates = {c: decay_rate(r_of(st, c)) for c in ('C1', 'C2') if PAIR[c] in st['ws']}
     for _ in range(days):
         for c, rate in rates.items():                                   # 6a
             st['s'][c] = q(max(floor_of(st, c), st['s'][c] - rate))
         for w in drop:                                                  # 6b
-            inc = min(FRAC * drop[w], budget[w])
+            inc = min(fr[w] * drop[w], budget[w])
             if inc <= EPS: continue
             new = min(st['start'][w], st['s'][w] + inc); budget[w] -= new - st['s'][w]; st['s'][w] = q(new)
     st['afterF1'] = True
@@ -90,10 +95,15 @@ def p_wrong(w):
     return 0.8 if w >= 1.5 - EPS else 0.4 if w >= 0.5 - EPS else 0.05
 
 
+def recall_floor(c):
+    """2a v2 graded mapping: floor on Wk's error probability from Ck = 0.4 * max(0, 1 - Ck/2) (0.4 at 0, 0.2 at 1, 0 at >= 2)."""
+    return MIN_ERR * max(0.0, 1.0 - c / FULL_RECALL)
+
+
 def item_error_prob(k, w):
-    """Error probability of Wk on an item that tests Ck (2a threshold applies only after at least one F1 interval)."""
+    """Error probability of Wk on an item that tests Ck (2a graded floor applies only after at least one F1 interval)."""
     p = p_wrong(k['s'][w])
-    if k.get('afterF1') and k['s'][PAIR[w]] < THRESH - EPS: p = max(p, MIN_ERR)
+    if k.get('afterF1'): p = max(p, recall_floor(k['s'][PAIR[w]]))
     return p
 
 

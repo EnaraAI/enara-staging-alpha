@@ -72,3 +72,26 @@ Rebuild: `python3 src/offline/esl6_valprep.py`. Tests: `python3 -m unittest src/
 
 ## Not run here
 No judge agents were started and no API was called. Agreement and noise numbers are produced only when the judges have written their batch JSON files.
+
+## Round 2 (F1 v2)
+
+**Round-1 failure.** Forgetting check, counted (full) design: 7-day (b) − (a) = 0.000 (0 / 60 learners changed); light design 0.000 with immediate +0.049. Cause (`FORGET_CHECK.json` → `mechanism`, round 1): retrieval only slowed Ck decay, which affected answers only below the hard Ck 1.0 threshold; partly returned wrong beliefs already forced ≥ 0.4; full teaching ends at Ck 3.0, and 7 days (−1.05) never crosses 1.0.
+
+**Change (F1 v2, `LEARNING_RULES.md` 2a and 6, `F1_PARAMS.json` version F1-v2; v1 kept in collapsed notes).** All parameters fixed before re-running; no tuning after the result.
+1. 6b/6c: each counted retrieval of Ck multiplies Wk's daily return **and** its per-gap cap by **g = 0.5** (testing effect reduces proactive interference / recovery of the old response; Szpunar, McDermott & Roediger 2008; Anderson, Bjork & Bjork 1994 — VERIFY). r = 0: 0.10 × drop/day, cap 0.5 × drop; r = 1: 0.05, cap 0.25; r = 2: 0.025, cap 0.125. g = m (the existing decay multiplier), so no new free value.
+2. 2a: hard threshold replaced by a graded floor on Wk's error on an item testing Ck: **0.4 × max(0, 1 − Ck/2)** (Ck 0 -> 0.4, 1 -> 0.2, 2+ -> 0). Anchor Ck ≥ 2 = reliable recall, as in 3a "say the rule". Same as v1 at whole Ck 0 and ≥ 2; at Ck 1 it is 0.2 (v1: 0). Applies only after an F1 interval, so session 1 / ESL5 behaviour is unchanged.
+3. Unchanged: decay 0.15/day, m = 0.5, r cap 2, return fraction 0.10 and cap 0.5 at r = 0, floors, timing (2 days / 7 days), rounding.
+
+**Rebuild.** `python3 src/offline/esl6_valprep.py` re-run. Session-2 starting strengths do not depend on v2 (r = 0 during the 2-day gap), and the session-2 learner dice did not change any reply: `cases_mixed.json`, `scripted_order.json`, `noise_cases.json`, the judge/noise inputs, `VAL_KEY.json` and `ORDER_REFERENCE.json` are byte-identical to round 1. Only `FORGET_CHECK.json` changed. Unit tests: 20 pass (`python3 -m unittest src/offline/test_esl6_forget.py`; worked example updated, new test for the retrieval-limited return and the graded floor).
+
+**Results (reference events, deterministic).**
+
+| Check | Result | Pass mark | |
+|---|---|---|---|
+| Order (session 1, no F1) | a 0.2053, b 0.2053, c 0.4303, d 0.936 | d > c > b ≈ a | **PASS** (unchanged) |
+| Forgetting, **full (counted)** | immediate a 0.936 / b 0.936 (diff 0.000); 7-day a 0.936 / b 0.936 (**diff 0.000**), 0 / 60 learners change | 7-day (b) > (a), immediate \|diff\| ≤ 0.03 | **FAIL** (immediate passes) |
+| Forgetting, light (sensitivity) | immediate a 0.8535 / b 0.8844 (diff +0.0309); 7-day a 0.3662 / b 0.5950 (diff +0.2288), 43 / 60 change | (not counted) | 7-day passes; immediate just over 0.03 |
+
+**Why the counted design still fails.** In the full design every wrong belief is removed (R4 reset, so the 6b change cannot act) and every Ck ends session 2 at 3.0. After 7 days Ck is 1.95 (a) vs 2.475 (b). The graded floor is 0.4 × (1 − 1.95/2) = 0.01 in (a) and 0 in (b). Both are below the table's 0.05 for W = 0, so both arms answer with p = 0.05 and score the same. The v2 changes do work where a wrong belief is only lowered (light design: +0.229 at 7 days).
+
+**Decision.** As pre-stated, v2 still fails the counted check, so I report it and stop. I did not tune any parameter after seeing the result. The protocol owner decides what happens next, before any ESL6 tutor session. Options: count the light design, accept that full teaching hits a ceiling, or set a new rule in advance.

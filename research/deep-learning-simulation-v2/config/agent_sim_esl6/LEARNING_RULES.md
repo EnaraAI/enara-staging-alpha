@@ -86,12 +86,17 @@ Each wrong belief the item can reveal fires independently:
 
 The answer is wrong if any relevant wrong belief fires (the first that fires decides the error). Seeds: `sha256(learner seed | purpose | turn | item)`.
 
-### 2a. Non-whole strengths and correct-belief strength (new in ESL6, used only after F1 has run)
+### 2a. Non-whole strengths and correct-belief strength (new in ESL6, used only after F1 has run; correct-belief line is v2, revised after validation round 1)
 F1 (section 6) can leave strengths that are not whole numbers. Then:
 - **Wrong belief:** use the row of the table for the strength rounded half up: W ≥ 1.5 -> 0.8; 0.5 ≤ W < 1.5 -> 0.4; W < 0.5 -> 0.05. "Wk at 0" in section 4c means rounded 0.
-- **Correct belief (retrieval threshold):** if an item tests Ck (section 4a) and Ck < 1.0, Wk's error probability on that item is at least 0.4 (the learner no longer reliably recalls the rule, so the wrong idea can win even if Wk is low). If Ck ≥ 1.0, the table alone applies.
-- These two lines apply to every answer given after at least one F1 interval: all of session 2, the immediate post-test and the delayed post-test. Session 1 is unaffected (all strengths whole, no F1 yet).
+- **Correct belief (graded, v2):** if an item tests Ck (section 4a), Wk's error probability on that item is at least **0.4 × max(0, 1 − Ck / 2)**: Ck 0 -> 0.4, 0.5 -> 0.3, 1 -> 0.2, 1.5 -> 0.1, 2 or more -> 0 (the table alone applies). Forgetting is gradual, so recall of the rule weakens gradually as Ck falls; Ck ≥ 2 is "reliable recall", the same point at which the learner can say the rule (3a).
+- These two lines apply to every answer given after at least one F1 interval: all of session 2, the immediate post-test and the delayed post-test. Session 1 is unaffected (all strengths whole, no F1 yet), so all ESL5 behaviour is unchanged. At whole strengths the v2 floor equals v1 at Ck = 0 and Ck ≥ 2; at Ck = 1 it is 0.2 instead of 0 (a gradual mapping cannot keep both 0.4 at 0 and 0 at 1 without being a step).
 - R1–R7 still add or subtract whole steps, then clamp to 0–3. R4's reset still sets Wk to exactly 0.
+
+<details><summary>v1 of the correct-belief line (failed validation round 1)</summary>
+
+- **Correct belief (retrieval threshold):** if an item tests Ck (section 4a) and Ck < 1.0, Wk's error probability on that item is at least 0.4 (the learner no longer reliably recalls the rule, so the wrong idea can win even if Wk is low). If Ck ≥ 1.0, the table alone applies.
+</details>
 
 ## 3. Update rules (unchanged from ESL5)
 
@@ -200,50 +205,62 @@ Counter-example (step 3): "We say 'He is a doctor', not 'He is doctor'." -> R2 W
    - **ESL6 addition:** the learner's answer also counts as a **retrieval attempt** for F1 (section 6c) on each tested Ck, right or wrong, unless the previous turn settled the answer (4b check 2) — then it was not answered from memory. The judge reports `retrieval: [Ck,...]` for that turn.
 2. **Own-sentence task:** a correct own sentence is always a new context, so R4 applies to each belief the sentence tests, unless the previous turn gave a model of that same sentence (one word changed counts as a model). Errors in an own sentence are judged by R2/R7 as usual. An own sentence is **not** a retrieval attempt for F1 unless the task names a rule taught in an earlier session.
 
-## 6. Forgetting rule F1 (new in ESL6; all parameters fixed now, see `F1_PARAMS.json`)
+## 6. Forgetting rule F1 — v2, revised after validation round 1 (all v2 parameters fixed before re-checking, see `F1_PARAMS.json`)
+
+**Why v2:** validation round 1 failed the forgetting check (7-day (b) − (a) = 0.000). In v1, retrieval only slowed the decay of Ck, and Ck mattered only through a hard 1.0 threshold; a lowered wrong belief that came back already forced at least 0.4, and full teaching ended at Ck = 3, so 7 days (3 − 1.05 = 1.95) never crossed the threshold. v2 makes two changes; decay rate, caps, floors and timing are unchanged.
+1. Retrieval of Ck also limits the return of Wk (6b, 6c).
+2. The hard threshold is replaced by a graded mapping (2a).
 
 F1 runs once for each simulated day that passes **outside** a session: 2 days between session 1 and session 2, and 7 days between session 2 and the delayed post-test (section 7). It never runs inside a session. Order on each day: 6a, then 6b. Retrieval counts (6c) are updated at the end of each session.
 
 **Principles (framework §7, "Spaced retrieval"; sources VERIFY as in the framework):**
-- Forgetting/decay: memory not used weakens over time (forgetting curve; Ebbinghaus 1885 — not cited in §7, VERIFY). Modelled as a fixed linear loss per day, a simplification of the curve.
+- Forgetting/decay: memory not used weakens over time (forgetting curve; Ebbinghaus 1885 — not cited in §7, VERIFY). Modelled as a fixed linear loss per day, a simplification of the curve. Forgetting is gradual, so the effect of a weaker Ck on answers is graded (2a, v2).
 - Retrieval practice / testing effect: trying to recall makes memory last longer (Roediger & Karpicke 2006, cited in §7). Modelled as a slower decay after retrieval attempts.
+- Testing reduces interference from older learning: retrieval practice protects against proactive interference (Szpunar, McDermott & Roediger 2008 — not cited in §7, VERIFY) and recall of the new response limits recovery of the old one (retrieval-induced forgetting, Anderson, Bjork & Bjork 1994 — not cited in §7, VERIFY). Modelled (v2) as a slower, smaller return of Wk after retrieval of Ck.
 - Spacing effect: recall spread over time beats massed recall (Cepeda et al. 2006, cited in §7). Modelled by counting at most one retrieval per session, so two retrievals need two sessions.
 - Recovery of old responses / proactive interference: an older response that was weakened but not unlearned comes back with time and competes with the new one (spontaneous recovery; proactive interference, Underwood 1957 — not cited in §7, VERIFY; framework §9 on L1 transfer as the source of the old response). Modelled as a partial return of lowered wrong beliefs.
 
-### 6a. Decay of correct beliefs
+### 6a. Decay of correct beliefs (unchanged)
 - Each day, each correct belief Ck loses **d = 0.15 × m^r** (r from 6c, m = 0.5).
 - **Floor:** Ck never falls below its band starting strength (section 1: A1 0 for C1 and C2; A2 1 for C1, 0 for C2; B2 3). What was never learned cannot be forgotten; B2 learners therefore do not decay.
-- **Mapping to answering:** section 2a. If Ck < 1.0 on an item that tests it, Wk's error probability is at least 0.4. The "say the rule" reply (3a) uses C1 ≥ 2 as before.
+- **Mapping to answering:** section 2a (v2 graded floor 0.4 × max(0, 1 − Ck/2)). The "say the rule" reply (3a) uses C1 ≥ 2 as before.
 
-### 6b. Partial return of lowered wrong beliefs
+### 6b. Partial return of lowered wrong beliefs (v2: retrieval factor added)
 - A wrong belief is **lowered** if, at the end of the last session, it is below its band starting strength and it was **not removed**. **Removed** = set to 0 by R4's reset (independent count reached 2). A removed belief does not return.
-- Each day a lowered Wk rises by **f × drop**, with **f = 0.10** and drop = (starting strength − strength at the end of the last session).
-- **Cap:** the total return over one gap is at most **0.5 × drop** (it never comes back more than halfway), and Wk never exceeds its starting strength.
+- Each day a lowered Wk rises by **f × g^r × drop**, with **f = 0.10**, **g = 0.5**, r = the retrieval count of its paired Ck (6c), and drop = (starting strength − strength at the end of the last session).
+- **Cap:** the total return over one gap is at most **0.5 × g^r × drop** (r = 0: half the drop; r = 1: a quarter; r = 2: an eighth), and Wk never exceeds its starting strength.
 - After a session, a new drop is computed from the new end-of-session strength; returns from earlier gaps are part of that strength.
 - Beliefs at or above their starting strength (never lowered, or raised by R7) do not change.
 
-### 6c. Retrieval attempts slow decay
+### 6c. Retrieval attempts slow decay and limit return
 - A retrieval attempt = a recall item answered from memory in a session (section 5b), for each Ck it tests, right or wrong.
 - **Counting:** at most **1** per Ck per session (spacing; extra attempts in the same session add nothing); **r** = number of sessions so far in which Ck had a retrieval attempt, **capped at 2**.
-- **Multiplier:** each counted retrieval multiplies the decay rate by **m = 0.5**: r = 0 -> 0.15/day, r = 1 -> 0.075/day, r = 2 -> 0.0375/day (the minimum).
-- Session 1 has no earlier session, so its recall items (if any) are not retrieval attempts; in this two-session design r is 0 or 1 at the delayed test. The cap of 2 is fixed for longer designs.
+- **Multipliers:** each counted retrieval multiplies Ck's decay rate by **m = 0.5** (r = 0 -> 0.15/day, 1 -> 0.075, 2 -> 0.0375) and Wk's return rate and cap by **g = 0.5** (r = 0 -> 0.10 × drop/day, cap 0.5 × drop; 1 -> 0.05, cap 0.25; 2 -> 0.025, cap 0.125). g = m: one retrieval halves both forgetting processes; no separate value was chosen.
+- Session 1 has no earlier session, so its recall items (if any) are not retrieval attempts; in this two-session design r is 0 or 1 at the delayed test (so the 2-day gap before session 2 is the same as in v1). The cap of 2 is fixed for longer designs.
 
-### 6d. Worked example
-A1 learner, copula. Starting strengths: W1 3, W2 1, C1 0, C2 0. At the end of session 2: **C1 = s = 2.0**, W1 = 1 (lowered by R1/R2, not removed; drop = 2), C1 independent count 1.
+### 6d. Worked example (v2)
+A1 learner, copula. Starting strengths: W1 3, W2 1, C1 0, C2 0. At the end of session 2: **C1 = 2.0**, W1 = 1 (lowered by R1/R2, not removed; drop = 2), C1 independent count 1.
 
-| Day after session 2 | C1, not retrieved (r = 0, −0.15/day) | C1, retrieved once in session 2 (r = 1, −0.075/day) | W1 (+0.10 × 2 = +0.2/day, cap +1.0) |
-|---|---|---|---|
-| 0 (immediate post-test) | 2.00 | 2.00 | 1.0 |
-| 1 | 1.85 | 1.925 | 1.2 |
-| 3 | 1.55 | 1.775 | 1.6 |
-| 5 | 1.25 | 1.625 | 2.0 (cap reached) |
-| **7 (delayed post-test)** | **0.95** | **1.475** | **2.0** |
+| Day after session 2 | C1, not retrieved (r = 0, −0.15/day) | W1, not retrieved (+0.2/day, cap +1.0) | C1, retrieved once (r = 1, −0.075/day) | W1, retrieved once (+0.1/day, cap +0.5) |
+|---|---|---|---|---|
+| 0 (immediate post-test) | 2.00 | 1.0 | 2.00 | 1.0 |
+| 1 | 1.85 | 1.2 | 1.925 | 1.1 |
+| 3 | 1.55 | 1.6 | 1.775 | 1.3 |
+| 5 | 1.25 | 2.0 (cap) | 1.625 | 1.5 (cap) |
+| **7 (delayed post-test)** | **0.95** | **2.0** | **1.475** | **1.5** |
 
 At day 7, on an open copula gap (tests C1):
-- W1 = 2.0 rounds to 2 -> 0.8 in both columns; W1's error dominates.
-- If instead W1 had been **removed** (R4 reset): W1 = 0 -> 0.05. Then not retrieved: C1 = 0.95 < 1.0 -> W1's error probability rises to 0.4; retrieved: C1 = 1.475 ≥ 1.0 -> stays 0.05.
+- W1 2.0 and 1.5 both round to 2 -> 0.8 (1.5 rounds half up). Had W1 ended session 2 at 0 instead (drop 3), it would return to 1.5 (0.8) without retrieval and 0.75 (0.4) with one.
+- If instead W1 had been **removed** (R4 reset): W1 = 0 -> table 0.05. Graded floor: not retrieved, C1 0.95 -> 0.4 × (1 − 0.475) = **0.21**; retrieved, C1 1.475 -> 0.4 × (1 − 0.7375) = **0.105**.
 
-So in this model retrieval in session 2 protects a removed wrong belief from coming back through a weak rule, and removing a wrong belief (two independent productions) protects it from returning at all.
+<details><summary>v1 (failed validation round 1)</summary>
+
+- 6b v1: each day a lowered Wk rose by 0.10 × drop, cap 0.5 × drop over one gap, independent of retrieval.
+- 6c v1: retrieval multiplied only the decay rate of Ck by 0.5.
+- 2a v1: Ck < 1.0 on an item that tests it -> Wk's error probability at least 0.4; Ck ≥ 1.0 -> table alone.
+- 6d v1 day 7: C1 0.95 (not retrieved) / 1.475 (retrieved), W1 2.0 in both; with W1 removed, error 0.4 (not retrieved) vs 0.05 (retrieved).
+- Failure (validation round 1): counted design 7-day (b) − (a) = 0.000, 0 / 60 learners changed; light design 0.000 with immediate +0.049.
+</details>
 
 ## 7. Sessions and post-tests (new in ESL6)
 - **Session 2 is 2 days after session 1.** F1 runs for 2 days between them (6a, 6b; r from session 1 is 0).
@@ -253,7 +270,8 @@ So in this model retrieval in session 2 protects a removed wrong belief from com
 
 ## 8. What changed vs ESL5
 - Unchanged: sections 1, 2 (table), 3 (R1–R7, limits), 3a, and the 4a–4d and 5a–5b procedures.
-- Added: 1b (33 form outcomes, 3 marked GAP), 2a (non-whole strengths, Ck < 1.0 threshold after F1), 5b retrieval reporting, 6 (F1), 7 (timing).
+- Added: 1b (33 form outcomes, 3 marked GAP), 2a (non-whole strengths, graded Ck floor after F1 — v2), 5b retrieval reporting, 6 (F1 v2), 7 (timing).
+- F1 v2 (after validation round 1): retrieval also limits the return of Wk (g = 0.5 on rate and cap); 2a hard Ck < 1.0 threshold replaced by floor 0.4 × max(0, 1 − Ck/2). v1 text kept in collapsed notes.
 - Changed wording only: 4 scope line, 4a check 1 note for article-the, 4c "at 0" means rounded 0, 4d check 1 for 1b forms. Arm labels removed from examples.
 
-Self-check (forbidden terms searched, case-sensitive whole word unless noted): ENARA, LE, A0, P+, PP, esl5 (lowercase; the study label "ESL5" is required by the task and allowed), levelExplicit, assess (any case, substring), selfCheck, graderV2, ENGINE_V2, wrongAnswer, strandLog, liveError, releaseAfterTwo, reviewOpen, fadeKnown, ownSentence, shortRecap, clarity, closing, engineV2 — **0 hits** (excluding this line). ("Hints" appears once inside the copied R1–R7 limits sentence as plain English, not as a switch name.)
+Self-check (forbidden terms searched, case-sensitive whole word unless noted): ENARA, LE, A0, P+, PP, esl5 (lowercase; the study label "ESL5" is required by the task and allowed), levelExplicit, assess (any case, substring), selfCheck, graderV2, ENGINE_V2, wrongAnswer, strandLog, liveError, releaseAfterTwo, reviewOpen, fadeKnown, ownSentence, shortRecap, clarity, closing, engineV2 — **0 hits** (excluding this line; re-run after F1 v2: 0 hits). ("Hints" appears once inside the copied R1–R7 limits sentence as plain English, not as a switch name.)
