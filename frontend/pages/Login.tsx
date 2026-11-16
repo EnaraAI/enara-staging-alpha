@@ -35,6 +35,7 @@ const TEXT = {
     parentSub: 'See how your child is practising, improving and staying safe.',
     parentSignupSub: 'Create your parent account. You will link your child with the code from their school.',
     parentLinkSub: 'Sign in or create a parent account, then enter the code from the school.',
+    parentSignupTitle: 'Create a parent account',
     parentCreate: 'Create a parent account', parentHaveAccount: 'Already have an account? Sign in',
     parentLink: 'Have an invite code? Link your child',
     name: 'Your name', namePh: 'e.g. Mona Hassan', noName: 'Enter your name.',
@@ -74,6 +75,7 @@ const TEXT = {
     parentSub: 'شوف ابنك بيتدرّب إزاي، وبيتحسّن قد إيه، وإنه في أمان.',
     parentSignupSub: 'اعمل حساب وليّ أمر. هتربط ابنك بالكود اللي من المدرسة.',
     parentLinkSub: 'سجّل دخولك أو اعمل حساب وليّ أمر، وبعدين اكتب الكود اللي من المدرسة.',
+    parentSignupTitle: 'اعمل حساب وليّ أمر',
     parentCreate: 'اعمل حساب وليّ أمر', parentHaveAccount: 'عندك حساب؟ سجّل دخولك',
     parentLink: 'معاك كود دعوة؟ اربط ابنك',
     name: 'اسمك', namePh: 'مثلاً: منى حسن', noName: 'اكتب اسمك.',
@@ -301,7 +303,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
         </div>
 
         <div className="si-head">
-          <h2>{t.welcome}</h2>
+          <h2>{signingUp ? t.parentSignupTitle : t.welcome}</h2>
           <p>{isSharedCourse || isSharedAssessment ? t.shared : isParent ? (linkIntent ? t.parentLinkSub : signingUp ? t.parentSignupSub : t.parentSub) : t.sub}</p>
         </div>
 
