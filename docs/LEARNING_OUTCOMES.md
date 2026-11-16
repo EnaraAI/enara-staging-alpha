@@ -222,3 +222,12 @@ Note: the research "listening" lessons (`RS-*-LS-*` below) are text-based stand-
 | `ESL1-thirdS` | none (A1–A2 form) | Present simple: he, she and it | Use the present simple with he, she and it for habits and routines | Adds -s or -es to the verb after he, she and it in the present simple; Uses -es after verbs ending in -sh, -ch, -s, -x or -o, and -ies after a consonant and y |
 
 **Gaps seen in the inventory.** No C1 lessons. No lesson ids or CEFR/skill tags on lessons. Several objectives use "Say…/Talk about…" (speaking) in a text-only tutor. Objectives are not yet written with a condition and criterion.
+
+## PART 9. Data separation
+
+Assessment content and results are kept apart from teaching. Checked by `backend/test/assessmentSeparation.test.ts`.
+
+- **Items stay out of teaching.** Item prompts and answers (`data/assessments/`) must not appear in engine code, tutor prompt builders or lesson data, and no `backend/src` file may import from `data/assessments`.
+- **Learner record stores scores only:** per outcome and form, the score, the max score, the form id (A/B/C), the test point (pre / post / delayed) and the date. No item text and no learner answers.
+- **Raw answers go to a separate research store, with consent only.** The learner's typed answers are written to a separate research store, not the learner record, and only when the learner (or guardian) has given research consent. Without consent, raw answers are scored and then discarded.
+- The research store is keyed by a research id, not the learner id; the link table stays with the product database.
