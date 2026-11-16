@@ -17,5 +17,5 @@ Every departure from `PROTOCOL.md` after the first tutor reply is applied is lis
 9. **Answer-release counting bug and leak recount (2026-11-16).** Guard 2 exempted all 263 LE `answerReleased` turns as "after 2 genuine attempts". The engine's `releaseAfterTwo` counter counted stale items, own-sentence answers and correct answers (`docs/ESL5_INSTRUCTION_FIXES.md`), so that condition was never checked.
    - **Recount:** `src/offline/esl5_leak_recount.py` reconstructed the attempts from the transcripts. Result: 40 genuine, 23 premature, 132 already solved, 68 not lesson items.
    - **LE early leaks:** strict 163, substantive 31, original 14, against PP 68.
-   - **Guard 2:** fails under the strict count and passes under the substantive count.
+   - **Guard 2:** passes under the pre-registered definition (only unsolved items count, so 31 ≤ 68); the strict count (163) is a sensitivity check only. Decision: CONFIRMED stands; the reported 263 releases figure is wrong (40 genuine).
    - **Records:** see `reports/exp4/ESL5_LEAK_RECOUNT.md`. Frozen study files are unchanged.
