@@ -1,0 +1,1008 @@
+{
+ "source": [
+  "final_R1.json",
+  "final_R2.json",
+  "final_R3.json"
+ ],
+ "rule": "final round: fix only key_error / missing_answer; all other groups recorded as known issues",
+ "totals": {
+  "flagsPerReviewer": {
+   "R1": 20,
+   "R2": 37,
+   "R3": 16
+  },
+  "flags": 73,
+  "groups": 22,
+  "flaggedBy2plus": 16,
+  "fixed": 2,
+  "knownIssues": 20,
+  "knownIssues2plus": 15
+ },
+ "groups": [
+  {
+   "group": "F01",
+   "category": "key_error",
+   "outcomes": [
+    "EN-F-A1-VO-family"
+   ],
+   "items": "C-4",
+   "issue": "targetForm 'niece' but key/acceptedAnswers 'aunt'",
+   "reviewers": [
+    "R1",
+    "R3"
+   ],
+   "count": 2,
+   "severity": "high",
+   "status": "fixed",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 0,
+     "target": "EN-F-A1-VO-family-C-4",
+     "check": "C3",
+     "problem": "targetForm is 'niece' but answerKey/acceptedAnswers are 'aunt'.",
+     "fix": "Set targetForm to 'aunt'."
+    },
+    {
+     "reviewer": "R3",
+     "index": 0,
+     "target": "EN-F-A1-VO-family-C-4",
+     "check": "C3",
+     "problem": "targetForm is 'niece' but answerKey/acceptedAnswers are 'aunt' (stale from removed niece distractor).",
+     "fix": "Set targetForm to 'aunt'."
+    }
+   ]
+  },
+  {
+   "group": "F02",
+   "category": "missing_answer",
+   "outcomes": [
+    "EN-F-A1-GR-prepositions-time"
+   ],
+   "items": "A-6, B-6, C-6",
+   "issue": "'at 6 o'clock' (digit + o'clock) and parallel variants not accepted",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "severity": "high",
+   "status": "fixed",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 10,
+     "target": "EN-F-A1-GR-prepositions-time-A-6",
+     "check": "C3",
+     "problem": "acceptedAnswers include 'at 6' but not 'at 6 o'clock' (digits + o'clock), a correct learner answer. Same for B-6 ('at 8 o'clock') and C-6 ('at 9 o'clock').",
+     "fix": "Add the digit + o'clock variants to A-6, B-6, C-6."
+    }
+   ]
+  },
+  {
+   "group": "K01",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A1-VO-family",
+    "EN-F-A1-VO-classroom-objects",
+    "EN-F-A1-VO-days-months",
+    "EN-F-A1-VO-numbers-time",
+    "EN-F-A1-VO-home-rooms"
+   ],
+   "items": "slot 6 all forms; home-rooms A-5/A-6/B-5/C-6",
+   "issue": "slot-6 tags lexical_l1_polysemy / lexical_l1_calque / lexical_room_label not in PART 2 enum nor outcome l1ErrorTypes",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 3,
+     "target": "EN-F-A1-VO-family",
+     "check": "C5",
+     "problem": "Slot-6 items carry l1ErrorType 'lexical_l1_polysemy'/'lexical_l1_calque', which is not a value in the docs/LEARNING_OUTCOMES.md PART 2 enum; outcome l1ErrorTypes lists only spelling_vowel, so slot 6 is untracked. Same issue in classroom-objects (A-6/B-6/C-6), days-months (A-6/B-6/C-6) and numbers-time (A-6/B-6/C-6).",
+     "fix": "Add a typed enum value (e.g. lexical_l1_polysemy, with definition) to PART 2 and to each outcome's l1ErrorTypes, or retag to an existing value."
+    },
+    {
+     "reviewer": "R1",
+     "index": 7,
+     "target": "EN-F-A1-VO-home-rooms-B-5",
+     "check": "C5",
+     "problem": "l1ErrorType 'lexical_room_label' is not an enum value and outcome l1ErrorTypes ([spelling_consonant]) does not cover the room-label calques in A-5/A-6/B-5/C-6.",
+     "fix": "Add a calque enum value (see family flag) and list it on the outcome."
+    },
+    {
+     "reviewer": "R2",
+     "index": 33,
+     "target": "EN-F-A1-VO-family",
+     "check": "C5",
+     "problem": "Outcome l1ErrorTypes is ['spelling_vowel'] but item 6 in each form uses 'lexical_l1_polysemy', which is not in the PART 2 enum. The same applies to classroom-objects and numbers-time (polysemy), days-months ('lexical_l1_calque') and home-rooms B-5 ('lexical_room_label').",
+     "fix": "Add lexical_l1_polysemy / lexical_l1_calque (and lexical_room_label or merge it into calque) to PART 2 with definitions and to each outcome's l1ErrorTypes."
+    },
+    {
+     "reviewer": "R3",
+     "index": 5,
+     "target": "EN-F-A1-VO-family",
+     "check": "l1ErrorTypes",
+     "problem": "Slot-6 items (A-6, B-6, C-6) are tagged 'lexical_l1_polysemy', which is not a PART 2 value and is not in the outcome's l1ErrorTypes ([spelling_vowel]). Same issue in classroom-objects (A-6, B-6, C-6), numbers-time (A-6, B-6, C-6) and days-months (lexical_l1_calque).",
+     "fix": "Add lexical_l1_polysemy / lexical_l1_calque (with definitions) to docs/LEARNING_OUTCOMES.md PART 2 and to each outcome's l1ErrorTypes, or tag with an existing value."
+    }
+   ]
+  },
+  {
+   "group": "K02",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A1-VO-family"
+   ],
+   "items": "A-4/A-6, C-1/C-5, C-4/C-6",
+   "issue": "in-form cueing and repeated keys within forms A and C",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 1,
+     "target": "EN-F-A1-VO-family-C-6",
+     "check": "C3",
+     "problem": "Prompt shows 'aunt', the C-4 answer word, so C-4 is cued within form C (violates the no-answer-shown rule). Also C-1 key 'grandmother' is the C-5 correction, so form C keys the same word twice.",
+     "fix": "Use another possessor in C-6 (e.g. 'My sister's man is a doctor' -> husband), and change the C-5 slip word to a kin word not keyed in form C (e.g. 'My dawghter...' style vowel slip on daughter)."
+    },
+    {
+     "reviewer": "R1",
+     "index": 2,
+     "target": "EN-F-A1-VO-family-A-6",
+     "check": "C3",
+     "problem": "A-6 answer 'wife' is shown in the A-4 prompt ('My uncle's wife'), and the A-6 prompt shows 'brother', the A-3 key.",
+     "fix": "Rephrase A-4 clue (e.g. 'My father's sister is my ____') and change A-6 subject (e.g. 'My cousin is married. His woman is a teacher.')."
+    }
+   ]
+  },
+  {
+   "group": "K03",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A1-VO-family"
+   ],
+   "items": "C-1 = A-1",
+   "issue": "C-1 verbatim copy of A-1 (not parallel)",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 34,
+     "target": "EN-F-A1-VO-family-C-1",
+     "check": "C4",
+     "problem": "Identical to A-1 ('My mother's mother is my ____', key grandmother). The item is reused rather than parallel.",
+     "fix": "Use 'My mother's father is my ____' (key grandfather), or another relation."
+    },
+    {
+     "reviewer": "R3",
+     "index": 1,
+     "target": "EN-F-A1-VO-family-C-1",
+     "check": "C4",
+     "problem": "C-1 prompt is identical to A-1 ('My mother's mother is my ____', key grandmother); parallel forms share a verbatim item, so a learner who saw form A has seen C-1.",
+     "fix": "Rewrite C-1 with another A1 kin relation not keyed elsewhere in form C (e.g. 'My father's mother is my ____' -> grandmother)."
+    }
+   ]
+  },
+  {
+   "group": "K04",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A1-VO-home-rooms"
+   ],
+   "items": "A-1/A-9, A-2/A-5, B-2/B-6/B-9, C-1/C-5, C-2/C-6, B-3~A-4, B-7=A-7, C-7=B-8",
+   "issue": "repeated keys within forms and repeated/identical stems across forms",
+   "reviewers": [
+    "R1",
+    "R2"
+   ],
+   "count": 2,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 4,
+     "target": "EN-F-A1-VO-home-rooms",
+     "check": "C3",
+     "problem": "Answer words repeat within forms despite the round-5 note: A-1 and A-9 both key 'kitchen', A-2 key 'bedroom' = A-5 correction; B-2, B-6 and B-9 all key 'bathroom'; C-1 key 'bathroom' = C-5 correction, C-2 key 'bedroom' = C-6 correction.",
+     "fix": "Re-key so each room is answered once per form (e.g. A-9 -> dining room advert and A-6 calque on another room; B-9 -> kitchen with B-8 naming another room; C-1 -> kitchen with C-7 naming another room) and re-check options and named words."
+    },
+    {
+     "reviewer": "R2",
+     "index": 35,
+     "target": "EN-F-A1-VO-home-rooms-B-3",
+     "check": "C4",
+     "problem": "Same stem as A-4 ('We watch TV on the sofa in the ____', key living room).",
+     "fix": "Use a different living-room activity, e.g. 'We sit and talk with guests in the ____.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 36,
+     "target": "EN-F-A1-VO-home-rooms-B-7",
+     "check": "C4",
+     "problem": "Identical to A-7 (garden). C-7 is likewise identical to B-8 (kitchen).",
+     "fix": "Give each form a different room word for items 7-8 (e.g. B-7 bedroom, C-7 living room)."
+    }
+   ]
+  },
+  {
+   "group": "K05",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A1-VO-home-rooms"
+   ],
+   "items": "B-6, C-5",
+   "issue": "'path room' (b->p) implausible Arabic-L1 slip, real word 'path', reused in two forms",
+   "reviewers": [
+    "R1",
+    "R3"
+   ],
+   "count": 2,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 5,
+     "target": "EN-F-A1-VO-home-rooms-B-6",
+     "check": "C7",
+     "problem": "'path room' for bathroom is b->p, the reverse of the typical Arabic-L1 p->b merge (bencil); it is a rare hypercorrection and also forms a real word 'path'. Same in C-5.",
+     "fix": "Replace with a plausible typed slip on a room word not keyed elsewhere in form B, e.g. a vowel slip ('kitchin', 'bedrum') tagged spelling_vowel, or a p->b slip on a home word."
+    },
+    {
+     "reviewer": "R1",
+     "index": 6,
+     "target": "EN-F-A1-VO-home-rooms-C-5",
+     "check": "C7",
+     "problem": "Same implausible b->p 'path room' slip as B-6; also its answer 'bathroom' duplicates the C-1 key.",
+     "fix": "Replace with a plausible slip on a room word not keyed elsewhere in form C."
+    },
+    {
+     "reviewer": "R3",
+     "index": 3,
+     "target": "EN-F-A1-VO-home-rooms-B-6",
+     "check": "C7",
+     "problem": "'path room' for bathroom is p written for b, the hypercorrection direction; Arabic-L1 learners mainly write b for p (bencil). It also forms a real English word ('path'). Plausible but weak; same item reused in C-5.",
+     "fix": "Prefer a b-for-p slip on an A1 home word (e.g. not available in room names -> use a vowel slip such as 'kitchin'/'bedrom' under spelling_vowel), or keep one 'path room' item only."
+    }
+   ]
+  },
+  {
+   "group": "K06",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A1-VO-home-rooms"
+   ],
+   "items": "slots 5-6 all forms",
+   "issue": "slot 5-6 error types not parallel across forms; form A has no spelling_consonant item",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "severity": "medium",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 2,
+     "target": "EN-F-A1-VO-home-rooms",
+     "check": "C4",
+     "problem": "Slot 5-6 error types are not parallel: A-5/A-6 both lexical_room_label (sleeping room, eating room), B-5 lexical + B-6 spelling, C-5 spelling + C-6 lexical. Form A has no spelling_consonant item although outcome l1ErrorTypes = [spelling_consonant]; B-6 and C-5 repeat the same 'path room' slip.",
+     "fix": "Fix one pattern for all forms (e.g. slot 5 = spelling_consonant slip, slot 6 = room-label calque), give form A a consonant slip, use different words for B and C, and add the room-label calque type to l1ErrorTypes or the enum."
+    }
+   ]
+  },
+  {
+   "group": "K07",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A1-VO-days-months"
+   ],
+   "items": "A-6, B-6, C-6",
+   "issue": "slot 6 tests time-expression meaning, not spelling of days/months; stray matchingNote on B-6/C-6",
+   "reviewers": [
+    "R1",
+    "R3"
+   ],
+   "count": 2,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 8,
+     "target": "EN-F-A1-VO-days-months-A-6",
+     "check": "C2",
+     "problem": "Outcome is 'Can spell days of the week and months'; the slot-6 meaning errors (history->date, this night->tonight, yesterday night->last night in A-6/B-6/C-6) do not test spelling of a day or month. B-6/C-6 also carry a matchingNote about a day/month capital that has no day/month word.",
+     "fix": "Either widen the outcome statement to time words, or make slot 6 a day/month item; drop the irrelevant matchingNote on B-6/C-6."
+    },
+    {
+     "reviewer": "R3",
+     "index": 4,
+     "target": "EN-F-A1-VO-days-months",
+     "check": "C2",
+     "problem": "Outcome is 'Can spell days of the week and months', but slot-6 items (A-6 history/date, B-6 this night/tonight, C-6 yesterday night/last night) test time-expression meaning, not spelling of days/months.",
+     "fix": "Either widen the outcome statement to time words, or keep slot 6 as a day/month spelling item."
+    }
+   ]
+  },
+  {
+   "group": "K08",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A1-VO-classroom-objects"
+   ],
+   "items": "B-6",
+   "issue": "watch/clock is not a classroom object; 'on my arm' unnatural; not parallel to A-6/C-6",
+   "reviewers": [
+    "R1",
+    "R3"
+   ],
+   "count": 2,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 9,
+     "target": "EN-F-A1-VO-classroom-objects-B-6",
+     "check": "C2",
+     "problem": "'watch' (clock->watch) is not a classroom object, unlike A-6 page and C-6 library, so form B slot 6 does not measure the outcome and is not parallel.",
+     "fix": "Use a classroom-object polysemy/calque parallel to A-6 and C-6 (e.g. an Arabic-L1 confusion between two classroom nouns, with one correct fix not shown elsewhere in form B)."
+    },
+    {
+     "reviewer": "R3",
+     "index": 6,
+     "target": "EN-F-A1-VO-classroom-objects-B-6",
+     "check": "C2",
+     "problem": "Watch/clock is not a classroom object; the item does not measure 'name classroom objects such as pen, desk and board'. 'on my arm' is also unnatural (wrist).",
+     "fix": "Use a classroom-object polysemy/calque (e.g. a board/blackboard or desk/table confusion) or accept 'on my wrist' wording; keep answer word unseen in form B."
+    }
+   ]
+  },
+  {
+   "group": "K09",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-FN-polite-requests"
+   ],
+   "items": "all 27 items (A-5, B-5, B-3, C-3, C-4, B-9, C-7, C-8, B-8, A-9, B-1)",
+   "issue": "outcome now A1 but vocabLevel A2 and above-A1 words (receipt, kiosk, plasters, charger, milkshake, ...)",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 11,
+     "target": "EN-F-A2-FN-polite-requests",
+     "check": "C1",
+     "problem": "Outcome now cefr A1 but every item in forms A-C has vocabLevel 'A2', and wording includes above-A1 words: remote control, receipt, plasters, rolls, kiosk, cough medicine, extra towel, charger, phone case, milkshake, grilled fish, bank card, pharmacy, bakery.",
+     "fix": "Replace with A1 nouns (tea, water, bread, ticket, map, pen, bag, key, menu, apple) and set vocabLevel A1 on every item."
+    },
+    {
+     "reviewer": "R2",
+     "index": 0,
+     "target": "EN-F-A2-FN-polite-requests",
+     "check": "C1",
+     "problem": "Outcome is now cefr A1 but all 27 items still carry vocabLevel 'A2'.",
+     "fix": "Re-check wording against A1 lists and set vocabLevel 'A1' item by item; replace any word that is not A1 (see item flags)."
+    },
+    {
+     "reviewer": "R2",
+     "index": 1,
+     "target": "EN-F-A2-FN-polite-requests-B-5",
+     "check": "C1",
+     "problem": "'receipt' is above A1.",
+     "fix": "Use an A1 noun, e.g. 'Give me the bag.' / 'Give me the menu.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 2,
+     "target": "EN-F-A2-FN-polite-requests-A-5",
+     "check": "C1",
+     "problem": "'remote control' is above A1.",
+     "fix": "Use 'Give me the pen.' or 'Give me the book.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 3,
+     "target": "EN-F-A2-FN-polite-requests-C-3",
+     "check": "C1",
+     "problem": "'pharmacy' and 'plasters' are above A1.",
+     "fix": "Use an A1 setting and noun, e.g. 'At a café. ... Can I have some water, please?'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 4,
+     "target": "EN-F-A2-FN-polite-requests-C-4",
+     "check": "C1",
+     "problem": "'bakery' and 'rolls' are above A1.",
+     "fix": "Use 'At a shop ... six eggs / six apples'."
+    },
+    {
+     "reviewer": "R2",
+     "index": 5,
+     "target": "EN-F-A2-FN-polite-requests-B-3",
+     "check": "C1",
+     "problem": "'kiosk' is above A1.",
+     "fix": "Use 'At a shop' or 'At a hotel'."
+    },
+    {
+     "reviewer": "R2",
+     "index": 6,
+     "target": "EN-F-A2-FN-polite-requests-B-9",
+     "check": "C1",
+     "problem": "'pharmacy' and 'cough medicine' are above A1.",
+     "fix": "Use, e.g., 'Write one line to a café: you need a bottle of water.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 7,
+     "target": "EN-F-A2-FN-polite-requests-C-7",
+     "check": "C1",
+     "problem": "'phone shop', 'charger' and 'phone case' in the prompt and key are above A1.",
+     "fix": "Use 'You are in a bookshop/clothes shop'; the key should be 'Can I have a pen, please?'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 8,
+     "target": "EN-F-A2-FN-polite-requests-C-8",
+     "check": "C1",
+     "problem": "'juice bar' and 'banana milkshake' are above A1.",
+     "fix": "Use 'You are in a café'; the key should be 'I would like an orange juice, please.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 9,
+     "target": "EN-F-A2-FN-polite-requests-B-8",
+     "check": "C1",
+     "problem": "'grilled fish' in the key is above A1.",
+     "fix": "Key: 'I would like fish and rice, please.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 10,
+     "target": "EN-F-A2-FN-polite-requests-A-9",
+     "check": "C1",
+     "problem": "'extra towel' / 'hotel' line: 'extra' is above A1.",
+     "fix": "'Write one line to a hotel: you need a towel.'"
+    },
+    {
+     "reviewer": "R3",
+     "index": 7,
+     "target": "EN-F-A2-FN-polite-requests",
+     "check": "C1",
+     "problem": "Outcome is now cefr A1, but every item still has vocabLevel 'A2' and the matching note says 'A2 shop and café nouns'. Words above A1 include remote control (A-5), receipt (B-5), kiosk (B-3), plasters (C-3), rolls/bakery (C-4), cough medicine/pharmacy (B-9), charger/phone case (C-7), milkshake (C-8), grilled (B-8), extra towel (A-9), slice (B-1).",
+     "fix": "Replace with A1 nouns (water, tea, coffee, bread, apple, pen, bag, ticket, sandwich, menu) and set vocabLevel A1 on all 27 items; update matching note."
+    }
+   ]
+  },
+  {
+   "group": "K10",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-FN-polite-requests"
+   ],
+   "items": "A-4, B-4, C-4",
+   "issue": "'Two tickets give.'-type OV distractors are not Arabic-L1 plausible",
+   "reviewers": [
+    "R1",
+    "R3"
+   ],
+   "count": 2,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 12,
+     "target": "EN-F-A2-FN-polite-requests-A-4",
+     "check": "C7",
+     "problem": "Distractor 'Two tickets give.' (also B-4 'One ticket give.', C-4 'Six rolls give.') is object-verb order, not an Arabic-L1 pattern (Arabic is verb-first: 'Give me two tickets').",
+     "fix": "Replace with an Arabic-L1 plausible distractor such as 'Give me two tickets.' or 'I want two ticket.'"
+    },
+    {
+     "reviewer": "R3",
+     "index": 8,
+     "target": "EN-F-A2-FN-polite-requests-A-4",
+     "check": "C7",
+     "problem": "Distractor 'Two tickets give.' (also B-4 'One ticket give.', C-4 'Six rolls give.') is object-verb order, which an Arabic-L1 learner (SVO/VSO) would not produce; implausible distractor.",
+     "fix": "Replace with a plausible Arabic-L1 form, e.g. 'Give me two tickets.' or 'I want two ticket.'"
+    }
+   ]
+  },
+  {
+   "group": "K11",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-FN-polite-requests"
+   ],
+   "items": "slots 5-6",
+   "issue": "tags direct_imperative / want_for_request not in enum; outcome l1ErrorTypes []",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 13,
+     "target": "EN-F-A2-FN-polite-requests",
+     "check": "C5",
+     "problem": "Outcome l1ErrorTypes is [] while items carry 'direct_imperative' and 'want_for_request', which are not PART 2 enum values.",
+     "fix": "Add enum values (with definitions) for these request errors and list them on the outcome, or mark the tags as untracked."
+    },
+    {
+     "reviewer": "R2",
+     "index": 11,
+     "target": "EN-F-A2-FN-polite-requests",
+     "check": "C5",
+     "problem": "Outcome l1ErrorTypes is [] but items 5-6 plant 'direct_imperative' and 'want_for_request', which are not in the LEARNING_OUTCOMES PART 2 enum.",
+     "fix": "Add the two values to the PART 2 enum with definitions and to the outcome's l1ErrorTypes, or mark the items as having no L1 tag."
+    },
+    {
+     "reviewer": "R3",
+     "index": 9,
+     "target": "EN-F-A2-FN-polite-requests",
+     "check": "l1ErrorTypes",
+     "problem": "Outcome l1ErrorTypes is [] while items 5-6 are tagged 'direct_imperative' and 'want_for_request', which are not PART 2 values.",
+     "fix": "Add these as defined pragmatic transfer types in PART 2 and list them in the outcome, or mark the items as untagged."
+    }
+   ]
+  },
+  {
+   "group": "K12",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-GR-present-continuous"
+   ],
+   "items": "all 27 items (B-1, C-1, A-4, C-4, B-3, C-6, C-8, C-9)",
+   "issue": "outcome now A1 but vocabLevel A1-A2 and above-A1 words (knock, bridge, workers, climb, sales report, probably)",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 14,
+     "target": "EN-F-A2-GR-present-continuous",
+     "check": "C1",
+     "problem": "Outcome now cefr A1 but every item has vocabLevel 'A1-A2', and wording includes above-A1 words: knock, bridge, workers, paint, climb, rest, bark, pray, match, report/sales report, 'working on'.",
+     "fix": "Use A1 verbs/nouns (play, cook, sleep, read, eat, watch TV, write, walk) and set vocabLevel A1 on all items; e.g. C-9 'What are you doing today?'."
+    },
+    {
+     "reviewer": "R2",
+     "index": 12,
+     "target": "EN-F-A2-GR-present-continuous",
+     "check": "C1",
+     "problem": "Outcome is now cefr A1 but all 27 items still carry vocabLevel 'A1-A2'.",
+     "fix": "Set vocabLevel 'A1' after replacing the words above A1 (see item flags)."
+    },
+    {
+     "reviewer": "R2",
+     "index": 13,
+     "target": "EN-F-A2-GR-present-continuous-C-9",
+     "check": "C1",
+     "problem": "'working on', 'report' and the key 'sales report' are above A1 (workplace, A2+).",
+     "fix": "'Your friend sends a text: What are you doing now?'; key: 'I am reading a book.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 14,
+     "target": "EN-F-A2-GR-present-continuous-C-8",
+     "check": "C1",
+     "problem": "The model answer uses 'probably', which is above A1.",
+     "fix": "Key: 'Sara is studying.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 15,
+     "target": "EN-F-A2-GR-present-continuous-B-1",
+     "check": "C1",
+     "problem": "'workers', 'paint' and 'bridge' are above A1.",
+     "fix": "'Look! The girls ___ (play) in the garden.' Choose a different A1 verb from A-1 if needed, e.g. 'run'."
+    },
+    {
+     "reviewer": "R2",
+     "index": 16,
+     "target": "EN-F-A2-GR-present-continuous-C-1",
+     "check": "C1",
+     "problem": "'climb the wall' is above A1.",
+     "fix": "'Look! The boys ___ (run) in the park.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 17,
+     "target": "EN-F-A2-GR-present-continuous-A-4",
+     "check": "C1",
+     "problem": "'knock' is above A1.",
+     "fix": "'Listen! The baby (cries / is crying).'"
+    },
+    {
+     "reviewer": "R3",
+     "index": 10,
+     "target": "EN-F-A2-GR-present-continuous",
+     "check": "C1",
+     "problem": "Outcome is now cefr A1, but all 27 items have vocabLevel 'A1-A2'. Above-A1 wording: knock (A-4), bark (C-4), climb (C-1), bridge/workers/paint (B-1), rest (B-3), pray (C-6), 'What are you working on today?' / 'sales report' (C-9, workplace register, B1).",
+     "fix": "Swap to A1 verbs/nouns (open the door, ring, run, play, the car, eat), rewrite C-9 as 'Your friend asks: What are you doing now?', set vocabLevel A1."
+    }
+   ]
+  },
+  {
+   "group": "K13",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-GR-present-continuous"
+   ],
+   "items": "slots 5-6",
+   "issue": "tags be_omission_progressive / simple_for_progressive not in enum (outcome lists copula_omission, tense_aspect)",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 15,
+     "target": "EN-F-A2-GR-present-continuous",
+     "check": "C5",
+     "problem": "Item tags 'be_omission_progressive' (slot 5) and 'simple_for_progressive' (slot 6) are not enum values; the outcome lists copula_omission and tense_aspect, which are the matching enum values.",
+     "fix": "Retag slot 5 copula_omission and slot 6 tense_aspect in all forms."
+    },
+    {
+     "reviewer": "R2",
+     "index": 21,
+     "target": "EN-F-A2-GR-present-continuous",
+     "check": "C5",
+     "problem": "The items use 'be_omission_progressive' and 'simple_for_progressive', which are not in the PART 2 enum. The outcome lists copula_omission and tense_aspect.",
+     "fix": "Tag the items copula_omission and tense_aspect, or add and define the new values in PART 2."
+    },
+    {
+     "reviewer": "R3",
+     "index": 11,
+     "target": "EN-F-A2-GR-present-continuous",
+     "check": "l1ErrorTypes",
+     "problem": "Items 5 are tagged 'be_omission_progressive' and items 6 'simple_for_progressive', not PART 2 values; outcome lists copula_omission and tense_aspect.",
+     "fix": "Tag slot 5 as copula_omission and slot 6 as tense_aspect."
+    }
+   ]
+  },
+  {
+   "group": "K14",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-GR-present-continuous"
+   ],
+   "items": "A-8, A-9, B-9, C-9",
+   "issue": "rubric criterion differs across parallel items (am/is/are vs am)",
+   "reviewers": [
+    "R1"
+   ],
+   "count": 1,
+   "severity": "medium",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 16,
+     "target": "EN-F-A2-GR-present-continuous-B-9",
+     "check": "C4",
+     "problem": "Rubric criteria differ across parallel items: A-9 'am/is/are + -ing' but B-9 and C-9 'am + -ing' (also A-8 'am'), so the same reply can score differently by form.",
+     "fix": "Use one criterion ('correct am/is/are + -ing') on all slot 7-9 items."
+    }
+   ]
+  },
+  {
+   "group": "K15",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-GR-present-continuous"
+   ],
+   "items": "A-6, B-6, C-6",
+   "issue": "planted sentence has two errors (no be+-ing and no 3rd-person -s)",
+   "reviewers": [
+    "R2"
+   ],
+   "count": 1,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 18,
+     "target": "EN-F-A2-GR-present-continuous-C-6",
+     "check": "C5",
+     "problem": "The planted 'my old grandmother pray' has two errors (no be + -ing, and no 3rd-person -s). The typical Arabic-L1 simple-for-progressive error is 'my grandmother prays now'. 'old' is also unnatural.",
+     "fix": "'Shh, my grandmother prays at the moment.' -> 'is praying'."
+    },
+    {
+     "reviewer": "R2",
+     "index": 19,
+     "target": "EN-F-A2-GR-present-continuous-A-6",
+     "check": "C5",
+     "problem": "'my father watch' has the same two-error problem: the -s omission is mixed with simple-for-progressive.",
+     "fix": "'Shh, my father watches the match at the moment.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 20,
+     "target": "EN-F-A2-GR-present-continuous-B-6",
+     "check": "C5",
+     "problem": "'my mother speak' has the same two-error problem.",
+     "fix": "'Shh, my mother speaks to the doctor at the moment.'"
+    }
+   ]
+  },
+  {
+   "group": "K16",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-GR-third-person-s"
+   ],
+   "items": "all 27 items (B-4, B-6, A-6, C-6, B-2, C-9, C-1, C-2)",
+   "issue": "outcome now A1 but vocabLevel A1-A2 and above-A1 words (strangers, mix, paint, fix, bake, weather report)",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 17,
+     "target": "EN-F-A2-GR-third-person-s",
+     "check": "C1",
+     "problem": "Outcome now cefr A1 but every item has vocabLevel 'A1-A2', and wording includes above-A1 words: strangers, bark, mix, paint, fix, touch, weather report, garage, bake, brush, flat.",
+     "fix": "Use A1 verbs/nouns (goes, plays, watches, washes, likes, cries, studies) and set vocabLevel A1 on all items; e.g. B-4 'Our dog (sleep / sleeps) in the garden'."
+    },
+    {
+     "reviewer": "R2",
+     "index": 22,
+     "target": "EN-F-A2-GR-third-person-s",
+     "check": "C1",
+     "problem": "Outcome is now cefr A1 but all 27 items still carry vocabLevel 'A1-A2'.",
+     "fix": "Set vocabLevel 'A1' after replacing the words above A1 (see item flags)."
+    },
+    {
+     "reviewer": "R2",
+     "index": 23,
+     "target": "EN-F-A2-GR-third-person-s-B-4",
+     "check": "C1",
+     "problem": "'strangers' is B1.",
+     "fix": "'Our dog (bark / barks) at night.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 24,
+     "target": "EN-F-A2-GR-third-person-s-B-6",
+     "check": "C1",
+     "problem": "'mix the paint' is above A1.",
+     "fix": "Use an A1 -x/-sh/-ch verb, e.g. 'He watchs TV after dinner.' (keep the -es spelling error)."
+    },
+    {
+     "reviewer": "R2",
+     "index": 25,
+     "target": "EN-F-A2-GR-third-person-s-A-6",
+     "check": "C1",
+     "problem": "'weather report' is above A1.",
+     "fix": "'She watchs TV every evening.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 26,
+     "target": "EN-F-A2-GR-third-person-s-C-6",
+     "check": "C1",
+     "problem": "'touch' is above A1.",
+     "fix": "'The boy catchs the ball.' or 'She brushs her teeth.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 27,
+     "target": "EN-F-A2-GR-third-person-s-B-2",
+     "check": "C1",
+     "problem": "'fix the cars in his garage' is above A1 (fix A2).",
+     "fix": "'He ___ (wash) the car every Friday.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 28,
+     "target": "EN-F-A2-GR-third-person-s-C-9",
+     "check": "C1",
+     "problem": "'fix computers' is above A1.",
+     "fix": "'I watch TV at home.' -> 'Karim watches TV at home.'"
+    },
+    {
+     "reviewer": "R2",
+     "index": 29,
+     "target": "EN-F-A2-GR-third-person-s-C-1",
+     "check": "C1",
+     "problem": "'bake' is above A1.",
+     "fix": "'My mother ___ (make) bread every Friday.'"
+    },
+    {
+     "reviewer": "R3",
+     "index": 12,
+     "target": "EN-F-A2-GR-third-person-s",
+     "check": "C1",
+     "problem": "Outcome is now cefr A1, but all 27 items have vocabLevel 'A1-A2'. Above-A1 wording: strangers (B-4, B1), bark (B-4), mix/paint (B-6), touch (C-6), bake (C-1), fix (B-2, C-9), weather report (A-6), brush (C-2).",
+     "fix": "Replace with A1 words (B-4 'Our dog (like/likes) the park', B-6 'He watchs TV'-type with go/do/watch, C-1 make/cook), set vocabLevel A1."
+    }
+   ]
+  },
+  {
+   "group": "K17",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-GR-third-person-s"
+   ],
+   "items": "slots 5-6",
+   "issue": "tags third_person_s_omission / es_spelling not in enum (outcome lists agreement_3s)",
+   "reviewers": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "count": 3,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 18,
+     "target": "EN-F-A2-GR-third-person-s",
+     "check": "C5",
+     "problem": "Item tags 'third_person_s_omission' (slot 5) and 'es_spelling' (slot 6) are not enum values; slot 5 should be agreement_3s; slot 6 (-es spelling) is developmental and has no enum value.",
+     "fix": "Retag slot 5 agreement_3s; tag slot 6 as untracked/developmental or add an enum value."
+    },
+    {
+     "reviewer": "R2",
+     "index": 30,
+     "target": "EN-F-A2-GR-third-person-s",
+     "check": "C5",
+     "problem": "The items use 'third_person_s_omission' and 'es_spelling', which are not in the PART 2 enum. The outcome watches 'agreement_3s'.",
+     "fix": "Tag the item-5s 'agreement_3s'; define 'es_spelling' in PART 2 or tag it as agreement_3s too."
+    },
+    {
+     "reviewer": "R3",
+     "index": 13,
+     "target": "EN-F-A2-GR-third-person-s",
+     "check": "l1ErrorTypes",
+     "problem": "Items 5 tagged 'third_person_s_omission' and items 6 'es_spelling', not PART 2 values; the outcome lists agreement_3s. '-chs/-xs' is a developmental spelling error, not an Arabic-transfer type.",
+     "fix": "Tag slot 5 agreement_3s; tag slot 6 agreement_3s (or add a defined es_spelling value marked developmental)."
+    }
+   ]
+  },
+  {
+   "group": "K18",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-GR-imperatives"
+   ],
+   "items": "outcomes.json",
+   "issue": "l1ErrorTypes copula_omission does not fit imperatives",
+   "reviewers": [
+    "R1",
+    "R2"
+   ],
+   "count": 2,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R1",
+     "index": 19,
+     "target": "EN-F-A2-GR-imperatives",
+     "check": "C5",
+     "problem": "l1ErrorTypes = [copula_omission], but imperatives ('Open the door', 'Don't run') contain no copula; the type does not describe the expected errors (e.g. 'No run', 'Don't to run').",
+     "fix": "Remove copula_omission; leave [] or add a suitable enum value for negative-imperative form."
+    },
+    {
+     "reviewer": "R2",
+     "index": 31,
+     "target": "EN-F-A2-GR-imperatives",
+     "check": "C5",
+     "problem": "cefr A1 is fine, but l1ErrorTypes ['copula_omission'] does not fit imperatives: typical Arabic-L1 imperative errors are 'No talk' / 'Not run' for 'Don't'. Copula omission is not an imperative error.",
+     "fix": "Remove copula_omission. Define an imperative-negation value in PART 2 (e.g. neg_imperative_no) or leave the list empty until a form exists."
+    }
+   ]
+  },
+  {
+   "group": "K19",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A2-GR-was-were"
+   ],
+   "items": "outcomes.json",
+   "issue": "agreement_3s (present 3rd-person -s) used for was/were number agreement",
+   "reviewers": [
+    "R2",
+    "R3"
+   ],
+   "count": 2,
+   "severity": "high",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R2",
+     "index": 32,
+     "target": "EN-F-A2-GR-was-were",
+     "check": "C5",
+     "problem": "'agreement_3s' is defined as present-simple 3rd-person -s, not as was/were number agreement ('They was').",
+     "fix": "Define agreement_3s in PART 2 as covering subject-verb number agreement (including was/were), or add a value such as agreement_be_past."
+    },
+    {
+     "reviewer": "R3",
+     "index": 14,
+     "target": "EN-F-A2-GR-was-were",
+     "check": "l1ErrorTypes",
+     "problem": "l1ErrorTypes includes agreement_3s, which in PART 2 is third-person -s; was/were is past-tense be number agreement.",
+     "fix": "Use a defined agreement value (e.g. widen agreement_3s definition to subject-verb agreement) or drop it, keeping tense_aspect / copula_omission."
+    }
+   ]
+  },
+  {
+   "group": "K20",
+   "category": "other",
+   "outcomes": [
+    "EN-F-A1-VO-food-drink"
+   ],
+   "items": "outcomes.json / matching note",
+   "issue": "stale matching note ('l1ErrorTypes cleared'); slot-5 sound slips untagged",
+   "reviewers": [
+    "R3"
+   ],
+   "count": 1,
+   "severity": "low",
+   "status": "known_issue",
+   "flags": [
+    {
+     "reviewer": "R3",
+     "index": 15,
+     "target": "EN-F-A1-VO-food-drink",
+     "check": "C5",
+     "problem": "outcomes.json l1ErrorTypes = [lexical_eat_drink] but the matching note still says 'l1ErrorTypes cleared' (stale), and slot-5 sound-confusion items are covered by no listed type.",
+     "fix": "Update the matching note; tag slot 5 with spelling_vowel/spelling_consonant where it applies, or note it untagged."
+    }
+   ]
+  }
+ ]
+}

@@ -644,3 +644,65 @@ Each vocabulary form now has at most one spelling error-correction item (slot 5 
 ### Tests
 
 `cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed. No existing tests were changed.
+
+## Final review round and close-out (A1–A2)
+
+Status: DRAFT. This was the last review round (user stopping rule): after it only factual key errors (wrong key / wrong key field, or a missing correct accepted answer) are fixed, with no further round. All other flags, whatever the reviewer count, are recorded below as known issues and were not fixed.
+
+### Flags
+
+R1 20, R2 37, R3 16 (73 flags). Consolidated by hand in `research/assessment-review/a1a2/consolidate_final.py` into 22 groups (`CONSOLIDATED_FINAL.json`); 16 groups were flagged by ≥2 reviewers. Categories: 1 key_error, 1 missing_answer, 20 other.
+
+Independence slips: in round 4, R1's grep reached this log, and in the final round R2's grep reached this log. In both cases no flag depended on the log content (each flag cites item text in the assessment files or the PART 2 enum).
+
+### Key fixes made
+
+| Group | Item | Change | Reviewers |
+|---|---|---|---|
+| F01 | EN-F-A1-VO-family-C-4 | targetForm `niece` -> `aunt` (matches answerKey/acceptedAnswers) | R1, R3 |
+| F02 | EN-F-A1-GR-prepositions-time-A-6 / B-6 / C-6 | added `at 6 o'clock` / `at 8 o'clock` / `at 9 o'clock` (digit + o'clock) and `at six` / `at eight` / `at nine` (word, no o'clock) as accepted answers, parallel to the existing `at 6`-style variant | R1 |
+
+No other flag was a wrong key or missing correct answer. Prompts, distractors, error tags, vocabulary and other items were not changed.
+
+### Known issues (not fixed)
+
+Severity: high = flagged by ≥2 reviewers or affects validity; medium/low = single reviewer, no direct validity impact.
+
+| Group | Reviewers | Outcomes | Items | Issue | Severity |
+|---|---|---|---|---|---|
+| K01 | 3 (R1, R2, R3) | A1-VO-family, A1-VO-classroom-objects, A1-VO-days-months, A1-VO-numbers-time, A1-VO-home-rooms | slot 6 all forms; home-rooms A-5/A-6/B-5/C-6 | slot-6 tags lexical_l1_polysemy / lexical_l1_calque / lexical_room_label not in PART 2 enum nor outcome l1ErrorTypes | high |
+| K02 | 1 (R1) | A1-VO-family | A-4/A-6, C-1/C-5, C-4/C-6 | in-form cueing and repeated keys within forms A and C | high |
+| K03 | 2 (R2, R3) | A1-VO-family | C-1 = A-1 | C-1 verbatim copy of A-1 (not parallel) | high |
+| K04 | 2 (R1, R2) | A1-VO-home-rooms | A-1/A-9, A-2/A-5, B-2/B-6/B-9, C-1/C-5, C-2/C-6, B-3~A-4, B-7=A-7, C-7=B-8 | repeated keys within forms and repeated/identical stems across forms | high |
+| K05 | 2 (R1, R3) | A1-VO-home-rooms | B-6, C-5 | 'path room' (b->p) implausible Arabic-L1 slip, real word 'path', reused in two forms | high |
+| K06 | 1 (R3) | A1-VO-home-rooms | slots 5-6 all forms | slot 5-6 error types not parallel across forms; form A has no spelling_consonant item | medium |
+| K07 | 2 (R1, R3) | A1-VO-days-months | A-6, B-6, C-6 | slot 6 tests time-expression meaning, not spelling of days/months; stray matchingNote on B-6/C-6 | high |
+| K08 | 2 (R1, R3) | A1-VO-classroom-objects | B-6 | watch/clock is not a classroom object; 'on my arm' unnatural; not parallel to A-6/C-6 | high |
+| K09 | 3 (R1, R2, R3) | A2-FN-polite-requests | all 27 items (A-5, B-5, B-3, C-3, C-4, B-9, C-7, C-8, B-8, A-9, B-1) | outcome now A1 but vocabLevel A2 and above-A1 words (receipt, kiosk, plasters, charger, milkshake, ...) | high |
+| K10 | 2 (R1, R3) | A2-FN-polite-requests | A-4, B-4, C-4 | 'Two tickets give.'-type OV distractors are not Arabic-L1 plausible | high |
+| K11 | 3 (R1, R2, R3) | A2-FN-polite-requests | slots 5-6 | tags direct_imperative / want_for_request not in enum; outcome l1ErrorTypes [] | high |
+| K12 | 3 (R1, R2, R3) | A2-GR-present-continuous | all 27 items (B-1, C-1, A-4, C-4, B-3, C-6, C-8, C-9) | outcome now A1 but vocabLevel A1-A2 and above-A1 words (knock, bridge, workers, climb, sales report, probably) | high |
+| K13 | 3 (R1, R2, R3) | A2-GR-present-continuous | slots 5-6 | tags be_omission_progressive / simple_for_progressive not in enum (outcome lists copula_omission, tense_aspect) | high |
+| K14 | 1 (R1) | A2-GR-present-continuous | A-8, A-9, B-9, C-9 | rubric criterion differs across parallel items (am/is/are vs am) | medium |
+| K15 | 1 (R2) | A2-GR-present-continuous | A-6, B-6, C-6 | planted sentence has two errors (no be+-ing and no 3rd-person -s) | high |
+| K16 | 3 (R1, R2, R3) | A2-GR-third-person-s | all 27 items (B-4, B-6, A-6, C-6, B-2, C-9, C-1, C-2) | outcome now A1 but vocabLevel A1-A2 and above-A1 words (strangers, mix, paint, fix, bake, weather report) | high |
+| K17 | 3 (R1, R2, R3) | A2-GR-third-person-s | slots 5-6 | tags third_person_s_omission / es_spelling not in enum (outcome lists agreement_3s) | high |
+| K18 | 2 (R1, R2) | A2-GR-imperatives | outcomes.json | l1ErrorTypes copula_omission does not fit imperatives | high |
+| K19 | 2 (R2, R3) | A2-GR-was-were | outcomes.json | agreement_3s (present 3rd-person -s) used for was/were number agreement | high |
+| K20 | 1 (R3) | A1-VO-food-drink | outcomes.json / matching note | stale matching note ('l1ErrorTypes cleared'); slot-5 sound slips untagged | low |
+
+### Per-outcome status (`research/assessment-review/a1a2/OUTCOME_STATUS.json`)
+
+Passed review — DRAFT pending human expert review and pilot (25; no ≥2-reviewer known issue): EN-F-A1-GR-article-a-an, EN-F-A1-GR-article-the, EN-F-A1-GR-can-ability, EN-F-A1-GR-capitals-full-stops, EN-F-A1-GR-copula-be, EN-F-A1-GR-possessive-adjectives, EN-F-A1-GR-prepositions-time, EN-F-A1-GR-there-is-are, EN-F-A1-GR-word-order-svo, EN-F-A1-VO-common-adjectives, EN-F-A1-VO-food-drink, EN-F-A2-GR-comparatives, EN-F-A2-GR-conjunctions, EN-F-A2-GR-frequency-adverbs, EN-F-A2-GR-going-to, EN-F-A2-GR-much-many, EN-F-A2-GR-past-questions-did, EN-F-A2-GR-past-simple-irregular, EN-F-A2-GR-past-simple-regular, EN-F-A2-GR-some-any, EN-F-A2-VO-appearance, EN-F-A2-VO-clothes-shopping, EN-F-A2-VO-jobs-workplaces, EN-F-A2-VO-make-do, EN-F-A2-VO-weather.
+
+DRAFT — not passed; do not use as a confirmatory measure until fixed and re-reviewed (10; ≥2-reviewer known issue): EN-F-A1-VO-classroom-objects, EN-F-A1-VO-days-months, EN-F-A1-VO-family, EN-F-A1-VO-home-rooms, EN-F-A1-VO-numbers-time, EN-F-A2-FN-polite-requests, EN-F-A2-GR-imperatives, EN-F-A2-GR-present-continuous, EN-F-A2-GR-third-person-s, EN-F-A2-GR-was-were. (imperatives and was-were have no assessment forms; their issue is outcome-level l1ErrorTypes metadata.)
+
+### Limits
+
+- No human expert review: all reviewers were model reviewers. Every outcome remains DRAFT.
+- Item analysis is required after the first pilot cohort.
+- Item-removal rule, fixed in advance of the pilot: remove or revise an item if its facility p < 0.20 or p > 0.95, or its point-biserial (corrected item-total) < 0.20; revise a form set if the parallel-form mean difference is > 10 points (on a 0–100 scale).
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed.
