@@ -1326,7 +1326,11 @@ const RULE_STYLE: Record<string, string> = {
   analogy: 'say it through one everyday comparison that has the same shape as the rule, then the right/wrong pair',
   visual_explanation: 'say it through a simple table or two-column picture, then the right/wrong pair',
 };
-export const ruleFirstLine = (rf: { texts: string[] }, planPrimary?: string, hasNext?: boolean) =>
+export const ruleFirstLine = (rf: { texts: string[] }, planPrimary?: string, hasNext?: boolean, taskBelow?: boolean) => taskBelow ? ruleFirstLine0(rf, planPrimary, hasNext).replace(RULE_LINE_TASK(hasNext), RULE_LINE_TASK_BELOW) : ruleFirstLine0(rf, planPrimary, hasNext);
+const RULE_LINE_TASK = (hasNext?: boolean) => `(3) ask them to apply the rule to a new item${hasNext ? ' (if their answer was right, present the next lesson item given below exactly as written; otherwise one short new item)' : ': one short new item you write'} made of words that appear in no lesson exercise.`;
+/** Conflict scan (ESL5): when another instruction below sets this reply's one task (answer release, own sentence, reviewOpen closing item), the rule line sets none. */
+export const RULE_LINE_TASK_BELOW = '(3) the task for this reply is the one set by the instruction below (one task only): set no other item.';
+const ruleFirstLine0 = (rf: { texts: string[] }, planPrimary?: string, hasNext?: boolean) =>
   `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). In this reply, inside the teaching method above: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) ask them to apply the rule to a new item${hasNext ? ' (if their answer was right, present the next lesson item given below exactly as written; otherwise one short new item)' : ': one short new item you write'} made of words that appear in no lesson exercise. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule, and the hint-level limits on stating the rule. Never write the answer to the exercise you are asking about or any part of it, never show its target form, never model on the learner's own answer.`;
 /** The explicit-first decision and the rule to state this turn (levelExplicit and ruleFirst). Pure: used by buildLanguageTeachingContext and by the tests. */
 export function ruleFirstDecision(i: { band: LevelBand; masteryStatus?: string; history: { role: string; languageTurn?: unknown }[]; signals: Parameters<typeof rulesToIntroduce>[1]; spec: { successCriteria?: string[] } | undefined; moves?: { id: string }[]; record?: Esl5Record; lessonId?: string }): { explicit?: boolean; ruleFirst?: { criteria: number[]; texts: string[] } } {
@@ -1552,6 +1556,10 @@ const targetPoint = (ctx: Pick<LanguageTeachingContext, 'signals' | 'lesson'>): 
   const crit = ctx.lesson.spec?.successCriteria ?? []; const c = ctx.signals.activeLessonItem?.criteria?.[0];
   return (c && crit[c - 1]) || crit[0] || ctx.lesson.spec?.objectives?.[0] || 'today\'s point';
 };
+export const RELEASED_EXCEPT = 'Apart from the item whose answer is released above, never write the answer to an open lesson exercise.';
+/** Conflict scan (ESL5): another instruction sets this reply's one task, so the levelExplicit/ruleFirst rule line must not add a second one. */
+const ruleTaskElsewhere = (ctx: Omit<LanguageTeachingContext, 'prompt'>): boolean =>
+  releasing(ctx) || ownSentenceNow(ctx) === 'ask' || Boolean(engineV2('reviewOpen') && ctx.research && isClosingTurn(ctx.research) && closingOn());
 /** releaseAfterTwo: this reply gives the answer after two genuine failed attempts. */
 export const releasing = (ctx: Pick<LanguageTeachingContext, 'moves'>): boolean => engineV2('releaseAfterTwo') && ctx.moves.some((m) => m.reasons.includes('release_after_two_genuine_attempts'));
 function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
@@ -1571,7 +1579,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (s.exampleStatement && engineV2('shortRecap')) out.push(`- ${EXAMPLE_CHECK}`);
   if (ctx.ruleFirst?.criteria.length) {
     if (ruleBeforeFirstTryOn(ctx)) out.push(`- ${ruleBeforeFirstTryLine(ctx.ruleFirst, ctx.planPrimary)}`);
-    else if (engineV2('ruleFirst') || (engineV2('levelExplicit') && ctx.explicitFirst)) out.push(`- ${ruleFirstLine(ctx.ruleFirst, ctx.planPrimary, Boolean(s.nextLessonItem))}`);
+    else if (engineV2('ruleFirst') || (engineV2('levelExplicit') && ctx.explicitFirst)) out.push(`- ${ruleFirstLine(ctx.ruleFirst, ctx.planPrimary, Boolean(s.nextLessonItem), ruleTaskElsewhere(ctx))}`);
   }
   if (fadedNow(s).length) out.push(`- ${FADE_LINE(fadedNow(s).map((c) => ctx.lesson.spec?.successCriteria?.[c - 1] ?? `point ${c}`))}`);
   if (engineV2('fadeKnown') && s.fade?.checkAnswered.length && !fadedNow(s).length) out.push(`- ${FADE_RETURN_LINE}`);
@@ -1581,8 +1589,10 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     if (rep) out.push(`- ${beliefShift(rep.text)}`);
   }
   const live = engineV2('liveError') ? s.liveError : undefined;
-  if (live) out.push(`- ${LIVE_ERROR_LINE(live.code)}`);
-  else if (s.diagnosis && !researchAblated('diagnosis')) out.push(`- ${diagnosisLine(s.diagnosis)}`);
+  // Conflict scan (ESL5): on an answer release the released item's answer IS given, so the live-error and diagnosis lines drop their "never write the
+  // answer" / "don't name the correct form" clauses for it (they still hold for every other open exercise).
+  if (live) out.push(`- ${releasing(ctx) ? LIVE_ERROR_LINE(live.code).replace(/Never write the answer to an open lesson exercise\.$/, RELEASED_EXCEPT) : LIVE_ERROR_LINE(live.code)}`);
+  else if (s.diagnosis && !researchAblated('diagnosis')) out.push(`- ${releasing(ctx) ? diagnosisLine(s.diagnosis).replace(/ Aim your hint at this cause; don't name the correct form\.$/, ' Use it for the one-line reason when you give the answer.') : diagnosisLine(s.diagnosis)}`);
   if (L && Object.keys(L.criteria).length && !researchAblated('transfer_check')) out.push('- Don\'t re-test a success criterion they have already shown on their own in two different tasks; work on the ones not shown yet. A criterion shown on their own only once needs one more unaided check in a new context (a different word or situation, with no model of the answer next to it).');
   if (s.learnerIntent === 'PARTIAL_ANSWER_ATTEMPT' && s.answeringCheck) out.push(`- ${WHY_PROBE}`);
   if (s.answeringCheck || s.unpromptedSentence) {
@@ -1622,7 +1632,9 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     if (r.stuck && researchImproved('strategy')) out.push(`- ${STRATEGY_SHIFT}`);
     if (r.hintRepeat && engineV2('hints') && s.activeLessonItem && !(isClosingTurn(r) && closingOn())) out.push(`- ${HINT_VARY}`);
     if (r.uncovered.length && r.turnNo >= 2 && researchImproved('coverage')) out.push(`- ${coverageRule(r.uncovered)}`);
-    if (isClosingTurn(r) && closingOn()) out.push(`- ${engineV2('reviewOpen') ? reviewCloseLine(ctx) : engineV2('shortRecap') ? SHORT_RECAP : CLOSING_RECAP}`);
+    // Conflict scan (ESL5): without reviewOpen, the recap closing ("do not set a new exercise", "never write a completed answer") cannot share a reply
+    // with an answer release (answer + new item); the release goes first and the recap waits (the reply guards defer it: the reply sets a task).
+    if (isClosingTurn(r) && closingOn() && !(releasing(ctx) && !engineV2('reviewOpen'))) out.push(`- ${engineV2('reviewOpen') ? reviewCloseLine(ctx) : engineV2('shortRecap') ? SHORT_RECAP : CLOSING_RECAP}`);
   }
   return out;
 }
