@@ -8,7 +8,7 @@
   "band": "A2",
   "primary": "W2",
   "s": {
-   "W2": 2,
+   "W2": 0,
    "W1": 0,
    "C1": 3,
    "C2": 0
@@ -918,7 +918,66 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 6.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is correct. \"My friend\" is one person, so the verb has -s.\n\nNow one on your own:\n\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatchs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\n\"watchs\" has an ending after \"she\", which is good. The spelling is not right yet.\n\nLook: I catch the bus. She catches the bus. A verb that ends in -ch or -sh takes -es, not just -s.\n\nRight: He pushes the door. Wrong: He pushs the door.\n\nNow a new one on your own:\n\nMy friend ___ (teach) children to swim.\n\nWrite only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 6.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"plays\" is correct. \"My friend\" is one person, so the verb has -s.\n\nNow one on your own:\n\nWrite the correct form: She ___ (watch) TV after dinner. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nwatchs\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\n\"watchs\" has an ending after \"she\", which is good. The spelling is not right yet.\n\nLook: I catch the bus. She catches the bus. A verb that ends in -ch or -sh takes -es, not just -s.\n\nRight: He pushes the door. Wrong: He pushs the door.\n\nNow a new one on your own:\n\nMy friend ___ (teach) children to swim.\n\nWrite only the verb.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A verb that ends in -ch or -sh takes -es, not just -s."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: He pushes the door. Wrong: He pushs the door."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "teaches",
+    "errors": {
+     "W1": "teach",
+     "W2": "teachs"
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 0
+    }
+   }
   }
  ],
  "stateAfterS1": {

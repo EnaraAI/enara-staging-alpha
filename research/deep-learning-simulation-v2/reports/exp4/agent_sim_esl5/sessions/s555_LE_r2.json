@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 5
+   "C1": 3,
+   "C2": 6
   }
  },
  "start": {
@@ -896,7 +896,78 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My brother is a doctor.\" is correct. The word fits \"My brother\", and nothing is missing.\n\nNow one on your own, with no help. Write only the missing word:\nThey ___ kind.\n\nLEARNER'S LAST MESSAGE:\nare\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's right, \"are\" is correct, and the sentence is complete.\n\nTo close today, here is one task in a new situation. Do it with no help.\n\nWrite only the missing word:\nThe students ___ tired after class."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: copula. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 3: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 2.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My brother is a doctor.\" is correct. The word fits \"My brother\", and nothing is missing.\n\nNow one on your own, with no help. Write only the missing word:\nThey ___ kind.\n\nLEARNER'S LAST MESSAGE:\nare\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThat's right, \"are\" is correct, and the sentence is complete.\n\nTo close today, here is one task in a new situation. Do it with no help.\n\nWrite only the missing word:\nThe students ___ tired after class.",
+   "stateBefore": {
+    "form": "copula",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 5
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "That's right, \"are\" is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "That's right, \"are\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "are"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "are"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W1": "",
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "copula",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 6
+    }
+   }
   }
  ],
  "stateAfterS1": {

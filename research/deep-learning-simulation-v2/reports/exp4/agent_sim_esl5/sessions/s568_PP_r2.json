@@ -14,7 +14,7 @@
    "C2": 3
   },
   "indep": {
-   "C1": 7,
+   "C1": 8,
    "C2": 6
   }
  },
@@ -838,7 +838,72 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 7.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nPerfect! Watch ends in -ch, so it takes -es: watches. Now a tricky one: My sister ___ (play) tennis on Sundays. Write only the verb, and compare it with cry.\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nRight! Play has a vowel (a) before the y, so we just add -s: plays. Cry has a consonant, so it becomes cries. Great job with all the spellings. Now write your own sentence about a friend's routine, using the verb study."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 7.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 6.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nPerfect! Watch ends in -ch, so it takes -es: watches. Now a tricky one: My sister ___ (play) tennis on Sundays. Write only the verb, and compare it with cry.\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nRight! Play has a vowel (a) before the y, so we just add -s: plays. Cry has a consonant, so it becomes cries. Great job with all the spellings. Now write your own sentence about a friend's routine, using the verb study.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 7,
+     "C2": 6
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Right! ... plays."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Right!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Play has a vowel (a) before the y, so we just add -s: plays. Cry has a consonant, so it becomes cries."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My friend studies every evening.",
+    "errors": {
+     "W1": "My friend study every evening.",
+     "W2": "My friend studys every evening."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 8,
+     "C2": 6
+    }
+   }
   }
  ],
  "stateAfterS1": {

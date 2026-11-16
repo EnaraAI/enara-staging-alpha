@@ -902,7 +902,70 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My sister is\" is fine. Look again at the small word before \"engineer\".\n\nCompare this pair.\nRight: He has an idea. Wrong: He has a idea. The wrong one is wrong because \"idea\" starts with a vowel sound.\n\nWhat were you thinking? Then write your sentence once more.\n\nLEARNER'S LAST MESSAGE:\nOK. Can I have an exercise, please?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure, here is an exercise. First, your sentence: it should be \"My sister is an engineer\", because \"engineer\" starts with a vowel sound.\n\nRight: I saw an eagle. Wrong: I saw a eagle.\n\nNow the exercise, to do on your own. One small word is missing in this sentence. Write the full sentence again, correctly:\n\nAfter school, my brother eats sandwich."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 2.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My sister is\" is fine. Look again at the small word before \"engineer\".\n\nCompare this pair.\nRight: He has an idea. Wrong: He has a idea. The wrong one is wrong because \"idea\" starts with a vowel sound.\n\nWhat were you thinking? Then write your sentence once more.\n\nLEARNER'S LAST MESSAGE:\nOK. Can I have an exercise, please?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nSure, here is an exercise. First, your sentence: it should be \"My sister is an engineer\", because \"engineer\" starts with a vowel sound.\n\nRight: I saw an eagle. Wrong: I saw a eagle.\n\nNow the exercise, to do on your own. One small word is missing in this sentence. Write the full sentence again, correctly:\n\nAfter school, my brother eats sandwich.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 5
+    }
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "it should be \"My sister is an engineer\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "because \"engineer\" starts with a vowel sound"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: I saw an eagle. Wrong: I saw a eagle."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 5
+    }
+   }
   }
  ],
  "stateAfterS1": {

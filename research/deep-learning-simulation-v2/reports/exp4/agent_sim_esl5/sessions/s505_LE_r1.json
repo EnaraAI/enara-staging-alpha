@@ -8,7 +8,7 @@
   "band": "A1",
   "primary": "W2",
   "s": {
-   "W2": 2,
+   "W2": 1,
    "W1": 0,
    "C1": 3,
    "C2": 0
@@ -876,7 +876,60 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "guardRemoved": 1,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My brother\" with an ending on the verb is a good start. Now check the spelling of the ending.\n\nLook at this pair:\nRight: She washes her hands.\nWrong: She washs her hands.\nThe wrong one has only -s after \"sh\".\n\nCompare the pair with your verb. Then write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy brother watchs football every Sunday.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nRight: She catches the bus.\nWrong: She catchs the bus.\n\nNow a new one on your own:\n\nHe ___ (brush) his teeth at night.\n\nWrite only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 3.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My brother\" with an ending on the verb is a good start. Now check the spelling of the ending.\n\nLook at this pair:\nRight: She washes her hands.\nWrong: She washs her hands.\nThe wrong one has only -s after \"sh\".\n\nCompare the pair with your verb. Then write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy brother watchs football every Sunday.\nFACT: the last learner message contained the error of W2 (adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\")).\n\nTUTOR TURN TO JUDGE:\nRight: She catches the bus.\nWrong: She catchs the bus.\n\nNow a new one on your own:\n\nHe ___ (brush) his teeth at night.\n\nWrite only the verb.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 2,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    }
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: She catches the bus. Wrong: She catchs the bus."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "brushes",
+    "errors": {
+     "W1": "brush",
+     "W2": "brushs"
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 1,
+     "W1": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    }
+   }
   }
  ],
  "stateAfterS1": {

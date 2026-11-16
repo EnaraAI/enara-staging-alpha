@@ -921,7 +921,72 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "guardRemoved": 1,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe verb ending in your sentence is not right yet.\n\nLook at this pair:\nRight: She kisses the baby.\nWrong: She kisss the baby.\nThe wrong one only adds -s to a verb that ends in -ss.\n\nNow look at the end of \"watch\". Compare it with the pair and write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy brother watch football every day.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\n\"Watch\" ends in -ch, so after one person it takes -es.\n\nRight: He catches the ball.\nWrong: He catchs the ball.\n\nNow a new one on your own:\n\nMy uncle ___ (mix) the paint for his work.\n\nWrite only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe verb ending in your sentence is not right yet.\n\nLook at this pair:\nRight: She kisses the baby.\nWrong: She kisss the baby.\nThe wrong one only adds -s to a verb that ends in -ss.\n\nNow look at the end of \"watch\". Compare it with the pair and write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy brother watch football every day.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\n\"Watch\" ends in -ch, so after one person it takes -es.\n\nRight: He catches the ball.\nWrong: He catchs the ball.\n\nNow a new one on your own:\n\nMy uncle ___ (mix) the paint for his work.\n\nWrite only the verb.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 1
+    }
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Watch\" ends in -ch, so after one person it takes -es."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after one person it takes -es"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: He catches the ball. Wrong: He catchs the ball."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "mixes",
+    "errors": {
+     "W1": "mix",
+     "W2": "mixs"
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R1:W1",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A1",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 1
+    }
+   }
   }
  ],
  "stateAfterS1": {

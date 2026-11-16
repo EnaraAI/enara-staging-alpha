@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 1,
-   "C2": 4
+   "C1": 2,
+   "C2": 5
   }
  },
  "start": {
@@ -870,7 +870,76 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood: \"My sister is\" is a good start. But one small word is missing.\n\nIn English, we put a small word (a, an or the) before one thing we can count.\n\nRight: My friend is a pilot.\nWrong: My friend is pilot.\n\nNow write this sentence with the missing word: My father is teacher.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, a is correct: the small word goes before \"teacher\".\n\nNow one last task, on a new topic. One small word is missing here:\n\nMy mother has bag.\n\nWrite the whole sentence again, with the missing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A1. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood: \"My sister is\" is a good start. But one small word is missing.\n\nIn English, we put a small word (a, an or the) before one thing we can count.\n\nRight: My friend is a pilot.\nWrong: My friend is pilot.\n\nNow write this sentence with the missing word: My father is teacher.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, a is correct: the small word goes before \"teacher\".\n\nNow one last task, on a new topic. One small word is missing here:\n\nMy mother has bag.\n\nWrite the whole sentence again, with the missing word.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, a is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, a is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "a"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "a"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A1",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 5
+    }
+   }
   }
  ],
  "stateAfterS1": {

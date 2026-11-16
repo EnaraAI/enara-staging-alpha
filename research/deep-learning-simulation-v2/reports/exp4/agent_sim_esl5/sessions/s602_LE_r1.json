@@ -8,7 +8,7 @@
   "band": "A2",
   "primary": "W1",
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 3,
    "C2": 3
@@ -877,7 +877,70 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an engineer\" is correct.\n\nNow write one more sentence of your own, about a different person you know. Use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy aunt is artist.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nOne small word is missing before \"artist\". The right sentence is: My aunt is an artist.\n\nIn English, we put a small word (a, an or the) before one thing we can count.\n\nRight: \"He has a phone.\" Wrong: \"He has phone.\"\n\nTo finish today, one last task on your own, on a new topic. Write this sentence again, correctly:\n\nOn the train, I read magazine."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an engineer\" is correct.\n\nNow write one more sentence of your own, about a different person you know. Use a or an in it.\n\nLEARNER'S LAST MESSAGE:\nMy aunt is artist.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nOne small word is missing before \"artist\". The right sentence is: My aunt is an artist.\n\nIn English, we put a small word (a, an or the) before one thing we can count.\n\nRight: \"He has a phone.\" Wrong: \"He has phone.\"\n\nTo finish today, one last task on your own, on a new topic. Write this sentence again, correctly:\n\nOn the train, I read magazine.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The right sentence is: My aunt is an artist."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English, we put a small word (a, an or the) before one thing we can count."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"He has a phone.\" Wrong: \"He has phone.\""
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    }
+   }
   }
  ],
  "stateAfterS1": {

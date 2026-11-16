@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 6,
-   "C2": 2
+   "C1": 7,
+   "C2": 3
   }
  },
  "start": {
@@ -921,7 +921,78 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 6.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"watches\" is the right form. \"My mother\" is like \"she\", and this verb takes -es, so your sentence works well.\n\nNow here is a lesson task to do on your own, with no example this time:\n\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"cries\" is right, and you spelled the ending well.\n\nTo finish today, here is one task in a new situation. Think about a man who works in an office. Do it on your own, with no example.\n\nMy uncle ___ (carry) a big bag to work.\n\nWrite only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 6.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"watches\" is the right form. \"My mother\" is like \"she\", and this verb takes -es, so your sentence works well.\n\nNow here is a lesson task to do on your own, with no example this time:\n\nWrite the correct form: The baby ___ (cry) at night. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ncries\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"cries\" is right, and you spelled the ending well.\n\nTo finish today, here is one task in a new situation. Think about a man who works in an office. Do it on your own, with no example.\n\nMy uncle ___ (carry) a big bag to work.\n\nWrite only the verb.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 2
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"cries\" is right"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"cries\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"cries\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"cries\" is right"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "carries",
+    "errors": {
+     "W1": "carry",
+     "W2": "carrys"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W1",
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 7,
+     "C2": 3
+    }
+   }
   }
  ],
  "stateAfterS1": {

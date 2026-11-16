@@ -14,8 +14,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 5,
-   "C2": 1
+   "C1": 6,
+   "C2": 2
   }
  },
  "start": {
@@ -919,7 +919,78 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence is correct: \"watches\" has the right ending. \"Watch\" ends in -ch, so it takes -es after \"my mother\".\n\nNext, one more sentence to do on your own, with no example first. Write the correct form:\n\nMy brother ___ (go) to the gym on Fridays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ngoes\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"goes\". You put the longer ending on \"go\" after \"my brother\".\n\nHere is a last sentence in a new place, for you to do alone.\n\nWrite only the verb: My father ___ (try) a new food every week."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: thirdS. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 5.\nC2 (correct) strength 3: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence is correct: \"watches\" has the right ending. \"Watch\" ends in -ch, so it takes -es after \"my mother\".\n\nNext, one more sentence to do on your own, with no example first. Write the correct form:\n\nMy brother ___ (go) to the gym on Fridays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\ngoes\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"goes\". You put the longer ending on \"go\" after \"my brother\".\n\nHere is a last sentence in a new place, for you to do alone.\n\nWrite only the verb: My father ___ (try) a new food every week.",
+   "stateBefore": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 1
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"goes\"."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"goes\"."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "goes"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "goes"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "tries",
+    "errors": {
+     "W1": "try",
+     "W2": "trys"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thirdS",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 2
+    }
+   }
   }
  ],
  "stateAfterS1": {

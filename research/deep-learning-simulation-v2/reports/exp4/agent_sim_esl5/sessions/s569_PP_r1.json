@@ -15,7 +15,7 @@
   },
   "indep": {
    "C1": 1,
-   "C2": 1
+   "C2": 2
   }
  },
  "start": {
@@ -661,7 +661,72 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour idea about articles is true, but here is the reason for \"an\": we choose \"a\" or \"an\" by the first sound of the next word. \"Orange\" starts with a vowel sound (o), so we say \"an orange\" - like \"an apple\". Before a consonant sound we use \"a\": \"a book\". Let's try a new one: My uncle is ___ doctor. Write a or an.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Doctor\" starts with the consonant sound \"d\", so \"a doctor\". Good - in English we need an article before a job. Now try \"the\": I bought a book. ___ book is very good. Write a, an or the."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: articles. Learner level A2. First language Arabic.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour idea about articles is true, but here is the reason for \"an\": we choose \"a\" or \"an\" by the first sound of the next word. \"Orange\" starts with a vowel sound (o), so we say \"an orange\" - like \"an apple\". Before a consonant sound we use \"a\": \"a book\". Let's try a new one: My uncle is ___ doctor. Write a or an.\n\nLEARNER'S LAST MESSAGE:\na\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Doctor\" starts with the consonant sound \"d\", so \"a doctor\". Good - in English we need an article before a job. Now try \"the\": I bought a book. ___ book is very good. Write a, an or the.",
+   "stateBefore": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    }
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "a doctor"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Doctor\" starts with the consonant sound \"d\", so \"a doctor\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "in English we need an article before a job"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "The",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "articles",
+    "band": "A2",
+    "primary": "W2",
+    "s": {
+     "W2": 0,
+     "W1": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    }
+   }
   }
  ],
  "stateAfterS1": {
