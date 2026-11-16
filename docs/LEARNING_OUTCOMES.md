@@ -47,7 +47,7 @@ Typed error types added by user decision (A1–A2, DRAFT):
 - `noun_for_adjective`: weather (or other) noun used where an adjective is needed. Example: "It is rain today." → rainy; "It is sun." → sunny.
 - `quantifier_countability`: quantifier not matched to a countable/uncountable noun (or to polarity, nearest value for some/any); Arabic *kathir* covers much/many. Example: "How much books?" → many; "many water" → much.
 
-Typed error types added in the fix of 2+ reviewer known issues (A1–A2, DRAFT; added by the agent, pending user approval):
+Typed error types added in the fix of 2+ reviewer known issues (A1–A2, DRAFT; approved by user):
 - `lexical_l1_transfer`: wrong English word chosen by transfer from Arabic, either because one Arabic word covers two English words (polysemy) or because an Arabic phrase is translated word for word (calque). Example: "His woman is a teacher." → wife (Arabic *imraʾa*); "one clock long" → one hour (*saʿa*); "the sleeping room" → bedroom (*ghurfat al-nawm*); "in month five" → in May.
 - `request_directness`: request made with a bare imperative or "I want", transferred from Arabic request forms (*aʿtini* "give me", *ana ʿayiz* / *biddi* "I want"), where English needs Can I have ... / I would like ..., please. Example: "Give me the key." → Can I have the key, please?; "I want a cup of tea." → I would like a cup of tea, please.
 - `agreement_be`: form of *be* not matched to the subject's number/person (Arabic past *kana* has no was/were contrast in learner use, and the copula is often dropped in the present). Example: "They was at home." → were; "We was late." → were.

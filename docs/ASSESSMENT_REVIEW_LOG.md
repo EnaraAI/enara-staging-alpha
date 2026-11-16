@@ -737,3 +737,49 @@ Status: DRAFT. User instruction: fix every known issue from the close-out table 
 
 ## User decision: new error types (A1–A2)
 The user approved keeping the three error types the agent added during the fix of the 2+ reviewer issues: `lexical_l1_transfer`, `request_directness`, `agreement_be`. The "added by agent" label in docs/LEARNING_OUTCOMES.md PART 2 will be changed to "approved by user" once the verification check finishes, so the reviewers' input does not change while they work. Imperatives still has no error type (none fits).
+
+## Verification and final status (A1–A2)
+
+Status: DRAFT. Three model reviewers checked the 103 targets of the fix round (`research/assessment-review/a1a2/verify_R1.json`, `verify_R2.json`, `verify_R3.json`).
+
+### Verification counts (unresolved / targets flagged)
+
+| Reviewer | Unresolved | New issues |
+|---|---|---|
+| R1 | 0/8 | 8 |
+| R2 | 0/5 | 5 |
+| R3 | 1/5 (classroom-objects B-6: key 'desk' still in B-7 prompt) | 5 |
+
+### Fixes
+
+- V01 (3 reviewers) classroom-objects B-7: prompt "something on your desk now" → "something you use in class every day" (B-6 key no longer shown).
+- V02 (2 reviewers) home-rooms C-3: distractor 'shop' → 'school' (garage / office / school).
+- V03 (2 reviewers) home-rooms A-6/B-6: note now "calque of Arabic ghurfat al-akl, 'eating room'".
+- V04 (2 reviewers) polite-requests slots 5–6, all forms: added "May I have X, please?", "Can/Could you give me X, please?", "Please give me X." and no-comma "... please" variants. The grader (`normalise` in placementEngine.ts) strips only final punctuation, so variants are listed explicitly; no matchingNote change.
+- V06 (2 reviewers) third-person-s B-7: 'neighbour' (EVP A2) → 'your uncle'; acceptedAnswers updated.
+- V05 (1 reviewer, key errors) home-rooms: C-1 "I wash my hands" → "I brush my teeth" (kitchen no longer fits); B-2 "Our dog plays behind our house in the ____" (park no longer fits); C-4 distractor 'hotel' → 'office'.
+- docs/LEARNING_OUTCOMES.md PART 2: `lexical_l1_transfer`, `request_directness`, `agreement_be` now labelled "approved by user".
+
+### Remaining known issues (1 reviewer each)
+
+| ID | Outcome | Issue |
+|---|---|---|
+| K20 | food-drink | stale matching note; slot-5 sound slips untagged |
+| K21 | family | C-1 stem shows 'father', weakly cues C-3 key (3-option choice) |
+| K22 | classroom-objects | C-6 'borrow' and planted 'bookshop' are EVP A2 in an A1 item |
+| K23 | polite-requests | slots 3–4 options and 7–8 prompts show "Can I have" / "I would like", cueing slot 1–2 answers |
+| K24 | third-person-s | A/B/C-6 watchs/washs/teachs tagged `agreement_3s`; the error is the -es spelling rule, but `spelling_vowel` / `spelling_consonant` do not fit, so the tag is kept |
+
+### Final per-outcome status
+
+`research/assessment-review/a1a2/OUTCOME_STATUS.json`: 35 outcomes; 33 passed_review_draft (no unresolved issue flagged by ≥2 reviewers after these fixes), 0 not_passed_draft, 2 no_forms_gap (imperatives, was-were: no assessment forms).
+
+### Limits
+
+- No human expert review: all reviewers were model reviewers. Every outcome remains DRAFT; "passed_review_draft" is not validation.
+- Item analysis is required after the first pilot cohort; the item-removal rule fixed in advance is in the "Final review round and close-out" section above.
+- EVP levels were checked from memory, not against the EVP database.
+
+### Tests
+
+`cd backend && npx vitest run test/outcomesSchema.test.ts test/placementEngine.test.ts test/assessmentNovelty.test.ts test/assessmentSeparation.test.ts test/assessmentForms.test.ts test/assessmentVocabValidity.test.ts`: 6 files, 142 tests passed (first run caught a slot-4 prompt-length mismatch in home-rooms C-4, fixed in the data).
