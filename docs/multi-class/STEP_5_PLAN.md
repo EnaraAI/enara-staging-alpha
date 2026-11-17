@@ -57,14 +57,21 @@ All of them are off by default.
 5. **Whole suite with every feature on:** no new failures compared with the suite with every feature off. Each run is recorded in the feature's report.
 6. **Q7 and Q8:** their own tests. With their switch off the result equals today's. With it on, only the intended students change.
 
-## 5. Rollout of each feature (after your OK each time)
+## 5. Rollout of each feature (updated 2026-11-17: lms-test only, no multi-day wait)
 
-1. **Code:** merge the feature's code with `ENROLLMENT_READ_FROM` empty. Nothing changes.
-2. **lms-test.enara.app (fake data):** dual write on, backfill (dry run first), shadow on.
-   - Shadow needs traffic, and the test site has very little. **Proposal:** a scripted pass that calls every shadowed endpoint for every fake student and class once a day.
-   - Then: **7 days in a row with checks, 0 mismatches and 0 errors** (`npm run enrollment:shadow-report`).
-3. **On lms-test:** add the feature to `ENROLLMENT_READ_FROM`, re-run the same-answer checks against the live site, and report.
-4. **test.enara.app (real data):** only with your OK, after the same 7 clean shadow days there. First a full backup with written restore steps, then a backfill dry-run report, then the same order.
+> **test.enara.app (real data) is FROZEN until Mohamed reopens it.** That means no backup, no dry run, no dual write, no backfill, no shadow, no deploy, no switch and no migration there. The learning-content copy (which reads the real database) is paused too, and lms-test uses fake seed content only.
+
+**lms-test.enara.app only:**
+1. **Done:** dual write is on, the backfill is applied and in sync, and the shadow check is on.
+2. **Intensive burst** (replaces the 2–3 day wait). Hundreds of changes through the app's own endpoints, in batches: enroll, unenroll, move between groups, leave a group, new students, delete a group, delete students. After **every** batch:
+   - a read pass over every shadowed page;
+   - the shadow deltas, which must be 0 mismatches and 0 errors;
+   - the dual-write consistency check, which must be in sync.
+
+   Script: `backend/src/scripts/lmsTestBurst.ts`.
+3. **Same-answer tests** for all 7 features, plus the **full suite with every feature on**.
+4. **If everything is clean,** switch the features on one at a time **right away**. Each one is checked on the live test site before the next.
+5. **Then step 6 on lms-test, then LMS Phase 1a on lms-test** immediately.
 
 ## 6. Order and size
 
@@ -79,12 +86,7 @@ Building all seven is roughly one long working session. The 7-day shadow wait ru
 
 **After feature 7:** step 6 (turn on multi-class, the first learner-visible change), then merge after your OK, then LMS Phase 1a.
 
-## 7. What I need from you
+## 7. Decisions
 
-| # | Ask | My recommendation |
-|---|---|---|
-| S5-1 | Approve this step 5 plan | Yes |
-| S5-2 | Use a scripted daily traffic pass on lms-test so the shadow has data | Yes. Fake data only, calls the app's own endpoints, no writes. |
-| S5-3 | OK to deploy the current branch to **lms-test** with `ENROLLMENT_DUAL_WRITE=true`, then run the backfill dry run there and send you the report, then (after a second OK) apply it and turn `ENROLLMENT_SHADOW=true` on there | Yes. This starts the 7-day clock while I build features 1–7. |
-
-Reply, for example, "S5-1 yes, S5-2 yes, S5-3 yes".
+- **S5-1, S5-2 and S5-3:** approved (2026-11-17). S5-2 was changed to "churn, not static reads". The multi-day wait was then replaced by the intensive burst.
+- **Real database:** frozen until Mohamed reopens it.
