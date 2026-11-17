@@ -19,6 +19,10 @@ let logging: typeof import('../../src/utils/logging');
 let shadow: typeof import('../../src/services/enrollmentShadow');
 
 function setShadow(on: boolean, rate?: string) {
+  // Step 5: the shadow compares old against new only while the old reads are
+  // used, so these tests run with every step 5 feature off (also when the
+  // whole suite runs with ENROLLMENT_READ_FROM set).
+  delete process.env.ENROLLMENT_READ_FROM;
   process.env.ENROLLMENT_SHADOW = on ? 'true' : 'false';
   if (rate === undefined) delete process.env.ENROLLMENT_SHADOW_SAMPLE_RATE;
   else process.env.ENROLLMENT_SHADOW_SAMPLE_RATE = rate;

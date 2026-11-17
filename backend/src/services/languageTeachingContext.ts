@@ -4,7 +4,8 @@ import { Curriculum } from '../models/Curriculum';
 import { Institution } from '../models/Institution';
 import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
-import { isLearnerAgeBand } from '../models/learnerAgeBand';
+import { isLearnerAgeBand, LEARNER_AGE_BANDS, type LearnerAgeBand } from '../models/learnerAgeBand';
+import { readsFromEnrollments, studentGroupIds } from './enrollmentReads';
 import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
 import { graderV2On } from './graderV2';
 import { engineV2, arbitrationForced } from './engineV2';
@@ -114,6 +115,30 @@ export function resolveTrustedAgeBand(learningSettings: unknown, studentBand?: u
   return { band: 'unknown', status: 'unknown', source: malformed ? 'invalid_school_setting' : 'no_trusted_learner_age_source' };
 }
 
+/**
+ * Multi-class step 5 (profile_context), Q8: the group band used as the class
+ * fallback. One group (or none): that group's band, exactly as today. Several
+ * groups (only after step 6): the youngest valid band among them
+ * (LEARNER_AGE_BANDS is ordered youngest first). The student's own band still
+ * wins (resolveTrustedAgeBand), so a group band is used only when the
+ * student's own band is unknown.
+ *
+ * ENROLLMENT_AGE_FROM_BIRTHDATE (Q8, deriving the band from Student.birthDate)
+ * is NOT applied: the code defines no age boundaries for child/teen/adult
+ * (models/learnerAgeBand.ts: "deliberately not encoded anywhere"), and
+ * inventing them is a product decision. The switch has no effect until they
+ * are decided (docs/multi-class/STEP_5_NOTES.md).
+ */
+export function pickGroupBand(groupIds: string[], bandOf: (groupId: string) => unknown): { groupId: string | null; band: unknown } {
+  if (groupIds.length <= 1) return { groupId: groupIds[0] ?? null, band: groupIds.length ? bandOf(groupIds[0]) : undefined };
+  let best: { groupId: string; band: LearnerAgeBand } | null = null;
+  for (const id of groupIds) {
+    const band = bandOf(id);
+    if (isLearnerAgeBand(band) && (!best || LEARNER_AGE_BANDS.indexOf(band) < LEARNER_AGE_BANDS.indexOf(best.band))) best = { groupId: id, band };
+  }
+  return best ?? { groupId: groupIds[0], band: undefined };
+}
+
 // Server-side load of the inputs, all scoped to the session's institution:
 // the student must belong to it, and the class is the student's own batch in it.
 export async function loadTrustedAgeBand(params: { institutionId?: string; studentId?: string; learningSettings?: unknown }): Promise<TrustedAgeBand> {
@@ -121,6 +146,13 @@ export async function loadTrustedAgeBand(params: { institutionId?: string; stude
   const student = params.studentId
     ? await Student.findOne({ id: params.studentId, institutionId: params.institutionId }).select('+learnerAgeBand batchId').lean()
     : null;
+  if (readsFromEnrollments('profile_context')) {
+    // The student's groups from class_enrollments, in this school only.
+    const groupIds = student ? await studentGroupIds({ id: params.studentId!, institutionId: params.institutionId }, 'profile_context') : [];
+    const batches = groupIds.length ? await Batch.find({ id: { $in: groupIds }, institutionId: params.institutionId }).select('+learnerAgeBand id').lean() : [];
+    const bandOf = new Map(batches.map((b) => [b.id, b.learnerAgeBand]));
+    return resolveTrustedAgeBand(params.learningSettings, student?.learnerAgeBand, pickGroupBand(groupIds, (id) => bandOf.get(id)).band);
+  }
   const batch = student?.batchId
     ? await Batch.findOne({ id: student.batchId, institutionId: params.institutionId }).select('+learnerAgeBand').lean()
     : null;

@@ -3,6 +3,7 @@ import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler } from '../middleware/errorHandler';
 import { isGlobalAdmin, scopedFilter } from '../auth/authorization';
 import { Student } from '../models/Student';
+import { groupIdsByStudent, readsFromEnrollments } from '../services/enrollmentReads';
 import { StudentCredit } from '../models/StudentCredit';
 import { UsageEvent } from '../models/UsageEvent';
 
@@ -58,6 +59,10 @@ export const getCreditsReport = asyncHandler(async (req: AuthRequest, res: Respo
   });
 
   const creditByStudent = new Map(credits.map((c) => [c.studentId, c]));
+  // Multi-class step 5 (credits): the group label from class_enrollments when
+  // switched on (each student's own school only). Several groups (step 6, Q9)
+  // are not reachable yet; the first by id is shown.
+  const groups = readsFromEnrollments('credits') ? await groupIdsByStudent(students, 'credits') : null;
   const rows = students
     .map((student) => {
       const credit = creditByStudent.get(student.id);
@@ -67,7 +72,7 @@ export const getCreditsReport = asyncHandler(async (req: AuthRequest, res: Respo
         studentId: student.id,
         name: student.name,
         email: student.email,
-        batchId: student.batchId,
+        batchId: groups ? groups.get(student.id)?.[0] : student.batchId,
         institutionId: student.institutionId,
         limit,
         usage,

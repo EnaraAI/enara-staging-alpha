@@ -6,7 +6,8 @@ import { Institution } from '../models/Institution';
 import { Student } from '../models/Student';
 import { isLearnerAgeBand, LEARNER_AGE_BANDS, type LearnerAgeBand } from '../models/learnerAgeBand';
 import { recordAudit } from '../services/auditTrail';
-import { resolveTrustedAgeBand } from '../services/languageTeachingContext';
+import { pickGroupBand, resolveTrustedAgeBand } from '../services/languageTeachingContext';
+import { groupIdsByStudent, readsFromEnrollments } from '../services/enrollmentReads';
 
 // Trusted learner age band (Option B). Writes: Workspace Admin ('admin') only.
 // Reads: Workspace Admin and Academic Manager. The tenant always comes from the
@@ -40,18 +41,22 @@ export const getAgeBands = asyncHandler(async (req: AuthRequest, res: Response) 
   ]);
   const settings = (school as { learningSettings?: unknown } | null)?.learningSettings;
   const classBand = new Map(batches.map((b) => [b.id, b.learnerAgeBand]));
+  // Multi-class step 5 (profile_context): the student's group from
+  // class_enrollments when switched on (Q8: youngest band if several).
+  const groups = readsFromEnrollments('profile_context') ? await groupIdsByStudent(students.map((s) => ({ id: s.id, institutionId })), 'profile_context') : null;
   res.json({
     values: LEARNER_AGE_BANDS,
     adultSchool: (settings as { adultLearners?: unknown } | undefined)?.adultLearners === true,
     canEdit: req.user?.role === 'admin',
     classes: batches.map((b) => ({ id: b.id, name: b.name, ageBand: isLearnerAgeBand(b.learnerAgeBand) ? b.learnerAgeBand : null })),
     students: students.map((s) => {
-      const cls = s.batchId ? classBand.get(s.batchId) : undefined;
+      const group = groups ? pickGroupBand(groups.get(s.id) ?? [], (id) => classBand.get(id)) : null;
+      const cls = group ? group.band : s.batchId ? classBand.get(s.batchId) : undefined;
       const effective = resolveTrustedAgeBand(settings, s.learnerAgeBand, cls);
       return {
         id: s.id,
         name: s.name,
-        classId: s.batchId ?? null,
+        classId: group ? group.groupId : s.batchId ?? null,
         ageBand: isLearnerAgeBand(s.learnerAgeBand) ? s.learnerAgeBand : null,
         classAgeBand: isLearnerAgeBand(cls) ? cls : null,
         effective: { ageBand: effective.band, source: effective.source, status: effective.status },

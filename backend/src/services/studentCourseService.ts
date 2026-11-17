@@ -1,7 +1,7 @@
 import { Curriculum } from '../models/Curriculum';
 import { enrolledClassFilter } from './enrollment';
 import { shadowCompare, shadowOn } from './enrollmentShadow';
-import { readsFromEnrollments } from './enrollmentReads';
+import { readsFromEnrollments, studentClassFilter, type ReadFeature } from './enrollmentReads';
 import { CourseInstance } from '../models/CourseInstance';
 import { LessonProgress } from '../models/LessonProgress';
 import { Student } from '../models/Student';
@@ -17,16 +17,21 @@ export async function getStudentOrThrow(studentId: string) {
   return student;
 }
 
-export function getEnrolledInstances(studentId: string) {
-  return requestMemo(`enrolled:${studentId}`, () => readEnrolledInstances(studentId));
+// The classes a student is in. `feature` names the step 5 switch that decides
+// where membership is read from: the student app (default) or, for "may this
+// teacher read this student", teacher_rosters.
+export function getEnrolledInstances(studentId: string, feature: ReadFeature = 'student_app') {
+  const fromEnrollments = readsFromEnrollments(feature);
+  return requestMemo(`enrolled:${studentId}:${fromEnrollments ? 'enrollments' : 'old'}`, () => readEnrolledInstances(studentId, fromEnrollments));
 }
 
-async function readEnrolledInstances(studentId: string) {
+async function readEnrolledInstances(studentId: string, fromEnrollments: boolean) {
   const student = await getStudentOrThrow(studentId);
   const institutionFilter = student.institutionId ? { institutionId: student.institutionId } : {};
-  // Multi-class step 5 (student_app): read from class_enrollments when switched on.
-  if (readsFromEnrollments('student_app')) {
-    const enrolled = await enrolledClassFilter(studentId, student.institutionId);
+  // Multi-class step 5: read from class_enrollments when the feature is switched on.
+  if (fromEnrollments) {
+    // Enrollments always belong to a school: a student without one has none.
+    const enrolled = student.institutionId ? await studentClassFilter(studentId, student.institutionId) : null;
     if (!enrolled) return CourseInstance.find({ id: { $in: [] } }).exec();
     return CourseInstance.find({ ...institutionFilter, ...STUDENT_VISIBLE_COURSE_FILTER, ...enrolled })
       .sort({ createdAt: -1 })

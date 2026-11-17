@@ -1,4 +1,5 @@
 import { AssessmentAttempt } from '../models/AssessmentAttempt';
+import { readsFromEnrollments, studentGroupIds } from './enrollmentReads';
 import { LearningEvidence } from '../models/LearningEvidence';
 import { PedagogicalDecision } from '../models/PedagogicalDecision';
 import { Student } from '../models/Student';
@@ -129,6 +130,11 @@ export async function recomputeStudentEpisodes(studentId: string, now = new Date
   const gradeBand = Number.isFinite(grade) ? (grade <= 5 ? 'K-5' : grade <= 8 ? '6-8' : '9-12') : 'unknown';
   const history = await MasteryHistory.find({ studentId, objectiveId: { $in: objectiveIds } }).sort({ at: 1 }).select('objectiveId masteryStatus masteryEstimate at').lean();
 
+  // The student's group on impact rows: Student.batchId, or (multi-class step 5,
+  // analytics) their active group enrollment. With several groups (step 6),
+  // the first by id.
+  const groupId = readsFromEnrollments('analytics') ? (student ? (await studentGroupIds(student, 'analytics'))[0] : undefined) : student?.batchId;
+
   let written = 0;
   for (const objectiveId of objectiveIds) {
     const own = decisions.filter((d) => d.objectiveId === objectiveId);
@@ -176,7 +182,7 @@ export async function recomputeStudentEpisodes(studentId: string, now = new Date
         id: `ep-${first.id}`,
         institutionId: first.institutionId ?? student?.institutionId,
         studentId,
-        batchId: student?.batchId,
+        batchId: groupId,
         origin: student?.origin === 'demo_seed' ? 'demo_seed' : 'live',
         objectiveId,
         subject: [...before, ...after].map((e) => ctx.get(e.id)?.subject).find(Boolean),

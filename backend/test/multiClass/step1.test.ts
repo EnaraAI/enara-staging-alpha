@@ -125,7 +125,9 @@ describe('migration and isolation from the app', () => {
   // Step 4 adds shadow reads: these files also import the enrollment service, but
   // only to compare inside shadowCompare; the answer returned is the old one
   // (test/multiClass/step4.test.ts). Step 5 updates this list feature by feature.
-  it('only the step 2 write-both helper and the step 4 shadow checks import the enrollment service (no reads are switched yet)', () => {
+  // Step 5 (features 1-7): every switched read goes through
+  // services/enrollmentReads.ts; no other file imports the enrollment service.
+  it('only the step 2 write-both helper, the step 4 shadow checks and services/enrollmentReads.ts import the enrollment service', () => {
     const src = path.resolve(__dirname, '../../src');
     const hits: string[] = [];
     const walk = (dir: string) => {

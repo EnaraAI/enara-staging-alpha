@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { studentIdsInClass } from '../services/enrollment';
 import { shadowCompare, shadowOn } from '../services/enrollmentShadow';
+import { classRosterFromEnrollments, readsFromEnrollments } from '../services/enrollmentReads';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { isGlobalAdmin, requireInstitutionId } from '../auth/authorization';
@@ -45,16 +46,24 @@ export const getTtuAnalytics = asyncHandler(async (req: AuthRequest, res: Respon
       ...(req.user!.role === 'teacher' ? { instructorIds: req.user!.id } : {}),
     }).lean();
     if (courseId && !classes.length) throw new AppError('Course not found', 404, 'COURSE_NOT_FOUND');
-    const batchIds = classes.map((c) => c.batchId).filter(Boolean);
-    const inBatches = batchIds.length ? await Student.find({ batchId: { $in: batchIds }, ...(filter.institutionId ? { institutionId: filter.institutionId } : {}) }).select('id').lean() : [];
-    studentIds = [...new Set([...classes.flatMap((c) => c.studentIds || []), ...inBatches.map((s) => s.id)])];
-    // Multi-class step 4: compare with class_enrollments; the old answer is used.
-    if (shadowOn()) {
-      await shadowCompare('pedagogy_roster', { classId: courseId, institutionId: filter.institutionId as string | undefined }, studentIds, async () =>
-        (await Promise.all(classes.map((c) => studentIdsInClass({ id: c.id, batchId: c.batchId, institutionId: filter.institutionId as string | undefined })))).flat(),
-      );
+    if (readsFromEnrollments('teacher_rosters')) {
+      // Multi-class step 5 (teacher_rosters): the classes' members from
+      // class_enrollments, each read in its class's own school. Used only as a
+      // set ($in), so the order does not matter.
+      studentIds = [...new Set((await Promise.all(classes.map((c) => classRosterFromEnrollments(c)))).flat())];
+      filter.studentId = { $in: await studentsInView(studentIds, view) };
+    } else {
+      const batchIds = classes.map((c) => c.batchId).filter(Boolean);
+      const inBatches = batchIds.length ? await Student.find({ batchId: { $in: batchIds }, ...(filter.institutionId ? { institutionId: filter.institutionId } : {}) }).select('id').lean() : [];
+      studentIds = [...new Set([...classes.flatMap((c) => c.studentIds || []), ...inBatches.map((s) => s.id)])];
+      // Multi-class step 4: compare with class_enrollments; the old answer is used.
+      if (shadowOn()) {
+        await shadowCompare('pedagogy_roster', { classId: courseId, institutionId: filter.institutionId as string | undefined }, studentIds, async () =>
+          (await Promise.all(classes.map((c) => studentIdsInClass({ id: c.id, batchId: c.batchId, institutionId: filter.institutionId as string | undefined })))).flat(),
+        );
+      }
+      filter.studentId = { $in: await studentsInView(studentIds, view) };
     }
-    filter.studentId = { $in: await studentsInView(studentIds, view) };
   } else {
     // School-wide: TTU episodes follow their students' origin.
     Object.assign(filter, await studentClauseForView(filter.institutionId as string | undefined, view));

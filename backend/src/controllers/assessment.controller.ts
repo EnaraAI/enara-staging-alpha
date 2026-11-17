@@ -12,6 +12,7 @@ import { stripAnswersForStudent } from '../services/assessmentSecurity';
 import { logger } from '../utils/logging';
 import { AssessmentAttempt } from '../models/AssessmentAttempt';
 import { Student } from '../models/Student';
+import { groupMemberIds, readsFromEnrollments } from '../services/enrollmentReads';
 import { generateAssessmentId } from '../utils/idGenerator';
 import { resolveWriteInstitutionId, scopedFilter } from '../auth/authorization';
 import {
@@ -230,7 +231,14 @@ export const getAssessmentAttempts = asyncHandler(async (req: AuthRequest, res: 
     .lean();
 
   const assignedTo: Record<string, unknown>[] = [];
-  if (assessment.batchId) assignedTo.push({ batchId: assessment.batchId });
+  if (assessment.batchId) {
+    // Multi-class step 5 (assessments): the group's members from class_enrollments
+    // when switched on (in the assessment's school), else Student.batchId.
+    if (readsFromEnrollments('assessments')) {
+      const inGroup = assessment.institutionId ? await groupMemberIds(assessment.batchId, assessment.institutionId) : [];
+      if (inGroup.length) assignedTo.push({ id: { $in: inGroup } });
+    } else assignedTo.push({ batchId: assessment.batchId });
+  }
   if (assessment.studentId) assignedTo.push({ id: assessment.studentId });
   const attemptedIds = [...new Set(attempts.map((a) => a.studentId))];
   if (attemptedIds.length) assignedTo.push({ id: { $in: attemptedIds } });
