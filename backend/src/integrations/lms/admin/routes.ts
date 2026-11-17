@@ -126,16 +126,22 @@ lmsAdminRouter.post(
       throw new AppError('Your ENARA account is not available. Ask your school administrator.', 403, 'LMS_ACCOUNT_UNAVAILABLE');
     }
     if (await isInstitutionSuspended(row.institutionId)) throw new AppError("Your school's ENARA access is suspended.", 403, 'INSTITUTION_SUSPENDED');
+    // A student preview is only for a staff account (its role may have changed since the launch).
+    const preview = row.preview === true;
+    if (preview && user.role !== 'teacher' && user.role !== 'admin') {
+      await writeLmsAudit({ event: 'lms.session', outcome: 'fail', institutionId: row.institutionId, platformId: row.platformId, code: 'preview_not_staff' });
+      throw new AppError('Your ENARA account is not available. Ask your school administrator.', 403, 'LMS_ACCOUNT_UNAVAILABLE');
+    }
     await writeLmsAudit({
       event: 'lms.session',
       outcome: 'ok',
       institutionId: row.institutionId,
       platformId: row.platformId,
       actor: row.lmsUserId,
-      refIds: { purpose: row.purpose, contextId: row.contextId, enaraClassId: row.enaraClassId, cookieless: row.cookieless },
+      refIds: { purpose: row.purpose, contextId: row.contextId, enaraClassId: row.enaraClassId, cookieless: row.cookieless, preview },
     });
     res.json({
-      token: signToken(user),
+      token: signToken(user, { preview }),
       user: await sessionUser(user),
       launch: {
         purpose: row.purpose,
@@ -143,6 +149,7 @@ lmsAdminRouter.post(
         classId: row.enaraClassId ?? null,
         presentation: row.presentation ?? 'iframe',
         cookieless: row.cookieless,
+        preview,
       },
     });
   }),
@@ -160,18 +167,21 @@ lmsAdminRouter.post(
     // Informational only (the landing page): kept only when it is a class of this school.
     const requestedClass = getOptionalId(body, 'classId');
     const classId = requestedClass && (await CourseInstance.exists({ id: requestedClass, institutionId: user.institutionId })) ? requestedClass : undefined;
+    // A preview stays a preview in the new tab.
+    const preview = user.preview === true;
     const token = await issueLaunchToken({
       institutionId: user.institutionId!,
       enaraUserId: user.id,
       purpose: 'handoff',
-      enaraRole: role,
+      enaraRole: preview ? 'student' : role,
+      ...(preview ? { preview: true } : {}),
       platformId: link.platformId,
       lmsUserId: link.id,
       enaraClassId: classId,
       presentation: 'window',
       cookieless: false,
     });
-    await writeLmsAudit({ event: 'lms.handoff', outcome: 'ok', institutionId: user.institutionId, platformId: link.platformId, actor: link.id });
+    await writeLmsAudit({ event: 'lms.handoff', outcome: 'ok', institutionId: user.institutionId, platformId: link.platformId, actor: link.id, refIds: { preview } });
     res.json({ token, url: `${lmsSettings().toolBaseUrl}/lms/launch#lt=${encodeURIComponent(token)}` });
   }),
 );

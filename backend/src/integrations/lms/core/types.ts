@@ -39,6 +39,8 @@ export interface LaunchResult {
   targetActivityId?: string;
   presentation: LmsPresentation;
   returnUrl?: string;
+  /** Student preview by a staff account: nothing was provisioned (docs/lms/PHASE_1A_NOTES.md). */
+  preview?: boolean;
 }
 
 export interface RosterDiff {

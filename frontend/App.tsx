@@ -44,9 +44,9 @@ import { CourseTeacherAnalytics } from './pages/CourseTeacherAnalytics';
 import { StudentDeepAnalytics } from './pages/StudentDeepAnalytics';
 import { Integrations } from '@/pages/Integrations';
 import { AdminAvatarControlCenter } from './components/enara/AdminAvatarControlCenter';
-import { LmsFrameBar, LmsLaunch, onLmsLaunchPath } from './pages/LmsLaunch';
+import { LmsFrameBar, LmsLaunch, LmsPreviewBanner, onLmsLaunchPath } from './pages/LmsLaunch';
 import { LmsConnections } from './pages/LmsConnections';
-import { fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
+import { isLmsPreview, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
@@ -97,7 +97,8 @@ const App: React.FC = () => {
       try { return localStorage.getItem(UI_ROLE_KEY) as AppState['role']; } catch { return null; }
     })();
     // Only a portal the account may open; academic managers always get theirs.
-    const role = restoreUiRole(session?.role, savedRole);
+    // An LMS student preview (staff account, read-only session) reopens the student view.
+    const role = isLmsPreview() && (session?.role === 'teacher' || session?.role === 'admin') ? 'student' : restoreUiRole(session?.role, savedRole);
     return {
       role,
       page: role === 'student' && courseId ? 'courses' : role === 'admin' ? staffLandingPage(session?.role) : 'dashboard',
@@ -163,7 +164,10 @@ const App: React.FC = () => {
   }, [assessments, state.completedAssessmentIds]);
 
   const handleLogin = (role: UiRole, user: SessionUser) => {
-    try { localStorage.setItem(UI_ROLE_KEY, role); } catch { /* storage unavailable */ }
+    // A student preview lives in this tab only: it must not change the portal a normal sign-in reopens.
+    if (!isLmsPreview()) {
+      try { localStorage.setItem(UI_ROLE_KEY, role); } catch { /* storage unavailable */ }
+    }
     let page = role === 'student' && state.sharedCourseId ? 'courses' : role === 'admin' ? staffLandingPage(user.role) : 'dashboard';
     let activeAssessment = null;
 
@@ -385,6 +389,7 @@ const App: React.FC = () => {
     return (
       <div className="flex flex-col h-screen overflow-hidden">
         <LmsFrameBar />
+        <LmsPreviewBanner />
         <Header 
           role="student" 
           userName={userName} 
@@ -543,6 +548,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <LmsFrameBar />
+      <LmsPreviewBanner />
       <Header 
         role="admin" 
         userName={userName} 

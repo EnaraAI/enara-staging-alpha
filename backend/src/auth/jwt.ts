@@ -10,12 +10,19 @@ export interface AccessTokenSubject {
   studentId?: string;
   institutionId?: string;
   tokenVersion?: number;
+  /**
+   * LMS student preview (docs/lms/PHASE_1A_NOTES.md): a staff account opened
+   * from the LMS with a Learner role. Carried as the `pv` claim; requests made
+   * with such a token are read-only (auth.middleware.ts).
+   */
+  preview?: boolean;
 }
 
 export interface VerifiedAccessToken {
   subject: string;
   tokenType: 'access';
   tokenVersion: number;
+  preview: boolean;
 }
 
 export function signAccessToken(user: AccessTokenSubject): string {
@@ -28,6 +35,7 @@ export function signAccessToken(user: AccessTokenSubject): string {
     studentId: user.studentId,
     institutionId: user.institutionId,
     tv: user.tokenVersion ?? 0,
+    ...(user.preview ? { pv: true } : {}),
   };
   const options: SignOptions = {
     algorithm: 'HS256',
@@ -66,5 +74,5 @@ export function verifyAccessToken(token: string): VerifiedAccessToken {
   if (typeof tokenVersion !== 'number' || !Number.isInteger(tokenVersion) || tokenVersion < 0) {
     throw new AppError('Invalid token payload', 401, 'INVALID_TOKEN');
   }
-  return { subject: decoded.sub, tokenType: 'access', tokenVersion };
+  return { subject: decoded.sub, tokenType: 'access', tokenVersion, preview: decoded.pv === true };
 }

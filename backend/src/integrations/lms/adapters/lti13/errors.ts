@@ -38,6 +38,8 @@ export const LTI_ERRORS = {
   observer_not_supported: [403, 'Parent and mentor access from the LMS is not available yet.'],
   institution_suspended: [403, "Your school's ENARA access is suspended. Contact your school administrator."],
   role_conflict: [409, 'Your ENARA account has a different role from the one your LMS sent. Ask your school administrator.'],
+  student_as_instructor: [409, 'Your ENARA account is a student account, so ENARA cannot open this activity for you as a teacher. If you teach this course, ask your school administrator to set up a teacher account for you.'],
+  test_user_not_supported: [403, 'This is a test student from your LMS. ENARA does not create accounts for test students. To preview the student view, open the activity as yourself and use your LMS\'s "switch role to student".'],
   account_disabled: [403, 'Your ENARA account is switched off. Ask your school administrator.'],
   account_conflict: [409, 'Your ENARA account could not be matched. Ask your school administrator.'],
   seat_limit_reached: [403, 'Your school has used all of its ENARA seats. Ask your school administrator.'],

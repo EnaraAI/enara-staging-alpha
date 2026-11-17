@@ -33,7 +33,7 @@ export function signToken(user: {
   studentId?: string;
   institutionId?: string;
   tokenVersion?: number;
-}) {
+}, opts: { preview?: boolean } = {}) {
   return signAccessToken({
     id: user._id.toString(),
     email: user.email,
@@ -41,6 +41,7 @@ export function signToken(user: {
     studentId: user.studentId,
     institutionId: user.institutionId,
     tokenVersion: user.tokenVersion,
+    ...(opts.preview ? { preview: true } : {}),
   });
 }
 

@@ -20,6 +20,8 @@ export interface ILmsLaunchToken {
   resourceLinkId?: string;
   presentation?: 'iframe' | 'window';
   cookieless: boolean;
+  /** Student preview by a staff account (enaraRole is then 'student', the view; the account keeps its own role). */
+  preview?: boolean;
   expiresAt: Date;
   usedAt?: Date;
   createdAt: Date;
@@ -39,6 +41,7 @@ const launchTokenSchema = new Schema<ILmsLaunchToken>(
     resourceLinkId: String,
     presentation: { type: String, enum: ['iframe', 'window'] },
     cookieless: { type: Boolean, default: false },
+    preview: Boolean,
     expiresAt: { type: Date, required: true },
     usedAt: Date,
     createdAt: { type: Date, default: () => new Date() },

@@ -17,6 +17,21 @@ export interface AuthPayload {
   permissions?: string[];
   // Set when the request was authenticated with a partner API key instead of a session token.
   apiKeyId?: string;
+  // LMS student preview (docs/lms/PHASE_1A_NOTES.md): a staff account viewing
+  // the student side from the LMS. Read-only: see refusePreviewWrite below.
+  preview?: boolean;
+}
+
+// LMS student preview sessions are read-only: no attempt, tutor session,
+// progress, setting or any other record is written for them. The only writes
+// allowed are signing out and "Open in new tab" (which carries the preview on).
+const PREVIEW_WRITE_ALLOWED = new Set(['/api/auth/logout', '/api/lms/launch/handoff']);
+export const PREVIEW_READ_ONLY_MESSAGE = 'Preview as student — nothing is saved.';
+
+export function previewWriteRefused(method: string, originalUrl: string): boolean {
+  if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') return false;
+  const path = originalUrl.split('?')[0].replace(/\/+$/, '');
+  return !PREVIEW_WRITE_ALLOWED.has(path);
 }
 
 export interface AuthRequest extends Request {
@@ -64,6 +79,15 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
       return;
     }
 
+    // An LMS preview token never grants anything; it only takes write rights away.
+    if (verified.preview && previewWriteRefused(req.method, req.originalUrl || req.url)) {
+      res.status(403).json({
+        error: { code: 'LMS_PREVIEW_READ_ONLY', message: PREVIEW_READ_ONLY_MESSAGE, requestId: req.requestId },
+        message: PREVIEW_READ_ONLY_MESSAGE,
+      });
+      return;
+    }
+
     req.user = {
       id: user._id.toString(),
       email: user.email,
@@ -71,6 +95,7 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
       studentId: user.studentId,
       institutionId: user.institutionId,
       permissions: user.permissions,
+      ...(verified.preview ? { preview: true } : {}),
     };
     // Who this request is for, for AI call records (re-entered so it holds even
     // if an earlier middleware's callback dropped the request's context).
@@ -181,6 +206,14 @@ export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction
 }
 
 export function requireStudent(req: AuthRequest, res: Response, next: NextFunction): void {
+  // A staff preview has no student record, so there is no student data to show.
+  if (req.user?.preview) {
+    res.status(403).json({
+      error: { code: 'LMS_PREVIEW_NO_STUDENT_DATA', message: 'Preview as student: there is no student work to show in a preview.', requestId: req.requestId },
+      message: 'Preview as student: there is no student work to show in a preview.',
+    });
+    return;
+  }
   if (!req.user || req.user.role !== 'student' || !req.user.studentId) {
     res.status(403).json({
       error: {

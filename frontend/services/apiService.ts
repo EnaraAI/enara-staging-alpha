@@ -1260,6 +1260,8 @@ export interface LmsLaunchInfo {
   classId: string | null;
   presentation: 'iframe' | 'window';
   cookieless: boolean;
+  /** Student preview by a staff account: read-only, nothing is saved. */
+  preview?: boolean;
 }
 const LMS_KEY = 'enara_lms';
 export async function exchangeLmsLaunch(token: string): Promise<{ user: SessionUser; launch: LmsLaunchInfo; token: string; stored: boolean }> {
@@ -1268,7 +1270,7 @@ export async function exchangeLmsLaunch(token: string): Promise<{ user: SessionU
   try {
     sessionStorage.setItem(TOKEN_KEY, data.token);
     sessionStorage.setItem(USER_KEY, JSON.stringify(data.user));
-    sessionStorage.setItem(LMS_KEY, JSON.stringify({ classId: data.launch.classId, presentation: data.launch.presentation }));
+    sessionStorage.setItem(LMS_KEY, JSON.stringify({ classId: data.launch.classId, presentation: data.launch.presentation, ...(data.launch.preview ? { preview: true } : {}) }));
   } catch {
     stored = false; // storage blocked in this frame: the page offers "Open in new tab"
   }
@@ -1277,6 +1279,14 @@ export async function exchangeLmsLaunch(token: string): Promise<{ user: SessionU
 export function isLmsSession(): boolean {
   try {
     return !!sessionStorage.getItem(LMS_KEY) && !!sessionStorage.getItem(TOKEN_KEY);
+  } catch {
+    return false;
+  }
+}
+/** A staff account previewing the student view from the LMS (the server refuses every write). */
+export function isLmsPreview(): boolean {
+  try {
+    return isLmsSession() && JSON.parse(sessionStorage.getItem(LMS_KEY) || '{}').preview === true;
   } catch {
     return false;
   }

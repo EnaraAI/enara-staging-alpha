@@ -3,11 +3,11 @@ import type { JWTPayload } from 'jose';
 import { isInstitutionSuspended } from '../../../../middleware/auth.middleware';
 import { writeLmsAudit } from '../../core/audit';
 import { sha256Hex } from '../../core/crypto';
-import { LmsProvisionError, provisionLaunch, type ProvisionRole } from '../../core/domainService';
+import { findStudentPreview, LmsProvisionError, provisionLaunch, type ProvisionInput, type ProvisionRole } from '../../core/domainService';
 import { lmsSettings } from '../../core/flags';
 import { loadJose } from '../../core/jose';
 import { issueLaunchToken } from '../../core/launchToken';
-import { mapLtiRoles } from '../../core/roleMap';
+import { isTestUser, mapLtiRoles } from '../../core/roleMap';
 import type { LaunchResult } from '../../core/types';
 import { LmsDeployment, LmsOidcState, LmsPlatform, type ILmsPlatform } from '../../models';
 import { getPreset } from '../../presets';
@@ -285,19 +285,82 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
 
   const ags = obj(claims[CLAIM.ags]);
   const nrps = obj(claims[CLAIM.nrps]);
+  const input: ProvisionInput = {
+    platformId: platform.id,
+    institutionId: platform.institutionId,
+    externalUserId: sub,
+    person: { email: str(payload.email, 254), givenName: str(payload.given_name, 120), familyName: str(payload.family_name, 120), name: str(payload.name, 200) },
+    role: mapped.role as ProvisionRole,
+    rawRoles: roles.filter((r): r is string => typeof r === 'string'),
+    testUser: isTestUser(roles),
+    context: { externalId: contextId, title: str(context?.title, 200), label: str(context?.label, 120) },
+    resourceLink: { externalId: resourceLinkId, title: str(resourceLink?.title, 200), customParams: stringMap(claims[CLAIM.custom]), lineItemUrl: str(ags?.lineitem) },
+    services: { nrpsUrl: str(nrps?.context_memberships_url), agsLineItemsUrl: str(ags?.lineitems) },
+  };
+
+  // Staff opening the activity as a learner (owner decision L1): a read-only
+  // preview of the student view. Nothing is provisioned or changed.
+  let preview;
+  try {
+    preview = await findStudentPreview(input);
+  } catch (error) {
+    if (error instanceof LmsProvisionError) return fail(error.code, 'lti.launch', { platform, refIds: { role: mapped.role, testUser: !!input.testUser } });
+    throw error;
+  }
+  if (preview) {
+    const token = await issueLaunchToken({
+      institutionId: platform.institutionId,
+      enaraUserId: preview.enaraUserId,
+      purpose: 'launch',
+      enaraRole: 'student',
+      preview: true,
+      platformId: platform.id,
+      lmsUserId: preview.lmsUserId,
+      contextId: preview.contextId,
+      enaraClassId: preview.enaraClassId,
+      resourceLinkId: preview.resourceLinkId,
+      presentation: preview.presentation,
+      cookieless,
+    });
+    await writeLmsAudit({
+      event: 'preview_launch',
+      outcome: 'ok',
+      institutionId: platform.institutionId,
+      platformId: platform.id,
+      actor: preview.lmsUserId,
+      code: cookieless ? 'cookieless' : undefined,
+      refIds: {
+        deploymentId: deployment.id,
+        lmsUserId: preview.lmsUserId,
+        enaraUserId: preview.enaraUserId,
+        staffRole: preview.staffRole,
+        detectedBy: preview.detectedBy,
+        contextId: preview.contextId,
+        resourceLinkId: preview.resourceLinkId,
+        enaraClassId: preview.enaraClassId,
+        cookieless,
+      },
+    });
+    return {
+      token,
+      cookieless,
+      platform,
+      stateCookieName: cookieName,
+      result: {
+        enaraUserId: preview.enaraUserId,
+        enaraRole: 'student',
+        enaraOrgId: platform.institutionId,
+        enaraClassId: preview.enaraClassId,
+        presentation: preview.presentation,
+        returnUrl: str(obj(claims[CLAIM.launchPresentation])?.return_url),
+        preview: true,
+      },
+    };
+  }
+
   let provisioned;
   try {
-    provisioned = await provisionLaunch({
-      platformId: platform.id,
-      institutionId: platform.institutionId,
-      externalUserId: sub,
-      person: { email: str(payload.email, 254), givenName: str(payload.given_name, 120), familyName: str(payload.family_name, 120), name: str(payload.name, 200) },
-      role: mapped.role as ProvisionRole,
-      rawRoles: roles.filter((r): r is string => typeof r === 'string'),
-      context: { externalId: contextId, title: str(context?.title, 200), label: str(context?.label, 120) },
-      resourceLink: { externalId: resourceLinkId, title: str(resourceLink?.title, 200), customParams: stringMap(claims[CLAIM.custom]), lineItemUrl: str(ags?.lineitem) },
-      services: { nrpsUrl: str(nrps?.context_memberships_url), agsLineItemsUrl: str(ags?.lineitems) },
-    });
+    provisioned = await provisionLaunch(input);
   } catch (error) {
     if (error instanceof LmsProvisionError) return fail(error.code, 'lti.launch', { platform, refIds: { role: mapped.role } });
     throw error;

@@ -303,9 +303,199 @@ describe('role mapping', () => {
     await expectLtiError(r, 'observer_not_supported', 403);
     expect(await M.LmsUser.exists({ externalUserId: 'parent-1' })).toBeNull();
   });
-  it('an account never changes role from a launch (role_conflict)', async () => {
+  it('an account never changes role from a launch: a student opened as Instructor is refused and told to ask an admin', async () => {
     const r = await failingLaunch(pA, { sub: 'student-1', 'lti:roles': [ROLE.instructor] });
-    await expectLtiError(r, 'role_conflict', 409);
+    await expectLtiError(r, 'student_as_instructor', 409);
+    expect(r.text).toMatch(/student account/);
+    expect(r.text).toMatch(/ask your school administrator/i);
+    const lu = await M.LmsUser.findOne({ externalUserId: 'student-1', institutionId: A }).lean();
+    const { User } = await import('../../src/models/User');
+    expect((await User.findById(lu!.enaraUserId).lean())!.role).toBe('student');
+  });
+});
+
+describe('student preview (owner decision L1): staff opening the activity as a learner', () => {
+  const decode = (jwt: string) => JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString('utf8'));
+  async function counts() {
+    const { Student } = await import('../../src/models/Student');
+    const { User } = await import('../../src/models/User');
+    const { ClassEnrollment } = await import('../../src/models/ClassEnrollment');
+    const { CourseInstance } = await import('../../src/models/CourseInstance');
+    const { Batch } = await import('../../src/models/Batch');
+    const { countSeats } = await import('../../src/integrations/lms/core/seats');
+    return {
+      students: await Student.countDocuments(),
+      users: await User.countDocuments(),
+      classEnrollments: await ClassEnrollment.countDocuments(),
+      classes: await CourseInstance.countDocuments(),
+      groups: await Batch.countDocuments(),
+      lmsUsers: await M.LmsUser.countDocuments(),
+      lmsEnrollments: await M.LmsEnrollment.countDocuments(),
+      contexts: await M.LmsContext.countDocuments(),
+      resourceLinks: await M.LmsResourceLink.countDocuments(),
+      gradeJobs: await M.LmsGradeSyncJob.countDocuments(),
+      seatsA: await countSeats(A),
+      seatsB: await countSeats(B),
+      orgSettings: JSON.stringify(await M.LmsOrgSettings.find({}).sort({ institutionId: 1 }).lean()),
+    };
+  }
+  async function snapshotClass(classId: string) {
+    const { CourseInstance } = await import('../../src/models/CourseInstance');
+    const c = await CourseInstance.findOne({ id: classId }).lean();
+    return JSON.stringify({ s: c!.studentIds, i: c!.instructorIds });
+  }
+
+  it('teacher -> learner: a preview session, nothing created, no seat, no outbox, the account keeps its role', async () => {
+    const { User } = await import('../../src/models/User');
+    const { countSeats } = await import('../../src/integrations/lms/core/seats');
+    // teacher.test opens the activity as a teacher first (account + class exist).
+    const t = await launchAndExchange(pA, { sub: 'pv-teacher', 'lti:roles': [ROLE.instructor], 'lti:context': { id: 'course-pv', title: 'Preview course' } });
+    const classId = t.ex.body.launch.classId as string;
+    const lu = await M.LmsUser.findOne({ externalUserId: 'pv-teacher', institutionId: A }).lean();
+    const teacherBefore = await User.findById(lu!.enaraUserId).lean();
+    // Hard cap at the current count: a NEW student would be refused; a preview takes no seat.
+    const used = await countSeats(A);
+    await request(app).put('/api/lms/seats').set('Authorization', auth.enara).send({ institutionId: A, seatLimit: used, hardCap: true });
+    try {
+      const before = await counts();
+      const cls = await snapshotClass(classId);
+      // Moodle "Switch role to -> Student": same sub, Learner only, a new activity link.
+      const { r, ex } = await launchAndExchange(pA, { sub: 'pv-teacher', 'lti:roles': [ROLE.learner], 'lti:context': { id: 'course-pv', title: 'Preview course' }, 'lti:resource_link': { id: 'rl-pv-new' } });
+      expect(r.status).toBe(303);
+      expect(ex.body.user.role).toBe('teacher');
+      expect(ex.body.user.studentId).toBeUndefined();
+      expect(ex.body.launch).toMatchObject({ purpose: 'launch', role: 'student', preview: true, classId });
+      expect(decode(ex.body.token).pv).toBe(true);
+      expect(await counts()).toEqual(before);
+      expect(await snapshotClass(classId)).toBe(cls);
+      const teacherAfter = await User.findById(lu!.enaraUserId).lean();
+      expect(teacherAfter!.role).toBe('teacher');
+      expect(teacherAfter!.studentId).toBeUndefined();
+      expect(teacherAfter!.tokenVersion ?? 0).toBe(teacherBefore!.tokenVersion ?? 0);
+      // No lms_enrollments row says "student" for this person.
+      expect(await M.LmsEnrollment.exists({ lmsUserId: lu!.id, enaraRole: 'student' })).toBeNull();
+      // Audit: preview_launch, IDs only.
+      const audit = await M.LmsAuditLog.findOne({ event: 'preview_launch', actor: lu!.id }).sort({ createdAt: -1 }).lean();
+      expect(audit).toMatchObject({ outcome: 'ok', institutionId: A, refIds: { lmsUserId: lu!.id, enaraUserId: lu!.enaraUserId, staffRole: 'teacher', detectedBy: 'staff_account', enaraClassId: classId } });
+      expect(JSON.stringify(audit)).not.toMatch(/Layla|Hassan|layla@/);
+      // The session itself works (reads).
+      const s = await request(app).get('/api/auth/session').set('Authorization', `Bearer ${ex.body.token}`);
+      expect(s.status).toBe(200);
+      expect(s.body.user.role).toBe('teacher');
+      // A normal NEW student is still refused by the hard cap at this moment (the cap is live).
+      await expectLtiError(await failingLaunch(pA, { sub: 'pv-new-student' }), 'seat_limit_reached', 403);
+    } finally {
+      await request(app).put('/api/lms/seats').set('Authorization', auth.enara).send({ institutionId: A, seatLimit: null, hardCap: false, clearBillingFlag: true });
+    }
+  });
+
+  it('writes are refused in a preview session (attempts, tutor sessions, progress, anything else); reads of student data say "preview"', async () => {
+    const { ex } = await launchAndExchange(pA, { sub: 'pv-teacher', 'lti:roles': [ROLE.learner], 'lti:context': { id: 'course-pv', title: 'Preview course' } });
+    const bearer = `Bearer ${ex.body.token}`;
+    const writes: Array<[string, string]> = [
+      ['post', '/api/me/tutor/sessions'],
+      ['post', '/api/me/tutor/sessions/x/messages'],
+      ['post', '/api/me/assessments/a1/attempts'],
+      ['post', '/api/me/assessments/a1/attempts/t1/submit'],
+      ['post', '/api/me/assignments/a1/attempts'],
+      ['post', '/api/me/courses/c1/lessons/l1/complete'],
+      ['post', '/api/me/events'],
+      ['post', '/api/learning/diagnostics'],
+      ['post', '/api/learning/students/STU1/mastery/recompute'],
+      ['post', '/api/auth/tour/complete'],
+      ['post', '/api/course-instances'],
+      ['put', '/api/me/tutor-face'],
+      ['delete', '/api/me/tutor/sessions'],
+      ['patch', '/api/learning/misconceptions/m1'],
+    ];
+    for (const [method, path] of writes) {
+      const res = await (request(app) as unknown as Record<string, (p: string) => request.Test>)[method](path).set('Authorization', bearer).send({});
+      expect(res.status, `${method} ${path}`).toBe(403);
+      expect(res.body.error.code, `${method} ${path}`).toBe('LMS_PREVIEW_READ_ONLY');
+      expect(res.body.error.message).toBe('Preview as student — nothing is saved.');
+    }
+    const read = await request(app).get('/api/me/tutor/sessions').set('Authorization', bearer);
+    expect(read.status).toBe(403);
+    expect(read.body.error.code).toBe('LMS_PREVIEW_NO_STUDENT_DATA');
+    // The same teacher's normal (non-preview) session is not affected.
+    const lu = await M.LmsUser.findOne({ externalUserId: 'pv-teacher', institutionId: A }).lean();
+    const { User } = await import('../../src/models/User');
+    const { signToken } = await import('../../src/controllers/auth.controller');
+    const normal = signToken((await User.findById(lu!.enaraUserId))!);
+    expect(decode(normal).pv).toBeUndefined();
+    expect((await request(app).post('/api/auth/tour/complete').set('Authorization', `Bearer ${normal}`).send({})).body?.error?.code).not.toBe('LMS_PREVIEW_READ_ONLY');
+    // "Open in new tab" is allowed and stays a preview.
+    const h = await request(app).post('/api/lms/launch/handoff').set('Authorization', bearer).send({ classId: ex.body.launch.classId });
+    expect(h.status, JSON.stringify(h.body)).toBe(200);
+    const ex2 = await request(app).post('/api/lms/launch/exchange').send({ token: h.body.token });
+    expect(ex2.body.launch).toMatchObject({ purpose: 'handoff', role: 'student', preview: true });
+    expect(decode(ex2.body.token).pv).toBe(true);
+    // Signing out is allowed.
+    expect((await request(app).post('/api/auth/logout').set('Authorization', `Bearer ${ex2.body.token}`)).status).toBe(204);
+  });
+
+  it('admin -> learner: preview too; a course not yet opened by staff creates nothing (no class)', async () => {
+    const { User } = await import('../../src/models/User');
+    await launchAndExchange(pA, { sub: 'pv-admin', 'lti:roles': [ROLE.instructor], 'lti:context': { id: 'course-pv', title: 'Preview course' } });
+    const lu = await M.LmsUser.findOne({ externalUserId: 'pv-admin', institutionId: A }).lean();
+    await User.updateOne({ _id: lu!.enaraUserId }, { $set: { role: 'admin' } }); // the school made this person an admin
+    const before = await counts();
+    const { ex } = await launchAndExchange(pA, { sub: 'pv-admin', 'lti:roles': [ROLE.learner], 'lti:context': { id: 'course-never-opened', title: 'New course' } });
+    expect(ex.body.user.role).toBe('admin');
+    expect(ex.body.launch).toMatchObject({ role: 'student', preview: true, classId: null });
+    expect(await counts()).toEqual(before);
+    expect(await M.LmsContext.exists({ externalContextId: 'course-never-opened' })).toBeNull();
+    const audit = await M.LmsAuditLog.findOne({ event: 'preview_launch', actor: lu!.id }).lean();
+    expect(audit?.refIds).toMatchObject({ staffRole: 'admin', detectedBy: 'staff_account' });
+    expect((await User.findById(lu!.enaraUserId).lean())!.role).toBe('admin');
+    expect((await request(app).post('/api/me/tutor/sessions').set('Authorization', `Bearer ${ex.body.token}`).send({})).body.error.code).toBe('LMS_PREVIEW_READ_ONLY');
+  });
+
+  it('LTI TestUser role: a preview when linked to staff; an unlinked test student is refused and nothing is created', async () => {
+    const TEST_USER = 'http://purl.imsglobal.org/vocab/lti/system/person#TestUser';
+    const before = await counts();
+    const r = await failingLaunch(pA, { sub: 'canvas-test-student', 'lti:roles': [ROLE.learner, TEST_USER] });
+    await expectLtiError(r, 'test_user_not_supported', 403);
+    expect(await counts()).toEqual(before);
+    expect(await M.LmsUser.exists({ externalUserId: 'canvas-test-student' })).toBeNull();
+    const { ex } = await launchAndExchange(pA, { sub: 'pv-teacher', 'lti:roles': [ROLE.learner, TEST_USER], 'lti:context': { id: 'course-pv', title: 'Preview course' } });
+    expect(ex.body.launch.preview).toBe(true);
+    const lu = await M.LmsUser.findOne({ externalUserId: 'pv-teacher', institutionId: A }).lean();
+    const audit = await M.LmsAuditLog.findOne({ event: 'preview_launch', actor: lu!.id, 'refIds.detectedBy': 'test_user' }).lean();
+    expect(audit).toBeTruthy();
+    expect(await counts()).toEqual(before);
+  });
+
+  it('a normal student launch is unchanged: no preview flag, enrolled as before', async () => {
+    const { ex } = await launchAndExchange(pA, { sub: 'pv-real-student', 'lti:context': { id: 'course-pv', title: 'Preview course' } });
+    expect(ex.body.user.role).toBe('student');
+    expect(ex.body.user.studentId).toBeTruthy();
+    expect(ex.body.launch).toMatchObject({ role: 'student', preview: false });
+    expect(decode(ex.body.token).pv).toBeUndefined();
+    const { ClassEnrollment } = await import('../../src/models/ClassEnrollment');
+    expect(await ClassEnrollment.exists({ studentId: ex.body.user.studentId, targetId: ex.body.launch.classId, status: 'active' })).toBeTruthy();
+    const lu = await M.LmsUser.findOne({ externalUserId: 'pv-real-student', institutionId: A }).lean();
+    expect(await M.LmsAuditLog.exists({ event: 'preview_launch', actor: lu!.id })).toBeNull();
+    expect(await M.LmsAuditLog.exists({ event: 'lti.launch', actor: lu!.id, outcome: 'ok' })).toBeTruthy();
+    // Writes are not blocked by the preview guard for a real student.
+    const w = await request(app).post('/api/me/tutor/sessions').set('Authorization', `Bearer ${ex.body.token}`).send({});
+    expect(w.body?.error?.code).not.toBe('LMS_PREVIEW_READ_ONLY');
+  });
+
+  it('tenant isolation: staff in school A is no one at school B; a link to another school\'s account is refused', async () => {
+    const { User } = await import('../../src/models/User');
+    // The same LMS user id at school B's platform is a different person: a normal new student there.
+    const { ex } = await launchAndExchange(pB, { sub: 'pv-teacher' });
+    expect(ex.body.launch.preview).toBe(false);
+    expect(ex.body.user).toMatchObject({ role: 'student', institutionId: B });
+    // An LMS user at school A linked (wrongly) to a school B teacher: refused, nothing written.
+    const bTeacher = await User.create({ email: 'pv-b-teacher@staff.test', password: 'x', role: 'teacher', name: 'B teacher', institutionId: B });
+    const platformA = (await M.LmsPlatform.findOne({ issuer: pA.issuer, clientId: pA.clientId }).lean())!;
+    await M.LmsUser.create({ platformId: platformA.id, institutionId: A, externalUserId: 'pv-cross', enaraUserId: bTeacher._id.toString() });
+    const before = await counts();
+    await expectLtiError(await failingLaunch(pA, { sub: 'pv-cross' }), 'account_conflict', 409);
+    expect(await counts()).toEqual(before);
+    expect(await M.LmsAuditLog.exists({ event: 'preview_launch', institutionId: B })).toBeNull();
   });
 });
 

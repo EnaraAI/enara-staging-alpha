@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { exchangeLmsLaunch, isLmsSession, lmsNewTabUrl, SessionUser } from '../services/apiService';
+import { exchangeLmsLaunch, isLmsPreview, isLmsSession, lmsNewTabUrl, SessionUser } from '../services/apiService';
 import type { UiRole } from '../services/roleRouting';
 
 // Landing page for a launch from an LMS: /lms/launch#lt=<one-time token>.
@@ -18,8 +18,9 @@ const inFrame = (() => {
   }
 })();
 
-export function uiRoleForLms(role: string): UiRole {
-  return role === 'student' ? 'student' : 'admin';
+export function uiRoleForLms(role: string, preview = false): UiRole {
+  // A staff preview opens the student view; the account keeps its own role.
+  return preview || role === 'student' ? 'student' : 'admin';
 }
 
 export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) => void }> = ({ onReady }) => {
@@ -45,7 +46,7 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
           return;
         }
         window.history.replaceState({}, document.title, '/');
-        onReady(uiRoleForLms(res.user.role), res.user);
+        onReady(uiRoleForLms(res.user.role, res.launch.preview === true), res.user);
       })
       .catch((e: Error) => setError(e.message || 'We could not sign you in. Please open the activity again from your LMS.'));
   }, [onReady]);
@@ -108,6 +109,16 @@ export const LmsFrameBar: React.FC = () => {
     <div className="bg-slate-900 text-white text-sm px-4 py-1.5 flex items-center justify-end gap-3">
       <span className="opacity-80">Opened from your LMS</span>
       <button onClick={open} disabled={busy} className="underline font-semibold disabled:opacity-60">{busy ? 'Opening…' : 'Open in new tab'}</button>
+    </div>
+  );
+};
+
+/** Always on top of a student preview opened from the LMS by a teacher or admin. */
+export const LmsPreviewBanner: React.FC = () => {
+  if (!isLmsPreview()) return null;
+  return (
+    <div role="status" data-testid="lms-preview-banner" className="bg-amber-100 text-amber-900 border-b border-amber-300 text-sm font-semibold px-4 py-2 text-center">
+      Preview as student — nothing is saved
     </div>
   );
 };

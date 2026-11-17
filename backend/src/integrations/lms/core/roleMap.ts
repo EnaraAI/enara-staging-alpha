@@ -24,6 +24,15 @@ const STANDARD: Record<string, LmsEnaraRole | 'admin_if_allowed'> = {
   Administrator: 'admin_if_allowed',
 };
 
+// LTI 1.3 system role for a platform's test account (e.g. a "student view"
+// test student). It says who the person is, not their course role, so it is
+// not mapped; isTestUser() lets the launch treat it as a student preview.
+export const TEST_USER_ROLE = 'http://purl.imsglobal.org/vocab/lti/system/person#TestUser';
+
+export function isTestUser(roles: unknown): boolean {
+  return Array.isArray(roles) && roles.includes(TEST_USER_ROLE);
+}
+
 // Sub-roles such as ".../membership/Learner#NonCreditLearner" follow their parent.
 function parentOf(uri: string): string | undefined {
   const m = /^http:\/\/purl\.imsglobal\.org\/vocab\/lis\/v2\/membership\/(\w+)#\w+$/.exec(uri);
@@ -46,6 +55,7 @@ export function mapLtiRoles(
   let best: LmsEnaraRole | undefined;
   let unknown = false;
   for (const uri of list) {
+    if (uri === TEST_USER_ROLE) continue;
     const override = opts.overrides?.[uri];
     let mapped: LmsEnaraRole | 'admin_if_allowed' | undefined =
       override && override in RANK ? (override as LmsEnaraRole) : STANDARD[uri] ?? STANDARD[parentOf(uri) ?? ''];

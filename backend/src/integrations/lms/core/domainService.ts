@@ -28,7 +28,10 @@ import type { LmsEnaraRole } from './types';
 // resource link + line item + LMS user).
 
 export class LmsProvisionError extends Error {
-  constructor(public readonly code: 'role_conflict' | 'account_disabled' | 'seat_limit_reached' | 'account_conflict', message?: string) {
+  constructor(
+    public readonly code: 'role_conflict' | 'student_as_instructor' | 'test_user_not_supported' | 'account_disabled' | 'seat_limit_reached' | 'account_conflict',
+    message?: string,
+  ) {
     super(message ?? code);
     this.name = 'LmsProvisionError';
   }
@@ -43,6 +46,8 @@ export interface ProvisionInput {
   person: { email?: string; givenName?: string; familyName?: string; name?: string };
   role: ProvisionRole;
   rawRoles: string[];
+  /** The LTI TestUser system role was sent (a platform's test account). */
+  testUser?: boolean;
   context: { externalId: string; title?: string; label?: string };
   resourceLink: { externalId: string; title?: string; customParams?: Record<string, string>; lineItemUrl?: string };
   services?: { nrpsUrl?: string; agsLineItemsUrl?: string };
@@ -156,6 +161,10 @@ async function resolveAccount(input: ProvisionInput, lmsUser: ILmsUser) {
   if (user.status !== 'active') throw new LmsProvisionError('account_disabled');
   // An account keeps the role it was created with: a launch never raises or
   // lowers it (a learner in one course who teaches another needs a decision).
+  // Owner decision L1: a student account opened with an Instructor (or admin)
+  // role is refused with its own message (ask an admin). The reverse, staff
+  // with a Learner role, never gets here: findStudentPreview() handles it.
+  if (user.role === 'student' && input.role !== 'student') throw new LmsProvisionError('student_as_instructor');
   if (user.role !== ENARA_ROLE[input.role]) throw new LmsProvisionError('role_conflict');
   return { userId: user._id.toString(), studentId: user.studentId, created: false };
 }
@@ -221,6 +230,63 @@ async function upsertResourceLink(input: ProvisionInput, context: ILmsContext): 
     if ((error as { code?: number }).code !== 11000) throw error;
     return (await LmsResourceLink.findOne(key).lean())!;
   }
+}
+
+// ------------------------------------------------------- student preview
+//
+// Owner decision L1 (2026-11-17): a staff account (ENARA teacher or admin)
+// that opens the activity with a Learner role, as a Moodle teacher does with
+// "Switch role to -> Student", gets a PREVIEW of the student view. Nothing is
+// written: no Student, no class enrollment, no seat, no lms_enrollments row,
+// no context/class or resource link, no change to the account or its role,
+// and (Phase 3) no grade job. The session it gets is marked preview and is
+// read-only (auth.middleware.ts).
+//
+// Detection: the LMS person (platform + sub) is already linked to an ENARA
+// account whose role is teacher or admin, and the launch maps to student.
+// Moodle sends no "role switched" flag in the launch: a switched teacher
+// arrives with the same sub and Learner as the only role. The LTI system role
+// TestUser (sent by some platforms for their own test students) also marks a
+// preview; a test user that is not linked to a staff account is refused,
+// because ENARA never creates an account for it.
+
+const PREVIEW_STAFF_ROLES = new Set(['teacher', 'admin']);
+
+export interface PreviewResult {
+  lmsUserId: string;
+  enaraUserId: string;
+  staffRole: 'teacher' | 'admin';
+  detectedBy: 'staff_account' | 'test_user';
+  contextId?: string;
+  enaraClassId?: string;
+  resourceLinkId?: string;
+  presentation: 'iframe' | 'window';
+}
+
+/** A student preview for this launch, or null for a normal launch. Read-only. */
+export async function findStudentPreview(input: ProvisionInput): Promise<PreviewResult | null> {
+  if (input.role !== 'student') return null;
+  const lmsUser = await LmsUser.findOne({ platformId: input.platformId, externalUserId: input.externalUserId }).lean();
+  const user = lmsUser?.enaraUserId ? await User.findById(lmsUser.enaraUserId).select('role status institutionId').lean() : null;
+  if (!lmsUser || !user || !PREVIEW_STAFF_ROLES.has(user.role)) {
+    if (input.testUser) throw new LmsProvisionError('test_user_not_supported');
+    return null;
+  }
+  if (user.institutionId !== input.institutionId || lmsUser.institutionId !== input.institutionId) throw new LmsProvisionError('account_conflict');
+  if (user.status !== 'active') throw new LmsProvisionError('account_disabled');
+  // The class is shown only when it already exists (a teacher launch made it); a preview never creates one.
+  const context = await LmsContext.findOne({ platformId: input.platformId, externalContextId: input.context.externalId, institutionId: input.institutionId }).lean();
+  const link = context ? await LmsResourceLink.findOne({ contextId: context.id, externalResourceLinkId: input.resourceLink.externalId }).lean() : null;
+  return {
+    lmsUserId: lmsUser.id,
+    enaraUserId: user._id.toString(),
+    staffRole: user.role as 'teacher' | 'admin',
+    detectedBy: input.testUser ? 'test_user' : 'staff_account',
+    contextId: context?.id,
+    enaraClassId: context?.enaraClassId,
+    resourceLinkId: link?.id,
+    presentation: link?.presentation ?? 'iframe',
+  };
 }
 
 export async function provisionLaunch(input: ProvisionInput): Promise<ProvisionResult> {
