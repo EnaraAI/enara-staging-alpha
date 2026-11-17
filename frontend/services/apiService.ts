@@ -482,6 +482,10 @@ export interface CreditsReport {
     period: string;
     status: 'active' | 'blocked' | 'throttled';
     restrictedFeatures: string[];
+    /** Multi-class (Q9): only for a student in several classes. */
+    groupIds?: string[];
+    /** Multi-class (Q9): last 30 days' AI use by the class it happened in; classId null = "No class". */
+    usageByClass?: Array<{ classId: string | null; className: string; credits: number; events: number }>;
   }>;
   usageByFeature: Array<{ feature: string; credits: number; events: number }>;
   usageByDay: Array<{ date: string; credits: number; events: number }>;
@@ -1275,3 +1279,34 @@ export const fetchArchivedCourseInstances = () => request<any[]>('GET', '/api/co
 /** A delete refused because the group or class still has active students (409). */
 export const isHasStudentsError = (err: unknown) =>
   err instanceof ApiError && err.status === 409 && (err.code === 'GROUP_HAS_STUDENTS' || err.code === 'CLASS_HAS_STUDENTS');
+
+// MULTI-CLASS (step 6, behind ENROLLMENT_MULTI_CLASS on the server)
+export const fetchMultiClassStatus = () => request<{ multiClass: boolean }>('GET', '/api/multi-class/status');
+
+export interface StudentMemberships {
+  studentId: string;
+  primaryGroupId: string | null;
+  multiClass: boolean;
+  groups: Array<{ id: string; name: string | null; primary: boolean; source: string; startedAt: string; removable: boolean }>;
+  classes: Array<{ id: string; courseName: string; groupId: string | null; groupName: string | null; via: Array<'group' | 'class'>; source: string | null; removable: boolean }>;
+}
+/** Admin: every group and class a student is in. */
+export const fetchStudentMemberships = (studentId: string) =>
+  request<StudentMemberships>('GET', `/api/multi-class/students/${encodeURIComponent(studentId)}/enrollments`);
+/** Admin: add a student to another group or class. */
+export const addStudentMembership = (studentId: string, scope: 'group' | 'class', targetId: string) =>
+  request('POST', `/api/multi-class/students/${encodeURIComponent(studentId)}/enrollments`, { scope, targetId });
+/** Admin: take a student out of an extra group or class. */
+export const removeStudentMembership = (studentId: string, scope: 'group' | 'class', targetId: string) =>
+  request('DELETE', `/api/multi-class/students/${encodeURIComponent(studentId)}/enrollments/${scope}/${encodeURIComponent(targetId)}`);
+
+export interface MyClasses {
+  enabled: boolean;
+  showSwitcher?: boolean;
+  /** A class id, 'all' ("All my classes"), or null when there is nothing to choose. */
+  current?: string | null;
+  classes?: Array<{ id: string; courseId: string; name: string; groupId: string | null; groupName: string | null }>;
+}
+/** Student: my classes and the one I use now (the switcher shows only with 2+ classes). */
+export const fetchMyClasses = () => request<MyClasses>('GET', '/api/multi-class/me/classes');
+export const setMyCurrentClass = (classId: string) => request<MyClasses>('PUT', '/api/multi-class/me/classes/current', { classId });

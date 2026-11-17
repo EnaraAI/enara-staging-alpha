@@ -140,7 +140,9 @@ describe('migration and isolation from the app', () => {
     walk(src);
     const shadowOnly = [path.join('controllers', 'learningPedagogy.controller.ts'), path.join('services', 'learningAccess.ts'), path.join('services', 'studentCourseService.ts')];
     // Step 5: switched reads go through services/enrollmentReads.ts (behind ENROLLMENT_READ_FROM).
-    expect(hits.sort()).toEqual([...shadowOnly, path.join('services', 'enrollmentReads.ts'), path.join('services', 'enrollmentSync.ts')].sort());
+    // Step 6: services/multiClass.ts (behind ENROLLMENT_MULTI_CLASS) adds and ends memberships.
+    expect(hits.sort()).toEqual([...shadowOnly, path.join('services', 'enrollmentReads.ts'), path.join('services', 'enrollmentSync.ts'), path.join('services', 'multiClass.ts')].sort());
+    expect(fs.readFileSync(path.join(src, 'services', 'multiClass.ts'), 'utf8')).toMatch(/function requireOn\(\)[\s\S]*multiClassOn\(\)/);
     for (const f of shadowOnly) expect(fs.readFileSync(path.join(src, f), 'utf8')).toMatch(/shadowCompare\(/);
   });
 });

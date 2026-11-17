@@ -7,6 +7,7 @@ import { StudyPlan, type IStudyItem } from '../models/StudyPlan';
 import { dueFor, studentStatus, submissionWindow } from './assignments';
 import { getFeatureFlags, isShadowMode } from './featureFlags';
 import { getEnrolledInstances } from './studentCourseService';
+import { foldForStudent } from './multiClass';
 
 // Study plans (plan-v1). Built only from records: open assignments, actions a
 // teacher assigned, released results that went badly, and (when the school
@@ -33,7 +34,8 @@ export async function planCandidates(student: { id: string; institutionId?: stri
     LearningIntervention.find({ studentId: student.id, assignedBy: 'teacher', status: { $in: ['assigned', 'in_progress'] }, interventionType: { $in: [...EDUCATOR_ACTIONS, 'teacher_assigned'] } }).lean(),
     AssessmentAttempt.find({ studentId: student.id, gradingStatus: 'released', releasedAt: { $gte: new Date(now.getTime() - 30 * DAY) } }).select('id assignmentId assessmentTitle score releasedAt').lean(),
   ]);
-  const mine = assignments.filter((a) => !a.studentIds?.length || a.studentIds.includes(student.id));
+  // Multi-class step 6 (Q6): the same assessment set in two of a multi-class student's classes once.
+  const mine = (await foldForStudent(student.id, assignments.filter((a) => !a.studentIds?.length || a.studentIds.includes(student.id)))).items;
   const attempts = await AssessmentAttempt.find({ studentId: student.id, assignmentId: { $in: mine.map((a) => a.id) } }).select('assignmentId status gradingStatus submittedAt').lean();
   const codes = new Map(
     (await LearningObjective.find({ id: { $in: interventions.map((i) => i.objectiveId).filter(Boolean) } }).select('id code').lean()).map((o) => [o.id, o.code]),

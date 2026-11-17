@@ -25,6 +25,7 @@ import {
 import { toast } from '../services/toastService';
 import { PendingPhotoQueue, StudentAvatar } from '../components/StudentPhoto';
 import { ArchivedStudentsPanel, confirmAndDeletePermanently, UnplacedStudentsPanel } from '../components/ArchivePanels';
+import { StudentGroupsPanel, useMultiClass } from '../components/StudentGroupsPanel';
 
 interface StudentManagementProps {
   students: Student[];
@@ -123,6 +124,9 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
   const [archiveSettings, setArchiveSettings] = useState<ArchiveSettings>({ groupArchive: false, studentArchive: false });
   const [archiveRefresh, setArchiveRefresh] = useState(0);
   useEffect(() => { fetchArchiveSettings().then(setArchiveSettings); }, []);
+  // Multi-class (step 6): "Groups and classes" appears only when the server has it on.
+  const multiClass = useMultiClass();
+  const [groupsFor, setGroupsFor] = useState<Student | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -384,6 +388,14 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
           >
             <Pencil size={12} /> Edit
           </button>
+          {multiClass && (
+            <button
+              onClick={() => { setMenuStudentId(null); setGroupsFor(s); }}
+              className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+            >
+              <Users size={12} /> Groups and classes
+            </button>
+          )}
           {archiveSettings.studentArchive ? (
             <>
               <button
@@ -1449,6 +1461,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
           </div>
         )}
       </AnimatePresence>
+      {groupsFor && <StudentGroupsPanel student={groupsFor} onClose={() => setGroupsFor(null)} />}
     </div>
   );
 };

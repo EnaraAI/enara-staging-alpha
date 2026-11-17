@@ -16,20 +16,26 @@ import { generateAttemptId } from '../utils/idGenerator';
 import { CONVERSATION_QUESTION_TYPES, MAX_REPLY_CHARS, answerFor, decideFollowUp, nextTurns } from '../services/conversationExam';
 import { ensurePlainObject, getOptionalString, getRequiredString, rejectMongoOperators } from '../utils/validation';
 import { evidenceFor, publicSettings } from '../services/speakingExam';
+import { foldForStudent } from '../services/multiClass';
 
 // Network and clock tolerance around deadlines and time limits.
 export const GRACE_MS = 2 * 60 * 1000;
 
-async function visibleAssignments(studentId: string) {
+async function visibleAssignmentsFolded(studentId: string) {
   const classes = await getEnrolledInstances(studentId);
   const items = await Assignment.find({ classId: { $in: classes.map((c) => c.id) }, state: { $in: ['published', 'closed'] } })
     .sort({ dueAt: 1 })
     .limit(200);
-  return items.filter((a) => !a.studentIds?.length || a.studentIds.includes(studentId));
+  // Multi-class step 6 (Q6): the same assessment set in two of a multi-class
+  // student's classes is shown once (no change for anyone else).
+  return foldForStudent(studentId, items.filter((a) => !a.studentIds?.length || a.studentIds.includes(studentId)));
 }
 
 export async function loadMine(studentId: string, id: string) {
-  const a = (await visibleAssignments(studentId)).find((x) => x.id === id);
+  const { items, alias } = await visibleAssignmentsFolded(studentId);
+  // A folded duplicate opens the one kept, so its attempts never double up (Q6).
+  const want = alias.get(id) ?? id;
+  const a = items.find((x) => x.id === want);
   if (!a) throw new AppError('Assignment not found', 404, 'ASSIGNMENT_NOT_FOUND');
   return a;
 }
@@ -111,7 +117,7 @@ function resultView(t: AttemptLike, revealKey: boolean) {
 // GET /api/me/assignments
 export const listMyAssignments = asyncHandler(async (req: AuthRequest, res: Response) => {
   const studentId = req.user!.studentId!;
-  const items = await visibleAssignments(studentId);
+  const { items, also } = await visibleAssignmentsFolded(studentId);
   const attempts = await AssessmentAttempt.find({ studentId, assignmentId: { $in: items.map((a) => a.id) } })
     .select('assignmentId status gradingStatus submittedAt')
     .lean();
@@ -123,6 +129,8 @@ export const listMyAssignments = asyncHandler(async (req: AuthRequest, res: Resp
         id: a.id,
         title: a.title,
         classId: a.classId,
+        // Multi-class (Q6): the other classes that set the same assessment; one result counts for all.
+        ...(also.has(a.id) ? { alsoInClassIds: also.get(a.id) } : {}),
         opensAt: a.opensAt,
         dueAt: dueFor(a, studentId),
         originalDueAt: a.dueAt,

@@ -124,8 +124,10 @@ export interface AppConfig {
   // one, record mismatches (step 4). sampleRate: share of requests checked.
   // readFrom: step 5 features that read membership from class_enrollments
   // (ENROLLMENT_READ_FROM, comma list). attendanceFix (Q7) and
-  // ageFromBirthDate (Q8) are separate switches.
-  enrollment: { dualWrite: boolean; shadow: boolean; shadowSampleRate: number; readFrom: string[]; attendanceFix: boolean; ageFromBirthDate: boolean };
+  // ageFromBirthDate (Q8) are separate switches. multiClass (step 6) turns on
+  // multi-class (admin "add to group/class", class switcher, Q1-Q9); it only
+  // takes effect with dual write on and all seven step 5 features in readFrom.
+  enrollment: { dualWrite: boolean; shadow: boolean; shadowSampleRate: number; readFrom: string[]; attendanceFix: boolean; ageFromBirthDate: boolean; multiClass: boolean };
   // Multi-class step 6 archiving (docs/multi-class/ARCHIVE_NOTES.md), both off by
   // default. group: ENROLLMENT_GROUP_ARCHIVE (block deleting groups/classes with
   // students, archive/restore them, unplaced-students list). student:
@@ -566,6 +568,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       readFrom: String(source.ENROLLMENT_READ_FROM ?? '').split(',').map((x) => x.trim()).filter(Boolean),
       attendanceFix: readBoolean(source, 'ENROLLMENT_ATTENDANCE_FIX', false),
       ageFromBirthDate: readBoolean(source, 'ENROLLMENT_AGE_FROM_BIRTHDATE', false),
+      multiClass: readBoolean(source, 'ENROLLMENT_MULTI_CLASS', false),
     },
     archive: {
       group: readBoolean(source, 'ENROLLMENT_GROUP_ARCHIVE', false),

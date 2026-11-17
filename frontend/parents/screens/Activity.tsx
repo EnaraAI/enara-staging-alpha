@@ -3,12 +3,14 @@ import { bi } from '../i18n';
 import { cairoDate, cairoTime, dayOfMonth, parentsApi, weekdayIndex, type LearnerChip, type Transcript } from '../api';
 import { AiBadge, ErrorBox, Icon, Loading, SampleBadge, Sheet, useP } from '../ui';
 import { useLive } from '../useLive';
+import { ClassFilter } from '../shared';
 
 const WEEK_ORDER = [6, 0, 1, 2, 3, 4, 5]; // Saturday first
 
 export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void }> = ({ learner, refreshKey, onFetched }) => {
   const { t, n, lang } = useP();
-  const q = useLive(() => parentsApi.activity(learner.studentId), [learner.studentId], refreshKey);
+  const [classId, setClassId] = useState<string | null>(null);
+  const q = useLive(() => parentsApi.activity(learner.studentId, classId), [learner.studentId, classId], refreshKey);
   React.useEffect(() => onFetched(q.fetchedAt, q.loading), [q.fetchedAt, q.loading]); // eslint-disable-line react-hooks/exhaustive-deps
   const [open, setOpen] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<{ id: string; data?: Transcript; error?: string; expired?: boolean } | null>(null);
@@ -51,6 +53,7 @@ export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
         </div>
       </section>
 
+      <ClassFilter classes={d.classes} value={classId} onChange={setClassId} />
       {d.sessions.length === 0 && <p className="pp-sub">{t.noSessions}</p>}
       {d.sessions.map((s) => {
         const isOpen = firstOpen === s.id;
@@ -66,7 +69,7 @@ export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
                 </div>
                 <div style={{ flexGrow: 1, minInlineSize: 0 }}>
                   <p style={{ fontSize: 14, fontWeight: 600, lineHeight: '20px' }} dir="auto">{s.title}</p>
-                  <p className="pp-meta" style={{ marginBlockStart: 2 }}>{cairoTime(s.startedAt, lang)} · {s.mode === 'voice' ? t.voice : t.chat}</p>
+                  <p className="pp-meta" style={{ marginBlockStart: 2 }}>{cairoTime(s.startedAt, lang)} · {s.mode === 'voice' ? t.voice : t.chat}{s.class !== undefined ? ` · ${s.class ? t.inClass(s.class.name) : t.noClass}` : ''}</p>
                 </div>
                 <Icon name="down" className={`pp-chev${isOpen ? ' pp-chev--open' : ''}`} />
               </button>
