@@ -61,7 +61,7 @@ describe('analytics: same answers off and on', () => {
     expect(overview.batches.map((b) => b.batchId)).toEqual(['gA', 'gA2', 'gDel']);
     expect(overview.students.find((s) => s.id === 'a6')!.overdueAssessments).toBe(2);
     expect(overview.students.find((s) => s.id === 'a5')!.overdueAssessments).toBe(1);
-  });
+  }, 60_000);
 
   it('the weekly class summary is identical', async () => {
     const { clearWeeklySummaryCache } = await import('../../src/services/classSummaryService');

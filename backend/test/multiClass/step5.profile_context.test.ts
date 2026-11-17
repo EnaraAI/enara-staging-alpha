@@ -7,11 +7,12 @@ import { ctx, expectSame, get, ignoredSeen, offOn, offOnWith, setSwitches, start
 // name (studentProfiles) come from class_enrollments. Byte-identical for every
 // single-class shape.
 //
-// Q8 (ENROLLMENT_AGE_FROM_BIRTHDATE): the code defines no child/teen/adult age
-// boundaries (models/learnerAgeBand.ts says they are deliberately not encoded),
-// so deriving a band from Student.birthDate is NOT implemented: with the switch
-// on, results equal today's. The youngest group band applies only to students
-// in several groups with no band of their own (tested with a step-6 shape).
+// Q8 (ENROLLMENT_AGE_FROM_BIRTHDATE, boundaries decided by Mohamed 2026-11-17:
+// child under 13, teen 13-17, adult 18+): off -> results equal today's; on ->
+// a student with no valid own band gets one from their birth date, before any
+// group band. Either way the feature off/on comparison is identical. The
+// youngest group band applies only to students in several groups whose age is
+// unknown (tested with a step-6 shape).
 
 const ADMIN = 'admin@a.test';
 const STUDENTS = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'b1'];
@@ -51,10 +52,12 @@ for (const birth of ['false', 'true']) {
       expectSame(r);
       const rows = (r.off[0].body as { students: { id: string; classId: string | null; effective: { ageBand: string; source: string } }[] }).students;
       const row = (id: string) => rows.find((x) => x.id === id)!;
-      expect(row('a1')).toMatchObject({ classId: 'gA', effective: { ageBand: 'teen', source: 'class_age_band' } });
+      // a1 was born 2016-03-15: a child by birth date (switch on), else the group band.
+      expect(row('a1')).toMatchObject(birth === 'true' ? { classId: 'gA', effective: { ageBand: 'child', source: 'student_birth_date' } } : { classId: 'gA', effective: { ageBand: 'teen', source: 'class_age_band' } });
       expect(row('a3')).toMatchObject({ classId: 'gA2', effective: { ageBand: 'adult', source: 'student_age_band' } });
       expect(row('a5')).toMatchObject({ classId: 'gDel', effective: { ageBand: 'unknown' } }); // deleted group
-      expect(row('a4')).toMatchObject({ classId: null, effective: { ageBand: 'unknown' } }); // birth date only: not derived
+      // a4 was born 2001-03-15 and has no group: an adult by birth date (switch on), else unknown.
+      expect(row('a4')).toMatchObject(birth === 'true' ? { classId: null, effective: { ageBand: 'adult', source: 'student_birth_date' } } : { classId: null, effective: { ageBand: 'unknown' } });
     });
 
     it("the tutor's trusted age band is identical", async () => {
@@ -62,7 +65,7 @@ for (const birth of ['false', 'true']) {
       calls.push(['b1', 'A'], ['a1', 'B']); // wrong school: no student, no group
       const r = await offOnWith('profile_context', (s, school) => tutorBand(s, school), calls, { vars });
       expectSame(r);
-      expect(r.off[0].body).toEqual({ band: 'teen', status: 'known', source: 'class_age_band' });
+      expect(r.off[0].body).toEqual(birth === 'true' ? { band: 'child', status: 'known', source: 'student_birth_date' } : { band: 'teen', status: 'known', source: 'class_age_band' });
     });
 
     it("the directory's class name is identical", async () => {
@@ -114,5 +117,28 @@ describe('profile_context: rules and isolation', () => {
     expect(on.band).toBe('unknown');
     expect(a2.band).toBe('unknown');
     expect(dir.get('a2')!.className).toBeNull();
+  });
+});
+
+describe('Q8 boundaries (child under 13, teen 13-17, adult 18+)', () => {
+  it('bandFromBirthDate uses the age on the given day', async () => {
+    const { bandFromBirthDate } = await import('../../src/models/learnerAgeBand');
+    const now = new Date('2026-11-17T12:00:00Z');
+    expect(bandFromBirthDate(new Date('2013-11-18'), now)).toBe('child'); // 12, birthday tomorrow
+    expect(bandFromBirthDate(new Date('2013-11-17'), now)).toBe('teen'); // 13 today
+    expect(bandFromBirthDate(new Date('2008-11-18'), now)).toBe('teen'); // 17
+    expect(bandFromBirthDate(new Date('2008-11-17'), now)).toBe('adult'); // 18 today
+    expect(bandFromBirthDate(undefined, now)).toBeUndefined();
+    expect(bandFromBirthDate('not a date', now)).toBeUndefined();
+    expect(bandFromBirthDate(new Date('2030-01-01'), now)).toBeUndefined(); // future
+  });
+
+  it("a student's own stored band always wins over the birth date", async () => {
+    await ctx.M.Student.updateOne({ id: 'a3' }, { $set: { birthDate: new Date('2016-01-01') } });
+    setSwitches({ ENROLLMENT_AGE_FROM_BIRTHDATE: 'true' });
+    const b = await tutorBand('a3', 'A');
+    setSwitches({ ENROLLMENT_AGE_FROM_BIRTHDATE: undefined });
+    await ctx.M.Student.updateOne({ id: 'a3' }, { $unset: { birthDate: 1 } });
+    expect(b).toEqual({ band: 'adult', status: 'known', source: 'student_age_band' });
   });
 });
