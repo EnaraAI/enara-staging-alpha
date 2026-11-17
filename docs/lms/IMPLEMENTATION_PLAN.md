@@ -142,6 +142,7 @@ admin/       Integrations admin endpoints (platforms, failures, retry, seats, ex
 - **Scoring policy.** `best` for practice and `latest` for assessments. It can be changed per resource link.
 - **Gradable.** Assessments and scored practice. **No lesson completion** in release 1.
 - **Gradebook value.** Always a numeric score. The comment adds the CEFR level and language skill breakdown **for language courses only**. Other subjects get their own criterion breakdown. `toLmsScore` is heavily unit-tested for both language and non-language attempts.
+- **Grader accuracy gate for real schools (Mohamed, 2026-11-17).** Grades sent to schools through grade passback come from ENARA's grader. **Before any real school receives grades, the grader must meet the accuracy bar set by the ESL6 grader fix:** a fresh, independent round with 3 scorers, ≥95% exact agreement on controlled items, and no increase in false accepts. Current status: 89.3% on Round 8 controlled items, so **not met**. This gate **does not block** building or testing on `lms-test.enara.app` (fake data). It is checked in the go-live checklist, and `LMS_GRADE_PASSBACK_ENABLED` stays off for real schools until it passes.
 - **Mentor/parent role from the LMS.** Ignored and logged in release 1.
 - **Legal.** Egypt PDPL first. Engineering builds **data export and deletion per org and per context** only. The DPA is outside engineering.
 
@@ -209,3 +210,4 @@ Mohamed adds these in Vercel himself. **Secrets are never pasted in chat.**
 - Google Workspace for Education test domain (Mohamed is requesting one) is needed for Phase 5.
 - Google OAuth app verification for Classroom scopes. Start it early, because it can take weeks.
 - A Vercel Pro review before the first real school.
+- **Grader accuracy gate** (§6) passed before grade passback is turned on for any real school.
