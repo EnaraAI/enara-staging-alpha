@@ -65,7 +65,10 @@
  "rec": {
   "entries": [],
   "liveErrors": {},
-  "knownPoints": {}
+  "knownPoints": {
+   "lsn:1": 1,
+   "lsn:3": 1
+  }
  },
  "turns": [
   {
@@ -222,7 +225,51 @@
     "probes": [
      "W1"
     ]
-   }
+   },
+   "lang": {
+    "assessment": {
+     "verdict": "CORRECT",
+     "relevance": "ACTIVE_ITEM",
+     "criteria": [
+      1,
+      3
+     ],
+     "next": "NEW_ITEM",
+     "item": "p2",
+     "source": "answer_key"
+    },
+    "activeItem": {
+     "id": "lesson:p2",
+     "source": "lesson",
+     "lessonItemId": "p2"
+    },
+    "hintLevel": 0
+   },
+   "markerStatus": "ok",
+   "qualityFlags": [
+    "possible_answer_leak_new_item"
+   ],
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "ev5": {},
+   "engineVerdict": "CORRECT",
+   "recordLive": [],
+   "tutor": "Correct. \"My brother likes tea.\" starts with a capital letter and ends with a full stop.\nNext one. Rewrite correctly:\n\"i am ten years old\"",
+   "raw": "[[assess verdict=CORRECT relevance=ACTIVE_ITEM criteria=1,3 next=NEW_ITEM item=p2]]\nCorrect. \"My brother likes tea.\" starts with a capital letter and ends with a full stop.\nNext one. Rewrite correctly:\n\"i am ten years old\"",
+   "leakRaw": 1,
+   "leakFinal": 1,
+   "earlyLeakRaw": 1,
+   "earlyLeakFinal": 1,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false
   }
  ],
  "assess": {
