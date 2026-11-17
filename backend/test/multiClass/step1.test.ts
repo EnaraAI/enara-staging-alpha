@@ -122,7 +122,10 @@ describe('migration and isolation from the app', () => {
     expect(names).toEqual(expect.arrayContaining(['one_enrollment_per_target', 'roster', 'student_classes', 'backfilled']));
   });
 
-  it('only the step 2 write-both helper imports the enrollment service (no reads are switched yet)', () => {
+  // Step 4 adds shadow reads: these files also import the enrollment service, but
+  // only to compare inside shadowCompare; the answer returned is the old one
+  // (test/multiClass/step4.test.ts). Step 5 updates this list feature by feature.
+  it('only the step 2 write-both helper and the step 4 shadow checks import the enrollment service (no reads are switched yet)', () => {
     const src = path.resolve(__dirname, '../../src');
     const hits: string[] = [];
     const walk = (dir: string) => {
@@ -133,6 +136,8 @@ describe('migration and isolation from the app', () => {
       }
     };
     walk(src);
-    expect(hits).toEqual([path.join('services', 'enrollmentSync.ts')]);
+    const shadowOnly = [path.join('controllers', 'learningPedagogy.controller.ts'), path.join('services', 'learningAccess.ts'), path.join('services', 'studentCourseService.ts')];
+    expect(hits.sort()).toEqual([...shadowOnly, path.join('services', 'enrollmentSync.ts')].sort());
+    for (const f of shadowOnly) expect(fs.readFileSync(path.join(src, f), 'utf8')).toMatch(/shadowCompare\(/);
   });
 });

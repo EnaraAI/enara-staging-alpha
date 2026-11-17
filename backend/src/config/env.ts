@@ -120,7 +120,9 @@ export interface AppConfig {
   lms: LmsConfig;
   // Multi-class enrollment (docs/multi-class/PLAN.md). Every switch defaults to
   // off; turning one on needs the owner's OK.
-  enrollment: { dualWrite: boolean };
+  // shadow: compute the enrollment answer next to the old one, return the old
+  // one, record mismatches (step 4). sampleRate: share of requests checked.
+  enrollment: { dualWrite: boolean; shadow: boolean; shadowSampleRate: number };
 }
 
 // LMS integration (docs/lms/IMPLEMENTATION_PLAN.md). Every flag defaults to off.
@@ -549,7 +551,11 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     googleClientId: readString(source, "GOOGLE_CLIENT_ID") || undefined,
     cronSecret: readString(source, "CRON_SECRET"),
     lms: parseLmsConfig(source),
-    enrollment: { dualWrite: readBoolean(source, 'ENROLLMENT_DUAL_WRITE', false) },
+    enrollment: {
+      dualWrite: readBoolean(source, 'ENROLLMENT_DUAL_WRITE', false),
+      shadow: readBoolean(source, 'ENROLLMENT_SHADOW', false),
+      shadowSampleRate: Math.min(1, Math.max(0, Number(source.ENROLLMENT_SHADOW_SAMPLE_RATE ?? 1) || 0)),
+    },
     // Staging starts with AI paused and invite-only registration unless set explicitly.
     aiPaused: readBoolean(source, "AI_PAUSED", staging),
     registrationInviteOnly: readBoolean(source, "REGISTRATION_INVITE_ONLY", staging),

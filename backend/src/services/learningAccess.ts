@@ -95,10 +95,20 @@ export async function loadClassForStaff(req: AuthRequest, classId: string) {
 }
 
 // Students in a class: listed explicitly or through its batch.
-export async function classStudentIds(cls: { studentIds?: string[]; batchId?: string; institutionId?: string }) {
+export async function classStudentIds(cls: { id?: string; studentIds?: string[]; batchId?: string; institutionId?: string }) {
   const { Student } = await import('../models/Student');
   const inBatch = cls.batchId
     ? await Student.find({ batchId: cls.batchId, ...(cls.institutionId ? { institutionId: cls.institutionId } : {}) }).select('id').lean()
     : [];
-  return [...new Set([...(cls.studentIds || []), ...inBatch.map((s) => s.id)])];
+  const ids = [...new Set([...(cls.studentIds || []), ...inBatch.map((s) => s.id)])];
+  // Multi-class step 4: compare with class_enrollments; the old answer is returned.
+  const { shadowOn, shadowCompare } = await import('./enrollmentShadow');
+  if (cls.id && shadowOn()) {
+    const { studentIdsInClass } = await import('./enrollment');
+    const classId = cls.id;
+    await shadowCompare('class_roster', { classId, institutionId: cls.institutionId }, ids, () =>
+      studentIdsInClass({ id: classId, batchId: cls.batchId, institutionId: cls.institutionId }),
+    );
+  }
+  return ids;
 }

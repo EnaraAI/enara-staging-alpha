@@ -10,6 +10,8 @@ import { TutorSession } from '../models/TutorSession';
 import { loadMessagesForSessions } from './tutorMessages';
 import { UsageEvent } from '../models/UsageEvent';
 import { STUDENT_VISIBLE_COURSE_FILTER } from './courseVisibility';
+import { ClassEnrollment } from '../models/ClassEnrollment';
+import { shadowCompare, shadowOn } from './enrollmentShadow';
 
 /**
  * Admin analytics computed from recorded activity: submitted assessment attempts,
@@ -168,6 +170,43 @@ function courseStudentIds(course: LeanCourse, students: LeanStudent[]): Set<stri
 }
 
 /**
+ * Shadow check (multi-class step 4): the same rosters as courseStudentIds, built
+ * from class_enrollments. One check per request; a mismatch lists
+ * "classId:studentId" pairs (IDs only).
+ */
+async function shadowCourseRosters(scope: Scope, courses: LeanCourse[], students: LeanStudent[]): Promise<void> {
+  const pairs = (rows: Iterable<[string, Iterable<string>]>) => {
+    const out: string[] = [];
+    for (const [cid, ids] of rows) for (const sid of ids) out.push(`${cid}:${sid}`);
+    return out;
+  };
+  const institutionId = typeof scope.institutionId === 'string' ? scope.institutionId : undefined;
+  await shadowCompare('analytics_course', { institutionId }, pairs(courses.map((c) => [c.id, courseStudentIds(c, students)])), async () => {
+    const loaded = new Set(students.map((s) => s.id));
+    const batchIds = [...new Set(courses.map((c) => c.batchId).filter(Boolean))] as string[];
+    const rows = await ClassEnrollment.find({
+      status: 'active',
+      ...(institutionId ? { institutionId } : {}),
+      $or: [{ scope: 'class', targetId: { $in: courses.map((c) => c.id) } }, { scope: 'group', targetId: { $in: batchIds } }],
+    })
+      .select('scope targetId studentId')
+      .lean();
+    const byClass = new Map<string, string[]>();
+    const byGroup = new Map<string, string[]>();
+    for (const r of rows) {
+      const m = r.scope === 'class' ? byClass : byGroup;
+      m.set(r.targetId, [...(m.get(r.targetId) ?? []), r.studentId]);
+    }
+    return pairs(
+      courses.map((c) => [
+        c.id,
+        new Set([...(byClass.get(c.id) ?? []), ...(c.batchId ? (byGroup.get(c.batchId) ?? []).filter((id) => loaded.has(id)) : [])]),
+      ]),
+    );
+  });
+}
+
+/**
  * Loads everything the analytics need for one scope (an institution, or everything for
  * an Enara admin) in a fixed number of queries.
  */
@@ -209,6 +248,9 @@ async function loadScope(scope: Scope, now: Date, studentFilter: Scope = {}, ori
     ]),
     Assessment.find(scope).select('id title subject dueDate batchId studentId curriculumId institutionId').lean(),
   ]);
+
+  // Multi-class step 4: compare every course roster with class_enrollments; the old answer is used.
+  if (shadowOn()) await shadowCourseRosters(scope, courses, students);
 
   // Messages live in tutor_messages (older ones may still be embedded): merge them in.
   const messagesBySession = await loadMessagesForSessions(sessions as never);

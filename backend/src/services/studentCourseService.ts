@@ -1,4 +1,6 @@
 import { Curriculum } from '../models/Curriculum';
+import { enrolledClassFilter } from './enrollment';
+import { shadowCompare, shadowOn } from './enrollmentShadow';
 import { CourseInstance } from '../models/CourseInstance';
 import { LessonProgress } from '../models/LessonProgress';
 import { Student } from '../models/Student';
@@ -25,7 +27,7 @@ async function readEnrolledInstances(studentId: string) {
     filter.push({ batchId: student.batchId });
   }
   const institutionFilter = student.institutionId ? { institutionId: student.institutionId } : {};
-  return CourseInstance.find({
+  const instances = await CourseInstance.find({
     ...institutionFilter,
     ...STUDENT_VISIBLE_COURSE_FILTER,
     $or: filter,
@@ -33,6 +35,20 @@ async function readEnrolledInstances(studentId: string) {
     .sort({ createdAt: -1 })
     .limit(100)
     .exec();
+  // Multi-class step 4: compare with class_enrollments; the old answer is returned.
+  if (shadowOn()) {
+    await shadowCompare('student_classes', { studentId, institutionId: student.institutionId }, instances.map((i) => i.id), async () => {
+      const enrolled = await enrolledClassFilter(studentId, student.institutionId);
+      if (!enrolled) return [];
+      const rows = await CourseInstance.find({ ...institutionFilter, ...STUDENT_VISIBLE_COURSE_FILTER, ...enrolled })
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .select('id')
+        .lean();
+      return rows.map((r) => r.id);
+    });
+  }
+  return instances;
 }
 
 export async function getVisibleCurriculumIdsForStudent(studentId: string): Promise<string[]> {
