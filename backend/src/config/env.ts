@@ -126,6 +126,11 @@ export interface AppConfig {
   // (ENROLLMENT_READ_FROM, comma list). attendanceFix (Q7) and
   // ageFromBirthDate (Q8) are separate switches.
   enrollment: { dualWrite: boolean; shadow: boolean; shadowSampleRate: number; readFrom: string[]; attendanceFix: boolean; ageFromBirthDate: boolean };
+  // Multi-class step 6 archiving (docs/multi-class/ARCHIVE_NOTES.md), both off by
+  // default. group: ENROLLMENT_GROUP_ARCHIVE (block deleting groups/classes with
+  // students, archive/restore them, unplaced-students list). student:
+  // ENROLLMENT_STUDENT_ARCHIVE (archive/restore students, confirmed permanent delete).
+  archive: { group: boolean; student: boolean };
 }
 
 // LMS integration (docs/lms/IMPLEMENTATION_PLAN.md). Every flag defaults to off.
@@ -561,6 +566,10 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       readFrom: String(source.ENROLLMENT_READ_FROM ?? '').split(',').map((x) => x.trim()).filter(Boolean),
       attendanceFix: readBoolean(source, 'ENROLLMENT_ATTENDANCE_FIX', false),
       ageFromBirthDate: readBoolean(source, 'ENROLLMENT_AGE_FROM_BIRTHDATE', false),
+    },
+    archive: {
+      group: readBoolean(source, 'ENROLLMENT_GROUP_ARCHIVE', false),
+      student: readBoolean(source, 'ENROLLMENT_STUDENT_ARCHIVE', false),
     },
     // Staging starts with AI paused and invite-only registration unless set explicitly.
     aiPaused: readBoolean(source, "AI_PAUSED", staging),

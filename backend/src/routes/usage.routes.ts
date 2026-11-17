@@ -11,6 +11,8 @@ import { forgetAiBudgetCache } from '../services/aiBudget';
 import { FEATURE_LABELS, NOT_ENOUGH_DATA, creditsForRow, enaraPrice, loadPlan, parseRange, requestUsage, savingsEstimate, usageReport } from '../services/usageReport';
 import { ensurePlainObject, rejectMongoOperators } from '../utils/validation';
 import { logger } from '../utils/logging';
+import { getSeats, onlyWhen } from '../controllers/archive.controller';
+import { studentArchiveOn } from '../services/archive';
 
 // P5 usage, budget, savings and simulator for schools. The institution always
 // comes from the signed-in user, never from the request. No response here
@@ -51,6 +53,10 @@ router.get('/me/today', asyncHandler(async (req: AuthRequest, res: Response) => 
 
 // Everything below: Workspace Admin (workspace:billing), own school only.
 const billing = requirePermission('workspace:billing');
+
+// Multi-class step 6: one seat per student, archived students excluded
+// (ENROLLMENT_STUDENT_ARCHIVE; the route is skipped while it is off).
+router.get('/seats', onlyWhen(studentArchiveOn), billing, getSeats);
 
 router.get('/report', billing, asyncHandler(async (req: AuthRequest, res: Response) => {
   const institutionId = requireInstitutionId(req);

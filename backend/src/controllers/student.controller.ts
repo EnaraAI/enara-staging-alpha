@@ -8,6 +8,8 @@ import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { toPlainObject } from '../utils/serialize';
 import { generateStudentId, initialsFromName } from '../utils/idGenerator';
 import { resolveWriteInstitutionId, scopedFilter } from '../auth/authorization';
+import { archivedListFilter } from './archive.controller';
+import { studentArchiveOn } from '../services/archive';
 import {
   ensurePlainObject,
   escapeRegex,
@@ -26,6 +28,8 @@ export const listStudents = asyncHandler(async (req: AuthRequest, res: Response)
 
   if (batchId) filter.batchId = batchId;
   if (grade && grade !== 'All Grades') filter.grade = grade;
+  // Step 6: archived students are hidden unless asked for (no change while off).
+  Object.assign(filter, archivedListFilter(req, studentArchiveOn));
 
   if (search) {
     const s = escapeRegex(String(search).slice(0, 80));

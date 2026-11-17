@@ -3,6 +3,7 @@ import { Batch } from '../models/Batch';
 import { ClassEnrollment, type EnrollmentScope } from '../models/ClassEnrollment';
 import { CourseInstance } from '../models/CourseInstance';
 import { Student } from '../models/Student';
+import { studentsWithoutActiveGroup, type UnplacedReason } from './archive';
 
 // Multi-class step 3: backfill class_enrollments from the old fields
 // (Student.batchId -> 'group' rows, CourseInstance.studentIds -> 'class' rows).
@@ -53,6 +54,12 @@ export interface BackfillReport {
     /** Active enrollment rows the old fields do not contain. Never changed by the backfill. */
     activeNotInOldFields: Listed<{ studentId: string; scope: EnrollmentScope; targetId: string }>;
   };
+  /**
+   * Step 6 (PLAN §10): active (not archived) students with no active group,
+   * by reason (group deleted, group archived, group in another school, never
+   * in a group). Information only: it never affects inSync. IDs only.
+   */
+  studentsWithoutActiveGroup: Listed<{ studentId: string; reason: UnplacedReason; groupId?: string }> & { byReason: Partial<Record<UnplacedReason, number>> };
   /** True when nothing would be created or reactivated and there are no conflicts. */
   inSync: boolean;
 }
@@ -177,9 +184,16 @@ async function buildPlan(institutionId?: string): Promise<Plan> {
       duplicateClassMember: listed(dnf.duplicateClassMember),
     },
     conflicts: { activeNotInOldFields: listed(activeNotInOldFields) },
+    studentsWithoutActiveGroup: unplacedReport(await studentsWithoutActiveGroup({ institutionId })),
     inSync: create.length === 0 && reactivate.length === 0 && activeNotInOldFields.length === 0,
   };
   return { report, create, reactivate };
+}
+
+function unplacedReport(items: Awaited<ReturnType<typeof studentsWithoutActiveGroup>>): BackfillReport['studentsWithoutActiveGroup'] {
+  const byReason: Partial<Record<UnplacedReason, number>> = {};
+  for (const i of items) byReason[i.reason] = (byReason[i.reason] ?? 0) + 1;
+  return { ...listed(items.map((i) => ({ studentId: i.studentId, reason: i.reason, ...(i.groupId ? { groupId: i.groupId } : {}) }))), byReason };
 }
 
 /** Dry run: reads only, writes nothing. */
