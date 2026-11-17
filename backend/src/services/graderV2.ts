@@ -138,6 +138,33 @@ function gapWithSubject(item: KeyItem, a: string, nkeys: string[], sens: Sensiti
   return false;
 }
 
+// Round-8 fix (pattern A): a gap answer that also repeats words the sentence shows right AFTER the gap, or on both
+// sides ("an old" for "___ old bicycle", "at half past nine"). Only words already in the sentence, at most 3 extra,
+// in the sentence's own order; the gap itself must still match an accepted answer exactly.
+function gapWithContext(item: KeyItem, a: string, nkeys: string[], sens: Sensitivity): boolean {
+  const p = String(item.prompt ?? item.text ?? '').replace(/^[^:]*:\s*/, '');
+  const m = /^(.*?)_{2,}(.*)$/.exec(p);
+  if (!m) return false;
+  const before = tokens(normaliseV2(m[1], sens));
+  const after = tokens(normaliseV2(m[2], sens));
+  const ans = tokens(a);
+  for (const k of nkeys) {
+    const kt = tokens(k);
+    for (let nb = 0; nb <= Math.min(3, before.length); nb++) {
+      for (let na = 1; na <= Math.min(3 - nb, after.length); na++) {
+        const cand = [...before.slice(before.length - nb), ...kt, ...after.slice(0, na)];
+        if (cand.length === ans.length && cand.every((x, i) => x === ans[i])) return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Round-8 fix (pattern B): prepositions a rater treats as a harmless change OUTSIDE the corrected target.
+const PREP = new Set(['in', 'on', 'at', 'for', 'to', 'from', 'with', 'by', 'into']);
+// Time prepositions are rule-bound (on Monday, in May, at 7): a swap in front of a time word is a real error.
+const TIME_WORD = /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|january|february|march|april|may|june|july|august|september|october|november|december|morning|afternoon|evening|night|weekend|summer|winter|spring|autumn|noon|midnight|\d.*|half|quarter)$/;
+
 const isErrorCorrection = (item: KeyItem) => /error.?correction/i.test(String(item.type ?? '')) || /\b(correct|fix) the (mistake|error)|find and correct/i.test(String(item.prompt ?? item.text ?? ''));
 const FUNC = new Set(['a', 'an', 'the', 'to', 'of', 'in', 'on', 'at', 'is', 'are', 'am', 'and', 'for', 'very', 'my', 'it']);
 const slipOf = (x: string, k: string) => x !== k && Math.min(x.length, k.length) >= 3 && (lev(x, k) <= (k.length >= 7 ? 2 : 1) || (x.length >= 4 && k.length >= 4 && x.slice(0, 3) === k.slice(0, 3) && Math.abs(x.length - k.length) <= 2));
@@ -201,10 +228,16 @@ function errorCorrectionTarget(item: KeyItem & { targetForm?: string }, a: strin
         if ((prev && target.has(prev[2]) && next && target.has(next[2])) || !FUNC.has(A[i])) { ok = false; return; }
       }
       if (op === 'i' && !FUNC.has(K[j])) { ok = false; return; }
-      if (op === 's' && !slipOf(A[i], K[j])) { ok = false; return; }
+      // Round-8 fix (pattern B): one preposition swapped for another outside the target ("in the market" for
+      // "at the market") is a slip; a preposition inside the target is still checked above and stays wrong.
+      const nextWord = K[j + 1] === 'the' ? K[j + 2] : K[j + 1]; // look past "the" (at the weekend)
+      const harmlessPrep = sens === 'none' && PREP.has(A[i]) && PREP.has(K[j]) && !TIME_WORD.test(nextWord ?? '');
+      if (op === 's' && !slipOf(A[i], K[j]) && !harmlessPrep) { ok = false; return; }
       slips++;
     });
-    if (ok && slips <= 2) return true;
+    // At least 70% of the key's words must be unchanged, so a rewrite never passes as "slips".
+    const same = ops.filter(([op]) => op === '=').length;
+    if (ok && slips <= 2 && same >= Math.ceil(0.7 * K.length)) return true;
   }
   return false;
 }
@@ -225,7 +258,7 @@ export function matchKeyV2(item: KeyItem, answer: string | number | undefined | 
   if (sens !== 'case_punct' && /\bits\b/.test(a) && !nkeys.some((k) => /\bits\b/.test(k)) && nkeys.includes(a.replace(/\bits\b/g, 'it is'))) return true;
   if (!isChoice(item)) {
     if (sens === 'case_punct') return false;
-    return gapWithSubject(item, a, nkeys, sens) || errorCorrectionTarget(item, a, sens);
+    return gapWithSubject(item, a, nkeys, sens) || gapWithContext(item, a, nkeys, sens) || errorCorrectionTarget(item, a, sens);
   }
   const options = choiceOptions(item);
   if (!options.length) return false;

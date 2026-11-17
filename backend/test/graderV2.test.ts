@@ -467,3 +467,36 @@ describe('round-7 fix: every verb, be agreement, head noun, two-slot items', () 
     expect(tf('A1-GR-there-is-are-C-9', 'There is a cinema and two lifts.')).toBe(1);
   });
 });
+
+describe('round-8 fix: gap answers with following words, harmless preposition swaps in corrections', () => {
+  it('pattern A: a gap answer that repeats the next words of the sentence (round-7 items)', () => {
+    expect(key('A1-GR-article-a-an-A-1', 'an old')).toBe(true);
+    expect(key('A1-GR-article-the-B-3', 'The restaurant')).toBe(true);
+    expect(key('A1-GR-prepositions-time-A-1', 'at half past nine')).toBe(true);
+  });
+  it('pattern A guards: wrong gap word, unrelated extra word, or words out of order stay wrong', () => {
+    expect(key('A1-GR-article-a-an-A-1', 'a old')).toBe(false);
+    expect(key('A1-GR-article-a-an-A-1', 'an new')).toBe(false);
+    expect(key('A1-GR-article-a-an-A-1', 'old an')).toBe(false);
+    expect(key('A1-GR-prepositions-time-A-1', 'in half past nine')).toBe(false);
+    expect(key('A1-GR-prepositions-time-A-1', 'at half past nine o clock today')).toBe(false); // more than 3 extra / not in sentence
+  });
+  it('pattern B: target fixed, one harmless preposition elsewhere changed (round-7 items)', () => {
+    expect(key('A1-GR-word-order-svo-A-6', 'Adel bought a black bag in the market.')).toBe(true);
+    expect(key('A2-GR-past-simple-irregular-C-5', 'Last month my cousin wrote a long letter for me.')).toBe(true);
+    expect(key('A2-GR-some-any-A-6', 'I bought some eggs from the shop.')).toBe(true);
+  });
+  it('pattern B guards: target still wrong, preposition IS the target, or a rewrite stay wrong', () => {
+    expect(key('A1-GR-word-order-svo-A-6', 'Adel bought a bag black in the market.')).toBe(false);
+    expect(key('A2-GR-some-any-A-6', 'I bought any eggs from the shop.')).toBe(false);
+    expect(key('A1-GR-prepositions-time-A-5', 'The exam is at Sunday morning.')).toBe(false);
+    expect(key('A1-GR-prepositions-time-A-5', 'The exam is on Sunday morning.')).toBe(true);
+    expect(key('A2-GR-some-any-A-6', 'Yesterday we got some eggs from a market.')).toBe(false);
+  });
+  it('spelling and capital-letter items are unchanged (earlier failure mode stays fixed)', () => {
+    expect(key('A1-VO-days-months-A-5', 'My birthday is in February.')).toBe(true);
+    expect(key('A1-VO-days-months-A-5', 'My birthday is in february.')).toBe(false);
+    expect(key('A1-VO-days-months-A-5', 'My birthday is in Febuary.')).toBe(false);
+    expect(key('A1-VO-days-months-B-5', 'The holiday starts on August.')).toBe(false); // case-sensitive item: no swap leniency
+  });
+});
