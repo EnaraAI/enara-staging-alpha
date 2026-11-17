@@ -22,6 +22,8 @@ import {
   rejectMongoOperators,
 } from '../utils/validation';
 import { normalizeCourseVisibility } from '../services/courseVisibility';
+import { archivedListFilter } from './archive.controller';
+import { groupArchiveOn } from '../services/archive';
 
 function toInstanceResponse(doc: InstanceType<typeof CourseInstance>) {
   return toPlainObject(doc);
@@ -42,6 +44,9 @@ export const listCourseInstances = asyncHandler(async (req: AuthRequest, res: Re
       { courseId: { $regex: s, $options: 'i' } },
     ];
   }
+
+  // Step 6: archived classes are hidden unless asked for (no change while off).
+  Object.assign(filter, archivedListFilter(req, groupArchiveOn));
 
   const instances = await CourseInstance.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
   res.json(instances.map(toInstanceResponse));

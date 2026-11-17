@@ -6,6 +6,7 @@ import { Student } from '../models/Student';
 import { groupIdsByStudent, readsFromEnrollments } from '../services/enrollmentReads';
 import { StudentCredit } from '../models/StudentCredit';
 import { UsageEvent } from '../models/UsageEvent';
+import { creditsByClass } from '../services/multiClass';
 
 const REPORT_DAYS = 30;
 const MAX_STUDENTS = 1000;
@@ -63,6 +64,10 @@ export const getCreditsReport = asyncHandler(async (req: AuthRequest, res: Respo
   // switched on (each student's own school only). Several groups (step 6, Q9)
   // are not reachable yet; the first by id is shown.
   const groups = readsFromEnrollments('credits') ? await groupIdsByStudent(students, 'credits') : null;
+  // Multi-class step 6 (Q9): for a multi-class student, every group and the
+  // credits used in each class (the class the session was in, else "No class").
+  // Empty for everyone else and while the switch is off.
+  const byClass = await creditsByClass(students, since);
   const rows = students
     .map((student) => {
       const credit = creditByStudent.get(student.id);
@@ -81,6 +86,7 @@ export const getCreditsReport = asyncHandler(async (req: AuthRequest, res: Respo
         period: credit?.period ?? DEFAULT_CREDIT.period,
         status: credit?.status ?? DEFAULT_CREDIT.status,
         restrictedFeatures: credit?.restrictedFeatures ?? DEFAULT_CREDIT.restrictedFeatures,
+        ...(byClass.has(student.id) ? { groupIds: groups?.get(student.id) ?? [], usageByClass: byClass.get(student.id) } : {}),
       };
     })
     .sort((a, b) => b.usage - a.usage);

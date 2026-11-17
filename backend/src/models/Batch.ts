@@ -12,6 +12,20 @@ export interface IBatch extends Document {
   origin?: 'live' | 'demo_seed';
   // Class-level trusted learner age band (see Student.learnerAgeBand).
   learnerAgeBand?: LearnerAgeBand;
+  // Multi-class step 6 (ENROLLMENT_GROUP_ARCHIVE): set while the group is
+  // archived. `archive` records the members and enrollments the archive ended.
+  archivedAt?: Date;
+  archivedBy?: string;
+  archive?: GroupArchiveRecord;
+}
+
+export interface GroupArchiveRecord {
+  /** Every member at archive time (old field or active group enrollment). */
+  memberIds: string[];
+  /** Members whose Student.batchId pointed here and was cleared. */
+  fieldMemberIds: string[];
+  enrollmentIds: string[];
+  studentCount: number;
 }
 
 const batchSchema = new Schema<IBatch>(
@@ -25,6 +39,9 @@ const batchSchema = new Schema<IBatch>(
     groupId: { type: String },
     origin: { type: String, enum: ['live', 'demo_seed'], default: 'live' },
     learnerAgeBand: { type: String, enum: LEARNER_AGE_BANDS, select: false },
+    archivedAt: { type: Date },
+    archivedBy: { type: String },
+    archive: { type: Schema.Types.Mixed },
   },
   { timestamps: true }
 );

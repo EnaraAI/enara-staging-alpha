@@ -3,16 +3,20 @@ import React, { useState, useEffect } from 'react';
 import { 
   Search, MoreVertical, Eye, EyeOff, Mail, Award,
   ChevronLeft, X, Send, CheckCircle2, Plus, GraduationCap, Users, 
-  TrendingUp, Zap, Database, BookOpen, Check, Lock, Key, Copy, Sparkles, Pencil, Trash2
+  TrendingUp, Zap, Database, BookOpen, Check, Lock, Key, Copy, Sparkles, Pencil, Trash2, Archive
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Student } from '../types';
 import {
   ApiError,
+  archiveStudent,
+  type ArchiveSettings,
   assignStudentToCourseInstance,
   createStudent,
   createUserAccount,
   deleteStudent,
+  deleteStudentPermanently,
+  fetchArchiveSettings,
   fetchCourseInstances,
   fetchStudents,
   removeStudentFromCourseInstance,
@@ -20,6 +24,8 @@ import {
 } from '../services/apiService';
 import { toast } from '../services/toastService';
 import { PendingPhotoQueue, StudentAvatar } from '../components/StudentPhoto';
+import { ArchivedStudentsPanel, confirmAndDeletePermanently, UnplacedStudentsPanel } from '../components/ArchivePanels';
+import { StudentGroupsPanel, useMultiClass } from '../components/StudentGroupsPanel';
 
 interface StudentManagementProps {
   students: Student[];
@@ -114,6 +120,13 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
   const [editForm, setEditForm] = useState({ name: '', email: '', grade: 'Grade 10', uiMode: 'standard' as 'standard' | 'kids' });
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [deletingStudentId, setDeletingStudentId] = useState<string | null>(null);
+  // Multi-class step 6: archiving, only when the backend switches are on.
+  const [archiveSettings, setArchiveSettings] = useState<ArchiveSettings>({ groupArchive: false, studentArchive: false });
+  const [archiveRefresh, setArchiveRefresh] = useState(0);
+  useEffect(() => { fetchArchiveSettings().then(setArchiveSettings); }, []);
+  // Multi-class (step 6): "Groups and classes" appears only when the server has it on.
+  const multiClass = useMultiClass();
+  const [groupsFor, setGroupsFor] = useState<Student | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -257,7 +270,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
         return;
       }
       // Roll back the student record so the admin can retry cleanly.
-      await deleteStudent(created.id).catch(() => undefined);
+      await (archiveSettings.studentArchive ? deleteStudentPermanently(created.id) : deleteStudent(created.id)).catch(() => undefined);
       toast.error('Could not create login account', errorMessage(err));
       setIsSubmitting(false);
       return;
@@ -317,7 +330,32 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
     }
   };
 
+  // Step 6: with student archiving on, the normal action is "Archive".
+  const handleArchiveStudent = async (student: Student) => {
+    setMenuStudentId(null);
+    if (!window.confirm(`Archive ${student.name}? Their account is closed and they leave their group and classes. Grades, reports and parent links are kept, and an admin can restore them.`)) return;
+    setDeletingStudentId(student.id);
+    try {
+      await archiveStudent(student.id);
+      setStudents(prev => prev.filter(s => s.id !== student.id));
+      setArchiveRefresh(k => k + 1);
+      toast.success('Student archived', `${student.name} was archived. You can restore them from "Archived students".`);
+    } catch (err) {
+      toast.error('Could not archive student', errorMessage(err));
+    } finally {
+      setDeletingStudentId(null);
+    }
+  };
+
+  const handleDeletePermanently = async (student: Student) => {
+    setMenuStudentId(null);
+    setDeletingStudentId(student.id);
+    if (await confirmAndDeletePermanently(student)) setStudents(prev => prev.filter(s => s.id !== student.id));
+    setDeletingStudentId(null);
+  };
+
   const handleDeleteStudent = async (student: Student) => {
+    if (archiveSettings.studentArchive) return handleArchiveStudent(student);
     setMenuStudentId(null);
     if (!window.confirm(`Delete ${student.name}? This removes the student record.`)) return;
     setDeletingStudentId(student.id);
@@ -343,19 +381,44 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
         <MoreVertical size={18} />
       </button>
       {menuStudentId === s.id && (
-        <div className="absolute right-0 mt-1 w-36 bg-white border border-slate-200 rounded-xl z-20 overflow-hidden text-left">
+        <div className={`absolute right-0 mt-1 ${archiveSettings.studentArchive ? "w-44" : "w-36"} bg-white border border-slate-200 rounded-xl z-20 overflow-hidden text-left`}>
           <button
             onClick={() => openEditStudent(s)}
             className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
           >
             <Pencil size={12} /> Edit
           </button>
-          <button
-            onClick={() => handleDeleteStudent(s)}
-            className="w-full px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2"
-          >
-            <Trash2 size={12} /> Delete
-          </button>
+          {multiClass && (
+            <button
+              onClick={() => { setMenuStudentId(null); setGroupsFor(s); }}
+              className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+            >
+              <Users size={12} /> Groups and classes
+            </button>
+          )}
+          {archiveSettings.studentArchive ? (
+            <>
+              <button
+                onClick={() => handleArchiveStudent(s)}
+                className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+              >
+                <Archive size={12} /> Archive
+              </button>
+              <button
+                onClick={() => handleDeletePermanently(s)}
+                className="w-full px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2"
+              >
+                <Trash2 size={12} /> Delete permanently
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => handleDeleteStudent(s)}
+              className="w-full px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2"
+            >
+              <Trash2 size={12} /> Delete
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -468,6 +531,18 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
       </div>
 
       <PendingPhotoQueue onDecided={row => setStudents(prev => prev.map(st => (st.id === row.id ? { ...st, photoUrl: row.photoUrl, pendingPhotoUrl: null } : st)))} />
+      {archiveSettings.groupArchive && (
+        <UnplacedStudentsPanel
+          refreshKey={archiveRefresh}
+          onPlaced={() => { fetchStudents().then(list => setStudents(list as Student[])).catch(() => undefined); }}
+        />
+      )}
+      {archiveSettings.studentArchive && (
+        <ArchivedStudentsPanel
+          refreshKey={archiveRefresh}
+          onRestored={student => { setStudents(prev => [student as Student, ...prev.filter(s => s.id !== student.id)]); setArchiveRefresh(k => k + 1); }}
+        />
+      )}
 
       {isLoadingStudents && students.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 p-6 flex items-center justify-center gap-3 text-slate-500 text-sm font-semibold">
@@ -1386,6 +1461,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
           </div>
         )}
       </AnimatePresence>
+      {groupsFor && <StudentGroupsPanel student={groupsFor} onClose={() => setGroupsFor(null)} />}
     </div>
   );
 };

@@ -1,10 +1,11 @@
 import { Response } from 'express';
+import { getConfig } from '../config/env';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { Batch } from '../models/Batch';
 import { Institution } from '../models/Institution';
 import { Student } from '../models/Student';
-import { isLearnerAgeBand, LEARNER_AGE_BANDS, type LearnerAgeBand } from '../models/learnerAgeBand';
+import { bandFromBirthDate, isLearnerAgeBand, LEARNER_AGE_BANDS, type LearnerAgeBand } from '../models/learnerAgeBand';
 import { recordAudit } from '../services/auditTrail';
 import { pickGroupBand, resolveTrustedAgeBand } from '../services/languageTeachingContext';
 import { groupIdsByStudent, readsFromEnrollments } from '../services/enrollmentReads';
@@ -37,7 +38,7 @@ export const getAgeBands = asyncHandler(async (req: AuthRequest, res: Response) 
   const [school, batches, students] = await Promise.all([
     Institution.findOne({ id: institutionId }).select('learningSettings').lean(),
     Batch.find({ institutionId }).select('+learnerAgeBand id name').sort({ name: 1 }).limit(500).lean(),
-    Student.find({ institutionId }).select('+learnerAgeBand id name batchId').sort({ name: 1 }).limit(5000).lean(),
+    Student.find({ institutionId }).select('+learnerAgeBand +birthDate id name batchId').sort({ name: 1 }).limit(5000).lean(),
   ]);
   const settings = (school as { learningSettings?: unknown } | null)?.learningSettings;
   const classBand = new Map(batches.map((b) => [b.id, b.learnerAgeBand]));
@@ -52,7 +53,7 @@ export const getAgeBands = asyncHandler(async (req: AuthRequest, res: Response) 
     students: students.map((s) => {
       const group = groups ? pickGroupBand(groups.get(s.id) ?? [], (id) => classBand.get(id)) : null;
       const cls = group ? group.band : s.batchId ? classBand.get(s.batchId) : undefined;
-      const effective = resolveTrustedAgeBand(settings, s.learnerAgeBand, cls);
+      const effective = resolveTrustedAgeBand(settings, s.learnerAgeBand, cls, getConfig().enrollment.ageFromBirthDate ? bandFromBirthDate((s as { birthDate?: unknown }).birthDate) : undefined);
       return {
         id: s.id,
         name: s.name,

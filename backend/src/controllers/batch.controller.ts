@@ -6,6 +6,8 @@ import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { generateBatchId, formatDate } from '../utils/idGenerator';
 import { toPlainObject } from '../utils/serialize';
 import { resolveWriteInstitutionId, scopedFilter } from '../auth/authorization';
+import { archivedListFilter } from './archive.controller';
+import { groupArchiveOn } from '../services/archive';
 import {
   ensurePlainObject,
   escapeRegex,
@@ -32,6 +34,9 @@ export const listBatches = asyncHandler(async (req: AuthRequest, res: Response) 
   if (search) {
     query.name = { $regex: escapeRegex(String(search).slice(0, 80)), $options: 'i' };
   }
+
+  // Step 6: archived groups are hidden unless asked for (no change while off).
+  Object.assign(query, archivedListFilter(req, groupArchiveOn));
 
   const batches = await Batch.find(query).sort({ name: 1 }).skip(skip).limit(limit);
   res.json(batches.map(toBatchResponse));

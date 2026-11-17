@@ -142,7 +142,9 @@ describe('migration and isolation from the app', () => {
     // Step 5: switched reads go through services/enrollmentReads.ts (behind ENROLLMENT_READ_FROM).
     // LMS Phase 1a: the LMS domain service writes 'lms' class enrollments (docs/multi-class/PLAN.md §3).
     const lmsWriter = path.join('integrations', 'lms', 'core', 'domainService.ts');
-    expect(hits.sort()).toEqual([...shadowOnly, path.join('services', 'enrollmentReads.ts'), path.join('services', 'enrollmentSync.ts'), lmsWriter].sort());
+    // Step 6: services/multiClass.ts (behind ENROLLMENT_MULTI_CLASS) adds and ends memberships.
+    expect(hits.sort()).toEqual([...shadowOnly, path.join('services', 'enrollmentReads.ts'), path.join('services', 'enrollmentSync.ts'), path.join('services', 'multiClass.ts'), lmsWriter].sort());
+    expect(fs.readFileSync(path.join(src, 'services', 'multiClass.ts'), 'utf8')).toMatch(/function requireOn\(\)[\s\S]*multiClassOn\(\)/);
     for (const f of shadowOnly) expect(fs.readFileSync(path.join(src, f), 'utf8')).toMatch(/shadowCompare\(/);
   });
 });

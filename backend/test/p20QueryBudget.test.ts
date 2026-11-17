@@ -66,7 +66,19 @@ afterAll(async () => {
   await mongo.stop();
 });
 
+// Multi-class step 5 (B1): with student_app on, the fixture's memberships must
+// exist in class_enrollments (as the backfill does on a real deployment), so the
+// measured pages are the real ones. Done once, before any measurement.
+let enrollmentsReady = false;
+async function ensureEnrollments() {
+  if (enrollmentsReady || !(process.env.ENROLLMENT_READ_FROM ?? '').includes('student_app')) return;
+  const { applyBackfill } = await import('../src/services/enrollmentBackfill');
+  await applyBackfill();
+  enrollmentsReady = true;
+}
+
 async function measure(method: 'get' | 'post', url: string, body?: object) {
+  await ensureEnrollments();
   commands = []; counting = true;
   const r = await request(app)[method](url).set('Authorization', auth).send(body);
   await new Promise((res) => setTimeout(res, 50)); // let fire-and-forget writes start
@@ -104,7 +116,11 @@ describe('P20 database round trips per student request', () => {
     console.log(`P20_QUERY_COUNTS\n${rows.join('\n')}`);
     // Budgets (P20, measured after the per-request memo; before: dashboard 13, courses 9, next-steps 15).
     const BUDGET: Record<string, number> = { dashboard: 10, courses: 7, assignments: 7, 'next-steps': 12, lesson: 7, 'tutor session': 13, 'tutor message (no provider)': 17, 'attempt start': 8 };
-    for (const [name, max] of Object.entries(BUDGET)) expect(QUERY_REPORT[name].count, `${name}: ${QUERY_REPORT[name].commands.join(' > ')}`).toBeLessThanOrEqual(max);
+    // Multi-class step 5 (Mohamed 2026-11-17, option B1): while the student_app
+    // feature reads membership from class_enrollments, each student page makes
+    // ONE more read (the enrollment lookup). The extra read goes away in step 7.
+    const studentAppOn = (process.env.ENROLLMENT_READ_FROM ?? '').split(',').map((x) => x.trim()).includes('student_app');
+    for (const [name, max] of Object.entries(BUDGET)) expect(QUERY_REPORT[name].count, `${name}: ${QUERY_REPORT[name].commands.join(' > ')}`).toBeLessThanOrEqual(max + (studentAppOn ? 1 : 0));
     for (const name of Object.keys(BUDGET)) {
       const students = QUERY_REPORT[name].commands.filter((c) => c === 'find:students').length;
       expect(students, `${name}: the student record is read once per request`).toBeLessThanOrEqual(1);
