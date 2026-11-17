@@ -264,3 +264,22 @@ Nothing changes in the code until then.
 - **Q8, A as fallback only:** use the student's **own** age band first (their own band, or one worked out from their birth date when known). Use the youngest group band only when the student's age is unknown. ENARA stores `Student.birthDate` (optional) and `Student.learnerAgeBand` (optional). Deriving the band from the birth date changes the result for students who have a birth date but no band, so it gets its own switch.
 - **Q9, A:** credit AI usage to the class it happened in, else "No class".
 - **Rules:** report after each step. Deploy nothing, run no migration and turn on no switch without Mohamed's OK. LMS Phase 1a starts after step 6 is merged.
+
+## 10. Deleted groups and archiving (Mohamed, 2026-11-17)
+
+**Found by the lms-test churn burst.** Deleting a group today leaves `Student.batchId` pointing at it, and the dual-written group row stays active. Decision, built **with step 6**, behind its own switch (`ENROLLMENT_GROUP_ARCHIVE`, off by default), on **lms-test only**:
+
+- **Block deleting a group or class that still has active students.** The admin sees a clear message: "Move or remove the students first."
+- **"Archive group"** (and archive class) instead:
+  - the group is closed;
+  - its enrollments are ended (status `inactive`, end date set);
+  - all history, grades and reports are kept;
+  - archived groups are hidden from normal lists, but visible in history and reports.
+- **Students who already point at a deleted group** count as **"no active group"**:
+  - they appear in a new admin list, **"Students without an active group"**, so an admin can place them;
+  - **nothing is deleted**.
+- **Burst script and tests:**
+  - deleting a group with students must be refused;
+  - archiving must end the enrollments and keep the history;
+  - the "without an active group" list must be right.
+- **When the real site is reopened** (it is frozen until Mohamed says so), the dry-run report must count the real students who point at deleted groups. It already does, under `doesNotFit.groupMissing`, plus `alreadyMatchingDeletedGroup`.
