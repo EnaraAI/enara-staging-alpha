@@ -2,7 +2,7 @@
 
 ENARA's LMS layer is provider-neutral. Core code and the LMS domain service talk only to the `LmsProvider` interface (`backend/src/integrations/lms/core/types.ts`). Vendor differences live in **presets** (data) and protocol differences live in **adapters** (code). Nothing outside those two folders may branch on a vendor name.
 
-Release 1 ships the `moodle` and `generic` presets only. The `lti13` adapter arrives in Phase 1 and the `google_classroom` adapter in Phase 5.
+Release 1 ships the `moodle` and `generic` presets only. The `lti13` adapter (`adapters/lti13/`) exists since Phase 1a (login and launch; `docs/lms/PHASE_1A_NOTES.md`); the `google_classroom` adapter arrives in Phase 5. Provisioning (users, classes, enrollments, seats) lives in the provider-neutral `core/domainService.ts`, which every adapter calls with normalised launch data.
 
 ## Which case are you in?
 
