@@ -124,11 +124,11 @@ export interface ErasureResult {
  * Attempts without a final score, and attempts on assessments made for this
  * student only (a group of one), are deleted with their proposals.
  */
-async function anonymiseResults(sid: string, removed: Record<string, number>, anonymised: Record<string, number>) {
+async function anonymiseResults(sid: string, removed: Record<string, number>, anonymised: Record<string, number>, personalAssignments: Set<string> = new Set()) {
   const personal = new Set((await Assessment.find({ studentId: sid }).select('id').lean()).map((a) => a.id));
   const attempts = (await AssessmentAttempt.collection.find({ studentId: sid }).toArray()) as unknown as Record<string, any>[]; // eslint-disable-line @typescript-eslint/no-explicit-any
   const allIds = attempts.map((t) => String(t.id));
-  const keep = attempts.filter((t) => keepsFinalResult(t) && !personal.has(String(t.assessmentId)));
+  const keep = attempts.filter((t) => keepsFinalResult(t) && !personal.has(String(t.assessmentId)) && !(t.assignmentId && personalAssignments.has(String(t.assignmentId))));
   const newAttemptId = new Map(keep.map((t) => [String(t.id), newAnonymousAttemptId()]));
   const anonymousId = keep.length ? newAnonymousStudentId() : '';
 
@@ -170,11 +170,17 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
   removed.class_lists = (await CourseInstance.updateMany({ studentIds: sid }, { $pull: { studentIds: sid } })).modifiedCount;
   removed.class_archive_records = (await CourseInstance.updateMany({ 'archive.memberIds': sid }, { $pull: { 'archive.memberIds': sid } })).modifiedCount;
   removed.group_archive_records = (await Batch.updateMany({ $or: [{ 'archive.memberIds': sid }, { 'archive.fieldMemberIds': sid }] }, { $pull: { 'archive.memberIds': sid, 'archive.fieldMemberIds': sid } })).modifiedCount;
+  // Assignments meant for this student ONLY (studentIds is exactly [sid]) are a
+  // group of one: deleted, with their attempts (not kept, see anonymiseResults).
+  // Pulling the ID would leave studentIds empty, which the app reads as "the
+  // whole class" and would hand the work to everyone (found in review).
+  const personalAssignments = (await Assignment.find({ studentIds: { $size: 1, $all: [sid] } }).select('id').lean()).map((a) => String(a.id));
+  removed.assignments_for_student_only = personalAssignments.length ? (await Assignment.deleteMany({ id: { $in: personalAssignments } })).deletedCount : 0;
   removed.assignment_lists = (await Assignment.updateMany({ $or: [{ studentIds: sid }, { 'extensions.studentId': sid }] }, { $pull: { studentIds: sid, extensions: { studentId: sid } } })).modifiedCount;
 
   // P1: final results kept anonymised, everything else about the attempts deleted
   // (before the per-student assessments go, which decide what is kept).
-  await anonymiseResults(sid, removed, anonymised);
+  await anonymiseResults(sid, removed, anonymised, new Set(personalAssignments));
   for (const [name, model] of DELETE_BY_STUDENT_ID) removed[name] = (await model.deleteMany({ studentId: sid })).deletedCount;
   // P2: safety alerts are kept for safeguarding (admins only, retention purge).
   const keptAlerts = (await SafetyAlert.updateMany({ studentId: sid }, { $set: { subjectDeleted: true }, $unset: { sessionId: 1 } })).matchedCount;

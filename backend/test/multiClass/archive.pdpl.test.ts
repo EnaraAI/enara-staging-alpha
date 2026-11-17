@@ -190,6 +190,16 @@ describe('PDPL P1: results kept anonymised, everything the student wrote removed
     await expectConsistent();
   });
 
+  it('an assignment meant for the deleted student only is deleted, never left with an empty list (which means "whole class")', async () => {
+    const co = await cohort(3);
+    await M().Assignment.create({ id: `solo-${co.g}`, institutionId: 'A', assessmentId: co.asmt, assessmentVersion: 1, title: 'Just for one', classId: co.c, studentIds: [co.target.id], opensAt: new Date(Date.now() - 7 * DAY), dueAt: new Date(Date.now() + DAY), createdBy: 'teacher', state: 'closed' });
+    await M().Assignment.create({ id: `pair-${co.g}`, institutionId: 'A', assessmentId: co.asmt, assessmentVersion: 1, title: 'For two', classId: co.c, studentIds: [co.target.id, co.live[0].id], opensAt: new Date(Date.now() - 7 * DAY), dueAt: new Date(Date.now() + DAY), createdBy: 'teacher', state: 'closed' });
+    expect((await del(co.target)).status).toBe(200);
+    expect(await M().Assignment.countDocuments({ id: `solo-${co.g}` })).toBe(0);
+    expect((await M().Assignment.findOne({ id: `pair-${co.g}` }).lean()).studentIds).toEqual([co.live[0].id]);
+    expect(await M().Assignment.countDocuments({ institutionId: 'A', studentIds: { $size: 0 }, title: { $in: ['Just for one', 'For two'] } })).toBe(0);
+  });
+
   it('small class (under 5 with the deleted student): only aggregates, never the anonymised row', async () => {
     const co = await cohort(3);
     const before = await report(co.asmt);
