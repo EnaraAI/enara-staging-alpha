@@ -70,7 +70,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 
 **Judge validation:** `reports/exp4/agent_sim_esl6/validation/VALIDATION.md`: scripted order d > c > b ≈ a (pass, both judges); agreement 97.1% mixed set, 98.6% session 2 (pass); forgetting check **FAIL** (section 12).
 
-## 4. Sample size (DECISIONS 7: n = 180)
+## 4. Sample size (DECISIONS 7, superseded by DECISIONS 14: n = 270)
 
 `config/agent_sim_esl6/POWER.json`, script `src/offline/esl6_power.py`.
 
@@ -85,64 +85,65 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 | **180 (chosen, largest multiple of 30 ≤ 200)** | **0.648** | **0.653** | **0.767** |
 | 200 (maximum) | 0.694 | 0.692 | 0.809 |
 
-- **Result: 80% power at +0.06 is NOT reachable inside 120–200.** The normal approximation needs n = 259 (270 as a multiple of 30) with the inflated SD, about 205 without inflation.
+- **DECISIONS 14 (user, 2026-11-17: "n = 270"), after the primary outcome was narrowed to 4 gap-fill/choice items (DECISIONS 11):** conservative power (`POWER_C.json`, `src/offline/esl6_power_c.py`, SD scaled by √(6/4) to 0.4213) at +0.06: n = 180: 0.478; 240: 0.6125; **270: 0.653 (chosen)**; 300: 0.717. The table below is the original 6-item analysis, kept for the record.
+- **Result (original 6-item analysis): 80% power at +0.06 is NOT reachable inside 120–200.** The normal approximation needs n = 259 (270 as a multiple of 30) with the inflated SD, about 205 without inflation.
 - **Decision (DECISIONS 7, user: "n = 180, ~65% power"):** **n = 180** explicit-first learners (6 per outcome), the largest permitted multiple of 30, target effect +0.06 unchanged. **Power ≈ 0.65 with the inflated SD 0.344 (simulated 0.653, normal approximation 0.648); ≈ 0.77 with the uninflated ESL5 SD 0.307 (simulated 0.767).** The report must state the low power. (`POWER.json` is frozen as computed; its `status` field still reads "PENDING USER DECISION" and is superseded by DECISIONS 7.)
 
 ## 5. Learners
 
 **Scope:** 30 outcomes (DECISIONS 5). The 3 A1–A2 form outcomes with no `l1ErrorTypes` (EN-F-A1-GR-possessive-adjectives, EN-F-A1-VO-common-adjectives, EN-F-A2-VO-make-do) have no wrong belief to simulate and are **out of scope by design** (decided before any session; not a post-hoc exclusion). Types: 19 GR, 10 VO, 1 FN.
 
-**180 NEW explicit-first learners, ids 700–879**, 6 per outcome, ids in blocks of 6 in outcome-id order. Each learner is assigned **one** outcome (its target form, LEARNING_RULES §1b row; starting strengths by band, §1). **Band rule (CEFR allows):** an A1 outcome gets 3 A1 and 3 A2 learners; an A2 outcome gets 6 A2 learners (an A1 learner is not given an A2 outcome). Totals: 42 A1, 138 A2. Objective status: `not_assessed` for the first 3 of each block of 6, `emerging` for the rest (both explicit-first, as ESL5). Primary wrong belief: for 2-belief outcomes, W1 primary for positions 1, 2, 4 and W2 for 3, 5, 6 of each block (balanced 3/3 per outcome); 1-belief outcomes: W1.
+**270 NEW explicit-first learners, ids 700–969** (DECISIONS 14), 9 per outcome, ids in blocks of 9 in outcome-id order. Each learner is assigned **one** outcome (its target form, LEARNING_RULES §1b row; starting strengths by band, §1). **Band rule (CEFR allows):** an A1 outcome gets 3 A1 and 6 A2 learners; an A2 outcome gets 9 A2 learners (an A1 learner is not given an A2 outcome). Totals: 42 A1, 228 A2. **Block of 9:** positions 0–5 are the original block of 6 unchanged; positions 6–8 (added for n = 270) are A2, statuses not_assessed / emerging / emerging, primary belief W2 / W1 / W1 (2-belief outcomes), one per form sequence; so each form sequence is used 3 times per outcome. Objective status: `not_assessed` for the first 3 of each block of 6, `emerging` for the rest (both explicit-first, as ESL5). Primary wrong belief: for 2-belief outcomes, W1 primary for positions 1, 2, 4 and W2 for 3, 5, 6 of each block (balanced 3/3 per outcome); 1-belief outcomes: W1.
 
 | Outcome | Type | Learner ids | Bands | Form sequence (pre/imm/delayed) by id |
 |---|---|---|---|---|
-| EN-F-A1-GR-article-a-an | GR | 700–705 | A1: 700–702; A2: 703–705 | 700 A/B/C, 701 B/C/A, 702 C/A/B, 703 A/B/C, 704 B/C/A, 705 C/A/B |
-| EN-F-A1-GR-article-the | GR | 706–711 | A1: 706–708; A2: 709–711 | 706 A/B/C, 707 B/C/A, 708 C/A/B, 709 A/B/C, 710 B/C/A, 711 C/A/B |
-| EN-F-A1-GR-can-ability | GR | 712–717 | A1: 712–714; A2: 715–717 | 712 A/B/C, 713 B/C/A, 714 C/A/B, 715 A/B/C, 716 B/C/A, 717 C/A/B |
-| EN-F-A1-GR-capitals-full-stops | GR | 718–723 | A1: 718–720; A2: 721–723 | 718 A/B/C, 719 B/C/A, 720 C/A/B, 721 A/B/C, 722 B/C/A, 723 C/A/B |
-| EN-F-A1-GR-copula-be | GR | 724–729 | A1: 724–726; A2: 727–729 | 724 A/B/C, 725 B/C/A, 726 C/A/B, 727 A/B/C, 728 B/C/A, 729 C/A/B |
-| EN-F-A1-GR-prepositions-time | GR | 730–735 | A1: 730–732; A2: 733–735 | 730 A/B/C, 731 B/C/A, 732 C/A/B, 733 A/B/C, 734 B/C/A, 735 C/A/B |
-| EN-F-A1-GR-there-is-are | GR | 736–741 | A1: 736–738; A2: 739–741 | 736 A/B/C, 737 B/C/A, 738 C/A/B, 739 A/B/C, 740 B/C/A, 741 C/A/B |
-| EN-F-A1-GR-word-order-svo | GR | 742–747 | A1: 742–744; A2: 745–747 | 742 A/B/C, 743 B/C/A, 744 C/A/B, 745 A/B/C, 746 B/C/A, 747 C/A/B |
-| EN-F-A1-VO-classroom-objects | VO | 748–753 | A1: 748–750; A2: 751–753 | 748 A/B/C, 749 B/C/A, 750 C/A/B, 751 A/B/C, 752 B/C/A, 753 C/A/B |
-| EN-F-A1-VO-days-months | VO | 754–759 | A1: 754–756; A2: 757–759 | 754 A/B/C, 755 B/C/A, 756 C/A/B, 757 A/B/C, 758 B/C/A, 759 C/A/B |
-| EN-F-A1-VO-family | VO | 760–765 | A1: 760–762; A2: 763–765 | 760 A/B/C, 761 B/C/A, 762 C/A/B, 763 A/B/C, 764 B/C/A, 765 C/A/B |
-| EN-F-A1-VO-food-drink | VO | 766–771 | A1: 766–768; A2: 769–771 | 766 A/B/C, 767 B/C/A, 768 C/A/B, 769 A/B/C, 770 B/C/A, 771 C/A/B |
-| EN-F-A1-VO-home-rooms | VO | 772–777 | A1: 772–774; A2: 775–777 | 772 A/B/C, 773 B/C/A, 774 C/A/B, 775 A/B/C, 776 B/C/A, 777 C/A/B |
-| EN-F-A1-VO-numbers-time | VO | 778–783 | A1: 778–780; A2: 781–783 | 778 A/B/C, 779 B/C/A, 780 C/A/B, 781 A/B/C, 782 B/C/A, 783 C/A/B |
-| EN-F-A2-FN-polite-requests | FN | 784–789 | A2: all 6 | 784 A/B/C, 785 B/C/A, 786 C/A/B, 787 A/B/C, 788 B/C/A, 789 C/A/B |
-| EN-F-A2-GR-comparatives | GR | 790–795 | A2: all 6 | 790 A/B/C, 791 B/C/A, 792 C/A/B, 793 A/B/C, 794 B/C/A, 795 C/A/B |
-| EN-F-A2-GR-conjunctions | GR | 796–801 | A2: all 6 | 796 A/B/C, 797 B/C/A, 798 C/A/B, 799 A/B/C, 800 B/C/A, 801 C/A/B |
-| EN-F-A2-GR-frequency-adverbs | GR | 802–807 | A2: all 6 | 802 A/B/C, 803 B/C/A, 804 C/A/B, 805 A/B/C, 806 B/C/A, 807 C/A/B |
-| EN-F-A2-GR-going-to | GR | 808–813 | A2: all 6 | 808 A/B/C, 809 B/C/A, 810 C/A/B, 811 A/B/C, 812 B/C/A, 813 C/A/B |
-| EN-F-A2-GR-much-many | GR | 814–819 | A2: all 6 | 814 A/B/C, 815 B/C/A, 816 C/A/B, 817 A/B/C, 818 B/C/A, 819 C/A/B |
-| EN-F-A2-GR-past-questions-did | GR | 820–825 | A2: all 6 | 820 A/B/C, 821 B/C/A, 822 C/A/B, 823 A/B/C, 824 B/C/A, 825 C/A/B |
-| EN-F-A2-GR-past-simple-irregular | GR | 826–831 | A2: all 6 | 826 A/B/C, 827 B/C/A, 828 C/A/B, 829 A/B/C, 830 B/C/A, 831 C/A/B |
-| EN-F-A2-GR-past-simple-regular | GR | 832–837 | A2: all 6 | 832 A/B/C, 833 B/C/A, 834 C/A/B, 835 A/B/C, 836 B/C/A, 837 C/A/B |
-| EN-F-A2-GR-present-continuous | GR | 838–843 | A2: all 6 | 838 A/B/C, 839 B/C/A, 840 C/A/B, 841 A/B/C, 842 B/C/A, 843 C/A/B |
-| EN-F-A2-GR-some-any | GR | 844–849 | A2: all 6 | 844 A/B/C, 845 B/C/A, 846 C/A/B, 847 A/B/C, 848 B/C/A, 849 C/A/B |
-| EN-F-A2-GR-third-person-s | GR | 850–855 | A2: all 6 | 850 A/B/C, 851 B/C/A, 852 C/A/B, 853 A/B/C, 854 B/C/A, 855 C/A/B |
-| EN-F-A2-VO-appearance | VO | 856–861 | A2: all 6 | 856 A/B/C, 857 B/C/A, 858 C/A/B, 859 A/B/C, 860 B/C/A, 861 C/A/B |
-| EN-F-A2-VO-clothes-shopping | VO | 862–867 | A2: all 6 | 862 A/B/C, 863 B/C/A, 864 C/A/B, 865 A/B/C, 866 B/C/A, 867 C/A/B |
-| EN-F-A2-VO-jobs-workplaces | VO | 868–873 | A2: all 6 | 868 A/B/C, 869 B/C/A, 870 C/A/B, 871 A/B/C, 872 B/C/A, 873 C/A/B |
-| EN-F-A2-VO-weather | VO | 874–879 | A2: all 6 | 874 A/B/C, 875 B/C/A, 876 C/A/B, 877 A/B/C, 878 B/C/A, 879 C/A/B |
+| EN-F-A1-GR-article-a-an | GR | 700–708 | A1: 700–702; A2: 703–708 | 700 A/B/C, 701 B/C/A, 702 C/A/B, 703 A/B/C, 704 B/C/A, 705 C/A/B, 706 A/B/C, 707 B/C/A, 708 C/A/B |
+| EN-F-A1-GR-article-the | GR | 709–717 | A1: 709–711; A2: 712–717 | 709 A/B/C, 710 B/C/A, 711 C/A/B, 712 A/B/C, 713 B/C/A, 714 C/A/B, 715 A/B/C, 716 B/C/A, 717 C/A/B |
+| EN-F-A1-GR-can-ability | GR | 718–726 | A1: 718–720; A2: 721–726 | 718 A/B/C, 719 B/C/A, 720 C/A/B, 721 A/B/C, 722 B/C/A, 723 C/A/B, 724 A/B/C, 725 B/C/A, 726 C/A/B |
+| EN-F-A1-GR-capitals-full-stops | GR | 727–735 | A1: 727–729; A2: 730–735 | 727 A/B/C, 728 B/C/A, 729 C/A/B, 730 A/B/C, 731 B/C/A, 732 C/A/B, 733 A/B/C, 734 B/C/A, 735 C/A/B |
+| EN-F-A1-GR-copula-be | GR | 736–744 | A1: 736–738; A2: 739–744 | 736 A/B/C, 737 B/C/A, 738 C/A/B, 739 A/B/C, 740 B/C/A, 741 C/A/B, 742 A/B/C, 743 B/C/A, 744 C/A/B |
+| EN-F-A1-GR-prepositions-time | GR | 745–753 | A1: 745–747; A2: 748–753 | 745 A/B/C, 746 B/C/A, 747 C/A/B, 748 A/B/C, 749 B/C/A, 750 C/A/B, 751 A/B/C, 752 B/C/A, 753 C/A/B |
+| EN-F-A1-GR-there-is-are | GR | 754–762 | A1: 754–756; A2: 757–762 | 754 A/B/C, 755 B/C/A, 756 C/A/B, 757 A/B/C, 758 B/C/A, 759 C/A/B, 760 A/B/C, 761 B/C/A, 762 C/A/B |
+| EN-F-A1-GR-word-order-svo | GR | 763–771 | A1: 763–765; A2: 766–771 | 763 A/B/C, 764 B/C/A, 765 C/A/B, 766 A/B/C, 767 B/C/A, 768 C/A/B, 769 A/B/C, 770 B/C/A, 771 C/A/B |
+| EN-F-A1-VO-classroom-objects | VO | 772–780 | A1: 772–774; A2: 775–780 | 772 A/B/C, 773 B/C/A, 774 C/A/B, 775 A/B/C, 776 B/C/A, 777 C/A/B, 778 A/B/C, 779 B/C/A, 780 C/A/B |
+| EN-F-A1-VO-days-months | VO | 781–789 | A1: 781–783; A2: 784–789 | 781 A/B/C, 782 B/C/A, 783 C/A/B, 784 A/B/C, 785 B/C/A, 786 C/A/B, 787 A/B/C, 788 B/C/A, 789 C/A/B |
+| EN-F-A1-VO-family | VO | 790–798 | A1: 790–792; A2: 793–798 | 790 A/B/C, 791 B/C/A, 792 C/A/B, 793 A/B/C, 794 B/C/A, 795 C/A/B, 796 A/B/C, 797 B/C/A, 798 C/A/B |
+| EN-F-A1-VO-food-drink | VO | 799–807 | A1: 799–801; A2: 802–807 | 799 A/B/C, 800 B/C/A, 801 C/A/B, 802 A/B/C, 803 B/C/A, 804 C/A/B, 805 A/B/C, 806 B/C/A, 807 C/A/B |
+| EN-F-A1-VO-home-rooms | VO | 808–816 | A1: 808–810; A2: 811–816 | 808 A/B/C, 809 B/C/A, 810 C/A/B, 811 A/B/C, 812 B/C/A, 813 C/A/B, 814 A/B/C, 815 B/C/A, 816 C/A/B |
+| EN-F-A1-VO-numbers-time | VO | 817–825 | A1: 817–819; A2: 820–825 | 817 A/B/C, 818 B/C/A, 819 C/A/B, 820 A/B/C, 821 B/C/A, 822 C/A/B, 823 A/B/C, 824 B/C/A, 825 C/A/B |
+| EN-F-A2-FN-polite-requests | FN | 826–834 | A2: all 9 | 826 A/B/C, 827 B/C/A, 828 C/A/B, 829 A/B/C, 830 B/C/A, 831 C/A/B, 832 A/B/C, 833 B/C/A, 834 C/A/B |
+| EN-F-A2-GR-comparatives | GR | 835–843 | A2: all 9 | 835 A/B/C, 836 B/C/A, 837 C/A/B, 838 A/B/C, 839 B/C/A, 840 C/A/B, 841 A/B/C, 842 B/C/A, 843 C/A/B |
+| EN-F-A2-GR-conjunctions | GR | 844–852 | A2: all 9 | 844 A/B/C, 845 B/C/A, 846 C/A/B, 847 A/B/C, 848 B/C/A, 849 C/A/B, 850 A/B/C, 851 B/C/A, 852 C/A/B |
+| EN-F-A2-GR-frequency-adverbs | GR | 853–861 | A2: all 9 | 853 A/B/C, 854 B/C/A, 855 C/A/B, 856 A/B/C, 857 B/C/A, 858 C/A/B, 859 A/B/C, 860 B/C/A, 861 C/A/B |
+| EN-F-A2-GR-going-to | GR | 862–870 | A2: all 9 | 862 A/B/C, 863 B/C/A, 864 C/A/B, 865 A/B/C, 866 B/C/A, 867 C/A/B, 868 A/B/C, 869 B/C/A, 870 C/A/B |
+| EN-F-A2-GR-much-many | GR | 871–879 | A2: all 9 | 871 A/B/C, 872 B/C/A, 873 C/A/B, 874 A/B/C, 875 B/C/A, 876 C/A/B, 877 A/B/C, 878 B/C/A, 879 C/A/B |
+| EN-F-A2-GR-past-questions-did | GR | 880–888 | A2: all 9 | 880 A/B/C, 881 B/C/A, 882 C/A/B, 883 A/B/C, 884 B/C/A, 885 C/A/B, 886 A/B/C, 887 B/C/A, 888 C/A/B |
+| EN-F-A2-GR-past-simple-irregular | GR | 889–897 | A2: all 9 | 889 A/B/C, 890 B/C/A, 891 C/A/B, 892 A/B/C, 893 B/C/A, 894 C/A/B, 895 A/B/C, 896 B/C/A, 897 C/A/B |
+| EN-F-A2-GR-past-simple-regular | GR | 898–906 | A2: all 9 | 898 A/B/C, 899 B/C/A, 900 C/A/B, 901 A/B/C, 902 B/C/A, 903 C/A/B, 904 A/B/C, 905 B/C/A, 906 C/A/B |
+| EN-F-A2-GR-present-continuous | GR | 907–915 | A2: all 9 | 907 A/B/C, 908 B/C/A, 909 C/A/B, 910 A/B/C, 911 B/C/A, 912 C/A/B, 913 A/B/C, 914 B/C/A, 915 C/A/B |
+| EN-F-A2-GR-some-any | GR | 916–924 | A2: all 9 | 916 A/B/C, 917 B/C/A, 918 C/A/B, 919 A/B/C, 920 B/C/A, 921 C/A/B, 922 A/B/C, 923 B/C/A, 924 C/A/B |
+| EN-F-A2-GR-third-person-s | GR | 925–933 | A2: all 9 | 925 A/B/C, 926 B/C/A, 927 C/A/B, 928 A/B/C, 929 B/C/A, 930 C/A/B, 931 A/B/C, 932 B/C/A, 933 C/A/B |
+| EN-F-A2-VO-appearance | VO | 934–942 | A2: all 9 | 934 A/B/C, 935 B/C/A, 936 C/A/B, 937 A/B/C, 938 B/C/A, 939 C/A/B, 940 A/B/C, 941 B/C/A, 942 C/A/B |
+| EN-F-A2-VO-clothes-shopping | VO | 943–951 | A2: all 9 | 943 A/B/C, 944 B/C/A, 945 C/A/B, 946 A/B/C, 947 B/C/A, 948 C/A/B, 949 A/B/C, 950 B/C/A, 951 C/A/B |
+| EN-F-A2-VO-jobs-workplaces | VO | 952–960 | A2: all 9 | 952 A/B/C, 953 B/C/A, 954 C/A/B, 955 A/B/C, 956 B/C/A, 957 C/A/B, 958 A/B/C, 959 B/C/A, 960 C/A/B |
+| EN-F-A2-VO-weather | VO | 961–969 | A2: all 9 | 961 A/B/C, 962 B/C/A, 963 C/A/B, 964 A/B/C, 965 B/C/A, 966 C/A/B, 967 A/B/C, 968 B/C/A, 969 C/A/B |
 
-**12 NEW B2 learners, ids 880–891** (no-harm check), one each on 12 outcomes spread over the list (every 5th outcome starting at the 1st and at the 3rd: 9 GR, 3 VO). B2 start W1 = W2 = 0, C = 3; F1 does not decay B2 (floor 3).
+**12 NEW B2 learners, ids 980–991** (no-harm check), one each on 12 outcomes spread over the list (every 5th outcome starting at the 1st and at the 3rd: 9 GR, 3 VO). B2 start W1 = W2 = 0, C = 3; F1 does not decay B2 (floor 3).
 
 | B2 learner id | Outcome | Form sequence |
 |---|---|---|
-| 880 | EN-F-A1-GR-article-a-an | A/B/C |
-| 881 | EN-F-A1-GR-can-ability | B/C/A |
-| 882 | EN-F-A1-GR-prepositions-time | C/A/B |
-| 883 | EN-F-A1-GR-word-order-svo | A/B/C |
-| 884 | EN-F-A1-VO-family | B/C/A |
-| 885 | EN-F-A1-VO-home-rooms | C/A/B |
-| 886 | EN-F-A2-GR-comparatives | A/B/C |
-| 887 | EN-F-A2-GR-frequency-adverbs | B/C/A |
-| 888 | EN-F-A2-GR-past-questions-did | C/A/B |
-| 889 | EN-F-A2-GR-past-simple-regular | A/B/C |
-| 890 | EN-F-A2-GR-third-person-s | B/C/A |
-| 891 | EN-F-A2-VO-clothes-shopping | C/A/B |
+| 980 | EN-F-A1-GR-article-a-an | A/B/C |
+| 981 | EN-F-A1-GR-can-ability | B/C/A |
+| 982 | EN-F-A1-GR-prepositions-time | C/A/B |
+| 983 | EN-F-A1-GR-word-order-svo | A/B/C |
+| 984 | EN-F-A1-VO-family | B/C/A |
+| 985 | EN-F-A1-VO-home-rooms | C/A/B |
+| 986 | EN-F-A2-GR-comparatives | A/B/C |
+| 987 | EN-F-A2-GR-frequency-adverbs | B/C/A |
+| 988 | EN-F-A2-GR-past-questions-did | C/A/B |
+| 989 | EN-F-A2-GR-past-simple-regular | A/B/C |
+| 990 | EN-F-A2-GR-third-person-s | B/C/A |
+| 991 | EN-F-A2-VO-clothes-shopping | C/A/B |
 
 **Seeds:** `esl6|L<id>|rep<1|2>`. All case, agreement, rater, recheck, rotation and fidelity hashes are salted with `esl6`.
 
@@ -154,7 +155,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 
 - **2 sessions × 5 turns = 10 rounds.** Session 2 is a **new chat 2 simulated days** after session 1 (LEARNING_RULES §7). Knowledge state and ENARA's record carry over; the tutor conversation does not (new chat for both arms; P+ gets only the lesson data and the new conversation).
 - **F1 v2** (`F1_PARAMS.json`, LEARNING_RULES §6) runs for 2 days between sessions and for **7 days** after session 2 before the delayed test; never inside a session. Retrieval counts come from the judge's `retrieval` field (§5b).
-- **2 replications;** every learner gets both arms in both replications: 192 × 2 × 2 = **768 sessions per round**, 7,680 tutor turns.
+- **2 replications;** every learner gets both arms in both replications: 282 × 2 × 2 = **1,128 sessions per round**, 11,280 tutor turns.
 - **Cells:** `<arm><rep><k>`, k = learner id mod 6 → 24 cells per round of 32 sessions, one tutor agent per cell writing every reply itself (scripted/templated/grouped replies kept as `PARTIAL_*` and redone).
 - **Judges:** blind, the ESL6 judge task (section 3) with ESL2 `JUDGE_INSTRUCTIONS.md` and ESL6 `LEARNING_RULES.md`; input = knowledge state, previous tutor turn, learner message, production fact, tutor turn (no arm). Batches of 36 (about 22 per round). Reading only, no scripts or helper files.
 - **No session is dropped;** failed work is kept as `PARTIAL_*` and rerun. The analysis refuses to decide on incomplete data.
@@ -175,7 +176,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 
 ## 8. Primary hypothesis (the only confirmatory test)
 
-**(LE) − (PP) on the delayed-form score on the PRIMARY items (percent of points), explicit-first learners (n = 180, DECISIONS 13 open), each learner's two replications averaged.**
+**(LE) − (PP) on the delayed-form score on the PRIMARY items (percent of points), explicit-first learners (n = 270, DECISIONS 14), each learner's two replications averaged.**
 - **Primary items (DECISIONS 8 and 11):** the gap-fill and choice items of the form (positions 1–4: gap_fill, controlled_gap_fill, multiple_choice, controlled_choice), **4 points per form** (3 on the 6 forms whose position 3 or 4 is a rewrite item). Reason: on these types the grader agreed 39/41 = 95.1% on a fresh independent answer set (round 8) and 132/134 pooled over rounds 5–8; on error correction it did not (27/33 in round 8).
 - **Test:** two-sided paired sign-flip. Exact over all 2^n sign patterns by convolution if every difference lies on a common grid (4- or 3-point forms averaged over 2 replications); otherwise Monte Carlo with **100,000** draws, **seed 6**. α = 0.05.
 - **Interval:** 95% percentile bootstrap, **10,000** resamples, **seed 7**.
@@ -205,7 +206,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 
 ## 11. Decision rule (fixed now)
 
-**CONFIRMED** only if all hold: p < 0.05; 95% CI lower bound > 0; all five guards pass; data complete (180 + 12 learners, both arms, both replications, 10 judged rounds, 3 forms scored each). Otherwise **NOT CONFIRMED**. No secondary outcome, subgroup, outcome, replication or other analysis will be presented as confirming the claim. B2 no-harm is reported next to the decision.
+**CONFIRMED** only if all hold: p < 0.05; 95% CI lower bound > 0; all five guards pass; data complete (270 + 12 learners, both arms, both replications, 10 judged rounds, 3 forms scored each). Otherwise **NOT CONFIRMED**. No secondary outcome, subgroup, outcome, replication or other analysis will be presented as confirming the claim. B2 no-harm is reported next to the decision.
 
 ## 12. Limits and known issues (stated before any session)
 
@@ -216,7 +217,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 5. Simulation only: hand-written learning rules, agent tutors, agent judges, agent scorers; nothing is evidence about real students.
 6. The ESL5 instruction fixes and graderV2 were designed after seeing earlier rules and ESL5 results.
 7. No human review of the assessments (bank status DRAFT); item-belief map and wrong answers are agent-written.
-8. Underpowered: with 4 primary items the conservative estimate is about **0.48 power at n = 180** (POWER_C.json; was 0.65 for 6 items); the final n is DECISIONS 13 (open); the report must state the power.
+8. Underpowered: with 4 primary items the conservative estimate is about **0.653 power at n = 270** (POWER_C.json; 0.48 at the earlier n = 180); the report must state the power.
 9. Per-learner judging noise on the delayed score is large (mean |diff| 0.149, NOISE_RESULT).
 10. Few learners per outcome (6); per-outcome results are descriptive only.
 11. Assessment answers are deterministic strings per belief (`WRONG_ANSWERS.json`), agent-written; 15 of them are grader-blind (section 7) (section 7).
@@ -227,7 +228,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 
 All commands from `backend/`, `S=../research/deep-learning-simulation-v2/src/offline/esl6Study.ts`, `D=../research/deep-learning-simulation-v2/reports/exp4/agent_sim_esl6`.
 
-0. DECISIONS 7 made (n = 180). Files of section 3 written and hashed; `answercheck` must pass (open: one key, section 7); commit this protocol with all hashes. No session before that commit. A dry run with scripted replies and scripted judges (no agents) was run in a scratch folder (`DRY_RUN` marker) through every step below.
+0. DECISIONS 7 made (n = 180), superseded by DECISIONS 14 (n = 270). Files of section 3 written and hashed; `answercheck` must pass (passes: 0 failures, section 7); commit this protocol with all hashes. No session before that commit. A dry run with scripted replies and scripted judges (no agents) was run in a scratch folder (`DRY_RUN` marker) through every step below.
 1. `npx tsx $S init $D` (hash checks, overlap check, 768 sessions); `assess $D pre` (pre-test, scored).
 2. Rounds 1–5 (session 1): per round `promptcheck` → 24 tutor cells (`tprompts` → answers → `tapply`, "applied 32 of 32") → `status` → `jprep r` → judges → `japply r`; round 3 also `agreeprep 3` + second judges.
 3. `f1 $D 2` (2 days). Rounds 6–10 (session 2, new chat), same steps; round 8 `agreeprep 8`.

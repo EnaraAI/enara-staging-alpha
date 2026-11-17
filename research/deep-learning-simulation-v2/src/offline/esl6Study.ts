@@ -1,5 +1,5 @@
 // SIMULATION ONLY. NO API. ESL stage-6 CONFIRMATORY runner (pre-registered: config/agent_sim_esl6/PROTOCOL.md). Built from esl5Study.ts (same P+ baseline, same
-// engine glue, same cells/judge/agreement/rating/fidelity mechanics) with: 192 NEW learners (180 explicit-first, ids 700-879, 6 per outcome; 12 B2, ids 880-891),
+// engine glue, same cells/judge/agreement/rating/fidelity mechanics) with: 282 NEW learners (270 explicit-first, ids 700-969, 9 per outcome; 12 B2, ids 980-991),
 // 30 A1-A2 form outcomes (lessons: esl6Fixtures.ts; beliefs: LEARNING_RULES §1b via esl6_outcomes.py), arm LE = ESL5 LE + graderV2 with the production
 // [[assess ...]] parser (stripAssessmentMarkers -> completeLanguageTurn/finalizeLanguageTurn), forgetting rule F1 v2 between sessions and before the delayed test
 // (esl6_forget.py, called through one python3 process per command), and the outcome assessment (pre / immediate / delayed, Latin-square forms) answered
@@ -131,9 +131,11 @@ function buildLearners(): Learner[] {
   const out: Learner[] = []; const O = outcomes();
   OUTCOME_IDS.forEach((oid, b) => {
     const two = O[oid].ws.length === 2; const a1 = /^EN-F-A1-/.test(oid);
-    for (let p = 0; p < 6; p++) out.push({ idx: 700 + 6 * b + p, outcome: oid, band: a1 && p < 3 ? 'A1' : 'A2', status: p < 3 ? 'not_assessed' : 'emerging', primary: two && [2, 4, 5].includes(p) ? 'W2' : 'W1', seq: SEQS[p % 3] });
+    // DECISIONS 14 (n = 270): blocks of 9. Positions 0-5 are the original block of 6 unchanged; the 3 added learners
+    // (6-8) are A2, statuses not_assessed/emerging/emerging, primary belief W2/W1/W1, one per form sequence.
+    for (let p = 0; p < 9; p++) out.push({ idx: 700 + 9 * b + p, outcome: oid, band: a1 && p < 3 ? 'A1' : 'A2', status: p < 3 || p === 6 ? 'not_assessed' : 'emerging', primary: two && [2, 4, 5, 6].includes(p) ? 'W2' : 'W1', seq: SEQS[p % 3] });
   });
-  B2_OUTCOMES.forEach((oid, i) => out.push({ idx: 880 + i, outcome: oid, band: 'B2', status: 'proficient', primary: 'W1', seq: SEQS[i % 3] }));
+  B2_OUTCOMES.forEach((oid, i) => out.push({ idx: 980 + i, outcome: oid, band: 'B2', status: 'proficient', primary: 'W1', seq: SEQS[i % 3] }));
   return out;
 }
 let LRN: Learner[] | undefined;
