@@ -329,13 +329,8 @@ async function evaluateErrorCorrection(
       }),
       validate: validateShortAnswer,
     });
-    // Same targetFormMissing guard as the meaning check. Calibration (research round 9) found removing it neutral
-    // (29/33 either way: fixes 2 correct rewrites, lets 2 wrong target words through), so the pre-specified design stays.
-    if (value.correct && targetFormMissing(question, answer) === true) {
-      value.correct = false;
-      value.flags = [...(value.flags || []), 'target_form_missing'];
-      value.scoreExplanation = `${value.scoreExplanation} The answer does not use the target form the question requires.`.trim();
-    }
+    // No targetFormMissing guard here (owner decision 2026-11-17, round 11): under rubric §2.2 (whole sentence) the
+    // guard overturned correct rewrites in 7 of 9 misses (research round 10). The prompt itself judges the sentence.
     return GradingProposal.create({ ...base, status: 'proposed', points: value.correct ? maxPoints : 0, feedback: value.feedback, scoreExplanation: value.scoreExplanation, flags: [...value.flags, 'error_correction_check'], confidence: 'medium', modelName: model });
   } catch (error) {
     const code = (error as { code?: string }).code;

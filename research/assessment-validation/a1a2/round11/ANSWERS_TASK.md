@@ -1,0 +1,8 @@
+SIMULATION ONLY
+# Round 11 answer set (ERROR CORRECTION only, FRESH — NEW, do not reuse earlier rounds) (DRAFT, SIMULATION ONLY)
+No API calls, no git, no sub-agents. Do NOT open backend/ code, docs/GRADER_*.md, or any round-1..10 answer, scorer, reference or grader file (research/assessment-validation/a1a2/*.json, round2/..round10/).
+Use the FINAL item bank: data/assessments/outcomes/*.json (only outcomes with status passed_review_draft in research/assessment-review/a1a2/OUTCOME_STATUS.json) and docs/SCORING_RUBRIC.md.
+Build 120 simulated Arabic-L1 learner answers to **error_correction items only** (scoring "exact"). Cover ALL outcomes that have error_correction items (at least 3 answers per such outcome), spread across forms A/B/C and both error-correction positions.
+Mix realistic answer types: fully correct rewrite; correct with case/punctuation/spacing/contraction variation (on case-sensitive items too); the error fixed but a slip ELSEWHERE in the sentence; a different but correct rewrite of the whole sentence; the error fixed but a new error inside the corrected part; the error fixed in a wrong way; the error left unchanged (prompt copied); only part of the sentence rewritten; off-topic; blank or "I don't know". STRICT mix: at least 35% partial or debatable, about 35% full credit, rest zero. Check the counts before finishing.
+Write answers.json: [{"answerId":"R11-001","outcomeId","form","itemId","itemType","scoring":"exact"|"target_form_0_1_2","answer":"..."}]. Do NOT include intended scores in that file. Write answers_design.json separately with your intended category per answerId (kept away from scorers).
+Validate with python3 json.load; reply with counts by itemType and outcome coverage.
