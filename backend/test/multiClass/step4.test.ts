@@ -16,6 +16,7 @@ let analytics: typeof import('../../src/services/analyticsService');
 let pedagogy: typeof import('../../src/controllers/learningPedagogy.controller');
 let backfill: typeof import('../../src/services/enrollmentBackfill');
 let logging: typeof import('../../src/utils/logging');
+let shadow: typeof import('../../src/services/enrollmentShadow');
 
 function setShadow(on: boolean, rate?: string) {
   process.env.ENROLLMENT_SHADOW = on ? 'true' : 'false';
@@ -25,6 +26,7 @@ function setShadow(on: boolean, rate?: string) {
 }
 
 async function stats() {
+  await shadow.flushShadowCounts();
   const rows = await M.EnrollmentShadowStat.find().lean();
   const out: Record<string, { checks: number; mismatches: number; errors: number }> = {};
   for (const r of rows) {
@@ -59,6 +61,7 @@ beforeAll(async () => {
   pedagogy = await import('../../src/controllers/learningPedagogy.controller');
   backfill = await import('../../src/services/enrollmentBackfill');
   logging = await import('../../src/utils/logging');
+  shadow = await import('../../src/services/enrollmentShadow');
 });
 afterAll(async () => {
   setShadow(false);
@@ -70,6 +73,7 @@ afterAll(async () => {
 beforeEach(async () => {
   setShadow(false);
   vi.restoreAllMocks();
+  await shadow.flushShadowCounts();
   for (const n of Object.keys(M)) await M[n].deleteMany({});
   await M.ClassEnrollment.createIndexes();
   const g = (id: string, school: string) => M.Batch.create({ id, name: `Group ${id}`, institutionId: school, academicYear: '2026' });
@@ -97,6 +101,16 @@ describe('shadow off (the default)', () => {
     await analytics.buildOverview({ institutionId: 'A' });
     await callPedagogy('cA');
     expect(await M.EnrollmentShadowStat.countDocuments()).toBe(0);
+  });
+});
+
+describe('cost', () => {
+  it('a clean check adds only the enrollment read; counts are written in batches', async () => {
+    setShadow(true);
+    const upd = vi.spyOn(M.EnrollmentShadowStat, 'updateOne');
+    for (let i = 0; i < 5; i++) await courses.getEnrolledInstances('a1');
+    expect(upd).not.toHaveBeenCalled();
+    expect((await stats()).student_classes).toEqual({ checks: 5, mismatches: 0, errors: 0 });
   });
 });
 

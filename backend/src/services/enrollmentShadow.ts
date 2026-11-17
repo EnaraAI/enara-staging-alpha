@@ -23,16 +23,49 @@ function day(now = new Date()): string {
   return now.toISOString().slice(0, 10);
 }
 
-async function count(feature: ShadowFeature, field: 'mismatches' | 'errors' | null): Promise<void> {
+// Clean checks are counted in memory and written in batches (every
+// FLUSH_EVERY checks or FLUSH_MS), so a clean check adds only the enrollment
+// read to the request. Mismatches and errors are written at once, together
+// with any pending clean checks. A batch lost when an instance stops only
+// under-counts clean checks; it never hides a mismatch.
+const FLUSH_EVERY = 50;
+const FLUSH_MS = 60_000;
+const pending = new Map<string, number>(); // `${day}|${feature}` -> clean checks
+let pendingTotal = 0;
+let lastFlush = Date.now();
+
+async function write(dayKey: string, feature: ShadowFeature, inc: Record<string, number>): Promise<void> {
   try {
-    await EnrollmentShadowStat.updateOne(
-      { day: day(), feature },
-      { $inc: { checks: 1, ...(field ? { [field]: 1 } : {}) } },
-      { upsert: true },
-    );
+    await EnrollmentShadowStat.updateOne({ day: dayKey, feature }, { $inc: inc }, { upsert: true });
   } catch {
     // Counting must never affect the request.
   }
+}
+
+/** Writes pending clean-check counts. Exported for tests and graceful shutdown. */
+export async function flushShadowCounts(): Promise<void> {
+  const entries = [...pending.entries()];
+  pending.clear();
+  pendingTotal = 0;
+  lastFlush = Date.now();
+  for (const [k, n] of entries) {
+    const [d, f] = k.split('|');
+    await write(d, f as ShadowFeature, { checks: n });
+  }
+}
+
+async function count(feature: ShadowFeature, field: 'mismatches' | 'errors' | null): Promise<void> {
+  const key = `${day()}|${feature}`;
+  if (field) {
+    const clean = pending.get(key) ?? 0;
+    pending.delete(key);
+    pendingTotal -= clean;
+    await write(day(), feature, { checks: clean + 1, [field]: 1 });
+    return;
+  }
+  pending.set(key, (pending.get(key) ?? 0) + 1);
+  pendingTotal++;
+  if (pendingTotal >= FLUSH_EVERY || Date.now() - lastFlush >= FLUSH_MS) await flushShadowCounts();
 }
 
 export interface ShadowDiff {

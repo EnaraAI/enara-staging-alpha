@@ -31,7 +31,11 @@ Then it compares the two.
 - **It never fails a request.** Any error in the enrollment read is caught and counted (tested by making the read throw).
 - **Mismatch logs hold IDs only:** `enrollment_shadow_mismatch` with the feature, the class or student ID, the school, counts, and up to 20 IDs on each side. No names and no emails (tested).
 - **Counts only in the database:** `enrollment_shadow_stats` holds one row per day and feature (checks, mismatches, errors), with no IDs. The collection appears on the first write, so no migration is needed.
-- **Cost:** one extra indexed query per checked request. `ENROLLMENT_SHADOW_SAMPLE_RATE` (0–1, default 1) limits the share of requests checked.
+- **Cost, measured:** with the switch off, nothing changes (`p20QueryBudget` passes).
+  - **Data in sync:** one extra indexed read per checked request. Clean checks are counted in memory and written in batches (every 50 checks or 60 s), so a lost batch only under-counts clean checks.
+  - **A mismatch or error:** one more write, made at once.
+  - **Effect on the P20 budget:** with the switch on, the student pages exceed it by 1–2 round trips (the dashboard does 11–12 against 10). That's expected for temporary monitoring.
+  - **On the real site:** use `ENROLLMENT_SHADOW_SAMPLE_RATE` (0–1, default 1), for example 0.1, to check only a share of requests.
 - **Undo:** set `ENROLLMENT_SHADOW=false`. The stats collection can be dropped at any time.
 
 ## Switches
