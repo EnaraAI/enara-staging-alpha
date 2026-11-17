@@ -81,6 +81,19 @@ export interface IStudent extends Document {
   pendingPhotoUrl?: string;
   pendingPhotoKey?: string;
   pendingPhotoAt?: Date;
+  // Multi-class step 6 (ENROLLMENT_STUDENT_ARCHIVE): set while the student is
+  // archived. `archive` records exactly what the archive ended, so a restore
+  // puts back only that (IDs only).
+  archivedAt?: Date;
+  archivedBy?: string;
+  archive?: StudentArchiveRecord;
+}
+
+export interface StudentArchiveRecord {
+  batchId?: string;
+  classIds: string[];
+  enrollmentIds: string[];
+  userIds: string[];
 }
 
 const studentSchema = new Schema<IStudent>(
@@ -120,6 +133,9 @@ const studentSchema = new Schema<IStudent>(
     nextBestActions: { type: [Schema.Types.Mixed], default: [] },
     subjects: { type: [Schema.Types.Mixed], default: [] },
     origin: { type: String, enum: ['live', 'demo_seed'], default: 'live' },
+    archivedAt: { type: Date },
+    archivedBy: { type: String },
+    archive: { type: Schema.Types.Mixed },
   },
   { timestamps: true }
 );

@@ -16,6 +16,20 @@ import { readFileSync, writeFileSync } from 'fs';
 //
 // It refuses any address other than https://lms-test.enara.app and never
 // changes the seeded students used in the documented logins.
+//
+// Step 6 archiving (docs/multi-class/ARCHIVE_NOTES.md): when the site has
+// ENROLLMENT_GROUP_ARCHIVE / ENROLLMENT_STUDENT_ARCHIVE on (detected from
+// GET /api/students/archive-settings; --with-archive requires it), more kinds
+// run, only ever on burst-created groups and students (never seeded or
+// protected ones):
+//   temp_group        deleting a group with students must be refused (409
+//                     GROUP_HAS_STUDENTS), then the group is archived: its
+//                     enrollments end and its history still lists them;
+//   restore_group     a burst group archived earlier is restored;
+//   archive_student / restore_student / delete_permanent (confirmed);
+//   delete_student and the cap use the confirmed permanent delete.
+// After each batch it also checks the "students without an active group"
+// list against the student and group lists.
 
 const BASE = 'https://lms-test.enara.app';
 const DOMAIN = 'lms-test.example';
@@ -42,7 +56,7 @@ async function call(token: string | null, method: string, path: string, body?: u
 }
 const list = (j: Json, key: string): Json[] => (Array.isArray(j) ? j : j?.[key] ?? j?.data ?? j?.items ?? []);
 
-async function main() {
+export async function main() {
   const password = readFileSync(process.env.LMS_TEST_PASSWORD_FILE!, 'utf8').trim();
   const maint = readFileSync(process.env.MAINTENANCE_TOKEN_FILE!, 'utf8').trim();
   const batches = arg('--batches', 40);
@@ -50,6 +64,7 @@ async function main() {
   const outFile = argS('--out');
   // --skip a,b: leave out some kinds of change (e.g. delete_student while a decision is pending).
   const skip = new Set((argS('--skip') ?? '').split(',').filter(Boolean));
+  const wantArchive = process.argv.includes('--with-archive');
   let s = arg('--seed', 20261117) >>> 0;
   const rand = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 2 ** 32);
   const pick = <T>(xs: T[]): T | undefined => (xs.length ? xs[Math.floor(rand() * xs.length)] : undefined);
@@ -85,13 +100,32 @@ async function main() {
   let prev = await shadowTotals();
   log.shadowAtStart = prev;
 
+  // Step 6 archiving: which switches the site has on (404 = the step is not there or both are off).
+  const settings = await call(await adminToken(), 'GET', '/api/students/archive-settings');
+  const arch = { group: settings.status === 200 && settings.json?.groupArchive === true, student: settings.status === 200 && settings.json?.studentArchive === true };
+  log.archive = arch;
+  if (wantArchive && !arch.group && !arch.student) throw new Error('--with-archive: the site has both archive switches off');
+  const archiveKinds = [...(arch.group ? ['restore_group'] : []), ...(arch.student ? ['archive_student', 'restore_student', 'delete_permanent'] : [])];
+  const isBurst = (x: Json) => String(x?.name ?? '').startsWith(PREFIX);
+  // DELETE a student: with the student switch on it must be the confirmed permanent delete.
+  const delStudent = (tok: string, id: string) => call(tok, 'DELETE', `/api/students/${id}`, arch.student ? { confirm: `DELETE ${id}` } : undefined);
+  const allPages = async (tok: string, path: string, key: string) => {
+    const out: Json[] = [];
+    for (let page = 1; page <= 50; page++) {
+      const rows = list((await call(tok, 'GET', `${path}${path.includes('?') ? '&' : '?'}limit=100&page=${page}`)).json, key);
+      out.push(...rows);
+      if (rows.length < 100) break;
+    }
+    return out;
+  };
+
   for (let b = 1; b <= batches; b++) {
     const tok = await adminToken();
     const groups = list((await call(tok, 'GET', '/api/batches')).json, 'batches').filter((g: Json) => g.institutionId === SCHOOL && !String(g.name).startsWith(PREFIX));
     const classes = list((await call(tok, 'GET', '/api/course-instances')).json, 'courseInstances').filter((c: Json) => c.institutionId === SCHOOL);
     let students = list((await call(tok, 'GET', '/api/students?limit=1000')).json, 'students').filter((x: Json) => x.institutionId === SCHOOL);
     const movable = () => students.filter((x: Json) => !PROTECTED.has(x.id));
-    const batch: Json = { batch: b, ops: [] as Json[], reads: { ok: 0, failed: [] as string[] } };
+    const batch: Json = { batch: b, ops: [] as Json[], reads: { ok: 0, failed: [] as string[] }, checks: [] as string[] };
     const stamp = `${Date.now().toString(36)}`;
     const op = async (name: string, fn: () => Promise<number>) => {
       let status = 0;
@@ -102,7 +136,7 @@ async function main() {
     };
 
     for (let k = 0; k < opsPerBatch; k++) {
-      const kinds = ['add', 'add_nogroup', 'move', 'leave_group', 'enroll', 'unenroll', 'temp_group', 'delete_student'].filter((k) => !skip.has(k));
+      const kinds = ['add', 'add_nogroup', 'move', 'leave_group', 'enroll', 'unenroll', 'temp_group', 'delete_student', ...archiveKinds].filter((k) => !skip.has(k));
       const kind = pick(kinds)!;
       if (kind === 'add' || kind === 'add_nogroup') {
         const g = kind === 'add' ? pick(groups) : undefined;
@@ -129,21 +163,62 @@ async function main() {
           const g = await call(tok, 'POST', '/api/batches', { name: `${PREFIX}group ${stamp}-${k}`, academicYear: '2026', institutionId: SCHOOL });
           const gid = g.json?.id ?? g.json?.batch?.id;
           if (g.status >= 400 || !gid) return g.status;
+          const members: string[] = [];
           for (const n of [1, 2]) {
             const r = await call(tok, 'POST', '/api/students', { name: `${PREFIX}${stamp}-${k}-${n}`, email: `burst-${stamp}-${k}-${n}@${DOMAIN}`, grade: 'Grade 8', batchId: gid, institutionId: SCHOOL });
             if (r.status >= 400) return r.status;
+            members.push(r.json.id);
           }
-          return (await call(tok, 'DELETE', `/api/batches/${gid}`)).status;
+          if (!arch.group) return (await call(tok, 'DELETE', `/api/batches/${gid}`)).status;
+          // Deleting a group that still has students must be refused...
+          const del = await call(tok, 'DELETE', `/api/batches/${gid}`);
+          if (del.status !== 409 || del.json?.error?.code !== 'GROUP_HAS_STUDENTS') { batch.checks.push(`delete group with students: ${del.status} ${del.json?.error?.code ?? ''}`); return 598; }
+          // ...archive it instead: enrollments ended, history kept.
+          const a = await call(tok, 'POST', `/api/batches/${gid}/archive`);
+          if (a.status !== 200) return a.status;
+          if (a.json.enrollmentsEnded !== 2 || a.json.studentsUnplaced !== 2) { batch.checks.push(`archive group ${gid}: ended ${a.json.enrollmentsEnded}, unplaced ${a.json.studentsUnplaced}`); return 597; }
+          const h = await call(tok, 'GET', `/api/batches/${gid}/history`);
+          const ended = (h.json?.memberships ?? []).filter((m: Json) => members.includes(m.studentId) && m.status === 'inactive' && m.endedAt).length;
+          if (h.status !== 200 || ended !== 2) { batch.checks.push(`archived group ${gid} history: ${h.status}, ${ended}/2 ended memberships`); return 596; }
+          return 200;
         });
       } else if (kind === 'delete_student') {
         const d = pick(students.filter((x: Json) => String(x.name).startsWith(PREFIX) || String(x.name).startsWith('Churn ')));
-        if (d) await op(kind, async () => { const r = await call(tok, 'DELETE', `/api/students/${d.id}`); if (r.status < 300) students = students.filter((x: Json) => x.id !== d.id); return r.status; });
+        if (d) await op(kind, async () => { const r = await delStudent(tok, d.id); if (r.status < 300) students = students.filter((x: Json) => x.id !== d.id); return r.status; });
+      } else if (kind === 'restore_group') {
+        const archived = list((await call(tok, 'GET', '/api/batches?archived=only&limit=100')).json, 'batches').filter((g: Json) => g.institutionId === SCHOOL && isBurst(g));
+        const g = pick(archived);
+        if (g) await op(kind, async () => {
+          const r = await call(tok, 'POST', `/api/batches/${g.id}/restore`);
+          // Every member the archive took out is either back or reported (moved / archived / deleted).
+          const seen = new Set([...(r.json?.returned ?? []), ...(r.json?.notReturned ?? []).map((x: Json) => x.studentId)]);
+          if (r.status === 200 && (g.archive?.fieldMemberIds ?? []).some((id: string) => !seen.has(id))) { batch.checks.push(`restore group ${g.id}: a member is unaccounted for`); return 595; }
+          return r.status;
+        });
+      } else if (kind === 'archive_student') {
+        const d = pick(students.filter((x: Json) => isBurst(x) && !PROTECTED.has(x.id)));
+        if (d) await op(kind, async () => { const r = await call(tok, 'POST', `/api/students/${d.id}/archive`); if (r.status < 300) students = students.filter((x: Json) => x.id !== d.id); return r.status; });
+      } else if (kind === 'restore_student') {
+        const d = pick(list((await call(tok, 'GET', '/api/students?archived=only&limit=100')).json, 'students').filter((x: Json) => x.institutionId === SCHOOL && isBurst(x)));
+        if (d) await op(kind, async () => { const r = await call(tok, 'POST', `/api/students/${d.id}/restore`); if (r.status < 300) students.push({ ...d, batchId: r.json.group ?? undefined }); return r.status; });
+      } else if (kind === 'delete_permanent') {
+        // A burst student, active or archived; never a seeded or protected one.
+        const pool = [...students.filter(isBurst), ...list((await call(tok, 'GET', '/api/students?archived=only&limit=100')).json, 'students').filter((x: Json) => x.institutionId === SCHOOL && isBurst(x))].filter((x: Json) => !PROTECTED.has(x.id));
+        const d = pick(pool);
+        if (d) await op(kind, async () => {
+          const r = await delStudent(tok, d.id);
+          if (r.status >= 300) return r.status;
+          students = students.filter((x: Json) => x.id !== d.id);
+          const gone = await call(tok, 'GET', `/api/students/${d.id}`);
+          if (gone.status !== 404) { batch.checks.push(`permanently deleted ${d.id} still readable: ${gone.status}`); return 594; }
+          return 200;
+        });
       }
       await sleep(300);
     }
     // Keep the data small: delete the oldest burst students above the cap.
     const extra = students.filter((x: Json) => String(x.name).startsWith(PREFIX)).slice(0, Math.max(0, students.filter((x: Json) => String(x.name).startsWith(PREFIX)).length - MAX_BURST_STUDENTS));
-    if (!skip.has('delete_student')) for (const d of extra) await op('cap_delete', async () => (await call(tok, 'DELETE', `/api/students/${d.id}`)).status);
+    if (!skip.has('delete_student')) for (const d of extra) await op('cap_delete', async () => (await delStudent(tok, d.id)).status);
 
     // Read pass over every shadowed page.
     const read = async (t: string, p: string) => { const r = await call(t, 'GET', p); if (r.status === 200) batch.reads.ok++; else batch.reads.failed.push(`${p} -> ${r.status}`); };
@@ -164,9 +239,19 @@ async function main() {
     const dry: Json = await maintPost('enrollment-backfill', { mode: 'dry-run', institutionId: SCHOOL });
     const r = dry.report;
     batch.consistency = { inSync: r.inSync, wouldCreate: r.wouldCreate, wouldReactivate: r.wouldReactivate.count, conflicts: r.conflicts.activeNotInOldFields.count, doesNotFit: Object.fromEntries(Object.entries(r.doesNotFit).map(([k, v]: [string, Json]) => [k, v.count]).filter(([, n]) => (n as number) > 0)) };
+    batch.consistency.studentsWithoutActiveGroup = r.studentsWithoutActiveGroup ? { count: r.studentsWithoutActiveGroup.count, byReason: r.studentsWithoutActiveGroup.byReason } : undefined;
+    // Step 6: the "students without an active group" list matches the student and group lists.
+    if (arch.group) {
+      const activeGroups = new Set((await allPages(tok, '/api/batches', 'batches')).filter((g: Json) => g.institutionId === SCHOOL).map((g: Json) => g.id));
+      const expected = (await allPages(tok, '/api/students', 'students')).filter((x: Json) => x.institutionId === SCHOOL && !(x.batchId && activeGroups.has(x.batchId))).map((x: Json) => x.id).sort();
+      const unplaced = await call(tok, 'GET', '/api/students/without-active-group');
+      const got = (unplaced.json?.students ?? []).filter((x: Json) => x.institutionId === SCHOOL).map((x: Json) => x.studentId).sort();
+      batch.unplaced = { count: got.length, byReason: unplaced.json?.byReason };
+      if (unplaced.status !== 200 || JSON.stringify(got) !== JSON.stringify(expected)) batch.checks.push(`students without an active group: list ${got.length}, expected ${expected.length}; missing ${expected.filter((x: string) => !got.includes(x)).slice(0, 10).join(',')}; extra ${got.filter((x: string) => !expected.includes(x)).slice(0, 10).join(',')}`);
+    }
     log.batches.push(batch);
     save();
-    const bad = Object.values(batch.shadowDelta).some((d: Json) => d.mismatches || d.errors) || !r.inSync || batch.reads.failed.length || batch.ops.some((o: Json) => o.status >= 400 || o.status < 0);
+    const bad = Object.values(batch.shadowDelta).some((d: Json) => d.mismatches || d.errors) || !r.inSync || batch.reads.failed.length || batch.checks.length || batch.ops.some((o: Json) => o.status >= 400 || o.status < 0);
     console.log(`batch ${b}/${batches}: ops ${batch.ops.length}, reads ${batch.reads.ok}/${batch.reads.ok + batch.reads.failed.length}, inSync ${r.inSync}, shadow mismatches ${Object.values(batch.shadowDelta).reduce((a: number, d: Json) => a + d.mismatches, 0)}, errors ${Object.values(batch.shadowDelta).reduce((a: number, d: Json) => a + d.errors, 0)}${bad ? '  <-- STOP' : ''}`);
     if (bad) { log.stoppedAt = b; break; }
     // Refresh student tokens every ~40 minutes.
@@ -182,4 +267,5 @@ async function main() {
   if (log.stoppedAt) process.exitCode = 1;
 }
 
-main().catch((e) => { console.error((e as Error).message); process.exit(1); });
+// Run only when started as a script (a test drives main() against a local app).
+if (typeof require !== 'undefined' && require.main === module) main().catch((e) => { console.error((e as Error).message); process.exit(1); });
