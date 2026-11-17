@@ -283,3 +283,41 @@ Nothing changes in the code until then.
   - archiving must end the enrollments and keep the history;
   - the "without an active group" list must be right.
 - **When the real site is reopened** (it is frozen until Mohamed says so), the dry-run report must count the real students who point at deleted groups. It already does, under `doesNotFit.groupMissing`, plus `alreadyMatchingDeletedGroup`.
+
+## 11. Decisions on step 6, LMS Phase 1a and permanent delete (Mohamed, 2026-11-17)
+
+**Step 6 core:**
+- **S1:** multi-class needs dual write to be on.
+- **S2:** the definition of a multi-class student is approved.
+- **S3:** the consistency check counts extra memberships **separately** and still **validates** them:
+  - the class exists;
+  - it's in the same school;
+  - it isn't archived;
+  - the student is active.
+- **S4:** while multi-class is on, a group counts every active member.
+- **S5:** the roster chips show extra classes.
+- **S6:** accepted and documented. Turning multi-class off **always** goes through the undo-script runbook.
+- **S7:** **not deferred.** Each tutor session stores its class ID, and credits are given by it. Old sessions without one keep today's behaviour.
+
+**LMS Phase 1a:**
+- **L1:** an existing ENARA student who launches as Instructor is refused, with a clear message. A teacher or admin who launches as Learner (including Moodle's "Switch role to student") gets a **preview**:
+  - no student record;
+  - no seat;
+  - no grades;
+  - nothing saved.
+- **L2:** seats are every live student.
+- **L3:** deploy to lms-test, run the migration there, and turn `LMS_LTI_ENABLED` on, on lms-test only.
+
+**Permanent delete (Egypt PDPL):**
+- **P1:** anonymise and keep **only** scores and structured results (score, item ID, correct/incorrect, timestamps). **Delete** all of the following:
+  - free text the student wrote;
+  - audio;
+  - transcripts;
+  - tutor conversation content.
+
+  In reports, rows of deleted students are never shown per student in classes of fewer than 5; only aggregates are shown there.
+- **P2:** safety alerts are kept, admins only, with a retention period (`SAFETY_ALERT_RETENTION_DAYS`, 730 as a placeholder until legal confirms).
+- **P3:** the usage ledger keeps bare IDs.
+- **P4:** the audit log keeps the student ID, with no personal data.
+- **P5:** backup and log retention is 30 days as a placeholder until legal confirms (`DATA_LOG_RETENTION_DAYS`).
+- **All of this stays on lms-test.** test.enara.app is frozen.
