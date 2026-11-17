@@ -1,5 +1,6 @@
 import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
+import { groupIdsByStudent, readsFromEnrollments } from './enrollmentReads';
 import { normaliseArabic } from './textSearch';
 
 // Named-student lookups for educator analytics (P10). Only educational
@@ -19,8 +20,14 @@ export interface StudentProfile {
 
 export async function studentProfiles(institutionId: string, ids: string[], enrolment: Map<string, string[]>): Promise<Map<string, StudentProfile>> {
   const students = await Student.find({ id: { $in: ids }, institutionId }).select('id name grade batchId').lean();
-  const batchIds = [...new Set(students.map((s) => s.batchId).filter(Boolean))] as string[];
+  // Multi-class step 5 (profile_context): the student's groups from
+  // class_enrollments when switched on (this school only). One group: its
+  // name, as today; several (step 6): their names, by group id.
+  const groups = readsFromEnrollments('profile_context') ? await groupIdsByStudent(students.map((s) => ({ id: s.id, institutionId })), 'profile_context') : null;
+  const batchIds = groups ? [...new Set([...groups.values()].flat())] : ([...new Set(students.map((s) => s.batchId).filter(Boolean))] as string[]);
   const batches = new Map((await Batch.find({ id: { $in: batchIds }, institutionId }).select('id name').lean()).map((b) => [b.id, b.name]));
+  const className = (s: { id: string; batchId?: string }) =>
+    groups ? (groups.get(s.id) ?? []).map((g) => batches.get(g)).filter(Boolean).join(', ') || null : (s.batchId && batches.get(s.batchId)) || null;
   return new Map(
     students.map((s) => [
       s.id,
@@ -28,7 +35,7 @@ export async function studentProfiles(institutionId: string, ids: string[], enro
         id: s.id,
         name: s.name,
         grade: typeof s.grade === 'string' && s.grade.trim() ? s.grade.trim() : null,
-        className: (s.batchId && batches.get(s.batchId)) || null,
+        className: className(s),
         courses: [...new Set(enrolment.get(s.id) ?? [])].sort(),
       },
     ]),

@@ -25,6 +25,13 @@ export interface ITutorSession extends Document {
   institutionId?: string;
   title: string;
   courseId?: string;
+  /**
+   * Multi-class S7: the class (CourseInstance id) the session happened in,
+   * resolved at creation from the course (or the assignment of a handoff), in
+   * the student's own school. Recorded whether or not multi-class is on; the
+   * credits report uses it only while multi-class is on. Absent on older sessions.
+   */
+  classId?: string;
   lessonId?: string;
   lessonTitle?: string;
   curriculumId?: string;
@@ -73,6 +80,7 @@ const tutorSessionSchema = new Schema<ITutorSession>(
     institutionId: { type: String, index: true },
     title: { type: String, default: 'New chat' },
     courseId: { type: String, index: true },
+    classId: { type: String },
     lessonId: { type: String },
     lessonTitle: { type: String },
     curriculumId: { type: String },

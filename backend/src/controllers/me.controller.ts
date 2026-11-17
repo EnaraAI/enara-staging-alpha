@@ -12,6 +12,7 @@ import {
 } from '../services/studentCourseService';
 import { Curriculum } from '../models/Curriculum';
 import { ownStudentView } from './studentPhoto.controller';
+import { rememberClassUse } from '../services/multiClass';
 
 export const getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
   const studentId = req.user!.studentId!;
@@ -55,6 +56,8 @@ export const getMyCourse = asyncHandler(async (req: AuthRequest, res: Response) 
   const studentId = req.user!.studentId!;
   const courseId = String(req.params.courseId);
   const course = await buildCourseTree(studentId, courseId);
+  // Multi-class step 6 (Q2): the last class used (multi-class students, switch on only).
+  await rememberClassUse(studentId, course.instanceId);
   res.json(course);
 });
 

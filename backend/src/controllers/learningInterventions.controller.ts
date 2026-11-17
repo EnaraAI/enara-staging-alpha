@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { resolveSessionClassId } from '../services/sessionClass';
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
@@ -11,6 +12,7 @@ import { TutorSession } from '../models/TutorSession';
 import { masterySnapshot } from '../services/interventions';
 import { buildObjectiveContext } from '../services/learningContext';
 import { resolveStudentForRead } from '../services/learningAccess';
+import { interventionInScope, teacherClassScope } from '../services/multiClass';
 import { STRATEGY_BY_ID } from '../services/strategyRegistry';
 import { getEnrolledInstances } from '../services/studentCourseService';
 import { appendTutorMessages } from '../services/tutorMessages';
@@ -111,12 +113,14 @@ export const startIntervention = asyncHandler(async (req: AuthRequest, res: Resp
   }
   if (!tutorSessionId && i.interventionType !== 'review') {
     const objective = await LearningObjective.findOne({ id: i.objectiveId }).select('code title').lean();
+    const classId = await resolveSessionClassId({ studentId: i.studentId, institutionId: i.institutionId, courseId: i.courseId }); // multi-class S7
     const session = await TutorSession.create({
       id: `tutor-${randomUUID()}`,
       studentId: i.studentId,
       institutionId: i.institutionId,
       title: `Practice: ${objective?.code} ${objective?.title ?? ''}`.trim().slice(0, 80),
       courseId: i.courseId,
+      ...(classId ? { classId } : {}),
       objectiveId: i.objectiveId,
       interventionId: i.id,
       teachingMethod: 'socratic',
@@ -195,7 +199,10 @@ export const reassessIntervention = asyncHandler(async (req: AuthRequest, res: R
 // GET /api/learning/students/:studentId/interventions
 export const listStudentInterventions = asyncHandler(async (req: AuthRequest, res: Response) => {
   const student = await resolveStudentForRead(req, String(req.params.studentId));
-  const items = await LearningIntervention.find({ studentId: student.id }).sort({ updatedAt: -1 }).limit(100).lean();
+  const all = await LearningIntervention.find({ studentId: student.id }).sort({ updatedAt: -1 }).limit(100).lean();
+  // Multi-class step 6 (Q4): a teacher sees only their classes' actions for a multi-class student.
+  const scope = await teacherClassScope(req.user!, student);
+  const items = scope ? all.filter((i) => interventionInScope(scope, i)) : all;
   const objectives = new Map(
     (await LearningObjective.find({ id: { $in: items.map((i) => i.objectiveId).filter(Boolean) } }).select('id code title').lean()).map((o) => [o.id, o]),
   );

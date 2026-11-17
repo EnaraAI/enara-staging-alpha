@@ -21,6 +21,7 @@ import { originFilter, parseOriginView, studentsInView, type OriginView } from '
 import { assignmentStatus, studentStatus } from '../services/assignments';
 import { getFeatureFlags, isFeatureEnabled } from '../services/featureFlags';
 import { getEnrolledInstances } from '../services/studentCourseService';
+import { attemptsInScope, eventsInScope, interventionInScope, sharedAttempts, teacherClassScope } from '../services/multiClass';
 import { ensurePlainObject, getOptionalId, getOptionalString, getRequiredId, getRequiredString, rejectMongoOperators } from '../utils/validation';
 
 const DAY = 86_400_000;
@@ -39,12 +40,16 @@ async function myClasses(req: AuthRequest, view: OriginView = 'live') {
 type Rules = Parameters<typeof studentStatus>[0];
 
 // Real per-student statuses for a set of assignments.
-async function statusesFor(assignments: (Rules & { id: string; classId: string; studentIds?: string[] })[], membersByClass: Map<string, string[]>, view: OriginView = 'live') {
+async function statusesFor(assignments: (Rules & { id: string; classId: string; studentIds?: string[]; assessmentId?: string; institutionId?: string })[], membersByClass: Map<string, string[]>, view: OriginView = 'live') {
   const attempts = await AssessmentAttempt.find({ assignmentId: { $in: assignments.map((a) => a.id) }, ...originFilter(view) })
     .select('assignmentId studentId status gradingStatus submittedAt')
     .lean();
   const by = new Map<string, typeof attempts>();
   for (const t of attempts) by.set(`${t.assignmentId}|${t.studentId}`, [...(by.get(`${t.assignmentId}|${t.studentId}`) ?? []), t]);
+  // Multi-class step 6 (Q6): a multi-class student's result on the same
+  // assessment in another of their classes counts here too (switch off: none).
+  const shared = await sharedAttempts<(typeof attempts)[number]>(assignments.filter((a) => a.assessmentId) as never, 'status gradingStatus submittedAt', originFilter(view));
+  for (const [k, list] of shared) by.set(k, [...(by.get(k) ?? []), ...list]);
   const rows: { assignmentId: string; studentId: string; status: string; late: boolean }[] = [];
   for (const a of assignments) {
     const inClass = new Set(membersByClass.get(a.classId) ?? []);
@@ -168,14 +173,21 @@ export const getLearnerProfile = asyncHandler(async (req: AuthRequest, res: Resp
   const of = originFilter(view);
   if (!(await studentsInView([student.id], view)).length) throw new AppError('Student not found', 404, 'STUDENT_NOT_FOUND');
   const flags = student.institutionId ? await getFeatureFlags(student.institutionId) : null;
-  const classes = await getEnrolledInstances(student.id);
+  // Multi-class step 6 (Q4): a teacher sees only their own classes' work for a
+  // multi-class student, plus the shared learner profile. Admins, and every
+  // single-class student, as before (scope null).
+  const scope = await teacherClassScope(req.user!, student);
+  const allClasses = await getEnrolledInstances(student.id);
+  const classes = scope ? allClasses.filter((c) => scope.classIds.has(c.id)) : allClasses;
   const now = new Date();
-  const [assignments, attempts, events, interventions] = await Promise.all([
+  const [assignments, allAttempts, events, allInterventions] = await Promise.all([
     Assignment.find({ classId: { $in: classes.map((c) => c.id) }, state: { $in: ['published', 'closed'] }, ...of }).sort({ dueAt: -1 }).limit(100).lean(),
     AssessmentAttempt.find({ studentId: student.id, status: 'submitted', ...of }).sort({ submittedAt: -1 }).limit(100).lean(),
-    LearningEvent.aggregate([{ $match: { studentId: student.id, at: { $gte: new Date(now.getTime() - 30 * DAY) }, ...of } }, { $group: { _id: '$type', n: { $sum: 1 }, last: { $max: '$at' } } }]),
+    LearningEvent.aggregate([{ $match: { studentId: student.id, at: { $gte: new Date(now.getTime() - 30 * DAY) }, ...of, ...(scope ? eventsInScope(scope) : {}) } }, { $group: { _id: '$type', n: { $sum: 1 }, last: { $max: '$at' } } }]),
     LearningIntervention.find({ studentId: student.id }).sort({ createdAt: -1 }).limit(50).lean(),
   ]);
+  const attempts = scope ? await attemptsInScope(scope, allAttempts) : allAttempts;
+  const interventions = scope ? allInterventions.filter((i) => interventionInScope(scope, i)) : allInterventions;
   const mine = assignments.filter((a) => !a.studentIds?.length || a.studentIds.includes(student.id));
   const rows = await statusesFor(mine as never, new Map(classes.map((c) => [c.id, [student.id]])), view);
   const objectiveIds = new Set<string>(interventions.map((i) => i.objectiveId).filter(Boolean) as string[]);
@@ -243,6 +255,7 @@ export const getLearnerProfile = asyncHandler(async (req: AuthRequest, res: Resp
   res.json({
     origin: view,
     student: { id: student.id, name: student.name },
+    ...(scope ? { classScope: { restricted: true, classIds: [...scope.classIds], reason: 'This learner is in several classes: you see your classes\' work and the shared learner profile.' } } : {}),
     note: 'Estimates come from a scoring rule over recorded answers; they are not grades or predictions, and a low score is not a judgement of ability.',
     observed: {
       classes: classes.map((c) => ({ id: c.id, courseName: c.courseName })),

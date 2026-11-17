@@ -8,6 +8,9 @@ import {
   fetchMyResults,
   fetchMyAchievements,
   fetchMyAssignments,
+  fetchMyClasses,
+  setMyCurrentClass,
+  type MyClasses,
 } from '../services/apiService';
 import { toast } from '../services/toastService';
 import { NextStepsCard } from '../components/proactive/NextStepsCard';
@@ -37,7 +40,7 @@ interface DashboardData {
 }
 // GET /api/me/courses
 interface CourseSummary {
-  id: string; title: string; subject: string; progressPct: number;
+  id: string; instanceId?: string; title: string; subject: string; progressPct: number;
   lessonsCount: number; completedLessons: number; academicYear?: string;
 }
 // GET /api/me/results
@@ -82,6 +85,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onStartAsses
   const [resumeTree, setResumeTree] = useState<(Course & { progressPct?: number }) | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  // Multi-class (step 6, Q2): a class switcher only for students in 2+ classes.
+  const [myClasses, setMyClasses] = useState<MyClasses | null>(null);
 
   const openCourse = (courseId?: string) => {
     if (courseId && onOpenCourse) onOpenCourse(courseId);
@@ -123,9 +128,25 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onStartAsses
   };
 
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    let cancelled = false;
+    fetchMyClasses().then(r => { if (!cancelled) setMyClasses(r); }).catch(() => { /* no switcher */ });
+    return () => { cancelled = true; };
+  }, []);
 
-  // Resume course: the dashboard's continueLearning course, else the first incomplete course.
+  const switcherClasses = myClasses?.showSwitcher ? myClasses.classes || [] : [];
+  const currentClass = switcherClasses.find(c => c.id === myClasses?.current);
+  const chooseClass = (classId: string) => {
+    setMyClasses(prev => (prev ? { ...prev, current: classId } : prev));
+    setMyCurrentClass(classId).then(setMyClasses).catch(err => toast.error('Could not switch class', err instanceof Error ? err.message : ''));
+  };
+  // With a class chosen, the dashboard shows that class's course (single-class students: unchanged).
+  const shownCourses = currentClass ? courses.filter(c => (c.instanceId ? c.instanceId === currentClass.id : c.id === currentClass.courseId)) : courses;
+
+  // Resume course: the chosen class (multi-class students), else the dashboard's
+  // continueLearning course, else the first incomplete course.
   const resumeCourseId =
+    currentClass?.courseId ||
     dashboard?.continueLearning?.courseId ||
     courses.find(c => c.progressPct < 100)?.id ||
     courses[0]?.id ||
@@ -216,6 +237,23 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onStartAsses
 
   return (
     <div className="flex flex-col gap-9 text-[#1f1f1f]">
+      {switcherClasses.length > 1 && (
+        <nav aria-label="Choose a class" className="flex flex-wrap gap-2 -mb-4">
+          {[{ id: 'all', name: 'All my classes' }, ...switcherClasses].map(c => {
+            const active = (myClasses?.current || 'all') === c.id;
+            return (
+              <button
+                key={c.id}
+                onClick={() => chooseClass(c.id)}
+                aria-pressed={active}
+                className={`px-3.5 py-1.5 rounded-full border text-sm font-semibold ${active ? 'bg-teal-600 border-teal-600 text-white' : 'bg-white border-[#d1d5db] text-zinc-700 hover:border-teal-400'}`}
+              >
+                {c.name}
+              </button>
+            );
+          })}
+        </nav>
+      )}
       {/* Hero + Due soon */}
       <section className="flex flex-wrap gap-6 items-stretch">
         <div className="flex-[2_1_560px] min-w-0 bg-teal-50 rounded-xl p-5 sm:p-8 flex flex-col gap-3.5">
@@ -297,15 +335,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onStartAsses
           <h2 className="m-0 text-2xl font-bold">My courses</h2>
           <button onClick={() => onNavigate('courses')} className="font-semibold text-teal-700 hover:underline">View all</button>
         </div>
-        {courses.length === 0 ? (
+        {shownCourses.length === 0 ? (
           <Card className="p-6 flex items-center gap-3 text-zinc-600">
             <BookOpen size={20} aria-hidden="true" /> No courses yet. Your enrolled courses will appear here.
           </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {courses.map(c => (
+            {shownCourses.map(c => (
               <button
-                key={c.id}
+                key={c.instanceId || c.id}
                 onClick={() => openCourse(c.id)}
                 className="text-left border border-[#e5e7eb] rounded-[10px] overflow-hidden bg-white hover:shadow-md hover:border-teal-200 transition"
               >

@@ -15,6 +15,7 @@ import { canDo, controlsModeFor, tierOf, transcriptExpired, visibilityFor, wordi
 import { CEFR_ORDER, PARENT_LEVEL_LABELS, checkpointLevel, computeLevel, courseOutcomes, loadOutcomes, subLevelName, type Cefr } from './levels';
 import { addDays, cairoDay, cairoDayStart, cairoTime, isWeekend, weekDays, weekStartDay } from './time';
 import * as mock from './mock';
+import { classOfAttempts, classOfCourse, classesForLabels } from '../services/multiClass';
 
 // Parents Portal data. Everything is computed from live data on each request
 // (user decision: real-time progress, no weekly snapshot or cache). Sections
@@ -60,6 +61,16 @@ function learnerHeader(ctx: LearnerContext) {
 }
 
 const envelope = <T extends Record<string, unknown>>(ctx: LearnerContext, body: T) => ({ generatedAt: new Date().toISOString(), timezone: 'Africa/Cairo', learner: learnerHeader(ctx), ...body });
+
+// Multi-class step 6 (Q3): one view of the child; for a child in several
+// classes each activity is labelled by class and a class filter is offered.
+// Null (no labels, no filter, today's reply) for every other child.
+async function classView(ctx: LearnerContext, classId: unknown) {
+  const classes = await classesForLabels({ id: ctx.student.id, institutionId: ctx.student.institutionId });
+  if (!classes) return null;
+  const filter = typeof classId === 'string' && classes.some((c) => c.id === classId) ? classId : null;
+  return { classes, filter, list: classes.map((c) => ({ id: c.id, name: c.name })) };
+}
 
 // ---------------------------------------------------------------------------
 // Learners list
@@ -277,7 +288,7 @@ function stripInternal<T extends { _m?: unknown }>(x: T): Omit<T, '_m'> {
   return rest;
 }
 
-export async function progress(ctx: LearnerContext) {
+export async function progress(ctx: LearnerContext, classId?: unknown) {
   const level = await levelCard(ctx);
   let canDos: { mock: boolean; items: { id: string; text: { en: string; ar: string }; state: 'achieved' | 'in_progress' | 'not_started' }[] };
   if (!level.mock) {
@@ -290,7 +301,10 @@ export async function progress(ctx: LearnerContext) {
   const strengths = ap?.strengths?.length && ap?.weaknesses?.length
     ? { mock: false, strengths: ap.strengths.slice(0, 2).map((s) => ({ en: s, ar: s })), focusAreas: ap.weaknesses.slice(0, 2).map((s) => ({ en: s, ar: s })) }
     : { mock: true, ...mock.mockStrengths(ctx.tier) };
-  const attempts = await AssessmentAttempt.find({ studentId: ctx.student.id, status: 'submitted' }).sort({ submittedAt: -1 }).limit(10).select('id assessmentTitle score submittedAt gradingStatus').lean();
+  const cv = await classView(ctx, classId);
+  let attempts = await AssessmentAttempt.find({ studentId: ctx.student.id, status: 'submitted' }).sort({ submittedAt: -1 }).limit(cv ? 50 : 10).select(cv ? 'id assessmentTitle score submittedAt gradingStatus assignmentId assessmentId' : 'id assessmentTitle score submittedAt gradingStatus').lean();
+  const classOf = cv ? await classOfAttempts(cv.classes, attempts) : null;
+  if (cv) attempts = attempts.filter((a) => !cv.filter || classOf!.get(a.id)?.id === cv.filter).slice(0, 10);
   const lessonsDone = await LessonProgress.countDocuments({ studentId: ctx.student.id, status: 'completed' });
   return envelope(ctx, {
     level: stripInternal(level),
@@ -302,8 +316,9 @@ export async function progress(ctx: LearnerContext) {
     lessonsCompleted: { mock: false, count: lessonsDone },
     assessments: {
       mock: false,
-      items: attempts.map((a) => ({ id: a.id, title: a.assessmentTitle, score: typeof a.score === 'number' ? a.score : null, submittedAt: a.submittedAt, passed: typeof a.score === 'number' ? a.score >= 60 : null, verified: a.gradingStatus === undefined || a.gradingStatus === 'released' || a.gradingStatus === 'finalized' })),
+      items: attempts.map((a) => ({ id: a.id, title: a.assessmentTitle, score: typeof a.score === 'number' ? a.score : null, submittedAt: a.submittedAt, passed: typeof a.score === 'number' ? a.score >= 60 : null, verified: a.gradingStatus === undefined || a.gradingStatus === 'released' || a.gradingStatus === 'finalized', ...(classOf ? { class: classOf.get(a.id) ?? null } : {}) })),
     },
+    ...(cv ? { classes: { items: cv.list, filter: cv.filter } } : {}),
   });
 }
 
@@ -328,10 +343,12 @@ export async function home(ctx: LearnerContext, now = new Date()) {
 // ---------------------------------------------------------------------------
 // Activity
 
-export async function activity(ctx: LearnerContext, now = new Date()) {
+export async function activity(ctx: LearnerContext, now = new Date(), classId?: unknown) {
   const today = cairoDay(now);
   const calStart = addDays(weekStartDay(now), -7);
   const sessions = await loadSessions(ctx.student.id, new Date(now.getTime() - 31 * DAY));
+  const cv = await classView(ctx, classId);
+  const classOfSession = (s: SessionRow) => (cv ? classOfCourse(cv.classes, s.courseId) : null);
   const perDay = minutesByDay(sessions);
   const calendar = Array.from({ length: 14 }, (_, i) => {
     const d = addDays(calStart, i);
@@ -339,7 +356,7 @@ export async function activity(ctx: LearnerContext, now = new Date()) {
   });
   return envelope(ctx, {
     calendar: { mock: false, days: calendar, practisedCount: calendar.filter((c) => c.state === 'practised').length, pastCount: calendar.filter((c) => c.day <= today).length },
-    sessions: sessions.map((s) => {
+    sessions: sessions.filter((s) => !cv?.filter || classOfSession(s)?.id === cv.filter).map((s) => {
       const insight = mock.mockSessionInsight(s.id);
       return {
         id: s.id,
@@ -356,8 +373,10 @@ export async function activity(ctx: LearnerContext, now = new Date()) {
         insight: { mock: true, aiWritten: true, wentWell: insight.wentWell, wasHard: insight.wasHard, words: insight.words, focus: insight.focus },
         transcript: { available: !transcriptExpired(s.startedAt, now), retentionDays: TRANSCRIPT_RETENTION_DAYS },
         audio: { available: false },
+        ...(cv ? { class: classOfSession(s) } : {}),
       };
     }),
+    ...(cv ? { classes: { items: cv.list, filter: cv.filter } } : {}),
   });
 }
 

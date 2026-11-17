@@ -1,5 +1,6 @@
 import { assertStagingIsolation, isStagingMode, stagingFlagProblem } from "./stagingGuard";
 import dotenv from "dotenv";
+import { dataLogRetentionDays, safetyAlertRetentionDays } from "./retention";
 
 // Keys filled in from a .env file (staging refuses to start with any: it must
 // run on its own environment only, never inherit another one's values).
@@ -118,6 +119,25 @@ export interface AppConfig {
   };
   r2?: { accountId: string; bucket: string; accessKeyId: string; secretAccessKey: string };
   lms: LmsConfig;
+  // Multi-class enrollment (docs/multi-class/PLAN.md). Every switch defaults to
+  // off; turning one on needs the owner's OK.
+  // shadow: compute the enrollment answer next to the old one, return the old
+  // one, record mismatches (step 4). sampleRate: share of requests checked.
+  // readFrom: step 5 features that read membership from class_enrollments
+  // (ENROLLMENT_READ_FROM, comma list). attendanceFix (Q7) and
+  // ageFromBirthDate (Q8) are separate switches. multiClass (step 6) turns on
+  // multi-class (admin "add to group/class", class switcher, Q1-Q9); it only
+  // takes effect with dual write on and all seven step 5 features in readFrom.
+  enrollment: { dualWrite: boolean; shadow: boolean; shadowSampleRate: number; readFrom: string[]; attendanceFix: boolean; ageFromBirthDate: boolean; multiClass: boolean };
+  // Multi-class step 6 archiving (docs/multi-class/ARCHIVE_NOTES.md), both off by
+  // default. group: ENROLLMENT_GROUP_ARCHIVE (block deleting groups/classes with
+  // students, archive/restore them, unplaced-students list). student:
+  // ENROLLMENT_STUDENT_ARCHIVE (archive/restore students, confirmed permanent delete).
+  archive: { group: boolean; student: boolean };
+  // PDPL retention (config/retention.ts): SAFETY_ALERT_RETENTION_DAYS (kept
+  // alerts of deleted students, default 730) and DATA_LOG_RETENTION_DAYS (the
+  // app's own logs with personal data, default 30). Placeholders until legal confirms.
+  retention: { safetyAlertDays: number; dataLogDays: number };
 }
 
 // LMS integration (docs/lms/IMPLEMENTATION_PLAN.md). Every flag defaults to off.
@@ -546,6 +566,20 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     googleClientId: readString(source, "GOOGLE_CLIENT_ID") || undefined,
     cronSecret: readString(source, "CRON_SECRET"),
     lms: parseLmsConfig(source),
+    enrollment: {
+      dualWrite: readBoolean(source, 'ENROLLMENT_DUAL_WRITE', false),
+      shadow: readBoolean(source, 'ENROLLMENT_SHADOW', false),
+      shadowSampleRate: Math.min(1, Math.max(0, Number(source.ENROLLMENT_SHADOW_SAMPLE_RATE ?? 1) || 0)),
+      readFrom: String(source.ENROLLMENT_READ_FROM ?? '').split(',').map((x) => x.trim()).filter(Boolean),
+      attendanceFix: readBoolean(source, 'ENROLLMENT_ATTENDANCE_FIX', false),
+      ageFromBirthDate: readBoolean(source, 'ENROLLMENT_AGE_FROM_BIRTHDATE', false),
+      multiClass: readBoolean(source, 'ENROLLMENT_MULTI_CLASS', false),
+    },
+    archive: {
+      group: readBoolean(source, 'ENROLLMENT_GROUP_ARCHIVE', false),
+      student: readBoolean(source, 'ENROLLMENT_STUDENT_ARCHIVE', false),
+    },
+    retention: { safetyAlertDays: safetyAlertRetentionDays(source), dataLogDays: dataLogRetentionDays(source) },
     // Staging starts with AI paused and invite-only registration unless set explicitly.
     aiPaused: readBoolean(source, "AI_PAUSED", staging),
     registrationInviteOnly: readBoolean(source, "REGISTRATION_INVITE_ONLY", staging),

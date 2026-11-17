@@ -16,6 +16,18 @@ export interface ICourseInstance extends Document {
   instructorIds: string[];
   // Demo/live separation (P1): seeded demo data is 'demo_seed'.
   origin?: 'live' | 'demo_seed';
+  // Multi-class step 6 (ENROLLMENT_GROUP_ARCHIVE): set while the class is
+  // archived (visibility is then 'archived'; the previous one is kept).
+  archivedAt?: Date;
+  archivedBy?: string;
+  archive?: ClassArchiveRecord;
+}
+
+export interface ClassArchiveRecord {
+  /** Explicit members (studentIds) removed by the archive. */
+  memberIds: string[];
+  enrollmentIds: string[];
+  visibility: CourseVisibility;
 }
 
 const courseInstanceSchema = new Schema<ICourseInstance>(
@@ -38,6 +50,9 @@ const courseInstanceSchema = new Schema<ICourseInstance>(
     studentIds: { type: [String], default: [] },
     instructorIds: { type: [String], default: [] },
     origin: { type: String, enum: ['live', 'demo_seed'], default: 'live' },
+    archivedAt: { type: Date },
+    archivedBy: { type: String },
+    archive: { type: Schema.Types.Mixed },
   },
   { timestamps: true }
 );

@@ -93,6 +93,8 @@ export interface CourseInstance {
   curriculumId?: string;
   groupId?: string;
   studentIds: string[];
+  /** Multi-class (switch on): students added to this class outside its own list. */
+  extraStudentIds?: string[];
 }
 
 export interface ExamResult {

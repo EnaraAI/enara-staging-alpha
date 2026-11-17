@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { syncClassDeleted, syncClassMember } from '../services/enrollmentSync';
 import { CourseInstance } from '../models/CourseInstance';
 import { Student } from '../models/Student';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -21,9 +22,18 @@ import {
   rejectMongoOperators,
 } from '../utils/validation';
 import { normalizeCourseVisibility } from '../services/courseVisibility';
+import { archivedListFilter } from './archive.controller';
+import { groupArchiveOn } from '../services/archive';
+import { withExtraClassMembers } from '../services/multiClass';
 
 function toInstanceResponse(doc: InstanceType<typeof CourseInstance>) {
   return toPlainObject(doc);
+}
+
+// Multi-class S5: with the switch on, rows also list the students added to the
+// class outside its own list (extraStudentIds); unchanged while off.
+async function instanceReply(doc: InstanceType<typeof CourseInstance>) {
+  return (await withExtraClassMembers([toInstanceResponse(doc) as Record<string, unknown>]))[0];
 }
 
 export const listCourseInstances = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -42,14 +52,17 @@ export const listCourseInstances = asyncHandler(async (req: AuthRequest, res: Re
     ];
   }
 
+  // Step 6: archived classes are hidden unless asked for (no change while off).
+  Object.assign(filter, archivedListFilter(req, groupArchiveOn));
+
   const instances = await CourseInstance.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
-  res.json(instances.map(toInstanceResponse));
+  res.json(await withExtraClassMembers(instances.map(toInstanceResponse) as Record<string, unknown>[]));
 });
 
 export const getCourseInstance = asyncHandler(async (req: AuthRequest, res: Response) => {
   const instance = await CourseInstance.findOne(scopedFilter(req, { id: req.params.id }));
   if (!instance) throw new AppError('Course instance not found', 404);
-  res.json(toInstanceResponse(instance));
+  res.json(await instanceReply(instance));
 });
 
 export const createCourseInstance = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -132,7 +145,7 @@ export const updateCourseInstance = asyncHandler(async (req: AuthRequest, res: R
   }
 
   await instance.save();
-  res.json(toInstanceResponse(instance));
+  res.json(await instanceReply(instance));
 });
 
 export const deleteCourseInstance = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -140,6 +153,7 @@ export const deleteCourseInstance = asyncHandler(async (req: AuthRequest, res: R
   if (!instance) throw new AppError('Course instance not found', 404);
 
   await CourseInstance.deleteOne(scopedFilter(req, { id: req.params.id }));
+  await syncClassDeleted({ classId: instance.id, by: req.user?.id });
   res.json({ message: 'Course instance deleted' });
 });
 
@@ -173,18 +187,22 @@ export const assignStudent = asyncHandler(async (req: AuthRequest, res: Response
 
   instance.studentIds.push(studentId);
   await instance.save();
+  await syncClassMember({ institutionId: student.institutionId, studentId, classId: instance.id, action: 'add', by: req.user?.id });
 
-  res.json(toInstanceResponse(instance));
+  res.json(await instanceReply(instance));
 });
 
 export const removeStudent = asyncHandler(async (req: AuthRequest, res: Response) => {
   const instance = await CourseInstance.findOne(scopedFilter(req, { id: req.params.id }));
   if (!instance) throw new AppError('Course instance not found', 404);
 
+  const removedId = String(req.params.studentId);
+  const wasMember = instance.studentIds.includes(removedId);
   instance.studentIds = instance.studentIds.filter((id) => id !== req.params.studentId);
   await instance.save();
+  if (wasMember) await syncClassMember({ institutionId: instance.institutionId, studentId: removedId, classId: instance.id, action: 'remove', by: req.user?.id });
 
-  res.json(toInstanceResponse(instance));
+  res.json(await instanceReply(instance));
 });
 
 export const getAssignedStudents = asyncHandler(async (req: AuthRequest, res: Response) => {

@@ -5,6 +5,7 @@ import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { requireInstitutionId } from '../auth/authorization';
 import { ASSESSMENT_KINDS, Assessment } from '../models/Assessment';
+import { anonymisedRowsAllowed, anonymisedStudents, DELETED_STUDENT_LABEL } from '../services/anonymisedResults';
 import { AssessmentAttempt } from '../models/AssessmentAttempt';
 import { Assignment, type IAssignment } from '../models/Assignment';
 import { CourseInstance } from '../models/CourseInstance';
@@ -18,6 +19,7 @@ import { logger } from '../utils/logging';
 import { CONVERSATION_QUESTION_TYPES } from '../services/conversationExam';
 import { isFeatureEnabled } from '../services/featureFlags';
 import { checkSpeakingQuestions, parseSpeakingSettings } from '../services/speakingExam';
+import { sharedAttempts } from '../services/multiClass';
 
 // Speaking exams (P4) need the school's speaking_exams_enabled flag; the
 // avatar-only and student-choice policies also need the avatar option, which
@@ -188,10 +190,17 @@ export const getAssignment = asyncHandler(async (req: AuthRequest, res: Response
   const memberIds = a.studentIds?.length ? a.studentIds : cls ? await classStudentIds(cls) : [];
   const [students, attempts] = await Promise.all([
     Student.find({ id: { $in: memberIds } }).select('id name').sort({ name: 1 }).lean(),
-    AssessmentAttempt.find({ assignmentId: a.id }).select('id studentId status gradingStatus submittedAt score totalPoints maxPoints isLate').lean(),
+    AssessmentAttempt.find({ assignmentId: a.id }).select('id studentId status gradingStatus submittedAt score totalPoints maxPoints isLate anonymised').lean(),
   ]);
   const byStudent = new Map<string, typeof attempts>();
   for (const t of attempts) byStudent.set(t.studentId, [...(byStudent.get(t.studentId) ?? []), t]);
+  // Multi-class step 6 (Q6): a multi-class student's result on the same
+  // assessment in another of their classes counts here too (switch off: none).
+  const shared = await sharedAttempts<(typeof attempts)[number]>([a as never], 'id status gradingStatus submittedAt score totalPoints maxPoints isLate');
+  for (const [k, list] of shared) {
+    const sid = k.slice(k.indexOf('|') + 1);
+    byStudent.set(sid, [...(byStudent.get(sid) ?? []), ...list]);
+  }
   const roster = students.map((s) => {
     const mine = byStudent.get(s.id) ?? [];
     const latest = mine.filter((t) => t.status === 'submitted').sort((x, y) => new Date(y.submittedAt!).getTime() - new Date(x.submittedAt!).getTime())[0];
@@ -223,8 +232,30 @@ export const getAssignment = asyncHandler(async (req: AuthRequest, res: Response
       late: roster.filter((r) => r.late).length,
     },
     roster,
+    ...anonymisedResultsBlock(attempts, roster.length),
   });
 });
+
+// PDPL P1: kept results of permanently deleted students (absent unless one was
+// deleted). Counted as aggregates; listed one by one, without name, only when
+// the class (live + anonymised students) has MIN_GROUP_SIZE_FOR_ROWS or more.
+function anonymisedResultsBlock(attempts: { id: string; studentId: string; status: string; gradingStatus?: string; submittedAt?: Date; score?: number; isLate?: boolean; anonymised?: boolean }[], liveStudents: number) {
+  const anon = anonymisedStudents(attempts.filter((t) => t.status === 'submitted'));
+  if (!anon.latest.length) return {};
+  const scored = anon.latest.filter((t) => typeof t.score === 'number');
+  const rowsShown = anonymisedRowsAllowed(liveStudents, anon.latest.length);
+  return {
+    anonymisedResults: {
+      students: anon.latest.length,
+      graded: scored.length,
+      averageScore: scored.length ? Math.round(scored.reduce((n, t) => n + (t.score as number), 0) / scored.length) : null,
+      rowsShown,
+      rows: rowsShown
+        ? anon.latest.map((t) => ({ studentId: t.studentId, name: DELETED_STUDENT_LABEL, attemptId: t.id, score: t.score ?? null, gradingStatus: t.gradingStatus ?? null, submittedAt: t.submittedAt ?? null, late: !!t.isLate }))
+        : [],
+    },
+  };
+}
 
 // PATCH /api/assignments/:id — dates and rules. The assessment version can
 // only change before anyone has started.

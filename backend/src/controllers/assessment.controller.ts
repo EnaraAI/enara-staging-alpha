@@ -12,6 +12,8 @@ import { stripAnswersForStudent } from '../services/assessmentSecurity';
 import { logger } from '../utils/logging';
 import { AssessmentAttempt } from '../models/AssessmentAttempt';
 import { Student } from '../models/Student';
+import { anonymisedRowsAllowed, anonymisedStudents, DELETED_STUDENT_LABEL } from '../services/anonymisedResults';
+import { groupMemberIds, readsFromEnrollments } from '../services/enrollmentReads';
 import { generateAssessmentId } from '../utils/idGenerator';
 import { resolveWriteInstitutionId, scopedFilter } from '../auth/authorization';
 import {
@@ -230,7 +232,14 @@ export const getAssessmentAttempts = asyncHandler(async (req: AuthRequest, res: 
     .lean();
 
   const assignedTo: Record<string, unknown>[] = [];
-  if (assessment.batchId) assignedTo.push({ batchId: assessment.batchId });
+  if (assessment.batchId) {
+    // Multi-class step 5 (assessments): the group's members from class_enrollments
+    // when switched on (in the assessment's school), else Student.batchId.
+    if (readsFromEnrollments('assessments')) {
+      const inGroup = assessment.institutionId ? await groupMemberIds(assessment.batchId, assessment.institutionId) : [];
+      if (inGroup.length) assignedTo.push({ id: { $in: inGroup } });
+    } else assignedTo.push({ batchId: assessment.batchId });
+  }
   if (assessment.studentId) assignedTo.push({ id: assessment.studentId });
   const attemptedIds = [...new Set(attempts.map((a) => a.studentId))];
   if (attemptedIds.length) assignedTo.push({ id: { $in: attemptedIds } });
@@ -260,13 +269,41 @@ export const getAssessmentAttempts = asyncHandler(async (req: AuthRequest, res: 
     };
   });
 
+  // PDPL P1: kept results of permanently deleted students (none unless one was
+  // deleted) count in every aggregate; as rows only in a group of at least
+  // MIN_GROUP_SIZE_FOR_ROWS students (live + anonymised), without name.
+  const anon = anonymisedStudents(attempts);
+  const anonScored = anon.latest.filter((t) => typeof t.score === 'number');
+  const liveRows = rows.length;
+  const anonRowsShown = anon.latest.length > 0 && anonymisedRowsAllowed(liveRows, anon.latest.length);
+
   const submittedRows = rows.filter((r) => r.status === 'submitted' && typeof r.score === 'number');
-  const scores = submittedRows.map((r) => r.score as number);
+  const scores = [...submittedRows.map((r) => r.score as number), ...anonScored.map((t) => t.score as number)];
 
   // Per-question correct rate across each student's latest submitted attempt.
   const latestSubmitted = submittedRows
     .map((r) => attempts.find((a) => a.id === r.attemptId))
-    .filter((a): a is NonNullable<typeof a> => !!a);
+    .filter((a): a is NonNullable<typeof a> => !!a)
+    .concat(anonScored);
+  if (anonRowsShown) {
+    for (const t of anon.latest) {
+      rows.push({
+        studentId: t.studentId,
+        name: DELETED_STUDENT_LABEL,
+        email: undefined as never,
+        batchId: undefined,
+        status: 'submitted',
+        attemptId: t.id,
+        score: t.score ?? null,
+        startedAt: t.startedAt ?? null,
+        submittedAt: t.submittedAt ?? null,
+        timeSpentSec: t.timeSpentSec ?? null,
+        attemptCount: anon.count.get(t.studentId) ?? 1,
+        answers: t.answers ?? [],
+        anonymised: true,
+      } as (typeof rows)[number]);
+    }
+  }
   const questions = assessment.questions.map((q) => {
     const answers = latestSubmitted
       .map((a) => a.answers.find((ans) => ans.questionId === q.id))
@@ -293,13 +330,14 @@ export const getAssessmentAttempts = asyncHandler(async (req: AuthRequest, res: 
       studentId: assessment.studentId,
     },
     summary: {
-      assigned: rows.length,
-      submitted: submittedRows.length,
+      assigned: liveRows + anon.latest.length,
+      submitted: submittedRows.length + anonScored.length,
       inProgress: rows.filter((r) => r.status === 'in-progress').length,
       notStarted: rows.filter((r) => r.status === 'not-started').length,
       averageScore: scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null,
       highestScore: scores.length ? Math.max(...scores) : null,
       lowestScore: scores.length ? Math.min(...scores) : null,
+      ...(anon.latest.length ? { anonymisedStudents: anon.latest.length, anonymisedRowsShown: anonRowsShown } : {}),
     },
     students: rows.sort((a, b) => a.name.localeCompare(b.name)),
     questions,

@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { bi } from '../i18n';
 import { cairoDate, parentsApi, type LearnerChip } from '../api';
 import { ErrorBox, Icon, Loading, SampleBadge, useP } from '../ui';
 import { useLive } from '../useLive';
+import { ClassFilter } from '../shared';
 
 export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void }> = ({ learner, refreshKey, onFetched }) => {
   const { t, n, lang } = useP();
-  const q = useLive(() => parentsApi.progress(learner.studentId), [learner.studentId], refreshKey);
+  const [classId, setClassId] = useState<string | null>(null);
+  const q = useLive(() => parentsApi.progress(learner.studentId, classId), [learner.studentId, classId], refreshKey);
   React.useEffect(() => onFetched(q.fetchedAt, q.loading), [q.fetchedAt, q.loading]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!q.data) return q.error ? <ErrorBox onRetry={q.reload} /> : <Loading />;
   const d = q.data;
@@ -113,12 +115,13 @@ export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
 
       <section className="pp-card" aria-labelledby="pp-results">
         <div className="pp-row"><h2 className="pp-h2" id="pp-results">{t.assessments}</h2><span className="pp-meta">{t.lessonsDone(n(d.lessonsCompleted.count))}</span></div>
+        <ClassFilter classes={d.classes} value={classId} onChange={setClassId} />
         {d.assessments.items.length === 0 && <p className="pp-sub">{t.noAssessments}</p>}
         {d.assessments.items.map((a) => (
           <div className="pp-row" key={a.id}>
             <div style={{ flexGrow: 1, minInlineSize: 0 }}>
               <p style={{ fontSize: 14, fontWeight: 600, lineHeight: '20px' }} dir="auto">{a.title}</p>
-              <p className="pp-sub">{a.submittedAt ? cairoDate(a.submittedAt.slice(0, 10), lang) : ''}{a.score !== null ? ` · ${n(a.score)}%` : ''}</p>
+              <p className="pp-sub">{a.submittedAt ? cairoDate(a.submittedAt.slice(0, 10), lang) : ''}{a.score !== null ? ` · ${n(a.score)}%` : ''}{a.class !== undefined ? ` · ${a.class ? t.inClass(a.class.name) : t.noClass}` : ''}</p>
             </div>
             {a.passed !== null && a.verified && (a.passed
               ? <span className="pp-tag pp-tag--ok"><Icon name="check" style={{ inlineSize: 14, blockSize: 14 }} />{t.passed}</span>

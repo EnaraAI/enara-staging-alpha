@@ -3,6 +3,7 @@ import { AttendanceSession } from '../models/AttendanceSession';
 import { AttendanceRecord, ATTENDANCE_STATUSES, AttendanceStatus } from '../models/AttendanceRecord';
 import { CourseInstance } from '../models/CourseInstance';
 import { Student } from '../models/Student';
+import { attendanceRosterCounts, attendanceRosterFromEnrollments, readsFromEnrollments } from '../services/enrollmentReads';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { toPlainObject } from '../utils/serialize';
@@ -41,6 +42,15 @@ async function loadOwnedCourseInstance(req: AuthRequest, courseInstanceId: strin
   return courseInstance;
 }
 
+// Who is on the attendance roster. Today: the class's own studentIds only
+// (students in the class only through their group are missing: the Q7 gap).
+// Multi-class step 5 (attendance): from class_enrollments when switched on;
+// the group's members are added only with ENROLLMENT_ATTENDANCE_FIX (Q7).
+async function attendanceRosterIds(courseInstance: { id: string; batchId?: string; institutionId?: string; studentIds: string[] }): Promise<string[]> {
+  if (!readsFromEnrollments('attendance')) return courseInstance.studentIds;
+  return attendanceRosterFromEnrollments(courseInstance);
+}
+
 function summarizeRecords(records: Array<{ status: AttendanceStatus }>) {
   const summary: Record<AttendanceStatus, number> & { total: number } = {
     present: 0,
@@ -74,6 +84,8 @@ export const listTeacherClasses = asyncHandler(async (req: AuthRequest, res: Res
     attendanceDate: today,
   });
   const sessionByCourseInstance = new Map(todaysSessions.map((s) => [s.courseInstanceId, s]));
+  // Multi-class step 5 (attendance): roster sizes from class_enrollments when switched on.
+  const counts = readsFromEnrollments('attendance') ? await attendanceRosterCounts(courseInstances) : null;
 
   res.json(
     courseInstances.map((c) => {
@@ -83,7 +95,7 @@ export const listTeacherClasses = asyncHandler(async (req: AuthRequest, res: Res
         courseName: c.courseName,
         batchId: c.batchId,
         academicYear: c.academicYear,
-        studentCount: c.studentIds.length,
+        studentCount: counts ? counts.get(c.id) ?? 0 : c.studentIds.length,
         todaySession: session ? toPlainObject(session) : null,
       };
     })
@@ -101,7 +113,7 @@ export const getRoster = asyncHandler(async (req: AuthRequest, res: Response) =>
   const courseInstance = await loadOwnedCourseInstance(req, courseInstanceId);
 
   const students = await Student.find(
-    scopedFilter(req, { id: { $in: courseInstance.studentIds } })
+    scopedFilter(req, { id: { $in: await attendanceRosterIds(courseInstance) } })
   ).sort({ name: 1 });
 
   const session = await AttendanceSession.findOne(
@@ -145,7 +157,7 @@ export const saveAttendance = asyncHandler(async (req: AuthRequest, res: Respons
   }
 
   const courseInstance = await loadOwnedCourseInstance(req, courseInstanceId);
-  const rosterIds = new Set(courseInstance.studentIds);
+  const rosterIds = new Set(await attendanceRosterIds(courseInstance));
 
   const parsedRecords = rawRecords.map((raw, index) => {
     const entry = ensurePlainObject(raw, `records[${index}]`);

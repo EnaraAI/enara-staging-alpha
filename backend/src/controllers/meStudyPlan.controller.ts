@@ -7,6 +7,7 @@ import { replan, setItemStatus } from '../services/studyPlans';
 import { buildHandoff } from '../services/tutorHandoff';
 import { appendTutorMessages } from '../services/tutorMessages';
 import { resolveStudentForRead } from '../services/learningAccess';
+import { studyItemsInScope, teacherClassScope } from '../services/multiClass';
 import { generateMessageId, generateTutorSessionId } from '../utils/idGenerator';
 import { ensurePlainObject, getRequiredString, rejectMongoOperators } from '../utils/validation';
 
@@ -56,6 +57,8 @@ export const startTutorHandoff = asyncHandler(async (req: AuthRequest, res: Resp
     studentId: student.id,
     institutionId: req.user!.institutionId,
     title: handoff.title.slice(0, 60),
+    // Multi-class S7: an assignment handoff happens in the assignment's class.
+    ...('classId' in handoff && handoff.classId ? { classId: handoff.classId } : {}),
     objectiveId: handoff.objectiveId,
     handoff: { kind, refId, prompt: handoff.prompt, createdAt: new Date() },
     teachingMethod: 'socratic',
@@ -72,5 +75,12 @@ export const startTutorHandoff = asyncHandler(async (req: AuthRequest, res: Resp
 export const getStudentStudyPlanForStaff = asyncHandler(async (req: AuthRequest, res: Response) => {
   const student = await resolveStudentForRead(req, String(req.params.studentId));
   if (req.user!.role === 'student') throw new AppError('Staff access required', 403, 'FORBIDDEN');
-  res.json(view(await replan(student, 'staff_view')));
+  const out = view(await replan(student, 'staff_view'));
+  // Multi-class step 6 (Q4): a teacher sees only their classes' items for a multi-class student.
+  const scope = await teacherClassScope(req.user!, student);
+  if (!scope) {
+    res.json(out);
+    return;
+  }
+  res.json({ ...out, items: await studyItemsInScope(scope, out.items || []), history: [], classScope: { restricted: true, classIds: [...scope.classIds] } });
 });

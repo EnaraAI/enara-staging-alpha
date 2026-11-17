@@ -74,7 +74,9 @@ export async function resolveStudentForRead(req: AuthRequest, studentIdParam: st
     .lean();
   if (!student) throw new AppError('Student not found', 404, 'STUDENT_NOT_FOUND');
   if (user.role === 'teacher') {
-    const classes = await getEnrolledInstances(studentId);
+    // Multi-class step 5 (teacher_rosters): the student's classes come from
+    // class_enrollments when switched on (same filters, sort and limit).
+    const classes = await getEnrolledInstances(studentId, 'teacher_rosters');
     if (!classes.some((c) => (c.instructorIds || []).includes(user.id))) {
       throw new AppError('Student not found', 404, 'STUDENT_NOT_FOUND');
     }
@@ -95,10 +97,24 @@ export async function loadClassForStaff(req: AuthRequest, classId: string) {
 }
 
 // Students in a class: listed explicitly or through its batch.
-export async function classStudentIds(cls: { studentIds?: string[]; batchId?: string; institutionId?: string }) {
+export async function classStudentIds(cls: { id?: string; studentIds?: string[]; batchId?: string; institutionId?: string }) {
+  // Multi-class step 5 (teacher_rosters): from class_enrollments when switched
+  // on, in the same order; the step 4 shadow check runs only on the old path.
+  const { readsFromEnrollments, classRosterFromEnrollments } = await import('./enrollmentReads');
+  if (readsFromEnrollments('teacher_rosters')) return classRosterFromEnrollments(cls);
   const { Student } = await import('../models/Student');
   const inBatch = cls.batchId
     ? await Student.find({ batchId: cls.batchId, ...(cls.institutionId ? { institutionId: cls.institutionId } : {}) }).select('id').lean()
     : [];
-  return [...new Set([...(cls.studentIds || []), ...inBatch.map((s) => s.id)])];
+  const ids = [...new Set([...(cls.studentIds || []), ...inBatch.map((s) => s.id)])];
+  // Multi-class step 4: compare with class_enrollments; the old answer is returned.
+  const { shadowOn, shadowCompare } = await import('./enrollmentShadow');
+  if (cls.id && shadowOn()) {
+    const { studentIdsInClass } = await import('./enrollment');
+    const classId = cls.id;
+    await shadowCompare('class_roster', { classId, institutionId: cls.institutionId }, ids, () =>
+      studentIdsInClass({ id: classId, batchId: cls.batchId, institutionId: cls.institutionId }),
+    );
+  }
+  return ids;
 }

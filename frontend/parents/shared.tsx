@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Icon, useP } from './ui';
-import { cairoTime, type WeeklyStatus } from './api';
+import { cairoTime, type ClassChoice, type WeeklyStatus } from './api';
 
 /** The status line shown above every tab: icon + title + one-line reason (never colour alone). */
 export const StatusLine: React.FC<{ status: WeeklyStatus }> = ({ status }) => {
@@ -30,6 +30,23 @@ export const Updated: React.FC<{ at: Date | null; loading: boolean; onRefresh: (
       <button type="button" onClick={onRefresh} disabled={loading} aria-label={loading ? t.refreshing : t.refresh}>
         <Icon name="refresh" />{loading ? t.refreshing : t.refresh}
       </button>
+    </div>
+  );
+};
+
+// Multi-class (step 6, Q3): a class filter, shown only for a child in several
+// classes (the server sends `classes` only then). "All classes" is one tap.
+export const ClassFilter: React.FC<{ classes?: ClassChoice; value: string | null; onChange: (classId: string | null) => void }> = ({ classes, value, onChange }) => {
+  const { t } = useP();
+  if (!classes || classes.items.length < 2) return null;
+  const options = [{ id: null as string | null, name: t.allClasses }, ...classes.items.map((c) => ({ id: c.id as string | null, name: c.name }))];
+  return (
+    <div className="pp-wrap" role="group" aria-label={t.classFilter}>
+      {options.map((o) => (
+        <button key={o.id ?? 'all'} type="button" className={`pp-method${value === o.id ? ' pp-method--on' : ''}`} aria-pressed={value === o.id} onClick={() => onChange(o.id)} style={value === o.id ? { fontWeight: 700, outline: '2px solid currentColor' } : undefined}>
+          {o.name}
+        </button>
+      ))}
     </div>
   );
 };

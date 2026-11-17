@@ -62,6 +62,7 @@ export const T = {
     strengths: 'Strengths', focusNext: 'Focus next', assessments: 'Results', passed: 'Passed', notPassed: 'Keep practising', noAssessments: 'No results yet.', lessonsDone: (n: string) => `${n} lessons completed`,
     // Activity
     activityTitle: 'Activity', last2Weeks: 'Last 2 weeks', daysPractised: (a: string, b: string) => `${a} of ${b} days practised`, practised: 'Practised', upcoming: 'Coming up', missed: 'Not practised',
+    allClasses: 'All classes', classFilter: 'Show activity for', inClass: (c: string) => `Class: ${c}`, noClass: 'No class',
     noSessions: 'No sessions in the last 30 days.', howTaught: 'How ENARA taught it', wentWell: 'Went well', wasHard: 'Was hard', words: 'Words to practise together',
     speakingTime: 'Speaking time', focus: 'Focus', focusLevel: { high: 'High', medium: 'Medium', low: 'Low' } as Record<string, string>, minShort: (n: string) => `${n} min`, mShort: (n: string) => `${n}m`,
     viewConversation: 'View conversation', keptDays: (n: string) => `Kept ${n} days`, summaryOnly: 'Older than 90 days: summary only', voice: 'voice call with the tutor', chat: 'chat with the tutor',
@@ -135,6 +136,7 @@ export const T = {
     canDoState: { achieved: 'اتحققت', in_progress: 'شغّال عليها', not_started: 'لسه' } as Record<string, string>,
     strengths: 'نقاط القوة', focusNext: 'نركّز على', assessments: 'النتائج', passed: 'نجح', notPassed: 'محتاج تدريب', noAssessments: 'مفيش نتايج لسه.', lessonsDone: (n: string) => `${n} درس خلصوا`,
     activityTitle: 'النشاط', last2Weeks: 'آخر أسبوعين', daysPractised: (a: string, b: string) => `اتدرّب ${a} من ${b} يوم`, practised: 'اتدرّب', upcoming: 'جاي', missed: 'متدرّبش',
+    allClasses: 'كل الفصول', classFilter: 'اعرض نشاط', inClass: (c: string) => `الفصل: ${c}`, noClass: 'من غير فصل',
     noSessions: 'مفيش جلسات في آخر ٣٠ يوم.', howTaught: 'إنارة علّمت إزاي', wentWell: 'اللي مشي كويس', wasHard: 'اللي كان صعب', words: 'كلمات تتدرّبوا عليها سوا',
     speakingTime: 'وقت الكلام', focus: 'التركيز', focusLevel: { high: 'عالي', medium: 'متوسط', low: 'قليل' } as Record<string, string>, minShort: (n: string) => `${n} دقيقة`, mShort: (n: string) => `${n} د`,
     viewConversation: 'شوف المحادثة', keptDays: (n: string) => `بتتحفظ ${n} يوم`, summaryOnly: 'أقدم من ٩٠ يوم: الملخص بس', voice: 'مكالمة صوتية مع المدرّس', chat: 'شات مع المدرّس',

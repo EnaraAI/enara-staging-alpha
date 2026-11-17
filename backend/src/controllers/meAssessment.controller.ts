@@ -1,4 +1,5 @@
 import { gradeAnswer } from '../services/assessmentSecurity';
+import { groupClause, studentGroupIds } from '../services/enrollmentReads';
 import { processStudentEvidenceSafely } from '../services/evidenceProcessor';
 import { recordLearningEvent, recordLearningEvents } from '../services/learningEvents';
 import { Response } from 'express';
@@ -23,7 +24,7 @@ import { ensurePlainObject, getOptionalNumber, rejectMongoOperators } from '../u
 async function getAssignedAssessments(studentId: string) {
   const student = await getStudentOrThrow(studentId);
   const filter: Record<string, unknown>[] = [{ studentId }];
-  if (student.batchId) filter.push({ batchId: student.batchId });
+  filter.push(...groupClause(await studentGroupIds(student, 'student_app')));
   const institutionFilter = student.institutionId ? { institutionId: student.institutionId } : {};
   // Drafts and archived assessments are never shown to students.
   return Assessment.find({ ...institutionFilter, $or: filter, lifecycle: { $nin: ['draft', 'archived'] } }).sort({ createdAt: -1 }).limit(100);

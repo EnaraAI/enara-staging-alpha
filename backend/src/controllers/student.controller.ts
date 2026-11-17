@@ -1,11 +1,16 @@
 import { Response } from 'express';
+import { syncStudentDeleted, syncStudentGroup } from '../services/enrollmentSync';
+import { groupsOfStudent, refreshGroupCounts } from '../services/groupCounts';
 import { Student, STUDENT_UI_MODES, StudentUiMode } from '../models/Student';
 import { Batch } from '../models/Batch';
+import { CourseInstance } from '../models/CourseInstance';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { toPlainObject } from '../utils/serialize';
 import { generateStudentId, initialsFromName } from '../utils/idGenerator';
 import { resolveWriteInstitutionId, scopedFilter } from '../auth/authorization';
+import { archivedListFilter } from './archive.controller';
+import { studentArchiveOn } from '../services/archive';
 import {
   ensurePlainObject,
   escapeRegex,
@@ -24,6 +29,8 @@ export const listStudents = asyncHandler(async (req: AuthRequest, res: Response)
 
   if (batchId) filter.batchId = batchId;
   if (grade && grade !== 'All Grades') filter.grade = grade;
+  // Step 6: archived students are hidden unless asked for (no change while off).
+  Object.assign(filter, archivedListFilter(req, studentArchiveOn));
 
   if (search) {
     const s = escapeRegex(String(search).slice(0, 80));
@@ -91,6 +98,8 @@ export const createStudent = asyncHandler(async (req: AuthRequest, res: Response
 
   if (batchId) {
     await Batch.updateOne(scopedFilter(req, { id: batchId }), { $inc: { studentCount: 1 } });
+    await syncStudentGroup({ institutionId: student.institutionId, studentId: student.id, toGroupId: batchId, by: req.user?.id });
+    await refreshGroupCounts([batchId]); // multi-class S4 (no-op while off)
   }
 
   res.status(201).json(toPlainObject(student));
@@ -125,7 +134,9 @@ export const updateStudent = asyncHandler(async (req: AuthRequest, res: Response
   if (academicYear !== undefined) student.academicYear = academicYear || undefined;
   if (groupId !== undefined) student.groupId = groupId || undefined;
 
+  let groupMove: { fromGroupId?: string; toGroupId?: string } | undefined;
   if (batchId !== undefined && batchId !== student.batchId) {
+    groupMove = { fromGroupId: student.batchId || undefined, toGroupId: batchId || undefined };
     if (batchId) {
       const batch = await Batch.findOne(scopedFilter(req, { id: batchId }));
       if (!batch) throw new AppError('Batch not found', 404);
@@ -140,17 +151,31 @@ export const updateStudent = asyncHandler(async (req: AuthRequest, res: Response
   }
 
   await student.save();
+  if (groupMove) {
+    await syncStudentGroup({ institutionId: student.institutionId, studentId: student.id, ...groupMove, by: req.user?.id });
+    await refreshGroupCounts([groupMove.fromGroupId, groupMove.toGroupId]); // multi-class S4 (no-op while off)
+  }
   res.json(toPlainObject(student));
 });
 
 export const deleteStudent = asyncHandler(async (req: AuthRequest, res: Response) => {
   const student = await Student.findOne(scopedFilter(req, { id: req.params.id }));
   if (!student) throw new AppError('Student not found', 404);
+  const extraGroups = await groupsOfStudent(student.id); // [] while multi-class is off
 
   if (student.batchId) {
     await Batch.updateOne(scopedFilter(req, { id: student.batchId }), { $inc: { studentCount: -1 } });
   }
 
   await Student.deleteOne(scopedFilter(req, { id: req.params.id }));
+  // Multi-class (decision A, 2026-11-17): also remove the student from every
+  // class list, so no class keeps a dangling ID (old field) while the
+  // enrollments below are ended (new records). Old and new then agree.
+  await CourseInstance.updateMany(
+    { ...(student.institutionId ? { institutionId: student.institutionId } : {}), studentIds: student.id },
+    { $pull: { studentIds: student.id } },
+  );
+  await syncStudentDeleted({ studentId: student.id, by: req.user?.id });
+  await refreshGroupCounts([student.batchId, ...extraGroups]); // multi-class S4 (no-op while off)
   res.json({ message: 'Student deleted' });
 });

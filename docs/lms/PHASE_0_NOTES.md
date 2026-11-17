@@ -27,7 +27,7 @@ Status: **done** (2026-11-16), on branch `claude/lms-integration`. **Not deploye
 
 - **`jose` is ESM-only.** The backend compiles to CommonJS, and Node 22 loads ESM through `require()`, which was checked at runtime. Vercel runs Node 22.x (`package.json` engines).
 - **Migrations go forward only.** The repo's runner has no "down" step. `npm run lms:drop -- --confirm` is the manual reverse. It deletes all LMS data, including the signing keys. Plan §3.1 was corrected: the first draft wrongly said the repo had no migrations.
-- **The migration runs on start-up in production** (`RUN_MIGRATIONS_ON_START`). The first deploy of this branch will create the 14 empty LMS collections and their indexes. No existing data is touched.
+- **Migrations do not run on start in staging mode**, and test.enara.app runs in staging mode (`migrateOnStart` returns false). *(Corrected: an earlier version of this note said the first deploy would create the collections.)* The 14 LMS collections are created only when `npm run migrate` is run, and on the real database that needs Mohamed's approval, a backup first, and a dry run.
 - **Fields that don't belong to one school:** `lms_tool_keys` and `lms_locks` are tool-wide by nature. `lms_audit_log.institutionId` is optional because a launch from an unknown platform has no school yet. Every other LMS record requires `institutionId`, and a test enforces this.
 - **Outbox statuses** are `pending | processing | sent | dead`. A failed attempt stays `pending` with a later `nextAttemptAt`. The spec's separate `failed` status is not used.
 - **Subject-neutral grades:** the outbox stores `levelScheme` and `levelLabel` (for example `cefr` and `A2`) only when an activity has a level. The spec's `cefr_level` field was generalised.

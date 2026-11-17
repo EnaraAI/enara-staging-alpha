@@ -482,6 +482,10 @@ export interface CreditsReport {
     period: string;
     status: 'active' | 'blocked' | 'throttled';
     restrictedFeatures: string[];
+    /** Multi-class (Q9): only for a student in several classes. */
+    groupIds?: string[];
+    /** Multi-class (Q9): last 30 days' AI use by the class it happened in; classId null = "No class". */
+    usageByClass?: Array<{ classId: string | null; className: string; credits: number; events: number }>;
   }>;
   usageByFeature: Array<{ feature: string; credits: number; events: number }>;
   usageByDay: Array<{ date: string; credits: number; events: number }>;
@@ -1244,3 +1248,68 @@ export const setStudentAgeBand = (id: string, ageBand: LearnerAgeBandValue | nul
   request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/students/${encodeURIComponent(id)}`, { ageBand });
 export const setClassAgeBand = (id: string, ageBand: LearnerAgeBandValue | null) =>
   request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/classes/${encodeURIComponent(id)}`, { ageBand });
+
+// MULTI-CLASS STEP 6: ARCHIVING (backend switches ENROLLMENT_GROUP_ARCHIVE /
+// ENROLLMENT_STUDENT_ARCHIVE). The settings route answers 404 while both are
+// off, which reads as "off": the pages then look and behave exactly as before.
+export interface ArchiveSettings { groupArchive: boolean; studentArchive: boolean }
+export const fetchArchiveSettings = async (): Promise<ArchiveSettings> => {
+  try {
+    const s = await request<ArchiveSettings>('GET', '/api/students/archive-settings');
+    return { groupArchive: s?.groupArchive === true, studentArchive: s?.studentArchive === true };
+  } catch {
+    return { groupArchive: false, studentArchive: false };
+  }
+};
+export const archiveStudent = (id: string) => request<any>('POST', `/api/students/${enc(id)}/archive`);
+export const restoreStudent = (id: string) => request<any>('POST', `/api/students/${enc(id)}/restore`);
+/** Permanent delete (data-deletion requests): the typed confirmation the server requires. */
+export const deleteStudentPermanently = (id: string) => request<any>('DELETE', `/api/students/${enc(id)}`, { confirm: `DELETE ${id}` });
+export const fetchArchivedStudents = () => request<any[]>('GET', '/api/students?archived=only&limit=100');
+/** PDPL P2: safety alerts kept about permanently deleted students (school and ENARA admins only). */
+export interface DeletedStudentAlert { id: string; studentId: string; category: string; subtype?: string; actionTaken: string; excerpt?: string; reviewRequired: boolean; reviewedAt?: string; createdAt: string; purgeAfter: string; overdue: boolean }
+export const fetchDeletedStudentAlerts = () => request<{ retentionDays: number; alerts: DeletedStudentAlert[] }>('GET', '/api/students/deleted-safety-alerts');
+export type UnplacedReason = 'group_deleted' | 'group_archived' | 'group_in_other_school' | 'no_group';
+export interface UnplacedStudent { studentId: string; reason: UnplacedReason; groupId?: string; institutionId?: string; name: string; email: string; grade?: string }
+export const fetchStudentsWithoutActiveGroup = () =>
+  request<{ count: number; byReason: Partial<Record<UnplacedReason, number>>; students: UnplacedStudent[] }>('GET', '/api/students/without-active-group');
+export const archiveBatch = (id: string) => request<any>('POST', `/api/batches/${enc(id)}/archive`);
+export const restoreBatch = (id: string) => request<any>('POST', `/api/batches/${enc(id)}/restore`);
+export const fetchArchivedBatches = () => request<any[]>('GET', '/api/batches?archived=only&limit=100');
+export const archiveCourseInstance = (id: string) => request<any>('POST', `/api/course-instances/${enc(id)}/archive`);
+export const restoreCourseInstance = (id: string) => request<any>('POST', `/api/course-instances/${enc(id)}/restore`);
+export const fetchArchivedCourseInstances = () => request<any[]>('GET', '/api/course-instances?archived=only&limit=100');
+/** A delete refused because the group or class still has active students (409). */
+export const isHasStudentsError = (err: unknown) =>
+  err instanceof ApiError && err.status === 409 && (err.code === 'GROUP_HAS_STUDENTS' || err.code === 'CLASS_HAS_STUDENTS');
+
+// MULTI-CLASS (step 6, behind ENROLLMENT_MULTI_CLASS on the server)
+export const fetchMultiClassStatus = () => request<{ multiClass: boolean }>('GET', '/api/multi-class/status');
+
+export interface StudentMemberships {
+  studentId: string;
+  primaryGroupId: string | null;
+  multiClass: boolean;
+  groups: Array<{ id: string; name: string | null; primary: boolean; source: string; startedAt: string; removable: boolean }>;
+  classes: Array<{ id: string; courseName: string; groupId: string | null; groupName: string | null; via: Array<'group' | 'class'>; source: string | null; removable: boolean }>;
+}
+/** Admin: every group and class a student is in. */
+export const fetchStudentMemberships = (studentId: string) =>
+  request<StudentMemberships>('GET', `/api/multi-class/students/${encodeURIComponent(studentId)}/enrollments`);
+/** Admin: add a student to another group or class. */
+export const addStudentMembership = (studentId: string, scope: 'group' | 'class', targetId: string) =>
+  request('POST', `/api/multi-class/students/${encodeURIComponent(studentId)}/enrollments`, { scope, targetId });
+/** Admin: take a student out of an extra group or class. */
+export const removeStudentMembership = (studentId: string, scope: 'group' | 'class', targetId: string) =>
+  request('DELETE', `/api/multi-class/students/${encodeURIComponent(studentId)}/enrollments/${scope}/${encodeURIComponent(targetId)}`);
+
+export interface MyClasses {
+  enabled: boolean;
+  showSwitcher?: boolean;
+  /** A class id, 'all' ("All my classes"), or null when there is nothing to choose. */
+  current?: string | null;
+  classes?: Array<{ id: string; courseId: string; name: string; groupId: string | null; groupName: string | null }>;
+}
+/** Student: my classes and the one I use now (the switcher shows only with 2+ classes). */
+export const fetchMyClasses = () => request<MyClasses>('GET', '/api/multi-class/me/classes');
+export const setMyCurrentClass = (classId: string) => request<MyClasses>('PUT', '/api/multi-class/me/classes/current', { classId });

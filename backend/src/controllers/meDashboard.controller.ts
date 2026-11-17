@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { groupClause, studentGroupIds } from '../services/enrollmentReads';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler } from '../middleware/errorHandler';
 import { toPlainObject } from '../utils/serialize';
@@ -85,7 +86,7 @@ export const getDashboard = asyncHandler(async (req: AuthRequest, res: Response)
 
   const upcomingAssessments = await Assessment.find({
     ...(student.institutionId ? { institutionId: student.institutionId } : {}),
-    $or: [{ studentId }, ...(student.batchId ? [{ batchId: student.batchId }] : [])],
+    $or: [{ studentId }, ...groupClause(await studentGroupIds(student, 'student_app'))],
     status: { $in: ['upcoming', 'active', 'pending'] },
   })
     .sort({ dueDate: 1 })

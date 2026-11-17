@@ -29,6 +29,10 @@ export interface WeeklySummary {
 }
 
 const cache = new Map<string, { at: number; summary: WeeklySummary }>();
+/** Tests only: forget cached summaries (the same-answer tests compute each one twice). */
+export function clearWeeklySummaryCache(): void {
+  cache.clear();
+}
 let client: Anthropic | undefined;
 
 const LINK_PATTERN = /\b(?:https?:\/\/|www\.)\S+|\b[\w.+-]+@[\w-]+\.[\w.]+\b/gi;

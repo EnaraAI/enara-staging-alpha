@@ -10,6 +10,7 @@ import { LearningObjective } from '../models/LearningObjective';
 import { Student } from '../models/Student';
 import { TimeToUnderstand } from '../models/TimeToUnderstand';
 import { classStudentIds, resolveStudentForRead } from '../services/learningAccess';
+import { attemptsInScope, interventionInScope, teacherClassScope } from '../services/multiClass';
 import { isFeatureEnabled } from '../services/featureFlags';
 import { originFilter, parseOriginView, studentsInView } from '../services/originScope';
 
@@ -167,19 +168,23 @@ export const getStudentTimeline = asyncHandler(async (req: AuthRequest, res: Res
   if (!['teacher', 'admin', 'enara-admin'].includes(user.role)) throw new AppError('Not allowed', 403, 'FORBIDDEN');
   if (user.role !== 'enara-admin' && !(await isFeatureEnabled(user.institutionId, 'connected_workflow_enabled'))) throw new AppError('Not found', 404, 'FEATURE_DISABLED');
   const student = await resolveStudentForRead(req, String(req.params.studentId));
+  // Multi-class step 6 (Q4): a teacher sees only their classes' work for a multi-class student.
+  const scope = await teacherClassScope(user, student);
   const events: { at: Date; type: string; ref: string; detail?: Record<string, unknown> }[] = [];
-  const attempts = await AssessmentAttempt.find({ studentId: student.id, institutionId: student.institutionId, assignmentId: { $exists: true } })
+  const allAttempts = await AssessmentAttempt.find({ studentId: student.id, institutionId: student.institutionId, assignmentId: { $exists: true } })
     .select('id assignmentId assessmentTitle status gradingStatus exceptionReason startedAt submittedAt finalizedAt history speaking.mode speaking.assessedAs')
     .sort({ startedAt: -1 })
     .limit(100)
     .lean();
+  const attempts = scope ? await attemptsInScope(scope, allAttempts) : allAttempts;
   for (const t of attempts) {
     events.push({ at: t.startedAt, type: 'attempt_started', ref: t.id, detail: { title: t.assessmentTitle, ...(t.speaking?.mode ? { mode: t.speaking.mode } : {}) } });
     if (t.submittedAt) events.push({ at: t.submittedAt, type: 'attempt_submitted', ref: t.id });
     if (t.gradingStatus === 'released') events.push({ at: t.finalizedAt ?? t.submittedAt ?? t.startedAt, type: 'grading_released', ref: t.id, detail: t.speaking?.assessedAs ? { assessedAs: t.speaking.assessedAs } : undefined });
     if (t.gradingStatus === 'grading_exception') events.push({ at: t.submittedAt ?? t.startedAt, type: t.exceptionReason === 'insufficient_evidence' ? 'insufficient_evidence' : 'grading_exception', ref: t.id });
   }
-  const interventions = await LearningIntervention.find({ studentId: student.id, institutionId: student.institutionId }).sort({ createdAt: -1 }).limit(100).lean();
+  const allInterventions = await LearningIntervention.find({ studentId: student.id, institutionId: student.institutionId }).sort({ createdAt: -1 }).limit(100).lean();
+  const interventions = scope ? allInterventions.filter((i) => interventionInScope(scope, i)) : allInterventions;
   for (const i of interventions) {
     events.push({ at: (i as unknown as { createdAt: Date }).createdAt, type: 'intervention_created', ref: i.id, detail: { objectiveId: i.objectiveId ?? null, type: i.interventionType, by: i.assignedBy } });
     if (i.completedAt) events.push({ at: i.completedAt, type: 'intervention_completed', ref: i.id });

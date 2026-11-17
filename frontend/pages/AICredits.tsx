@@ -104,6 +104,9 @@ export const AICredits: React.FC<{ isEnaraAdmin?: boolean }> = ({ isEnaraAdmin }
     health: inst.limit > 0 && inst.usage >= inst.limit * NEAR_LIMIT_RATIO ? 'Warning' : 'Healthy',
   }));
   const usageByClass = groupUsage(r => r.batchId || 'No batch');
+  // Multi-class (step 6, Q9): students in several classes, with their AI use
+  // credited to the class it happened in (else "No class"). Empty otherwise.
+  const multiClassRows = rows.filter(r => r.usageByClass?.length);
 
   // Usage by feature and by day comes from settled usage events; with an
   // institution selected those totals still cover everything the admin can see.
@@ -305,6 +308,34 @@ export const AICredits: React.FC<{ isEnaraAdmin?: boolean }> = ({ isEnaraAdmin }
               ))}
             </div>
           </div>
+          {multiClassRows.length > 0 && (
+            <div className={`lg:col-span-2 ${cardCls} overflow-hidden`}>
+              <div className="p-5">
+                <h2 className="text-lg font-bold text-slate-900">Students in several classes</h2>
+                <p className="text-sm text-slate-600">AI use in the last {report.periodDays} days, by the class it happened in.</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm min-w-[480px]">
+                  <thead>
+                    <tr className="text-xs uppercase tracking-wide text-slate-500 border-t border-slate-100">
+                      <th className={thCls}>Student</th>
+                      <th className={thCls}>Class</th>
+                      <th className={`${thCls} text-right`}>Credits used</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {multiClassRows.flatMap(r => (r.usageByClass || []).filter(c => c.credits > 0 || c.classId).map((c, i) => (
+                      <tr key={`${r.studentId}-${c.classId ?? 'none'}`} className="border-t border-slate-100">
+                        <td className="px-5 py-3 font-semibold text-slate-900">{i === 0 ? r.name : ''}</td>
+                        <td className="px-5 py-3 text-slate-700">{c.className}</td>
+                        <td className="px-5 py-3 text-right font-bold text-slate-900">{formatCredits(c.credits)}</td>
+                      </tr>
+                    )))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

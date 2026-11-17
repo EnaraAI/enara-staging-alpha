@@ -10,6 +10,9 @@ import { TutorSession } from '../models/TutorSession';
 import { loadMessagesForSessions } from './tutorMessages';
 import { UsageEvent } from '../models/UsageEvent';
 import { STUDENT_VISIBLE_COURSE_FILTER } from './courseVisibility';
+import { ClassEnrollment } from '../models/ClassEnrollment';
+import { shadowCompare, shadowOn } from './enrollmentShadow';
+import { analyticsMembership, readsFromEnrollments } from './enrollmentReads';
 
 /**
  * Admin analytics computed from recorded activity: submitted assessment attempts,
@@ -160,11 +163,54 @@ function isStudentVisible(course: LeanCourse) {
   return course.visibility === STUDENT_VISIBLE_COURSE_FILTER.visibility && course.isDemo !== true;
 }
 
-/** Students a course reaches: listed explicitly or in its batch (same rule the student app uses). */
-function courseStudentIds(course: LeanCourse, students: LeanStudent[]): Set<string> {
+type Membership = Awaited<ReturnType<typeof analyticsMembership>>;
+
+/**
+ * Students a course reaches: listed explicitly or in its batch (same rule the student app uses).
+ * Multi-class step 5 (analytics): from class_enrollments when `membership` is given.
+ */
+function courseStudentIds(course: LeanCourse, students: LeanStudent[], membership?: Membership | null): Set<string> {
+  if (membership) return new Set(membership.rosters.get(course.id) ?? []);
   const ids = new Set(course.studentIds || []);
   for (const s of students) if (course.batchId && s.batchId === course.batchId) ids.add(s.id);
   return ids;
+}
+
+/**
+ * Shadow check (multi-class step 4): the same rosters as courseStudentIds, built
+ * from class_enrollments. One check per request; a mismatch lists
+ * "classId:studentId" pairs (IDs only).
+ */
+async function shadowCourseRosters(scope: Scope, courses: LeanCourse[], students: LeanStudent[]): Promise<void> {
+  const pairs = (rows: Iterable<[string, Iterable<string>]>) => {
+    const out: string[] = [];
+    for (const [cid, ids] of rows) for (const sid of ids) out.push(`${cid}:${sid}`);
+    return out;
+  };
+  const institutionId = typeof scope.institutionId === 'string' ? scope.institutionId : undefined;
+  await shadowCompare('analytics_course', { institutionId }, pairs(courses.map((c) => [c.id, courseStudentIds(c, students)])), async () => {
+    const loaded = new Set(students.map((s) => s.id));
+    const batchIds = [...new Set(courses.map((c) => c.batchId).filter(Boolean))] as string[];
+    const rows = await ClassEnrollment.find({
+      status: 'active',
+      ...(institutionId ? { institutionId } : {}),
+      $or: [{ scope: 'class', targetId: { $in: courses.map((c) => c.id) } }, { scope: 'group', targetId: { $in: batchIds } }],
+    })
+      .select('scope targetId studentId')
+      .lean();
+    const byClass = new Map<string, string[]>();
+    const byGroup = new Map<string, string[]>();
+    for (const r of rows) {
+      const m = r.scope === 'class' ? byClass : byGroup;
+      m.set(r.targetId, [...(m.get(r.targetId) ?? []), r.studentId]);
+    }
+    return pairs(
+      courses.map((c) => [
+        c.id,
+        new Set([...(byClass.get(c.id) ?? []), ...(c.batchId ? (byGroup.get(c.batchId) ?? []).filter((id) => loaded.has(id)) : [])]),
+      ]),
+    );
+  });
 }
 
 /**
@@ -210,6 +256,12 @@ async function loadScope(scope: Scope, now: Date, studentFilter: Scope = {}, ori
     Assessment.find(scope).select('id title subject dueDate batchId studentId curriculumId institutionId').lean(),
   ]);
 
+  // Multi-class step 5 (analytics): course members and students' groups from
+  // class_enrollments when switched on. Otherwise the old fields, and the
+  // step 4 shadow check compares every course roster (the old answer is used).
+  const membership = readsFromEnrollments('analytics') ? await analyticsMembership(courses, students) : null;
+  if (!membership && shadowOn()) await shadowCourseRosters(scope, courses, students);
+
   // Messages live in tutor_messages (older ones may still be embedded): merge them in.
   const messagesBySession = await loadMessagesForSessions(sessions as never);
   for (const session of sessions as { id: string; messages?: unknown }[]) {
@@ -243,7 +295,9 @@ async function loadScope(scope: Scope, now: Date, studentFilter: Scope = {}, ori
   const assignmentDue = new Map((assignmentIds.length ? await Assignment.find({ id: { $in: assignmentIds } }).select('id dueAt state').lean() : []).map((a) => [a.id, { dueAt: a.dueAt, state: a.state }]));
   const scoreWindow = { from: new Date(now.getTime() - SCORE_WINDOW_DAYS * DAY_MS), to: now };
   const scoredAttempts = scoresInWindow(attempts, scoreWindow, (id) => assignmentDue.get(id)).sort((a, b) => +new Date(a.submittedAt ?? 0) - +new Date(b.submittedAt ?? 0));
-  return { since, students, courses, attempts, scoredAttempts, scoreWindow, lessons, sessions, usage, assessments, chaptersByCurriculum, questions };
+  // The student's groups: Student.batchId, or their active group enrollments.
+  const groupsOf = (s: { id: string; batchId?: string }): string[] => (membership ? membership.groupsByStudent.get(s.id) ?? [] : s.batchId ? [s.batchId] : []);
+  return { since, students, courses, attempts, scoredAttempts, scoreWindow, lessons, sessions, usage, assessments, chaptersByCurriculum, questions, membership, groupsOf };
 }
 
 type ScopeData = Awaited<ReturnType<typeof loadScope>>;
@@ -252,7 +306,7 @@ function enrolledCoursesByStudent(data: ScopeData) {
   const map = new Map<string, LeanCourse[]>();
   for (const course of data.courses) {
     if (!isStudentVisible(course)) continue;
-    for (const id of courseStudentIds(course, data.students)) {
+    for (const id of courseStudentIds(course, data.students, data.membership)) {
       if (!map.has(id)) map.set(id, []);
       map.get(id)!.push(course);
     }
@@ -269,7 +323,7 @@ function countOverdue(data: ScopeData, enrolled: Map<string, LeanCourse[]>, now:
     const curricula = new Set((enrolled.get(student.id) || []).map((c) => c.curriculumId).filter(Boolean));
     let count = 0;
     for (const a of pastDue) {
-      const assigned = a.studentId === student.id || (!!student.batchId && a.batchId === student.batchId);
+      const assigned = a.studentId === student.id || (!!a.batchId && data.groupsOf(student).includes(a.batchId));
       const curriculumOk = !a.curriculumId || curricula.has(a.curriculumId);
       if (assigned && curriculumOk && !submitted.has(`${student.id}:${a.id}`)) count++;
     }
@@ -472,7 +526,7 @@ export async function buildOverview(scope: Scope, now = new Date(), origin: Orig
   const { totals: courseCredits, unattributed } = creditsByCourse(data);
   const byStudent = new Map(students.map((s) => [s.id, s]));
   const courses = data.courses.map((course) => {
-    const ids = courseStudentIds(course, data.students);
+    const ids = courseStudentIds(course, data.students, data.membership);
     const members = [...ids].map((id) => byStudent.get(id)).filter(Boolean) as StudentMetrics[];
     const chapters = course.curriculumId ? data.chaptersByCurriculum.get(course.curriculumId) || [] : [];
     const completed = data.lessons.filter((l) => l.courseId === course.courseId && ids.has(l.studentId)).length;
@@ -494,10 +548,11 @@ export async function buildOverview(scope: Scope, now = new Date(), origin: Orig
     };
   });
 
-  const batchIds = [...new Set(students.map((s) => s.batchId).filter(Boolean))] as string[];
+  // Per-group stats: by the students' groups (one each today).
+  const batchIds = [...new Set(students.flatMap((s) => data.groupsOf(s)))];
   const since30 = data.since.getTime();
   const batches = batchIds.map((batchId) => {
-    const members = students.filter((s) => s.batchId === batchId);
+    const members = students.filter((s) => data.groupsOf(s).includes(batchId));
     const avg = mean(members.map((m) => m.avgScore).filter((v): v is number => v !== null));
     const active = members.filter((m) => m.lastActiveAt && new Date(m.lastActiveAt).getTime() >= since30).length;
     return {
@@ -556,7 +611,9 @@ export async function buildCourseAnalytics(scope: Scope, courseKey: string, now 
 
   const institutionScope = course.institutionId ? { institutionId: course.institutionId } : scope;
   const data = await loadScope(institutionScope, now, {}, origin);
-  const ids = courseStudentIds(course, data.students);
+  // The course itself may be outside the loaded courses (origin filter): read its members too.
+  const membership = data.membership && !data.membership.rosters.has(course.id) ? await analyticsMembership([course], data.students) : data.membership;
+  const ids = courseStudentIds(course, data.students, membership);
   const metrics = computeStudentMetrics(data, now).filter((m) => ids.has(m.id));
   const chapters = course.curriculumId ? data.chaptersByCurriculum.get(course.curriculumId) || [] : [];
 
