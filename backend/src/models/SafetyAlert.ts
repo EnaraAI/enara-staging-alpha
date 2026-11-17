@@ -26,6 +26,10 @@ export interface ISafetyAlert extends Document {
   reviewedAt?: Date;
   reviewedBy?: string;
   createdAt: Date;
+  // PDPL P2: the student was permanently deleted; the alert is kept (school and
+  // ENARA admins only, never teachers or parents) until SAFETY_ALERT_RETENTION_DAYS
+  // after createdAt, then purged (services/pdplRetention.ts).
+  subjectDeleted?: boolean;
 }
 
 const safetyAlertSchema = new Schema<ISafetyAlert>(
@@ -44,6 +48,7 @@ const safetyAlertSchema = new Schema<ISafetyAlert>(
     reviewedAt: Date,
     reviewedBy: String,
     createdAt: { type: Date, default: () => new Date() },
+    subjectDeleted: { type: Boolean, default: undefined },
   },
   { collection: 'safety_alerts', versionKey: false },
 );

@@ -132,6 +132,10 @@ export interface IAssessmentAttempt extends Document {
   history: { at: Date; by?: string; action: string; questionId?: string; from?: unknown; to?: unknown; reason?: string }[];
   // Demo/live separation (P1): seeded demo data is 'demo_seed'.
   origin?: 'live' | 'demo_seed';
+  // PDPL P1: the structured result of a permanently deleted student, kept for
+  // the school's totals. studentId is then a random anonymous ID, the attempt
+  // has a new id, and every free-text field is gone (services/anonymisedResults.ts).
+  anonymised?: boolean;
 }
 
 const attemptAnswerSchema = new Schema<IAttemptAnswer>(
@@ -208,6 +212,7 @@ const assessmentAttemptSchema = new Schema<IAssessmentAttempt>(
       default: [],
     },
     origin: { type: String, enum: ['live', 'demo_seed'], default: 'live' },
+    anonymised: { type: Boolean, default: undefined },
   },
   { timestamps: true }
 );

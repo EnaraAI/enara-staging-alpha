@@ -24,7 +24,7 @@ import {
 } from '../services/apiService';
 import { toast } from '../services/toastService';
 import { PendingPhotoQueue, StudentAvatar } from '../components/StudentPhoto';
-import { ArchivedStudentsPanel, confirmAndDeletePermanently, UnplacedStudentsPanel } from '../components/ArchivePanels';
+import { ArchivedStudentsPanel, confirmAndDeletePermanently, DeletedStudentAlertsPanel, UnplacedStudentsPanel } from '../components/ArchivePanels';
 import { StudentGroupsPanel, useMultiClass } from '../components/StudentGroupsPanel';
 
 interface StudentManagementProps {
@@ -543,6 +543,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
           onRestored={student => { setStudents(prev => [student as Student, ...prev.filter(s => s.id !== student.id)]); setArchiveRefresh(k => k + 1); }}
         />
       )}
+      {archiveSettings.studentArchive && <DeletedStudentAlertsPanel refreshKey={archiveRefresh} />}
 
       {isLoadingStudents && students.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 p-6 flex items-center justify-center gap-3 text-slate-500 text-sm font-semibold">

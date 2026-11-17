@@ -20,6 +20,7 @@ import {
   deleteStudentPermanently,
   getArchiveSettings,
   guardStudentGroupWrite,
+  listDeletedStudentSafetyAlerts,
   listStudentsWithoutActiveGroup,
   onlyWhen,
   restoreStudentHandler,
@@ -35,6 +36,7 @@ router.get('/', listStudents);
 // Multi-class step 6 archiving: each route is skipped while its switch is off.
 router.get('/archive-settings', onlyWhen(anyArchiveOn), getArchiveSettings);
 router.get('/without-active-group', onlyWhen(groupArchiveOn), listStudentsWithoutActiveGroup);
+router.get('/deleted-safety-alerts', onlyWhen(studentArchiveOn), listDeletedStudentSafetyAlerts);
 router.post('/:id/archive', onlyWhen(studentArchiveOn), archiveStudentHandler);
 router.post('/:id/restore', onlyWhen(studentArchiveOn), restoreStudentHandler);
 router.get('/photos/pending', listPendingPhotos);
