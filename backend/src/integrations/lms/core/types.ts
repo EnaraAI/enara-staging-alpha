@@ -59,9 +59,13 @@ export interface ExternalAssignment {
 export interface GradeSyncJobView {
   id: string;
   platformId: string;
+  institutionId: string;
+  contextId: string;
+  resourceLinkId?: string;
   lineItemRef: string;
   lmsUserId: string;
-  scoreGiven: number;
+  /** Absent for a status-only push (PendingManual). */
+  scoreGiven?: number;
   scoreMaximum: number;
   comment?: string;
   activityProgress: string;
@@ -70,8 +74,9 @@ export interface GradeSyncJobView {
 }
 
 export type PushResult =
-  | { ok: true }
-  | { ok: false; retryable: boolean; status?: number; retryAfterSeconds?: number; error: string };
+  | { ok: true; lineItemRef?: string }
+  /** `error` is a short code (http_503, timeout, no_line_item, ...), never a response body. */
+  | { ok: false; retryable: boolean; status?: number; retryAfterSeconds?: number; error: string; lineItemRef?: string };
 
 /**
  * One implementation per protocol family. Phase 0 defines the contract only;

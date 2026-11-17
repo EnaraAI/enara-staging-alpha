@@ -21,6 +21,7 @@ import { recordLearningEvents } from '../services/learningEvents';
 import { notifyResultsReleased } from '../services/teachingNotifications';
 import { ensurePlainObject, getOptionalNumber, getOptionalString, getRequiredString, rejectMongoOperators } from '../utils/validation';
 import { logger } from '../utils/logging';
+import { lmsResultChanged } from '../integrations/lms/core/gradeEvents';
 
 async function loadAttemptForStaff(req: AuthRequest, attemptId: string) {
   const attempt = await AssessmentAttempt.findOne({ id: attemptId, status: 'submitted', assignmentId: { $exists: true } });
@@ -359,6 +360,8 @@ export const correctGrade = asyncHandler(async (req: AuthRequest, res: Response)
   const updated = (await AssessmentAttempt.findOne({ id: attempt.id }))!;
   const t = totals(updated.answers);
   await AssessmentAttempt.updateOne({ id: attempt.id }, { $set: { totalPoints: t.totalPoints, maxPoints: t.maxPoints, score: t.percent } });
+  // LMS grade passback (inert unless switched on): the corrected score.
+  await lmsResultChanged(attempt.id, 'corrected');
 
   // Evidence: invalidate what the old score produced, record the new one.
   const keys = [`attempt:${attempt.id}:q:${questionId}`, ...Array.from({ length: corrections - 1 }, (_, i) => `attempt:${attempt.id}:q:${questionId}:c${i + 1}`)];

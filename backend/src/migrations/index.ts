@@ -25,7 +25,7 @@ import { LessonProgress } from '../models/LessonProgress';
 import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
-import { LMS_MODELS, LMS_PHASE1A_MODELS, LmsGradeSyncJob, LmsLaunchToken, LmsOrgSettings, LmsPlatform, LmsToolKey } from '../integrations/lms/models';
+import { LMS_MODELS, LMS_PHASE1A_MODELS, LmsGradeSyncJob, LmsLaunchToken, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsToolKey } from '../integrations/lms/models';
 import { ClassEnrollment } from '../models/ClassEnrollment';
 import { ReminderLog } from '../models/ReminderLog';
 import { SignInEvent } from '../models/SignInEvent';
@@ -422,6 +422,17 @@ export const MIGRATIONS: Migration[] = [
     description: 'PDPL P5: sign-in history and the sent-email log expire after DATA_LOG_RETENTION_DAYS (default 30; the email log was 90)',
     up: async () => {
       await setLogRetention([[SignInEvent.collection, 'at'], [ReminderLog.collection, 'createdAt']], dataLogRetentionDays());
+    },
+  },
+  {
+    id: '2026-11-18-lms-phase3-indexes',
+    description: 'LMS Phase 3 (grades): outbox slot and per-platform indexes, resource link -> assignment index (additive; no existing rows touched)',
+    up: async () => {
+      await LmsGradeSyncJob.createIndexes();
+      await LmsResourceLink.createIndexes();
+      const jobs = await LmsGradeSyncJob.collection.indexes();
+      if (!jobs.some((i) => i.key.resourceLinkId === 1 && i.key.lmsUserId === 1)) throw new Error('lms_grade_sync_jobs slot index missing');
+      if (!(await LmsResourceLink.collection.indexes()).some((i) => i.key.enaraActivityId === 1)) throw new Error('lms_resource_links enaraActivityId index missing');
     },
   },
 ];

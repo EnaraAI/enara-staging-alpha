@@ -18,6 +18,8 @@ export interface ILmsContext {
   enaraGroupId?: string;
   nrpsUrl?: string;
   agsLineItemsUrl?: string;
+  /** AGS scopes the last launch's endpoint claim granted (Phase 3: what the token may ask for, and whether line items may be created). */
+  agsScopes?: string[];
   lastRosterSyncAt?: Date;
   status: 'active' | 'inactive';
   createdAt: Date;
@@ -36,6 +38,7 @@ const contextSchema = new Schema<ILmsContext>(
     enaraGroupId: String,
     nrpsUrl: String,
     agsLineItemsUrl: String,
+    agsScopes: { type: [String], default: undefined },
     lastRosterSyncAt: Date,
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   },
@@ -108,13 +111,24 @@ enrollmentSchema.index({ contextId: 1, status: 1 });
 // lms_resource_links: a placement in the LMS, mapped to an ENARA activity.
 // scoringPolicy unset = the default for the activity kind (best for practice,
 // latest for assessments); a teacher can set it per link.
+//
+// Phase 3 binding (until Phase 2's picker): the activity's LTI custom
+// parameter enara_assessment=<id> or enara_assignment=<id> names the ENARA
+// work. It is checked against the launch's school, and the work is given to
+// the LMS course's own ENARA class as an assignment (enaraActivityId), so the
+// course's students can open it and its attempts are graded as usual.
+// enaraSource* records what the LMS asked for.
 export interface ILmsResourceLink {
   id: string;
   contextId: string;
   institutionId: string;
   externalResourceLinkId: string;
+  /** The ENARA Assignment this link opens and grades (in the LMS course's class). */
   enaraActivityId?: string;
   activityKind?: 'assessment' | 'practice' | 'lesson';
+  enaraSourceType?: 'assessment' | 'assignment';
+  enaraSourceId?: string;
+  boundAt?: Date;
   lineItemUrl?: string;
   customParams?: Record<string, string>;
   presentation: 'iframe' | 'window';
@@ -131,6 +145,9 @@ const resourceLinkSchema = new Schema<ILmsResourceLink>(
     externalResourceLinkId: { type: String, required: true },
     enaraActivityId: String,
     activityKind: { type: String, enum: ['assessment', 'practice', 'lesson'] },
+    enaraSourceType: { type: String, enum: ['assessment', 'assignment'] },
+    enaraSourceId: String,
+    boundAt: Date,
     lineItemUrl: String,
     customParams: { type: Schema.Types.Mixed },
     presentation: { type: String, enum: ['iframe', 'window'], default: 'iframe' },
@@ -139,6 +156,8 @@ const resourceLinkSchema = new Schema<ILmsResourceLink>(
   { collection: 'lms_resource_links', versionKey: false, timestamps: true },
 );
 resourceLinkSchema.index({ contextId: 1, externalResourceLinkId: 1 }, { unique: true });
+// Phase 3: from a graded attempt (its assignment) to the LMS placements that report it.
+resourceLinkSchema.index({ institutionId: 1, enaraActivityId: 1 });
 
 // lms_line_items: a gradebook column. resourceId = ENARA activity id, so a
 // line item can be found again.

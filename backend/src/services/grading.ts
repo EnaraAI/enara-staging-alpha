@@ -8,6 +8,7 @@ import { processStudentEvidenceSafely } from './evidenceProcessor';
 import { logger } from '../utils/logging';
 import { getFeatureFlags } from './featureFlags';
 import { graderV2On, targetFormPoints } from './graderV2';
+import { lmsResultChanged } from '../integrations/lms/core/gradeEvents';
 
 // Grading for assignment attempts (grading-v2). Objective questions are scored
 // here by the answer key. Everything else is graded automatically by
@@ -114,6 +115,7 @@ export async function finalizeAttempt(attempt: AttemptDoc, by: string, questions
     throw new AppError('This attempt cannot be finalized now', 409, 'INVALID_GRADING_STATE');
   }
   await updateLearningIntelligence(updated.id, questions, subject);
+  await lmsResultChanged(updated.id, 'finalized');
   return updated;
 }
 
@@ -130,6 +132,8 @@ export async function releaseAttempt(attempt: AttemptDoc, by: string) {
     if (current?.gradingStatus === 'released') return current;
     throw new AppError('Only finalized results can be released', 409, 'INVALID_GRADING_STATE');
   }
+  // LMS grade passback (inert unless switched on).
+  await lmsResultChanged(updated.id, 'released');
   return updated;
 }
 

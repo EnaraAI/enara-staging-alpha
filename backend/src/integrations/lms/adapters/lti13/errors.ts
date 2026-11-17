@@ -43,6 +43,7 @@ export const LTI_ERRORS = {
   account_disabled: [403, 'Your ENARA account is switched off. Ask your school administrator.'],
   account_conflict: [409, 'Your ENARA account could not be matched. Ask your school administrator.'],
   seat_limit_reached: [403, 'Your school has used all of its ENARA seats. Ask your school administrator.'],
+  invalid_activity_binding: [400, "This activity points to ENARA work that isn't available (unknown, not published, or from another school). Ask your teacher to check the activity's ENARA setting."],
   internal_error: [500, 'Something went wrong on our side while opening ENARA. Please try again in a minute; if it keeps happening, send this reference to ENARA support.'],
 } as const satisfies Record<string, readonly [number, string]>;
 

@@ -53,6 +53,7 @@ import multiClassRoutes from './routes/multiClass.routes';
 import { ltiRouter, wellKnownRouter } from './integrations/lms/routes';
 import { lmsAdminRouter } from './integrations/lms/admin/routes';
 import { lmsFlags } from './integrations/lms/core/flags';
+import { piggybackDrain } from './integrations/lms/core/drain';
 import maintenanceRoutes from './maintenance/routes';
 import { getPostgresPool } from './config/postgres';
 import mongoose from 'mongoose';
@@ -285,6 +286,9 @@ export function createApp() {
     res.redirect('/api-docs');
   });
 
+  // LMS grade outbox (plan §5 c): may start a background drain, at most once a
+  // minute across instances. One flag check when LMS grade passback is off.
+  app.use('/api', piggybackDrain);
   app.use('/api', demoGuard);
   app.use('/api/auth', authRoutes);
   app.use('/api/curriculums', curriculumRoutes);

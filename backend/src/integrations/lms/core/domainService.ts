@@ -8,6 +8,7 @@ import { User } from '../../../models/User';
 import { enroll } from '../../../services/enrollment';
 import { initialsFromName } from '../../../utils/idGenerator';
 import { LmsContext, LmsEnrollment, LmsResourceLink, LmsUser, type ILmsContext, type ILmsResourceLink, type ILmsUser } from '../models';
+import { bindResourceLink, type ValidatedBinding } from './binding';
 import { checkSeatForNewStudent } from './seats';
 import type { LmsEnaraRole } from './types';
 
@@ -50,7 +51,9 @@ export interface ProvisionInput {
   testUser?: boolean;
   context: { externalId: string; title?: string; label?: string };
   resourceLink: { externalId: string; title?: string; customParams?: Record<string, string>; lineItemUrl?: string };
-  services?: { nrpsUrl?: string; agsLineItemsUrl?: string };
+  services?: { nrpsUrl?: string; agsLineItemsUrl?: string; agsScopes?: string[] };
+  /** Phase 3: the ENARA work the activity's custom parameter names, already checked against the school (binding.ts). */
+  binding?: ValidatedBinding;
 }
 
 export interface ProvisionResult {
@@ -177,6 +180,7 @@ async function ensureContext(input: ProvisionInput): Promise<{ context: ILmsCont
   if (input.context.label) set.label = input.context.label.slice(0, 120);
   if (input.services?.nrpsUrl) set.nrpsUrl = input.services.nrpsUrl;
   if (input.services?.agsLineItemsUrl) set.agsLineItemsUrl = input.services.agsLineItemsUrl;
+  if (input.services?.agsScopes?.length) set.agsScopes = input.services.agsScopes.slice(0, 10);
   let context: ILmsContext;
   try {
     context = (await LmsContext.findOneAndUpdate(key, { $set: set, $setOnInsert: { institutionId: input.institutionId, status: 'active' } }, { upsert: true, new: true }).lean())!;
@@ -260,6 +264,8 @@ export interface PreviewResult {
   contextId?: string;
   enaraClassId?: string;
   resourceLinkId?: string;
+  /** The ENARA assignment the activity is already bound to (a preview never binds). */
+  targetAssignmentId?: string;
   presentation: 'iframe' | 'window';
 }
 
@@ -285,6 +291,7 @@ export async function findStudentPreview(input: ProvisionInput): Promise<Preview
     contextId: context?.id,
     enaraClassId: context?.enaraClassId,
     resourceLinkId: link?.id,
+    targetAssignmentId: link?.enaraActivityId,
     presentation: link?.presentation ?? 'iframe',
   };
 }
@@ -314,7 +321,8 @@ export async function provisionLaunch(input: ProvisionInput): Promise<ProvisionR
     await CourseInstance.updateOne({ id: enaraClassId, institutionId: input.institutionId }, { $addToSet: { instructorIds: account.userId } });
   }
 
-  const resourceLink = await upsertResourceLink(input, context);
+  let resourceLink = await upsertResourceLink(input, context);
+  if (input.binding) resourceLink = await bindResourceLink(resourceLink, context, input.binding);
   return {
     lmsUser: { ...lmsUser, enaraUserId: account.userId },
     enaraUserId: account.userId,

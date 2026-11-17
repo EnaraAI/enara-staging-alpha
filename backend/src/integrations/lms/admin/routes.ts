@@ -1,7 +1,8 @@
-import { Router, type Response } from 'express';
+import { Router, type NextFunction, type Request, type Response } from 'express';
 import { sessionUser, signToken } from '../../../controllers/auth.controller';
 import { authMiddleware, isInstitutionSuspended, requireAdmin, type AuthRequest } from '../../../middleware/auth.middleware';
 import { AppError, asyncHandler } from '../../../middleware/errorHandler';
+import { Assignment } from '../../../models/Assignment';
 import { CourseInstance } from '../../../models/CourseInstance';
 import { Institution } from '../../../models/Institution';
 import { User } from '../../../models/User';
@@ -9,7 +10,9 @@ import { ensurePlainObject, getOptionalBoolean, getOptionalId, rejectMongoOperat
 import { isAcceptableKeysetUrl } from '../adapters/lti13/jwks';
 import { writeLmsAudit } from '../core/audit';
 import { lmsSettings } from '../core/flags';
+import { runInBackground, triggerOn } from '../core/drain';
 import { consumeLaunchToken, issueLaunchToken, LaunchTokenError } from '../core/launchToken';
+import { drainGradeJobs, gradeStats, passbackOn, resyncGrades, retryDead } from '../core/outbox';
 import { seatView, updateSeatSettings } from '../core/seats';
 import { LmsDeployment, LmsOrgSettings, LmsPlatform, LmsUser, type ILmsDeployment, type ILmsPlatform } from '../models';
 import { isKnownVendor, listPresets } from '../presets';
@@ -20,6 +23,8 @@ import { requireLti } from '../routes';
 //   Public:   POST /launch/exchange   one-time launch token -> ENARA session
 //   Signed in: POST /launch/handoff   "Open in new tab" (LMS accounts only)
 //   Admins:   status, platforms (manual "Add LMS"), deployments, seats
+//   Grades (Phase 3, also needs LMS_GRADE_PASSBACK_ENABLED): outbox counts and
+//             last error per platform, "Re-sync grades", "Retry dead jobs"
 // School admins see and change only their own school. A school admin's new
 // connection is 'pending' until an ENARA admin approves it
 // (LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL, default on). ENARA admins see and
@@ -150,6 +155,8 @@ lmsAdminRouter.post(
         presentation: row.presentation ?? 'iframe',
         cookieless: row.cookieless,
         preview,
+        // Phase 3: the ENARA work the activity is bound to (the landing page opens it).
+        target: row.targetAssignmentId ? { kind: 'assignment', assignmentId: row.targetAssignmentId } : null,
       },
     });
   }),
@@ -167,6 +174,9 @@ lmsAdminRouter.post(
     // Informational only (the landing page): kept only when it is a class of this school.
     const requestedClass = getOptionalId(body, 'classId');
     const classId = requestedClass && (await CourseInstance.exists({ id: requestedClass, institutionId: user.institutionId })) ? requestedClass : undefined;
+    // Phase 3: the bound activity, kept only when it is an assignment of this school.
+    const requestedAssignment = getOptionalId(body, 'assignmentId');
+    const targetAssignmentId = requestedAssignment && (await Assignment.exists({ id: requestedAssignment, institutionId: user.institutionId })) ? requestedAssignment : undefined;
     // A preview stays a preview in the new tab.
     const preview = user.preview === true;
     const token = await issueLaunchToken({
@@ -178,6 +188,7 @@ lmsAdminRouter.post(
       platformId: link.platformId,
       lmsUserId: link.id,
       enaraClassId: classId,
+      targetAssignmentId,
       presentation: 'window',
       cookieless: false,
     });
@@ -185,6 +196,54 @@ lmsAdminRouter.post(
     res.json({ token, url: `${lmsSettings().toolBaseUrl}/lms/launch#lt=${encodeURIComponent(token)}` });
   }),
 );
+
+// --------------------------------------------------------------- grades
+//
+// Phase 3. The app's normal 404 unless LMS_GRADE_PASSBACK_ENABLED is on too.
+// School admins: their own school's platforms. ENARA admins: every school.
+
+const gradesRouter = Router();
+gradesRouter.use((_req: Request, _res: Response, next: NextFunction) => (passbackOn() ? next() : next('router')));
+gradesRouter.use(authMiddleware, requireAdmin);
+
+gradesRouter.get(
+  '/grades',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const requested = typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined;
+    const filter = isEnara(req) ? (requested ? { institutionId: requested } : {}) : { institutionId: req.user!.institutionId ?? '__none__' };
+    const platforms = await LmsPlatform.find(filter).select('id').sort({ createdAt: -1 }).limit(200).lean();
+    res.json({ enabled: true, platforms: await gradeStats(platforms.map((p) => p.id)) });
+  }),
+);
+
+/** After an admin action: send what was queued, in the background (plan §5 a). */
+function drainSoon(platformId: string) {
+  if (triggerOn('inline')) runInBackground('admin_drain', () => drainGradeJobs({ filter: { platformId }, limit: 20, trigger: 'admin' }));
+}
+
+gradesRouter.post(
+  '/platforms/:id/grades/resync',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const p = await ownPlatform(req, String(req.params.id));
+    const body = ensurePlainObject(req.body ?? {});
+    const resourceLinkId = getOptionalId(body, 'resourceLinkId');
+    const out = await resyncGrades({ platformId: p.id, institutionId: p.institutionId, resourceLinkId }, req.user!.id);
+    drainSoon(p.id);
+    res.json({ links: out.links, students: out.students, outcomes: out.outcomes, queued: out.jobIds.length });
+  }),
+);
+
+gradesRouter.post(
+  '/platforms/:id/grades/retry-dead',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const p = await ownPlatform(req, String(req.params.id));
+    const retried = await retryDead({ platformId: p.id, institutionId: p.institutionId }, req.user!.id);
+    drainSoon(p.id);
+    res.json({ retried });
+  }),
+);
+
+lmsAdminRouter.use(gradesRouter);
 
 // ---------------------------------------------------------------- admin
 

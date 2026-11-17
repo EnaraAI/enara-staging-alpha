@@ -20,6 +20,7 @@ import { CONVERSATION_QUESTION_TYPES } from '../services/conversationExam';
 import { isFeatureEnabled } from '../services/featureFlags';
 import { checkSpeakingQuestions, parseSpeakingSettings } from '../services/speakingExam';
 import { sharedAttempts } from '../services/multiClass';
+import { scheduleTargetedFlush } from '../integrations/lms/core/drain';
 
 // Speaking exams (P4) need the school's speaking_exams_enabled flag; the
 // avatar-only and student-choice policies also need the avatar option, which
@@ -175,6 +176,8 @@ export const listAssignments = asyncHandler(async (req: AuthRequest, res: Respon
       throw new AppError('Class not found', 404, 'CLASS_NOT_FOUND');
     }
     filter.classId = req.query.classId;
+    // LMS grade outbox (plan §5 d): a teacher opening a class flushes its pending grades. Inert unless switched on.
+    if (typeof filter.institutionId === 'string') scheduleTargetedFlush({ enaraClassId: req.query.classId, institutionId: filter.institutionId });
   }
   if (req.query.includeArchived !== 'true') filter.state = { $ne: 'archived' };
   const items = await Assignment.find(filter).sort({ dueAt: -1 }).limit(200);

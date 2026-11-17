@@ -2,11 +2,13 @@ import { randomBytes } from 'crypto';
 import type { JWTPayload } from 'jose';
 import { isInstitutionSuspended } from '../../../../middleware/auth.middleware';
 import { writeLmsAudit } from '../../core/audit';
+import { BindingError, bindingRequest, validateBinding, type ValidatedBinding } from '../../core/binding';
 import { sha256Hex } from '../../core/crypto';
 import { findStudentPreview, LmsProvisionError, provisionLaunch, type ProvisionInput, type ProvisionRole } from '../../core/domainService';
 import { lmsSettings } from '../../core/flags';
 import { loadJose } from '../../core/jose';
 import { issueLaunchToken } from '../../core/launchToken';
+import { scheduleTargetedFlush } from '../../core/drain';
 import { isTestUser, mapLtiRoles } from '../../core/roleMap';
 import type { LaunchResult } from '../../core/types';
 import { LmsDeployment, LmsOidcState, LmsPlatform, type ILmsPlatform } from '../../models';
@@ -285,6 +287,20 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
 
   const ags = obj(claims[CLAIM.ags]);
   const nrps = obj(claims[CLAIM.nrps]);
+  const customParams = stringMap(claims[CLAIM.custom]);
+  const agsScopes = Array.isArray(ags?.scope) ? ags.scope.filter((x): x is string => typeof x === 'string' && x.length <= 200).slice(0, 10) : undefined;
+
+  // Phase 3: the ENARA work this activity opens (custom parameter), checked
+  // against this school before anything is provisioned.
+  let binding: ValidatedBinding | undefined;
+  try {
+    const wanted = bindingRequest(customParams);
+    if (wanted) binding = await validateBinding(wanted, platform.institutionId);
+  } catch (error) {
+    if (error instanceof BindingError) return fail('invalid_activity_binding', 'lti.launch', { platform, refIds: { reason: error.reason } });
+    throw error;
+  }
+
   const input: ProvisionInput = {
     platformId: platform.id,
     institutionId: platform.institutionId,
@@ -294,8 +310,9 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
     rawRoles: roles.filter((r): r is string => typeof r === 'string'),
     testUser: isTestUser(roles),
     context: { externalId: contextId, title: str(context?.title, 200), label: str(context?.label, 120) },
-    resourceLink: { externalId: resourceLinkId, title: str(resourceLink?.title, 200), customParams: stringMap(claims[CLAIM.custom]), lineItemUrl: str(ags?.lineitem) },
-    services: { nrpsUrl: str(nrps?.context_memberships_url), agsLineItemsUrl: str(ags?.lineitems) },
+    resourceLink: { externalId: resourceLinkId, title: str(resourceLink?.title, 200), customParams, lineItemUrl: str(ags?.lineitem) },
+    services: { nrpsUrl: str(nrps?.context_memberships_url), agsLineItemsUrl: str(ags?.lineitems), agsScopes },
+    binding,
   };
 
   // Staff opening the activity as a learner (owner decision L1): a read-only
@@ -319,6 +336,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
       contextId: preview.contextId,
       enaraClassId: preview.enaraClassId,
       resourceLinkId: preview.resourceLinkId,
+      targetAssignmentId: preview.targetAssignmentId,
       presentation: preview.presentation,
       cookieless,
     });
@@ -381,9 +399,13 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
     contextId: provisioned.context.id,
     enaraClassId: provisioned.enaraClassId,
     resourceLinkId: provisioned.resourceLink.id,
+    targetAssignmentId: provisioned.resourceLink.enaraActivityId,
     presentation: provisioned.resourceLink.presentation,
     cookieless,
   });
+  // Plan §5 (d): a learner's launch flushes that learner's pending grades; a
+  // teacher's launch flushes the course's. Background; inert unless passback is on.
+  scheduleTargetedFlush(tokenRole === 'student' ? { lmsUserId: provisioned.lmsUser.id } : { contextId: provisioned.context.id });
   await writeLmsAudit({
     event: 'lti.launch',
     outcome: mapped.warnings.length || cookieless || provisioned.seat?.overLimit ? 'warn' : 'ok',
@@ -415,6 +437,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
       enaraRole: mapped.role,
       enaraOrgId: platform.institutionId,
       enaraClassId: provisioned.enaraClassId,
+      targetActivityId: provisioned.resourceLink.enaraActivityId,
       presentation: provisioned.resourceLink.presentation,
       returnUrl: str(obj(claims[CLAIM.launchPresentation])?.return_url),
     },

@@ -16,6 +16,7 @@ import { sweepStaleReservations } from '../services/aiBudget';
 import { sweepDocumentScans } from '../services/documentSafety';
 import { sweepDocumentRetention } from '../services/documentRetention';
 import { sweepSpeakingTranscripts } from '../services/speakingExam';
+import { scheduledDrain, triggerOn } from '../integrations/lms/core/drain';
 
 // Meant to be called once a day by a scheduler that sends
 // "Authorization: Bearer <CRON_SECRET>". Staging deliberately has no Vercel
@@ -69,10 +70,29 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     await run('speakingTranscripts', () => sweepSpeakingTranscripts());
     // Demo sessions left open (browser closed without saying so).
     await run('demoSessions', () => sweepDemoSessions({ limit: 200 }));
+    // LMS grade outbox, last safety net (plan §5 e). Skipped unless passback is on.
+    if (triggerOn('daily')) await run('lmsGrades', () => scheduledDrain('daily'));
     await run('reminders', () => sendReminders({}));
     if (new Date().getUTCDay() === 1) await run('weekly', () => sendWeeklySummaries());
     logger.info('cron_daily', { ...results, failed });
     res.status(failed.length ? 207 : 200).json({ ...results, failed });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// A protected drain for a future per-minute scheduler (Vercel Pro or an
+// external one): switched on by adding 'cron' to LMS_DRAIN_TRIGGERS, nothing
+// else. Otherwise the app's normal 404.
+router.get('/lms-drain', async (req: Request, res: Response, next: NextFunction) => {
+  if (!triggerOn('cron')) return next();
+  const secret = getConfig().cronSecret;
+  if (!secret || !authorised(req.headers.authorization, secret)) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  try {
+    res.json(await scheduledDrain('cron'));
   } catch (error) {
     next(error);
   }

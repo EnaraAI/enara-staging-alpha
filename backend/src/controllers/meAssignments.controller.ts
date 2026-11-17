@@ -17,6 +17,7 @@ import { CONVERSATION_QUESTION_TYPES, MAX_REPLY_CHARS, answerFor, decideFollowUp
 import { ensurePlainObject, getOptionalString, getRequiredString, rejectMongoOperators } from '../utils/validation';
 import { evidenceFor, publicSettings } from '../services/speakingExam';
 import { foldForStudent } from '../services/multiClass';
+import { lmsResultChanged } from '../integrations/lms/core/gradeEvents';
 
 // Network and clock tolerance around deadlines and time limits.
 export const GRACE_MS = 2 * 60 * 1000;
@@ -254,6 +255,9 @@ async function submitAttempt(a: IAssignment, attempt: AttemptDoc, answers: Recor
     at: claimed.startedAt,
   });
   if (status === 'grading_queued') claimed = await startGrading(claimed);
+  // LMS grade passback (inert unless switched on): a hand-graded or held
+  // submission shows as pending in the LMS; automatic grading reports itself.
+  else await lmsResultChanged(claimed.id, 'submitted');
   return claimed;
 }
 

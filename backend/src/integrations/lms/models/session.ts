@@ -18,6 +18,8 @@ export interface ILmsLaunchToken {
   contextId?: string;
   enaraClassId?: string;
   resourceLinkId?: string;
+  /** Phase 3: the ENARA assignment the activity is bound to; the landing page opens it. */
+  targetAssignmentId?: string;
   presentation?: 'iframe' | 'window';
   cookieless: boolean;
   /** Student preview by a staff account (enaraRole is then 'student', the view; the account keeps its own role). */
@@ -39,6 +41,7 @@ const launchTokenSchema = new Schema<ILmsLaunchToken>(
     contextId: String,
     enaraClassId: String,
     resourceLinkId: String,
+    targetAssignmentId: String,
     presentation: { type: String, enum: ['iframe', 'window'] },
     cookieless: { type: Boolean, default: false },
     preview: Boolean,

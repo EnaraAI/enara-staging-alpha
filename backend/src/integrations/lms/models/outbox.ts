@@ -16,10 +16,14 @@ export interface ILmsGradeSyncJob {
   institutionId: string;
   platformId: string;
   contextId: string;
+  /** Phase 3: the LMS placement (lms_resource_links.id). One "slot" = resource link + LMS user. */
+  resourceLinkId?: string;
+  /** The AGS line item URL, or `link:<resourceLinkId>` until it is found or created at send time. */
   lineItemRef: string;
   lmsUserId: string;
   enaraAttemptId: string;
-  scoreGiven: number;
+  /** Absent while a person still has to grade (gradingProgress PendingManual): no score is sent. */
+  scoreGiven?: number;
   scoreMaximum: number;
   levelScheme?: string;
   levelLabel?: string;
@@ -33,7 +37,11 @@ export interface ILmsGradeSyncJob {
   nextAttemptAt: Date;
   leaseUntil?: Date;
   leaseOwner?: string;
+  /** A short code only (e.g. http_503, timeout, not_eligible); never a response body. */
   lastError?: string;
+  lastErrorAt?: Date;
+  /** Why it was queued: submitted, released, corrected, resync, ... */
+  reason?: string;
   sentAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -46,10 +54,11 @@ const jobSchema = new Schema<ILmsGradeSyncJob>(
     institutionId: requiredOrg,
     platformId: { type: String, required: true },
     contextId: { type: String, required: true },
+    resourceLinkId: String,
     lineItemRef: { type: String, required: true },
     lmsUserId: { type: String, required: true },
     enaraAttemptId: { type: String, required: true },
-    scoreGiven: { type: Number, required: true, min: 0 },
+    scoreGiven: { type: Number, min: 0 },
     scoreMaximum: { type: Number, required: true, min: 0 },
     levelScheme: String,
     levelLabel: String,
@@ -63,6 +72,8 @@ const jobSchema = new Schema<ILmsGradeSyncJob>(
     leaseUntil: Date,
     leaseOwner: String,
     lastError: { type: String, maxlength: 500 },
+    lastErrorAt: Date,
+    reason: { type: String, maxlength: 40 },
     sentAt: Date,
   },
   { collection: 'lms_grade_sync_jobs', versionKey: false, timestamps: true },
@@ -71,6 +82,9 @@ jobSchema.index({ status: 1, nextAttemptAt: 1 });
 jobSchema.index({ status: 1, leaseUntil: 1 });
 jobSchema.index({ institutionId: 1, contextId: 1, status: 1 });
 jobSchema.index({ lmsUserId: 1, status: 1 });
+// Phase 3: one slot per resource link + LMS user (supersede), and the admin view per platform.
+jobSchema.index({ resourceLinkId: 1, lmsUserId: 1, scoreTimestamp: -1 });
+jobSchema.index({ platformId: 1, status: 1 });
 
 // lms_locks: named, expiring locks (e.g. "drain once a minute across instances").
 // Tool-wide; not tied to one school.
