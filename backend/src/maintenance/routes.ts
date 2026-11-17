@@ -5,6 +5,8 @@ import { getConfig } from '../config/env';
 import { MIGRATIONS } from '../migrations';
 import { pendingMigrations, runMigrations } from '../migrations/runner';
 import { logger } from '../utils/logging';
+import { applyBackfill, planBackfill, undoBackfill } from '../services/enrollmentBackfill';
+import { shadowReport } from '../services/enrollmentShadowReport';
 import { seedLmsTest } from './lmsTestSeed';
 
 // Maintenance for the LMS TEST deployment only (lms-test.enara.app). This
@@ -79,6 +81,50 @@ router.post('/seed-lms-test', async (req, res, next) => {
     const result = await seedLmsTest(password);
     logger.info('maintenance_seed', result as unknown as Record<string, unknown>);
     res.json({ seeded: result });
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Multi-class step 3 backfill on the test database (fake data only).
+// mode: dry-run (default, writes nothing) | apply | undo. apply and undo need
+// "confirm": true, like the npm script.
+router.post('/enrollment-backfill', async (req, res, next) => {
+  try {
+    const body = (req.body ?? {}) as { mode?: unknown; confirm?: unknown; institutionId?: unknown };
+    const mode = body.mode ?? 'dry-run';
+    const opts = typeof body.institutionId === 'string' ? { institutionId: body.institutionId } : {};
+    if (mode === 'dry-run') {
+      res.json({ mode, report: await planBackfill(opts) });
+      return;
+    }
+    if ((mode === 'apply' || mode === 'undo') && body.confirm !== true) {
+      res.status(400).json({ error: `${mode} needs "confirm": true` });
+      return;
+    }
+    if (mode === 'apply') {
+      const r = await applyBackfill(opts);
+      logger.info('maintenance_enrollment_backfill', { mode, created: r.created, reactivated: r.reactivated });
+      res.json({ mode, created: r.created, reactivated: r.reactivated, report: r.report });
+      return;
+    }
+    if (mode === 'undo') {
+      const r = await undoBackfill(opts);
+      logger.info('maintenance_enrollment_backfill', { mode, deleted: r.deleted });
+      res.json({ mode, ...r });
+      return;
+    }
+    res.status(400).json({ error: 'mode must be dry-run, apply or undo' });
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Multi-class step 4 shadow report (counts only).
+router.get('/enrollment-shadow-report', async (req, res, next) => {
+  try {
+    const n = (v: unknown) => (typeof v === 'string' && Number(v) > 0 ? Number(v) : undefined);
+    res.json(await shadowReport({ days: n(req.query.days), requiredCleanDays: n(req.query.required) }));
   } catch (e) {
     next(e);
   }

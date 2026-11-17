@@ -117,3 +117,34 @@ describe('migrate and seed through the route', () => {
     expect(login.status).toBe(200);
   }, 60_000);
 });
+
+describe('enrollment backfill and shadow report through the route (multi-class steps 3-4)', () => {
+  it('dry run writes nothing; apply and undo need confirm; real cluster is 404', async () => {
+    setEnv({ MONGODB_URI: REAL_URI, MAINTENANCE_ENDPOINTS_ENABLED: 'true', MAINTENANCE_TOKEN: TOKEN });
+    expect((await request(await app()).post('/api/maintenance/enrollment-backfill').set('Authorization', `Bearer ${TOKEN}`).send({})).status).toBe(404);
+
+    setEnv({ MONGODB_URI: TEST_URI, MAINTENANCE_ENDPOINTS_ENABLED: 'true', MAINTENANCE_TOKEN: TOKEN });
+    const a = await app();
+    const { ClassEnrollment } = await import('../src/models/ClassEnrollment');
+    await request(a).post('/api/maintenance/seed-lms-test').set('Authorization', `Bearer ${TOKEN}`).send({ password: 'FakeTestPass-2026!' });
+    const before = await ClassEnrollment.countDocuments();
+    const dry = await request(a).post('/api/maintenance/enrollment-backfill').set('Authorization', `Bearer ${TOKEN}`).send({ mode: 'dry-run' });
+    expect(dry.status).toBe(200);
+    expect(dry.body.report.wouldCreate.group).toBeGreaterThan(0);
+    expect(await ClassEnrollment.countDocuments()).toBe(before);
+
+    expect((await request(a).post('/api/maintenance/enrollment-backfill').set('Authorization', `Bearer ${TOKEN}`).send({ mode: 'apply' })).status).toBe(400);
+    const applied = await request(a).post('/api/maintenance/enrollment-backfill').set('Authorization', `Bearer ${TOKEN}`).send({ mode: 'apply', confirm: true });
+    expect(applied.body.created).toBe(dry.body.report.wouldCreate.group + dry.body.report.wouldCreate.class);
+    const again = await request(a).post('/api/maintenance/enrollment-backfill').set('Authorization', `Bearer ${TOKEN}`).send({});
+    expect(again.body.report.inSync).toBe(true); // the plan after apply: nothing left to do
+    const undone = await request(a).post('/api/maintenance/enrollment-backfill').set('Authorization', `Bearer ${TOKEN}`).send({ mode: 'undo', confirm: true });
+    expect(undone.body.deleted).toBe(applied.body.created);
+    expect(await ClassEnrollment.countDocuments()).toBe(before);
+
+    const rep = await request(a).get('/api/maintenance/enrollment-shadow-report?days=3&required=2').set('Authorization', `Bearer ${TOKEN}`);
+    expect(rep.status).toBe(200);
+    expect(rep.body.features.map((f: { feature: string }) => f.feature)).toEqual(['class_roster', 'student_classes', 'analytics_course', 'pedagogy_roster']);
+    expect(rep.body.features[0].requiredCleanDays).toBe(2);
+  }, 60_000);
+});
