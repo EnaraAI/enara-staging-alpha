@@ -48,9 +48,17 @@ async function call(token: string | null, method: string, path: string, body?: u
   return { status: r.status, json };
 }
 
+const lastLoginStatus: Record<string, number> = {};
 async function login(email: string, password: string): Promise<string | null> {
-  const r = await call(null, 'POST', '/api/auth/login', { email, password });
-  return r.status === 200 ? (r.json?.token as string) : null;
+  // The app rate-limits sign-ins; wait and retry on 429 (fake accounts only).
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const r = await call(null, 'POST', '/api/auth/login', { email, password });
+    lastLoginStatus[email] = r.status;
+    if (r.status === 200) return r.json?.token as string;
+    if (r.status !== 429) return null;
+    await new Promise((res) => setTimeout(res, 20_000 * (attempt + 1)));
+  }
+  return null;
 }
 
 function list(j: Json, key: string): Json[] {
@@ -157,7 +165,7 @@ async function main() {
     const students = list((await call(tok, 'GET', '/api/students?limit=500')).json, 'students').filter((s: Json) => s.institutionId === school && /^LT-S-/.test(s.id));
     for (const s of students) {
       const st = await login(`${String(s.id).toLowerCase()}@${DOMAIN}`, password);
-      if (!st) { out.reads.failed.push(`student sign-in ${s.id}`); continue; }
+      if (!st) { out.reads.failed.push(`student sign-in ${s.id} -> ${lastLoginStatus[`${String(s.id).toLowerCase()}@${DOMAIN}`]}`); continue; }
       await read(st, '/api/me/courses');
       await read(st, '/api/me/dashboard');
     }
