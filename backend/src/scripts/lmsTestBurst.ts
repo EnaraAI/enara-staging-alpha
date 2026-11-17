@@ -48,6 +48,8 @@ async function main() {
   const batches = arg('--batches', 40);
   const opsPerBatch = arg('--ops', 12);
   const outFile = argS('--out');
+  // --skip a,b: leave out some kinds of change (e.g. delete_student while a decision is pending).
+  const skip = new Set((argS('--skip') ?? '').split(',').filter(Boolean));
   let s = arg('--seed', 20261117) >>> 0;
   const rand = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 2 ** 32);
   const pick = <T>(xs: T[]): T | undefined => (xs.length ? xs[Math.floor(rand() * xs.length)] : undefined);
@@ -100,7 +102,8 @@ async function main() {
     };
 
     for (let k = 0; k < opsPerBatch; k++) {
-      const kind = pick(['add', 'add_nogroup', 'move', 'leave_group', 'enroll', 'unenroll', 'temp_group', 'delete_student'])!;
+      const kinds = ['add', 'add_nogroup', 'move', 'leave_group', 'enroll', 'unenroll', 'temp_group', 'delete_student'].filter((k) => !skip.has(k));
+      const kind = pick(kinds)!;
       if (kind === 'add' || kind === 'add_nogroup') {
         const g = kind === 'add' ? pick(groups) : undefined;
         await op(kind, async () => {
@@ -140,7 +143,7 @@ async function main() {
     }
     // Keep the data small: delete the oldest burst students above the cap.
     const extra = students.filter((x: Json) => String(x.name).startsWith(PREFIX)).slice(0, Math.max(0, students.filter((x: Json) => String(x.name).startsWith(PREFIX)).length - MAX_BURST_STUDENTS));
-    for (const d of extra) await op('cap_delete', async () => (await call(tok, 'DELETE', `/api/students/${d.id}`)).status);
+    if (!skip.has('delete_student')) for (const d of extra) await op('cap_delete', async () => (await call(tok, 'DELETE', `/api/students/${d.id}`)).status);
 
     // Read pass over every shadowed page.
     const read = async (t: string, p: string) => { const r = await call(t, 'GET', p); if (r.status === 200) batch.reads.ok++; else batch.reads.failed.push(`${p} -> ${r.status}`); };
