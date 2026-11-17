@@ -432,7 +432,10 @@ describe('launch token exchange and "Open in new tab"', () => {
     expect(h.body.url).toBe(`${TOOL}/lms/launch#lt=${encodeURIComponent(h.body.token)}`);
     const ex2 = await request(app).post('/api/lms/launch/exchange').send({ token: h.body.token });
     expect(ex2.status).toBe(200);
-    expect(ex2.body.launch).toMatchObject({ purpose: 'handoff', presentation: 'window' });
+    expect(ex2.body.launch).toMatchObject({ purpose: 'handoff', presentation: 'window', classId: ex.body.launch.classId });
+    // A class id from another school is dropped.
+    const h2 = await request(app).post('/api/lms/launch/handoff').set('Authorization', `Bearer ${ex.body.token}`).send({ classId: 'inst-of-another-school' });
+    expect((await request(app).post('/api/lms/launch/exchange').send({ token: h2.body.token })).body.launch.classId).toBeNull();
     expect((await request(app).post('/api/lms/launch/handoff').set('Authorization', auth.teacherA).send({})).status).toBe(403);
     expect((await request(app).post('/api/lms/launch/handoff').send({})).status).toBe(401);
   });

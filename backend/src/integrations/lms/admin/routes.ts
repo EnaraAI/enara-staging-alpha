@@ -2,6 +2,7 @@ import { Router, type Response } from 'express';
 import { sessionUser, signToken } from '../../../controllers/auth.controller';
 import { authMiddleware, isInstitutionSuspended, requireAdmin, type AuthRequest } from '../../../middleware/auth.middleware';
 import { AppError, asyncHandler } from '../../../middleware/errorHandler';
+import { CourseInstance } from '../../../models/CourseInstance';
 import { Institution } from '../../../models/Institution';
 import { User } from '../../../models/User';
 import { ensurePlainObject, getOptionalBoolean, getOptionalId, rejectMongoOperators } from '../../../utils/validation';
@@ -156,7 +157,9 @@ lmsAdminRouter.post(
     const link = role && user.institutionId ? await LmsUser.findOne({ enaraUserId: user.id, institutionId: user.institutionId }).select('id platformId').lean() : null;
     if (!role || !link) throw new AppError('Only accounts that came from an LMS can do this', 403, 'LMS_ACCOUNT_REQUIRED');
     const body = ensurePlainObject(req.body ?? {});
-    const classId = getOptionalId(body, 'classId');
+    // Informational only (the landing page): kept only when it is a class of this school.
+    const requestedClass = getOptionalId(body, 'classId');
+    const classId = requestedClass && (await CourseInstance.exists({ id: requestedClass, institutionId: user.institutionId })) ? requestedClass : undefined;
     const token = await issueLaunchToken({
       institutionId: user.institutionId!,
       enaraUserId: user.id,
