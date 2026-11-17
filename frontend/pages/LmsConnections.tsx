@@ -5,13 +5,17 @@ import {
   approveLmsPlatform,
   createLmsPlatform,
   disableLmsPlatform,
+  fetchLmsGrades,
   fetchLmsPlatforms,
   fetchLmsSeats,
   fetchLmsStatus,
   getSessionUser,
+  LmsGradeStats,
   LmsPlatformView,
   LmsSeats,
   LmsStatus,
+  resyncLmsGrades,
+  retryLmsDeadGrades,
   updateLmsSeats,
 } from '../services/apiService';
 
@@ -19,6 +23,9 @@ import {
 // status, deployments and launches, and the school's seats. A school admin's
 // new connection waits for an ENARA admin's approval. ENARA admins see every
 // school, approve connections and set seat limits.
+// Phase 3: when grade passback is switched on, each connection also shows its
+// grade outbox (waiting, sent, failed, the last error code) with "Re-sync
+// grades" and "Retry failed".
 
 const EMPTY = { vendor: 'moodle', issuer: '', clientId: '', authLoginUrl: '', authTokenUrl: '', keysetUrl: '', deploymentIds: '', institutionId: '' };
 
@@ -42,14 +49,17 @@ export const LmsConnections: React.FC = () => {
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [seatForm, setSeatForm] = useState({ institutionId: '', seatLimit: '', hardCap: false });
+  // null: grade passback is off (the API answers 404).
+  const [grades, setGrades] = useState<Record<string, LmsGradeStats> | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const [s, p, seat] = await Promise.all([fetchLmsStatus(), fetchLmsPlatforms(), fetchLmsSeats()]);
+      const [s, p, seat, g] = await Promise.all([fetchLmsStatus(), fetchLmsPlatforms(), fetchLmsSeats(), fetchLmsGrades().catch(() => null)]);
       setStatus(s);
       setPlatforms(p.platforms);
       setSeats(seat.seats ?? null);
       setFlagged(seat.flagged ?? []);
+      setGrades(g ? Object.fromEntries(g.platforms.map((x) => [x.platformId, x])) : null);
     } catch (e) {
       setMessage({ ok: false, text: (e as Error).message });
     }
@@ -180,6 +190,28 @@ export const LmsConnections: React.FC = () => {
                   </span>
                 ))}
               </p>
+              {grades?.[p.id] && (() => {
+                const g = grades[p.id];
+                return (
+                  <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700" data-testid="lms-grade-sync">
+                    <span className="font-semibold">Grades to the LMS:</span> {g.pending + g.processing} waiting · {g.sent} sent ·{' '}
+                    <span className={g.dead ? 'text-red-700 font-semibold' : ''}>{g.dead} failed</span>
+                    {g.lastSentAt ? ` · last sent ${new Date(g.lastSentAt).toLocaleString()}` : ''}
+                    {g.lastErrorCode && <> · last error <code className="bg-white px-1 rounded">{g.lastErrorCode}</code>{g.lastErrorAt ? ` (${new Date(g.lastErrorAt).toLocaleString()})` : ''}</>}
+                    <div className="flex flex-wrap gap-3 mt-1">
+                      <button disabled={busy} className="text-sm font-semibold text-teal-700"
+                        onClick={() => act(async () => { const r = await resyncLmsGrades(p.id); return r; }, 'Grades queued again; they are sent in the background.')}>
+                        Re-sync grades
+                      </button>
+                      {g.dead > 0 && (
+                        <button disabled={busy} className="text-sm font-semibold text-teal-700" onClick={() => act(() => retryLmsDeadGrades(p.id), 'Failed grades will be sent again.')}>
+                          Retry failed ({g.dead})
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
               <div className="flex flex-wrap gap-3 mt-3">
                 {isEnara && p.status !== 'active' && (
                   <button disabled={busy} className="text-sm font-semibold text-teal-700" onClick={() => act(() => approveLmsPlatform(p.id), 'Connection approved.')}>

@@ -46,7 +46,7 @@ import { Integrations } from '@/pages/Integrations';
 import { AdminAvatarControlCenter } from './components/enara/AdminAvatarControlCenter';
 import { LmsFrameBar, LmsLaunch, LmsPreviewBanner, onLmsLaunchPath } from './pages/LmsLaunch';
 import { LmsConnections } from './pages/LmsConnections';
-import { isLmsPreview, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
+import { isLmsPreview, takeLmsTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
@@ -74,6 +74,8 @@ type AppState = {
   sharedCourseId?: string | null;
   sharedAssessmentId?: string | null;
   completedAssessmentIds: Set<string>;
+  /** An LMS activity bound to ENARA work (Phase 3): the assignment to open once. */
+  lmsTarget?: { assignmentId: string; classId: string | null } | null;
 };
 
 // Which view (student / admin / enara-admin) the user signed in to.
@@ -184,8 +186,12 @@ const App: React.FC = () => {
       }
     }
 
+    // Opened from an LMS activity bound to ENARA work: go straight to it.
+    const lmsTarget = takeLmsTarget();
+    if (lmsTarget) page = role === 'student' ? 'assignments-student' : 'class-assignments';
+
     if (role === 'parent' && !onParentsPath()) window.history.pushState({}, '', '/parents');
-    setState(prev => ({ ...prev, role, page, activeAssessment }));
+    setState(prev => ({ ...prev, role, page, activeAssessment, lmsTarget }));
     setKidsMode(usesKidsApp(role, user));
     setUserName(user.name || user.email);
   };
@@ -422,7 +428,7 @@ const App: React.FC = () => {
               {state.page === 'courses' && <CoursePage initialCourseId={state.sharedCourseId} />}
               {state.page === 'progress' && <KnowledgeMap onAskTutor={handleAskTutor} onOpenCourses={() => navigate('courses')} />}
               {state.page === 'results' && <TestResults completedIds={state.completedAssessmentIds} onAskTutor={handleAskTutor} />}
-              {state.page === 'assignments-student' && <StudentAssignments onAskTutor={handleAskTutor} />}
+              {state.page === 'assignments-student' && <StudentAssignments onAskTutor={handleAskTutor} initialAssignmentId={state.lmsTarget?.assignmentId} />}
               {state.page === 'study-plan' && <StudyPlan onAskTutor={handleAskTutor} onNavigate={navigate} />}
               {state.page === 'assessments' && (
                 <div className="p-8 max-w-7xl mx-auto">
@@ -599,7 +605,7 @@ const App: React.FC = () => {
           {/* LMS connections (docs/lms): school admins; the server enforces it and is off unless LMS_LTI_ENABLED. */}
           {state.page === 'lms' && lmsEnabled && sessionUser()?.role === 'admin' && <LmsConnections />}
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
-          {state.page === 'class-assignments' && <ClassAssignments />}
+          {state.page === 'class-assignments' && <ClassAssignments initialClassId={state.lmsTarget?.classId ?? undefined} initialAssignmentId={state.lmsTarget?.assignmentId} />}
           {state.page === 'grading' && <GradingReview />}
           {state.page === 'teaching' && <TeachingDashboard />}
           {state.page === 'lesson-planner' && <LessonPlanner />}

@@ -221,7 +221,7 @@ function ConversationExam({ assignmentId, attempt, questionCount, busy, onSubmit
   );
 }
 
-export const StudentAssignments: React.FC<{ onAskTutor?: (message: string, sessionId?: string) => void }> = ({ onAskTutor }) => {
+export const StudentAssignments: React.FC<{ onAskTutor?: (message: string, sessionId?: string) => void; initialAssignmentId?: string }> = ({ onAskTutor, initialAssignmentId }) => {
   const [list, setList] = useState<any[] | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [detail, setDetail] = useState<any>(null);
@@ -234,6 +234,8 @@ export const StudentAssignments: React.FC<{ onAskTutor?: (message: string, sessi
 
   const loadList = () => fetchMyAssignments().then((r) => setList(r.assignments)).catch((err) => { toast.error('Could not load assignments', errorText(err)); setList([]); });
   useEffect(() => { loadList(); }, []);
+  // Opened from an LMS activity: that assignment straight away.
+  useEffect(() => { if (initialAssignmentId) void open(initialAssignmentId); }, [initialAssignmentId]);
 
   const open = async (id: string) => {
     setOpenId(id);

@@ -25,7 +25,7 @@ export function uiRoleForLms(role: string, preview = false): UiRole {
 
 export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) => void }> = ({ onReady }) => {
   const [error, setError] = useState<string | null>(null);
-  const [blocked, setBlocked] = useState<{ token: string; classId: string | null } | null>(null);
+  const [blocked, setBlocked] = useState<{ token: string; classId: string | null; assignmentId: string | null } | null>(null);
   const [opening, setOpening] = useState(false);
   const started = useRef(false);
 
@@ -42,7 +42,7 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
     exchangeLmsLaunch(token)
       .then((res) => {
         if (!res.stored) {
-          setBlocked({ token: res.token, classId: res.launch.classId });
+          setBlocked({ token: res.token, classId: res.launch.classId, assignmentId: res.launch.target?.assignmentId ?? null });
           return;
         }
         window.history.replaceState({}, document.title, '/');
@@ -54,7 +54,7 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
   const openNewTab = async () => {
     setOpening(true);
     try {
-      const url = await lmsNewTabUrl(blocked?.classId, blocked?.token);
+      const url = await lmsNewTabUrl(blocked?.classId, blocked?.token, blocked?.assignmentId);
       window.open(url, '_blank', 'noopener');
     } catch (e) {
       setError((e as Error).message);
@@ -95,10 +95,13 @@ export const LmsFrameBar: React.FC = () => {
     setBusy(true);
     try {
       let classId: string | null = null;
+      let assignmentId: string | null = null;
       try {
-        classId = JSON.parse(sessionStorage.getItem('enara_lms') || '{}').classId ?? null;
+        const info = JSON.parse(sessionStorage.getItem('enara_lms') || '{}');
+        classId = info.classId ?? null;
+        assignmentId = info.assignmentId ?? null;
       } catch { /* none */ }
-      window.open(await lmsNewTabUrl(classId), '_blank', 'noopener');
+      window.open(await lmsNewTabUrl(classId, undefined, assignmentId), '_blank', 'noopener');
     } catch {
       /* the bar stays; the user can retry */
     } finally {

@@ -1262,15 +1262,20 @@ export interface LmsLaunchInfo {
   cookieless: boolean;
   /** Student preview by a staff account: read-only, nothing is saved. */
   preview?: boolean;
+  /** Phase 3: the ENARA work the LMS activity is bound to; the app opens it. */
+  target?: { kind: 'assignment'; assignmentId: string } | null;
 }
 const LMS_KEY = 'enara_lms';
+const LMS_TARGET_KEY = 'enara_lms_target';
 export async function exchangeLmsLaunch(token: string): Promise<{ user: SessionUser; launch: LmsLaunchInfo; token: string; stored: boolean }> {
   const data = await request<{ token: string; user: SessionUser; launch: LmsLaunchInfo }>('POST', '/api/lms/launch/exchange', { token });
   let stored = true;
   try {
     sessionStorage.setItem(TOKEN_KEY, data.token);
     sessionStorage.setItem(USER_KEY, JSON.stringify(data.user));
-    sessionStorage.setItem(LMS_KEY, JSON.stringify({ classId: data.launch.classId, presentation: data.launch.presentation, ...(data.launch.preview ? { preview: true } : {}) }));
+    sessionStorage.setItem(LMS_KEY, JSON.stringify({ classId: data.launch.classId, presentation: data.launch.presentation, ...(data.launch.preview ? { preview: true } : {}), ...(data.launch.target ? { assignmentId: data.launch.target.assignmentId } : {}) }));
+    if (data.launch.target) sessionStorage.setItem(LMS_TARGET_KEY, JSON.stringify({ assignmentId: data.launch.target.assignmentId, classId: data.launch.classId }));
+    else sessionStorage.removeItem(LMS_TARGET_KEY);
   } catch {
     stored = false; // storage blocked in this frame: the page offers "Open in new tab"
   }
@@ -1291,12 +1296,23 @@ export function isLmsPreview(): boolean {
     return false;
   }
 }
-/** "Open in new tab": a fresh one-time link for this LMS account. */
-export async function lmsNewTabUrl(classId?: string | null, bearer?: string): Promise<string> {
+/** The ENARA work the LMS launch asked to open (once: reading it clears it). */
+export function takeLmsTarget(): { assignmentId: string; classId: string | null } | null {
+  try {
+    const raw = sessionStorage.getItem(LMS_TARGET_KEY);
+    sessionStorage.removeItem(LMS_TARGET_KEY);
+    const t = raw ? JSON.parse(raw) : null;
+    return t && typeof t.assignmentId === 'string' ? { assignmentId: t.assignmentId, classId: typeof t.classId === 'string' ? t.classId : null } : null;
+  } catch {
+    return null;
+  }
+}
+/** "Open in new tab": a fresh one-time link for this LMS account (opening the same activity when there is one). */
+export async function lmsNewTabUrl(classId?: string | null, bearer?: string, assignmentId?: string | null): Promise<string> {
   const res = await fetch(toUrl('/api/lms/launch/handoff'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${bearer ?? getToken() ?? ''}` },
-    body: JSON.stringify(classId ? { classId } : {}),
+    body: JSON.stringify({ ...(classId ? { classId } : {}), ...(assignmentId ? { assignmentId } : {}) }),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new ApiError(data?.error?.message || 'Could not open a new tab', res.status, data?.error?.code);
@@ -1326,6 +1342,15 @@ export const approveLmsPlatform = (id: string) => request<{ platform: LmsPlatfor
 export const disableLmsPlatform = (id: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(id)}/disable`);
 export const addLmsDeployment = (id: string, deploymentId: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(id)}/deployments`, { deploymentId });
 export const approveLmsDeployment = (id: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/deployments/${encodeURIComponent(id)}/approve`);
+/** Grade passback (Phase 3), per platform. The API answers 404 while LMS_GRADE_PASSBACK_ENABLED is off. */
+export interface LmsGradeStats {
+  platformId: string; pending: number; processing: number; sent: number; dead: number;
+  lastErrorCode: string | null; lastErrorAt: string | null; lastSentAt: string | null;
+  recentDead: { id: string; resourceLinkId: string | null; lmsUserId: string; attemptId: string; code: string | null; tries: number; at: string }[];
+}
+export const fetchLmsGrades = () => request<{ enabled: boolean; platforms: LmsGradeStats[] }>('GET', '/api/lms/grades');
+export const resyncLmsGrades = (platformId: string) => request<{ links: number; students: number; queued: number; outcomes: Record<string, number> }>('POST', `/api/lms/platforms/${encodeURIComponent(platformId)}/grades/resync`, {});
+export const retryLmsDeadGrades = (platformId: string) => request<{ retried: number }>('POST', `/api/lms/platforms/${encodeURIComponent(platformId)}/grades/retry-dead`, {});
 export const fetchLmsSeats = () => request<{ seats?: LmsSeats; flagged?: LmsSeats[] }>('GET', '/api/lms/seats');
 export const updateLmsSeats = (body: { institutionId: string; seatLimit?: number | null; hardCap?: boolean; clearBillingFlag?: boolean }) => request<{ seats: LmsSeats }>('PUT', '/api/lms/seats', body);
 

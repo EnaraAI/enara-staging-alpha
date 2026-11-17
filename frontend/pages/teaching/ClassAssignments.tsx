@@ -109,7 +109,7 @@ function CreateAssignment({ classes, onDone, onClose }: { classes: any[]; onDone
   );
 }
 
-export const ClassAssignments: React.FC = () => {
+export const ClassAssignments: React.FC<{ initialClassId?: string; initialAssignmentId?: string }> = ({ initialClassId, initialAssignmentId }) => {
   const [classes, setClasses] = useState<any[] | null>(null);
   const [classId, setClassId] = useState('');
   const [list, setList] = useState<any[] | null>(null);
@@ -122,12 +122,25 @@ export const ClassAssignments: React.FC = () => {
 
   useEffect(() => {
     fetchTeachingClasses()
-      .then((r) => { setClasses(r.classes); if (r.classes[0]) setClassId(r.classes[0].id); })
+      .then((r) => {
+        setClasses(r.classes);
+        // Opened from an LMS activity: its course's class first.
+        const wanted = initialClassId && r.classes.find((c: any) => c.id === initialClassId);
+        if (wanted) setClassId(wanted.id);
+        else if (r.classes[0]) setClassId(r.classes[0].id);
+      })
       .catch((err) => { if (isFeatureDisabled(err)) setDisabled(true); setClasses([]); });
   }, []);
   const loadList = () => classId && fetchClassAssignments(classId).then((r) => setList(r.assignments)).catch((err) => toast.error('Could not load', errorText(err)));
   useEffect(() => { setList(null); setDetail(null); loadList(); }, [classId]);
   const openDetail = (id: string) => fetchClassAssignment(id).then(setDetail).catch((err) => toast.error('Could not open', errorText(err)));
+  // ...and the activity's assignment once that class's list is in.
+  const openedInitial = React.useRef(false);
+  useEffect(() => {
+    if (openedInitial.current || !initialAssignmentId || !list?.some((a) => a.id === initialAssignmentId)) return;
+    openedInitial.current = true;
+    void openDetail(initialAssignmentId);
+  }, [list, initialAssignmentId]);
   const act = async (fn: () => Promise<any>, ok: string) => {
     try {
       const r = await fn();
