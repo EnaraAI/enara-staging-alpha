@@ -44,7 +44,9 @@ import { CourseTeacherAnalytics } from './pages/CourseTeacherAnalytics';
 import { StudentDeepAnalytics } from './pages/StudentDeepAnalytics';
 import { Integrations } from '@/pages/Integrations';
 import { AdminAvatarControlCenter } from './components/enara/AdminAvatarControlCenter';
-import { fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
+import { LmsFrameBar, LmsLaunch, onLmsLaunchPath } from './pages/LmsLaunch';
+import { LmsConnections } from './pages/LmsConnections';
+import { fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
@@ -250,6 +252,15 @@ const App: React.FC = () => {
     }
   };
 
+  // "LMS connections" page: only when the LMS integration is switched on (the API answers 404 otherwise).
+  const [lmsEnabled, setLmsEnabled] = useState(false);
+  useEffect(() => {
+    if (state.role !== 'admin' && state.role !== 'enara-admin') return setLmsEnabled(false);
+    const backendRole = getSessionUser()?.role;
+    if (backendRole !== 'admin' && backendRole !== 'enara-admin') return setLmsEnabled(false);
+    fetchLmsStatus().then(() => setLmsEnabled(true)).catch(() => setLmsEnabled(false));
+  }, [state.role]);
+
   const [isTutorOpen, setIsTutorOpen] = useState(false);
   const [tutorMessage, setTutorMessage] = useState<string | null>(null);
   const [tutorSessionId, setTutorSessionId] = useState<string | null>(null);
@@ -284,6 +295,9 @@ const App: React.FC = () => {
     // Clear message after passing it to prevent repeated triggers on state updates
     setTimeout(() => setTutorMessage(null), 100);
   };
+
+  // A launch from an LMS (docs/lms): exchange the one-time token, then open the app.
+  if (onLmsLaunchPath()) return <LmsLaunch onReady={handleLogin} />;
 
   // Invitation and password-reset links open their own page (P22).
   const accountLink = accountLinkFromLocation();
@@ -370,6 +384,7 @@ const App: React.FC = () => {
 
     return (
       <div className="flex flex-col h-screen overflow-hidden">
+        <LmsFrameBar />
         <Header 
           role="student" 
           userName={userName} 
@@ -496,6 +511,7 @@ const App: React.FC = () => {
             onClose={() => setIsSidebarOpen(false)}
             isEnaraAdmin={true}
             role="enara-admin"
+            showLms={lmsEnabled}
           />
           <main className="flex-1 overflow-y-auto p-8">
             {state.page === 'dashboard' && <EnaraAdminDashboard onNavigate={navigate} />}
@@ -513,6 +529,7 @@ const App: React.FC = () => {
             {state.page === 'credits' && <AICredits isEnaraAdmin={true} />}
             {state.page === 'credit-management' && <EnaraCreditManagement />}
             {state.page === 'integrations' && <Integrations />}
+            {state.page === 'lms' && lmsEnabled && <LmsConnections />}
             {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
             {state.page === 'settings' && <div className="p-20 text-center text-slate-400">Platform Global Settings</div>}
           </main>
@@ -525,6 +542,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
+      <LmsFrameBar />
       <Header 
         role="admin" 
         userName={userName} 
@@ -539,6 +557,7 @@ const App: React.FC = () => {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           role="admin"
+          showLms={lmsEnabled}
         />
         <main className="flex-1 overflow-y-auto">
           {state.page === 'dashboard' && <AdminDashboard onNavigate={navigate} students={students} setStudents={setStudents} onViewStudent={viewStudentProfile} onViewDeepAnalytics={viewStudentDeepAnalytics} />}
@@ -571,6 +590,8 @@ const App: React.FC = () => {
           {/* Option B: Workspace Admin edits learner age bands; the server enforces it. */}
           {state.page === 'age-bands' && sessionUser()?.role === 'admin' && <LearnerAgeBands />}
           {state.page === 'savings' && sessionUser()?.role === 'admin' && <SavingsCenter />}
+          {/* LMS connections (docs/lms): school admins; the server enforces it and is off unless LMS_LTI_ENABLED. */}
+          {state.page === 'lms' && lmsEnabled && sessionUser()?.role === 'admin' && <LmsConnections />}
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments />}
           {state.page === 'grading' && <GradingReview />}

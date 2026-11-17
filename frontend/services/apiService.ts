@@ -81,6 +81,7 @@ export function clearSession() {
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(USER_KEY);
     sessionStorage.removeItem(DEMO_KEY);
+    sessionStorage.removeItem('enara_lms');
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     // Keys used by older versions of the app.
@@ -1244,3 +1245,72 @@ export const setStudentAgeBand = (id: string, ageBand: LearnerAgeBandValue | nul
   request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/students/${encodeURIComponent(id)}`, { ageBand });
 export const setClassAgeBand = (id: string, ageBand: LearnerAgeBandValue | null) =>
   request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/classes/${encodeURIComponent(id)}`, { ageBand });
+
+// LMS (docs/lms/PHASE_1A_NOTES.md). A launch from an LMS arrives at
+// /lms/launch#lt=<one-time token>; the token is exchanged once for a normal
+// session, kept in sessionStorage (per tab, and it works inside the LMS
+// iframe without third-party cookies).
+export interface LmsLaunchInfo {
+  purpose: 'launch' | 'handoff';
+  role: 'student' | 'teacher' | 'admin';
+  classId: string | null;
+  presentation: 'iframe' | 'window';
+  cookieless: boolean;
+}
+const LMS_KEY = 'enara_lms';
+export async function exchangeLmsLaunch(token: string): Promise<{ user: SessionUser; launch: LmsLaunchInfo; token: string; stored: boolean }> {
+  const data = await request<{ token: string; user: SessionUser; launch: LmsLaunchInfo }>('POST', '/api/lms/launch/exchange', { token });
+  let stored = true;
+  try {
+    sessionStorage.setItem(TOKEN_KEY, data.token);
+    sessionStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    sessionStorage.setItem(LMS_KEY, JSON.stringify({ classId: data.launch.classId, presentation: data.launch.presentation }));
+  } catch {
+    stored = false; // storage blocked in this frame: the page offers "Open in new tab"
+  }
+  return { ...data, stored };
+}
+export function isLmsSession(): boolean {
+  try {
+    return !!sessionStorage.getItem(LMS_KEY) && !!sessionStorage.getItem(TOKEN_KEY);
+  } catch {
+    return false;
+  }
+}
+/** "Open in new tab": a fresh one-time link for this LMS account. */
+export async function lmsNewTabUrl(classId?: string | null, bearer?: string): Promise<string> {
+  const res = await fetch(toUrl('/api/lms/launch/handoff'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${bearer ?? getToken() ?? ''}` },
+    body: JSON.stringify(classId ? { classId } : {}),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new ApiError(data?.error?.message || 'Could not open a new tab', res.status, data?.error?.code);
+  return data.url as string;
+}
+
+export interface LmsPlatformView {
+  id: string; institutionId: string; vendor: string; issuer: string; clientId: string;
+  authLoginUrl: string | null; authTokenUrl: string | null; keysetUrl: string | null;
+  status: 'pending' | 'active' | 'disabled'; createdAt: string; approvedAt: string | null;
+  launchCount: number; cookielessLaunchCount: number; lastLaunchAt: string | null;
+  deployments: { id: string; deploymentId: string; status: 'pending' | 'active' | 'disabled' }[];
+}
+export interface LmsStatus {
+  enabled: boolean; requireApproval: boolean;
+  tool: { toolUrl: string; loginUrl: string; launchUrl: string; redirectUris: string[]; jwksUrl: string };
+  presets: { id: string; label: string }[];
+}
+export interface LmsSeats {
+  institutionId: string; seatsUsed: number; lmsStudents: number; seatLimit: number | null; hardCap: boolean;
+  overLimit: boolean; billingFlaggedAt: string | null; lastAlertAt: string | null;
+}
+export const fetchLmsStatus = () => request<LmsStatus>('GET', '/api/lms/status');
+export const fetchLmsPlatforms = () => request<{ platforms: LmsPlatformView[] }>('GET', '/api/lms/platforms');
+export const createLmsPlatform = (body: Record<string, unknown>) => request<{ platform: LmsPlatformView }>('POST', '/api/lms/platforms', body);
+export const approveLmsPlatform = (id: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(id)}/approve`);
+export const disableLmsPlatform = (id: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(id)}/disable`);
+export const addLmsDeployment = (id: string, deploymentId: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(id)}/deployments`, { deploymentId });
+export const approveLmsDeployment = (id: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/deployments/${encodeURIComponent(id)}/approve`);
+export const fetchLmsSeats = () => request<{ seats?: LmsSeats; flagged?: LmsSeats[] }>('GET', '/api/lms/seats');
+export const updateLmsSeats = (body: { institutionId: string; seatLimit?: number | null; hardCap?: boolean; clearBillingFlag?: boolean }) => request<{ seats: LmsSeats }>('PUT', '/api/lms/seats', body);

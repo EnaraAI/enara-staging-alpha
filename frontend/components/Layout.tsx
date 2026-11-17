@@ -198,7 +198,9 @@ export const AdminSidebar: React.FC<{
   onClose?: () => void;
   isEnaraAdmin?: boolean;
   role?: 'admin' | 'enara-admin';
-}> = ({ activeTab, onNavigate, isOpen, onClose, isEnaraAdmin, role }) => {
+  /** Show "LMS connections" (only when the LMS integration is on). */
+  showLms?: boolean;
+}> = ({ activeTab, onNavigate, isOpen, onClose, isEnaraAdmin, role, showLms }) => {
   const adminMenuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'live-avatars', label: 'Live Avatar Control', icon: Radio },
@@ -226,6 +228,7 @@ export const AdminSidebar: React.FC<{
     { id: 'usage', label: 'Usage', icon: Gauge, workspaceAdminOnly: true },
     { id: 'savings', label: 'AI Savings Center', icon: PiggyBank, workspaceAdminOnly: true },
     { id: 'learning-events', label: 'Learning Events', icon: ListChecks },
+    ...(showLms ? [{ id: 'lms', label: 'LMS connections', icon: Share2, workspaceAdminOnly: true }] : []),
   ];
 
   const enaraMenuItems = [
@@ -243,6 +246,7 @@ export const AdminSidebar: React.FC<{
     { id: 'school-insights', label: 'School Insights', icon: BarChart3 },
     { id: 'learning-events', label: 'Learning Events', icon: ListChecks },
     { id: 'integrations', label: 'Integrations', icon: Share2 },
+    ...(showLms ? [{ id: 'lms', label: 'LMS connections', icon: Share2 }] : []),
     { id: 'credits', label: 'Credit Reports', icon: Zap },
     { id: 'credit-management', label: 'Credit Management', icon: ShieldAlert },
   ];
