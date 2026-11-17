@@ -11,6 +11,7 @@ import { TutorSession } from '../models/TutorSession';
 import { masterySnapshot } from '../services/interventions';
 import { buildObjectiveContext } from '../services/learningContext';
 import { resolveStudentForRead } from '../services/learningAccess';
+import { interventionInScope, teacherClassScope } from '../services/multiClass';
 import { STRATEGY_BY_ID } from '../services/strategyRegistry';
 import { getEnrolledInstances } from '../services/studentCourseService';
 import { appendTutorMessages } from '../services/tutorMessages';
@@ -195,7 +196,10 @@ export const reassessIntervention = asyncHandler(async (req: AuthRequest, res: R
 // GET /api/learning/students/:studentId/interventions
 export const listStudentInterventions = asyncHandler(async (req: AuthRequest, res: Response) => {
   const student = await resolveStudentForRead(req, String(req.params.studentId));
-  const items = await LearningIntervention.find({ studentId: student.id }).sort({ updatedAt: -1 }).limit(100).lean();
+  const all = await LearningIntervention.find({ studentId: student.id }).sort({ updatedAt: -1 }).limit(100).lean();
+  // Multi-class step 6 (Q4): a teacher sees only their classes' actions for a multi-class student.
+  const scope = await teacherClassScope(req.user!, student);
+  const items = scope ? all.filter((i) => interventionInScope(scope, i)) : all;
   const objectives = new Map(
     (await LearningObjective.find({ id: { $in: items.map((i) => i.objectiveId).filter(Boolean) } }).select('id code title').lean()).map((o) => [o.id, o]),
   );

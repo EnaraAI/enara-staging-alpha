@@ -27,6 +27,32 @@ export function readsFromEnrollments(feature: ReadFeature): boolean {
   return list.includes(feature);
 }
 
+// Multi-class step 6 (docs/multi-class/STEP_6_NOTES.md): ENROLLMENT_MULTI_CLASS
+// turns on multi-class. It only takes effect when dual write is on and all
+// seven step 5 features read from enrollments (extra memberships live only in
+// class_enrollments, so every read must come from there); otherwise it is
+// treated as off and a warning is logged once.
+let multiClassWarned = false;
+
+export function multiClassOn(): boolean {
+  const cfg = getConfig().enrollment;
+  if (!cfg.multiClass) return false;
+  const missing = READ_FEATURES.filter((f) => !cfg.readFrom.includes(f));
+  if (missing.length || !cfg.dualWrite) {
+    if (!multiClassWarned) {
+      multiClassWarned = true;
+      logger.warn('enrollment_multi_class_ignored', { missingReadFrom: missing, dualWrite: cfg.dualWrite });
+    }
+    return false;
+  }
+  return true;
+}
+
+/** Tests only: lets the "warned once" check run again. */
+export function resetMultiClassWarningForTests(): void {
+  multiClassWarned = false;
+}
+
 /**
  * The student's groups, from the old field or from class_enrollments.
  * Old: [batchId] or []. New: the active group enrollments, sorted.

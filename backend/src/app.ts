@@ -49,6 +49,7 @@ import educatorChatRoutes from './routes/educatorChat.routes';
 import speakingRoutes from './routes/speaking.routes';
 import usageRoutes from './routes/usage.routes';
 import parentsRoutes from './parents/routes';
+import multiClassRoutes from './routes/multiClass.routes';
 import { ltiRouter, wellKnownRouter } from './integrations/lms/routes';
 import { lmsFlags } from './integrations/lms/core/flags';
 import maintenanceRoutes from './maintenance/routes';
@@ -315,6 +316,7 @@ export function createApp() {
   app.use('/api/usage', usageRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/parents', parentsRoutes);
+  app.use('/api/multi-class', multiClassRoutes);
   // Test-deployment maintenance: 404 unless switched on AND pointed at the test cluster (maintenance/routes.ts).
   app.use('/api/maintenance', maintenanceRoutes);
   // LMS (docs/lms): inert unless LMS_LTI_ENABLED is on and the LMS config is valid.

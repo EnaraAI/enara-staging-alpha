@@ -106,8 +106,9 @@ router.get('/learners/:studentId/status', h(async (req, res) => {
   res.json({ generatedAt: new Date().toISOString(), status: await svc.weeklyStatus(ctx) });
 }));
 router.get('/learners/:studentId/home', h(async (req, res) => { res.json(await svc.home(await learner()(req))); }));
-router.get('/learners/:studentId/progress', h(async (req, res) => { res.json(await svc.progress(await learner()(req))); }));
-router.get('/learners/:studentId/activity', h(async (req, res) => { res.json(await svc.activity(await learner()(req))); }));
+// ?classId= filters by class; only for a child in several classes (multi-class step 6, Q3).
+router.get('/learners/:studentId/progress', h(async (req, res) => { res.json(await svc.progress(await learner()(req), req.query.classId)); }));
+router.get('/learners/:studentId/activity', h(async (req, res) => { res.json(await svc.activity(await learner()(req), new Date(), req.query.classId)); }));
 router.get('/learners/:studentId/sessions/:sessionId/transcript', h(async (req, res) => {
   const ctx = await learner()(req);
   try {

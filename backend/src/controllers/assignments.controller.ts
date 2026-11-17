@@ -18,6 +18,7 @@ import { logger } from '../utils/logging';
 import { CONVERSATION_QUESTION_TYPES } from '../services/conversationExam';
 import { isFeatureEnabled } from '../services/featureFlags';
 import { checkSpeakingQuestions, parseSpeakingSettings } from '../services/speakingExam';
+import { sharedAttempts } from '../services/multiClass';
 
 // Speaking exams (P4) need the school's speaking_exams_enabled flag; the
 // avatar-only and student-choice policies also need the avatar option, which
@@ -192,6 +193,13 @@ export const getAssignment = asyncHandler(async (req: AuthRequest, res: Response
   ]);
   const byStudent = new Map<string, typeof attempts>();
   for (const t of attempts) byStudent.set(t.studentId, [...(byStudent.get(t.studentId) ?? []), t]);
+  // Multi-class step 6 (Q6): a multi-class student's result on the same
+  // assessment in another of their classes counts here too (switch off: none).
+  const shared = await sharedAttempts<(typeof attempts)[number]>([a as never], 'id status gradingStatus submittedAt score totalPoints maxPoints isLate');
+  for (const [k, list] of shared) {
+    const sid = k.slice(k.indexOf('|') + 1);
+    byStudent.set(sid, [...(byStudent.get(sid) ?? []), ...list]);
+  }
   const roster = students.map((s) => {
     const mine = byStudent.get(s.id) ?? [];
     const latest = mine.filter((t) => t.status === 'submitted').sort((x, y) => new Date(y.submittedAt!).getTime() - new Date(x.submittedAt!).getTime())[0];
