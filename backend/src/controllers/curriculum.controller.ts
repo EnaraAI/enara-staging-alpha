@@ -1,4 +1,5 @@
 import { queueCurriculumProcessing } from '../services/curriculumExtraction';
+import { withLiveGroupCounts } from '../services/groupCounts';
 import { sanitizeLanguageSpec } from '../services/languageTeachingContext';
 import { unsignUploadPath } from '../utils/uploadSigning';
 import { ownerFromName, ownUploadsOnly, resolveUpload, schoolSlug, storedUploadName } from '../services/uploadAccess';
@@ -561,10 +562,12 @@ export const getBatchesForAssignment = asyncHandler(async (req: AuthRequest, res
   if (!curriculum) throw new AppError('Curriculum not found', 404);
 
   const batches = await Batch.find(scopedFilter(req, {})).sort({ name: 1 }).limit(100);
-  const result = batches.map((b) => ({
+  // Multi-class S4: live counts while multi-class is on (no read while off).
+  const live = await withLiveGroupCounts(batches.map((b) => ({ id: b.id, institutionId: b.institutionId, studentCount: b.studentCount })));
+  const result = batches.map((b, i) => ({
     id: b.id,
     name: b.name,
-    studentCount: b.studentCount,
+    studentCount: live[i].studentCount,
     academicYear: b.academicYear,
     groupId: b.groupId,
     curriculumId: b.curriculumId,

@@ -39,6 +39,7 @@ import { UsageLedger } from '../models/UsageLedger';
 import { User } from '../models/User';
 import { logger, serializeError } from '../utils/logging';
 import { type Actor, studentUserFilter } from './archive';
+import { groupsOfStudent, refreshGroupCounts } from './groupCounts';
 import { recordAudit } from './auditTrail';
 import { deleteUpload } from './uploadStorage';
 
@@ -106,6 +107,8 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
   const removed: Record<string, number> = {};
   const anonymised: Record<string, number> = {};
   const sid = s.id;
+  // Multi-class S4: the groups whose live count must drop ([] while off; read before the rows go).
+  const groupsToRecount = await groupsOfStudent(sid);
 
   // Group count: only an active (not archived) student still counts in it.
   if (s.batchId && !s.archivedAt) {
@@ -165,6 +168,7 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
 
   removed.user_accounts = userIds.length ? (await User.deleteMany({ _id: { $in: userIds } })).deletedCount : 0;
   removed.student = (await Student.deleteOne({ id: sid })).deletedCount;
+  await refreshGroupCounts([s.batchId, ...groupsToRecount]);
 
   const kept = { usage_ledger_rows_with_ids: keptUsageLedgerRows };
   await recordAudit('student.deleted_permanently', actor, { institutionId: s.institutionId, type: 'student', id: sid }, { removed, anonymised, kept, files });

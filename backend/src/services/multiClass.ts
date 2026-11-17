@@ -13,7 +13,8 @@ import { UsageEvent } from '../models/UsageEvent';
 import { requestMemo } from '../utils/callContext';
 import { recordAudit } from './auditTrail';
 import { endEnrollment, enroll, studentIdsInClass } from './enrollment';
-import { multiClassOn } from './enrollmentReads';
+import { refreshGroupCounts } from './groupCounts';
+import { enrollmentOnlyClassMembers, multiClassOn } from './enrollmentReads';
 import { getEnrolledInstances } from './studentCourseService';
 
 // Multi-class step 6 (docs/multi-class/STEP_6_NOTES.md), behind
@@ -175,6 +176,7 @@ export async function addMembership(req: StaffReq, studentId: string, body: Reco
   // enroll() checks that the student and the group/class are in this school (404 otherwise).
   // extraVia marks the row as an extra membership (not drift) for the consistency check.
   const row = await enroll({ institutionId: student.institutionId, studentId: student.id, scope, targetId, source: 'manual', createdBy: req.user!.id, extraVia: 'multi_class' });
+  if (scope === 'group') await refreshGroupCounts([targetId]); // S4: extra members count in the group
   await recordAudit('student_membership_added', req.user, { institutionId: student.institutionId, type: 'student', id: student.id }, { scope, targetId });
   return { enrollmentId: row.id, scope, targetId, status: row.status };
 }
@@ -194,8 +196,24 @@ export async function removeMembership(req: StaffReq, studentId: string, scopeRa
     throw new AppError("The student is on this class's own list; remove them on the class", 409, 'CLASS_ROSTER');
   }
   await endEnrollment({ studentId: student.id, scope, targetId, status: 'removed', endedBy: req.user!.id });
+  if (scope === 'group') await refreshGroupCounts([targetId]);
   await recordAudit('student_membership_removed', req.user, { institutionId: student.institutionId, type: 'student', id: student.id }, { scope, targetId });
   return { scope, targetId, status: 'removed' as const };
+}
+
+/**
+ * S5: class rows for the admin class lists (CurriculumCenter roster chips)
+ * gain `extraStudentIds`, the students in the class through an added class
+ * membership (not on its own list), only when there are any. Unchanged (no
+ * read) while the switch is off.
+ */
+export async function withExtraClassMembers<T extends Record<string, unknown>>(rows: T[]): Promise<T[]> {
+  if (!multiClassOn() || !rows.length) return rows;
+  const extra = await enrollmentOnlyClassMembers(rows.map((r) => ({ id: String(r.id), institutionId: r.institutionId as string | undefined, studentIds: (r.studentIds as string[] | undefined) ?? [] })));
+  return rows.map((r) => {
+    const ids = extra.get(String(r.id)) ?? [];
+    return ids.length ? { ...r, extraStudentIds: ids } : r;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -549,6 +567,8 @@ export async function endExtraMemberships(opts: { institutionId?: string; apply:
       { $set: { status: 'inactive', endedAt: new Date(), ...(opts.by ? { endedBy: opts.by } : {}) } },
     );
     ended = res.modifiedCount;
+    // S4: group counts back to the members that remain (the switch is off by now, hence force).
+    await refreshGroupCounts([...new Set(extra.filter((r) => r.scope === 'group').map((r) => r.targetId))], { force: true });
   }
   return {
     apply: opts.apply,
