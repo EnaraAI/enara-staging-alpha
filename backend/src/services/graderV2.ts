@@ -242,6 +242,23 @@ function errorCorrectionTarget(item: KeyItem & { targetForm?: string }, a: strin
   return false;
 }
 
+// Option B2 (error-correction check, switch ENARA_EC_CHECK=on, off by default; needs graderV2 ON). For error-
+// correction items that are not case/spelling-sensitive, any answer that is not an exact key match is decided by the
+// target-aware error-correction check (gradingProposals.evaluateErrorCorrection), which can also overturn credit the
+// rules gave leniently. Exact key matches, case/spelling-sensitive items and every other item type are unchanged.
+export const ecCheckOn = (): boolean => graderV2On() && String(process.env.ENARA_EC_CHECK ?? '').trim().toLowerCase() === 'on';
+export const isErrorCorrectionItem = (item: KeyItem): boolean => isErrorCorrection(item);
+/** True when the answer equals an accepted key after the item's own normalisation (no leniency rules). */
+export function exactKeyMatch(item: KeyItem, answer: string | number | undefined | null): boolean {
+  if (answer === undefined || answer === null) return false;
+  const sens = sensitivityOf(item);
+  const a = normaliseV2(String(answer), sens);
+  return Boolean(a) && acceptedKeys(item).some((k) => normaliseV2(k, sens) === a);
+}
+export function useErrorCorrectionCheck(item: KeyItem, answer: string | undefined | null): boolean {
+  return ecCheckOn() && isErrorCorrection(item) && sensitivityOf(item) === 'none' && Boolean(String(answer ?? '').trim()) && !exactKeyMatch(item, answer);
+}
+
 const LETTER = /^\s*\(?\s*([a-h])\s*(?:\)|\.|:|\s*$)\s*(.*)$/i;
 
 // Fixes 1-3. True when the answer matches an accepted answer.

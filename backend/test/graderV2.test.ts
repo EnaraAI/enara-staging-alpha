@@ -500,3 +500,33 @@ describe('round-8 fix: gap answers with following words, harmless preposition sw
     expect(key('A1-VO-days-months-B-5', 'The holiday starts on August.')).toBe(false); // case-sensitive item: no swap leniency
   });
 });
+
+describe('option B2: error-correction check (ENARA_EC_CHECK, off by default)', () => {
+  const EC = 'A1-GR-word-order-svo-A-6'; // Fix the mistake: Adel bought a bag black at the market.
+  const ans = (studentAnswer: string, isCorrect: boolean) => ({ questionId: 'q', studentAnswer, isCorrect, points: isCorrect ? 1 : 0 }) as never;
+  const q = () => { const it: any = item(EC); return { ...it, type: 'short-answer', text: it.prompt, correctAnswer: it.answerKey, points: 1 } as never; };
+  afterEach(() => { delete process.env.ENARA_EC_CHECK; });
+
+  it('off (default): production behaviour is unchanged', () => {
+    expect(needsAiEvaluation(q(), ans('Adel bought a black bag in the market.', true))).toBe(false);
+  });
+  it('on: exact key match never calls the model; any other answer does, even one the rules credited', async () => {
+    process.env.ENARA_EC_CHECK = 'on';
+    const { useErrorCorrectionCheck, exactKeyMatch } = await import('../src/services/graderV2');
+    expect(exactKeyMatch(item(EC), 'adel bought a black bag at the market')).toBe(true);
+    expect(needsAiEvaluation(q(), ans('Adel bought a black bag at the market.', true))).toBe(false);
+    expect(needsAiEvaluation(q(), ans('Adel bought a black bag in the market.', true))).toBe(true);
+    expect(needsAiEvaluation(q(), ans('Adel bought a bag black at the market.', false))).toBe(true);
+    expect(useErrorCorrectionCheck(item('A1-VO-days-months-A-5'), 'My birthday is in february.')).toBe(false); // case-sensitive: key only
+    expect(useErrorCorrectionCheck(item('A1-GR-article-a-an-A-1'), 'an old')).toBe(false); // not error correction
+  });
+  it('on: the check uses the error-correction prompt and its verdict replaces the rules score', async () => {
+    process.env.ENARA_EC_CHECK = 'on';
+    vi.mocked(askForJson).mockClear();
+    vi.mocked(askForJson).mockResolvedValueOnce({ value: { correct: false, scoreExplanation: 'New mistake in the corrected part.', feedback: 'Check the verb.', flags: [] }, model: 'm' } as never);
+    const e: any = await evaluateShortAnswer({ attempt: { id: 'a', institutionId: 'i' } as never, question: q(), answer: 'Adel bought a black bag in the market.', run: 1 });
+    expect(vi.mocked(askForJson).mock.calls[0][0].system).toMatch(/error-correction item/);
+    expect(e.points).toBe(0);
+    expect(e.flags).toContain('error_correction_check');
+  });
+});
