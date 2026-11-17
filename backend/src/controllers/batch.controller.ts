@@ -8,6 +8,7 @@ import { toPlainObject } from '../utils/serialize';
 import { resolveWriteInstitutionId, scopedFilter } from '../auth/authorization';
 import { archivedListFilter } from './archive.controller';
 import { groupArchiveOn } from '../services/archive';
+import { withLiveGroupCounts } from '../services/groupCounts';
 import {
   ensurePlainObject,
   escapeRegex,
@@ -39,13 +40,14 @@ export const listBatches = asyncHandler(async (req: AuthRequest, res: Response) 
   Object.assign(query, archivedListFilter(req, groupArchiveOn));
 
   const batches = await Batch.find(query).sort({ name: 1 }).skip(skip).limit(limit);
-  res.json(batches.map(toBatchResponse));
+  // Multi-class S4: every active member counts (main and extra groups), each once.
+  res.json(await withLiveGroupCounts(batches.map(toBatchResponse) as Record<string, unknown>[]));
 });
 
 export const getBatch = asyncHandler(async (req: AuthRequest, res: Response) => {
   const batch = await Batch.findOne(scopedFilter(req, { id: req.params.id }));
   if (!batch) throw new AppError('Batch not found', 404);
-  res.json(toBatchResponse(batch));
+  res.json((await withLiveGroupCounts([toBatchResponse(batch) as Record<string, unknown>]))[0]);
 });
 
 export const createBatch = asyncHandler(async (req: AuthRequest, res: Response) => {

@@ -30,6 +30,18 @@ import { readFileSync, writeFileSync } from 'fs';
 //   delete_student and the cap use the confirmed permanent delete.
 // After each batch it also checks the "students without an active group"
 // list against the student and group lists.
+//
+// Step 6 multi-class (docs/multi-class/STEP_6_NOTES.md): when the site has
+// ENROLLMENT_MULTI_CLASS in effect (detected from GET /api/multi-class/status;
+// --with-multi-class requires it), three more kinds run, never on protected
+// students:
+//   add_extra_group   a student with a main group joins a second (seeded) group;
+//   add_extra_class   a student joins a class outside the class's own list;
+//   remove_extra      an extra group or class is removed again.
+// Each add is checked on the student's membership list. The dry run reports
+// these as extraMemberships (validated), not as conflicts; the burst STOPS on
+// any invalid extra (missing / other school / archived target, inactive
+// student), as on any conflict.
 
 const BASE = 'https://lms-test.enara.app';
 const DOMAIN = 'lms-test.example';
@@ -65,6 +77,7 @@ export async function main() {
   // --skip a,b: leave out some kinds of change (e.g. delete_student while a decision is pending).
   const skip = new Set((argS('--skip') ?? '').split(',').filter(Boolean));
   const wantArchive = process.argv.includes('--with-archive');
+  const wantMulti = process.argv.includes('--with-multi-class');
   let s = arg('--seed', 20261117) >>> 0;
   const rand = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 2 ** 32);
   const pick = <T>(xs: T[]): T | undefined => (xs.length ? xs[Math.floor(rand() * xs.length)] : undefined);
@@ -106,6 +119,16 @@ export async function main() {
   log.archive = arch;
   if (wantArchive && !arch.group && !arch.student) throw new Error('--with-archive: the site has both archive switches off');
   const archiveKinds = [...(arch.group ? ['restore_group'] : []), ...(arch.student ? ['archive_student', 'restore_student', 'delete_permanent'] : [])];
+  // Step 6 multi-class: in effect on the site? (404 = the step is not deployed.)
+  const mcStatus = await call(await adminToken(), 'GET', '/api/multi-class/status');
+  const multiClass = mcStatus.status === 200 && mcStatus.json?.multiClass === true;
+  log.multiClass = multiClass;
+  if (wantMulti && !multiClass) throw new Error('--with-multi-class: multi-class is not in effect on the site');
+  const multiKinds = multiClass ? ['add_extra_group', 'add_extra_class', 'remove_extra'] : [];
+  const memberships = async (tok: string, id: string) => call(tok, 'GET', `/api/multi-class/students/${id}/enrollments`);
+  // Students given an extra membership by this run (remove_extra picks from them).
+  const extraTouched = new Set<string>();
+  const notArchivedClass = (c: Json) => !c.archivedAt && c.visibility !== 'archived';
   const isBurst = (x: Json) => String(x?.name ?? '').startsWith(PREFIX);
   // DELETE a student: with the student switch on it must be the confirmed permanent delete.
   const delStudent = (tok: string, id: string) => call(tok, 'DELETE', `/api/students/${id}`, arch.student ? { confirm: `DELETE ${id}` } : undefined);
@@ -136,7 +159,7 @@ export async function main() {
     };
 
     for (let k = 0; k < opsPerBatch; k++) {
-      const kinds = ['add', 'add_nogroup', 'move', 'leave_group', 'enroll', 'unenroll', 'temp_group', 'delete_student', ...archiveKinds].filter((k) => !skip.has(k));
+      const kinds = ['add', 'add_nogroup', 'move', 'leave_group', 'enroll', 'unenroll', 'temp_group', 'delete_student', ...archiveKinds, ...multiKinds].filter((k) => !skip.has(k));
       const kind = pick(kinds)!;
       if (kind === 'add' || kind === 'add_nogroup') {
         const g = kind === 'add' ? pick(groups) : undefined;
@@ -185,6 +208,39 @@ export async function main() {
       } else if (kind === 'delete_student') {
         const d = pick(students.filter((x: Json) => String(x.name).startsWith(PREFIX) || String(x.name).startsWith('Churn ')));
         if (d) await op(kind, async () => { const r = await delStudent(tok, d.id); if (r.status < 300) students = students.filter((x: Json) => x.id !== d.id); return r.status; });
+      } else if (kind === 'add_extra_group') {
+        const m = pick(movable().filter((x: Json) => x.batchId && !x.archivedAt));
+        const g = m ? pick(groups.filter((x: Json) => x.id !== m.batchId)) : undefined;
+        if (m && g) await op(kind, async () => {
+          const r = await call(tok, 'POST', `/api/multi-class/students/${m.id}/enrollments`, { scope: 'group', targetId: g.id });
+          if (r.status >= 300) return r.status;
+          extraTouched.add(m.id);
+          const l = await memberships(tok, m.id);
+          if (!(l.json?.groups ?? []).some((x: Json) => x.id === g.id)) { batch.checks.push(`extra group ${g.id} not listed for ${m.id}`); return 593; }
+          return 200;
+        });
+      } else if (kind === 'add_extra_class') {
+        const c = pick(classes.filter(notArchivedClass));
+        const m = c ? pick(movable().filter((x: Json) => !x.archivedAt && !(c.studentIds ?? []).includes(x.id))) : undefined;
+        if (c && m) await op(kind, async () => {
+          const r = await call(tok, 'POST', `/api/multi-class/students/${m.id}/enrollments`, { scope: 'class', targetId: c.id });
+          if (r.status >= 300) return r.status;
+          extraTouched.add(m.id);
+          const l = await memberships(tok, m.id);
+          if (!(l.json?.classes ?? []).some((x: Json) => x.id === c.id && (x.via ?? []).includes('class'))) { batch.checks.push(`extra class ${c.id} not listed for ${m.id}`); return 592; }
+          return 200;
+        });
+      } else if (kind === 'remove_extra') {
+        const id = pick([...extraTouched].filter((x) => !PROTECTED.has(x) && students.some((st: Json) => st.id === x)));
+        if (id) {
+          const l = await memberships(tok, id);
+          const options = [
+            ...(l.json?.groups ?? []).filter((x: Json) => x.removable).map((x: Json) => ({ scope: 'group', targetId: x.id })),
+            ...(l.json?.classes ?? []).filter((x: Json) => x.removable).map((x: Json) => ({ scope: 'class', targetId: x.id })),
+          ];
+          const o = pick(options);
+          if (o) await op(kind, async () => (await call(tok, 'DELETE', `/api/multi-class/students/${id}/enrollments/${o.scope}/${o.targetId}`)).status);
+        }
       } else if (kind === 'restore_group') {
         const archived = list((await call(tok, 'GET', '/api/batches?archived=only&limit=100')).json, 'batches').filter((g: Json) => g.institutionId === SCHOOL && isBurst(g));
         const g = pick(archived);
@@ -240,10 +296,20 @@ export async function main() {
     const r = dry.report;
     batch.consistency = { inSync: r.inSync, wouldCreate: r.wouldCreate, wouldReactivate: r.wouldReactivate.count, conflicts: r.conflicts.activeNotInOldFields.count, doesNotFit: Object.fromEntries(Object.entries(r.doesNotFit).map(([k, v]: [string, Json]) => [k, v.count]).filter(([, n]) => (n as number) > 0)) };
     batch.consistency.studentsWithoutActiveGroup = r.studentsWithoutActiveGroup ? { count: r.studentsWithoutActiveGroup.count, byReason: r.studentsWithoutActiveGroup.byReason } : undefined;
+    // Step 6 extras: expected (valid) ones are counted; any invalid one is a STOP.
+    const ex = r.extraMemberships;
+    batch.consistency.extraMemberships = ex ? { valid: ex.valid, invalid: ex.invalid.count, legacyUnmarked: ex.legacyUnmarked, byReason: Object.fromEntries(['targetMissing', 'studentInactive', 'otherSchool', 'targetArchived'].map((k) => [k, ex.invalid[k]]).filter(([, n]) => n)) } : undefined;
+    if (ex?.invalid?.count) batch.checks.push(`invalid extra memberships: ${ex.invalid.count} ${JSON.stringify(ex.invalid.items.slice(0, 10))}`);
     // Step 6: the "students without an active group" list matches the student and group lists.
     if (arch.group) {
       const activeGroups = new Set((await allPages(tok, '/api/batches', 'batches')).filter((g: Json) => g.institutionId === SCHOOL).map((g: Json) => g.id));
-      const expected = (await allPages(tok, '/api/students', 'students')).filter((x: Json) => x.institutionId === SCHOOL && !(x.batchId && activeGroups.has(x.batchId))).map((x: Json) => x.id).sort();
+      let expected = (await allPages(tok, '/api/students', 'students')).filter((x: Json) => x.institutionId === SCHOOL && !(x.batchId && activeGroups.has(x.batchId))).map((x: Json) => x.id).sort();
+      // Multi-class: an extra group in an active group also places a student.
+      if (multiClass) {
+        const placed = new Set<string>();
+        for (const id of expected) if (((await memberships(tok, id)).json?.groups ?? []).some((g: Json) => activeGroups.has(g.id))) placed.add(id);
+        expected = expected.filter((id: string) => !placed.has(id));
+      }
       const unplaced = await call(tok, 'GET', '/api/students/without-active-group');
       const got = (unplaced.json?.students ?? []).filter((x: Json) => x.institutionId === SCHOOL).map((x: Json) => x.studentId).sort();
       batch.unplaced = { count: got.length, byReason: unplaced.json?.byReason };
@@ -252,7 +318,7 @@ export async function main() {
     log.batches.push(batch);
     save();
     const bad = Object.values(batch.shadowDelta).some((d: Json) => d.mismatches || d.errors) || !r.inSync || batch.reads.failed.length || batch.checks.length || batch.ops.some((o: Json) => o.status >= 400 || o.status < 0);
-    console.log(`batch ${b}/${batches}: ops ${batch.ops.length}, reads ${batch.reads.ok}/${batch.reads.ok + batch.reads.failed.length}, inSync ${r.inSync}, shadow mismatches ${Object.values(batch.shadowDelta).reduce((a: number, d: Json) => a + d.mismatches, 0)}, errors ${Object.values(batch.shadowDelta).reduce((a: number, d: Json) => a + d.errors, 0)}${bad ? '  <-- STOP' : ''}`);
+    console.log(`batch ${b}/${batches}: ops ${batch.ops.length}, reads ${batch.reads.ok}/${batch.reads.ok + batch.reads.failed.length}, inSync ${r.inSync}${ex ? `, extras ${ex.valid} valid / ${ex.invalid.count} invalid` : ''}, shadow mismatches ${Object.values(batch.shadowDelta).reduce((a: number, d: Json) => a + d.mismatches, 0)}, errors ${Object.values(batch.shadowDelta).reduce((a: number, d: Json) => a + d.errors, 0)}${bad ? '  <-- STOP' : ''}`);
     if (bad) { log.stoppedAt = b; break; }
     // Refresh student tokens every ~40 minutes.
     for (const st of studentTokens) if (Date.now() - st.at > 40 * 60_000) {

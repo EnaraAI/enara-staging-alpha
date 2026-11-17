@@ -13,7 +13,8 @@ import { UsageEvent } from '../models/UsageEvent';
 import { requestMemo } from '../utils/callContext';
 import { recordAudit } from './auditTrail';
 import { endEnrollment, enroll, studentIdsInClass } from './enrollment';
-import { multiClassOn } from './enrollmentReads';
+import { refreshGroupCounts } from './groupCounts';
+import { enrollmentOnlyClassMembers, multiClassOn } from './enrollmentReads';
 import { getEnrolledInstances } from './studentCourseService';
 
 // Multi-class step 6 (docs/multi-class/STEP_6_NOTES.md), behind
@@ -79,12 +80,12 @@ async function loadStudentForAdmin(req: StaffReq, studentId: string) {
   const user = req.user!;
   if (!['admin', 'enara-admin'].includes(user.role)) throw new AppError('Admin access required', 403, 'ADMIN_REQUIRED');
   const student = await Student.findOne(user.role === 'enara-admin' ? { id: studentId } : { id: studentId, institutionId: user.institutionId })
-    .select('id name institutionId batchId')
+    .select('id name institutionId batchId archivedAt')
     .lean();
   if (!student) throw new AppError('Student not found', 404, 'STUDENT_NOT_FOUND');
   // Every enrollment belongs to the student's school (Enara admins included).
   if (!student.institutionId) throw new AppError('This student has no school', 409, 'NO_SCHOOL');
-  return student as { id: string; name: string; institutionId: string; batchId?: string };
+  return student as { id: string; name: string; institutionId: string; batchId?: string; archivedAt?: Date | null };
 }
 
 /** Every group and class the student is in, for the admin student page. */
@@ -161,9 +162,21 @@ export async function addMembership(req: StaffReq, studentId: string, body: Reco
   // A second group needs a main group first: Student.batchId stays the main
   // group (still written for the main group only); extra groups live in
   // class_enrollments only.
+  // Never make an extra the consistency check would call invalid: no extras
+  // for an archived student, or in an archived group or class.
+  if (student.archivedAt) throw new AppError('This student is archived; restore them first', 409, 'STUDENT_ARCHIVED');
   if (scope === 'group' && !student.batchId) throw new AppError('Give the student a main group first (edit the student)', 409, 'NO_PRIMARY_GROUP');
+  const target =
+    scope === 'group'
+      ? await Batch.findOne({ id: targetId, institutionId: student.institutionId }).select('archivedAt').lean()
+      : await CourseInstance.findOne({ id: targetId, institutionId: student.institutionId }).select('archivedAt visibility').lean();
+  if (target && (target.archivedAt || (target as { visibility?: string }).visibility === 'archived')) {
+    throw new AppError(scope === 'group' ? 'This group is archived' : 'This class is archived', 409, scope === 'group' ? 'GROUP_ARCHIVED' : 'CLASS_ARCHIVED');
+  }
   // enroll() checks that the student and the group/class are in this school (404 otherwise).
-  const row = await enroll({ institutionId: student.institutionId, studentId: student.id, scope, targetId, source: 'manual', createdBy: req.user!.id });
+  // extraVia marks the row as an extra membership (not drift) for the consistency check.
+  const row = await enroll({ institutionId: student.institutionId, studentId: student.id, scope, targetId, source: 'manual', createdBy: req.user!.id, extraVia: 'multi_class' });
+  if (scope === 'group') await refreshGroupCounts([targetId]); // S4: extra members count in the group
   await recordAudit('student_membership_added', req.user, { institutionId: student.institutionId, type: 'student', id: student.id }, { scope, targetId });
   return { enrollmentId: row.id, scope, targetId, status: row.status };
 }
@@ -183,8 +196,24 @@ export async function removeMembership(req: StaffReq, studentId: string, scopeRa
     throw new AppError("The student is on this class's own list; remove them on the class", 409, 'CLASS_ROSTER');
   }
   await endEnrollment({ studentId: student.id, scope, targetId, status: 'removed', endedBy: req.user!.id });
+  if (scope === 'group') await refreshGroupCounts([targetId]);
   await recordAudit('student_membership_removed', req.user, { institutionId: student.institutionId, type: 'student', id: student.id }, { scope, targetId });
   return { scope, targetId, status: 'removed' as const };
+}
+
+/**
+ * S5: class rows for the admin class lists (CurriculumCenter roster chips)
+ * gain `extraStudentIds`, the students in the class through an added class
+ * membership (not on its own list), only when there are any. Unchanged (no
+ * read) while the switch is off.
+ */
+export async function withExtraClassMembers<T extends Record<string, unknown>>(rows: T[]): Promise<T[]> {
+  if (!multiClassOn() || !rows.length) return rows;
+  const extra = await enrollmentOnlyClassMembers(rows.map((r) => ({ id: String(r.id), institutionId: r.institutionId as string | undefined, studentIds: (r.studentIds as string[] | undefined) ?? [] })));
+  return rows.map((r) => {
+    const ids = extra.get(String(r.id)) ?? [];
+    return ids.length ? { ...r, extraStudentIds: ids } : r;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -481,32 +510,60 @@ export async function classOfAttempts(
 export const NO_CLASS = 'No class';
 
 /**
- * Q9: AI credits of multi-class students by class over a period, from each
- * use's session (its course). Uses without a known class go to "No class".
+ * Q9: AI credits of multi-class students by class over a period. S7: a use
+ * whose session recorded its class (TutorSession.classId, set at creation) is
+ * credited to that class, even one the student has since left (named from the
+ * class record in the student's school; a class that no longer exists there
+ * goes to "No class"). Older sessions without a class keep the old mapping:
+ * the class of the session's course among the student's current classes.
+ * Uses without a known class go to "No class".
  */
-export async function creditsByClass(students: Who[], since: Date): Promise<Map<string, { classId: string | null; className: string; credits: number; events: number }[]>> {
-  const out = new Map<string, { classId: string | null; className: string; credits: number; events: number }[]>();
+type CreditRow = { classId: string | null; className: string; credits: number; events: number };
+export async function creditsByClass(students: Who[], since: Date): Promise<Map<string, CreditRow[]>> {
+  const out = new Map<string, CreditRow[]>();
   const multi = await multiClassStudentIds(students);
   if (!multi.size) return out;
+  const school = new Map(students.map((s) => [s.id, s.institutionId ?? undefined]));
   const events = await UsageEvent.find({ studentId: { $in: [...multi] }, status: 'settled', timestamp: { $gte: since } }).select('studentId sessionId creditsUsed').lean();
   const sessionIds = [...new Set(events.map((e) => e.sessionId).filter(Boolean))] as string[];
   const [tutor, avatar] = sessionIds.length
     ? await Promise.all([
-        TutorSession.find({ id: { $in: sessionIds } }).select('id courseId').lean(),
+        TutorSession.find({ id: { $in: sessionIds } }).select('id courseId classId institutionId studentId').lean(),
         AvatarSession.find({ id: { $in: sessionIds } }).select('id courseId').lean(),
       ])
     : [[], []];
   const courseOfSession = new Map<string, string | undefined>([...tutor, ...avatar].map((s) => [s.id, s.courseId]));
+  // The recorded class, only for the session's own student and school.
+  const classOfSession = new Map<string, { classId: string; studentId: string }>(
+    tutor.filter((s) => s.classId && s.studentId && school.get(s.studentId) && s.institutionId === school.get(s.studentId)).map((s) => [s.id, { classId: s.classId!, studentId: s.studentId }]),
+  );
+  const recordedClass = (e: { sessionId?: string; studentId?: string }) => {
+    const r = e.sessionId ? classOfSession.get(e.sessionId) : undefined;
+    return r && r.studentId === e.studentId ? r.classId : undefined;
+  };
   for (const id of multi) {
     const classes = (await getEnrolledInstances(id)).map((c) => ({ id: c.id, courseId: c.courseId, name: c.courseName }));
-    const rows = new Map<string, { classId: string | null; className: string; credits: number; events: number }>();
+    const rows = new Map<string, CreditRow>();
     for (const c of classes) rows.set(c.id, { classId: c.id, className: c.name, credits: 0, events: 0 });
-    const noClass = { classId: null, className: NO_CLASS, credits: 0, events: 0 };
-    for (const e of events.filter((x) => x.studentId === id)) {
-      // A session id names a tutor or avatar session; a few uses store the course id directly.
-      const course = e.sessionId ? (courseOfSession.has(e.sessionId) ? courseOfSession.get(e.sessionId) : e.sessionId) : undefined;
-      const c = classOfCourse(classes, course);
-      const row = c ? rows.get(c.id)! : noClass;
+    const noClass: CreditRow = { classId: null, className: NO_CLASS, credits: 0, events: 0 };
+    const mine = events.filter((x) => x.studentId === id);
+    // Recorded classes the student is no longer in: named from the class record (their school only).
+    const past = [...new Set(mine.map(recordedClass).filter((c): c is string => !!c && !rows.has(c)))];
+    const pastNames = new Map(
+      (past.length && school.get(id) ? await CourseInstance.find({ id: { $in: past }, institutionId: school.get(id) }).select('id courseName').lean() : []).map((c) => [c.id, c.courseName]),
+    );
+    for (const e of mine) {
+      const recorded = recordedClass(e);
+      let row: CreditRow | undefined;
+      if (recorded) {
+        if (!rows.has(recorded) && pastNames.has(recorded)) rows.set(recorded, { classId: recorded, className: pastNames.get(recorded)!, credits: 0, events: 0 });
+        row = rows.get(recorded) ?? noClass;
+      } else {
+        // A session id names a tutor or avatar session; a few uses store the course id directly.
+        const course = e.sessionId ? (courseOfSession.has(e.sessionId) ? courseOfSession.get(e.sessionId) : e.sessionId) : undefined;
+        const c = classOfCourse(classes, course);
+        row = c ? rows.get(c.id)! : noClass;
+      }
       row.credits += e.creditsUsed ?? 0;
       row.events += 1;
     }
@@ -538,6 +595,8 @@ export async function endExtraMemberships(opts: { institutionId?: string; apply:
       { $set: { status: 'inactive', endedAt: new Date(), ...(opts.by ? { endedBy: opts.by } : {}) } },
     );
     ended = res.modifiedCount;
+    // S4: group counts back to the members that remain (the switch is off by now, hence force).
+    await refreshGroupCounts([...new Set(extra.filter((r) => r.scope === 'group').map((r) => r.targetId))], { force: true });
   }
   return {
     apply: opts.apply,

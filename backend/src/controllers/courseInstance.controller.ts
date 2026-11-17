@@ -24,9 +24,16 @@ import {
 import { normalizeCourseVisibility } from '../services/courseVisibility';
 import { archivedListFilter } from './archive.controller';
 import { groupArchiveOn } from '../services/archive';
+import { withExtraClassMembers } from '../services/multiClass';
 
 function toInstanceResponse(doc: InstanceType<typeof CourseInstance>) {
   return toPlainObject(doc);
+}
+
+// Multi-class S5: with the switch on, rows also list the students added to the
+// class outside its own list (extraStudentIds); unchanged while off.
+async function instanceReply(doc: InstanceType<typeof CourseInstance>) {
+  return (await withExtraClassMembers([toInstanceResponse(doc) as Record<string, unknown>]))[0];
 }
 
 export const listCourseInstances = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -49,13 +56,13 @@ export const listCourseInstances = asyncHandler(async (req: AuthRequest, res: Re
   Object.assign(filter, archivedListFilter(req, groupArchiveOn));
 
   const instances = await CourseInstance.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
-  res.json(instances.map(toInstanceResponse));
+  res.json(await withExtraClassMembers(instances.map(toInstanceResponse) as Record<string, unknown>[]));
 });
 
 export const getCourseInstance = asyncHandler(async (req: AuthRequest, res: Response) => {
   const instance = await CourseInstance.findOne(scopedFilter(req, { id: req.params.id }));
   if (!instance) throw new AppError('Course instance not found', 404);
-  res.json(toInstanceResponse(instance));
+  res.json(await instanceReply(instance));
 });
 
 export const createCourseInstance = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -138,7 +145,7 @@ export const updateCourseInstance = asyncHandler(async (req: AuthRequest, res: R
   }
 
   await instance.save();
-  res.json(toInstanceResponse(instance));
+  res.json(await instanceReply(instance));
 });
 
 export const deleteCourseInstance = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -182,7 +189,7 @@ export const assignStudent = asyncHandler(async (req: AuthRequest, res: Response
   await instance.save();
   await syncClassMember({ institutionId: student.institutionId, studentId, classId: instance.id, action: 'add', by: req.user?.id });
 
-  res.json(toInstanceResponse(instance));
+  res.json(await instanceReply(instance));
 });
 
 export const removeStudent = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -195,7 +202,7 @@ export const removeStudent = asyncHandler(async (req: AuthRequest, res: Response
   await instance.save();
   if (wasMember) await syncClassMember({ institutionId: instance.institutionId, studentId: removedId, classId: instance.id, action: 'remove', by: req.user?.id });
 
-  res.json(toInstanceResponse(instance));
+  res.json(await instanceReply(instance));
 });
 
 export const getAssignedStudents = asyncHandler(async (req: AuthRequest, res: Response) => {

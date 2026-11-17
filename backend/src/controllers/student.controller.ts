@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { syncStudentDeleted, syncStudentGroup } from '../services/enrollmentSync';
+import { groupsOfStudent, refreshGroupCounts } from '../services/groupCounts';
 import { Student, STUDENT_UI_MODES, StudentUiMode } from '../models/Student';
 import { Batch } from '../models/Batch';
 import { CourseInstance } from '../models/CourseInstance';
@@ -98,6 +99,7 @@ export const createStudent = asyncHandler(async (req: AuthRequest, res: Response
   if (batchId) {
     await Batch.updateOne(scopedFilter(req, { id: batchId }), { $inc: { studentCount: 1 } });
     await syncStudentGroup({ institutionId: student.institutionId, studentId: student.id, toGroupId: batchId, by: req.user?.id });
+    await refreshGroupCounts([batchId]); // multi-class S4 (no-op while off)
   }
 
   res.status(201).json(toPlainObject(student));
@@ -149,13 +151,17 @@ export const updateStudent = asyncHandler(async (req: AuthRequest, res: Response
   }
 
   await student.save();
-  if (groupMove) await syncStudentGroup({ institutionId: student.institutionId, studentId: student.id, ...groupMove, by: req.user?.id });
+  if (groupMove) {
+    await syncStudentGroup({ institutionId: student.institutionId, studentId: student.id, ...groupMove, by: req.user?.id });
+    await refreshGroupCounts([groupMove.fromGroupId, groupMove.toGroupId]); // multi-class S4 (no-op while off)
+  }
   res.json(toPlainObject(student));
 });
 
 export const deleteStudent = asyncHandler(async (req: AuthRequest, res: Response) => {
   const student = await Student.findOne(scopedFilter(req, { id: req.params.id }));
   if (!student) throw new AppError('Student not found', 404);
+  const extraGroups = await groupsOfStudent(student.id); // [] while multi-class is off
 
   if (student.batchId) {
     await Batch.updateOne(scopedFilter(req, { id: student.batchId }), { $inc: { studentCount: -1 } });
@@ -170,5 +176,6 @@ export const deleteStudent = asyncHandler(async (req: AuthRequest, res: Response
     { $pull: { studentIds: student.id } },
   );
   await syncStudentDeleted({ studentId: student.id, by: req.user?.id });
+  await refreshGroupCounts([student.batchId, ...extraGroups]); // multi-class S4 (no-op while off)
   res.json({ message: 'Student deleted' });
 });

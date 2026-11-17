@@ -1,4 +1,5 @@
 import { publicVersion } from '../utils/vendorNeutral';
+import { resolveSessionClassId } from '../services/sessionClass';
 import { assignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { isFeatureEnabled, isShadowMode } from '../services/featureFlags';
 import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSource } from '../services/curriculumRetrieval';
@@ -102,12 +103,15 @@ export const createTutorSession = asyncHandler(async (req: AuthRequest, res: Res
     }
   }
 
+  // Multi-class S7: the class this session happens in (recorded always).
+  const classId = await resolveSessionClassId({ studentId, institutionId: req.user!.institutionId, courseId });
   const session = await TutorSession.create({
     id: generateTutorSessionId(),
     studentId,
     institutionId: req.user!.institutionId,
     title: title || lessonTitle || 'AI Tutor chat',
     courseId,
+    ...(classId ? { classId } : {}),
     lessonId,
     lessonTitle,
     curriculumId,

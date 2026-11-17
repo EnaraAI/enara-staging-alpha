@@ -66,6 +66,8 @@ export async function buildHandoff(student: { id: string; institutionId?: string
     const objectives = await objectiveLines(objectiveIds, student.institutionId);
     return {
       title: `Help with ${a.title}`,
+      // Multi-class S7: the assignment's class (one of the student's classes, their school).
+      classId: a.classId as string | undefined,
       objectiveId: objectiveIds.length === 1 ? objectiveIds[0] : undefined,
       prompt: [
         header,
