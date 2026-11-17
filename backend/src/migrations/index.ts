@@ -27,6 +27,9 @@ import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
 import { LMS_MODELS, LMS_PHASE1A_MODELS, LmsGradeSyncJob, LmsLaunchToken, LmsOrgSettings, LmsPlatform, LmsToolKey } from '../integrations/lms/models';
 import { ClassEnrollment } from '../models/ClassEnrollment';
+import { ReminderLog } from '../models/ReminderLog';
+import { SignInEvent } from '../models/SignInEvent';
+import { dataLogRetentionDays } from '../config/retention';
 import type { Migration } from './runner';
 
 // Inserts events with fixed ids, so re-running adds nothing twice.
@@ -414,4 +417,25 @@ export const MIGRATIONS: Migration[] = [
       if (!(await LmsOrgSettings.collection.indexes()).some((i) => i.key.institutionId === 1 && i.unique)) throw new Error('lms_org_settings institutionId unique index missing');
     },
   },
+  {
+    id: '2026-11-17-pdpl-data-log-retention',
+    description: 'PDPL P5: sign-in history and the sent-email log expire after DATA_LOG_RETENTION_DAYS (default 30; the email log was 90)',
+    up: async () => {
+      await setLogRetention([[SignInEvent.collection, 'at'], [ReminderLog.collection, 'createdAt']], dataLogRetentionDays());
+    },
+  },
 ];
+
+type TtlCollection = { collectionName: string; indexes(): Promise<{ key: Record<string, unknown>; expireAfterSeconds?: number }[]>; createIndex(key: Record<string, 1>, opts: { expireAfterSeconds: number }): Promise<unknown> };
+
+// Moves each collection's single-field TTL index to `days` (collMod keeps the
+// index and its name; nothing is rebuilt), or creates it if missing. Idempotent.
+export async function setLogRetention(targets: [TtlCollection, string][], days: number) {
+  const seconds = days * 86400;
+  const db = (await import('mongoose')).default.connection.db!;
+  for (const [collection, field] of targets) {
+    const ttl = (await collection.indexes().catch(() => [])).find((i) => Object.keys(i.key).length === 1 && i.key[field] === 1 && i.expireAfterSeconds !== undefined);
+    if (!ttl) await collection.createIndex({ [field]: 1 }, { expireAfterSeconds: seconds });
+    else if (ttl.expireAfterSeconds !== seconds) await db.command({ collMod: collection.collectionName, index: { keyPattern: { [field]: 1 }, expireAfterSeconds: seconds } });
+  }
+}

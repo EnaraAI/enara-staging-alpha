@@ -1,5 +1,6 @@
 import { assertStagingIsolation, isStagingMode, stagingFlagProblem } from "./stagingGuard";
 import dotenv from "dotenv";
+import { dataLogRetentionDays, safetyAlertRetentionDays } from "./retention";
 
 // Keys filled in from a .env file (staging refuses to start with any: it must
 // run on its own environment only, never inherit another one's values).
@@ -133,6 +134,10 @@ export interface AppConfig {
   // students, archive/restore them, unplaced-students list). student:
   // ENROLLMENT_STUDENT_ARCHIVE (archive/restore students, confirmed permanent delete).
   archive: { group: boolean; student: boolean };
+  // PDPL retention (config/retention.ts): SAFETY_ALERT_RETENTION_DAYS (kept
+  // alerts of deleted students, default 730) and DATA_LOG_RETENTION_DAYS (the
+  // app's own logs with personal data, default 30). Placeholders until legal confirms.
+  retention: { safetyAlertDays: number; dataLogDays: number };
 }
 
 // LMS integration (docs/lms/IMPLEMENTATION_PLAN.md). Every flag defaults to off.
@@ -577,6 +582,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       group: readBoolean(source, 'ENROLLMENT_GROUP_ARCHIVE', false),
       student: readBoolean(source, 'ENROLLMENT_STUDENT_ARCHIVE', false),
     },
+    retention: { safetyAlertDays: safetyAlertRetentionDays(source), dataLogDays: dataLogRetentionDays(source) },
     // Staging starts with AI paused and invite-only registration unless set explicitly.
     aiPaused: readBoolean(source, "AI_PAUSED", staging),
     registrationInviteOnly: readBoolean(source, "REGISTRATION_INVITE_ONLY", staging),

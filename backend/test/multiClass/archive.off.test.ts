@@ -42,6 +42,7 @@ describe('switches off: the new routes do not exist', () => {
       ['post', `/api/students/${s.id}/restore`, `/api/students/${s.id}/no-such-route`],
       ['get', '/api/students/without-active-group', '/api/students/no-such-student'],
       ['get', '/api/students/archive-settings', '/api/students/no-such-student'],
+      ['get', '/api/students/deleted-safety-alerts', '/api/students/no-such-student'],
       ['post', `/api/batches/${g}/archive`, `/api/batches/${g}/no-such-route`],
       ['post', `/api/batches/${g}/restore`, `/api/batches/${g}/no-such-route`],
       ['get', `/api/batches/${g}/history`, `/api/batches/${g}/no-such-route`],

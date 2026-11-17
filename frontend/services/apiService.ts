@@ -1346,6 +1346,9 @@ export const restoreStudent = (id: string) => request<any>('POST', `/api/student
 /** Permanent delete (data-deletion requests): the typed confirmation the server requires. */
 export const deleteStudentPermanently = (id: string) => request<any>('DELETE', `/api/students/${enc(id)}`, { confirm: `DELETE ${id}` });
 export const fetchArchivedStudents = () => request<any[]>('GET', '/api/students?archived=only&limit=100');
+/** PDPL P2: safety alerts kept about permanently deleted students (school and ENARA admins only). */
+export interface DeletedStudentAlert { id: string; studentId: string; category: string; subtype?: string; actionTaken: string; excerpt?: string; reviewRequired: boolean; reviewedAt?: string; createdAt: string; purgeAfter: string; overdue: boolean }
+export const fetchDeletedStudentAlerts = () => request<{ retentionDays: number; alerts: DeletedStudentAlert[] }>('GET', '/api/students/deleted-safety-alerts');
 export type UnplacedReason = 'group_deleted' | 'group_archived' | 'group_in_other_school' | 'no_group';
 export interface UnplacedStudent { studentId: string; reason: UnplacedReason; groupId?: string; institutionId?: string; name: string; email: string; grade?: string }
 export const fetchStudentsWithoutActiveGroup = () =>
