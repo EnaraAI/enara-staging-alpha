@@ -43,6 +43,7 @@ export const LTI_ERRORS = {
   account_disabled: [403, 'Your ENARA account is switched off. Ask your school administrator.'],
   account_conflict: [409, 'Your ENARA account could not be matched. Ask your school administrator.'],
   seat_limit_reached: [403, 'Your school has used all of its ENARA seats. Ask your school administrator.'],
+  internal_error: [500, 'Something went wrong on our side while opening ENARA. Please try again in a minute; if it keeps happening, send this reference to ENARA support.'],
 } as const satisfies Record<string, readonly [number, string]>;
 
 export type LtiErrorCode = keyof typeof LTI_ERRORS;

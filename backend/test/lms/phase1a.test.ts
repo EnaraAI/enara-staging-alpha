@@ -181,6 +181,52 @@ describe('OIDC login', () => {
   });
 });
 
+describe('framing inside the LMS (regression: first MoodleCloud test, 2026-11-17)', () => {
+  // Chrome applies CSP frame-ancestors to every response of a framed
+  // navigation, redirects included. A success redirect that still said
+  // frame-ancestors 'self' was blocked inside Moodle with Chrome's raw
+  // "might be temporarily down" page and no Reference code.
+  const ancestors = (r: request.Response) => /frame-ancestors ([^;]+)/.exec(String(r.headers['content-security-policy']))?.[1] ?? '';
+  const platformOrigin = () => new URL(pA.issuer).origin;
+
+  it('/lti/login (POST and GET): the redirect may be framed by the LMS, with no X-Frame-Options', async () => {
+    const post = await request(app).post('/lti/login').type('form').send({ iss: pA.issuer, login_hint: 'h', target_link_uri: `${TOOL}/lti/launch`, client_id: pA.clientId, lti_deployment_id: pA.deploymentId });
+    const get = await request(app).get('/lti/login').query({ iss: pA.issuer, login_hint: 'h', target_link_uri: `${TOOL}/lti/launch`, client_id: pA.clientId });
+    for (const r of [post, get]) {
+      expect(r.status).toBe(302);
+      expect(r.headers['x-frame-options']).toBeUndefined();
+      expect(ancestors(r)).toContain(platformOrigin());
+      expect(ancestors(r).split(' ')).not.toContain('*');
+    }
+  });
+
+  it('/lti/launch success redirect may be framed by the LMS, with no X-Frame-Options', async () => {
+    const { r } = await launch(pA);
+    expect(r.status, r.text).toBe(303);
+    expect(r.headers['x-frame-options']).toBeUndefined();
+    expect(ancestors(r)).toContain(platformOrigin());
+  });
+
+  it('an unexpected server error shows the ENARA error page with a Reference code, frameable, never the raw browser error', async () => {
+    const target = (await import('../../src/integrations/lms/models')).LmsOidcState as unknown as { create: (...a: unknown[]) => unknown };
+    const orig = target.create;
+    target.create = () => { throw new Error('simulated database failure'); };
+    try {
+      const r = await request(app).post('/lti/login').type('form').send({ iss: pA.issuer, login_hint: 'h', target_link_uri: `${TOOL}/lti/launch`, client_id: pA.clientId, lti_deployment_id: pA.deploymentId });
+      expect(r.status).toBe(500);
+      expect(r.headers['content-type']).toMatch(/html/);
+      expect(r.text).toContain('<code>internal_error</code>');
+      expect(r.text).not.toMatch(/simulated database failure/);
+      expect(r.headers['x-frame-options']).toBeUndefined();
+      // The platform isn't known here, so the page (no data, no actions) may be
+      // framed by any https site, like the other error pages for an unknown LMS.
+      expect(ancestors(r)).toBe("'self' https:");
+    } finally {
+      target.create = orig;
+    }
+  });
+});
+
 describe('launch: happy paths', () => {
   it('a teacher: class + group created, teacher on the class, one-time token -> ENARA session', async () => {
     const { r, ex, token } = await launchAndExchange(pA, { sub: 'teacher-1', 'lti:roles': [ROLE.instructor] });
