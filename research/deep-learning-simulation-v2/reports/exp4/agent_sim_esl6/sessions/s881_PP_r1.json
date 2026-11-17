@@ -13,8 +13,8 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
-   "W2": 1,
+   "W1": 0,
+   "W2": 0,
    "C1": 1,
    "C2": 0
   },
@@ -86,7 +86,116 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on past questions with did?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! To ask about the past, use: (question word) + did + person + base verb.\nExample: What did you do last weekend? Did you go to the beach?\nRemember: after did, the verb stays in the base form (go, not went).\n\nExercise: Make a question with did from these words:\nyou / visit / your grandmother / last weekend ?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on past questions with did?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! To ask about the past, use: (question word) + did + person + base verb.\nExample: What did you do last weekend? Did you go to the beach?\nRemember: after did, the verb stays in the base form (go, not went).\n\nExercise: Make a question with did from these words:\nyou / visit / your grandmother / last weekend ?",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Remember: after did, the verb stays in the base form (go, not went)."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "To ask about the past, use: (question word) + did + person + base verb."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "after did, the verb stays in the base form (go, not went)"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you visit your grandmother last weekend?",
+    "errors": {
+     "W1": "Did you visited your grandmother last weekend?",
+     "W2": "You visited your grandmother last weekend?"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Did you visit your grandmother last weekend?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Did you visit your grandmother last weekend?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
