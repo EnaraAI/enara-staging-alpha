@@ -147,7 +147,7 @@ const seedOf = (idx: number, rep: number) => `${NS}|L${idx}|rep${rep}`;
 interface LangTurn { assessment?: any; activeItem?: any; hintLevel?: number; rulesIntroduced?: number[]; closingAsk?: string; [k: string]: unknown }
 interface Turn { session: 1 | 2; learner: string; production: Production; tutor?: string; raw?: string; ev5?: Record<string, unknown>; lang?: LangTurn; judgeInput?: string; [k: string]: unknown }
 interface Rec { entries: any[]; liveErrors: Record<string, { seen: number; lastCorrect?: boolean }>; knownPoints: Record<string, number> }
-interface AssessSummary { form: string; points: number; max: number; pct: number; free: number; items1to4: number; nulls: number }
+interface AssessSummary { form: string; points: number; max: number; pct: number; free: number; items1to4: number; nulls: number; primary: number; primaryMax: number; ecRewrite: number; ecRewriteMax: number }
 interface Sess { arm: Arm; rep: number; learnerIdx: number; outcome: string; seed: string; state: KState; start: KState; rec: Rec; turns: Turn[]; stateAfterS1?: KState; recAfterS1?: Rec; stateS2Start?: KState; stateEndS2?: KState; stateDelayed?: KState; assess?: Partial<Record<Time, AssessSummary>> }
 const keyOf = (s: { learnerIdx: number; arm: Arm; rep: number }) => `s${s.learnerIdx}_${s.arm}_r${s.rep}`;
 const sf = (dir: string, key: string) => path.join(dir, 'sessions', `${key}.json`);
@@ -483,13 +483,15 @@ async function main() {
     for (const f of sessionFiles(dir)) {
       const s = load(dir, f.replace(/\.json$/, '')); const l = L_OF(s.learnerIdx);
       const k = time === 'pre' ? s.start : time === 'imm' ? s.stateEndS2 : s.stateDelayed; if (!k) throw new Error(`${f}: no state for ${time} (imm needs round 10 judged; del needs f1 7)`);
-      const form = l.seq[time]; const items = bank().forms.get(l.outcome)![form]; let pts = 0; let free = 0; let c14 = 0; let nul = 0;
+      const form = l.seq[time]; const items = bank().forms.get(l.outcome)![form]; let pts = 0; let free = 0; let c14 = 0; let nul = 0; let prim = 0; let primMax = 0; let ecr = 0; let ecrMax = 0;
       for (const it of items) {
         const a = answerItem(k, s.seed, time, it.id, map, wrong); const sc = scoreAnswer(it.id, a.answer); const p = sc.points ?? 0; if (sc.points === null) { nul++; nulls++; }
         pts += p; const pos = map[it.id].position; if (pos >= 7) free += p; if (pos <= 4 && p === sc.max) c14++;
+        // DECISIONS 11: primary = gap-fill and choice items; error correction and rewrite are secondary.
+        if (PRIMARY_TYPES.has(it.type)) { prim += p; primMax += sc.max; } else if (it.type === 'error_correction' || it.type === 'rewrite') { ecr += p; ecrMax += sc.max; }
         rows.push({ answerId: `a${sha(`${NS}|ans|${keyOf(s)}|${time}|${it.id}`).slice(0, 12)}`, session: keyOf(s), learner: s.learnerIdx, arm: s.arm, rep: s.rep, time, form, itemId: it.id, position: pos, scoring: it.scoring, probes: map[it.id].probes, fired: a.fired, answer: a.answer, points: sc.points, max: sc.max });
       }
-      s.assess = { ...(s.assess ?? {}), [time]: { form, points: pts, max: 12, pct: pts / 12, free, items1to4: c14, nulls: nul } }; save(dir, s);
+      s.assess = { ...(s.assess ?? {}), [time]: { form, points: pts, max: 12, pct: pts / 12, free, items1to4: c14, nulls: nul, primary: prim, primaryMax: primMax, ecRewrite: ecr, ecRewriteMax: ecrMax } }; save(dir, s);
     }
     write(path.join(dir, `ASSESS_${time}.json`), rows); console.log(`assess ${time}: answers ${rows.length}, sessions ${rows.length / 9}, grader null ${nulls}`);
   } else if (cmd === 'post') {

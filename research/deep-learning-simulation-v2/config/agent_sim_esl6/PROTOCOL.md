@@ -1,6 +1,6 @@
 # SIMULATION ONLY
 
-# ESL stage 6: confirmatory protocol (pre-registration, DRAFT)
+# ESL stage 6: confirmatory protocol (pre-registration, committed 2026-11-17, DECISIONS 16)
 
 This file must be committed before any ESL6 tutor reply is written. Nothing below may change after the first tutor reply is applied; any departure goes in `config/agent_sim_esl6/DEVIATIONS.md`. No real learners take part, and no API is called. Tutors, judges, raters, scorers and fidelity checkers are agents, with at most 3 running at a time. The binding user decisions 1–7 of `DECISIONS_FOR_PROTOCOL.md` (SHA-256 `6bba106b…b932e7`) are copied into the sections named in brackets: scoring (1, section 7), grader guard (2, section 10), ENARA arm with graderV2 (3, section 2), model path not used (4, section 7), 30 outcomes (5, section 5), forgetting check failed (6, section 12), sample size n = 180 at ~65% power (7, section 4).
 
@@ -35,16 +35,16 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 | `backend/src/services/pedagogyPolicy.ts` | `fd0cad88cd51aa5ff5f80432d93ae1187221a4f106011a20803de0744ba7efbf` |
 | `backend/src/services/learningContext.ts` | `556c1ad4fa083732b41dc633d4c0363e971c29f19c15a51220235e9e1e87ca6c` |
 | `backend/src/models/LearnerLanguageProfile.ts` | `fbab9ad58f4d4a76d04bea2320dbf2a87c67f5f08c309519866045d7704dd01a` |
-| `backend/src/services/graderV2.ts` | `56e09319a644601616e805673842b9816111a335d03b63da714ff01615e17645` (round-8 fix, DECISIONS 12) |
+| `backend/src/services/graderV2.ts` (round-8 fix, DECISIONS 12; inert B2 code, DECISIONS 15) | `80746e02f3c5b895f9d632d4d31f0ba56ec160187ff137115815d273b19915f4` |
 | `backend/src/services/grading.ts` | `dc0080001018d3cf7fae39b0a3919fa4e1ddd4a115136543ca1f586d234e601c` |
 | `backend/src/services/assessmentSecurity.ts` | `56c79bda5764d5e4b9aa201c38ec723cf6780bbd2a4add7c246007a4cfd2f477` |
 | `data/assessments/outcomes/*.json` (33 files, concatenated in name order) | `bf78f551a5292cd88632794618922bebf4f02efe372ece6d945a78a3be4383e4` |
-| `docs/SCORING_RUBRIC.md` | `947b603294bc47f12cad7ed28c567ee2372712d167dc70ce185dc7e0e1172008` |
+| `docs/SCORING_RUBRIC.md` | `ae4c65673269a2fb31bdd974e9c51ef33a57d83776dc4d8c96fbb00c63ba4bb3` |
 | `src/offline/learnerSim.ts` (session simulator, unchanged since ESL4) | `711c8334b6323dc9e72a5617072edf3b9fc808499080ca52f1d62aa78f71ebd4` |
 | `src/offline/eslFixtures.ts` | `7b616767502fc64d5f14ec2d2b8dbfc7e2019ac3e2612926425cb29500a3ebb6` |
 | `config/agent_sim_esl6/LEARNING_RULES.md` | `c705d576da041c9ba012c105b4f6237f682a549a8c36089a6f33bdf31ddf8c4c` |
 | `config/agent_sim_esl6/F1_PARAMS.json` (F1 v2) | `f75f568059c95cb5b5fb6aa63bb318ce594533852eaa8831c212411d4ee1d584` |
-| `config/agent_sim_esl6/DECISIONS_FOR_PROTOCOL.md` | `6bba106b5e271b6139719baa132bbc92937c6e9457d5d06205acab8356b932e7` |
+| `config/agent_sim_esl6/DECISIONS_FOR_PROTOCOL.md` | `9fb39ad04beaf6b4f1e64654dd23f7c1c6fc0e2d50edcc0d7b52665d7a960df0` |
 | `config/agent_sim_esl6/POWER.json` | `c55f59ce922b82a61d3439f0081d3e6fe2696ffda910ebc620f62b0050496b57` |
 | `src/offline/esl6_power.py` | `0ec99a73e53f1c8d515dddc919d3309b028e6536b62f690abc5e5f9d776fd78f` |
 | `reports/exp4/agent_sim_esl6/validation/JUDGE_TASK_ESL6.md` (validated judge task) | `b081773d1538b35b13b88a3ca4c8020998cc967bb007af7e1a1cfbb634cd604a` |
@@ -52,8 +52,8 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 | `config/agent_sim_esl4/PPLUS_PROMPT.txt` | `e373018e76243b1c6817dc1bdcbd8f60d3aff0cbf54d90312bbdd13cb7655472` |
 | `config/agent_sim_esl4/RATER_INSTRUCTIONS.md` (reused unchanged) | `77b8c0e6040b4bf5d8b3fb60ed23ea4e1d1ffc4f127f1cb52bf4346e9b1c69a8` |
 | `config/agent_sim_esl4/FIDELITY_INSTRUCTIONS.md` (reused unchanged) | `f4c0b7aa1e98e96ceb1ab16d00c381b50ae1e06215e457b6f3b6784b7fdd53e3` |
-| `src/offline/esl6Study.ts` (runner) | `f95136c212130a1bbcc7a883a24ae25402f78a12e770eb9d16c4d598ea0a83e7` |
-| `src/offline/esl6_analyze.py` (analysis and decision rule, sections 8–11) | `c65c41a681c3097af1ba9c45aee756cd94bab59064266a76a68850d0527ddd70` |
+| `src/offline/esl6Study.ts` (runner) | `b81667fb15e099253c163291195bc34dbb10185d558e9f35b7cce2dbe6d1b11d` |
+| `src/offline/esl6_analyze.py` (analysis and decision rule, sections 8–11) | `75f7fba473ba2d9e5b03c9ce236c28aa0537eea511871eae18d3d1ffb78544f3` |
 | `src/offline/esl6Fixtures.ts` (lessons of the 30 outcomes) | `bda973481e314b0532557296e78dbd0679a0688f42ff8aa7b70a6f7189fa1cb7` |
 | `src/offline/esl6_forget.py` (F1 v2 and event rules, called by the runner) | `8cf37577da5cdb5d574a63cb2e8db6e0504a4814b039134292335072a2a960c1` |
 | `src/offline/esl6_outcomes.py` (belief texts of the 30 outcomes, called by the runner) | `3a39d975457fc30c83f4b7e57c8816b06a0868648f9c72faade83da6fc92d34d` |
@@ -228,9 +228,9 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 
 All commands from `backend/`, `S=../research/deep-learning-simulation-v2/src/offline/esl6Study.ts`, `D=../research/deep-learning-simulation-v2/reports/exp4/agent_sim_esl6`.
 
-0. DECISIONS 7 made (n = 180), superseded by DECISIONS 14 (n = 270). Files of section 3 written and hashed; `answercheck` must pass (passes: 0 failures, section 7); commit this protocol with all hashes. No session before that commit. A dry run with scripted replies and scripted judges (no agents) was run in a scratch folder (`DRY_RUN` marker) through every step below.
-1. `npx tsx $S init $D` (hash checks, overlap check, 768 sessions); `assess $D pre` (pre-test, scored).
-2. Rounds 1–5 (session 1): per round `promptcheck` → 24 tutor cells (`tprompts` → answers → `tapply`, "applied 32 of 32") → `status` → `jprep r` → judges → `japply r`; round 3 also `agreeprep 3` + second judges.
+0. DECISIONS 7 made (n = 180), superseded by DECISIONS 14 (n = 270). Files of section 3 written and hashed; `answercheck` must pass (passes: 0 failures, section 7); commit this protocol with all hashes. No session before that commit. A dry run with scripted replies and scripted judges (no agents) was run in a scratch folder (`DRY_RUN` marker) through every step below; re-run on 2026-11-17 with n = 270 and the 4-item primary: 1,128 sessions, 24 cells, 10,152 answers per assessment, grader null 0, 0 rejected events, analysis complete (n = 270).
+1. `npx tsx $S init $D` (hash checks, overlap check, 1,128 sessions); `assess $D pre` (pre-test, scored).
+2. Rounds 1–5 (session 1): per round `promptcheck` → 24 tutor cells (`tprompts` → answers → `tapply`, "applied 47 of 47") → `status` → `jprep r` → judges → `japply r`; round 3 also `agreeprep 3` + second judges.
 3. `f1 $D 2` (2 days). Rounds 6–10 (session 2, new chat), same steps; round 8 `agreeprep 8`.
 4. `assess $D imm`; `f1 $D 7`; `assess $D del`.
 5. `recheckprep $D` → 3 scorer agents (`tasks/RECHECK_TASK.md`) → `recheckscore $D`; `agreescore`; `tags $D` (TAGS.json, STUCK.json, leak recount); `post $D` (POST.json); `rateprep $D` → raters (`tasks/RATE_TASK.md`); `fidprep $D` → fidelity checkers (`tasks/FID_TASK.md`).
