@@ -1,4 +1,5 @@
 import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
+import { resolveSessionClassId } from '../services/sessionClass';
 import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { SentenceSplitter } from '../services/sentenceSplitter';
 import { TutorSession } from '../models/TutorSession';
@@ -313,12 +314,14 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
 
   // Students' calls are kept as a transcript with their tutor chats.
   if (req.user!.studentId) {
+    const classId = await resolveSessionClassId({ studentId: req.user!.studentId, institutionId: req.user!.institutionId, courseId: body.course_id }); // multi-class S7
     await TutorSession.create({
       id: session.id,
       studentId: req.user!.studentId,
       institutionId: req.user!.institutionId,
       title: body.lesson_title ? `Live call: ${body.lesson_title}` : 'Live tutor call',
       courseId: body.course_id,
+      ...(classId ? { classId } : {}),
       lessonId: body.lesson_id,
       lessonTitle: body.lesson_title,
       mode: 'voice',

@@ -510,32 +510,60 @@ export async function classOfAttempts(
 export const NO_CLASS = 'No class';
 
 /**
- * Q9: AI credits of multi-class students by class over a period, from each
- * use's session (its course). Uses without a known class go to "No class".
+ * Q9: AI credits of multi-class students by class over a period. S7: a use
+ * whose session recorded its class (TutorSession.classId, set at creation) is
+ * credited to that class, even one the student has since left (named from the
+ * class record in the student's school; a class that no longer exists there
+ * goes to "No class"). Older sessions without a class keep the old mapping:
+ * the class of the session's course among the student's current classes.
+ * Uses without a known class go to "No class".
  */
-export async function creditsByClass(students: Who[], since: Date): Promise<Map<string, { classId: string | null; className: string; credits: number; events: number }[]>> {
-  const out = new Map<string, { classId: string | null; className: string; credits: number; events: number }[]>();
+type CreditRow = { classId: string | null; className: string; credits: number; events: number };
+export async function creditsByClass(students: Who[], since: Date): Promise<Map<string, CreditRow[]>> {
+  const out = new Map<string, CreditRow[]>();
   const multi = await multiClassStudentIds(students);
   if (!multi.size) return out;
+  const school = new Map(students.map((s) => [s.id, s.institutionId ?? undefined]));
   const events = await UsageEvent.find({ studentId: { $in: [...multi] }, status: 'settled', timestamp: { $gte: since } }).select('studentId sessionId creditsUsed').lean();
   const sessionIds = [...new Set(events.map((e) => e.sessionId).filter(Boolean))] as string[];
   const [tutor, avatar] = sessionIds.length
     ? await Promise.all([
-        TutorSession.find({ id: { $in: sessionIds } }).select('id courseId').lean(),
+        TutorSession.find({ id: { $in: sessionIds } }).select('id courseId classId institutionId studentId').lean(),
         AvatarSession.find({ id: { $in: sessionIds } }).select('id courseId').lean(),
       ])
     : [[], []];
   const courseOfSession = new Map<string, string | undefined>([...tutor, ...avatar].map((s) => [s.id, s.courseId]));
+  // The recorded class, only for the session's own student and school.
+  const classOfSession = new Map<string, { classId: string; studentId: string }>(
+    tutor.filter((s) => s.classId && s.studentId && school.get(s.studentId) && s.institutionId === school.get(s.studentId)).map((s) => [s.id, { classId: s.classId!, studentId: s.studentId }]),
+  );
+  const recordedClass = (e: { sessionId?: string; studentId?: string }) => {
+    const r = e.sessionId ? classOfSession.get(e.sessionId) : undefined;
+    return r && r.studentId === e.studentId ? r.classId : undefined;
+  };
   for (const id of multi) {
     const classes = (await getEnrolledInstances(id)).map((c) => ({ id: c.id, courseId: c.courseId, name: c.courseName }));
-    const rows = new Map<string, { classId: string | null; className: string; credits: number; events: number }>();
+    const rows = new Map<string, CreditRow>();
     for (const c of classes) rows.set(c.id, { classId: c.id, className: c.name, credits: 0, events: 0 });
-    const noClass = { classId: null, className: NO_CLASS, credits: 0, events: 0 };
-    for (const e of events.filter((x) => x.studentId === id)) {
-      // A session id names a tutor or avatar session; a few uses store the course id directly.
-      const course = e.sessionId ? (courseOfSession.has(e.sessionId) ? courseOfSession.get(e.sessionId) : e.sessionId) : undefined;
-      const c = classOfCourse(classes, course);
-      const row = c ? rows.get(c.id)! : noClass;
+    const noClass: CreditRow = { classId: null, className: NO_CLASS, credits: 0, events: 0 };
+    const mine = events.filter((x) => x.studentId === id);
+    // Recorded classes the student is no longer in: named from the class record (their school only).
+    const past = [...new Set(mine.map(recordedClass).filter((c): c is string => !!c && !rows.has(c)))];
+    const pastNames = new Map(
+      (past.length && school.get(id) ? await CourseInstance.find({ id: { $in: past }, institutionId: school.get(id) }).select('id courseName').lean() : []).map((c) => [c.id, c.courseName]),
+    );
+    for (const e of mine) {
+      const recorded = recordedClass(e);
+      let row: CreditRow | undefined;
+      if (recorded) {
+        if (!rows.has(recorded) && pastNames.has(recorded)) rows.set(recorded, { classId: recorded, className: pastNames.get(recorded)!, credits: 0, events: 0 });
+        row = rows.get(recorded) ?? noClass;
+      } else {
+        // A session id names a tutor or avatar session; a few uses store the course id directly.
+        const course = e.sessionId ? (courseOfSession.has(e.sessionId) ? courseOfSession.get(e.sessionId) : e.sessionId) : undefined;
+        const c = classOfCourse(classes, course);
+        row = c ? rows.get(c.id)! : noClass;
+      }
       row.credits += e.creditsUsed ?? 0;
       row.events += 1;
     }
