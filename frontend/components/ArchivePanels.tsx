@@ -1,16 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Archive, ArchiveRestore, Trash2, UserPlus } from 'lucide-react';
+import { Archive, ArchiveRestore, ShieldAlert, Trash2, UserPlus } from 'lucide-react';
 import {
   deleteStudentPermanently,
   fetchArchivedBatches,
   fetchArchivedCourseInstances,
   fetchArchivedStudents,
   fetchBatches,
+  fetchDeletedStudentAlerts,
   fetchStudentsWithoutActiveGroup,
   restoreBatch,
   restoreCourseInstance,
   restoreStudent,
   updateStudent,
+  type DeletedStudentAlert,
   type UnplacedReason,
   type UnplacedStudent,
 } from '../services/apiService';
@@ -32,7 +34,7 @@ const REASONS: Record<UnplacedReason, string> = {
 export async function confirmAndDeletePermanently(student: { id: string; name?: string }): Promise<boolean> {
   const expected = `DELETE ${student.id}`;
   const typed = window.prompt(
-    `Delete ${student.name || student.id} permanently?\n\nThis is for data-deletion requests only. It removes the student, their login, class and group places, parent links, grades and learning records. It cannot be undone. To keep the history, archive the student instead.\n\nType ${expected} to confirm.`,
+    `Delete ${student.name || student.id} permanently?\n\nThis is for data-deletion requests only. It removes the student, their login, class and group places, parent links, everything they wrote, recordings, transcripts, tutor conversations and learning records. Final scores stay in the school's totals without the student's name. Safety alerts are kept for admins for a limited time. It cannot be undone. To keep the history, archive the student instead.\n\nType ${expected} to confirm.`,
   );
   if (typed === null) return false;
   if (typed.trim() !== expected) {
@@ -41,7 +43,7 @@ export async function confirmAndDeletePermanently(student: { id: string; name?: 
   }
   try {
     await deleteStudentPermanently(student.id);
-    toast.success('Student deleted permanently', `${student.name || student.id} and their records were removed.`);
+    toast.success('Student deleted permanently', `${student.name || student.id} and their personal records were removed.`);
     return true;
   } catch (err) {
     toast.error('Could not delete the student', errorMessage(err));
@@ -221,6 +223,30 @@ export const ArchivedGroupsPanel: React.FC<{ refreshKey?: number; onRestored?: (
       <ul className="divide-y divide-slate-100">
         {(groups || []).map((g) => row('group', g))}
         {(classes || []).map((c) => row('class', c))}
+      </ul>
+    </Panel>
+  );
+};
+
+/**
+ * PDPL P2: safety alerts kept about permanently deleted students. School and
+ * ENARA admins only (the server refuses everyone else); each is removed after
+ * the retention period. Rendered only when there is at least one.
+ */
+export const DeletedStudentAlertsPanel: React.FC<{ refreshKey?: number }> = ({ refreshKey }) => {
+  const [data, setData] = useState<{ retentionDays: number; alerts: DeletedStudentAlert[] } | null>(null);
+  useEffect(() => { fetchDeletedStudentAlerts().then(setData, () => setData(null)); }, [refreshKey]);
+  if (!data || data.alerts.length === 0) return null;
+  return (
+    <Panel id="deleted-student-alerts-title" title={`Safety alerts kept after deletion (${data.alerts.length})`} icon={<ShieldAlert size={18} />} description={`Safety alerts about students who were deleted permanently. Only admins see them. Each is removed ${data.retentionDays} days after it was raised.`}>
+      <ul className="divide-y divide-slate-100">
+        {data.alerts.map((a) => (
+          <li key={a.id} className="py-3 space-y-1">
+            <p className="text-sm font-semibold text-slate-900">{a.category.replace(/_/g, ' ')}{a.subtype ? ` · ${a.subtype}` : ''}</p>
+            {a.excerpt && <p className="text-sm text-slate-700 break-words">{a.excerpt}</p>}
+            <p className="text-xs text-slate-500">Raised {new Date(a.createdAt).toLocaleDateString()} · {a.actionTaken} · removed after {new Date(a.purgeAfter).toLocaleDateString()}</p>
+          </li>
+        ))}
       </ul>
     </Panel>
   );
