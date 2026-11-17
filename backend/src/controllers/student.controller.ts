@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { syncStudentDeleted, syncStudentGroup } from '../services/enrollmentSync';
 import { Student, STUDENT_UI_MODES, StudentUiMode } from '../models/Student';
 import { Batch } from '../models/Batch';
+import { CourseInstance } from '../models/CourseInstance';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { toPlainObject } from '../utils/serialize';
@@ -157,6 +158,13 @@ export const deleteStudent = asyncHandler(async (req: AuthRequest, res: Response
   }
 
   await Student.deleteOne(scopedFilter(req, { id: req.params.id }));
+  // Multi-class (decision A, 2026-11-17): also remove the student from every
+  // class list, so no class keeps a dangling ID (old field) while the
+  // enrollments below are ended (new records). Old and new then agree.
+  await CourseInstance.updateMany(
+    { ...(student.institutionId ? { institutionId: student.institutionId } : {}), studentIds: student.id },
+    { $pull: { studentIds: student.id } },
+  );
   await syncStudentDeleted({ studentId: student.id, by: req.user?.id });
   res.json({ message: 'Student deleted' });
 });

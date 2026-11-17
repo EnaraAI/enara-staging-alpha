@@ -7,6 +7,7 @@ import { pendingMigrations, runMigrations } from '../migrations/runner';
 import { logger } from '../utils/logging';
 import { applyBackfill, planBackfill, undoBackfill } from '../services/enrollmentBackfill';
 import { shadowReport } from '../services/enrollmentShadowReport';
+import { cleanDanglingClassMembers, planDanglingClassMembers } from '../services/danglingClassMembers';
 import { seedLmsTest } from './lmsTestSeed';
 
 // Maintenance for the LMS TEST deployment only (lms-test.enara.app). This
@@ -115,6 +116,21 @@ router.post('/enrollment-backfill', async (req, res, next) => {
       return;
     }
     res.status(400).json({ error: 'mode must be dry-run, apply or undo' });
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Decision A cleanup: dangling student IDs in class lists (test database only).
+router.post('/dangling-class-members', async (req, res, next) => {
+  try {
+    const body = (req.body ?? {}) as { mode?: unknown; confirm?: unknown; institutionId?: unknown };
+    const opts = typeof body.institutionId === 'string' ? { institutionId: body.institutionId } : {};
+    if ((body.mode ?? 'dry-run') === 'dry-run') { res.json({ mode: 'dry-run', ...(await planDanglingClassMembers(opts)) }); return; }
+    if (body.mode !== 'apply' || body.confirm !== true) { res.status(400).json({ error: 'mode apply needs "confirm": true' }); return; }
+    const r = await cleanDanglingClassMembers(opts);
+    logger.info('maintenance_dangling_class_members', { removed: r.removed });
+    res.json({ mode: 'apply', ...r });
   } catch (e) {
     next(e);
   }

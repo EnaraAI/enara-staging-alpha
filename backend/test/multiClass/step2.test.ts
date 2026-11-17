@@ -169,3 +169,31 @@ describe('switch on', () => {
     setDualWrite(false);
   });
 });
+
+describe('decision A: deleting a student leaves no dangling class IDs', () => {
+  it('removes the student from every class list and ends their enrollments; old and new agree', async () => {
+    setDualWrite(true);
+    const s = await createStudent('del@mc-a.test', 'g1');
+    await api().post('/api/course-instances/c2/students').set('Authorization', admin).send({ studentId: s.body.id });
+    await api().post('/api/course-instances/c1/students').set('Authorization', admin).send({ studentId: s.body.id });
+    expect((await api().delete(`/api/students/${s.body.id}`).set('Authorization', admin)).status).toBe(200);
+    for (const c of await M.CourseInstance.find().lean()) expect(c.studentIds).not.toContain(s.body.id);
+    expect(await M.ClassEnrollment.countDocuments({ studentId: s.body.id, status: 'active' })).toBe(0);
+    expect(await M.ClassEnrollment.countDocuments({ studentId: s.body.id })).toBeGreaterThan(0); // history kept
+    expect(await enrollmentMemberships()).toEqual(await legacyMemberships());
+    setDualWrite(false);
+  });
+
+  it('the cleanup finds and removes dangling IDs left by older deletes, and nothing else', async () => {
+    const { planDanglingClassMembers, cleanDanglingClassMembers } = await import('../../src/services/danglingClassMembers');
+    const s = await createStudent('keep@mc-a.test');
+    await M.CourseInstance.updateOne({ id: 'c1' }, { $set: { studentIds: [s.body.id, 'ghost1', 'ghost2'] } });
+    const plan = await planDanglingClassMembers({ institutionId: 'mc-A' });
+    expect(plan.dangling).toBe(2);
+    expect(plan.items).toEqual([{ classId: 'c1', studentId: 'ghost1' }, { classId: 'c1', studentId: 'ghost2' }]);
+    const r = await cleanDanglingClassMembers({ institutionId: 'mc-A' });
+    expect(r.removed).toBe(2);
+    expect((await M.CourseInstance.findOne({ id: 'c1' }).lean()).studentIds).toEqual([s.body.id]);
+    expect((await planDanglingClassMembers({ institutionId: 'mc-A' })).dangling).toBe(0);
+  });
+});
