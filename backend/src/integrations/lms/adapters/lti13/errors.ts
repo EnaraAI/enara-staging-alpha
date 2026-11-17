@@ -1,0 +1,58 @@
+// Every way an LTI login or launch can be refused. The code goes to the audit
+// log and is shown on the error page as a reference; the text never contains
+// personal data or anything from the token.
+export const LTI_ERRORS = {
+  lti_disabled: [404, 'This page is not available.'],
+  missing_parameters: [400, 'The LMS sent an incomplete sign-in request.'],
+  invalid_target_link_uri: [400, 'The LMS asked to open an address that is not part of ENARA.'],
+  unknown_platform: [400, 'This LMS is not connected to ENARA. Ask your school administrator to connect it.'],
+  ambiguous_platform: [400, 'This LMS is connected more than once. Ask your school administrator to check the connection.'],
+  platform_pending: [403, 'This LMS connection is waiting for approval by ENARA. Please try again later.'],
+  platform_disabled: [403, 'This LMS connection has been switched off. Ask your school administrator.'],
+  platform_misconfigured: [500, 'This LMS connection is incomplete. Ask your school administrator to check it.'],
+  state_missing: [400, 'The sign-in request is incomplete. Please open the activity again from your LMS.'],
+  state_invalid: [400, 'This sign-in link has already been used or has expired. Please open the activity again from your LMS.'],
+  state_cookie_mismatch: [400, 'This sign-in did not start in this browser. Please open the activity again from your LMS.'],
+  id_token_missing: [400, 'The LMS did not send a sign-in token.'],
+  invalid_token: [401, 'The sign-in token from your LMS could not be read.'],
+  invalid_signature: [401, 'The sign-in token from your LMS could not be verified.'],
+  unknown_kid: [401, 'The sign-in token was signed with a key ENARA does not know.'],
+  jwks_unavailable: [503, 'ENARA could not reach your LMS to check the sign-in. Please try again in a minute.'],
+  invalid_alg: [401, 'The sign-in token uses a method ENARA does not accept.'],
+  invalid_iss: [401, 'The sign-in token came from a different LMS.'],
+  invalid_aud: [401, 'The sign-in token was meant for a different tool.'],
+  invalid_azp: [401, 'The sign-in token was meant for a different tool.'],
+  token_expired: [401, 'The sign-in token has expired. Please open the activity again from your LMS.'],
+  missing_iat: [401, 'The sign-in token is missing its time of issue.'],
+  iat_in_future: [401, "The sign-in token's time is in the future. The LMS server clock may be wrong."],
+  nonce_invalid: [401, 'This sign-in token has already been used. Please open the activity again from your LMS.'],
+  invalid_version: [400, 'The LMS uses an LTI version ENARA does not support.'],
+  unsupported_message_type: [400, 'ENARA cannot handle this kind of LMS request yet.'],
+  missing_deployment: [400, 'The LMS did not say which installation of ENARA this is.'],
+  unknown_deployment: [403, 'This installation of ENARA in your LMS is not registered. Ask your school administrator.'],
+  deployment_pending: [403, 'This installation of ENARA in your LMS is waiting for approval.'],
+  anonymous_launch: [400, 'Your LMS did not say who you are. ENARA needs an LMS account to sign you in.'],
+  missing_roles: [400, 'Your LMS did not send your role in this course.'],
+  missing_context: [400, 'ENARA must be opened from inside a course in your LMS.'],
+  missing_resource_link: [400, 'The LMS did not say which activity to open.'],
+  observer_not_supported: [403, 'Parent and mentor access from the LMS is not available yet.'],
+  institution_suspended: [403, "Your school's ENARA access is suspended. Contact your school administrator."],
+  role_conflict: [409, 'Your ENARA account has a different role from the one your LMS sent. Ask your school administrator.'],
+  account_disabled: [403, 'Your ENARA account is switched off. Ask your school administrator.'],
+  account_conflict: [409, 'Your ENARA account could not be matched. Ask your school administrator.'],
+  seat_limit_reached: [403, 'Your school has used all of its ENARA seats. Ask your school administrator.'],
+} as const satisfies Record<string, readonly [number, string]>;
+
+export type LtiErrorCode = keyof typeof LTI_ERRORS;
+
+export class LtiError extends Error {
+  readonly status: number;
+  constructor(
+    public readonly code: LtiErrorCode,
+    public readonly context: { platformId?: string; institutionId?: string; frameOrigins?: string[] } = {},
+  ) {
+    super(LTI_ERRORS[code][1]);
+    this.name = 'LtiError';
+    this.status = LTI_ERRORS[code][0];
+  }
+}

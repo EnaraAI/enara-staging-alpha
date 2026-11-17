@@ -50,6 +50,7 @@ import speakingRoutes from './routes/speaking.routes';
 import usageRoutes from './routes/usage.routes';
 import parentsRoutes from './parents/routes';
 import { ltiRouter, wellKnownRouter } from './integrations/lms/routes';
+import { lmsAdminRouter } from './integrations/lms/admin/routes';
 import { lmsFlags } from './integrations/lms/core/flags';
 import maintenanceRoutes from './maintenance/routes';
 import { getPostgresPool } from './config/postgres';
@@ -320,6 +321,7 @@ export function createApp() {
   // LMS (docs/lms): inert unless LMS_LTI_ENABLED is on and the LMS config is valid.
   app.use('/lti', ltiRouter);
   app.use('/.well-known', wellKnownRouter);
+  app.use('/api/lms', lmsAdminRouter);
 
   app.use((_req, _res, next) => {
     next(new AppError('Route not found', 404, 'NOT_FOUND'));

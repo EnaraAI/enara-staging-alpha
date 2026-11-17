@@ -24,3 +24,9 @@ export function anyLmsFlagSet(): boolean {
   const lms = getConfig().lms;
   return lms.ltiEnabled || lms.googleClassroomEnabled || lms.gradePassbackEnabled;
 }
+
+/** Phase 1a settings read by the LTI and admin routes. */
+export function lmsSettings(): { toolBaseUrl?: string; schoolConnectionsRequireApproval: boolean } {
+  const lms = getConfig().lms;
+  return { toolBaseUrl: lms.toolBaseUrl, schoolConnectionsRequireApproval: lms.schoolConnectionsRequireApproval };
+}

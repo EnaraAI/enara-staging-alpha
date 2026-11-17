@@ -25,7 +25,7 @@ import { LessonProgress } from '../models/LessonProgress';
 import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
-import { LMS_MODELS, LmsGradeSyncJob, LmsPlatform, LmsToolKey } from '../integrations/lms/models';
+import { LMS_MODELS, LMS_PHASE1A_MODELS, LmsGradeSyncJob, LmsLaunchToken, LmsOrgSettings, LmsPlatform, LmsToolKey } from '../integrations/lms/models';
 import { ClassEnrollment } from '../models/ClassEnrollment';
 import type { Migration } from './runner';
 
@@ -402,6 +402,16 @@ export const MIGRATIONS: Migration[] = [
       await ClassEnrollment.createIndexes();
       const idx = await ClassEnrollment.collection.indexes();
       if (!idx.some((i) => i.name === 'one_enrollment_per_target' && i.unique)) throw new Error('class_enrollments unique index missing');
+    },
+  },
+  {
+    id: '2026-11-17-lms-phase1a-indexes',
+    description: 'LMS Phase 1a: launch tokens and per-school seat settings, plus new platform index (additive; no existing rows touched)',
+    up: async () => {
+      for (const model of LMS_PHASE1A_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
+      await LmsPlatform.createIndexes();
+      if (!(await LmsLaunchToken.collection.indexes()).some((i) => i.key.jtiHash === 1 && i.unique)) throw new Error('lms_launch_tokens jtiHash unique index missing');
+      if (!(await LmsOrgSettings.collection.indexes()).some((i) => i.key.institutionId === 1 && i.unique)) throw new Error('lms_org_settings institutionId unique index missing');
     },
   },
 ];

@@ -140,7 +140,9 @@ describe('migration and isolation from the app', () => {
     walk(src);
     const shadowOnly = [path.join('controllers', 'learningPedagogy.controller.ts'), path.join('services', 'learningAccess.ts'), path.join('services', 'studentCourseService.ts')];
     // Step 5: switched reads go through services/enrollmentReads.ts (behind ENROLLMENT_READ_FROM).
-    expect(hits.sort()).toEqual([...shadowOnly, path.join('services', 'enrollmentReads.ts'), path.join('services', 'enrollmentSync.ts')].sort());
+    // LMS Phase 1a: the LMS domain service writes 'lms' class enrollments (docs/multi-class/PLAN.md §3).
+    const lmsWriter = path.join('integrations', 'lms', 'core', 'domainService.ts');
+    expect(hits.sort()).toEqual([...shadowOnly, path.join('services', 'enrollmentReads.ts'), path.join('services', 'enrollmentSync.ts'), lmsWriter].sort());
     for (const f of shadowOnly) expect(fs.readFileSync(path.join(src, f), 'utf8')).toMatch(/shadowCompare\(/);
   });
 });

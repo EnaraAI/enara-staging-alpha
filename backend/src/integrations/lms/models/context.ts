@@ -1,7 +1,10 @@
 import { Schema, model, models, type Model } from 'mongoose';
 import { newId, requiredOrg } from './common';
 
-// lms_contexts: an LMS course/class, mapped to an ENARA Batch (enaraClassId).
+// lms_contexts: an LMS course. On the first launch it gets its own ENARA class
+// (CourseInstance, enaraClassId) and its own group (Batch, enaraGroupId)
+// (docs/multi-class/PLAN.md §3). Learners join the class through
+// class_enrollments (scope 'class', source 'lms', lmsContextId = this id).
 export interface ILmsContext {
   id: string;
   platformId: string;
@@ -9,7 +12,10 @@ export interface ILmsContext {
   externalContextId: string;
   title?: string;
   label?: string;
+  /** ENARA CourseInstance id. */
   enaraClassId?: string;
+  /** ENARA Batch id (the class's own group). */
+  enaraGroupId?: string;
   nrpsUrl?: string;
   agsLineItemsUrl?: string;
   lastRosterSyncAt?: Date;
@@ -27,6 +33,7 @@ const contextSchema = new Schema<ILmsContext>(
     title: String,
     label: String,
     enaraClassId: { type: String, index: true },
+    enaraGroupId: String,
     nrpsUrl: String,
     agsLineItemsUrl: String,
     lastRosterSyncAt: Date,

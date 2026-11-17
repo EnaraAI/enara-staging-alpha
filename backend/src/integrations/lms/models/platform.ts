@@ -24,6 +24,14 @@ export interface ILmsPlatform {
   roleOverrides?: Record<string, string>;
   /** Allow LMS Administrator -> ENARA admin (else teacher). Off by default (Spec §5.4). */
   allowAdminRole: boolean;
+  /** Who registered it (ENARA user id) and, for a school admin's connection, who approved it. */
+  createdBy?: string;
+  approvedBy?: string;
+  approvedAt?: Date;
+  /** Launch counters (Phase 1a). Cookieless = the browser sent no state cookie (decision 2:A). */
+  launchCount: number;
+  cookielessLaunchCount: number;
+  lastLaunchAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,10 +54,17 @@ const platformSchema = new Schema<ILmsPlatform>(
     autoCreateDeployments: { type: Boolean, default: false },
     roleOverrides: { type: Schema.Types.Mixed },
     allowAdminRole: { type: Boolean, default: false },
+    createdBy: String,
+    approvedBy: String,
+    approvedAt: Date,
+    launchCount: { type: Number, default: 0, min: 0 },
+    cookielessLaunchCount: { type: Number, default: 0, min: 0 },
+    lastLaunchAt: Date,
   },
   { collection: 'lms_platforms', versionKey: false, timestamps: true },
 );
 platformSchema.index({ issuer: 1, clientId: 1 }, { unique: true });
+platformSchema.index({ institutionId: 1, status: 1 });
 
 // lms_deployments: an LTI deployment_id; a platform can have many.
 export interface ILmsDeployment {
@@ -58,6 +73,8 @@ export interface ILmsDeployment {
   deploymentId: string;
   institutionId: string;
   status: 'pending' | 'active' | 'disabled';
+  createdBy?: string;
+  approvedBy?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -69,6 +86,8 @@ const deploymentSchema = new Schema<ILmsDeployment>(
     deploymentId: { type: String, required: true },
     institutionId: requiredOrg,
     status: { type: String, enum: ['pending', 'active', 'disabled'], default: 'pending' },
+    createdBy: String,
+    approvedBy: String,
   },
   { collection: 'lms_deployments', versionKey: false, timestamps: true },
 );

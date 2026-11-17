@@ -142,6 +142,8 @@ export interface LmsConfig {
   kek?: Buffer;
   kekPrevious?: Buffer;
   drainTriggers: LmsDrainTrigger[];
+  /** A school admin's own LMS connection starts 'pending' until an ENARA admin approves (Phase 1a, decision 3:A). Default true. */
+  schoolConnectionsRequireApproval: boolean;
   google: { clientId?: string; clientSecret?: string; redirectUri?: string };
   problem?: string;
 }
@@ -248,6 +250,7 @@ export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
     kek: kek.value,
     kekPrevious: kekPrevious.value,
     drainTriggers: [...new Set(drainTriggers)],
+    schoolConnectionsRequireApproval: readBoolean(source, 'LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL', true),
     google: {
       clientId: readString(source, 'GOOGLE_CLASSROOM_CLIENT_ID'),
       clientSecret: readString(source, 'GOOGLE_CLASSROOM_CLIENT_SECRET'),

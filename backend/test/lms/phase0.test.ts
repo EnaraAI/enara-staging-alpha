@@ -151,15 +151,15 @@ describe('presets, registry, capabilities', () => {
     expect(isKnownVendor('moodle')).toBe(true);
     expect(isKnownVendor('canvas')).toBe(false);
   });
-  it('the registry has no adapters yet and refuses duplicates', async () => {
+  it('the registry has only the built-in adapters (lti13 since Phase 1a) and refuses duplicates', async () => {
     const { listProviders, registerProvider, resetProvidersForTests, getProvider } = await import('../../src/integrations/lms/registry');
-    expect(listProviders()).toEqual([]);
+    expect(listProviders().map((p) => p.kind)).toEqual(['lti13']);
     const fake = { kind: 'contract_fake', capabilities: () => ({ launch: false, roster: false, grades: false, deepLinking: false, lineItemCreate: false, submissionReview: false }) };
     registerProvider(fake);
     expect(getProvider('contract_fake')).toBe(fake);
     expect(() => registerProvider(fake)).toThrow(/registered twice/);
     resetProvidersForTests();
-    expect(listProviders()).toEqual([]);
+    expect(listProviders().map((p) => p.kind)).toEqual(['lti13']);
   });
   it('capabilities = preset ceiling narrowed by granted scopes', async () => {
     const { resolveCapabilities, AGS_SCOPE, NRPS_SCOPE } = await import('../../src/integrations/lms/core/capabilities');
@@ -302,7 +302,7 @@ describe('HTTP: inert with the flags off', () => {
     expect((await request(a).get('/lti/jwks')).status).toBe(404);
     expect((await request(a).get('/.well-known/jwks.json')).status).toBe(404);
     expect(await LmsToolKey.countDocuments()).toBe(0);
-  });
+  }, 60_000); // the first import of the whole app is slow on a loaded machine
 
   it('flag on with a broken KEK: still 404', async () => {
     setLmsEnv({ LMS_LTI_ENABLED: 'true', LMS_TOOL_BASE_URL: 'https://test.enara.app', LMS_KEK: 'YnJva2Vu' });

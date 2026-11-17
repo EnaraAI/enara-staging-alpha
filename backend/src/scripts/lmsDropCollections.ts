@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { openMongo } from '../config/db';
-import { LMS_MODELS } from '../integrations/lms/models';
+import { ALL_LMS_MODELS as LMS_MODELS } from '../integrations/lms/models';
 
 // Removes every LMS collection (the "down" for the Phase 0 migration; the
 // migration runner only goes forward). DELETES ALL LMS DATA, including the
@@ -19,7 +19,9 @@ async function main() {
     if (exists) await mongoose.connection.db!.dropCollection(name);
     console.log(`${exists ? 'dropped' : 'absent '}  ${name}`);
   }
-  await mongoose.connection.db!.collection('migrations').deleteOne({ _id: '2026-11-16-lms-phase0-indexes' as unknown as never });
+  for (const id of ['2026-11-16-lms-phase0-indexes', '2026-11-17-lms-phase1a-indexes']) {
+    await mongoose.connection.db!.collection('migrations').deleteOne({ _id: id as unknown as never });
+  }
   await mongoose.disconnect();
 }
 
