@@ -1244,3 +1244,34 @@ export const setStudentAgeBand = (id: string, ageBand: LearnerAgeBandValue | nul
   request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/students/${encodeURIComponent(id)}`, { ageBand });
 export const setClassAgeBand = (id: string, ageBand: LearnerAgeBandValue | null) =>
   request<{ id: string; ageBand: LearnerAgeBandValue | null }>('PUT', `/api/age-bands/classes/${encodeURIComponent(id)}`, { ageBand });
+
+// MULTI-CLASS STEP 6: ARCHIVING (backend switches ENROLLMENT_GROUP_ARCHIVE /
+// ENROLLMENT_STUDENT_ARCHIVE). The settings route answers 404 while both are
+// off, which reads as "off": the pages then look and behave exactly as before.
+export interface ArchiveSettings { groupArchive: boolean; studentArchive: boolean }
+export const fetchArchiveSettings = async (): Promise<ArchiveSettings> => {
+  try {
+    const s = await request<ArchiveSettings>('GET', '/api/students/archive-settings');
+    return { groupArchive: s?.groupArchive === true, studentArchive: s?.studentArchive === true };
+  } catch {
+    return { groupArchive: false, studentArchive: false };
+  }
+};
+export const archiveStudent = (id: string) => request<any>('POST', `/api/students/${enc(id)}/archive`);
+export const restoreStudent = (id: string) => request<any>('POST', `/api/students/${enc(id)}/restore`);
+/** Permanent delete (data-deletion requests): the typed confirmation the server requires. */
+export const deleteStudentPermanently = (id: string) => request<any>('DELETE', `/api/students/${enc(id)}`, { confirm: `DELETE ${id}` });
+export const fetchArchivedStudents = () => request<any[]>('GET', '/api/students?archived=only&limit=100');
+export type UnplacedReason = 'group_deleted' | 'group_archived' | 'group_in_other_school' | 'no_group';
+export interface UnplacedStudent { studentId: string; reason: UnplacedReason; groupId?: string; institutionId?: string; name: string; email: string; grade?: string }
+export const fetchStudentsWithoutActiveGroup = () =>
+  request<{ count: number; byReason: Partial<Record<UnplacedReason, number>>; students: UnplacedStudent[] }>('GET', '/api/students/without-active-group');
+export const archiveBatch = (id: string) => request<any>('POST', `/api/batches/${enc(id)}/archive`);
+export const restoreBatch = (id: string) => request<any>('POST', `/api/batches/${enc(id)}/restore`);
+export const fetchArchivedBatches = () => request<any[]>('GET', '/api/batches?archived=only&limit=100');
+export const archiveCourseInstance = (id: string) => request<any>('POST', `/api/course-instances/${enc(id)}/archive`);
+export const restoreCourseInstance = (id: string) => request<any>('POST', `/api/course-instances/${enc(id)}/restore`);
+export const fetchArchivedCourseInstances = () => request<any[]>('GET', '/api/course-instances?archived=only&limit=100');
+/** A delete refused because the group or class still has active students (409). */
+export const isHasStudentsError = (err: unknown) =>
+  err instanceof ApiError && err.status === 409 && (err.code === 'GROUP_HAS_STUDENTS' || err.code === 'CLASS_HAS_STUDENTS');

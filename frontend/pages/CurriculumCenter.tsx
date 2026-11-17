@@ -25,7 +25,8 @@ import {
   Tag,
   Sparkles,
   Database,
-  ShieldCheck
+  ShieldCheck,
+  Archive
 } from 'lucide-react';
 import { Curriculum, Batch, Chapter, CourseInstance, Student } from '../types';
 import { ChapterQuizEditor, normalizeQuiz, quizFingerprint, quizProblems } from '../components/ChapterQuizEditor';
@@ -53,7 +54,13 @@ import {
   removeStudentFromCourseInstance,
   uploadCourseFile,
   fetchStudents,
+  archiveBatch,
+  archiveCourseInstance,
+  fetchArchiveSettings,
+  isHasStudentsError,
+  type ArchiveSettings,
 } from '../services/apiService';
+import { ArchivedGroupsPanel } from '../components/ArchivePanels';
 import { toast } from '../services/toastService';
 import { getSessionUser, fetchTeachingClasses, publishCurriculumToClass } from '../services/apiService';
 import { staffPageAllowed } from '../services/roleRouting';
@@ -88,6 +95,10 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
   const [curriculums, setCurriculums] = useState<Curriculum[]>([]);
   const [batches, setBatches] = useState<Batch[]>([]);
   const [courseInstances, setCourseInstances] = useState<CourseInstanceRow[]>([]);
+  // Multi-class step 6: archiving, only when the backend switch is on.
+  const [archiveSettings, setArchiveSettings] = useState<ArchiveSettings>({ groupArchive: false, studentArchive: false });
+  const [archiveRefresh, setArchiveRefresh] = useState(0);
+  useEffect(() => { fetchArchiveSettings().then(setArchiveSettings); }, []);
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -600,7 +611,24 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
       await deleteCourseInstance(inst.id);
       setCourseInstances(prev => prev.filter(i => i.id !== inst.id));
     } catch (err) {
+      // Step 6: a class that still has students can't be deleted; offer to archive it.
+      if (isHasStudentsError(err)) {
+        if (window.confirm(`"${inst.courseName}" still has active students. ${errorMessage(err)}\n\nArchive the class instead? Its history, grades and reports are kept.`)) await handleArchiveInstance(inst, true);
+        return;
+      }
       toast.error('Could not delete course instance', errorMessage(err));
+    }
+  };
+
+  const handleArchiveInstance = async (inst: CourseInstanceRow, confirmed = false) => {
+    if (!confirmed && !window.confirm(`Archive "${inst.courseName}"? It is closed and hidden from students; its history, grades and reports are kept, and it can be restored.`)) return;
+    try {
+      const r = await archiveCourseInstance(inst.id);
+      setCourseInstances(prev => prev.filter(i => i.id !== inst.id));
+      setArchiveRefresh(k => k + 1);
+      toast.success('Class archived', `${inst.courseName} was archived (${r?.explicitMembers ?? 0} student${r?.explicitMembers === 1 ? '' : 's'} taken off its list).`);
+    } catch (err) {
+      toast.error('Could not archive the class', errorMessage(err));
     }
   };
 
@@ -651,7 +679,24 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
         assignedBatches: c.assignedBatches.filter(name => name !== batch.name)
       })));
     } catch (err) {
+      // Step 6: a group that still has students can't be deleted; offer to archive it.
+      if (isHasStudentsError(err)) {
+        if (window.confirm(`"${batch.name}" still has active students. ${errorMessage(err)}\n\nArchive the group instead? Its students will be listed under "Students without an active group" so you can place them, and its history is kept.`)) await handleArchiveBatch(batch, true);
+        return;
+      }
       toast.error('Could not delete batch', errorMessage(err));
+    }
+  };
+
+  const handleArchiveBatch = async (batch: Batch, confirmed = false) => {
+    if (!confirmed && !window.confirm(`Archive "${batch.name}"? It is closed; its students will be listed under "Students without an active group". Its history, grades and reports are kept, and it can be restored.`)) return;
+    try {
+      const r = await archiveBatch(batch.id);
+      setBatches(prev => prev.filter(b => b.id !== batch.id));
+      setArchiveRefresh(k => k + 1);
+      toast.success('Group archived', `${batch.name} was archived. ${r?.studentsUnplaced ?? 0} student${r?.studentsUnplaced === 1 ? '' : 's'} now need${r?.studentsUnplaced === 1 ? 's' : ''} a group.`);
+    } catch (err) {
+      toast.error('Could not archive the group', errorMessage(err));
     }
   };
 
@@ -1066,6 +1111,16 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
                           >
                             <Edit2 size={16} />
                           </button>
+                          {archiveSettings.groupArchive && (
+                            <button
+                              onClick={() => handleArchiveBatch(batch)}
+                              className="p-2 text-slate-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all"
+                              title="Archive group"
+                              aria-label={`Archive ${batch.name}`}
+                            >
+                              <Archive size={16} />
+                            </button>
+                          )}
                           <button 
                             onClick={() => handleDeleteBatch(batch.id)}
                             className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
@@ -1134,6 +1189,16 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
                       <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-md">
                         {inst.academicYear}
                       </span>
+                      {archiveSettings.groupArchive && (
+                        <button
+                          onClick={() => handleArchiveInstance(inst)}
+                          className="p-1.5 text-slate-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all"
+                          title="Archive class"
+                          aria-label={`Archive ${inst.courseName}`}
+                        >
+                          <Archive size={14} />
+                        </button>
+                      )}
                       <button
                         onClick={() => handleDeleteInstance(inst)}
                         className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
@@ -1226,6 +1291,13 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
             })}
           </div>
         </>
+      )}
+
+      {/* Multi-class step 6: archived groups and classes (history), when archiving is on. */}
+      {archiveSettings.groupArchive && activeTab !== 'curriculums' && (
+        <div className="mt-8">
+          <ArchivedGroupsPanel refreshKey={archiveRefresh} onRestored={() => { loadAll(); }} />
+        </div>
       )}
 
       {/* Publish to class (teachers) */}
