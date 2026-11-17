@@ -126,67 +126,152 @@ minus archived ones. It only exists while the switch is on.
   for active and archived students, and returns the counts per collection.
 - **Audit:** `student.deleted_permanently`, with IDs and counts only.
 
-### Permanent delete: what is removed and what is kept
+### Permanent delete: what is removed, anonymised and kept (PDPL, final)
 
-**Removed from lists / counts (no ghosts, tested):**
-- `CourseInstance.studentIds`: every class.
-- `CourseInstance.archive.memberIds` and `Batch.archive.memberIds` / `fieldMemberIds`: archive records.
-- `Batch.studentCount`: lowered by one when the student was still active in a group.
-- `Assignment.studentIds` and `Assignment.extensions` entries for the student.
+The owner's Egypt PDPL decisions (2026-11-17) are built in. All of it is
+still behind `ENROLLMENT_STUDENT_ARCHIVE`: with the switch off, `DELETE` is the
+old delete and nothing below happens (tested).
 
+**Removed from lists / counts (no ghosts, tested):** every class list
+(`CourseInstance.studentIds`), group and class archive records, the group count
+(when still active), `Assignment.studentIds` and `Assignment.extensions`.
 These IDs are unique across schools, so they are pulled everywhere.
 
-**Deleted (the student's personal records):**
-- **Student and logins:** the `Student` record; the student's login accounts
-  (`User`: linked by `studentId`, or unlinked with the same email in the same
-  school, so a sign-in can't re-create the student); `password_resets` and
-  `sign_in_events` of those accounts (by user ID or email); pending student
-  `invitations` for that email in that school.
-- **Memberships and parents:** `class_enrollments` (all rows, history
-  included); `parent_learner_links` and `parent_link_codes`.
-- **Grades and work:**
-  - `assessment_attempts`, and the `grading_proposals` of those attempts;
-  - assessments made for this student only (`Assessment.studentId`);
-  - `attendance_records`.
-- **Learning records:** `diagnostic_sessions`, `learner_language_profiles`,
-  `learning_events`, `learning_evidence`, `learning_interventions`,
-  `lesson_progress`, `objective_retention_states`, `pedagogical_decisions`,
-  `review_items`, `student_misconceptions`, `student_objective_mastery`,
-  `mastery_history`, `study_plans`, `teaching_episodes`,
-  `time_to_understand`.
-- **Tutor and safety:** `tutor_sessions`, `tutor_messages`, `tutor_faces`,
-  `student_tutor_choices`, `avatar_sessions`, `safety_alerts`,
-  `student_credits`.
-- **Photos:** uploaded photo files (`photoKey`, `pendingPhotoKey`), best
-  effort; a storage failure is counted in the reply and logged.
+| Data | What happens | Why |
+|---|---|---|
+| `Student` record; login accounts (`User`, by `studentId`, or unlinked with the same email in the school) | **Deleted** | the person |
+| `password_resets`, `sign_in_events` (by user ID or email), pending student `invitations` | **Deleted** | |
+| `reminder_logs` (sent-email log: address, subject), by address, student or account | **Deleted** | new |
+| `class_enrollments` (history too), `parent_learner_links`, `parent_link_codes`, `student_class_choices` | **Deleted** | `student_class_choices` new |
+| LMS: `lms_users` of the student's accounts (LMS name and email), their `lms_enrollments` and unsent `lms_grade_sync_jobs`; `google_connections` | **Deleted** | new; `lms_audit_log` is not touched |
+| `assessment_attempts` with a final score (`submitted` and graded, `finalized` or `released`) | **Anonymised and kept** (P1, below) | school totals |
+| `assessment_attempts` without a final score (open, abandoned, still grading, drafts) | **Deleted** | nothing final to keep |
+| Attempts on assessments made for this student only (`Assessment.studentId`), and those assessments | **Deleted** | a group of one cannot be anonymous |
+| `grading_proposals` of kept attempts | **Anonymised and kept**: structured score only | P1 |
+| `grading_proposals` of deleted attempts | **Deleted** | |
+| Experimental `hybridshadowresults` (answer hashes) of the student's attempts, `hybridanchorsets` using them | **Deleted** | derived from the answers |
+| Free text the student wrote: answers, essays, written responses, drafts, appeals; feedback, explanations, strengths/improvements that quote them | **Deleted** (whitelist: anything not listed as kept is dropped) | P1 |
+| Transcripts: speaking-exam conversation turns, `avatar_sessions`, `learner_language_profiles`, `diagnostic_sessions` | **Deleted** | P1 |
+| Tutor conversations: `tutor_sessions`, `tutor_messages`, `tutor_faces`, `student_tutor_choices` | **Deleted** | P1 |
+| Audio recordings | **None stored.** Speaking exams and pronunciation scoring transcribe audio in memory and do not keep it; tutor voice is streamed. Checked in the code: the only stored files linked to a student are photos | P1 |
+| Photo files (`photoKey`, `pendingPhotoKey`) in storage (R2 or local) | **Deleted**, best effort: a failure is counted and its key listed (`files.failedKeys`, also in the audit record) for a retry | P1 |
+| Learning records: `learning_events`, `learning_evidence`, `learning_interventions`, `lesson_progress`, `objective_retention_states`, `pedagogical_decisions`, `review_items`, `student_misconceptions`, `student_objective_mastery`, `mastery_history`, `study_plans`, `teaching_episodes`, `time_to_understand`, `attendance_records`, `student_credits` | **Deleted** | profiling and derived data, not scores |
+| `safety_alerts` about the student | **Kept** (`subjectDeleted: true`, `sessionId` removed), school and ENARA admins only, purged after `SAFETY_ALERT_RETENTION_DAYS` | P2 |
+| `ai_calls` | **Anonymised**: `studentId`, `userId` removed | |
+| `usage_events` | **Anonymised**: `studentId` removed, `userId` = `'erased'` | |
+| `budget_reservations` | **Anonymised**: `userId` removed | |
+| `usage_ledger` | **Kept unchanged**: bare student/user IDs (and old attempt IDs in `refs`); append-only; 30-day TTL | P3 accepted |
+| `audit_events` | **Kept unchanged**: the student ID, including the deletion record (IDs and counts, no names); append-only; 30-day TTL | P4 accepted |
+| Parent's own account and profile | **Kept** (another person; only the link is removed) | |
+| Staff free text that may name the student (educator chat, lesson plans, documents) | **Not searched** | as before |
 
-**Anonymised (kept for the school's totals, link to the person removed):**
-- `ai_calls`: `studentId` and `userId` removed.
-- `usage_events`: `studentId` removed; `userId` set to `'erased'` (the field is required).
-- `budget_reservations`: `userId` removed.
+**P1: what a kept (anonymised) result holds.**
+- **Kept:** score, total and max points, status, grading status, item
+  (question) IDs, correct/incorrect, points, max points, method, criterion
+  scores, original points; started/submitted/finalized/released times, time
+  spent, late flag; assessment, version and assignment IDs (the assignment gives
+  the class); school; origin.
+- **Replaced:** `studentId` becomes `anon_<random UUID>`, one per deleted
+  student, generated at random (not derived from the student ID). It is not
+  returned, logged or audited, so nothing maps it back. The attempt and its
+  proposals get new random IDs (`att_anon_…`, `gp_anon_…`), so the old attempt
+  IDs that the usage ledger keeps (P3) match nothing. `updatedAt` is left as
+  it was, so no field dates the deletion. A result that was `finalized` but
+  not released is stored as `released`: with no student it would otherwise
+  wait in teachers' release queues for ever.
+- **Dropped:** everything else, by whitelist (`services/anonymisedResults.ts`):
+  answers, question text, explanations, feedback, strengths/improvements,
+  overall feedback, transcript turns, speaking details, appeals, drafts, the
+  grading history (actors and reasons), errors and the learning-update flags.
+- **Grading proposals of kept attempts:** criterion, level and points stay;
+  evidence quotes, rationale, feedback and explanations are removed.
 
-**Kept unchanged:**
-- **`usage_ledger`:** append-only by design (`models/UsageLedger.ts` refuses
-  updates and deletes). Its rows keep the student and user IDs, which no longer
-  point at any record. The reply counts them (`kept.usage_ledger_rows_with_ids`).
-- **`audit_events`:** append-only. Records of actions by or on the student,
-  including the deletion record (IDs and counts, no names).
-- **The parent's own account and parent profile:** a different person, who may
-  have other children. Only the link is removed.
-- **Not searched:** free text written by staff (educator chat conversations,
-  lesson plans, uploaded documents) that may mention the student by name.
-- **Outside the database:** application logs (IDs only) and database backups.
+**P1: reports and analytics (`MIN_GROUP_SIZE_FOR_ROWS = 5`).**
+- **The rule:** a deleted student's kept result is never shown as its own row
+  in a class or group with fewer than 5 students, counting live and anonymised
+  students. There, only aggregates. Live students' rows are unchanged.
+- **Assessment results** (`GET /api/assessments/:id/attempts`): kept results
+  count in `assigned`, `submitted`, the average, highest and lowest scores and
+  the per-question correct rates. So these are the same before and after the
+  delete (tested).
+  - `summary.anonymisedStudents` and `summary.anonymisedRowsShown` appear only
+    when there are some.
+  - With 5 or more students, each one is a row named "Deleted student", with
+    no email.
+- **Assignment** (`GET /api/assignments/:id`): the roster stays the class's
+  live students.
+  - A new `anonymisedResults` block (only when there are some) gives
+    `students`, `graded`, `averageScore`, `rowsShown` and `rows` (empty under 5).
+- **Grading queue and grading actions:** kept results are not work items. They
+  are left out of the queue, and opening or changing one answers 404 (review,
+  release, regrade, correct, appeals). "Release all" skips them.
+- **Class analytics** (educator analytics, learning analytics, outcomes, the
+  teaching overview, speaking-exam list): these already count only the
+  class's current members, as for withdrawn students. Anonymised results are
+  therefore never shown per student there and not counted there either
+  (unchanged).
+- Student-, parent- and per-student views look results up by a real student,
+  so an anonymous ID never matches.
 
-**For the owner to confirm (PDPL):**
-1. **Grades and attempts are deleted** (personal records; the instruction was
-   to delete when unsure). If school records law requires keeping grades,
-   they can be anonymised instead.
-2. **`safety_alerts` are deleted.** A safeguarding duty may require keeping
-   them for a period.
-3. **`usage_ledger` keeps the IDs** (append-only). Anonymising them needs a
-   dedicated, audited ledger operation; decide whether that is required.
-4. **`audit_events` keep the student ID**, including in the deletion record.
-5. **Backups and logs:** retention rules for them (outside the app).
+**P2: safety alerts.** Alerts about the deleted student are kept as they
+were (category, action, detector, review state, excerpt, the original
+student ID), marked `subjectDeleted: true`, without the deleted tutor
+session's ID. They are not linked to the anonymous ID.
+- **Who sees them:** `GET /api/students/deleted-safety-alerts` (switch on),
+  school admins (own school) and ENARA admins (all, or `?institutionId=`).
+  Teachers and students get 403; parents have no link any more. The student
+  management page shows them in "Safety alerts kept after deletion" (admins
+  only, hidden when there are none).
+- **Retention:** `SAFETY_ALERT_RETENTION_DAYS` (default 730 = 2 years,
+  placeholder until legal confirms), counted from the alert's `createdAt`.
+- **Purge:** `npm run pdpl:retention` is a dry run (it reports what is due).
+  `-- --apply` deletes kept alerts of deleted students older than the
+  retention. Alerts of live students are never touched. It is safe to run on a
+  schedule (`services/pdplRetention.ts`, `runPdplRetention({ apply })`).
+- **Excerpt (decision to confirm):** the alert's excerpt is the student's
+  own words (e.g. a phone number they typed). It is kept because the alert
+  is kept for safeguarding. To drop it as well, unset `excerpt` in the
+  erasure (one line).
+
+**P3/P4 (accepted as is).** `usage_ledger` keeps bare student and user IDs,
+and `audit_events` keep the student ID (no names or PII). Both are append-only
+and expire after 30 days by their own TTL. The deletion audit record holds IDs
+and counts only, never the anonymous ID.
+
+**P5: logs and backups (`DATA_LOG_RETENTION_DAYS`, default 30, placeholder).**
+What the app itself stores in MongoDB:
+
+| Collection | Personal data | Retention now |
+|---|---|---|
+| `sign_in_events` | email, user ID, full IP, browser | TTL = the setting (was a fixed 30 days). Index name stays `retention_30d` |
+| `reminder_logs` | email address, subject | TTL = the setting (**was 90 days**) |
+| `ai_calls` | user, student and request IDs on cost records | kept 180 days for cost totals (TTL unchanged); the person links are removed after the setting by `npm run pdpl:retention` (dry run by default) |
+| `alert_events` | none (attempt IDs, routes) | 30 days, unchanged (OD-5) |
+| `audit_events` | actor and target IDs | 30 days, append-only, **not touched** (P4) |
+| `usage_ledger` | student/user IDs | 30 days, append-only, **not touched** (P3) |
+| `lms_audit_log` | LMS | **not touched** |
+| `rate_limits` | limiter keys | expire at the end of each window |
+| `avatar_sessions`, `educator_conversations` | session transcripts, staff chat | their own retention TTLs, unchanged |
+| `usage_events` | user/student IDs | billing records, not a log: unchanged |
+| `demo_sessions` | hashed IP of demo visitors | not a log: unchanged (no TTL; listed for the owner) |
+
+- **Migration `2026-11-17-pdpl-data-log-retention`** (new). It moves the two
+  TTL indexes to the setting with `collMod` (no rebuild) and is idempotent.
+  **It has not been run anywhere.** It runs with the other migrations
+  (`npm run migrate`, or at start-up where `RUN_MIGRATIONS_ON_START` is not
+  `false`).
+- **Models** use the same setting for new databases. Until the migration has
+  run, MongoDB keeps the old 90-day email-log index, and Mongoose logs an
+  index-options conflict at start-up (harmless).
+- **The email log** only stops a second "assignment published / results
+  released" email for the same student and event. 30 days is far longer than
+  any re-send window.
+- **Outside the app:**
+  - **Database backups** are MongoDB Atlas snapshots, set in Atlas, not in
+    this code. Set the snapshot retention to the same placeholder (30 days) in
+    Atlas. A deleted student stays in backups until they expire.
+  - **Application logs** (Vercel / host logs) hold IDs, not names. Their
+    retention is set at the host.
 
 ## Switches off: nothing changes
 
@@ -255,7 +340,12 @@ It has **not** been run on lms-test (no deployment without Mohamed's OK).
 - **Backend services:**
   - `services/archive.ts`: rules, group/class/student archive and restore,
     unplaced list, seat count;
-  - `services/studentErasure.ts`: permanent delete;
+  - `services/studentErasure.ts`: permanent delete (PDPL P1/P2);
+  - `services/anonymisedResults.ts`: what a kept result holds (whitelists),
+    the random anonymous IDs, `MIN_GROUP_SIZE_FOR_ROWS` and the small-group rule;
+  - `services/pdplRetention.ts` and `scripts/pdplRetention.ts`
+    (`npm run pdpl:retention`, dry run by default): kept-alert purge (P2),
+    AI call person links (P5), the admin alert list;
   - `services/enrollmentBackfill.ts`: report field.
 - **Controllers and routes:**
   - `controllers/archive.controller.ts`: handlers, route guards, list filter;
@@ -265,7 +355,15 @@ It has **not** been run on lms-test (no deployment without Mohamed's OK).
 - **Models and config:**
   - `archivedAt`/`archivedBy`/`archive` on `Student`, `Batch`,
     `CourseInstance`;
-  - `config/env.ts`: `archive.group` / `archive.student`.
+  - `config/env.ts`: `archive.group` / `archive.student`, `retention`;
+  - `config/retention.ts`: `SAFETY_ALERT_RETENTION_DAYS` (730),
+    `DATA_LOG_RETENTION_DAYS` (30);
+  - `AssessmentAttempt.anonymised`, `SafetyAlert.subjectDeleted`; TTLs of
+    `SignInEvent` and `ReminderLog` from the setting;
+  - migration `2026-11-17-pdpl-data-log-retention` (not run anywhere).
+- **Reports (PDPL P1):** `controllers/assessment.controller.ts` (assessment
+  results), `controllers/assignments.controller.ts` (`anonymisedResults`),
+  `controllers/grading.controller.ts` (queue, actions, release all).
 - **Frontend:**
   - `components/ArchivePanels.tsx`: "Students without an active group",
     "Archived students", "Archived groups and classes", the
@@ -273,8 +371,10 @@ It has **not** been run on lms-test (no deployment without Mohamed's OK).
   - `pages/StudentManagement.tsx`: Archive / Delete permanently;
   - `pages/CurriculumCenter.tsx`: Archive buttons, and the 409 refusal
     offers to archive;
+  - `components/ArchivePanels.tsx` also: "Safety alerts kept after deletion"
+    (admins, hidden when empty) and the updated permanent-delete wording;
   - `services/apiService.ts`.
-- **Tests:** `test/multiClass/archive.{helpers,off,groups,students,isolation,burst}`.
+- **Tests:** `test/multiClass/archive.{helpers,off,groups,students,isolation,burst,pdpl}`.
 
 ## Tests
 
@@ -285,42 +385,38 @@ It has **not** been run on lms-test (no deployment without Mohamed's OK).
 | `archive.students.test.ts` (6) | archive/restore (account, sessions, rosters, seats, lists, grades, parent link, history; exact restore); permanent delete needs role + confirmation; no ghosts (active and archived student) |
 | `archive.isolation.test.ts` (2) | other school's admin gets 404 on every action; school B data byte-identical after A's actions; per-school lists and seats |
 | `archive.burst.test.ts` (1) | the lms-test burst end to end, locally |
+| `archive.pdpl.test.ts` (6) | PDPL: kept result anonymised (random ID, new IDs, whitelisted fields, proposals without quotes), aggregates identical before/after, live rows unchanged, anonymised row shown in a class of 5; every collection in the database searched for the student ID, user ID, email, their text and the old attempt ID (only the usage ledger, audit trail and kept alert, as decided); the anonymous ID appears nowhere else; small class (3, then 4 with two deletions): aggregates only; two deletions give unrelated IDs; not in the grading queue, 404 on grading actions; failed photo deletion reported with its key; kept alerts: admins only, purge dry run / apply / setting, live alerts untouched; P5 migration (90 → 30 days, setting, idempotent, index name kept) and AI call person links (dry run / apply); switch off: old delete, attempts and alerts untouched, reports identical, new route absent |
 
 Every archive test ends with a consistency check: backfill dry run in sync and
 every class roster equal on the old and new paths.
 
-### Results (2026-11-17)
+### Results (2026-11-17, with the PDPL decisions)
 
-**Type-check:** `npx tsc --noEmit -p .` is clean (backend). Frontend:
-`tsc --noEmit` and `vite build` pass.
+**Type-check:** `npx tsc --noEmit -p .` is clean for the backend and the
+frontend. `vite build` passes.
 
-**`npx vitest run test/multiClass`:** 17 files, 104 tests, all pass. That is
-the 27 new archive tests plus every step 1–5 test.
+**`npx vitest run test/multiClass --hookTimeout 60000 --testTimeout 60000`:**
+21 files, 151 tests, all pass. That includes the 6 PDPL tests.
 - Use `--hookTimeout 60000` on a busy machine. The step 2 setup hook and its
   demo-template test sit close to vitest's 10 s and 5 s defaults when many
   files run in parallel; they pass alone and on a quiet run.
 
-**Full backend suite, defaults (switches off):** 22 failed tests and 12 files
-whose `beforeAll` timed out at 10 s. The machine was heavily loaded: the
-suite ran in parallel with other test runs and another session.
-
-**Recheck:**
-- The 26 affected files were rerun with `--hookTimeout 120000`, on this
-  branch and on the base commit (`7aaee244`, sources checked out
-  temporarily).
-- **Branch:** 17 failing tests. **Base:** 18 failing tests.
-- **The same failures on both:**
-  - AI providers unreachable: test-spend cap, Anam switch, P20 AI-path budget,
-    ELIE / phase 3 end-to-end loops;
-  - upload signing (phase0) and the document scan gate;
+**Full backend suite, defaults (switches off), on a loaded machine:** 185 files,
+2386 tests, 17 failed tests in 12 files.
+- **None is new.** These are the failures already known on the base:
+  - AI providers unreachable: test-spend cap (2), Anam switch, P20 AI-path
+    budget, ELIE e2e and sprint 4 loops, phase 3 end to end;
+  - upload signing (phase0, 2) and the document scan gate (p2Documents, 2);
   - the P19 per-IP limiter reproduction;
   - p3 educator chat isolation;
-  - p0c avatar heartbeat;
   - phase3 autograding 11, 14 and 15.
-- **No failure is new.**
-- `p20QueryBudget` "journey pages" failed on the base run only. It
-  measures round trips and is unaffected (the switch-off guards make no
-  database calls).
-- The server-side-render UI tests (educatorAnalytics, learnerAgeBand,
-  p10NamedStudents) now pass because the frontend dependencies were installed
-  in this worktree. They were part of the earlier "~21 known failures".
+- **Rechecked alone:**
+  - p24 sign-in history (its setup hook had timed out at 10 s) passes alone.
+  - p20 "journey pages" passes alone; the P20 AI-path test still fails alone,
+    as on the base.
+  - phase3 autograding 11, 14 and 15 fail in the same way with this step's
+    grading controller, models and config put back to the base versions, so
+    they do not come from this change.
+
+**Not run anywhere:** the migration `2026-11-17-pdpl-data-log-retention`, the
+retention script, and the permanent delete on lms-test or production.
