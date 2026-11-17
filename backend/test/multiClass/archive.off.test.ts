@@ -26,7 +26,9 @@ async function ops(fn: () => Promise<unknown>): Promise<string[]> {
   } finally {
     mongoose.set('debug', false);
   }
-  return seen.filter((x) => !x.startsWith('rate_limits') && !x.startsWith('users') && !x.startsWith('institutions') && !x.startsWith('audit_events') && !x.startsWith('alert_events'));
+  // Only the collections this step reads or writes (other writes, e.g. logs and
+  // rate limits, can land asynchronously and are not part of the measure).
+  return seen.filter((x) => /^(students|batches|courseinstances|class_enrollments)\./.test(x));
 }
 
 describe('switches off: the new routes do not exist', () => {
