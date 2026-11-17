@@ -125,3 +125,22 @@ describe('apply and undo', () => {
     expect(JSON.stringify([await M.Student.find().sort({ id: 1 }).lean(), await M.CourseInstance.find().sort({ id: 1 }).lean()])).toBe(before);
   });
 });
+
+describe('deleted group (found by the lms-test churn burst)', () => {
+  it('a student still pointing at a deleted group, with the dual-written row, is in sync, not a conflict', async () => {
+    await B.applyBackfill();
+    // As the app does today: deleting a group leaves Student.batchId in place,
+    // and the dual-written group row stays active, so both sides agree.
+    await M.Batch.create({ id: 'gTemp', name: 'Temp', institutionId: 'A', academicYear: '2026' });
+    await M.Student.create({ id: 'tmp1', name: 'Student tmp1', email: 'tmp1@fake.test', institutionId: 'A', batchId: 'gTemp' });
+    await M.ClassEnrollment.create({ id: 'enr_tmp1', institutionId: 'A', studentId: 'tmp1', scope: 'group', targetId: 'gTemp', status: 'active', source: 'manual', startedAt: new Date() });
+    await M.Batch.deleteOne({ id: 'gTemp' });
+    const r = await B.planBackfill({ institutionId: 'A' });
+    expect(r.doesNotFit.groupMissing.items).toContainEqual({ studentId: 'tmp1', groupId: 'gTemp' });
+    expect(r.alreadyMatchingDeletedGroup).toBe(1);
+    expect(r.conflicts.activeNotInOldFields.items).not.toContainEqual(expect.objectContaining({ studentId: 'tmp1' }));
+    // A row for a deleted group that the old field does NOT point at is still a conflict.
+    await M.ClassEnrollment.create({ id: 'enr_tmp2', institutionId: 'A', studentId: 'a4', scope: 'group', targetId: 'gTemp', status: 'active', source: 'manual', startedAt: new Date() });
+    expect((await B.planBackfill({ institutionId: 'A' })).conflicts.activeNotInOldFields.items).toContainEqual({ studentId: 'a4', scope: 'group', targetId: 'gTemp' });
+  });
+});

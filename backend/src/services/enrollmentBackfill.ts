@@ -37,6 +37,8 @@ export interface BackfillReport {
   };
   wouldCreate: { group: number; class: number };
   alreadyMatching: { group: number; class: number };
+  /** Active group rows for students whose old batchId points at a deleted group: both sides agree. */
+  alreadyMatchingDeletedGroup: number;
   wouldReactivate: Listed<{ studentId: string; scope: EnrollmentScope; targetId: string; status: string }>;
   doesNotFit: {
     studentWithoutSchool: Listed<{ studentId: string; groupId?: string }>;
@@ -86,6 +88,7 @@ async function buildPlan(institutionId?: string): Promise<Plan> {
     duplicateClassMember: [] as { classId: string; studentId: string }[],
   };
   const wants: Want[] = [];
+  const deletedGroupKeys = new Set<string>();
 
   for (const s of students) {
     if (!s.institutionId) {
@@ -93,7 +96,14 @@ async function buildPlan(institutionId?: string): Promise<Plan> {
       continue;
     }
     if (!s.batchId) continue;
-    if (!allBatches.has(s.batchId)) dnf.groupMissing.push({ studentId: s.id, groupId: s.batchId });
+    if (!allBatches.has(s.batchId)) {
+      // The group was deleted but the student still points at it (deleting a
+      // group never cleared Student.batchId). The backfill doesn't create a row
+      // for it, but an active row written by the dual write agrees with the
+      // old field, so it is not a conflict (see deletedGroupMatching below).
+      dnf.groupMissing.push({ studentId: s.id, groupId: s.batchId });
+      deletedGroupKeys.add(key(s.id, 'group', s.batchId));
+    }
     else if (allBatches.get(s.batchId) !== s.institutionId) dnf.groupInOtherSchool.push({ studentId: s.id, groupId: s.batchId });
     else wants.push({ institutionId: s.institutionId, studentId: s.id, scope: 'group', targetId: s.batchId, migratedFrom: 'student.batchId' });
   }
@@ -135,8 +145,9 @@ async function buildPlan(institutionId?: string): Promise<Plan> {
       reactivateListed.push({ studentId: w.studentId, scope: w.scope, targetId: w.targetId, status: e.status });
     }
   }
+  const deletedGroupMatching = existing.filter((e) => e.status === 'active' && deletedGroupKeys.has(key(e.studentId, e.scope, e.targetId))).length;
   const activeNotInOldFields = existing
-    .filter((e) => e.status === 'active' && !wanted.has(key(e.studentId, e.scope, e.targetId)))
+    .filter((e) => e.status === 'active' && !wanted.has(key(e.studentId, e.scope, e.targetId)) && !deletedGroupKeys.has(key(e.studentId, e.scope, e.targetId)))
     .map((e) => ({ studentId: e.studentId, scope: e.scope, targetId: e.targetId }));
 
   const report: BackfillReport = {
@@ -154,6 +165,7 @@ async function buildPlan(institutionId?: string): Promise<Plan> {
     },
     wouldCreate: { group: create.filter((w) => w.scope === 'group').length, class: create.filter((w) => w.scope === 'class').length },
     alreadyMatching: matching,
+    alreadyMatchingDeletedGroup: deletedGroupMatching,
     wouldReactivate: listed(reactivateListed),
     doesNotFit: {
       studentWithoutSchool: listed(dnf.studentWithoutSchool),
