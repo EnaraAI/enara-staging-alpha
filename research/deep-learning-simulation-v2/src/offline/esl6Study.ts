@@ -72,6 +72,9 @@ const REPS = [1, 2] as const;
 const BASE = 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog';
 // LE = ESL5 LE (A0 + levelExplicit + esl5 bundle) with graderV2 appended (DECISIONS 3). shortRecap is not used.
 export const ENV_OF: Record<Arm, string> = { PP: '', LE: `${BASE},levelExplicit,esl5,graderV2` };
+// DECISIONS 11 (option C, 2026-11-17): the primary outcome uses only these item types (positions 1-4 of each form,
+// minus the 6 rewrite items of 2 outcomes); error correction (5-6) and rewrite are secondary.
+const PRIMARY_TYPES = new Set(['gap_fill', 'controlled_gap_fill', 'multiple_choice', 'controlled_choice']);
 const GRADER_ENV = 'graderV2';                          // assessment scoring (DECISIONS 1): deterministic path, model path off
 const TURNS_PER_SESSION = 5; const ROUNDS = 2 * TURNS_PER_SESSION; const DAY = 86_400_000; const T0 = Date.parse('2027-03-01T09:00:00Z');
 const GAP_DAYS = 2; const DELAY_DAYS = 7;
@@ -556,11 +559,14 @@ async function main() {
     const dir = dirArg(a1); const key = JSON.parse(readFileSync(path.join(dir, 'recheck', 'KEY.json'), 'utf8')) as Record<string, any>; const got: Record<string, Record<string, number>> = {}; const missing: string[] = [];
     for (const sc of ['s1', 's2', 's3']) { const files = JSON.parse(readFileSync(path.join(dir, 'recheck', sc, 'FILES.json'), 'utf8')) as { batch: string; ids: string[] }[]; for (const f of files) { const p = path.join(dir, 'recheck', sc, `${f.batch}.json`); if (!existsSync(p)) { missing.push(`${sc}/${f.batch}`); continue; } const d = JSON.parse(readFileSync(p, 'utf8')); for (const id of f.ids) { const v = d.scores?.[id]; if (typeof v !== 'number') missing.push(`${sc}/${f.batch}:${id}`); else (got[id] ??= {})[sc] = v; } } }
     const ref = (v: number[]) => { const c: Record<number, number> = {}; v.forEach((x) => (c[x] = (c[x] ?? 0) + 1)); const m = Object.entries(c).find(([, n]) => n >= 2); return m ? Number(m[0]) : [...v].sort((a, b) => a - b)[1]; };
-    const ex: { g: number; r: number }[] = []; const tf: { g: number; r: number }[] = [];
-    for (const [id, k] of Object.entries(key)) { const v = got[id]; if (!v || Object.keys(v).length !== 3) continue; const r = ref([v.s1, v.s2, v.s3]); (k.scoring === 'exact' ? ex : tf).push({ g: k.grader, r }); }
+    const ex: { g: number; r: number }[] = []; const tf: { g: number; r: number }[] = []; const prim: { g: number; r: number }[] = [];
+    for (const [id, k] of Object.entries(key)) { const v = got[id]; if (!v || Object.keys(v).length !== 3) continue; const r = ref([v.s1, v.s2, v.s3]); (k.scoring === 'exact' ? ex : tf).push({ g: k.grader, r }); if (k.scoring === 'exact' && PRIMARY_TYPES.has(bank().items.get(k.itemId)?.type ?? '')) prim.push({ g: k.grader, r }); }
     const qwk = (xs: { g: number; r: number }[]) => { const K = 3; const O = Array.from({ length: K }, () => Array(K).fill(0)); xs.forEach(({ g, r }) => O[g][r]++); const n = xs.length; if (!n) return null; const hg = O.map((row) => row.reduce((a, b) => a + b, 0)); const hr = [0, 1, 2].map((j) => O.reduce((a, row) => a + row[j], 0)); let num = 0; let den = 0; for (let i = 0; i < K; i++) for (let j = 0; j < K; j++) { const w = (i - j) ** 2 / (K - 1) ** 2; num += w * O[i][j]; den += w * hg[i] * hr[j] / n; } return den === 0 ? 1 : +(1 - num / den).toFixed(4); };
-    const exact = ex.length ? +(ex.filter((x) => x.g === x.r).length / ex.length).toFixed(4) : null; const q = qwk(tf);
-    const res = { _label: 'SIMULATION ONLY', sampled: Object.keys(key).length, exactItems: ex.length, exactAgreement: exact, freeItems: tf.length, qwk: q, missing, pass: !missing.length && exact !== null && exact >= 0.95 && q !== null && q >= 0.8 };
+    const agree = (xs: { g: number; r: number }[]) => (xs.length ? +(xs.filter((x) => x.g === x.r).length / xs.length).toFixed(4) : null);
+    const exact = agree(ex); const primary = agree(prim); const q = qwk(tf);
+    // DECISIONS 9 + 11: the guard is >=95% exact agreement on PRIMARY items only (gap-fill and choice items);
+    // all-exact agreement (incl. error correction) and free-item QWK are reported, not guards.
+    const res = { _label: 'SIMULATION ONLY', sampled: Object.keys(key).length, primaryItems: prim.length, primaryAgreement: primary, exactItems: ex.length, exactAgreement: exact, freeItems: tf.length, qwk: q, missing, guard: 'primary (gap-fill/choice) exact agreement >= 0.95', pass: !missing.length && primary !== null && primary >= 0.95 };
     write(path.join(dir, 'GRADER_RECHECK.json'), res); console.log(JSON.stringify({ ...res, missing: missing.length }));
   } else if (cmd === 'rateprep') {
     const dir = dirArg(a1); const out = path.resolve(a2 ?? path.join(dir, 'rate')); mkdirSync(out, { recursive: true }); const labels = ['V', 'W']; const key: Record<string, any> = {};

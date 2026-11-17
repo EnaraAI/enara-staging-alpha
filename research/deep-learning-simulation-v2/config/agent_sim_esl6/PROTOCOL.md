@@ -35,7 +35,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 | `backend/src/services/pedagogyPolicy.ts` | `fd0cad88cd51aa5ff5f80432d93ae1187221a4f106011a20803de0744ba7efbf` |
 | `backend/src/services/learningContext.ts` | `556c1ad4fa083732b41dc633d4c0363e971c29f19c15a51220235e9e1e87ca6c` |
 | `backend/src/models/LearnerLanguageProfile.ts` | `fbab9ad58f4d4a76d04bea2320dbf2a87c67f5f08c309519866045d7704dd01a` |
-| `backend/src/services/graderV2.ts` | `a1f574dc800ce603aaec5e333a29d419d213b506db75e5dd610a394f01b71360` |
+| `backend/src/services/graderV2.ts` | `56e09319a644601616e805673842b9816111a335d03b63da714ff01615e17645` (round-8 fix, DECISIONS 12) |
 | `backend/src/services/grading.ts` | `dc0080001018d3cf7fae39b0a3919fa4e1ddd4a115136543ca1f586d234e601c` |
 | `backend/src/services/assessmentSecurity.ts` | `56c79bda5764d5e4b9aa201c38ec723cf6780bbd2a4add7c246007a4cfd2f477` |
 | `data/assessments/outcomes/*.json` (33 files, concatenated in name order) | `bf78f551a5292cd88632794618922bebf4f02efe372ece6d945a78a3be4383e4` |
@@ -170,17 +170,19 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
   - **Wk fires:** the answer is `WRONG_ANSWERS.json[item id][Wk]`, a fixed string showing Wk's error pattern (§1b) applied to the key: for error correction, the prompt sentence unchanged when the item's error is Wk's error, else the key with Wk's error applied; for gap/choice items the option or form Wk would produce (e.g. copula W1: empty gap; W2: "is"); for free/transfer items the key sentence with Wk's error applied in the target form only. Written once by one agent before `init`, from the bank, the §1b error examples and the rubric, blind to arm.
   - **Pre-init checks (`esl6Study.ts answercheck`, must pass; `init` refuses to run otherwise):** every key string scores full points under the grader of this section; every wrong string scores less than full on the item it belongs to (free/transfer: 0 or 1); no wrong string equals a key. Failures are fixed in the files before `init`.
   - **Grader-blind wrong strings (reported, not counted as failures):** 15 items where the deterministic grader gives full points to the faithful wrong string and no faithful string scores lower: conjunctions items 7–9 (all forms; the conjunction rule accepts any clause-joining and/but/because, so "and" for because/but is not detected) and appearance/clothes-shopping item 7 (all forms; the vocabulary rubric scores the words, not their order). The belief still fires there and the answer is the faithful string (`graderBlind` in both files); it scores like the key, so these items cannot differ between a learner with and without the belief.
-  - **Answercheck result (2026-11-16):** 810 keys and 753 wrong strings checked; **1 failure: `EN-F-A2-GR-third-person-s-C-9` — the bank's own key "Karim does his homework at home." scores 0/2 under graderV2** (also "He does his homework at home."; the only correct answer to the prompt). This cannot be fixed in the answer files without giving a wrong answer as the key; it needs a user decision before `init` (fix the grader in a separate, re-validated commit; replace the bank item; or accept the item as a constant −2 points on form C for third-person-s learners in both arms and report it).
+  - **Answercheck result (2026-11-17, round-8 grader, DECISIONS 12):** 810 keys and 753 wrong strings checked; **0 failures**, 15 grader-blind (above). (The 2026-11-16 failure on `EN-F-A2-GR-third-person-s-C-9` no longer occurs: the round-7 fix scores the bank key in full.)
 - **Scoring (DECISIONS 1):** ENARA's deterministic grader path, **graderV2 ON** (`ENARA_ENGINE_V2=graderV2`), **model path OFF** (DECISIONS 4: not validated, not used anywhere): exact items via `matchKeyV2`, free/transfer items via `scoreTargetForm`; a `null` from the scorer (no rule fits) scores 0 and is counted and reported. The scorer gets only item id and answer string (no arm, learner or time). **Score = percent of points per form** (points / 12).
 
 ## 8. Primary hypothesis (the only confirmatory test)
 
-**(LE) − (PP) on the delayed-form score (percent of points), explicit-first learners (n = 180), each learner's two replications averaged.**
-- **Test:** two-sided paired sign-flip. Exact over all 2^n sign patterns by convolution if every difference lies on the 1/24 grid (12-point forms averaged over 2 replications give multiples of 1/24 per arm, so the difference is too); otherwise Monte Carlo with **100,000** draws, **seed 6**. α = 0.05.
+**(LE) − (PP) on the delayed-form score on the PRIMARY items (percent of points), explicit-first learners (n = 180, DECISIONS 13 open), each learner's two replications averaged.**
+- **Primary items (DECISIONS 8 and 11):** the gap-fill and choice items of the form (positions 1–4: gap_fill, controlled_gap_fill, multiple_choice, controlled_choice), **4 points per form** (3 on the 6 forms whose position 3 or 4 is a rewrite item). Reason: on these types the grader agreed 39/41 = 95.1% on a fresh independent answer set (round 8) and 132/134 pooled over rounds 5–8; on error correction it did not (27/33 in round 8).
+- **Test:** two-sided paired sign-flip. Exact over all 2^n sign patterns by convolution if every difference lies on a common grid (4- or 3-point forms averaged over 2 replications); otherwise Monte Carlo with **100,000** draws, **seed 6**. α = 0.05.
 - **Interval:** 95% percentile bootstrap, **10,000** resamples, **seed 7**.
 
 ## 9. Secondary outcomes (descriptive only, no claims)
 
+- **whole-form delayed score (12 points)** and **error-correction + rewrite items** (positions 5–6 and the rewrite items), each with the grader's round-8 agreement on those types stated next to it (error correction 27/33);
 - immediate post-test score (LE − PP, 95% bootstrap CI);
 - **mastery rate** on the delayed form: rubric criterion, ≥ 80% of points AND ≥ 3 of items 1–4 correct; share per arm, per-learner mean of replications;
 - by outcome type (GR / VO / FN) and by outcome (30 rows, mean diff with 95% bootstrap CI; n = 6 per outcome, so wide);
@@ -199,7 +201,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 2. **Early leaks:** LE ≤ PP, ESL5 definition (completed answer of a lesson item the learner has not solved with < 2 genuine failed attempts this session; releases and answers after ≥ 2 attempts counted separately). The genuine-attempt count is reconstructed from transcripts as in `esl5_leak_recount.py`, not from the engine counter.
 3. **Answer protection:** mean blind `answer_protection` LE ≥ PP.
 4. **Judge agreement:** in-study blind second judging of a stable 20% (`rand('esl6-agree', caseId) < 0.2`) in rounds 3 (session 1) and 8 (session 2); agreement ≥ **85% overall AND ≥ 85% in session 2**, no missing cases.
-5. **Grader recheck (DECISIONS 2):** a 10% sample of all scored assessment answers (all times, arms, learners, items), drawn with `rand('esl6-recheck', answerId) < 0.1` (fixed seed string). **3 independent agent scorers**, rubric (`docs/SCORING_RUBRIC.md`) and item only, blind to arm, learner, time and grader score; reference = majority (median for 0/1/2 if all differ). Targets: **≥ 95% exact agreement** grader vs reference on exact items AND **QWK ≥ 0.80** on free/transfer items. Missing either = failed guard. Batches: `esl6Study.ts recheckprep` (40 answers per batch, own order per scorer, item + rubric fields + answer only); scored by `recheckscore` → `GRADER_RECHECK.json` (reference: majority, median if all three differ; exact agreement on exact items; quadratic-weighted kappa on 0/1/2 items); task `tasks/RECHECK_TASK.md`.
+5. **Grader recheck (DECISIONS 2):** a 10% sample of all scored assessment answers (all times, arms, learners, items), drawn with `rand('esl6-recheck', answerId) < 0.1` (fixed seed string). **3 independent agent scorers**, rubric (`docs/SCORING_RUBRIC.md`) and item only, blind to arm, learner, time and grader score; reference = majority (median for 0/1/2 if all differ). Target (DECISIONS 9 and 11): **≥ 95% exact agreement** grader vs reference on the **primary item types** (gap-fill and choice). Exact agreement on all exact items and QWK on free/transfer items are **reported, not guards**. Batches: `esl6Study.ts recheckprep` (40 answers per batch, own order per scorer, item + rubric fields + answer only); scored by `recheckscore` → `GRADER_RECHECK.json` (reference: majority, median if all three differ; exact agreement on exact items; quadratic-weighted kappa on 0/1/2 items); task `tasks/RECHECK_TASK.md`.
 
 ## 11. Decision rule (fixed now)
 
@@ -209,15 +211,15 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 
 1. **Forgetting check FAILED** (DECISIONS 6) in validation rounds 1 (F1 v1) and 2 (F1 v2) on the counted full-teaching design: 7-day (b) − (a) = 0.000, a ceiling effect (full teaching removes every wrong belief). Light-teaching sensitivity: 0.366 vs 0.595, immediate +0.031. The report must state that the forgetting model shows no recall benefit when teaching is complete and that this check did not pass.
 2. 30, not 33, outcomes (section 5).
-3. Grader validated only against agent scorers (round 5: 96.0% exact, 72/75, one miss from failing; QWK 0.914; scorers unanimous, shared bias likely); no human raters.
+3. Grader validated only against agent scorers, no human raters. Fresh round 8: **all controlled items 89.3% (fail)**, primary item types 95.1% (39/41, one miss from failing), free QWK 0.891. The primary outcome was narrowed to the passing types after seeing this result (DECISIONS 11).
 4. Model grader path NOT VALIDATED and not used.
 5. Simulation only: hand-written learning rules, agent tutors, agent judges, agent scorers; nothing is evidence about real students.
 6. The ESL5 instruction fixes and graderV2 were designed after seeing earlier rules and ESL5 results.
 7. No human review of the assessments (bank status DRAFT); item-belief map and wrong answers are agent-written.
-8. Underpowered: n = 180 (DECISIONS 7) gives about 0.65 power at +0.06 with the inflated SD (0.77 uninflated); the report must state it.
+8. Underpowered: with 4 primary items the conservative estimate is about **0.48 power at n = 180** (POWER_C.json; was 0.65 for 6 items); the final n is DECISIONS 13 (open); the report must state the power.
 9. Per-learner judging noise on the delayed score is large (mean |diff| 0.149, NOISE_RESULT).
 10. Few learners per outcome (6); per-outcome results are descriptive only.
-11. Assessment answers are deterministic strings per belief (`WRONG_ANSWERS.json`), agent-written; 15 of them are grader-blind (section 7) and one bank key (`EN-F-A2-GR-third-person-s-C-9`) is not scored as correct by the grader (section 7, open).
+11. Assessment answers are deterministic strings per belief (`WRONG_ANSWERS.json`), agent-written; 15 of them are grader-blind (section 7) (section 7).
 12. Lessons are research fixtures of uneven fit: 3 outcomes have no practice items, several lessons are only loosely about the outcome (e.g. family: "This is my … He/She is …"; days-months shares the in/on/at lesson); 2 lesson items equal bank items (section 5).
 13. B2 no-harm uses "delayed ≥ pre-test"; with W = 0 an item still errs with probability 0.05 per probed belief on different forms, so a B2 learner can fail it by chance (seen in the dry run with scripted replies).
 
