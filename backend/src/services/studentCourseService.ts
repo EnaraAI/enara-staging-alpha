@@ -1,6 +1,7 @@
 import { Curriculum } from '../models/Curriculum';
 import { enrolledClassFilter } from './enrollment';
 import { shadowCompare, shadowOn } from './enrollmentShadow';
+import { readsFromEnrollments } from './enrollmentReads';
 import { CourseInstance } from '../models/CourseInstance';
 import { LessonProgress } from '../models/LessonProgress';
 import { Student } from '../models/Student';
@@ -22,11 +23,20 @@ export function getEnrolledInstances(studentId: string) {
 
 async function readEnrolledInstances(studentId: string) {
   const student = await getStudentOrThrow(studentId);
+  const institutionFilter = student.institutionId ? { institutionId: student.institutionId } : {};
+  // Multi-class step 5 (student_app): read from class_enrollments when switched on.
+  if (readsFromEnrollments('student_app')) {
+    const enrolled = await enrolledClassFilter(studentId, student.institutionId);
+    if (!enrolled) return CourseInstance.find({ id: { $in: [] } }).exec();
+    return CourseInstance.find({ ...institutionFilter, ...STUDENT_VISIBLE_COURSE_FILTER, ...enrolled })
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .exec();
+  }
   const filter: Record<string, unknown>[] = [{ studentIds: studentId }];
   if (student.batchId) {
     filter.push({ batchId: student.batchId });
   }
-  const institutionFilter = student.institutionId ? { institutionId: student.institutionId } : {};
   const instances = await CourseInstance.find({
     ...institutionFilter,
     ...STUDENT_VISIBLE_COURSE_FILTER,

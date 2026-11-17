@@ -137,7 +137,8 @@ describe('migration and isolation from the app', () => {
     };
     walk(src);
     const shadowOnly = [path.join('controllers', 'learningPedagogy.controller.ts'), path.join('services', 'learningAccess.ts'), path.join('services', 'studentCourseService.ts')];
-    expect(hits.sort()).toEqual([...shadowOnly, path.join('services', 'enrollmentSync.ts')].sort());
+    // Step 5: switched reads go through services/enrollmentReads.ts (behind ENROLLMENT_READ_FROM).
+    expect(hits.sort()).toEqual([...shadowOnly, path.join('services', 'enrollmentReads.ts'), path.join('services', 'enrollmentSync.ts')].sort());
     for (const f of shadowOnly) expect(fs.readFileSync(path.join(src, f), 'utf8')).toMatch(/shadowCompare\(/);
   });
 });

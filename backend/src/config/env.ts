@@ -122,7 +122,10 @@ export interface AppConfig {
   // off; turning one on needs the owner's OK.
   // shadow: compute the enrollment answer next to the old one, return the old
   // one, record mismatches (step 4). sampleRate: share of requests checked.
-  enrollment: { dualWrite: boolean; shadow: boolean; shadowSampleRate: number };
+  // readFrom: step 5 features that read membership from class_enrollments
+  // (ENROLLMENT_READ_FROM, comma list). attendanceFix (Q7) and
+  // ageFromBirthDate (Q8) are separate switches.
+  enrollment: { dualWrite: boolean; shadow: boolean; shadowSampleRate: number; readFrom: string[]; attendanceFix: boolean; ageFromBirthDate: boolean };
 }
 
 // LMS integration (docs/lms/IMPLEMENTATION_PLAN.md). Every flag defaults to off.
@@ -555,6 +558,9 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       dualWrite: readBoolean(source, 'ENROLLMENT_DUAL_WRITE', false),
       shadow: readBoolean(source, 'ENROLLMENT_SHADOW', false),
       shadowSampleRate: Math.min(1, Math.max(0, Number(source.ENROLLMENT_SHADOW_SAMPLE_RATE ?? 1) || 0)),
+      readFrom: String(source.ENROLLMENT_READ_FROM ?? '').split(',').map((x) => x.trim()).filter(Boolean),
+      attendanceFix: readBoolean(source, 'ENROLLMENT_ATTENDANCE_FIX', false),
+      ageFromBirthDate: readBoolean(source, 'ENROLLMENT_AGE_FROM_BIRTHDATE', false),
     },
     // Staging starts with AI paused and invite-only registration unless set explicitly.
     aiPaused: readBoolean(source, "AI_PAUSED", staging),

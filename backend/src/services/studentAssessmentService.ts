@@ -1,4 +1,5 @@
 import { Assessment } from '../models/Assessment';
+import { groupClause, studentGroupIds } from './enrollmentReads';
 import { getEnrolledInstances, getStudentOrThrow } from './studentCourseService';
 
 function noCurriculumAssessmentFilter() {
@@ -20,7 +21,7 @@ export async function getStudentVisibleAssessments(
   ] as string[];
 
   const assignmentFilters: Record<string, unknown>[] = [{ studentId }];
-  if (student.batchId) assignmentFilters.push({ batchId: student.batchId });
+  assignmentFilters.push(...groupClause(await studentGroupIds(student, 'student_app')));
 
   const curriculumFilters: Record<string, unknown>[] = noCurriculumAssessmentFilter();
   if (visibleCurriculumIds.length > 0) {
