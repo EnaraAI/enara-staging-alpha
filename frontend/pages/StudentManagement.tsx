@@ -20,6 +20,7 @@ import {
 } from '../services/apiService';
 import { toast } from '../services/toastService';
 import { PendingPhotoQueue, StudentAvatar } from '../components/StudentPhoto';
+import { StudentGroupsPanel, useMultiClass } from '../components/StudentGroupsPanel';
 
 interface StudentManagementProps {
   students: Student[];
@@ -114,6 +115,9 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
   const [editForm, setEditForm] = useState({ name: '', email: '', grade: 'Grade 10', uiMode: 'standard' as 'standard' | 'kids' });
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [deletingStudentId, setDeletingStudentId] = useState<string | null>(null);
+  // Multi-class (step 6): "Groups and classes" appears only when the server has it on.
+  const multiClass = useMultiClass();
+  const [groupsFor, setGroupsFor] = useState<Student | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -350,6 +354,14 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
           >
             <Pencil size={12} /> Edit
           </button>
+          {multiClass && (
+            <button
+              onClick={() => { setMenuStudentId(null); setGroupsFor(s); }}
+              className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+            >
+              <Users size={12} /> Groups and classes
+            </button>
+          )}
           <button
             onClick={() => handleDeleteStudent(s)}
             className="w-full px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2"
@@ -1386,6 +1398,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
           </div>
         )}
       </AnimatePresence>
+      {groupsFor && <StudentGroupsPanel student={groupsFor} onClose={() => setGroupsFor(null)} />}
     </div>
   );
 };
