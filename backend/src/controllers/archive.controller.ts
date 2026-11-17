@@ -21,6 +21,7 @@ import {
   studentArchiveOn,
   studentsWithoutActiveGroup,
 } from '../services/archive';
+import { listDeletedStudentAlerts } from '../services/pdplRetention';
 import { confirmationFor, permanentlyDeleteStudent } from '../services/studentErasure';
 import { ensurePlainObject } from '../utils/validation';
 
@@ -202,6 +203,19 @@ export const deleteStudentPermanently = asyncHandler(async (req: AuthRequest, re
   }
   const result = await permanentlyDeleteStudent(s, actorOf(req));
   res.json({ message: 'Student deleted permanently', ...result });
+});
+
+/**
+ * GET /api/students/deleted-safety-alerts (PDPL P2): safety alerts kept about
+ * permanently deleted students. School admins (own school) and ENARA admins
+ * (all, or ?institutionId=) only; teachers and parents never see them.
+ */
+export const listDeletedStudentSafetyAlerts = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user || !['admin', 'enara-admin'].includes(req.user.role)) throw new AppError('Admin access required', 403, 'ADMIN_REQUIRED');
+  const institutionId = isGlobalAdmin(req)
+    ? (typeof req.query.institutionId === 'string' && req.query.institutionId ? req.query.institutionId : undefined)
+    : requireInstitutionId(req);
+  res.json(await listDeletedStudentAlerts(institutionId));
 });
 
 // --- seats ------------------------------------------------------------------

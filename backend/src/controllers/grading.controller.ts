@@ -24,7 +24,8 @@ import { logger } from '../utils/logging';
 
 async function loadAttemptForStaff(req: AuthRequest, attemptId: string) {
   const attempt = await AssessmentAttempt.findOne({ id: attemptId, status: 'submitted', assignmentId: { $exists: true } });
-  if (!attempt) throw new AppError('Submission not found', 404, 'SUBMISSION_NOT_FOUND');
+  // PDPL P1: a deleted student's kept result is read-only and aggregate-only.
+  if (!attempt || attempt.anonymised) throw new AppError('Submission not found', 404, 'SUBMISSION_NOT_FOUND');
   // Same school and, for teachers, a class they instruct (404 otherwise).
   const assignment = await loadAssignmentForStaff(req, attempt.assignmentId!).catch(() => {
     throw new AppError('Submission not found', 404, 'SUBMISSION_NOT_FOUND');
@@ -55,10 +56,12 @@ export const getReviewQueue = asyncHandler(async (req: AuthRequest, res: Respons
     gradingStatus: { $in: statuses },
     ...(req.query.appeals === 'open' ? { 'appeals.status': 'open' } : {}),
   })
-    .select('id assignmentId studentId submittedAt isLate gradingStatus answers.needsReview answers.proposalId answers.method totalPoints maxPoints score exceptionReason gradingError nextGradingAt appeals.status releasedAt')
+    .select('id assignmentId studentId submittedAt isLate gradingStatus answers.needsReview answers.proposalId answers.method totalPoints maxPoints score exceptionReason gradingError nextGradingAt appeals.status releasedAt anonymised')
     .sort({ submittedAt: -1 })
     .limit(500)
-    .lean();
+    .lean()
+    // PDPL P1: kept results of deleted students are not work items (nothing to review or release).
+    .then((list) => list.filter((t) => !t.anonymised));
   const openAppeals = (t: (typeof attempts)[number]) => (t.appeals ?? []).filter((p) => p.status === 'open').length;
   attempts.sort((x, y) => QUEUE_ORDER.indexOf(x.gradingStatus!) - QUEUE_ORDER.indexOf(y.gradingStatus!) || openAppeals(y) - openAppeals(x));
   // Viewing the list also nudges any grading run that is due.
@@ -258,7 +261,7 @@ export const releaseSubmission = asyncHandler(async (req: AuthRequest, res: Resp
 // POST /api/grading/assignments/:assignmentId/release — every finalized result.
 export const releaseAssignmentResults = asyncHandler(async (req: AuthRequest, res: Response) => {
   const assignment = await loadAssignmentForStaff(req, String(req.params.assignmentId));
-  const finalized = await AssessmentAttempt.find({ assignmentId: assignment.id, gradingStatus: 'finalized' });
+  const finalized = (await AssessmentAttempt.find({ assignmentId: assignment.id, gradingStatus: 'finalized' })).filter((t) => !t.anonymised);
   for (const t of finalized) {
     await releaseAttempt(t, req.user!.id);
     await notifyResultsReleased(assignment, t.studentId, t.id).catch(() => undefined);

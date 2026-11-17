@@ -147,7 +147,7 @@ describe('delete permanently', () => {
       expect((await ctx.M.Batch.findOne({ id: g }).lean()).studentCount).toBe(countBefore - 1);
       expect((await ctx.M.CourseInstance.findOne({ id: c2 }).lean()).studentIds).not.toContain(s.id);
       // The append-only usage ledger is kept unchanged (reported for the owner to decide).
-      expect(r.body.kept).toEqual({ usage_ledger_rows_with_ids: 1 });
+      expect(r.body.kept).toEqual({ usage_ledger_rows_with_ids: 1, safety_alerts: 0 });
       expect(await ctx.M.UsageLedger.collection.countDocuments({ id: `ul-${s.id}` })).toBe(1);
       // The deletion itself is audited with IDs and counts only.
       const audit = await ctx.M.AuditEvent.findOne({ action: 'student.deleted_permanently', targetId: s.id }).lean();
