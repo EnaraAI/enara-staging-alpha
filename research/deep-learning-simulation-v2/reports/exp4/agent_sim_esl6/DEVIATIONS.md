@@ -1,0 +1,8 @@
+SIMULATION ONLY
+
+# ESL6 deviations from the pre-registered protocol (commit 3fffc9c8)
+
+Each entry: what, when, why, and its effect on the confirmatory test.
+
+1. **Tutor task wording: "up to 32 sessions per cell" (2026-11-17, before round 1).** The frozen `tasks/TUTOR_TASK.md` (hashed, unchanged) still says a cell prints up to 32 sessions and that `tapply` replies "applied N of 32". With n = 270 (DECISIONS 14) each of the 24 cells holds **47** sessions. The runner prints and applies all sessions of a cell, so behaviour is unchanged. To stop an agent stopping at 32, each tutor agent's instructions also say: "this cell has 47 sessions; write a reply for every one; the final line will read 'applied 47 of 47'". **Effect on the primary test: none** (same prompts, same replies, same application).
+2. **Study location moved (2026-11-17, before round 1).** `init` and the pre-test ran in a separate git worktree of the same commit. The frozen task files name `/home/user/enara-staging-alpha`, so the study folder (sessions, pre-test, cells) was copied unchanged to that checkout of the same branch. A tracked `backend/node_modules` symlink, committed by mistake, was removed (commit ebdd4e03; no frozen file changed; hashcheck 39/39 passes). **Effect: none.**
