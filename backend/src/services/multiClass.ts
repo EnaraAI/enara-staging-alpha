@@ -79,12 +79,12 @@ async function loadStudentForAdmin(req: StaffReq, studentId: string) {
   const user = req.user!;
   if (!['admin', 'enara-admin'].includes(user.role)) throw new AppError('Admin access required', 403, 'ADMIN_REQUIRED');
   const student = await Student.findOne(user.role === 'enara-admin' ? { id: studentId } : { id: studentId, institutionId: user.institutionId })
-    .select('id name institutionId batchId')
+    .select('id name institutionId batchId archivedAt')
     .lean();
   if (!student) throw new AppError('Student not found', 404, 'STUDENT_NOT_FOUND');
   // Every enrollment belongs to the student's school (Enara admins included).
   if (!student.institutionId) throw new AppError('This student has no school', 409, 'NO_SCHOOL');
-  return student as { id: string; name: string; institutionId: string; batchId?: string };
+  return student as { id: string; name: string; institutionId: string; batchId?: string; archivedAt?: Date | null };
 }
 
 /** Every group and class the student is in, for the admin student page. */
@@ -161,9 +161,20 @@ export async function addMembership(req: StaffReq, studentId: string, body: Reco
   // A second group needs a main group first: Student.batchId stays the main
   // group (still written for the main group only); extra groups live in
   // class_enrollments only.
+  // Never make an extra the consistency check would call invalid: no extras
+  // for an archived student, or in an archived group or class.
+  if (student.archivedAt) throw new AppError('This student is archived; restore them first', 409, 'STUDENT_ARCHIVED');
   if (scope === 'group' && !student.batchId) throw new AppError('Give the student a main group first (edit the student)', 409, 'NO_PRIMARY_GROUP');
+  const target =
+    scope === 'group'
+      ? await Batch.findOne({ id: targetId, institutionId: student.institutionId }).select('archivedAt').lean()
+      : await CourseInstance.findOne({ id: targetId, institutionId: student.institutionId }).select('archivedAt visibility').lean();
+  if (target && (target.archivedAt || (target as { visibility?: string }).visibility === 'archived')) {
+    throw new AppError(scope === 'group' ? 'This group is archived' : 'This class is archived', 409, scope === 'group' ? 'GROUP_ARCHIVED' : 'CLASS_ARCHIVED');
+  }
   // enroll() checks that the student and the group/class are in this school (404 otherwise).
-  const row = await enroll({ institutionId: student.institutionId, studentId: student.id, scope, targetId, source: 'manual', createdBy: req.user!.id });
+  // extraVia marks the row as an extra membership (not drift) for the consistency check.
+  const row = await enroll({ institutionId: student.institutionId, studentId: student.id, scope, targetId, source: 'manual', createdBy: req.user!.id, extraVia: 'multi_class' });
   await recordAudit('student_membership_added', req.user, { institutionId: student.institutionId, type: 'student', id: student.id }, { scope, targetId });
   return { enrollmentId: row.id, scope, targetId, status: row.status };
 }

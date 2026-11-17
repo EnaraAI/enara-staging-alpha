@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { AuditEvent } from '../models/AuditEvent';
 import { Batch } from '../models/Batch';
 import { ClassEnrollment, type EnrollmentScope } from '../models/ClassEnrollment';
 import { CourseInstance } from '../models/CourseInstance';
@@ -13,6 +14,15 @@ import { studentsWithoutActiveGroup, type UnplacedReason } from './archive';
 // migratedFrom, so undoBackfill() removes exactly them) and reactivates rows
 // the old fields say are active. It never ends or deletes a row the old fields
 // do not mention: those are reported as conflicts for a human decision.
+//
+// Step 6 extras (STEP_6_NOTES.md, "Consistency check"): an active row the old
+// fields can't express is NOT a conflict when the multi-class service made it
+// (an extra group or class): rows marked extraVia 'multi_class', or, for rows
+// written before the marker existed, rows with a 'student_membership_added'
+// audit event for the same student, scope and target in the same school.
+// Extras are validated (target exists, same school as the student, not
+// archived; student exists and is not archived) and reported under
+// extraMemberships; an invalid extra makes inSync false.
 
 const LIST_CAP = 200;
 
@@ -51,8 +61,19 @@ export interface BackfillReport {
     duplicateClassMember: Listed<{ classId: string; studentId: string }>;
   };
   conflicts: {
-    /** Active enrollment rows the old fields do not contain. Never changed by the backfill. */
+    /** Active enrollment rows the old fields do not contain (and that are not step 6 extras). Never changed by the backfill. */
     activeNotInOldFields: Listed<{ studentId: string; scope: EnrollmentScope; targetId: string }>;
+  };
+  /**
+   * Step 6: active extra memberships made by the multi-class service (extra
+   * groups, enrollment-only classes). Valid ones are expected; invalid ones
+   * (by reason) make inSync false. legacyUnmarked counts the extras recognised
+   * by the audit trail because they predate the extraVia marker.
+   */
+  extraMemberships: {
+    valid: number;
+    invalid: Listed<{ studentId: string; scope: EnrollmentScope; targetId: string; reason: ExtraInvalidReason }> & Record<ExtraInvalidReason, number>;
+    legacyUnmarked: number;
   };
   /**
    * Step 6 (PLAN §10): active (not archived) students with no active group,
@@ -60,7 +81,7 @@ export interface BackfillReport {
    * in a group). Information only: it never affects inSync. IDs only.
    */
   studentsWithoutActiveGroup: Listed<{ studentId: string; reason: UnplacedReason; groupId?: string }> & { byReason: Partial<Record<UnplacedReason, number>> };
-  /** True when nothing would be created or reactivated and there are no conflicts. */
+  /** True when nothing would be created or reactivated, there are no conflicts and no invalid extras. */
   inSync: boolean;
 }
 
@@ -72,17 +93,84 @@ interface Plan {
 
 const key = (studentId: string, scope: string, targetId: string) => `${studentId}|${scope}|${targetId}`;
 
+export const EXTRA_INVALID_REASONS = ['targetMissing', 'studentInactive', 'otherSchool', 'targetArchived'] as const;
+export type ExtraInvalidReason = (typeof EXTRA_INVALID_REASONS)[number];
+type Row = { studentId: string; scope: EnrollmentScope; targetId: string; institutionId: string; extraVia?: string };
+
+/**
+ * Splits active rows the old fields don't contain into step 6 extras and real
+ * conflicts, and validates the extras. Reads nothing when there are no rows.
+ */
+async function classifyNotInOldFields(rows: Row[], batches: Map<string, { institutionId?: string; archivedAt?: Date | null }>) {
+  const extras: Row[] = [];
+  const conflicts: Row[] = [];
+  let legacyUnmarked = 0;
+  const unmarked = rows.filter((r) => r.extraVia !== 'multi_class');
+  // Rows from before the marker: the multi-class service audits every add
+  // (student_membership_added, IDs only). createdBy/source can't tell them
+  // apart: the dual write also writes source 'manual' with the acting admin.
+  const audited = new Set<string>();
+  if (unmarked.length) {
+    const events = await AuditEvent.find({ action: 'student_membership_added', targetType: 'student', targetId: { $in: [...new Set(unmarked.map((r) => r.studentId))] } })
+      .select('institutionId targetId detail')
+      .lean();
+    for (const e of events) {
+      const d = (e.detail ?? {}) as { scope?: string; targetId?: string };
+      if (e.targetId && d.scope && d.targetId) audited.add(`${e.institutionId}|${key(e.targetId, d.scope, d.targetId)}`);
+    }
+  }
+  for (const r of rows) {
+    if (r.extraVia === 'multi_class') extras.push(r);
+    else if (audited.has(`${r.institutionId}|${key(r.studentId, r.scope, r.targetId)}`)) {
+      extras.push(r);
+      legacyUnmarked += 1;
+    } else conflicts.push(r);
+  }
+
+  const invalid: { studentId: string; scope: EnrollmentScope; targetId: string; reason: ExtraInvalidReason }[] = [];
+  if (extras.length) {
+    const students = new Map(
+      (await Student.find({ id: { $in: [...new Set(extras.map((r) => r.studentId))] } }).select('id institutionId archivedAt').lean()).map((s) => [s.id, s]),
+    );
+    const classIds = [...new Set(extras.filter((r) => r.scope === 'class').map((r) => r.targetId))];
+    const classes = new Map(
+      (classIds.length ? await CourseInstance.find({ id: { $in: classIds } }).select('id institutionId archivedAt visibility').lean() : []).map((c) => [c.id, c]),
+    );
+    for (const r of extras) {
+      const target = r.scope === 'group' ? batches.get(r.targetId) : classes.get(r.targetId);
+      const student = students.get(r.studentId);
+      const archived = !!target && (!!target.archivedAt || (r.scope === 'class' && (target as { visibility?: string }).visibility === 'archived'));
+      const reason: ExtraInvalidReason | null = !target
+        ? 'targetMissing'
+        : !student || student.archivedAt
+          ? 'studentInactive'
+          : target.institutionId !== student.institutionId || r.institutionId !== student.institutionId
+            ? 'otherSchool'
+            : archived
+              ? 'targetArchived'
+              : null;
+      if (reason) invalid.push({ studentId: r.studentId, scope: r.scope, targetId: r.targetId, reason });
+    }
+  }
+  const byReason = Object.fromEntries(EXTRA_INVALID_REASONS.map((k) => [k, invalid.filter((i) => i.reason === k).length])) as Record<ExtraInvalidReason, number>;
+  return {
+    conflicts,
+    extraMemberships: { valid: extras.length - invalid.length, invalid: { ...listed(invalid), ...byReason }, legacyUnmarked },
+  };
+}
+
 async function buildPlan(institutionId?: string): Promise<Plan> {
   const scopeFilter = institutionId ? { institutionId } : {};
   const students = await Student.find(scopeFilter).select('id institutionId batchId').lean();
   const classes = await CourseInstance.find(scopeFilter).select('id institutionId studentIds').lean();
   // Lookups are global (not school-scoped) so cross-school references are detected.
-  const allBatches = new Map((await Batch.find({}).select('id institutionId').lean()).map((b) => [b.id, b.institutionId]));
+  const batchRows = await Batch.find({}).select('id institutionId archivedAt').lean();
+  const allBatches = new Map(batchRows.map((b) => [b.id, b.institutionId]));
   const memberIds = [...new Set(classes.flatMap((c) => c.studentIds || []))];
   const studentSchool = new Map(
     (await Student.find({ id: { $in: [...new Set([...memberIds, ...students.map((s) => s.id)])] } }).select('id institutionId').lean()).map((s) => [s.id, s.institutionId]),
   );
-  const existing = await ClassEnrollment.find(scopeFilter).select('studentId scope targetId status').lean();
+  const existing = await ClassEnrollment.find(scopeFilter).select('studentId scope targetId status institutionId extraVia').lean();
   const existingByKey = new Map(existing.map((e) => [key(e.studentId, e.scope, e.targetId), e]));
 
   const dnf = {
@@ -153,9 +241,11 @@ async function buildPlan(institutionId?: string): Promise<Plan> {
     }
   }
   const deletedGroupMatching = existing.filter((e) => e.status === 'active' && deletedGroupKeys.has(key(e.studentId, e.scope, e.targetId))).length;
-  const activeNotInOldFields = existing
-    .filter((e) => e.status === 'active' && !wanted.has(key(e.studentId, e.scope, e.targetId)) && !deletedGroupKeys.has(key(e.studentId, e.scope, e.targetId)))
-    .map((e) => ({ studentId: e.studentId, scope: e.scope, targetId: e.targetId }));
+  const notInOldFields = existing.filter(
+    (e) => e.status === 'active' && !wanted.has(key(e.studentId, e.scope, e.targetId)) && !deletedGroupKeys.has(key(e.studentId, e.scope, e.targetId)),
+  );
+  const { conflicts, extraMemberships } = await classifyNotInOldFields(notInOldFields, new Map(batchRows.map((b) => [b.id, b])));
+  const activeNotInOldFields = conflicts.map((e) => ({ studentId: e.studentId, scope: e.scope, targetId: e.targetId }));
 
   const report: BackfillReport = {
     scope: { institutionId: institutionId ?? 'all' },
@@ -184,8 +274,9 @@ async function buildPlan(institutionId?: string): Promise<Plan> {
       duplicateClassMember: listed(dnf.duplicateClassMember),
     },
     conflicts: { activeNotInOldFields: listed(activeNotInOldFields) },
+    extraMemberships,
     studentsWithoutActiveGroup: unplacedReport(await studentsWithoutActiveGroup({ institutionId })),
-    inSync: create.length === 0 && reactivate.length === 0 && activeNotInOldFields.length === 0,
+    inSync: create.length === 0 && reactivate.length === 0 && activeNotInOldFields.length === 0 && extraMemberships.invalid.count === 0,
   };
   return { report, create, reactivate };
 }
