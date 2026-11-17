@@ -23,7 +23,7 @@ async function clearLimits() {
   await mongoose.connection.collection('rate_limits').deleteMany({}).catch(() => {});
 }
 
-export async function call(user: string, method: 'get' | 'post' | 'put' | 'delete', path: string, body?: unknown) {
+export async function call(user: string, method: 'get' | 'post' | 'put' | 'patch' | 'delete', path: string, body?: unknown) {
   await clearLimits();
   let r = request(ctx.app)[method](path).set('Authorization', ctx.tokens[user]);
   if (body !== undefined) r = r.send(body as object);

@@ -19,6 +19,11 @@ export const ENROLLMENT_ROLES = ['learner'] as const;
 export type EnrollmentRole = (typeof ENROLLMENT_ROLES)[number];
 export const ENROLLMENT_MIGRATED_FROM = ['student.batchId', 'courseInstance.studentIds'] as const;
 export type EnrollmentMigratedFrom = (typeof ENROLLMENT_MIGRATED_FROM)[number];
+// Multi-class step 6: set on a row the multi-class service added (an extra
+// group or class the old fields cannot express), so the consistency check
+// (enrollmentBackfill.planBackfill) can tell it from drift.
+export const ENROLLMENT_EXTRA_VIA = ['multi_class'] as const;
+export type EnrollmentExtraVia = (typeof ENROLLMENT_EXTRA_VIA)[number];
 
 export interface IClassEnrollment {
   id: string;
@@ -32,6 +37,11 @@ export interface IClassEnrollment {
   source: EnrollmentSource;
   /** Set only on rows created by the backfill, so it can be undone exactly. */
   migratedFrom?: EnrollmentMigratedFrom;
+  /**
+   * Set when the multi-class service (re)activated the row as an extra
+   * membership; cleared when another writer (the dual write) reactivates it.
+   */
+  extraVia?: EnrollmentExtraVia;
   /** lms_contexts.id when source is 'lms'. */
   lmsContextId?: string;
   startedAt: Date;
@@ -53,6 +63,7 @@ const enrollmentSchema = new Schema<IClassEnrollment>(
     status: { type: String, enum: ENROLLMENT_STATUSES, default: 'active' },
     source: { type: String, enum: ENROLLMENT_SOURCES, required: true },
     migratedFrom: { type: String, enum: ENROLLMENT_MIGRATED_FROM },
+    extraVia: { type: String, enum: ENROLLMENT_EXTRA_VIA },
     lmsContextId: String,
     startedAt: { type: Date, required: true, default: () => new Date() },
     endedAt: Date,

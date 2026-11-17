@@ -7,6 +7,7 @@ import { Student, type StudentArchiveRecord } from '../models/Student';
 import { User } from '../models/User';
 import { recordAudit } from './auditTrail';
 import { syncClassMember, syncStudentGroup } from './enrollmentSync';
+import { groupsOfStudent, refreshGroupCounts } from './groupCounts';
 
 // Multi-class step 6: archiving (docs/multi-class/ARCHIVE_NOTES.md, PLAN §10).
 //
@@ -104,6 +105,7 @@ export async function archiveGroup(group: GroupLike, actor: Actor) {
     : 0;
   if (cleared) await Batch.updateOne({ id: group.id }, [{ $set: { studentCount: { $max: [0, { $subtract: [{ $ifNull: ['$studentCount', 0] }, cleared] }] } } }]);
   const ended = await endRows(record.enrollmentIds, actor, now);
+  await refreshGroupCounts([group.id]); // multi-class S4 (no-op while off)
   await recordAudit('group.archived', actor, { institutionId: group.institutionId, type: 'group', id: group.id }, { members: record.memberIds.length, unplaced: cleared, enrollmentsEnded: ended });
   return { id: group.id, archivedAt: now, members: record.memberIds.length, studentsUnplaced: cleared, enrollmentsEnded: ended };
 }
@@ -130,6 +132,7 @@ export async function restoreGroup(group: GroupLike, actor: Actor) {
   // With the dual write on, make sure every returned student has the row (idempotent).
   for (const studentId of returned) await syncStudentGroup({ institutionId: group.institutionId, studentId, toGroupId: group.id, by: actor?.id });
 
+  await refreshGroupCounts([group.id]); // multi-class S4 (no-op while off)
   const notReturned = await whyNotBack(rec.fieldMemberIds.filter((id) => !returned.includes(id)));
   await recordAudit('group.restored', actor, { institutionId: group.institutionId, type: 'group', id: group.id }, { returned: back.length, enrollmentsReactivated: reactivated, notReturned: notReturned.length });
   return { id: group.id, returned: back, enrollmentsReactivated: reactivated, notReturned };
@@ -282,6 +285,7 @@ export async function archiveStudent(s: StudentLike, actor: Actor) {
   const ended = await endRows(record.enrollmentIds, actor, now);
   // Account closed: no sign-in, and existing sessions end (tokenVersion).
   if (record.userIds.length) await User.updateMany({ _id: { $in: record.userIds }, status: 'active' }, { $set: { status: 'disabled' }, $inc: { tokenVersion: 1 } });
+  await refreshGroupCounts([s.batchId, ...(await groupsOfStudent(s.id))]); // multi-class S4 (no-op while off)
   await recordAudit('student.archived', actor, { institutionId: s.institutionId, type: 'student', id: s.id }, { group: record.batchId ? 1 : 0, classes: record.classIds.length, enrollmentsEnded: ended, accountsClosed: record.userIds.length });
   return { id: s.id, archivedAt: now, group: record.batchId ?? null, classesLeft: record.classIds.length, enrollmentsEnded: ended, accountsClosed: record.userIds.length };
 }
@@ -324,6 +328,7 @@ export async function restoreStudent(s: StudentLike, actor: Actor) {
   // With the dual write on, make sure the restored memberships have their rows (idempotent).
   if (groupBack) await syncStudentGroup({ institutionId: s.institutionId, studentId: s.id, toGroupId: groupBack, by: actor?.id });
   for (const classId of classesBack) await syncClassMember({ institutionId: s.institutionId, studentId: s.id, classId, action: 'add', by: actor?.id });
+  await refreshGroupCounts([groupBack, ...(await groupsOfStudent(s.id))]); // multi-class S4 (no-op while off)
 
   // Reopen exactly the accounts the archive closed.
   const reopened = rec.userIds.length ? (await User.updateMany({ _id: { $in: rec.userIds }, status: 'disabled' }, { $set: { status: 'active' } })).modifiedCount : 0;

@@ -200,6 +200,32 @@ export async function analyticsMembership(
 }
 
 /**
+ * Multi-class S5: students in each class through a class enrollment only (not
+ * on the class's own studentIds): the step 6 extra class members. These are
+ * the class rows the teacher_rosters roster reads (studentIdsInClass), batched
+ * for a list. Rows count only in the class's school, for students that exist
+ * there and are not archived. Order: enrollment start, then student id.
+ */
+export async function enrollmentOnlyClassMembers(classes: { id: string; institutionId?: string | null; studentIds?: string[] }[]): Promise<Map<string, string[]>> {
+  const out = new Map<string, string[]>(classes.map((c) => [c.id, []]));
+  const scoped = classes.filter((c) => c.institutionId);
+  if (!scoped.length) return out;
+  const school = new Map(scoped.map((c) => [c.id, c.institutionId as string]));
+  const rows = await ClassEnrollment.find({ scope: 'class', status: 'active', targetId: { $in: scoped.map((c) => c.id) }, institutionId: { $in: [...new Set(school.values())] } })
+    .select('studentId targetId institutionId startedAt')
+    .sort({ startedAt: 1, studentId: 1 })
+    .lean();
+  const listed = new Map(scoped.map((c) => [c.id, new Set(c.studentIds ?? [])]));
+  const candidates = rows.filter((r) => school.get(r.targetId) === r.institutionId && !listed.get(r.targetId)!.has(r.studentId));
+  if (!candidates.length) return out;
+  const live = new Set(
+    (await Student.find({ id: { $in: [...new Set(candidates.map((r) => r.studentId))] }, archivedAt: null }).select('id institutionId').lean()).map((s) => `${s.institutionId}|${s.id}`),
+  );
+  for (const r of candidates) if (live.has(`${r.institutionId}|${r.studentId}`) && !out.get(r.targetId)!.includes(r.studentId)) out.get(r.targetId)!.push(r.studentId);
+  return out;
+}
+
+/**
  * Attendance roster (feature `attendance`). Today the roster is the class's own
  * studentIds only (the Q7 gap). From enrollments: the class's explicit members;
  * with ENROLLMENT_ATTENDANCE_FIX also its group's members (Q7). Order does not

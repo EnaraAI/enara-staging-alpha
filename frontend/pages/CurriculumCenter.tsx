@@ -58,6 +58,7 @@ import {
   archiveCourseInstance,
   fetchArchiveSettings,
   isHasStudentsError,
+  removeStudentMembership,
   type ArchiveSettings,
 } from '../services/apiService';
 import { ArchivedGroupsPanel } from '../components/ArchivePanels';
@@ -665,6 +666,17 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
     }
   };
 
+  // Multi-class: a student added to this class outside its own list leaves
+  // through their extra class membership (the row is kept as history).
+  const removeExtraStudentFromInstance = async (inst: CourseInstanceRow, studentId: string) => {
+    try {
+      await removeStudentMembership(studentId, 'class', inst.id);
+      replaceInstance({ ...inst, extraStudentIds: (inst.extraStudentIds ?? []).filter(id => id !== studentId) });
+    } catch (err) {
+      toast.error('Could not remove student', errorMessage(err));
+    }
+  };
+
   const handleDeleteBatch = async (id: string) => {
     const batch = batches.find(b => b.id === id);
     if (!batch) return;
@@ -1222,7 +1234,7 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
                     )}
                     <div className="flex items-center gap-2 text-sm text-slate-600">
                       <Users size={16} className="text-slate-400" />
-                      <span>Students: <span className="font-semibold">{inst.studentIds.length}</span></span>
+                      <span>Students: <span className="font-semibold">{inst.studentIds.length + (inst.extraStudentIds?.length ?? 0)}</span></span>
                     </div>
                     {inst.groupId && (
                       <div className="flex items-center gap-2 text-sm text-slate-600">
@@ -1247,19 +1259,27 @@ export const CurriculumCenter: React.FC<{ isEnaraAdmin?: boolean }> = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {inst.studentIds.slice(0, 3).map(id => {
+                    {/* The class's own list, then (multi-class on) students added to the class outside it. */}
+                    {[...inst.studentIds.map(id => ({ id, extra: false })), ...(inst.extraStudentIds ?? []).map(id => ({ id, extra: true }))].slice(0, 3).map(({ id, extra }) => {
                       const student = students.find(s => s.id === id);
                       return (
-                        <div key={id} className="flex items-center gap-1.5 px-2 py-1 bg-teal-50 text-teal-700 text-xs font-bold rounded-full border border-teal-100">
+                        <div
+                          key={`${extra ? 'x' : 'l'}-${id}`}
+                          className={`flex items-center gap-1.5 px-2 py-1 text-xs font-bold rounded-full border ${extra ? 'bg-indigo-50 text-indigo-700 border-indigo-100' : 'bg-teal-50 text-teal-700 border-teal-100'}`}
+                          title={extra ? 'Also in this class (added as an extra class)' : undefined}
+                        >
                           {student?.name || id}
-                          <button onClick={() => removeStudentFromInstance(inst.id, id)} className="hover:text-red-600">
+                          <button
+                            onClick={() => (extra ? removeExtraStudentFromInstance(inst, id) : removeStudentFromInstance(inst.id, id))}
+                            className="hover:text-red-600"
+                          >
                             <X size={10} />
                           </button>
                         </div>
                       );
                     })}
-                    {inst.studentIds.length > 3 && (
-                      <span className="text-xs text-slate-500 font-bold">+{inst.studentIds.length - 3} more</span>
+                    {inst.studentIds.length + (inst.extraStudentIds?.length ?? 0) > 3 && (
+                      <span className="text-xs text-slate-500 font-bold">+{inst.studentIds.length + (inst.extraStudentIds?.length ?? 0) - 3} more</span>
                     )}
                   </div>
 

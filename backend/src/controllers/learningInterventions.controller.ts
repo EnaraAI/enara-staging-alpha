@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { resolveSessionClassId } from '../services/sessionClass';
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
@@ -112,12 +113,14 @@ export const startIntervention = asyncHandler(async (req: AuthRequest, res: Resp
   }
   if (!tutorSessionId && i.interventionType !== 'review') {
     const objective = await LearningObjective.findOne({ id: i.objectiveId }).select('code title').lean();
+    const classId = await resolveSessionClassId({ studentId: i.studentId, institutionId: i.institutionId, courseId: i.courseId }); // multi-class S7
     const session = await TutorSession.create({
       id: `tutor-${randomUUID()}`,
       studentId: i.studentId,
       institutionId: i.institutionId,
       title: `Practice: ${objective?.code} ${objective?.title ?? ''}`.trim().slice(0, 80),
       courseId: i.courseId,
+      ...(classId ? { classId } : {}),
       objectiveId: i.objectiveId,
       interventionId: i.id,
       teachingMethod: 'socratic',

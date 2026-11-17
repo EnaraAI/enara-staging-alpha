@@ -53,6 +53,9 @@ students (`services/multiClass.ts`, `multiClassStudentIds` / `isMultiClassStuden
   student record); removing a class that lists the student in its own
   `studentIds` (409 `CLASS_ROSTER`, remove on the class); a second group for a
   student with no main group (409 `NO_PRIMARY_GROUP`).
+  Since the follow-ups (S3): adding to an archived group or class (409
+  `GROUP_ARCHIVED` / `CLASS_ARCHIVED`) or for an archived student (409
+  `STUDENT_ARCHIVED`), so the service never makes an invalid extra.
 - Tenant isolation: another school's group/class → 404
   `ENROLLMENT_TARGET_NOT_FOUND`; another school's student → 404; teachers and
   students → 403. Every change is audited (`student_membership_added` /
@@ -162,23 +165,184 @@ of their own gets the youngest group band (tested: teen + child → child).
 its tutor/avatar session's course, or to a class id stored directly as the
 session id, else "No class"). Every other row is unchanged. Frontend:
 `pages/AICredits.tsx` adds a "Students in several classes" table on the
-classes view, only when such rows exist.
+classes view, only when such rows exist. Since S7 (below), a use whose session
+recorded its class is credited to that class.
 
-## Undo
+## Follow-ups (owner decisions 2026-11-17: S3–S7)
 
-1. Set `ENROLLMENT_MULTI_CLASS=false`: the new screens and Q2–Q9 behaviours
-   stop at once.
-2. **Then run the undo script**, because the step 5 reads still see extra
-   memberships while they are active:
-   ```
-   npm run enrollment:multi-class-undo                       # dry run, counts only
-   npm run enrollment:multi-class-undo -- --institution ID   # one school
-   npm run enrollment:multi-class-undo -- --confirm          # end them
-   ```
-   It sets `inactive` (with an end date) on every active group row that is not
-   the student's `Student.batchId`, and every active `manual` class row the
-   class's own `studentIds` does not hold. Rows are kept. Tested: exactly the
-   two extra rows end and the student's classes return to the old answer.
+All behind the existing switches; every default is unchanged. With
+`ENROLLMENT_MULTI_CLASS` off nothing below reads or writes anything new,
+except S7, which only records a field.
+
+### S3. The consistency check reports extras separately and validates them
+
+The backfill dry run (`planBackfill`: `npm run enrollment:backfill`, the
+maintenance endpoint, and the lms-test burst's STOP condition) used to report
+every step 6 extra membership as a conflict (`activeNotInOldFields`), so
+`inSync` turned false as soon as anyone was given a second group.
+
+- **Marker.** `class_enrollments.extraVia: 'multi_class'` is set when the
+  multi-class service (admin "add to group/class") creates or reactivates a
+  row. Any other writer that reactivates the row (the dual write, e.g. the
+  class's own list taking the student) clears it. An already active row is
+  returned unchanged (re-adding an existing drift row does not relabel it).
+- **Rows from before the marker** (legacy rule). `createdBy`/`source` cannot
+  tell them apart from drift: the dual write also writes `source: 'manual'`
+  with the acting admin as `createdBy`. So an unmarked row counts as an extra
+  only when the audit trail has a `student_membership_added` event (written by
+  the multi-class service for every add) for the same student, scope and
+  target, in the same school. Audit rows are kept 30 days; step 6 has never
+  been switched on outside tests, so no deployed database has unmarked extras.
+  The report counts them in `extraMemberships.legacyUnmarked`.
+- **Report.** Active rows the old fields cannot hold are split:
+  - extras (marked, or legacy) go to `extraMemberships`;
+  - everything else stays a conflict (`conflicts.activeNotInOldFields`), as before.
+  ```json
+  "extraMemberships": {
+    "valid": 2,
+    "invalid": { "count": 1, "targetMissing": 1, "studentInactive": 0, "otherSchool": 0, "targetArchived": 0,
+                 "items": [{ "studentId": "…", "scope": "group", "targetId": "…", "reason": "targetMissing" }] },
+    "legacyUnmarked": 0
+  }
+  ```
+  An extra is **valid** when its group/class exists, is in the student's
+  school (and the row's), is not archived (`archivedAt`, or a class with
+  visibility `archived`), and the student exists and is not archived. One
+  reason per invalid row, checked in this order: `targetMissing`,
+  `studentInactive`, `otherSchool`, `targetArchived`. IDs and counts only.
+- **`inSync`** is true only with nothing to create or reactivate, no conflict
+  and **no invalid extra**. Valid extras never affect it.
+- **Burst** (`src/scripts/lmsTestBurst.ts`): reads `GET /api/multi-class/status`;
+  when multi-class is in effect (`--with-multi-class` requires it) three
+  more kinds run, never on protected students:
+  - `add_extra_group`: a student with a main group joins a second seeded group;
+  - `add_extra_class`: a student joins a class (not archived) outside its list;
+  - `remove_extra`: one of the removable extras made by this run is removed.
+  Each add is checked on the student's membership list. After every batch the
+  log has `consistency.extraMemberships` (valid, invalid by reason), and the
+  burst STOPS on any invalid extra (as on any conflict). The "students without
+  an active group" check now counts an extra group as placing a student. With
+  multi-class off the burst runs exactly as before (`log.multiClass: false`).
+
+### S4. Group counts count every active member
+
+While multi-class is in effect, a group's count is every **active** member:
+students whose main group it is (`Student.batchId`) plus students with an
+active group enrollment in it (extra groups), **each student once**. Archived
+students and rows of another school never count (`services/groupCounts.ts`).
+
+- **Stored:** `Batch.studentCount` is recomputed for the groups concerned after
+  every membership change: student create, group change and delete; multi-class
+  add/remove of a group; group archive/restore; student archive/restore;
+  permanent delete. (The old `$inc` still runs first; the recount overwrites it.)
+- **Reported:** `GET /api/batches`, `GET /api/batches/:id` and
+  `GET /api/curriculums/:id/batches` report the live count, so groups not
+  touched since the switch went on are right too. The analytics overview's
+  per-group `students` already counted enrollments (Q5) and agrees.
+- **Off:** no read and no write; the stored value is reported as before.
+- **Undo:** `enrollment:multi-class-undo --confirm` recounts the groups whose
+  extra rows it ended (forced, because the switch is off by then), back to
+  main-group members.
+- Turning the switch on replaces a stored count that had drifted (e.g. typed in
+  on the group form) with the real count in the replies.
+
+### S5. Roster chips show students in extra classes
+
+`GET /api/course-instances`, `GET /api/course-instances/:id` and the replies
+of update / assign / remove student add `extraStudentIds` while multi-class
+is on: the students in the class through an added class membership (not on
+its own `studentIds`). It comes from the same `class_enrollments` class rows
+the `teacher_rosters` roster reads (`enrollmentReads.enrollmentOnlyClassMembers`),
+school-scoped, existing and non-archived students only, ordered by start date.
+The field is present only when non-empty, so single-class data gives
+byte-identical replies on and off (tested). `pages/CurriculumCenter.tsx` shows
+them after the class's own chips, in another colour, counts them in
+"Students", and their X removes the extra membership through
+`DELETE /api/multi-class/students/:id/enrollments/class/:classId`. Members
+through the group are not chips, as before. Off: unchanged.
+
+### S6. Runbook: turning multi-class OFF
+
+Always through `npm run enrollment:multi-class-undo`: **dry run, review,
+`--confirm`, in that order**. Never switch off without it: the step 5 reads
+keep showing extra memberships while their rows are active.
+
+**Before** (switch still on):
+1. `npm run enrollment:backfill` (dry run, add `-- --institution ID` for one
+   school): note `inSync`, `conflicts.activeNotInOldFields.count` and
+   `extraMemberships` (`valid`, `invalid`). Expected: `inSync: true`, no
+   conflict, no invalid extra. Anything else: stop and investigate first.
+2. `npm run enrollment:multi-class-undo` (dry run): note `groups`, `classes`,
+   `students`. Review: `groups + classes` should equal `extraMemberships.valid`.
+   The undo's own rule is structural (an active group row that is not the
+   student's `batchId`; an active `manual` class row not on the class's list),
+   so a difference means drift rows that it would also end: look at them first.
+3. On the real database (PLAN §9): Mohamed's OK and a full backup first.
+
+**Switch off:**
+4. Set `ENROLLMENT_MULTI_CLASS=false` and restart/redeploy. Check
+   `GET /api/multi-class/status` → `{ "multiClass": false }` (the admin
+   add/remove routes now answer 404, so no new extras appear).
+5. `npm run enrollment:multi-class-undo` (dry run) again: same counts as in
+   step 2 (review again if not).
+6. `npm run enrollment:multi-class-undo -- --confirm`: `ended` must equal
+   `groups + classes` from step 5. Rows become `inactive` with an end date;
+   nothing is deleted. Group counts of the touched groups are recounted.
+
+**After:**
+7. `npm run enrollment:multi-class-undo` (dry run): `0 / 0 / 0`.
+8. `npm run enrollment:backfill` (dry run): `inSync: true`,
+   `extraMemberships.valid: 0`, `invalid.count: 0`, no conflict.
+9. Spot checks: a formerly multi-class student's `GET /api/me/courses` lists
+   only their old classes and `GET /api/multi-class/me/classes` is
+   `{ enabled: false }`; `GET /api/batches` counts are main-group members.
+10. Turning multi-class on again later does not bring the ended rows back:
+    re-add them in the admin panel.
+
+On lms-test the same order applies; the burst can be re-run without
+`--with-multi-class` afterwards (it reports `multiClass: false`).
+
+### S7. The class is stored on each tutor session
+
+`TutorSession.classId` = the class (CourseInstance) the session happened in,
+set at creation **whether or not multi-class is on** (`services/sessionClass.ts`):
+tutor chats (`POST /api/me/tutor/sessions`), intervention chats, live-call
+transcripts (avatar), and assignment handoffs (the assignment's class).
+
+- **Rule:** among the student's own classes, in the session's school: the
+  class whose id is the session's course id; else the one class with that
+  `courseId`; when two or more share it, the student's current class choice
+  (Q2 switcher) if it is one of them, else the first in class order (what the
+  old mapping picked). No course: no class.
+- **Tenant isolation:** a class of another school is never stored (the class
+  list is the student's school, and each class's school is checked again).
+- **Cost:** the tutor-session page already read the student's classes in the
+  same request (memoised), so no extra query (P20 budget "tutor session" 13,
+  unchanged); one more read only when two classes share the courseId.
+- **Credits (Q9, multi-class on only):** a use whose session recorded a class
+  is credited to that class; a class the student has since left gets its own
+  row (named from the class record in the student's school); a class that no
+  longer exists there, or a session of another student, never counts as
+  recorded. Sessions without `classId` (all sessions before this change) keep
+  the old mapping. The session replies (`GET /api/me/tutor/sessions/:id`)
+  now include `classId` when set (additive field).
+- Parents' activity labels (Q3) still use the course mapping; they could use
+  `classId` the same way (not asked).
+
+## Undo (summary)
+
+Switch `ENROLLMENT_MULTI_CLASS=false`, then the undo script, exactly as in the
+runbook (S6) above:
+```
+npm run enrollment:multi-class-undo                       # dry run, counts only
+npm run enrollment:multi-class-undo -- --institution ID   # one school
+npm run enrollment:multi-class-undo -- --confirm          # end them
+```
+It sets `inactive` (with an end date) on every active group row that is not
+the student's `Student.batchId`, and every active `manual` class row the
+class's own `studentIds` does not hold. Rows are kept. Tested: exactly the
+two extra rows end, the student's classes return to the old answer, and the
+touched groups' counts return to main-group members.
 
 ## Tests
 
@@ -191,6 +355,11 @@ plus `step6.helpers.ts`.
 | `step6.admin.test.ts` | 11 | List, add (group and class), idempotent re-add, remove (history kept, reactivation), refusals (main group, class roster, no main group, bad body), tenant isolation both ways (other school's group/class 404, other school's admin 404), teachers/students 403, Enara admin limited to the student's school, audit rows. |
 | `step6.behaviour.test.ts` | 24 | A student in 2 groups and 3 classes against Q1–Q9 (above), Q4 in both directions (teacher 1 vs teacher 2) plus admin and a single-class student unchanged, Q6 dedupe (shown once, one attempt via the hidden id, no second attempt, the result shown to both teachers), staff and student study plans, and the undo. |
 | `step1.test.ts` | updated | The import guard now also allows `services/multiClass.ts`, and checks its writes are behind the switch. |
+| `step6.consistency.test.ts` | 8 | S3: fixture in sync with an empty extras section; extras made through the admin routes are marked, valid, not conflicts; the marker follows the writer (re-add marks again, a dual-write reactivation clears it); unmarked drift is still a conflict; legacy rule (audit event in the same school and for the same target only); each invalid kind (target missing, other school's class, archived group, archived class, archived student, deleted student) counted by reason and listed, `inSync` false; a row of school A pointing at a school B student; school B's report unaffected; the service refuses archived students, groups and classes. |
+| `step6.burst.test.ts` | 2 | S3: the lms-test burst locally with multi-class (and both archive switches) on: every kind incl. `add_extra_group`, `add_extra_class`, `remove_extra`, every batch in sync with valid extras and no conflict, rows marked; an extra whose group was deleted STOPS the burst at batch 1 (`targetMissing`). |
+| `step6.groups.test.ts` | 10 | S4: off reports the stored count (list, one group, curriculum's group list); on reports live counts; an extra member counts in both groups once, also when the extra becomes the main group and back; removal, new and deleted students (both groups); archived students and rows of another school never count; school B unaffected; the undo recounts after the switch is off. S5: on with no extras byte-identical to off; `extraStudentIds` on the list, one class, assign and remove replies; a student moved onto the class's own list stops being an extra; removing the extra; off never shows it; chips equal the teacher_rosters roster; another school's or an archived student is never a chip. |
+| `step6.sessions.test.ts` | 7 | S7: off, the class is recorded (class id, plain course id, shared courseId → first, no course → none); shared courseId follows the Q2 choice (`cX1`, `cX2`, "all" → first), a class id always wins; an assignment handoff records the assignment's class; tenant isolation (another school's class id, a session claimed for another school, a drifted row to another school's class, the API refusal; nothing stored); credits: two classes sharing a courseId credited by recorded class, an old session keeps the old mapping; a left class gets a named row, a forged other-school class and a deleted class go to No class, another student's session never counts as recorded; switch off: no `usageByClass`. |
+| `archive.burst.test.ts` | updated | Uses the shared `burst.helpers.ts`; checks the burst sees multi-class off. |
 
 Results (2026-11-17):
 - `npx tsc --noEmit -p .` (backend): clean. `npx tsc --noEmit -p .` (frontend): clean.
@@ -201,6 +370,24 @@ Results (2026-11-17):
 - Full backend suite with defaults: see "Full suite" below.
 - Frontend: no frontend test runner exists (frontend modules are tested from
   the backend suite, e.g. `parentsPortal.test.ts`, which passes).
+
+Follow-ups (S3–S7) results (2026-11-17):
+- `npx tsc --noEmit -p .`: clean in `backend` and in `frontend`.
+- `npx vitest run test/multiClass --hookTimeout 60000 --testTimeout 60000`:
+  24 files, 172 tests, all pass (the four new step6 files, 27 tests, plus
+  every earlier multi-class test).
+- Full backend suite (defaults, `--hookTimeout 60000`): 2371 tests, 18 failed.
+  - 17 fail the same way on the base commit `6d79f0ac` or are in the known
+    list above: `p20QueryBudget` AI path, `p3EducatorChat` isolation,
+    `p19Resilience` C1b, `p14_2GradingTestSpend` (2), `p14_8BlockerFixes`
+    GAP-1, `phase3.autograding` 11/14/15, `usageLedger` migration,
+    `lms/phase0` JWKS, `phase0` upload signing (2); and `p2Documents` scan gate
+    (2), `phase3.e2e`, `elie.e2e`, `elie.sprint4`, re-run alone on this branch
+    and on `6d79f0ac` (same 5 failures on both).
+  - `multiClass/step5.random`: MongoMemoryServer "port already in use" at
+    start under load; passes alone.
+  - The P20 journey budgets pass unchanged (tutor session 13).
+  - **No new failure.**
 
 ## Full suite
 
@@ -241,23 +428,16 @@ P20 query counts confirm.
 2. **Definition of multi-class student** (above). It keeps today's behaviour
    for everyone the old fields can describe, including students in several
    classes through one group plus class lists.
-3. **The dual-write consistency check** (`enrollment:backfill` dry run, used
-   by `lmsTestBurst.ts` as its STOP condition) reports step 6 extras under
-   `conflicts.activeNotInOldFields`, so `inSync` turns false once anyone is
-   given a second group or an added class. Before turning step 6 on in
-   lms-test, the burst's check should exclude those rows (or count them
-   separately). Not changed here.
-4. **`Batch.studentCount`** still counts main-group members only (it is an old
-   field); extra members are not counted there. Group sizes in reports come
-   from enrollments.
-5. **Extra classes are not in `CourseInstance.studentIds`**, so screens that
-   still draw class rosters from `studentIds` (the roster chips in
-   `CurriculumCenter`/`StudentManagement` course lists) do not show them; the
-   step 5 reads (rosters, attendance, analytics) do.
+3. ~~The consistency check reports extras as conflicts~~: done (S3).
+4. ~~`Batch.studentCount` counts main-group members only~~: done (S4).
+5. ~~Roster chips don't show extra classes~~: done for `CurriculumCenter`
+   (S5). `StudentManagement` has no class roster chips; its class lists are
+   unchanged.
 6. **Turning the switch off does not hide existing extra memberships** from
-   the step 5 reads: run the undo script (above).
+   the step 5 reads: follow the runbook (S6).
 7. **Q8** (age from birth date) is not built: no age boundaries exist.
-8. When two of a student's classes share the same `courseId`, a tutor session
-   (which stores the course id) is credited/labelled to the first of them.
+8. ~~Two classes sharing a `courseId`~~: sessions now store their class
+   (S7). Sessions from before keep the old mapping (the first class); parents'
+   activity labels still use the course mapping.
 9. Not built here, by instruction: group/class archiving and delete-blocking
    (§10).

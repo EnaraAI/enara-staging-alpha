@@ -2,6 +2,7 @@ import { AppError } from '../middleware/errorHandler';
 import { Batch } from '../models/Batch';
 import {
   ClassEnrollment,
+  type EnrollmentExtraVia,
   type EnrollmentMigratedFrom,
   type EnrollmentScope,
   type EnrollmentSource,
@@ -29,6 +30,8 @@ export interface EnrollInput {
   createdBy?: string;
   lmsContextId?: string;
   migratedFrom?: EnrollmentMigratedFrom;
+  /** Multi-class step 6: marks an extra membership added by the multi-class service. */
+  extraVia?: EnrollmentExtraVia;
   startedAt?: Date;
 }
 
@@ -49,7 +52,9 @@ async function assertSameSchool(input: Pick<EnrollInput, 'institutionId' | 'stud
  * Makes the student an active member of the group or class. Idempotent: an
  * active row is returned unchanged; an inactive or removed row is reactivated
  * (new startedAt, endedAt cleared). source, migratedFrom and createdBy are
- * set only when the row is first created.
+ * set only when the row is first created. extraVia follows the writer that
+ * (re)activates the row: set by the multi-class service, cleared by any other
+ * writer; an already active row is returned unchanged.
  */
 export async function enroll(input: EnrollInput): Promise<IClassEnrollment> {
   await assertSameSchool(input);
@@ -60,7 +65,10 @@ export async function enroll(input: EnrollInput): Promise<IClassEnrollment> {
     if (existing.status === 'active') return existing;
     const reactivated = await ClassEnrollment.findOneAndUpdate(
       { ...key, status: { $ne: 'active' } },
-      { $set: { status: 'active', startedAt: input.startedAt ?? new Date() }, $unset: { endedAt: 1, endedBy: 1 } },
+      {
+        $set: { status: 'active', startedAt: input.startedAt ?? new Date(), ...(input.extraVia ? { extraVia: input.extraVia } : {}) },
+        $unset: { endedAt: 1, endedBy: 1, ...(input.extraVia ? {} : { extraVia: 1 }) },
+      },
       { new: true },
     ).lean();
     return reactivated ?? (await ClassEnrollment.findOne(key).lean())!;
@@ -73,6 +81,7 @@ export async function enroll(input: EnrollInput): Promise<IClassEnrollment> {
       createdBy: input.createdBy,
       lmsContextId: input.lmsContextId,
       migratedFrom: input.migratedFrom,
+      ...(input.extraVia ? { extraVia: input.extraVia } : {}),
       startedAt: input.startedAt ?? new Date(),
     });
     return created.toObject();
