@@ -1,5 +1,7 @@
 # Copying learning content to the LMS test site (no personal data)
 
+> **PAUSED (Mohamed, 2026-11-17).** The copy reads the real database (test.enara.app), which is frozen until Mohamed reopens it. lms-test uses fake seed content only. Do not run the export until he allows it.
+
 Approved by Mohamed on 2026-11-17 (B1). **Uploaded files are not copied** (B2: later).
 
 ## What is copied, and what is removed
