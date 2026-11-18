@@ -7,6 +7,7 @@ import { checkPickerDue, DUE_PARAM, formatDueLine } from '../core/dueDate';
 import { alreadyAddedKeys, itemKey, pickerType, pickerTypes, type PickerItem } from '../core/picker';
 import '../core/pickerTypes';
 import '../core/pickerPages';
+import '../core/pickerActivities';
 import { LmsPlatform } from '../models';
 import { DEFAULT_SCHOOL_TIME_ZONE } from '../../../services/institutionTimeZone';
 

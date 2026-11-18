@@ -1,6 +1,6 @@
 import { LmsContext, LmsDeepLinkSession, LmsResourceLink } from '../models';
 import { BINDING_PARAM } from './binding';
-import { TARGET_PARAM } from './pageTargets';
+import { pageTargetDef, TARGET_PARAM, type LmsActivityKind } from './pageTargets';
 
 // Phase 2 activity picker: the registry of item types. The picker screen,
 // its API and the Deep Linking response know nothing about assessments or
@@ -38,6 +38,8 @@ export interface PickerItem {
   teacherOnly?: boolean;
   /** Phase 2b: the Arabic title and description (an Arabic picker shows them and sends them to the LMS). */
   ar?: { title: string; description?: string };
+  /** Phase 8: a no-grade ENARA activity (tutor session, live avatar, diagnostic). The picker shows a note about Moodle's empty grade column. */
+  activity?: LmsActivityKind;
 }
 
 export interface PickerItemType {
@@ -45,6 +47,8 @@ export interface PickerItemType {
   label: { en: string; ar: string };
   /** Phase 2b (D13): the picker offers an optional due date for this type's items (graded ENARA work only). */
   dueDate?: boolean;
+  /** Phase 8: the type is offered only while this returns true (its feature flag). Absent: always. */
+  enabled?: () => boolean;
   /** The school's items of this type (published / usable only). */
   list(institutionId: string, limit: number): Promise<PickerItem[]>;
   /** Re-checks one item at submit time (null: not found, other school, or not usable). */
@@ -58,12 +62,16 @@ export function registerPickerType(t: PickerItemType): void {
   REGISTRY.set(t.type, t);
 }
 
+const isOn = (t: PickerItemType) => !t.enabled || t.enabled();
+
+/** The item types offered now (a type behind a switched-off flag is left out). */
 export function pickerTypes(): PickerItemType[] {
-  return [...REGISTRY.values()];
+  return [...REGISTRY.values()].filter(isOn);
 }
 
 export function pickerType(type: string): PickerItemType | undefined {
-  return REGISTRY.get(type);
+  const t = REGISTRY.get(type);
+  return t && isOn(t) ? t : undefined;
 }
 
 export const itemKey = (type: string, id: string) => `${type}:${id}`;
@@ -71,7 +79,13 @@ export const itemKey = (type: string, id: string) => `${type}:${id}`;
 /** Picker types of page targets (Phase 2b, pickerPages.ts): the course link is enara_target=home, every other page key is a page item. */
 export const COURSE_LINK_TYPE = 'course_link';
 export const PAGE_TYPE = 'enara_page';
-export const pageTargetItemKey = (target: string) => (target === 'home' ? itemKey(COURSE_LINK_TYPE, 'home') : itemKey(PAGE_TYPE, target));
+/** Phase 8: the picker type of each no-grade activity (pickerActivities.ts); the item id is its enara_target key. */
+export const ACTIVITY_PICKER_TYPE: Record<LmsActivityKind, string> = { tutor: 'tutor_session', avatar: 'live_avatar', diagnostic: 'diagnostic' };
+export function pageTargetItemKey(target: string): string {
+  if (target === 'home') return itemKey(COURSE_LINK_TYPE, 'home');
+  const activity = pageTargetDef(target.toLowerCase())?.activity;
+  return activity ? itemKey(ACTIVITY_PICKER_TYPE[activity], target.toLowerCase()) : itemKey(PAGE_TYPE, target);
+}
 
 /** Items already added in this LMS course: earlier picks, plus activities launched with a binding. */
 export async function alreadyAddedKeys(platformId: string, institutionId: string, externalContextId: string): Promise<Set<string>> {

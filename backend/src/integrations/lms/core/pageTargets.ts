@@ -22,6 +22,8 @@
 // A page target is never graded: no grade column in the picker (no lineItem),
 // and the grade outbox never queues anything for such a link (outbox.ts).
 
+import { lmsFlags } from './flags';
+
 export const TARGET_PARAM = 'enara_target';
 
 export type PageTargetRole = 'student' | 'teacher' | 'admin';
@@ -34,7 +36,12 @@ export interface PageTargetDef {
   staff?: string;
   label: { en: string; ar: string };
   description: { en: string; ar: string };
+  /** Phase 8: a no-grade ENARA activity (tutor, live avatar, diagnostic), not a plain page. Behind LMS_NO_GRADE_ACTIVITIES_ENABLED. */
+  activity?: LmsActivityKind;
 }
+
+/** Phase 8 (activities.ts): the three no-grade activities. */
+export type LmsActivityKind = 'tutor' | 'avatar' | 'diagnostic';
 
 export const STUDENT_HOME_PAGE = 'dashboard';
 export const STAFF_HOME_PAGE = 'teaching';
@@ -64,7 +71,45 @@ export const PAGE_TARGETS: readonly PageTargetDef[] = [
   { key: 'curriculum', staff: 'curriculum', label: { en: 'Curriculum', ar: 'المنهج' }, description: { en: "The school's curriculum.", ar: 'منهج المدرسة.' } },
 ];
 
-const BY_KEY = new Map(PAGE_TARGETS.map((p) => [p.key, p]));
+// LMS Phase 8 ("more activities, no grade"): three ENARA activities opened
+// through the same enara_target door (B1). Each key names one app page; the
+// student portal renders the activity there, the staff portal an overview of
+// it for the course's class (see activities.ts). Kept off the "ENARA pages"
+// picker list: they have picker types of their own (pickerActivities.ts).
+// While LMS_NO_GRADE_ACTIVITIES_ENABLED is off, a launch of one of these keys
+// lands on the role's home (fallback 'disabled'). Never graded, like every
+// page target.
+export const ACTIVITY_TARGETS: readonly PageTargetDef[] = [
+  {
+    key: 'tutor-session',
+    activity: 'tutor',
+    student: 'activity-tutor',
+    staff: 'activity-tutor',
+    label: { en: 'AI tutor session', ar: 'جلسة مع المعلم الذكي' },
+    description: { en: "A conversation with ENARA's AI tutor (typing or voice). No grade.", ar: 'محادثة مع المعلم الذكي في إنارة (بالكتابة أو بالصوت). بدون درجة.' },
+  },
+  {
+    key: 'live-avatar',
+    activity: 'avatar',
+    student: 'activity-avatar',
+    staff: 'activity-avatar',
+    label: { en: 'Live avatar session', ar: 'جلسة مع المعلم المرئي' },
+    description: { en: "A live voice call with ENARA's video tutor. Needs the microphone. No grade.", ar: 'مكالمة صوتية مباشرة مع المعلم المرئي في إنارة. تحتاج إلى الميكروفون. بدون درجة.' },
+  },
+  {
+    key: 'diagnostic',
+    activity: 'diagnostic',
+    student: 'activity-diagnostic',
+    staff: 'activity-diagnostic',
+    label: { en: 'Diagnostic check', ar: 'اختبار تشخيصي' },
+    description: { en: 'A short adaptive check of what the student knows, objective by objective. A report, not a grade.', ar: 'فحص قصير متكيّف لما يعرفه الطالب، هدفاً بعد هدف. تقرير وليس درجة.' },
+  },
+];
+
+const BY_KEY = new Map([...PAGE_TARGETS, ...ACTIVITY_TARGETS].map((p) => [p.key, p]));
+
+/** The activity target for a kind. */
+export const activityTargetDef = (kind: LmsActivityKind): PageTargetDef => ACTIVITY_TARGETS.find((p) => p.activity === kind)!;
 
 export const pageTargetDef = (key: string): PageTargetDef | undefined => BY_KEY.get(key);
 
@@ -85,7 +130,9 @@ export interface ResolvedPageTarget {
   /** The app page for this role. */
   page: string;
   /** Why the requested key was not opened as asked. */
-  fallback?: 'unknown' | 'forbidden';
+  fallback?: 'unknown' | 'forbidden' | 'disabled';
+  /** Phase 8: the activity this key opens. */
+  activity?: LmsActivityKind;
 }
 
 /** Where a launch with enara_target lands, for the role the session opens (a student preview is 'student'). */
@@ -93,7 +140,8 @@ export function resolvePageTarget(requested: string, role: PageTargetRole): Reso
   const def = pageTargetDef(requested.toLowerCase());
   const home = role === 'student' ? STUDENT_HOME_PAGE : STAFF_HOME_PAGE;
   if (!def) return { key: 'home', page: home, fallback: 'unknown' };
+  if (def.activity && !lmsFlags().noGradeActivities) return { key: 'home', page: home, fallback: 'disabled' };
   const page = role === 'student' ? def.student : def.staff;
   if (!page) return { key: 'home', page: home, fallback: 'forbidden' };
-  return { key: def.key, page };
+  return { key: def.key, page, ...(def.activity ? { activity: def.activity } : {}) };
 }

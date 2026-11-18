@@ -328,6 +328,28 @@ export const OTHER_HELP: Record<string, Entry> = {
     en: ['An "Open in new tab" link was used twice.', 'Click "Open in new tab" again.'],
     ar: ['استُخدم رابط "فتح في علامة تبويب جديدة" مرتين.', 'انقر على "فتح في علامة تبويب جديدة" مرة أخرى.'],
   },
+  // Phase 8: tutor, live avatar and diagnostic activities (no grade). Warnings:
+  // the activity opened, but could not start for this reason.
+  activity_provider_not_configured: {
+    en: ['A student opened an AI tutor or live avatar activity, but this ENARA site has no AI tutor or video avatar service set up, so it could not start. The student saw a message asking them to try later.', 'Ask ENARA support to set up the AI tutor and the live avatar on this ENARA site. Until then, hide these activities from students in the LMS.'],
+    ar: ['فتح طالب نشاط المعلم الذكي أو المعلم المرئي، لكن موقع ENARA هذا لم تُجهَّز فيه خدمة المعلم الذكي أو المعلم المرئي، فلم يبدأ النشاط. ظهرت للطالب رسالة تطلب منه المحاولة لاحقًا.', 'اطلب من دعم ENARA تجهيز المعلم الذكي والمعلم المرئي على موقع ENARA هذا. وحتى ذلك الحين أخفِ هذه الأنشطة عن الطلاب في نظام إدارة التعلم.'],
+  },
+  activity_ai_paused: {
+    en: ['A student opened an AI tutor or live avatar activity while AI features are paused (for the whole ENARA site or for this school), so it could not start.', 'A school admin checks the AI budget and pause settings, or asks ENARA support whether AI is paused on this site.'],
+    ar: ['فتح طالب نشاط المعلم الذكي أو المعلم المرئي بينما ميزات الذكاء الاصطناعي متوقفة مؤقتًا (لموقع ENARA كله أو لهذه المدرسة)، فلم يبدأ النشاط.', 'يتحقق مسؤول المدرسة من ميزانية الذكاء الاصطناعي وإعدادات الإيقاف، أو يسأل دعم ENARA هل الذكاء الاصطناعي متوقف على هذا الموقع.'],
+  },
+  activity_feature_off: {
+    en: ["A student opened a diagnostic activity, but the school's learning features (learning intelligence and diagnostics) are switched off, so it could not start.", 'Ask ENARA support to switch on learning intelligence and diagnostics for this school, or hide the diagnostic activity from students.'],
+    ar: ['فتح طالب نشاط الاختبار التشخيصي، لكن ميزات التعلم في المدرسة (ذكاء التعلم والاختبارات التشخيصية) متوقفة، فلم يبدأ النشاط.', 'اطلب من دعم ENARA تشغيل ذكاء التعلم والاختبارات التشخيصية لهذه المدرسة، أو أخفِ نشاط الاختبار التشخيصي عن الطلاب.'],
+  },
+  activity_no_class: {
+    en: ["A student opened a diagnostic activity, but ENARA could not find the LMS course's class among the student's classes.", 'The student opens the activity again from the LMS course. If it stays, check that the student is enrolled in the course, then send this code to ENARA support.'],
+    ar: ['فتح طالب نشاط الاختبار التشخيصي، لكن ENARA لم يجد فصل مقرر نظام إدارة التعلم ضمن فصول الطالب.', 'يفتح الطالب النشاط مرة أخرى من مقرر نظام إدارة التعلم. إذا استمر ذلك فتحقق من تسجيل الطالب في المقرر، ثم أرسل هذا الرمز إلى دعم ENARA.'],
+  },
+  activity_no_objectives: {
+    en: ["A student opened a diagnostic activity, but the course's ENARA class has no curriculum with approved learning objectives, so there is nothing to check yet. Classes made by an LMS start without a curriculum.", "Link the class to a curriculum in ENARA and approve its learning objectives. Until then, hide the diagnostic activity from students."],
+    ar: ['فتح طالب نشاط الاختبار التشخيصي، لكن فصل المقرر في ENARA ليس له منهج بأهداف تعلم معتمدة، فلا يوجد ما يُختبر بعد. الفصول التي ينشئها نظام إدارة التعلم تبدأ بدون منهج.', 'اربط الفصل بمنهج في ENARA واعتمد أهداف التعلم فيه. وحتى ذلك الحين أخفِ نشاط الاختبار التشخيصي عن الطلاب.'],
+  },
   // A student's current class after a launch (multi-class).
   no_student: {
     en: ["A student's launch could not select the course's class because the student record was not found.", SUPPORT_EN],

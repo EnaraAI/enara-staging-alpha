@@ -45,6 +45,8 @@ registerPickerType({
   },
   async resolve(_institutionId, id) {
     const p = id !== 'home' ? pageTargetDef(id) : undefined;
+    // Phase 8 activities have picker types of their own (pickerActivities.ts), behind their flag.
+    if (p?.activity) return null;
     return p ? pageItem(PAGE_TYPE, p) : null;
   },
 });

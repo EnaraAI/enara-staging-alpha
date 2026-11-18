@@ -636,7 +636,7 @@ async function completeLaunch({ platform, nonceHash, idToken, binding: via, cook
       createdContext: provisioned.createdContext,
       overSeatLimit: !!provisioned.seat?.overLimit,
       ...(rosterSyncStarted ? { rosterSyncStarted } : {}),
-      ...(page ? { pageTarget: page.key, page: page.page, ...(page.fallback ? { pageFallback: page.fallback } : {}) } : {}),
+      ...(page ? { pageTarget: page.key, page: page.page, ...(page.fallback ? { pageFallback: page.fallback } : {}), ...(page.activity ? { activity: page.activity } : {}) } : {}),
     },
   });
   return {

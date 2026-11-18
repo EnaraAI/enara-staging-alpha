@@ -11,6 +11,8 @@ export interface LmsFlags {
   roster: boolean;
   /** Phase 2 activity picker (LTI Deep Linking). On only with LMS_LTI_ENABLED too. */
   deepLinking: boolean;
+  /** Phase 8: tutor, live avatar and diagnostic activities (no grade). On only with LMS_LTI_ENABLED too. */
+  noGradeActivities: boolean;
   problem?: string;
 }
 
@@ -23,13 +25,14 @@ export function lmsFlags(): LmsFlags {
     gradePassback: ok && lms.gradePassbackEnabled,
     roster: ok && lms.ltiEnabled && lms.rosterSyncEnabled,
     deepLinking: ok && lms.ltiEnabled && lms.deepLinkingEnabled,
+    noGradeActivities: ok && lms.ltiEnabled && lms.noGradeActivitiesEnabled,
     problem: lms.problem,
   };
 }
 
 export function anyLmsFlagSet(): boolean {
   const lms = getConfig().lms;
-  return lms.ltiEnabled || lms.googleClassroomEnabled || lms.gradePassbackEnabled || lms.rosterSyncEnabled || lms.deepLinkingEnabled;
+  return lms.ltiEnabled || lms.googleClassroomEnabled || lms.gradePassbackEnabled || lms.rosterSyncEnabled || lms.deepLinkingEnabled || lms.noGradeActivitiesEnabled;
 }
 
 /** Phase 1a settings read by the LTI and admin routes. */

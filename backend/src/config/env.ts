@@ -158,6 +158,8 @@ export interface LmsConfig {
   rosterSyncEnabled: boolean;
   /** Phase 2: the activity picker (LTI Deep Linking; needs LMS_LTI_ENABLED). Default off. */
   deepLinkingEnabled: boolean;
+  /** Phase 8: tutor, live avatar and diagnostic activities, no grade (needs LMS_LTI_ENABLED). Default off. */
+  noGradeActivitiesEnabled: boolean;
   toolBaseUrl?: string;
   /** Key-encryption key (32 bytes) and an optional previous one for rotation. */
   kek?: Buffer;
@@ -299,6 +301,7 @@ export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
     gradePassbackEnabled: readBoolean(source, 'LMS_GRADE_PASSBACK_ENABLED', false),
     rosterSyncEnabled: readBoolean(source, 'LMS_ROSTER_SYNC_ENABLED', false),
     deepLinkingEnabled: readBoolean(source, 'LMS_DEEP_LINKING_ENABLED', false),
+    noGradeActivitiesEnabled: readBoolean(source, 'LMS_NO_GRADE_ACTIVITIES_ENABLED', false),
     toolBaseUrl,
     kek: kek.value,
     kekPrevious: kekPrevious.value,
