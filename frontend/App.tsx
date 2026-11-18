@@ -47,7 +47,7 @@ import { AdminAvatarControlCenter } from './components/enara/AdminAvatarControlC
 import { LmsFrameBar, LmsLaunch, LmsPreviewBanner, onLmsLaunchPath } from './pages/LmsLaunch';
 import { LmsPicker, onLmsPickerPath } from './pages/LmsPicker';
 import { LmsConnections } from './pages/LmsConnections';
-import { isLmsPreview, isLmsSession, takeLmsTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
+import { isLmsPreview, isLmsSession, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
@@ -66,7 +66,7 @@ import { Outcomes } from './pages/workspace/Outcomes';
 import { Usage } from './pages/workspace/Usage';
 import { SavingsCenter } from './pages/workspace/SavingsCenter';
 import { getSessionUser as sessionUser } from './services/apiService';
-import { ACADEMIC_MANAGER_PAGES, academicManagerPage, restoreUiRole, showOldAssessmentsTab, staffLandingPage, staffPageAllowed, UiRole } from './services/roleRouting';
+import { ACADEMIC_MANAGER_PAGES, academicManagerPage, lmsLandingPage, restoreUiRole, showOldAssessmentsTab, staffLandingPage, staffPageAllowed, UiRole } from './services/roleRouting';
 import { Assessment, Student } from './types';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -79,7 +79,7 @@ type AppState = {
   sharedAssessmentId?: string | null;
   completedAssessmentIds: Set<string>;
   /** An LMS activity bound to ENARA work (Phase 3): the assignment to open once. */
-  lmsTarget?: { assignmentId: string; classId: string | null } | null;
+  lmsTarget?: LmsLandingTarget | null;
 };
 
 // Which view (student / admin / enara-admin) the user signed in to.
@@ -193,8 +193,9 @@ const App: React.FC = () => {
     }
 
     // Opened from an LMS activity bound to ENARA work: go straight to it.
+    // "Open in new tab" may reopen the page the student was on instead.
     const lmsTarget = takeLmsTarget();
-    if (lmsTarget) page = role === 'student' ? 'assignments-student' : 'class-assignments';
+    page = lmsLandingPage(role, user.role, lmsTarget, page);
 
     if (role === 'parent' && !onParentsPath()) window.history.pushState({}, '', '/parents');
     setState(prev => ({ ...prev, role, page, activeAssessment, lmsTarget }));
@@ -406,7 +407,7 @@ const App: React.FC = () => {
 
     return (
       <div className="flex flex-col h-screen overflow-hidden">
-        <LmsFrameBar />
+        <LmsFrameBar page={state.page} />
         <LmsPreviewBanner />
         <Header 
           role="student" 
@@ -565,7 +566,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <LmsFrameBar />
+      <LmsFrameBar page={state.page} />
       <LmsPreviewBanner />
       <Header 
         role="admin" 

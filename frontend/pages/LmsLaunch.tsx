@@ -1,22 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ApiError, clearSession, exchangeLmsLaunch, isLmsPreview, isLmsSession, lmsNewTabUrl, SessionUser } from '../services/apiService';
+import { ApiError, clearSession, exchangeLmsHandoff, exchangeLmsLaunch, isLmsPreview, isLmsSession, lmsNewTabTarget, SessionUser, type LmsNewTabTarget } from '../services/apiService';
 import { lmsLaunchPortal, type UiRole } from '../services/roleRouting';
+import { isInFrame } from '../services/micCheck';
+import { OpenInNewTab } from '../components/OpenInNewTab';
 
-// Landing page for a launch from an LMS: /lms/launch#lt=<one-time token>.
-// The token is read from the fragment (never sent to a server by the browser),
-// removed from the address bar, and exchanged once for an ENARA session.
-// No cookies are needed. When the browser blocks storage inside the LMS frame,
-// or the launch was cookieless, "Open in new tab" is offered.
+// Landing page for a launch from an LMS: /lms/launch#lt=<one-time token>, or
+// for "Open in new tab": /lms/launch#hc=<one-time code> (60 seconds, used
+// once). Either is read from the fragment (never sent to a server by the
+// browser), removed from the address bar, and exchanged once for an ENARA
+// session. No cookies are needed. When the browser blocks storage inside the
+// LMS frame, or the launch was cookieless, "Open in new tab" is offered.
 
 export const onLmsLaunchPath = () => window.location.pathname.replace(/\/$/, '') === '/lms/launch';
 
-const inFrame = (() => {
-  try {
-    return window.self !== window.top;
-  } catch {
-    return true;
-  }
-})();
+const inFrame = isInFrame();
 
 const ROLE_NOT_SUPPORTED = 'ENARA does not open this kind of account from your LMS. Ask your school administrator.';
 
@@ -24,8 +21,7 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
   const [error, setError] = useState<string | null>(null);
   // Shown under the message so support can find the cause (e.g. lms_role_not_supported).
   const [reference, setReference] = useState<string | null>(null);
-  const [blocked, setBlocked] = useState<{ token: string; classId: string | null; assignmentId: string | null } | null>(null);
-  const [opening, setOpening] = useState(false);
+  const [blocked, setBlocked] = useState<{ token: string; target: LmsNewTabTarget } | null>(null);
   const started = useRef(false);
 
   useEffect(() => {
@@ -33,12 +29,13 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
     started.current = true;
     const params = new URLSearchParams(window.location.hash.slice(1));
     const token = params.get('lt');
+    const code = params.get('hc');
     window.history.replaceState({}, document.title, '/lms/launch');
-    if (!token) {
+    if (!token && !code) {
       setError('This link has no sign-in information. Please open the activity again from your LMS.');
       return;
     }
-    exchangeLmsLaunch(token)
+    (code ? exchangeLmsHandoff(code) : exchangeLmsLaunch(token!))
       .then((res) => {
         // The portal comes from the ENARA account's role; an unsupported role
         // never opens the staff portal (P0 item 1). The server refuses these
@@ -51,7 +48,16 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
           return;
         }
         if (!res.stored) {
-          setBlocked({ token: res.token, classId: res.launch.classId, assignmentId: res.launch.target?.assignmentId ?? null });
+          const t = res.launch.target;
+          setBlocked({
+            token: res.token,
+            target: {
+              classId: res.launch.classId,
+              assignmentId: t?.kind === 'assignment' ? t.assignmentId : null,
+              resourceLinkId: res.launch.resourceLinkId ?? null,
+              page: t?.kind === 'page' ? t.page : null,
+            },
+          });
           return;
         }
         window.history.replaceState({}, document.title, '/');
@@ -62,18 +68,6 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
         setError(e.message || 'We could not sign you in. Please open the activity again from your LMS.');
       });
   }, [onReady]);
-
-  const openNewTab = async () => {
-    setOpening(true);
-    try {
-      const url = await lmsNewTabUrl(blocked?.classId, blocked?.token, blocked?.assignmentId);
-      window.open(url, '_blank', 'noopener');
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setOpening(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
@@ -92,9 +86,12 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
           <>
             <h1 className="text-xl font-bold text-slate-900 mb-2">Open ENARA in a new tab</h1>
             <p className="text-slate-600 mb-6">Your browser does not let ENARA keep you signed in inside this page.</p>
-            <button onClick={openNewTab} disabled={opening} className="w-full py-3 bg-slate-900 text-white rounded-xl font-bold disabled:opacity-60">
-              {opening ? 'Opening…' : 'Open in new tab'}
-            </button>
+            <OpenInNewTab
+              target={() => blocked.target}
+              bearer={blocked.token}
+              label="Open in new tab"
+              className="w-full py-3 bg-slate-900 text-white rounded-xl font-bold disabled:opacity-60"
+            />
           </>
         ) : (
           <p className="text-slate-500">Signing you in…</p>
@@ -105,30 +102,15 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
 };
 
 /** A slim bar shown inside the LMS frame: "Open in new tab" (needed for mic and camera, and when the frame is cramped). */
-export const LmsFrameBar: React.FC = () => {
-  const [busy, setBusy] = useState(false);
+export const LmsFrameBar: React.FC<{ page?: string }> = ({ page }) => {
   if (!inFrame || !isLmsSession()) return null;
-  const open = async () => {
-    setBusy(true);
-    try {
-      let classId: string | null = null;
-      let assignmentId: string | null = null;
-      try {
-        const info = JSON.parse(sessionStorage.getItem('enara_lms') || '{}');
-        classId = info.classId ?? null;
-        assignmentId = info.assignmentId ?? null;
-      } catch { /* none */ }
-      window.open(await lmsNewTabUrl(classId, undefined, assignmentId), '_blank', 'noopener');
-    } catch {
-      /* the bar stays; the user can retry */
-    } finally {
-      setBusy(false);
-    }
-  };
+  // The new tab lands on the same step: the launch's activity on the
+  // assignments pages, otherwise the page the student is on.
+  const onAssignments = !page || page === 'assignments-student' || page === 'class-assignments';
   return (
     <div className="bg-slate-900 text-white text-sm px-4 py-1.5 flex items-center justify-end gap-3">
       <span className="opacity-80">Opened from your LMS</span>
-      <button onClick={open} disabled={busy} className="underline font-semibold disabled:opacity-60">{busy ? 'Opening…' : 'Open in new tab'}</button>
+      <OpenInNewTab target={() => lmsNewTabTarget(onAssignments ? {} : { page })} label="Open in new tab" />
     </div>
   );
 };

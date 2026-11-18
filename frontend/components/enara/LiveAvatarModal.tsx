@@ -5,6 +5,7 @@ import { createClient, AnamEvent } from '@anam-ai/js-sdk';
 import { Assessment } from '../../types';
 import {
   avatarFetch,
+  lmsNewTabTarget,
   fetchMyTutorFace,
   setMyTutorFace,
   type TutorFace,
@@ -16,6 +17,8 @@ import { AvatarVoice, SentenceSplitter, type VoiceLanguage } from '../../service
 import { markRelayDown, relayBase } from '../../services/relay';
 import { notCaughtLine } from '../../services/voiceText';
 import { WebAudioSink } from '../../services/webAudioSink';
+import { classifyMicError, isInFrame, micMessage } from '../../services/micCheck';
+import { MicProblemNotice, useMicGate, type MicProblem } from '../MicCheck';
 
 interface LiveAvatarModalProps {
   isOpen: boolean;
@@ -76,6 +79,17 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   // the student to say "speak Arabic" in English first.
   // 'auto': the server picks the opening language (the student's last call's).
   const [languageChoice, setLanguageChoice] = useState<'english' | 'arabic' | 'auto' | null>(null);
+  // Mic / new tab: a short mic probe on "Start call", before any voice or
+  // avatar SDK starts; its error (and any later one) picks the message, and
+  // "blocked by the LMS frame" offers "Open in a new tab".
+  const mic = useMicGate('avatar', { showOnLoad: true });
+  const micRef = useRef(mic);
+  micRef.current = mic;
+  const micFailed = useCallback((p: MicProblem) => {
+    micRef.current.fail(p);
+    setError(`${micMessage(p, 'en').title} / ${micMessage(p, 'ar').title}`);
+  }, []);
+  const newTabTarget = useCallback(() => lmsNewTabTarget({ page: isStudent ? 'courses' : null }), [isStudent]);
 
   const sessionIdRef = useRef<string | null>(null);
   const anamClientRef = useRef<any>(null);
@@ -186,6 +200,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   }, []);
 
   const resetUi = useCallback(() => {
+    micRef.current.clear();
     voiceSwitchedRef.current = false;
     setProvider(null);
     setTavusUrl(null);
@@ -462,9 +477,9 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       })
       .catch((e) => {
         console.error('[AVATAR] Voice start failed', e);
-        setError('Microphone permission is required for the live tutor.');
+        micFailed(classifyMicError(e, isInFrame()));
       });
-  }, [answerSpokenTurn, clearSilenceTimer, switchToAvatarVoice]);
+  }, [answerSpokenTurn, clearSilenceTimer, micFailed, switchToAvatarVoice]);
 
   // The video avatar refused the call: carry on as a voice-only tutor.
   const startVoiceOnly = useCallback(async () => {
@@ -547,7 +562,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     client.addListener(AnamEvent.CONNECTION_CLOSED, async (reason: unknown) => {
       console.warn('[AVATAR] video connection closed', reason);
       if (String(reason) === MIC_PERMISSION_DENIED_REASON) {
-        setError('Microphone permission is required for the live tutor.');
+        micFailed(isInFrame() ? 'blocked_in_frame' : 'denied');
         setLoading(false);
         return;
       }
@@ -593,7 +608,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       void client.stopStreaming().catch(() => {});
       await startAnam(sessionToken, false);
     }
-  }, [startVoice, startVoiceOnly, streamEnaraAnswerToAnam, switchToTavus]);
+  }, [micFailed, startVoice, startVoiceOnly, streamEnaraAnswerToAnam, switchToTavus]);
 
   // Anam has no mid-call language switch: the adapter decides (from the
   // transcript) that the student wants Arabic/English, and this tears down
@@ -886,7 +901,11 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               {/* No language choice: the tutor follows whichever language the
                   student speaks. The click also lets the browser play sound. */}
               <button
-                onClick={() => { unlockAudio(); setLanguageChoice('auto'); }}
+                onClick={() => {
+                  unlockAudio();
+                  // The mic probe runs before the call (and its SDKs) start.
+                  void mic.check().then((status) => { if (status === 'ok') setLanguageChoice('auto'); });
+                }}
                 className="px-8 py-3 bg-teal-600 hover:bg-teal-500 text-white text-base font-bold rounded-xl transition-all"
               >
                 Start call
@@ -894,6 +913,11 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               <p className="text-sm text-slate-400 m-0">
                 Speak English or Arabic. <span dir="rtl">تكلم عربي أو إنجليزي</span>
               </p>
+              {mic.problem && (
+                <div className="max-w-md w-full px-4">
+                  <MicProblemNotice problem={mic.problem} feature="avatar" arabic tone="dark" target={newTabTarget} />
+                </div>
+              )}
             </div>
           )}
 
@@ -907,14 +931,23 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
           {error && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-white z-30 bg-black">
               <AlertCircle size={32} className="text-rose-400" />
-              <p className="text-sm text-slate-400">{error}</p>
+              {mic.problem ? (
+                <div className="max-w-md w-full px-4">
+                  <MicProblemNotice problem={mic.problem} feature="avatar" arabic tone="dark" target={newTabTarget} />
+                </div>
+              ) : (
+                <p className="text-sm text-slate-400">{error}</p>
+              )}
               <button
                 disabled={loading || Date.now() < retryWaitUntil}
                 onClick={() => {
                   const until = Date.now() + 5000;
                   setRetryWaitUntil(until);
                   setTimeout(() => setRetryTick((n) => n + 1), 5000);
-                  void start(languageChoice && languageChoice !== 'auto' ? languageChoice : undefined);
+                  // A mic problem: probe again first; the call starts only once the mic works.
+                  void mic.check().then((status) => {
+                    if (status === 'ok') void start(languageChoice && languageChoice !== 'auto' ? languageChoice : undefined);
+                  });
                 }}
                 className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all"
               >

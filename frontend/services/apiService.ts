@@ -1272,28 +1272,46 @@ export interface LmsLaunchInfo {
   purpose: 'launch' | 'handoff';
   role: 'student' | 'teacher' | 'admin';
   classId: string | null;
+  /** The LMS activity (ENARA's own id for it); "Open in new tab" carries it so the new tab opens the same activity. */
+  resourceLinkId?: string | null;
   presentation: 'iframe' | 'window';
   cookieless: boolean;
   /** Student preview by a staff account: read-only, nothing is saved. */
   preview?: boolean;
-  /** Phase 3: the ENARA work the LMS activity is bound to; the app opens it. */
-  target?: { kind: 'assignment'; assignmentId: string } | null;
+  /** Phase 3: the ENARA work the LMS activity is bound to; the app opens it. A new tab may reopen a page instead. */
+  target?: { kind: 'assignment'; assignmentId: string } | { kind: 'page'; page: string } | null;
 }
 const LMS_KEY = 'enara_lms';
 const LMS_TARGET_KEY = 'enara_lms_target';
-export async function exchangeLmsLaunch(token: string): Promise<{ user: SessionUser; launch: LmsLaunchInfo; token: string; stored: boolean }> {
-  const data = await request<{ token: string; user: SessionUser; launch: LmsLaunchInfo }>('POST', '/api/lms/launch/exchange', { token });
-  let stored = true;
+type LmsExchange = { token: string; user: SessionUser; launch: LmsLaunchInfo };
+function storeLmsSession(data: LmsExchange): boolean {
   try {
+    const target = data.launch.target ?? null;
+    const assignmentId = target?.kind === 'assignment' ? target.assignmentId : null;
     sessionStorage.setItem(TOKEN_KEY, data.token);
     sessionStorage.setItem(USER_KEY, JSON.stringify(data.user));
-    sessionStorage.setItem(LMS_KEY, JSON.stringify({ classId: data.launch.classId, presentation: data.launch.presentation, ...(data.launch.preview ? { preview: true } : {}), ...(data.launch.target ? { assignmentId: data.launch.target.assignmentId } : {}) }));
-    if (data.launch.target) sessionStorage.setItem(LMS_TARGET_KEY, JSON.stringify({ assignmentId: data.launch.target.assignmentId, classId: data.launch.classId }));
+    sessionStorage.setItem(LMS_KEY, JSON.stringify({
+      classId: data.launch.classId,
+      presentation: data.launch.presentation,
+      ...(data.launch.preview ? { preview: true } : {}),
+      ...(assignmentId ? { assignmentId } : {}),
+      ...(data.launch.resourceLinkId ? { resourceLinkId: data.launch.resourceLinkId } : {}),
+    }));
+    if (target) sessionStorage.setItem(LMS_TARGET_KEY, JSON.stringify({ ...(assignmentId ? { assignmentId } : { page: (target as { page: string }).page }), classId: data.launch.classId }));
     else sessionStorage.removeItem(LMS_TARGET_KEY);
+    return true;
   } catch {
-    stored = false; // storage blocked in this frame: the page offers "Open in new tab"
+    return false; // storage blocked in this frame: the page offers "Open in new tab"
   }
-  return { ...data, stored };
+}
+export async function exchangeLmsLaunch(token: string): Promise<LmsExchange & { stored: boolean }> {
+  const data = await request<LmsExchange>('POST', '/api/lms/launch/exchange', { token });
+  return { ...data, stored: storeLmsSession(data) };
+}
+/** The new tab's side of "Open in new tab": trades the one-time code (#hc=...) once for its own session. */
+export async function exchangeLmsHandoff(code: string): Promise<LmsExchange & { stored: boolean }> {
+  const data = await request<LmsExchange>('POST', '/api/lms/launch/handoff/exchange', { code });
+  return { ...data, stored: storeLmsSession(data) };
 }
 export function isLmsSession(): boolean {
   try {
@@ -1310,27 +1328,80 @@ export function isLmsPreview(): boolean {
     return false;
   }
 }
-/** The ENARA work the LMS launch asked to open (once: reading it clears it). */
-export function takeLmsTarget(): { assignmentId: string; classId: string | null } | null {
+export type LmsLandingTarget = { assignmentId?: string; page?: string; classId: string | null };
+/** The ENARA work (or page) the LMS launch asked to open (once: reading it clears it). */
+export function takeLmsTarget(): LmsLandingTarget | null {
   try {
     const raw = sessionStorage.getItem(LMS_TARGET_KEY);
     sessionStorage.removeItem(LMS_TARGET_KEY);
     const t = raw ? JSON.parse(raw) : null;
-    return t && typeof t.assignmentId === 'string' ? { assignmentId: t.assignmentId, classId: typeof t.classId === 'string' ? t.classId : null } : null;
+    const classId = t && typeof t.classId === 'string' ? t.classId : null;
+    if (t && typeof t.assignmentId === 'string') return { assignmentId: t.assignmentId, classId };
+    if (t && typeof t.page === 'string') return { page: t.page, classId };
+    return null;
   } catch {
     return null;
   }
 }
-/** "Open in new tab": a fresh one-time link for this LMS account (opening the same activity when there is one). */
-export async function lmsNewTabUrl(classId?: string | null, bearer?: string, assignmentId?: string | null): Promise<string> {
+/** Where "Open in new tab" should land: an assignment, or a page of the app. */
+export interface LmsNewTabTarget {
+  classId?: string | null;
+  assignmentId?: string | null;
+  resourceLinkId?: string | null;
+  page?: string | null;
+}
+/**
+ * The new-tab target for this LMS session: the activity it was launched for,
+ * or the given assignment or page. The LMS activity is carried only when it
+ * opens that same assignment (the server refuses a mismatch).
+ */
+export function lmsNewTabTarget(want: { assignmentId?: string | null; page?: string | null } = {}): LmsNewTabTarget {
+  let info: { classId?: string | null; assignmentId?: string | null; resourceLinkId?: string | null } = {};
+  try {
+    info = JSON.parse(sessionStorage.getItem(LMS_KEY) || '{}');
+  } catch { /* none */ }
+  const assignmentId = want.assignmentId ?? (want.page ? null : info.assignmentId ?? null);
+  const sameActivity = !!assignmentId && assignmentId === info.assignmentId;
+  return {
+    classId: info.classId ?? null,
+    assignmentId,
+    resourceLinkId: sameActivity || (!assignmentId && !want.page) ? info.resourceLinkId ?? null : null,
+    page: assignmentId ? null : want.page ?? null,
+  };
+}
+/** "Open in new tab": a fresh one-time link (60 seconds, used once) for this LMS account, landing on the same step. */
+export async function lmsNewTabUrl(target: LmsNewTabTarget = {}, bearer?: string): Promise<string> {
+  const body: Record<string, string> = {};
+  if (target.classId) body.classId = target.classId;
+  if (target.assignmentId) body.assignmentId = target.assignmentId;
+  if (target.resourceLinkId) body.resourceLinkId = target.resourceLinkId;
+  if (target.page) body.page = target.page;
   const res = await fetch(toUrl('/api/lms/launch/handoff'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${bearer ?? getToken() ?? ''}` },
-    body: JSON.stringify({ ...(classId ? { classId } : {}), ...(assignmentId ? { assignmentId } : {}) }),
+    body: JSON.stringify(body),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new ApiError(data?.error?.message || 'Could not open a new tab', res.status, data?.error?.code);
   return data.url as string;
+}
+/**
+ * Mic telemetry (IDs only): one mic check outcome or "new tab opened", counted
+ * per school by the server. Fire and forget; never signs anyone out.
+ */
+export function reportMicTelemetry(event: { event: string; browserFamily: string; inFrame: boolean; feature?: string }, bearer?: string): void {
+  const token = bearer ?? getToken();
+  if (!token) return;
+  try {
+    void fetch(toUrl('/api/lms/telemetry/mic'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(event),
+      keepalive: true,
+    }).catch(() => undefined);
+  } catch {
+    /* telemetry never gets in the way */
+  }
 }
 
 export interface LmsPlatformView {

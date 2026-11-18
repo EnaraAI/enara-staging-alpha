@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Loader2, Mic, Square, Volume2 } from 'lucide-react';
-import { ApiError, beginSpeakingExam, sendSpeakingAudio, sendSpeakingText, type SpeakingAudio } from '../services/apiService';
+import { ApiError, beginSpeakingExam, lmsNewTabTarget, sendSpeakingAudio, sendSpeakingText, type SpeakingAudio } from '../services/apiService';
+import { classifyMicError, isInFrame } from '../services/micCheck';
 import { toast } from '../services/toastService';
+import { MicProblemNotice, SafariFrameHint, useMicGate } from './MicCheck';
 import { UsageChip } from './UsageChip';
 
 // P4 English speaking exam, voice only. The student records each reply with
@@ -69,6 +71,10 @@ export function SpeakingExam({ assignmentId, attempt, settings, busy, onSubmit }
   const chunks = useRef<Blob[]>([]);
   const audioCtx = useRef<AudioContext | null>(null);
   const timer = useRef<number | undefined>(undefined);
+  // Mic / new tab: the frame's policy is read on load (no prompt); the
+  // "Test microphone" click is the probe, and its error picks the message.
+  const mic = useMicGate('speaking', { showOnLoad: true });
+  const newTabTarget = useCallback(() => lmsNewTabTarget({ assignmentId }), [assignmentId]);
 
   useEffect(() => () => { streamRef.current?.getTracks().forEach((t) => t.stop()); audioCtx.current?.close().catch(() => undefined); }, []);
 
@@ -96,12 +102,14 @@ export function SpeakingExam({ assignmentId, attempt, settings, busy, onSubmit }
         tick();
       });
       ctx.close().catch(() => undefined);
+      mic.settle('ok');
       setMicOk(heard ? 'ok' : 'failed');
       if (!heard) setError("We didn't pick up any sound. Speak while the check runs, or try another microphone.");
       else setError(null);
-    } catch {
+    } catch (err) {
       setMicOk('failed');
-      setError('Microphone permission was refused or no microphone was found. Allow microphone access in your browser to take this spoken exam.');
+      setError(null);
+      mic.settle(classifyMicError(err, isInFrame()));
     }
   };
 
@@ -134,6 +142,7 @@ export function SpeakingExam({ assignmentId, attempt, settings, busy, onSubmit }
 
   const startRecording = async () => {
     setError(null);
+    mic.clear();
     try {
       streamRef.current ??= await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
       const type = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg', 'audio/mp4'].find((t) => MediaRecorder.isTypeSupported(t));
@@ -145,8 +154,9 @@ export function SpeakingExam({ assignmentId, attempt, settings, busy, onSubmit }
       recRef.current = rec;
       setRecording(true);
       timer.current = window.setTimeout(() => stopRecording(), MAX_RECORDING_MS);
-    } catch {
-      setError('The microphone is not available. Check your browser permissions and try again.');
+    } catch (err) {
+      streamRef.current = null;
+      mic.fail(classifyMicError(err, isInFrame()));
     }
   };
   const stopRecording = () => {
@@ -203,6 +213,7 @@ export function SpeakingExam({ assignmentId, attempt, settings, busy, onSubmit }
         {!accommodation && (
           <div className="rounded-lg border border-slate-200 p-4 space-y-2">
             <p className="text-sm font-semibold text-slate-800">1. Check your microphone</p>
+            <SafariFrameHint feature="speaking" target={newTabTarget} />
             <div className="flex items-center gap-3">
               <button onClick={checkMic} disabled={micOk === 'checking'} className="px-3 py-1.5 rounded-lg border border-slate-300 text-sm font-medium inline-flex items-center gap-1.5 disabled:opacity-50">
                 {micOk === 'checking' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mic className="w-4 h-4" />} {micOk === 'checking' ? 'Say something…' : 'Test microphone'}
@@ -211,6 +222,7 @@ export function SpeakingExam({ assignmentId, attempt, settings, busy, onSubmit }
               {micOk === 'ok' && <span className="text-sm text-emerald-700 font-medium">Microphone works</span>}
               {micOk === 'failed' && <span className="text-sm text-rose-700 font-medium">Not working</span>}
             </div>
+            {mic.problem && <MicProblemNotice problem={mic.problem} feature="speaking" target={newTabTarget} />}
           </div>
         )}
         <label className="flex items-start gap-2 text-sm text-slate-700 rounded-lg border border-slate-200 p-4">
@@ -261,6 +273,7 @@ export function SpeakingExam({ assignmentId, attempt, settings, busy, onSubmit }
         {working === 'sending' && <div className="flex items-center gap-2 text-xs text-slate-500"><Loader2 className="w-3 h-3 animate-spin" /> The examiner is listening…</div>}
       </div>
       {error && <p role="alert" className="px-5 py-2 text-sm text-rose-800 bg-rose-50 border-t border-rose-200">{error}</p>}
+      {mic.problem && !textMode && !done && <div className="px-5 py-2 border-t border-slate-200"><MicProblemNotice problem={mic.problem} feature="speaking" target={newTabTarget} /></div>}
       {done ? (
         <div className="p-4 border-t border-slate-200 flex items-center justify-between gap-3">
           <p className="text-sm text-slate-600">What you said is saved. Submit to have it marked.</p>

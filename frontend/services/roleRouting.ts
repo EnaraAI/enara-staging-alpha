@@ -111,3 +111,19 @@ export function showOldAssessmentsTab(opts: { assignmentsEnabled: boolean; oldAs
   if (opts.lmsStudent) return false;
   return !opts.assignmentsEnabled || opts.oldAssessmentCount > 0;
 }
+
+// Mic / new tab: "Open in new tab" lands on the same step. An assignment
+// opens the assignments page (as before); a page key reopens that page when
+// the portal has it (a teacher still never gets a school-admin page).
+const PAGES_NEEDING_STATE = ['taking-assessment', 'student-profile', 'student-analytics'] as const;
+export const STUDENT_LANDING_PAGES = ['dashboard', 'courses', 'progress', 'assignments-student', 'study-plan', 'assessments', 'results'] as const;
+export function lmsLandingPage(uiRole: UiRole, backendRole: string | undefined, target: { assignmentId?: string; page?: string } | null, fallback: string): string {
+  if (!target) return fallback;
+  if (target.assignmentId) return uiRole === 'student' ? 'assignments-student' : 'class-assignments';
+  const page = target.page;
+  // Pages that need something picked in the tab first (an assessment being taken, a student) are not reopened.
+  if (!page || (PAGES_NEEDING_STATE as readonly string[]).includes(page)) return fallback;
+  if (uiRole === 'student') return (STUDENT_LANDING_PAGES as readonly string[]).includes(page) ? page : fallback;
+  if (uiRole === 'admin') return staffPageAllowed(backendRole, page) ? page : staffLandingPage(backendRole);
+  return fallback;
+}

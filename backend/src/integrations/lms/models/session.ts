@@ -1,5 +1,5 @@
 import { Schema, model, models, type Model } from 'mongoose';
-import { requiredOrg } from './common';
+import { newId, requiredOrg } from './common';
 
 // lms_launch_tokens (Phase 1a): the one-time token that turns a validated LTI
 // launch into an ENARA session without any third-party cookie. The token is a
@@ -120,3 +120,64 @@ deepLinkSessionSchema.index({ platformId: 1, externalContextId: 1, usedAt: 1 });
 
 export const LmsDeepLinkSession =
   (models.LmsDeepLinkSession as Model<ILmsDeepLinkSession>) || model<ILmsDeepLinkSession>('LmsDeepLinkSession', deepLinkSessionSchema);
+
+// lms_handoff_codes (mic / new tab): "Open in new tab" from a signed-in LMS
+// session. An opaque 32-byte random code (base64url) travels in the new tab's
+// URL fragment (#hc=...), so it never reaches a server log or a Referer. Only
+// its SHA-256 is stored. It lives 60 seconds, is used exactly once (usedAt is
+// set atomically on exchange), and is bound to the account, the school, the
+// LMS link and activity, the target (assignment or page, kept here, never in
+// the URL) and the issuing session (the account's session version: a sign-out
+// or password reset since then refuses it). A TTL index removes rows after expiry.
+export interface ILmsHandoffCode {
+  id: string;
+  codeHash: string;
+  institutionId: string;
+  enaraUserId: string;
+  /** The view the new tab opens ('student' for a preview). Parents never come from an LMS. */
+  enaraRole: 'student' | 'teacher' | 'admin';
+  /** The account's role when the code was made; a change since then refuses the code. */
+  accountRole: string;
+  /** The issuing session's version (users.tokenVersion); a sign-out since then refuses the code. */
+  sessionVersion: number;
+  preview?: boolean;
+  platformId: string;
+  lmsUserId: string;
+  contextId?: string;
+  enaraClassId?: string;
+  resourceLinkId?: string;
+  targetAssignmentId?: string;
+  /** An allowlisted page key (e.g. 'courses') when there is no assignment. */
+  targetPage?: string;
+  expiresAt: Date;
+  usedAt?: Date;
+  createdAt: Date;
+}
+
+const handoffCodeSchema = new Schema<ILmsHandoffCode>(
+  {
+    id: { type: String, required: true, unique: true, default: newId('lmsh') },
+    codeHash: { type: String, required: true, unique: true },
+    institutionId: requiredOrg,
+    enaraUserId: { type: String, required: true },
+    enaraRole: { type: String, enum: ['student', 'teacher', 'admin'], required: true },
+    accountRole: { type: String, required: true },
+    sessionVersion: { type: Number, required: true },
+    preview: Boolean,
+    platformId: { type: String, required: true },
+    lmsUserId: { type: String, required: true },
+    contextId: String,
+    enaraClassId: String,
+    resourceLinkId: String,
+    targetAssignmentId: String,
+    targetPage: String,
+    expiresAt: { type: Date, required: true },
+    usedAt: Date,
+    createdAt: { type: Date, default: () => new Date() },
+  },
+  { collection: 'lms_handoff_codes', versionKey: false },
+);
+handoffCodeSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+export const LmsHandoffCode =
+  (models.LmsHandoffCode as Model<ILmsHandoffCode>) || model<ILmsHandoffCode>('LmsHandoffCode', handoffCodeSchema);
