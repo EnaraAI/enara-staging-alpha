@@ -11,6 +11,13 @@ import { fetchLmsPickerItems, fetchLmsPickerSession, submitLmsPicker, type LmsPi
 
 export const onLmsPickerPath = () => window.location.pathname.replace(/\/$/, '') === '/lms/picker';
 
+/** Arabic number agreement: 1, 2, 3–10 (plural), 11+ (singular accusative). */
+function arCount(n: number, one: string, two: string, few: string, many: string): string {
+  if (n === 1) return one;
+  if (n === 2) return two;
+  return `${n} ${n % 100 >= 3 && n % 100 <= 10 ? few : many}`;
+}
+
 const T = {
   en: {
     title: 'Add ENARA activities',
@@ -56,13 +63,13 @@ const T = {
     allKinds: 'كل الأصناف',
     allLevels: 'كل المستويات',
     allSkills: 'كل المهارات',
-    questions: (n: number) => `${n} ${n === 1 ? 'سؤال' : 'أسئلة'}`,
+    questions: (n: number) => arCount(n, 'سؤال واحد', 'سؤالان', 'أسئلة', 'سؤالاً'),
     points: (n: number) => `${n} درجة`,
     graded: 'عمود درجة',
     notGraded: 'بدون عمود درجة',
     newWindow: 'يفتح في نافذة جديدة (الميكروفون)',
     already: 'أُضيف سابقاً في هذا المقرر',
-    add: (n: number) => (n ? `إضافة ${n} ${n === 1 ? 'نشاط' : 'أنشطة'}` : 'إضافة'),
+    add: (n: number) => (n ? `إضافة ${arCount(n, 'نشاط واحد', 'نشاطين', 'أنشطة', 'نشاطاً')}` : 'إضافة'),
     cancel: 'إلغاء',
     sending: 'جارٍ الإضافة إلى مقررك…',
     loading: 'جارٍ التحميل…',
