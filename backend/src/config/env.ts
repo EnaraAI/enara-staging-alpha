@@ -69,6 +69,11 @@ export interface AppConfig {
     from?: string;
     enabled: boolean;
     testRecipient?: string;
+    /**
+     * EMAIL_SUBJECT_PREFIX: put in front of every LMS email subject (lms-test: "[lms-test] "),
+     * so a test copy is never mistaken for a real one. Unset in production.
+     */
+    subjectPrefix?: string;
   };
   appUrl: string;
   // Parents Portal "Continue with Google": the OAuth 2.0 Web client ID. Public
@@ -177,6 +182,20 @@ export interface LmsConfig {
    * lms-test keeps it off (the invite text is copied by hand).
    */
   emailsEnabled: boolean;
+  /** LMS_OPS_EMAILS: ENARA ops mailboxes for the lms-ops-* emails (comma list; owner decision D4). Malformed entries are dropped. */
+  opsEmails: string[];
+  /**
+   * LMS_TEST_DAILY_CAP: with REMINDER_TEST_RECIPIENT set (lms-test), at most this many LMS
+   * emails per Cairo day go to the test inbox (default 20); the rest are held (recorded,
+   * not sent), except the ops daily digest. 0 = no cap. Ignored without a test recipient.
+   */
+  testDailyCap: number;
+  /**
+   * LMS_EMAIL_CAPTURE (the Docker E2E stack only): LMS emails are rendered and recorded in
+   * lms_email_log as 'captured' instead of being sent; Resend is never called and no
+   * RESEND_API_KEY is needed. It can only stop emails, never send one.
+   */
+  emailCapture: boolean;
   google: { clientId?: string; clientSecret?: string; redirectUri?: string };
   problem?: string;
   /** Something to check that does not switch the LMS off (e.g. APP_URL unset, so the one-host rule could not be checked). Names variables only. */
@@ -312,6 +331,9 @@ export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
     schoolConnectionsRequireApproval: readBoolean(source, 'LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL', true),
     platformStorageEnabled: readBoolean(source, 'LMS_PLATFORM_STORAGE_ENABLED', true),
     emailsEnabled: readBoolean(source, 'LMS_EMAILS_ENABLED', false),
+    opsEmails: (readString(source, 'LMS_OPS_EMAILS') ?? '').split(',').map((x) => x.trim().toLowerCase()).filter((x) => /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]+$/.test(x)).slice(0, 10),
+    testDailyCap: readNumber(source, 'LMS_TEST_DAILY_CAP', 20, { min: 0, max: 10_000 }),
+    emailCapture: readBoolean(source, 'LMS_EMAIL_CAPTURE', false),
     google: {
       clientId: readString(source, 'GOOGLE_CLASSROOM_CLIENT_ID'),
       clientSecret: readString(source, 'GOOGLE_CLASSROOM_CLIENT_SECRET'),
@@ -502,6 +524,8 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     from: readString(source, "REMINDER_FROM"),
     enabled: readString(source, "REMINDERS_ENABLED") === "true",
     testRecipient: readString(source, "REMINDER_TEST_RECIPIENT"),
+    // "[lms-test]" -> "[lms-test] " (one space is added; env editors often trim a trailing space).
+    subjectPrefix: readString(source, "EMAIL_SUBJECT_PREFIX") ? `${readString(source, "EMAIL_SUBJECT_PREFIX")!.slice(0, 40)} ` : undefined,
   };
 
   const awsS3Bucket = readString(source, "AWS_S3_BUCKET");

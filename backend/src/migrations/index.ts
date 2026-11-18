@@ -25,7 +25,7 @@ import { LessonProgress } from '../models/LessonProgress';
 import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
-import { LMS_MIC_MODELS, LMS_MODELS, LMS_P0_MODELS, LMS_PHASE1A_MODELS, LMS_PHASE1B_MODELS, LMS_ONBOARDING_MODELS, LmsConnectionCheck, LmsOnboarding, LmsRegistrationCode, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsHandoffCode, LmsLaunchToken, LmsMicDaily, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsSuppressedIdentity, LmsToolKey } from '../integrations/lms/models';
+import { LMS_MIC_MODELS, LMS_MODELS, LMS_P0_MODELS, LMS_PHASE1A_MODELS, LMS_PHASE1B_MODELS, LMS_ONBOARDING_MODELS, LMS_EMAIL_MODELS, LmsAuditLog, LmsEmailLog, LmsConnectionCheck, LmsOnboarding, LmsRegistrationCode, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsHandoffCode, LmsLaunchToken, LmsMicDaily, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsSuppressedIdentity, LmsToolKey } from '../integrations/lms/models';
 import { ClassEnrollment } from '../models/ClassEnrollment';
 import { ReminderLog } from '../models/ReminderLog';
 import { SignInEvent } from '../models/SignInEvent';
@@ -494,6 +494,15 @@ export const MIGRATIONS: Migration[] = [
       for (const model of LMS_ONBOARDING_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
       if (!(await LmsOnboarding.collection.indexes()).some((i) => i.key.institutionId === 1 && i.unique)) throw new Error('lms_onboardings institutionId unique index missing');
       if (!(await LmsConnectionCheck.collection.indexes()).some((i) => i.key.platformId === 1 && i.unique)) throw new Error('lms_connection_checks platformId unique index missing');
+    },
+  },
+  {
+    id: '2026-11-25-lms-emails',
+    description: 'LMS emails: lms_email_log, lms_email_claims and lms_email_optins indexes (new collections) and an { event: 1, createdAt: 1 } index on lms_audit_log (added, nothing removed)',
+    up: async () => {
+      for (const model of LMS_EMAIL_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
+      await LmsAuditLog.collection.createIndex({ event: 1, createdAt: 1 });
+      if (!(await LmsEmailLog.collection.indexes()).some((i) => i.key.key === 1 && i.unique)) throw new Error('lms_email_log key unique index missing');
     },
   },
 ];

@@ -33,9 +33,21 @@ export interface LmsAuditInput {
   code?: string;
 }
 
+/** A written audit row, as the LMS email triggers see it (core/lmsEmailEvents.ts). */
+export type LmsAuditRow = LmsAuditInput & { id: string; createdAt: Date; refIds: Record<string, string | number | boolean> };
+let afterWrite: ((row: LmsAuditRow) => void) | undefined;
+
+/**
+ * The LMS email triggers listen here (set once, when lmsEmailEvents.ts loads).
+ * The listener must not throw and must not block: it only schedules work.
+ */
+export function setLmsAuditListener(listener: ((row: LmsAuditRow) => void) | undefined): void {
+  afterWrite = listener;
+}
+
 export async function writeLmsAudit(input: LmsAuditInput): Promise<void> {
   try {
-    await LmsAuditLog.create({
+    const row = await LmsAuditLog.create({
       event: input.event.slice(0, 80),
       outcome: input.outcome,
       institutionId: input.institutionId,
@@ -44,6 +56,13 @@ export async function writeLmsAudit(input: LmsAuditInput): Promise<void> {
       refIds: sanitizeRefIds(input.refIds),
       code: input.code?.slice(0, 80),
     });
+    if (afterWrite) {
+      try {
+        afterWrite({ ...input, id: row.id, createdAt: row.createdAt, refIds: row.refIds ?? {} });
+      } catch (error) {
+        logger.warn('lms_audit_listener_failed', { event: input.event, error: serializeError(error) });
+      }
+    }
   } catch (error) {
     logger.error('lms_audit_write_failed', { event: input.event, error: serializeError(error) });
   }

@@ -176,11 +176,13 @@ describe('sendParentTemplate / sendLmsTemplate', () => {
     sendMock.mockResolvedValue({ data: { id: 'em_1' }, error: null });
     resetEmailClientForTests();
     process.env.RESEND_API_KEY = 're_test_dummy';
+    process.env.PARENT_EMAILS_ENABLED = 'true';
     errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => undefined);
     warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
   });
   afterEach(() => {
     delete process.env.RESEND_API_KEY;
+    delete process.env.PARENT_EMAILS_ENABLED;
     resetEmailClientForTests();
     errorSpy.mockRestore();
     warnSpy.mockRestore();
@@ -200,6 +202,15 @@ describe('sendParentTemplate / sendLmsTemplate', () => {
     expect(sent.html).toContain('cid:enara-logo');
     expect(sent.html).not.toMatch(/\{\{/);
     expect(sent.attachments.map((a) => a.contentId).sort()).toEqual(['enara-logo', 'enara-logo-white']);
+  });
+
+  it('parent emails are off unless PARENT_EMAILS_ENABLED=true (nothing sent)', async () => {
+    for (const v of [undefined, '', 'false', 'no']) {
+      if (v === undefined) delete process.env.PARENT_EMAILS_ENABLED;
+      else process.env.PARENT_EMAILS_ENABLED = v;
+      expect(await sendParentTemplate('parent-invite-en', TO, samples(PARENTS_DIR, 'parent-invite-en'))).toMatchObject({ ok: false, code: 'parent_emails_off' });
+    }
+    expect(sendMock).not.toHaveBeenCalled();
   });
 
   it('sends a newly promoted LMS template', async () => {

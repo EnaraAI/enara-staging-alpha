@@ -39,26 +39,33 @@ export function renderCodeTemplate(t: CodeTemplate, values: Record<string, strin
   return { subject: fillPlaceholders(t.subject, values, t.fallbacks), html };
 }
 
-export async function sendCodeTemplate(
-  kind: CodeTemplateKind,
-  bundle: Readonly<Record<string, CodeTemplate>>,
-  alias: string,
-  to: string,
-  variables: Record<string, string>,
-): Promise<SendTemplateResult> {
-  const t = Object.prototype.hasOwnProperty.call(bundle, alias) ? bundle[alias] : undefined;
-  if (!t) return fail(kind, String(alias), 'unknown_template', `Unknown ${kind === 'lms' ? 'LMS' : 'parent'} template alias`);
+export interface DeliverInput {
+  kind: CodeTemplateKind;
+  alias: string;
+  to: string;
+  subject: string;
+  html: string;
+  /** The parent link code the email shows (never allowed in a link). */
+  linkCode?: unknown;
+  /** Render and check everything, but do not call Resend (LMS_EMAIL_CAPTURE, the E2E stack). */
+  capture?: boolean;
+}
+
+/**
+ * The last step of every code-sent email: refuses a reserved recipient, a
+ * leftover placeholder or a link carrying a parent link code, then sends with
+ * both logos attached inline (or, with capture, stops right before Resend and
+ * returns { ok: true, id: 'captured' }).
+ */
+export async function deliverRendered(input: DeliverInput): Promise<SendTemplateResult> {
+  const { kind, alias, to, subject, html } = input;
   if (!to || isReservedRecipient(to)) {
     logger.warn(`email.send_${kind}_template_refused`, { alias, code: 'reserved_recipient' });
     return { ok: false, code: 'reserved_recipient', message: 'Recipient is on a reserved domain; nothing was sent' };
   }
-  const given = Object.keys(variables ?? {});
-  const missing = t.variables.filter((k) => !given.includes(k));
-  const extra = given.filter((k) => !t.variables.includes(k));
-  if (missing.length || extra.length) return fail(kind, alias, 'invalid_variables', `Template variables mismatch (missing: ${missing.join(',') || 'none'}; extra: ${extra.join(',') || 'none'})`);
-  const { subject, html } = renderCodeTemplate(t, variables);
   if (LEFTOVER.test(html) || LEFTOVER.test(subject)) return fail(kind, alias, 'unfilled_placeholder', 'Rendered template still contains a {{{...}}} placeholder');
-  if (linkCarriesCode(html, variables.LINK_CODE)) return fail(kind, alias, 'code_in_url', 'A link in the email carries a parent link code');
+  if (linkCarriesCode(html, input.linkCode)) return fail(kind, alias, 'code_in_url', 'A link in the email carries a parent link code');
+  if (input.capture) return { ok: true, id: 'captured' };
   const resend = getEmailClient();
   if (!resend) return fail(kind, alias, 'missing_api_key', 'RESEND_API_KEY is not set');
   try {
@@ -79,4 +86,32 @@ export async function sendCodeTemplate(
     const code = typeof e?.code === 'string' ? e.code : typeof e?.name === 'string' ? e.name : 'exception';
     return fail(kind, alias, code, typeof e?.message === 'string' ? e.message : 'Send failed');
   }
+}
+
+export async function sendCodeTemplate(
+  kind: CodeTemplateKind,
+  bundle: Readonly<Record<string, CodeTemplate>>,
+  alias: string,
+  to: string,
+  variables: Record<string, string>,
+): Promise<SendTemplateResult> {
+  const t = Object.prototype.hasOwnProperty.call(bundle, alias) ? bundle[alias] : undefined;
+  if (!t) return fail(kind, String(alias), 'unknown_template', `Unknown ${kind === 'lms' ? 'LMS' : 'parent'} template alias`);
+  if (!to || isReservedRecipient(to)) {
+    logger.warn(`email.send_${kind}_template_refused`, { alias, code: 'reserved_recipient' });
+    return { ok: false, code: 'reserved_recipient', message: 'Recipient is on a reserved domain; nothing was sent' };
+  }
+  const mismatch = variablesMismatch(t, variables);
+  if (mismatch) return fail(kind, alias, 'invalid_variables', mismatch);
+  const { subject, html } = renderCodeTemplate(t, variables);
+  return deliverRendered({ kind, alias, to, subject, html, linkCode: variables.LINK_CODE });
+}
+
+/** null when the given variables are exactly the template's (all required, no extras), else the message. */
+export function variablesMismatch(t: CodeTemplate, variables: Record<string, unknown>): string | null {
+  const given = Object.keys(variables ?? {});
+  const missing = t.variables.filter((k) => !given.includes(k));
+  const extra = given.filter((k) => !t.variables.includes(k));
+  if (!missing.length && !extra.length) return null;
+  return `Template variables mismatch (missing: ${missing.join(',') || 'none'}; extra: ${extra.join(',') || 'none'})`;
 }

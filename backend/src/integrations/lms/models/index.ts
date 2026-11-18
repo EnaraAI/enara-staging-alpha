@@ -4,6 +4,7 @@ import { GoogleConnection } from './google';
 import { LmsGradeSyncJob, LmsLock } from './outbox';
 import { LmsDeployment, LmsPlatform } from './platform';
 import { LmsConnectionCheck, LmsOnboarding } from './onboarding';
+import { LmsEmailClaim, LmsEmailLog, LmsEmailOptIn } from './email';
 import { LmsRegistrationCode } from './registration';
 import { LmsOrgSettings } from './seats';
 import { LmsAccessToken, LmsOidcState, LmsToolKey } from './security';
@@ -13,6 +14,7 @@ import { LmsSuppressedIdentity } from './suppression';
 
 export * from './audit';
 export * from './context';
+export * from './email';
 export * from './google';
 export * from './onboarding';
 export * from './outbox';
@@ -66,5 +68,9 @@ export const LMS_PHASE1B_MODELS = [LmsRegistrationCode] as const;
 // the "New school" onboardings and the per-connection automatic checks.
 export const LMS_ONBOARDING_MODELS = [LmsOnboarding, LmsConnectionCheck] as const;
 
+// Added with the LMS emails (migration 2026-11-25-lms-emails): the email log
+// (idempotency), the once-per-window claims and counters, the teachers' opt-ins.
+export const LMS_EMAIL_MODELS = [LmsEmailLog, LmsEmailClaim, LmsEmailOptIn] as const;
+
 /** Every LMS collection, for the cleanup script and the tests. */
-export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS, ...LMS_P0_MODELS, ...LMS_MIC_MODELS, ...LMS_PHASE1B_MODELS, ...LMS_ONBOARDING_MODELS] as const;
+export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS, ...LMS_P0_MODELS, ...LMS_MIC_MODELS, ...LMS_PHASE1B_MODELS, ...LMS_ONBOARDING_MODELS, ...LMS_EMAIL_MODELS] as const;

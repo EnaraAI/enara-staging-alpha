@@ -59,6 +59,12 @@
       "sample": "Nile Valley International School: 42%"
     },
     {
+      "key": "CAP_NOTE",
+      "type": "string",
+      "fallback_value": "none",
+      "sample": "cap hit: 23 held back (lms-seats-warning 9, lms-roster-sync-failed 8, lms-grade-changed-in-lms 6)"
+    },
+    {
       "key": "ACTION_URL",
       "type": "string",
       "fallback_value": null,
@@ -77,5 +83,6 @@
   "recipient": "ENARA ops (LMS_OPS_EMAILS)",
   "trigger": "Daily cron: pending approvals > 24 h, billing flags, dead grade jobs (all schools), unknown-LMS launches, cookieless share, roster failures, key problems, switch-offs",
   "delivery": "digest",
-  "frequency": "Daily; only if any row is non-zero"
+  "frequency": "Daily; only if any row is non-zero",
+  "capNote": "CAP_NOTE added 2026-11-18 with the wiring (owner condition: the digest states 'cap hit: N held back' with a per-template count); 'none' when no cap applies or nothing was held"
 }
