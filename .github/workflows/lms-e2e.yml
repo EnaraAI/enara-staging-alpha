@@ -1,0 +1,151 @@
+# ENARA LMS (LTI 1.3) end-to-end suite: Moodle in Docker + Playwright.
+# Everything runs inside the runner (Moodle, Postgres, MongoDB, ENARA, an
+# https proxy with its own local CA). No repository secrets: every secret and
+# test password is generated per run (e2e/scripts/gen-env.sh). Fake data only;
+# nothing here calls lms-test.enara.app or test.enara.app.
+#
+# Runs on pull requests from LMS branches (claude/lms-*) and by hand
+# (workflow_dispatch; GitHub offers "Run workflow" only once this file is on
+# the default branch, until then re-run the latest PR run). No schedule, no push.
+name: lms-e2e
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+# Widened per job where needed (a later deploy job may add contents/pull-requests: write).
+permissions:
+  contents: read
+
+concurrency:
+  group: lms-e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: e2e (${{ matrix.moodle }})
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'claude/lms')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # The latest stable Moodle first; MOODLE_405_STABLE (LTS) is added back
+        # once this is green.
+        moodle: [MOODLE_503_STABLE]
+    env:
+      MOODLE_BRANCH: ${{ matrix.moodle }}
+      MOODLE_SRC: ${{ github.workspace }}/../moodle-src
+      ENARA_IMAGE: enara-e2e:local
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build ENARA (Dockerfile.staging-single)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.staging-single
+          tags: enara-e2e:local
+          load: true
+          cache-from: type=gha,scope=enara-e2e
+          cache-to: type=gha,mode=max,scope=enara-e2e
+
+      - name: Moodle source (${{ matrix.moodle }})
+        run: |
+          git clone --quiet --depth 1 --branch "$MOODLE_BRANCH" https://github.com/moodle/moodle.git "$MOODLE_SRC"
+          git -C "$MOODLE_SRC" log -1 --format='Moodle %H %cd'
+
+      - name: Secrets for this run, hosts
+        working-directory: e2e
+        run: |
+          ./scripts/gen-env.sh
+          ./scripts/hosts.sh
+
+      - name: Pull images
+        working-directory: e2e
+        run: docker compose pull --quiet postgres mongo caddy moodle
+
+      - name: Start the stack, install and provision Moodle
+        working-directory: e2e
+        run: ./scripts/up.sh
+
+      - name: Playwright
+        working-directory: e2e
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+
+      - name: Run the scenarios
+        id: tests
+        working-directory: e2e
+        run: npx playwright test
+        continue-on-error: true
+
+      - name: Summary
+        if: always()
+        working-directory: e2e
+        run: |
+          node scripts/summary.mjs > /dev/null || true
+          cat .run/summary.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Docker logs
+        if: always()
+        working-directory: e2e
+        run: |
+          mkdir -p .run/docker-logs
+          for s in enara moodle caddy mongo postgres; do docker compose logs --no-color "$s" > ".run/docker-logs/$s.log" 2>&1 || true; done
+
+      - name: Upload report, screenshots, summary, logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lms-e2e-${{ matrix.moodle }}
+          path: |
+            e2e/.run/playwright-report
+            e2e/.run/test-results
+            e2e/.run/summary.md
+            e2e/.run/timings.json
+            e2e/.run/up-timings.json
+            e2e/.run/moodle-version.json
+            e2e/.run/docker-logs
+          retention-days: 14
+          include-hidden-files: true
+
+      - name: Result
+        if: steps.tests.outcome != 'success'
+        run: |
+          echo "::error::Scenarios failed on ${{ matrix.moodle }} (see the summary and the lms-e2e-${{ matrix.moodle }} artifact)"
+          exit 1
+
+  minutes:
+    name: minutes
+    needs: [e2e]
+    if: always() && needs.e2e.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    steps:
+      - name: Runner minutes of this run (sum of job durations)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs" --paginate \
+            --jq '.jobs[] | select(.completed_at != null and .started_at != null) | [.name, .started_at, .completed_at] | @tsv' > jobs.tsv || true
+          total=0
+          while IFS=$'\t' read -r name start end; do
+            s=$(( $(date -d "$end" +%s) - $(date -d "$start" +%s) ))
+            total=$(( total + s ))
+            echo "$name: $(( (s + 59) / 60 )) min"
+          done < jobs.tsv
+          mins=$(( (total + 59) / 60 ))
+          echo "lms-e2e minutes: ${mins} (sum of finished e2e job durations, run ${{ github.run_id }})" | tee -a "$GITHUB_STEP_SUMMARY"

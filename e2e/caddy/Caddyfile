@@ -1,0 +1,29 @@
+# ENARA LMS e2e: one https front for both hosts, certificates from Caddy's own
+# local CA ("tls internal"). Moodle and ENARA trust that CA, so their
+# server-to-server calls (JWKS, registration, token, AGS, NRPS) are real https.
+{
+	local_certs
+	skip_install_trust
+	admin off
+}
+
+{$MOODLE_HOST:moodle.school.test} {
+	tls internal
+	reverse_proxy moodle:80
+}
+
+# Mirrors the Vercel project (vercel.json): the API paths go to the Node
+# server; everything else is the static SPA (no frame headers, so Moodle can
+# embed /lms/launch, exactly as on lms-test).
+{$ENARA_HOST:enara.tool.test} {
+	tls internal
+	@api path /api /api/* /uploads/* /ready /health /lti /lti/* /.well-known/jwks.json
+	handle @api {
+		reverse_proxy enara:3001
+	}
+	handle {
+		root * /srv/enara
+		try_files {path} /index.html
+		file_server
+	}
+}
