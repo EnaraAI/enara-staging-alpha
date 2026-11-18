@@ -1,0 +1,168 @@
+# ENARA LMS end-to-end stack (CI and local). Fake data only; every secret is
+# generated per run into e2e/.env by scripts/gen-env.sh (never committed).
+#
+#   caddy     https front for moodle.school.test and enara.tool.test (tls internal)
+#   moodle    moodlehq/moodle-php-apache + the Moodle checkout in $MOODLE_SRC
+#   postgres  Moodle's database (and ENARA's DATABASE_URL, needed in production mode)
+#   mongo     ENARA's database; its host name starts with "enara-lms-test." so the
+#             maintenance routes (migrate, seed) accept it, as on lms-test
+#   enara     the API from Dockerfile.staging-single (image enara-e2e:local)
+#   enara-spa copies the built SPA out of the same image for Caddy to serve
+name: enara-e2e
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: moodle
+      POSTGRES_PASSWORD: moodle
+      POSTGRES_DB: moodle
+    # ENARA's pg client always uses TLS; the Debian image ships a snakeoil pair.
+    command: ["postgres", "-c", "ssl=on", "-c", "ssl_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem", "-c", "ssl_key_file=/etc/ssl/private/ssl-cert-snakeoil.key", "-c", "fsync=off", "-c", "synchronous_commit=off"]
+    tmpfs: ["/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U moodle -d moodle"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+
+  mongo:
+    image: mongo:7
+    hostname: enara-lms-test.local
+    networks:
+      default:
+        aliases: [enara-lms-test.local]
+    tmpfs: ["/data/db"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  caddy:
+    image: caddy:2
+    environment:
+      MOODLE_HOST: ${MOODLE_HOST:-moodle.school.test}
+      ENARA_HOST: ${ENARA_HOST:-enara.tool.test}
+    ports: ["443:443"]
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - enara-spa:/srv/enara:ro
+    networks:
+      default:
+        aliases: ["${MOODLE_HOST:-moodle.school.test}", "${ENARA_HOST:-enara.tool.test}"]
+    healthcheck:
+      test: ["CMD-SHELL", "test -s /data/caddy/pki/authorities/local/root.crt"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      enara-spa:
+        condition: service_completed_successfully
+
+  # Caddy keeps its CA in a private directory: publish the root certificate
+  # (public) on its own volume for Moodle and ENARA to trust.
+  ca:
+    image: caddy:2
+    command: ["sh", "-c", "cp /data/caddy/pki/authorities/local/root.crt /ca/root.crt && chmod 644 /ca/root.crt"]
+    volumes:
+      - caddy-data:/data:ro
+      - e2e-ca:/ca
+    depends_on:
+      caddy:
+        condition: service_healthy
+
+  moodle:
+    image: moodlehq/moodle-php-apache:8.3
+    environment:
+      MOODLE_HOST: ${MOODLE_HOST:-moodle.school.test}
+    volumes:
+      - ${MOODLE_SRC:?set MOODLE_SRC to a Moodle checkout}:/var/www/html
+      - ./moodle/config.php:/var/www/html/config.php:ro
+      - ./moodle/05-e2e.sh:/docker-entrypoint.d/05-e2e.sh:ro
+      - ./moodle/e2e.ini:/docker-entrypoint.d/e2e.ini:ro
+      - ./moodle:/e2e:ro
+      - moodledata:/var/www/moodledata
+      - e2e-ca:/ca:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ca:
+        condition: service_completed_successfully
+
+  enara-spa:
+    image: ${ENARA_IMAGE:-enara-e2e:local}
+    user: root
+    command: ["sh", "-c", "rm -rf /srv/enara/* && cp -r /app/public/. /srv/enara/ && ls /srv/enara/index.html"]
+    volumes:
+      - enara-spa:/srv/enara
+
+  enara:
+    image: ${ENARA_IMAGE:-enara-e2e:local}
+    env_file: [.env]
+    environment:
+      # Mirrors lms-test (Vercel staging project) as far as a container can:
+      # production + staging guard, every LMS switch on, the multi-class switches.
+      NODE_ENV: production
+      # Caddy serves the SPA, as Vercel does for lms-test. The image's own SPA
+      # fallback (staging single-service mode) would answer GET /lti/* and
+      # /.well-known/* with index.html, so it is switched off here.
+      SERVE_FRONTEND_DIR: ""
+      ENARA_STAGING: "true"
+      PORT: "3001"
+      MONGODB_URI: mongodb://enara-lms-test.local:27017/enara_staging_alpha
+      DATABASE_URL: postgres://moodle:moodle@postgres:5432/moodle
+      DATABASE_SSL_REJECT_UNAUTHORIZED: "false"
+      APP_URL: https://${ENARA_HOST:-enara.tool.test}
+      FRONTEND_URL: https://${ENARA_HOST:-enara.tool.test}
+      CORS_ALLOWED_ORIGINS: https://${ENARA_HOST:-enara.tool.test}
+      TRUST_PROXY: "1"
+      RUN_MIGRATIONS_ON_START: "false"
+      REGISTRATION_INVITE_ONLY: "true"
+      SERVE_LOCAL_UPLOADS: "false"
+      AI_PAUSED: "true"
+      # Staging stores files only in R2; nothing in the suite uploads a file.
+      R2_ACCOUNT_ID: e2e-unused
+      R2_BUCKET: enara-e2e-staging
+      R2_ACCESS_KEY_ID: e2e-unused
+      R2_SECRET_ACCESS_KEY: e2e-unused
+      # Required in production; never called (AI is paused, no network to them).
+      ENARA_ORCHESTRATOR_URL: https://orchestrator.invalid
+      ENARA_API_KEY: e2e-unused
+      AI_ENGINE_URL: https://ai-engine.invalid
+      AWS_S3_BUCKET: enara-e2e-staging
+      AI_TEST_SPEND_CAP_USD: "1"
+      AI_TEST_SPEND_ID: e2e
+      LMS_LTI_ENABLED: "true"
+      LMS_TOOL_BASE_URL: https://${ENARA_HOST:-enara.tool.test}
+      LMS_DEEP_LINKING_ENABLED: "true"
+      LMS_GRADE_PASSBACK_ENABLED: "true"
+      LMS_ROSTER_SYNC_ENABLED: "true"
+      GRADE_LEDGER_ENABLED: "true"
+      MAINTENANCE_ENDPOINTS_ENABLED: "true"
+      ENROLLMENT_DUAL_WRITE: "true"
+      ENROLLMENT_READ_FROM: student_app,teacher_rosters,assessments,analytics,profile_context,credits,attendance
+      ENROLLMENT_MULTI_CLASS: "true"
+      NODE_EXTRA_CA_CERTS: /ca/root.crt
+      NODE_OPTIONS: --max-old-space-size=768
+    volumes:
+      - e2e-ca:/ca:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/health >/dev/null || exit 1"]
+      interval: 2s
+      timeout: 3s
+      retries: 90
+    depends_on:
+      mongo:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      ca:
+        condition: service_completed_successfully
+
+volumes:
+  caddy-data:
+  e2e-ca:
+  enara-spa:
+  moodledata:
