@@ -62,6 +62,7 @@ const T = {
     due_in_past: 'The due date must be in the future.',
     due_too_far: 'The due date must be within 2 years.',
     due_invalid: 'The due date is not valid.',
+    noGradeNote: "AI tutor, live avatar and diagnostic activities send no grade. With your LMS's tool setting \"Accept grades from the tool: Always\", Moodle still adds a grade column for each of them; it stays empty, because ENARA never sends a grade to it.",
   },
   ar: {
     title: 'إضافة أنشطة إنارة',
@@ -100,6 +101,7 @@ const T = {
     due_in_past: 'يجب أن يكون موعد التسليم في المستقبل.',
     due_too_far: 'يجب أن يكون موعد التسليم خلال سنتين.',
     due_invalid: 'موعد التسليم غير صالح.',
+    noGradeNote: 'أنشطة المعلم الذكي والمعلم المرئي والاختبار التشخيصي لا ترسل أي درجة. مع إعداد الأداة في نظام إدارة التعلم «قبول الدرجات من الأداة: دائماً» يضيف Moodle عمود درجة لكل منها، ويبقى فارغاً لأن إنارة لا ترسل إليه أي درجة.',
   },
 };
 
@@ -116,6 +118,8 @@ const KIND_LABEL: Record<string, { en: string; ar: string }> = {
   practice: { en: 'Practice', ar: 'تدريب' },
   speaking: { en: 'Speaking', ar: 'محادثة' },
   page: { en: 'Page', ar: 'صفحة' },
+  tutor: { en: 'AI tutor', ar: 'المعلم الذكي' },
+  avatar: { en: 'Live avatar', ar: 'المعلم المرئي' },
 };
 
 const DUE_ERRORS = ['due_in_past', 'due_too_far', 'due_invalid'] as const;
@@ -269,6 +273,12 @@ export const LmsPicker: React.FC = () => {
             {shown.some((i) => i.teacherOnly) && (
               <p data-testid="picker-teacher-only-note" className="mt-2 text-sm bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-3 py-2">
                 {t.teachersOnlyNote}
+              </p>
+            )}
+
+            {shown.some((i) => i.activity) && (
+              <p data-testid="picker-no-grade-note" className="mt-2 text-sm bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-3 py-2">
+                {t.noGradeNote}
               </p>
             )}
 

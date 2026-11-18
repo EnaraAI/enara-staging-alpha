@@ -116,7 +116,16 @@ export function showOldAssessmentsTab(opts: { assignmentsEnabled: boolean; oldAs
 // opens the assignments page (as before); a page key reopens that page when
 // the portal has it (a teacher still never gets a school-admin page).
 const PAGES_NEEDING_STATE = ['taking-assessment', 'student-profile', 'student-analytics'] as const;
-export const STUDENT_LANDING_PAGES = ['dashboard', 'courses', 'progress', 'assignments-student', 'study-plan', 'assessments', 'results'] as const;
+export const STUDENT_LANDING_PAGES = ['dashboard', 'courses', 'progress', 'assignments-student', 'study-plan', 'assessments', 'results', 'activity-tutor', 'activity-avatar', 'activity-diagnostic'] as const;
+
+// LMS Phase 8: the app page of each no-grade activity (backend
+// core/pageTargets.ts ACTIVITY_TARGETS). Students get the activity itself,
+// staff an overview of it for the course's class.
+export const LMS_ACTIVITY_PAGES = { 'activity-tutor': 'tutor', 'activity-avatar': 'avatar', 'activity-diagnostic': 'diagnostic' } as const;
+export type LmsActivityPage = keyof typeof LMS_ACTIVITY_PAGES;
+export function lmsActivityOfPage(page: string | null | undefined): (typeof LMS_ACTIVITY_PAGES)[LmsActivityPage] | null {
+  return page && Object.prototype.hasOwnProperty.call(LMS_ACTIVITY_PAGES, page) ? LMS_ACTIVITY_PAGES[page as LmsActivityPage] : null;
+}
 export function lmsLandingPage(uiRole: UiRole, backendRole: string | undefined, target: { assignmentId?: string; page?: string } | null, fallback: string): string {
   if (!target) return fallback;
   if (target.assignmentId) return uiRole === 'student' ? 'assignments-student' : 'class-assignments';

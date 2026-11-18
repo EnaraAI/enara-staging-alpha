@@ -1343,6 +1343,30 @@ export function takeLmsTarget(): LmsLandingTarget | null {
     return null;
   }
 }
+/** The ENARA class of this LMS session (the course's class), if any. */
+export function lmsSessionClassId(): string | null {
+  try {
+    const c = JSON.parse(sessionStorage.getItem(LMS_KEY) || '{}').classId;
+    return typeof c === 'string' ? c : null;
+  } catch {
+    return null;
+  }
+}
+/** LMS Phase 8: tutor, live avatar and diagnostic activities (no grade). */
+export type LmsActivityKind = 'tutor' | 'avatar' | 'diagnostic';
+export interface LmsActivityStatus {
+  kind: LmsActivityKind;
+  ready: boolean;
+  /** Why it cannot start (activity_provider_not_configured, activity_ai_paused, ...). */
+  code: string | null;
+  graded: false;
+  needsMicrophone: boolean;
+  classId: string | null;
+  /** Staff with a class: what the class did with this activity in the last days. */
+  overview: { classId: string; className: string | null; students: number; days: number; studentsStarted: number; sessions: number; completed?: number } | null;
+}
+export const fetchLmsActivity = (kind: LmsActivityKind, classId?: string | null) =>
+  request<LmsActivityStatus>('GET', `/api/lms/activities/${kind}${classId ? `?classId=${encodeURIComponent(classId)}` : ''}`);
 /** Where "Open in new tab" should land: an assignment, or a page of the app. */
 export interface LmsNewTabTarget {
   classId?: string | null;
@@ -1570,6 +1594,8 @@ export interface LmsPickerItem {
   graded: boolean; needsMedia: boolean; meta?: string; alreadyAdded: boolean;
   /** Phase 2b: a page only teachers can open ("Teachers only" badge). */
   teacherOnly?: boolean;
+  /** LMS Phase 8: a no-grade ENARA activity (tutor, avatar, diagnostic). */
+  activity?: "tutor" | "avatar" | "diagnostic";
   /** Phase 2b: the Arabic title and description. */
   ar?: { title: string; description?: string };
 }

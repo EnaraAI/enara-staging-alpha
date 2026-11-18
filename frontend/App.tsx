@@ -47,7 +47,8 @@ import { AdminAvatarControlCenter } from './components/enara/AdminAvatarControlC
 import { LmsFrameBar, LmsLaunch, LmsPreviewBanner, onLmsLaunchPath } from './pages/LmsLaunch';
 import { LmsPicker, onLmsPickerPath } from './pages/LmsPicker';
 import { LmsConnections } from './pages/LmsConnections';
-import { isLmsPreview, isLmsSession, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
+import { LmsActivityOverview, LmsActivityStudent } from './pages/LmsActivity';
+import { isLmsPreview, isLmsSession, lmsSessionClassId, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
@@ -66,7 +67,7 @@ import { Outcomes } from './pages/workspace/Outcomes';
 import { Usage } from './pages/workspace/Usage';
 import { SavingsCenter } from './pages/workspace/SavingsCenter';
 import { getSessionUser as sessionUser } from './services/apiService';
-import { ACADEMIC_MANAGER_PAGES, academicManagerPage, lmsLandingPage, restoreUiRole, showOldAssessmentsTab, staffLandingPage, staffPageAllowed, UiRole } from './services/roleRouting';
+import { ACADEMIC_MANAGER_PAGES, academicManagerPage, lmsActivityOfPage, lmsLandingPage, restoreUiRole, showOldAssessmentsTab, staffLandingPage, staffPageAllowed, UiRole } from './services/roleRouting';
 import { Assessment, Student } from './types';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -444,6 +445,16 @@ const App: React.FC = () => {
               {state.page === 'results' && <TestResults completedIds={state.completedAssessmentIds} onAskTutor={handleAskTutor} />}
               {state.page === 'assignments-student' && <StudentAssignments onAskTutor={handleAskTutor} initialAssignmentId={state.lmsTarget?.assignmentId} />}
               {state.page === 'study-plan' && <StudyPlan onAskTutor={handleAskTutor} onNavigate={navigate} />}
+              {/* LMS Phase 8: the tutor, live avatar or diagnostic activity an LMS launch opened (no grade). */}
+              {lmsActivityOfPage(state.page) && (
+                <LmsActivityStudent
+                  key={state.page}
+                  kind={lmsActivityOfPage(state.page)!}
+                  classId={state.lmsTarget?.classId ?? lmsSessionClassId()}
+                  onOpenTutor={() => setIsTutorOpen(true)}
+                  onAskTutor={handleAskTutor}
+                />
+              )}
               {state.page === 'assessments' && (
                 <div className="p-8 max-w-7xl mx-auto">
                   <h2 className="text-2xl font-bold text-slate-900 mb-6">Your Assessments</h2>
@@ -622,6 +633,8 @@ const App: React.FC = () => {
           {state.page === 'class-assignments' && <ClassAssignments initialClassId={state.lmsTarget?.classId ?? undefined} initialAssignmentId={state.lmsTarget?.assignmentId} />}
           {state.page === 'grading' && <GradingReview />}
           {state.page === 'teaching' && <TeachingDashboard initialClassId={state.lmsTarget?.classId ?? undefined} />}
+          {/* LMS Phase 8: a teacher's view of a tutor, live avatar or diagnostic activity for the course's class. */}
+          {lmsActivityOfPage(state.page) && <LmsActivityOverview key={state.page} kind={lmsActivityOfPage(state.page)!} classId={state.lmsTarget?.classId ?? lmsSessionClassId()} />}
           {state.page === 'lesson-planner' && <LessonPlanner />}
           {state.page === 'operations' && <div className="p-20 text-center text-slate-400">Operational Efficiency & Resource Management</div>}
           {/* Integrations (API keys) is for Enara admins only. */}

@@ -30,6 +30,8 @@ interface LiveAvatarModalProps {
   courseId?: string;
   lessonId?: string;
   assessments?: Assessment[];
+  /** LMS Phase 8: the page "Open in a new tab" lands on (default: My learning for students). */
+  newTabPage?: string;
 }
 
 // 'voice': the video avatar couldn't connect, so the tutor talks without a face.
@@ -67,6 +69,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   courseId,
   lessonId,
   isStudent = false,
+  newTabPage,
 }) => {
   const [provider, setProvider] = useState<AvatarProvider | null>(null);
   const [tavusUrl, setTavusUrl] = useState<string | null>(null);
@@ -89,7 +92,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     micRef.current.fail(p);
     setError(`${micMessage(p, 'en').title} / ${micMessage(p, 'ar').title}`);
   }, []);
-  const newTabTarget = useCallback(() => lmsNewTabTarget({ page: isStudent ? 'courses' : null }), [isStudent]);
+  const newTabTarget = useCallback(() => lmsNewTabTarget({ page: newTabPage ?? (isStudent ? 'courses' : null) }), [isStudent, newTabPage]);
 
   const sessionIdRef = useRef<string | null>(null);
   const anamClientRef = useRef<any>(null);
