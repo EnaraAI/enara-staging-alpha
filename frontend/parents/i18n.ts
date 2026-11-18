@@ -90,6 +90,8 @@ export const T = {
     signInTitle: 'Signing in', codeOnlyBody: 'You joined with a school code. This device remembers you. If you lose this device or sign out, ask the school for a new code.',
     codeOnlySignOut: 'You joined with a school code and have no email on this account. If you sign out, you will need a new code from the school to come back. Sign out anyway?',
     hiddenBySchool: "A child linked to you is hidden for now: their school switched parent access off. Ask the school.",
+    // Parents P3
+    waitingForTeacher: 'Waiting for the teacher',
     // Parents P2: add your email (6-digit code) and the merge it may offer
     addEmailPrompt: 'Add your email to get notifications and sign in on any device.',
     addEmailLost: 'Without an email, if you lose this device or sign out, you will need a new code from the school.',
@@ -183,6 +185,8 @@ export const T = {
     signInTitle: 'تسجيل الدخول', codeOnlyBody: 'انضممت برمز من المدرسة. هذا الجهاز يتذكرك. إذا فقدت هذا الجهاز أو سجّلت الخروج، فاطلب رمزًا جديدًا من المدرسة.',
     codeOnlySignOut: 'انضممت برمز من المدرسة ولا يوجد بريد إلكتروني في هذا الحساب. إذا سجّلت الخروج فستحتاج إلى رمز جديد من المدرسة للعودة. هل تريد تسجيل الخروج؟',
     hiddenBySchool: 'أحد أبنائك المرتبطين مخفي حاليًا: أوقفت مدرسته وصول أولياء الأمور. تواصل مع المدرسة.',
+    // Parents P3
+    waitingForTeacher: 'بانتظار المعلم',
     // Parents P2
     addEmailPrompt: 'أضف بريدك الإلكتروني لتصلك الإشعارات وتسجّل الدخول من أي جهاز.',
     addEmailLost: 'بدون بريد إلكتروني، إذا فقدت هذا الجهاز أو سجّلت الخروج فستحتاج إلى رمز جديد من المدرسة.',

@@ -9,9 +9,13 @@
 //                               code expiry
 //   PARENT_EMAIL_SIGNIN_ENABLED P2: "Add your email" with a 6-digit code, passwordless
 //                               email sign-in, merge of two accounts on a verified email
+//   PARENT_GRADES_AFTER_REVIEW_ENABLED P3: the school's "Show results to parents:
+//                               immediately / after the teacher releases them" (default
+//                               after release, D7), applied to every score a parent sees
 const on = (name: string) => /^(true|1|yes)$/i.test((process.env[name] ?? '').trim());
 
 export const parentSettingsEnabled = () => on('PARENT_SETTINGS_ENABLED');
 export const parentCodeSignupEnabled = () => on('PARENT_CODE_SIGNUP_ENABLED');
 export const parentCodeToolsEnabled = () => on('PARENT_CODE_TOOLS_ENABLED');
 export const parentEmailSigninEnabled = () => on('PARENT_EMAIL_SIGNIN_ENABLED');
+export const parentGradesAfterReviewEnabled = () => on('PARENT_GRADES_AFTER_REVIEW_ENABLED');

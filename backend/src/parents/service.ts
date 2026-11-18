@@ -18,6 +18,7 @@ import * as mock from './mock';
 import { classOfAttempts, classOfCourse, classesForLabels } from '../services/multiClass';
 import { READ_CHECK_ACTOR, endParentLink, endReasonFor } from './linkLifecycle';
 import { parentAccessOf, schoolAccessOffError, schoolsWithAccessOff } from './schoolAccess';
+import { attemptVerified, attemptVisible, resultsPolicyFor, visibleAttemptFilter, type ResultsPolicy } from './resultVisibility';
 
 // Parents Portal data. Everything is computed from live data on each request
 // (user decision: real-time progress, no weekly snapshot or cache). Sections
@@ -61,6 +62,9 @@ export async function requireLearner(parentUserId: string, studentId: string, ac
   const t = tierOf(student);
   return { link, student: student as LearnerContext['student'], tier: t.tier, age: t.age, firstName: String(student.name || '').trim().split(/\s+/)[0] || 'Learner' };
 }
+
+/** Parents P3: the results rule of the child's school (the link's school). */
+const policyOf = (ctx: LearnerContext): Promise<ResultsPolicy> => resultsPolicyFor(ctx.link.institutionId ?? ctx.student.institutionId);
 
 function learnerHeader(ctx: LearnerContext) {
   return {
@@ -241,7 +245,7 @@ export async function weeklyStatus(ctx: LearnerContext, now = new Date()) {
 
   const alerts = await visibleAlerts(ctx, now);
   const recentAlert = alerts.items.find((a) => now.getTime() - new Date(a.createdAt).getTime() < 7 * DAY);
-  const drop = await scoreDrop(ctx.student.id);
+  const drop = await scoreDrop(ctx.student.id, await policyOf(ctx));
 
   let status: 'on_track' | 'needs_nudge' | 'check_this' = 'on_track';
   let reason: { code: string; params: Record<string, unknown> };
@@ -278,8 +282,9 @@ export async function weeklyStatus(ctx: LearnerContext, now = new Date()) {
   };
 }
 
-async function scoreDrop(studentId: string): Promise<{ from: number; to: number } | null> {
-  const last = await AssessmentAttempt.find({ studentId, status: 'submitted', score: { $type: 'number' } }).sort({ submittedAt: -1 }).limit(2).select('score submittedAt').lean();
+async function scoreDrop(studentId: string, policy: ResultsPolicy): Promise<{ from: number; to: number } | null> {
+  // P3: only results the parent may see (an unreleased score never shows as a drop).
+  const last = await AssessmentAttempt.find({ studentId, status: 'submitted', score: { $type: 'number' }, ...visibleAttemptFilter(policy) }).sort({ submittedAt: -1 }).limit(2).select('score submittedAt').lean();
   if (last.length < 2) return null;
   const [a, b] = last;
   return (b.score as number) - (a.score as number) >= 20 ? { from: b.score as number, to: a.score as number } : null;
@@ -304,14 +309,15 @@ async function masteredOutcomes(studentId: string) {
   return { mastered, touched, masteredAny: rows.filter((r) => r.masteryStatus === 'mastered').length };
 }
 
-async function passedCheckpoints(studentId: string) {
-  const attempts = await AssessmentAttempt.find({ studentId, status: 'submitted' }).select('assessmentTitle score').limit(200).lean();
+async function passedCheckpoints(studentId: string, policy: ResultsPolicy) {
+  // P3: a checkpoint test raises the CEFR level only once its result is visible to the parent.
+  const attempts = await AssessmentAttempt.find({ studentId, status: 'submitted', ...visibleAttemptFilter(policy) }).select('assessmentTitle score').limit(200).lean();
   return new Set(attempts.map((a) => checkpointLevel(a.assessmentTitle, a.score)).filter((x): x is Cefr => !!x));
 }
 
 export async function levelCard(ctx: LearnerContext) {
   const m = await masteredOutcomes(ctx.student.id);
-  const real = computeLevel(m.mastered, await passedCheckpoints(ctx.student.id), m.touched.size > 0);
+  const real = computeLevel(m.mastered, await passedCheckpoints(ctx.student.id, await policyOf(ctx)), m.touched.size > 0);
   if (real) {
     return { mock: false, basis: real.basis, cefr: real.cefr, label: PARENT_LEVEL_LABELS[real.cefr], subLevel: real.subLevel, subLevelPct: real.subLevelPct, next: real.next, nextLabel: real.next ? PARENT_LEVEL_LABELS[real.next] : null, masteredOutcomes: real.masteredCount, levelOutcomes: real.outcomeCount, _m: m };
   }
@@ -329,6 +335,7 @@ function stripInternal<T extends { _m?: unknown }>(x: T): Omit<T, '_m'> {
 
 export async function progress(ctx: LearnerContext, classId?: unknown) {
   const level = await levelCard(ctx);
+  const policy = await policyOf(ctx);
   let canDos: { mock: boolean; items: { id: string; text: { en: string; ar: string }; state: 'achieved' | 'in_progress' | 'not_started' }[] };
   if (!level.mock) {
     const items = courseOutcomes(level.cefr).filter((o) => o.measurable === 'yes' || o.measurable === undefined).map((o) => ({ id: o.id, text: { en: o.statement.replace(/^Can /, ''), ar: o.statement.replace(/^Can /, '') }, state: (level._m.mastered.has(o.id) ? 'achieved' : level._m.touched.has(o.id) ? 'in_progress' : 'not_started') as 'achieved' | 'in_progress' | 'not_started' }));
@@ -355,7 +362,12 @@ export async function progress(ctx: LearnerContext, classId?: unknown) {
     lessonsCompleted: { mock: false, count: lessonsDone },
     assessments: {
       mock: false,
-      items: attempts.map((a) => ({ id: a.id, title: a.assessmentTitle, score: typeof a.score === 'number' ? a.score : null, submittedAt: a.submittedAt, passed: typeof a.score === 'number' ? a.score >= 60 : null, verified: a.gradingStatus === undefined || a.gradingStatus === 'released' || a.gradingStatus === 'finalized', ...(classOf ? { class: classOf.get(a.id) ?? null } : {}) })),
+      // P3: a result the parent may not see yet is listed as waiting for the teacher, with no score.
+      items: attempts.map((a) => {
+        const visible = attemptVisible(policy, a);
+        const score = visible && typeof a.score === 'number' ? a.score : null;
+        return { id: a.id, title: a.assessmentTitle, score, submittedAt: a.submittedAt, passed: score !== null ? score >= 60 : null, verified: visible && attemptVerified(policy, a), ...(visible ? {} : { waiting: true }), ...(classOf ? { class: classOf.get(a.id) ?? null } : {}) };
+      }),
     },
     ...(cv ? { classes: { items: cv.list, filter: cv.filter } } : {}),
   });

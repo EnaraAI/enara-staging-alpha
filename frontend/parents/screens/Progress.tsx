@@ -118,11 +118,13 @@ export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
         <ClassFilter classes={d.classes} value={classId} onChange={setClassId} />
         {d.assessments.items.length === 0 && <p className="pp-sub">{t.noAssessments}</p>}
         {d.assessments.items.map((a) => (
-          <div className="pp-row" key={a.id}>
+          <div className="pp-row" key={a.id} data-testid="pp-result">
             <div style={{ flexGrow: 1, minInlineSize: 0 }}>
               <p style={{ fontSize: 14, fontWeight: 600, lineHeight: '20px' }} dir="auto">{a.title}</p>
               <p className="pp-sub">{a.submittedAt ? cairoDate(a.submittedAt.slice(0, 10), lang) : ''}{a.score !== null ? ` · ${n(a.score)}%` : ''}{a.class !== undefined ? ` · ${a.class ? t.inClass(a.class.name) : t.noClass}` : ''}</p>
             </div>
+            {/* Parents P3: not released yet: no score, "Waiting for the teacher". */}
+            {a.waiting && <span className="pp-tag pp-tag--sky" data-testid="pp-result-waiting">{t.waitingForTeacher}</span>}
             {a.passed !== null && a.verified && (a.passed
               ? <span className="pp-tag pp-tag--ok"><Icon name="check" style={{ inlineSize: 14, blockSize: 14 }} />{t.passed}</span>
               : <span className="pp-tag pp-tag--warn">{t.notPassed}</span>)}

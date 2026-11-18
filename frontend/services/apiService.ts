@@ -277,13 +277,13 @@ export interface ParentsSchoolRow {
   id: string; name: string; status: string; access: ParentAccess; accessUpdatedAt: string | null;
   usage: { linkedParents: number; active7: number; active30: number; logins30: number; topScreens: { screen: string; views: number }[] };
 }
-export interface ParentsAdminStatus { enabled: boolean; usage: boolean; canChangeAccess: boolean; codeTools: boolean; settings?: { codeTtlDays: number; teachersMayIssueCodes: boolean }; canChangeSettings?: boolean }
+export interface ParentsAdminStatus { enabled: boolean; usage: boolean; canChangeAccess: boolean; codeTools: boolean; settings?: { codeTtlDays: number; teachersMayIssueCodes: boolean; showResults?: 'immediately' | 'after_release' }; canChangeSettings?: boolean; settingsAvailable?: { codes: boolean; results: boolean } }
 export const fetchParentsAdminStatus = () => request<ParentsAdminStatus>('GET', '/api/parents-admin/status');
 // Parents P2 (PARENT_CODE_TOOLS_ENABLED): school code settings and class code sheets. A sheet's codes are
 // in the response body only and shown once (never in a URL).
 export interface ParentCodeSheet { class: { id: string; name: string }; school: string | null; batchId: string; expiresAt: string; revoked: number; rows: { studentId: string; studentName: string; code: string; codeId: string }[] }
-export const saveSchoolParentSettings = (institutionId: string, body: { codeTtlDays?: number; teachersMayIssueCodes?: boolean }) =>
-  request<{ institutionId: string; codeTtlDays: number; teachersMayIssueCodes: boolean }>('PUT', `/api/parents-admin/schools/${encodeURIComponent(institutionId)}/settings`, body);
+export const saveSchoolParentSettings = (institutionId: string, body: { codeTtlDays?: number; teachersMayIssueCodes?: boolean; showResults?: 'immediately' | 'after_release' }) =>
+  request<{ institutionId: string; codeTtlDays: number; teachersMayIssueCodes: boolean; showResults: 'immediately' | 'after_release' }>('PUT', `/api/parents-admin/schools/${encodeURIComponent(institutionId)}/settings`, body);
 export const fetchCodeClasses = () => request<{ classes: { id: string; name: string; students: number; activeCodes: number }[] }>('GET', '/api/parents-admin/classes');
 export const printClassCodes = (classId: string) => request<ParentCodeSheet>('POST', `/api/parents-admin/classes/${encodeURIComponent(classId)}/code-sheet`);
 export const revokeClassCodes = (classId: string) => request<{ revoked: number }>('POST', `/api/parents-admin/classes/${encodeURIComponent(classId)}/codes/revoke`);

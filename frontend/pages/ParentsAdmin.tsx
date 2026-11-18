@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Users } from 'lucide-react';
 import { fetchParentsAdminSchools, setSchoolParentAccess, type ParentAccess, type ParentsAdminStatus, type ParentsSchoolRow } from '../services/apiService';
 import { ParentCodeTools } from './ParentCodeTools';
+import { ParentSchoolSettings } from './ParentSchoolSettings';
 import { LangSwitch, initialLang, type Lang } from './LmsSchoolStatus';
 
 // Parents P1 (PARENT_SETTINGS_ENABLED): the "Parents" page.
@@ -78,6 +79,7 @@ export const ParentsAdmin: React.FC<{ status?: ParentsAdminStatus }> = ({ status
       {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{t.failed} <button type="button" className="underline" onClick={load}>{t.retry}</button></div>}
       {showUsage && !data && !error && <p className="text-slate-500">{t.loading}</p>}
       {/* Parents P2: code settings and class code sheets. */}
+      {status?.canChangeSettings && <ParentSchoolSettings lang={lang} status={status} />}
       {status?.codeTools && <ParentCodeTools lang={lang} status={status} />}
       {note && <p className="text-sm text-slate-600" role="status">{note}</p>}
 
