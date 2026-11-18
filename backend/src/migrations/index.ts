@@ -33,6 +33,7 @@ import { ParentDeviceSession } from '../models/ParentDeviceSession';
 import { ParentCapturedCode, ParentEmailCode } from '../models/ParentEmailCode';
 import { ParentLinkCode } from '../models/ParentLinkCode';
 import { ParentEmailSend } from '../models/ParentEmailSend';
+import { ParentInvite } from '../models/ParentInvite';
 import { ParentUsageDaily, ParentUsageEvent, USAGE_RETENTION_DAYS } from '../models/ParentUsage';
 import { dataLogRetentionDays } from '../config/retention';
 import type { Migration } from './runner';
@@ -532,6 +533,13 @@ export const MIGRATIONS: Migration[] = [
     description: 'Parents P4: parent_email_sends (unique key, 13-month TTL); new collection, nothing removed',
     up: async () => {
       await (ParentEmailSend as { createIndexes(): Promise<unknown> }).createIndexes();
+    },
+  },
+  {
+    id: '2026-11-29-parents-p5',
+    description: 'Parents P5: parent_invites (13-month TTL; the address hidden, with a hash); new collection, nothing removed',
+    up: async () => {
+      await (ParentInvite as { createIndexes(): Promise<unknown> }).createIndexes();
     },
   },
 ];

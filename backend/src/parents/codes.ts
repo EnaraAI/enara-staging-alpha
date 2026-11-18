@@ -218,6 +218,8 @@ export async function confirmCode(parent: Actor & { email?: string }, input: unk
   await recordAudit('parent_code_redeemed', parent, { institutionId: student.institutionId, type: 'student', id: student.id }, { codeId: code.id, linkId: link.id, role: link.role, ...(previousStatus ? { previousStatus } : {}) });
 
   if (tier === '13plus') await notifyLearnerEmailStub(student.email, link.id);
+  // Parents P5: a code from a CSV invite remembers who redeemed it (the invited address is then a suggestion only).
+  await (await import('./csvInvites')).markInviteRedeemed(code.id, parent.id).catch(() => undefined);
   // Parents P4: parent-link-confirmed (never fails the redeem).
   await (await import('./parentEmails')).notifyLinkConfirmed({ id: link.id, parentUserId: parent.id, studentId: student.id, institutionId: student.institutionId, codeId: code.id });
   return { linkId: link.id, studentId: student.id, role: link.role, status: link.status, consent: link.consent };

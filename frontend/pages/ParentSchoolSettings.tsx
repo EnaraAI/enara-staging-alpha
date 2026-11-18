@@ -13,6 +13,7 @@ const TEXT = {
     title: 'Parent settings', ttl: 'Codes last (days, 1–60)', teachers: 'Teachers may issue codes for their own classes',
     results: 'Show results to parents', immediately: 'Immediately', afterRelease: 'After the teacher releases them',
     resultsHelp: 'Until a result is released, parents see "Waiting for the teacher" and no score. A result that an assignment releases automatically counts as released.',
+    csv: 'Invite parents with a CSV file (the school uploads parent email addresses)',
     emails: 'Emails to parents', emailLabels: { linkConfirmed: 'Link confirmed', weeklySummary: 'Weekly summary (parents can turn it off)', newResults: 'New results (one per child per day at most)', linkEnded: 'Link ended (school unlink, archived, left)' } as Record<string, string>,
     save: 'Save', saved: 'Saved.', failed: 'Could not save. Check the values and try again.',
   },
@@ -20,6 +21,7 @@ const TEXT = {
     title: 'إعدادات أولياء الأمور', ttl: 'مدة صلاحية الرموز (أيام، 1–60)', teachers: 'يمكن للمعلمين إصدار رموز لفصولهم',
     results: 'عرض النتائج لأولياء الأمور', immediately: 'فورًا', afterRelease: 'بعد أن يعتمدها المعلم',
     resultsHelp: 'إلى أن تُعتمد النتيجة يرى ولي الأمر «بانتظار المعلم» دون درجة. النتيجة التي يعتمدها الواجب تلقائيًا تُعد معتمدة.',
+    csv: 'دعوة أولياء الأمور بملف CSV (ترفع المدرسة عناوين البريد الإلكتروني لأولياء الأمور)',
     emails: 'رسائل البريد إلى أولياء الأمور', emailLabels: { linkConfirmed: 'تأكيد الربط', weeklySummary: 'الملخص الأسبوعي (يمكن لولي الأمر إيقافه)', newResults: 'النتائج الجديدة (رسالة واحدة لكل طفل في اليوم كحد أقصى)', linkEnded: 'انتهاء الربط (إلغاء من المدرسة، أرشفة، مغادرة)' } as Record<string, string>,
     save: 'حفظ', saved: 'تم الحفظ.', failed: 'تعذّر الحفظ. تحقق من القيم وحاول مرة أخرى.',
   },
@@ -32,6 +34,8 @@ export const ParentSchoolSettings: React.FC<{ lang: Lang; status: ParentsAdminSt
   const codes = status.settingsAvailable?.codes !== false;
   const results = !!status.settingsAvailable?.results;
   const emailsOn = !!status.settingsAvailable?.emails;
+  const csvOn = !!status.settingsAvailable?.csv;
+  const [csv, setCsv] = useState(!!status.settings?.csvInvites);
   const [emails, setEmails] = useState<Record<EmailKind, boolean>>({ linkConfirmed: true, weeklySummary: true, newResults: false, linkEnded: true, ...(status.settings?.emails ?? {}) });
   const [ttl, setTtl] = useState(String(status.settings?.codeTtlDays ?? 7));
   const [teachers, setTeachers] = useState(!!status.settings?.teachersMayIssueCodes);
@@ -42,7 +46,7 @@ export const ParentSchoolSettings: React.FC<{ lang: Lang; status: ParentsAdminSt
     const school = getSessionUser()?.institutionId;
     if (!school) return;
     try {
-      await saveSchoolParentSettings(school, { ...(codes ? { codeTtlDays: Number(ttl), teachersMayIssueCodes: teachers } : {}), ...(results ? { showResults: show } : {}), ...(emailsOn ? { emails } : {}) });
+      await saveSchoolParentSettings(school, { ...(codes ? { codeTtlDays: Number(ttl), teachersMayIssueCodes: teachers } : {}), ...(results ? { showResults: show } : {}), ...(emailsOn ? { emails } : {}), ...(csvOn ? { csvInvites: csv } : {}) });
       setNote(t.saved);
     } catch {
       setNote(t.failed);
@@ -66,6 +70,9 @@ export const ParentSchoolSettings: React.FC<{ lang: Lang; status: ParentsAdminSt
           <label className="flex items-center gap-2"><input type="radio" name="ps-results" checked={show === 'immediately'} onChange={() => setShow('immediately')} data-testid="ps-results-now" />{t.immediately}</label>
           <p className="text-xs text-slate-500">{t.resultsHelp}</p>
         </fieldset>
+      )}
+      {csvOn && (
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={csv} onChange={(e) => setCsv(e.target.checked)} data-testid="ps-csv" />{t.csv}</label>
       )}
       {emailsOn && (
         <fieldset className="space-y-1 text-sm" data-testid="ps-emails">
