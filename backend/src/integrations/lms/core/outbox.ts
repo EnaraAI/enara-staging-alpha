@@ -9,6 +9,7 @@ import { LmsContext, LmsEnrollment, LmsGradeSyncJob, LmsPlatform, LmsResourceLin
 import { writeLmsAudit } from './audit';
 import { AGS_SCOPE } from './capabilities';
 import { lmsFlags } from './flags';
+import { LMS_VALUE_DIFFERS, lmsSlotHeld, recordGradeSyncTry } from './gradeSyncLog';
 import { effectivePolicy, pickForPolicy, toLmsScore, type LmsScore, type ScoreAttempt, type ScoreCourse, type ScoreQuestion } from './scoring';
 
 // The grade outbox (plan §5, Phase 3): lms_grade_sync_jobs.
@@ -83,6 +84,8 @@ async function sendTimeProblem(job: ILmsGradeSyncJob): Promise<string | null> {
   if (!context || context.platformId !== job.platformId) return 'not_eligible';
   const who = await linkedStudent(attempt.studentId, job.institutionId, context);
   if (!who || who.lmsUserId !== job.lmsUserId) return 'not_eligible';
+  // Grade ledger: the teacher changed this cell in the LMS; nothing is sent until an ENARA teacher decides.
+  if (await lmsSlotHeld(job.resourceLinkId, job.lmsUserId)) return LMS_VALUE_DIFFERS;
   return null;
 }
 
@@ -266,6 +269,8 @@ export async function claimJob(filter: DrainFilter, owner: string, now = new Dat
 
 async function finish(job: ILmsGradeSyncJob, owner: string, update: Record<string, unknown>): Promise<boolean> {
   const r = await LmsGradeSyncJob.updateOne({ id: job.id, status: 'processing', leaseOwner: owner }, update);
+  // Grade ledger sync log (inert unless GRADE_LEDGER_ENABLED): one append-only row per try.
+  if (r.modifiedCount === 1) await recordGradeSyncTry(job, update.$set as Record<string, unknown> | undefined);
   return r.modifiedCount === 1;
 }
 

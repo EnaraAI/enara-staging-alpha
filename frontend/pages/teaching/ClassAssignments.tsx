@@ -14,6 +14,7 @@ import {
 } from '../../services/apiService';
 import { toast } from '../../services/toastService';
 import { SubmissionReview } from './GradingReview';
+import { GradeHistory } from './GradeHistory';
 import { DEFAULT_SPEAKING, SpeakingAttemptsPanel, SpeakingPreview, SpeakingSettingsFields, speakingPayload } from './SpeakingExamSettings';
 
 // Class assignments (Phase 3): give a published assessment version to a
@@ -118,6 +119,7 @@ export const ClassAssignments: React.FC<{ initialClassId?: string; initialAssign
   const [disabled, setDisabled] = useState(false);
   const [review, setReview] = useState<string | null>(null);
   const [extend, setExtend] = useState<{ studentId: string; name: string } | null>(null);
+  const [history, setHistory] = useState<string | null>(null);
   const [ext, setExt] = useState({ dueAt: toLocalInput(new Date(Date.now() + 2 * 86400000)), reason: '' });
 
   useEffect(() => {
@@ -213,9 +215,10 @@ export const ClassAssignments: React.FC<{ initialClassId?: string; initialAssign
                         <td className="py-1.5 pr-3 font-medium">{r.name}</td>
                         <td className="py-1.5 pr-3">{STATUS[r.status] ?? r.status}{r.late ? ' · late' : ''}</td>
                         <td className="py-1.5 pr-3">{new Date(r.dueAt).toLocaleDateString()}</td>
-                        <td className="py-1.5 pr-3 tabular-nums">{r.score ?? '—'}</td>
+                        <td className="py-1.5 pr-3 tabular-nums">{r.score ?? '—'}{r.lmsValueDiffers ? <span className="ml-2 text-xs font-semibold text-amber-800 bg-amber-100 rounded px-1.5 py-0.5">Changed in LMS</span> : null}</td>
                         <td className="py-1.5 space-x-3 whitespace-nowrap">
                           {r.latestAttemptId && <button onClick={() => setReview(r.latestAttemptId)} className="text-indigo-700 font-semibold">Review</button>}
+                          {detail.gradeLedger && <button onClick={() => setHistory(r.studentId)} className="text-slate-600">Grade history</button>}
                           <button onClick={() => setExtend({ studentId: r.studentId, name: r.name })} className="text-slate-600">Extend</button>
                         </td>
                       </tr>
@@ -227,6 +230,7 @@ export const ClassAssignments: React.FC<{ initialClassId?: string; initialAssign
           )}
         </div>
       )}
+      {history && detail && <GradeHistory assignmentId={detail.assignment.id} studentId={history} onClose={() => { setHistory(null); openDetail(detail.assignment.id); }} />}
       {extend && detail && (
         <Modal title={`Extension for ${extend.name}`} onClose={() => setExtend(null)}>
           <label className="block text-sm">New due date<input type="datetime-local" className="mt-1 w-full border border-slate-300 rounded px-2 py-1.5 text-sm" value={ext.dueAt} onChange={(e) => setExt({ ...ext, dueAt: e.target.value })} /></label>

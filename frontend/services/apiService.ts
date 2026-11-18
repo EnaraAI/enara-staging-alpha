@@ -1048,6 +1048,12 @@ export const regradeSubmission = (attemptId: string, reason?: string) => request
 export const resolveAppeal = (attemptId: string, appealId: string, decision: 'upheld' | 'rejected', response: string) =>
   request<any>('PUT', `/api/grading/attempts/${enc(attemptId)}/appeals/${enc(appealId)}`, { decision, response });
 export const correctSubmissionGrade = (attemptId: string, body: any) => request<any>('POST', `/api/grading/attempts/${enc(attemptId)}/correct`, body);
+// Grade ledger (GRADE_LEDGER_ENABLED): one student's grade history on one assignment, and the
+// teacher's choice for a grade changed in the LMS.
+export const fetchGradeHistory = (assignmentId: string, studentId: string) =>
+  request<any>('GET', `/api/assignments/${enc(assignmentId)}/students/${enc(studentId)}/grade-history`);
+export const decideLmsGrade = (assignmentId: string, studentId: string, resourceLinkId: string, keep: 'lms' | 'enara') =>
+  request<{ resolution: string; queued: number }>('POST', `/api/assignments/${enc(assignmentId)}/students/${enc(studentId)}/lms-decision`, { resourceLinkId, keep });
 
 export const fetchMyAssignments = () => request<{ assignments: any[] }>('GET', '/api/me/assignments');
 export const fetchMyAssignment = (id: string) => request<any>('GET', `/api/me/assignments/${enc(id)}`);

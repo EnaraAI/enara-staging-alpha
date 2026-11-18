@@ -68,6 +68,17 @@ export class MockPlatform {
   lineItems: MockLineItem[] = [];
   lineItemPosts: Record<string, unknown>[] = [];
   lineItemGets: string[] = [];
+  /**
+   * Grade ledger: a Moodle-style gradebook behind the AGS result service. A
+   * posted score is stored scaled to `gradebookMax` (Moodle scales to the line
+   * item's maximum grade, e.g. 100); a teacher's own change can be set with
+   * setGradebook (overridden: later tool scores are ignored, Moodle's rule).
+   */
+  gradebook = new Map<string, { resultScore: number | null; resultMaximum: number; overridden?: boolean }>();
+  gradebookMax = 100;
+  resultGets: { path: string; query: string; accept: string; auth: string }[] = [];
+  /** Status for the next results reads (shifted per request); empty = 200. */
+  resultStatuses: number[] = [];
   private tokenCount = 0;
 
   constructor(
@@ -116,6 +127,19 @@ export class MockPlatform {
     this.lineItems = [];
     this.lineItemPosts = [];
     this.lineItemGets = [];
+    this.gradebook.clear();
+    this.gradebookMax = 100;
+    this.resultGets = [];
+    this.resultStatuses = [];
+  }
+
+  /** A grade typed into the LMS gradebook by its teacher (line item path like /lineitems/5/lineitem). */
+  setGradebook(lineItemPath: string, userId: string, resultScore: number | null, opts: { overridden?: boolean; resultMaximum?: number } = {}) {
+    this.gradebook.set(`${lineItemPath}|${userId}`, { resultScore, resultMaximum: opts.resultMaximum ?? this.gradebookMax, overridden: opts.overridden ?? true });
+  }
+
+  gradebookValue(lineItemPath: string, userId: string) {
+    return this.gradebook.get(`${lineItemPath}|${userId}`);
   }
 
   private async body(req: http.IncomingMessage): Promise<string> {
@@ -161,10 +185,26 @@ export class MockPlatform {
     if (/^\/lineitems\/\d+\/lineitem\/scores$/.test(url.pathname) && req.method === 'POST') {
       if (this.scoreDelayMs) await new Promise((r) => setTimeout(r, this.scoreDelayMs));
       const status = this.scoreStatuses.shift() ?? 200;
-      this.scores.push({ path: url.pathname, query: url.search, auth, contentType: String(req.headers['content-type'] ?? ''), body: JSON.parse(raw || '{}') });
+      const posted = JSON.parse(raw || '{}') as Record<string, unknown>;
+      this.scores.push({ path: url.pathname, query: url.search, auth, contentType: String(req.headers['content-type'] ?? ''), body: posted });
+      const cell = `${url.pathname.replace(/\/scores$/, '')}|${String(posted.userId)}`;
+      if (status === 200 && typeof posted.scoreGiven === 'number' && typeof posted.scoreMaximum === 'number' && !this.gradebook.get(cell)?.overridden) {
+        this.gradebook.set(cell, { resultScore: Math.round((posted.scoreGiven / posted.scoreMaximum) * this.gradebookMax * 100) / 100, resultMaximum: this.gradebookMax });
+      }
       if (status === 429) res.setHeader('Retry-After', '1');
       res.writeHead(status).end();
       return;
+    }
+    if (/^\/lineitems\/\d+\/lineitem\/results$/.test(url.pathname) && req.method === 'GET') {
+      this.resultGets.push({ path: url.pathname, query: url.search, accept: String(req.headers.accept ?? ''), auth });
+      const status = this.resultStatuses.shift() ?? 200;
+      if (status !== 200) return this.json(res, status, { error: 'x' });
+      const item = url.pathname.replace(/\/results$/, '');
+      const userId = url.searchParams.get('user_id');
+      const rows = [...this.gradebook.entries()]
+        .filter(([k]) => k.startsWith(`${item}|`) && (!userId || k === `${item}|${userId}`))
+        .map(([k, v]) => ({ id: `${this.serviceBase}${item}/results/${k.split('|')[1]}`, scoreOf: `${this.serviceBase}${item}`, userId: k.split('|')[1], ...(v.resultScore === null ? {} : { resultScore: v.resultScore }), resultMaximum: v.resultMaximum }));
+      return this.json(res, 200, rows, 'application/vnd.ims.lis.v2.resultcontainer+json');
     }
     res.writeHead(404).end();
   }

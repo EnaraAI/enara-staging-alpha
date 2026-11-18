@@ -22,6 +22,7 @@ import { notifyResultsReleased } from '../services/teachingNotifications';
 import { ensurePlainObject, getOptionalNumber, getOptionalString, getRequiredString, rejectMongoOperators } from '../utils/validation';
 import { logger } from '../utils/logging';
 import { lmsResultChanged } from '../integrations/lms/core/gradeEvents';
+import { gradeLedgerOn, recordGradeChange } from '../services/gradeLedger';
 
 async function loadAttemptForStaff(req: AuthRequest, attemptId: string) {
   const attempt = await AssessmentAttempt.findOne({ id: attemptId, status: 'submitted', assignmentId: { $exists: true } });
@@ -136,6 +137,8 @@ export const getSubmissionForReview = asyncHandler(async (req: AuthRequest, res:
       };
     }),
     aiGradingEnabled: await isFeatureEnabled(attempt.institutionId, 'ai_grading_enabled'),
+    // Grade ledger on: the screen offers "Grade history" (absent when off).
+    ...(gradeLedgerOn() ? { gradeLedger: true } : {}),
   });
 });
 
@@ -223,6 +226,7 @@ export const scoreAnswer = asyncHandler(async (req: AuthRequest, res: Response) 
   updated.totalPoints = t.totalPoints;
   updated.maxPoints = t.maxPoints;
   await AssessmentAttempt.updateOne({ id: updated.id, gradingStatus: { $in: ['needs_review', 'graded_draft', 'grading_exception'] } }, { $set: { gradingStatus: updated.gradingStatus, totalPoints: t.totalPoints, maxPoints: t.maxPoints } });
+  await recordGradeChange(attempt.id, action === 'override' ? 'teacher_override' : 'teacher_scored', req.user!.id, { questionId, note: reason });
   logger.info('grading_answer_scored', { attemptId: attempt.id, questionId, action, by: req.user!.id });
   res.json({ gradingStatus: updated.gradingStatus, totalPoints: t.totalPoints, maxPoints: t.maxPoints, answer: updated.answers.find((a) => a.questionId === questionId) });
 });
@@ -291,6 +295,7 @@ export const regradeSubmission = asyncHandler(async (req: AuthRequest, res: Resp
     { new: true },
   );
   if (!updated) throw new AppError('This submission changed; reload and try again', 409, 'INVALID_GRADING_STATE');
+  await recordGradeChange(updated.id, 'regrade_requested', req.user!.id, { note: reason });
   const { processAttempt } = await import('../services/autoGrading');
   const outcome = await processAttempt(updated.id);
   const now = await AssessmentAttempt.findOne({ id: updated.id }).select('gradingStatus score exceptionReason').lean();
@@ -360,7 +365,8 @@ export const correctGrade = asyncHandler(async (req: AuthRequest, res: Response)
   const updated = (await AssessmentAttempt.findOne({ id: attempt.id }))!;
   const t = totals(updated.answers);
   await AssessmentAttempt.updateOne({ id: attempt.id }, { $set: { totalPoints: t.totalPoints, maxPoints: t.maxPoints, score: t.percent } });
-  // LMS grade passback (inert unless switched on): the corrected score.
+  // Grade ledger, then LMS grade passback (both inert unless switched on): the corrected score.
+  await recordGradeChange(attempt.id, 'teacher_correction', req.user!.id, { questionId, note: reason });
   await lmsResultChanged(attempt.id, 'corrected');
 
   // Evidence: invalidate what the old score produced, record the new one.
