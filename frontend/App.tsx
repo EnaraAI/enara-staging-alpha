@@ -50,8 +50,9 @@ import { LmsConnections } from './pages/LmsConnections';
 import { LmsActivityOverview, LmsActivityStudent } from './pages/LmsActivity';
 import { LmsOnboarding } from './pages/LmsOnboarding';
 import { LmsSchoolStatus } from './pages/LmsSchoolStatus';
+import { ParentsAdmin } from './pages/ParentsAdmin';
 import { LmsEmailOptIn } from './components/LmsEmailOptIn';
-import { isLmsPreview, isLmsSession, lmsSessionClassId, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
+import { isLmsPreview, isLmsSession, lmsSessionClassId, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser, getParentDeviceToken, resumeParentDevice, fetchParentsAdminStatus } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
@@ -294,6 +295,14 @@ const App: React.FC = () => {
     fetchLmsStatus().then(() => setLmsEnabled(true)).catch(() => setLmsEnabled(false));
   }, [state.role]);
 
+  // Parents P1: the "Parents" page, only when PARENT_SETTINGS_ENABLED is on (the API answers 404 otherwise).
+  const [parentsAdminEnabled, setParentsAdminEnabled] = useState(false);
+  useEffect(() => {
+    const backendRole = getSessionUser()?.role;
+    if ((state.role !== 'admin' && state.role !== 'enara-admin') || (backendRole !== 'admin' && backendRole !== 'enara-admin')) return setParentsAdminEnabled(false);
+    fetchParentsAdminStatus().then(() => setParentsAdminEnabled(true)).catch(() => setParentsAdminEnabled(false));
+  }, [state.role]);
+
   const [isTutorOpen, setIsTutorOpen] = useState(false);
   const [tutorMessage, setTutorMessage] = useState<string | null>(null);
   const [tutorSessionId, setTutorSessionId] = useState<string | null>(null);
@@ -332,11 +341,23 @@ const App: React.FC = () => {
   };
 
   // A launch from an LMS (docs/lms): exchange the one-time token, then open the app.
+  // Parents P1: a remembered parent device (code-first sign-in) opens the portal
+  // without signing in again; the device token is exchanged for a new session.
+  const [resumingDevice, setResumingDevice] = useState(() => !state.role && onParentsPath() && !!getParentDeviceToken());
+  useEffect(() => {
+    if (!resumingDevice) return;
+    resumeParentDevice()
+      .then((user) => { if (user && user.role === 'parent') handleLogin('parent', user); })
+      .catch(() => undefined)
+      .finally(() => setResumingDevice(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   if (onLmsLaunchPath()) return <LmsLaunch onReady={handleLogin} />;
   // LMS Phase 2: the activity picker (a teacher's "Select content" in the LMS).
   if (onLmsPickerPath()) return <LmsPicker />;
 
   // Invitation and password-reset links open their own page (P22).
+  if (resumingDevice) return <div className="min-h-screen flex items-center justify-center text-slate-500">Loading…</div>;
+
   const accountLink = accountLinkFromLocation();
   if (accountLink) return <AccountLink kind={accountLink.kind} token={accountLink.token} />;
 
@@ -563,6 +584,7 @@ const App: React.FC = () => {
             isEnaraAdmin={true}
             role="enara-admin"
             showLms={lmsEnabled}
+            showParents={parentsAdminEnabled}
           />
           <main className="flex-1 overflow-y-auto p-8">
             {state.page === 'dashboard' && <EnaraAdminDashboard onNavigate={navigate} />}
@@ -582,6 +604,7 @@ const App: React.FC = () => {
             {state.page === 'integrations' && <Integrations />}
             {state.page === 'lms' && lmsEnabled && <LmsConnections />}
             {state.page === 'lms-onboarding' && lmsEnabled && <LmsOnboarding />}
+            {state.page === 'parents-admin' && parentsAdminEnabled && <ParentsAdmin />}
             {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
             {state.page === 'settings' && <div className="p-20 text-center text-slate-400">Platform Global Settings</div>}
           </main>
@@ -611,6 +634,7 @@ const App: React.FC = () => {
           onClose={() => setIsSidebarOpen(false)}
           role="admin"
           showLms={lmsEnabled}
+            showParents={parentsAdminEnabled}
         />
         <main className="flex-1 overflow-y-auto">
           {/* LMS emails (D2): a teacher from the LMS is asked once whether Enara may email them. */}
@@ -649,6 +673,8 @@ const App: React.FC = () => {
           {state.page === 'lms' && lmsEnabled && sessionUser()?.role === 'admin' && <LmsConnections />}
           {/* LMS step 2 (S5): the school connection status page, own school only (server-enforced; teachers never). */}
           {state.page === 'lms-status' && lmsEnabled && sessionUser()?.role === 'admin' && sessionUser()?.institutionId && <LmsSchoolStatus institutionId={sessionUser()!.institutionId!} isEnara={false} />}
+          {/* Parents P1: the school's Parents card (school admins; server-enforced, off unless PARENT_SETTINGS_ENABLED). */}
+          {state.page === 'parents-admin' && parentsAdminEnabled && sessionUser()?.role === 'admin' && <ParentsAdmin />}
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments initialClassId={state.lmsTarget?.classId ?? undefined} initialAssignmentId={state.lmsTarget?.assignmentId} />}
           {state.page === 'grading' && <GradingReview />}

@@ -24,6 +24,8 @@ import { lmsFlags } from '../integrations/lms/core/flags';
 import { gradeLedgerOn } from '../services/gradeLedger';
 import { runLmsEmailDaily } from '../integrations/lms/core/lmsEmailDaily';
 import { lmsEmailsActive } from '../integrations/lms/core/lmsEmail';
+import { parentSettingsEnabled } from '../parents/flags';
+import { runParentUsageRollup } from '../parents/usage';
 
 // Meant to be called once a day by a scheduler that sends
 // "Authorization: Bearer <CRON_SECRET>". Staging deliberately has no Vercel
@@ -104,6 +106,8 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
       const budgetMs = Math.max(3_000, Math.min(15_000, 57_000 - (Date.now() - startedAt)));
       await run('lmsEmails', () => runLmsEmailDaily({ budgetMs }));
     }
+    // Parents P1: nightly rollup of parent usage events (inert unless PARENT_SETTINGS_ENABLED).
+    if (parentSettingsEnabled()) await run('parentUsage', () => runParentUsageRollup());
     await run('reminders', () => sendReminders({}));
     if (new Date().getUTCDay() === 1) await run('weekly', () => sendWeeklySummaries());
     logger.info('cron_daily', { ...results, failed });

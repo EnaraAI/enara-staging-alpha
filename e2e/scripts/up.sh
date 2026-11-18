@@ -33,8 +33,8 @@ docker compose up -d --wait enara
 curl --noproxy '*' -fsS --cacert .run/caddy-root.crt "https://${ENARA_HOST:-enara.tool.test}/health"; echo
 # Owner rule: the e2e stack never sends real email (no Resend key; LMS emails
 # on only in capture mode: rendered and recorded, never sent).
-if docker compose exec -T enara sh -c 'test -n "${RESEND_API_KEY:-}" || { test "${LMS_EMAILS_ENABLED:-}" = true && test "${LMS_EMAIL_CAPTURE:-}" != true; }'; then
-  echo "ERROR: ENARA has an email key, or LMS emails on without capture; the e2e stack must never send email" >&2; exit 1
+if docker compose exec -T enara sh -c 'test -n "${RESEND_API_KEY:-}" || { test "${LMS_EMAILS_ENABLED:-}" = true && test "${LMS_EMAIL_CAPTURE:-}" != true; } || { test "${PARENT_EMAILS_ENABLED:-}" = true && test "${LMS_EMAIL_CAPTURE:-}" != true; }'; then
+  echo "ERROR: ENARA has an email key, or LMS or parent emails on without capture; the e2e stack must never send email" >&2; exit 1
 fi
 echo "email sending: off (no RESEND_API_KEY; LMS emails captured only)"
 # The LTI key set is served by the API, not the image's SPA fallback.

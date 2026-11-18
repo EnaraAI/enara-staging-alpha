@@ -23,11 +23,13 @@ export interface Activity { classes?: ClassChoice; generatedAt: string; learner:
 export interface Transcript { learner: LearnerHeader; session: { id: string; title: string; startedAt: string }; expiresAt: string; messages: { id: string; from: 'learner' | 'enara'; text: string; at: string }[]; audio: { available: boolean } }
 export interface Controls { learner: LearnerHeader; controls: { weeklyGoalMin: number; dailyLimitMin: number; focus: string; reminders: boolean; liveAvatar: boolean; microphone: boolean; camera: boolean; learnerAccepted?: boolean }; mode: 'parent_sets' | 'co_set'; enforced: boolean }
 export interface Report { learner: LearnerHeader; report: { weekStart: string; status: WeeklyStatus['status']; minutesDone: number; goalMinutes: number; streak: number; level: Level; learned: { mock: boolean; items: Bi[] }; tryAtHome: { mock: boolean; text: Bi } } }
-export interface Account { learners: LearnerChip[]; pending: { linkId: string }[]; guardians: { byLearner: { studentId: string; canManage: boolean; items: { linkId: string; name: string; role: LinkRole; isYou: boolean }[] }[] }; plan: { mock: boolean; name: Bi; price: string; learners: number; renewsOn: string; payment: Bi }; preferences: { language: 'en' | 'ar'; alertChannels: string[] } }
+export interface Account { learners: LearnerChip[]; pending: { linkId: string }[]; guardians: { byLearner: { studentId: string; canManage: boolean; items: { linkId: string; name: string; role: LinkRole; isYou: boolean }[] }[] }; plan: AccountPlan; preferences: { language: 'en' | 'ar'; alertChannels: string[] }; signIn?: { method: 'code' | 'password' | 'google'; hasEmail: boolean }; hiddenBySchool?: number }
+// Parents P1: with PARENT_SETTINGS_ENABLED the plan is "Provided by <school>" (no price); otherwise the mock plan.
+export type AccountPlan = { mock: true; name: Bi; price: string; learners: number; renewsOn: string; payment: Bi } | { mock: false; kind: 'school'; providedBy: string[] };
 
 const L = (id: string) => `/api/parents/learners/${encodeURIComponent(id)}`;
 export const parentsApi = {
-  learners: () => apiRequest<{ generatedAt: string; learners: LearnerChip[]; pending: { linkId: string }[] }>('GET', '/api/parents/learners'),
+  learners: () => apiRequest<{ generatedAt: string; learners: LearnerChip[]; pending: { linkId: string }[]; hiddenBySchool?: number }>('GET', '/api/parents/learners'),
   status: (id: string) => apiRequest<{ generatedAt: string; status: WeeklyStatus }>('GET', `${L(id)}/status`),
   home: (id: string) => apiRequest<Home>('GET', `${L(id)}/home`),
   progress: (id: string, classId?: string | null) => apiRequest<Progress>('GET', `${L(id)}/progress${classId ? `?classId=${encodeURIComponent(classId)}` : ''}`),

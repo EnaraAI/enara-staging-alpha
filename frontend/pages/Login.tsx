@@ -5,6 +5,7 @@ import { uiRoleFor, UiRole, LoginChoice } from '../services/roleRouting';
 import './Login.css';
 import { EnaraLogo } from '../components/brand/EnaraLogo';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
+import { CodeStart } from '../parents/CodeStart';
 
 // Sign-in "Floating Classroom" (redesign concept B). The sign-in flow is the
 // same as before: the backend checks the email and password, and
@@ -38,6 +39,7 @@ const TEXT = {
     parentSignupTitle: 'Create a parent account',
     parentCreate: 'Create a parent account', parentHaveAccount: 'Already have an account? Sign in',
     parentLink: 'Have an invite code? Link your child',
+    parentHaveCode: 'New here? I have a code from the school',
     name: 'Your name', namePh: 'e.g. Mona Hassan', noName: 'Enter your name.',
     newPassword: 'Create a password', newPasswordPh: 'At least 8 characters', shortPassword: 'Use at least 8 characters.',
     createSubmit: 'Create account', creating: 'Creating account…', exists: 'An account with this email already exists. Sign in instead.',
@@ -78,6 +80,7 @@ const TEXT = {
     parentSignupTitle: 'اعمل حساب وليّ أمر',
     parentCreate: 'اعمل حساب وليّ أمر', parentHaveAccount: 'عندك حساب؟ سجّل دخولك',
     parentLink: 'معاك كود دعوة؟ اربط ابنك',
+    parentHaveCode: 'جديد هنا؟ عندي كود من المدرسة',
     name: 'اسمك', namePh: 'مثلاً: منى حسن', noName: 'اكتب اسمك.',
     newPassword: 'اختار كلمة سر', newPasswordPh: '٨ حروف على الأقل', shortPassword: 'استخدم ٨ حروف على الأقل.',
     createSubmit: 'اعمل الحساب', creating: 'جاري عمل الحساب…', exists: 'فيه حساب بالإيميل ده. سجّل دخولك بدل كده.',
@@ -121,7 +124,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
   });
   const [portal, setPortal] = useState<LoginChoice>(initialPortal ?? 'student');
   // Parents tab: sign in, or create a parent account; linkIntent opens the code screen next.
-  const [parentMode, setParentMode] = useState<'signin' | 'signup'>('signin');
+  // Parents P1 (codeSignup from the server): 'code' is the code-first entry, the default for the Parents tab.
+  const [parentMode, setParentMode] = useState<'signin' | 'signup' | 'code'>('signin');
   const [linkIntent, setLinkIntent] = useState(() => { try { return sessionStorage.getItem(PARENT_LINK_INTENT_KEY) === '1'; } catch { return false; } });
   const [name, setName] = useState('');
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -134,9 +138,16 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
   const [info, setInfo] = useState<string | null>(null);
   // Parents tab: "Continue with Google", shown only when the server has a Google client ID.
   const [googleCfg, setGoogleCfg] = useState<{ google: boolean; clientId?: string }>({ google: false });
+  const [codeSignup, setCodeSignup] = useState(false);
   useEffect(() => {
     if (isSharedCourse || isSharedAssessment) return;
-    fetchParentAuthConfig().then((c) => setGoogleCfg(c?.google && c.clientId ? c : { google: false })).catch(() => setGoogleCfg({ google: false }));
+    fetchParentAuthConfig().then((c) => {
+      setGoogleCfg(c?.google && c.clientId ? c : { google: false });
+      if (c?.codeSignup) {
+        setCodeSignup(true);
+        setParentMode((m) => (m === 'signin' ? 'code' : m));
+      }
+    }).catch(() => setGoogleCfg({ google: false }));
   }, [isSharedCourse, isSharedAssessment]);
   // One-click partner demo, shown only while the demo is open.
   const [demoOpen, setDemoOpen] = useState(false);
@@ -198,6 +209,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
   };
   const isParent = portal === 'parent';
   const signingUp = isParent && parentMode === 'signup';
+  const codeMode = isParent && codeSignup && parentMode === 'code';
   const rememberLinkIntent = (on: boolean) => {
     setLinkIntent(on);
     try { if (on) sessionStorage.setItem(PARENT_LINK_INTENT_KEY, '1'); else sessionStorage.removeItem(PARENT_LINK_INTENT_KEY); } catch { /* storage unavailable */ }
@@ -205,6 +217,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (codeMode) return; // the code entry has its own buttons
     setAuthError(null); setInfo(null); setFieldError(null);
     if (!EMAIL_RE.test(email.trim())) { setFieldError({ field: 'email', text: t.badEmail }); return; }
     if (!password) { setFieldError({ field: 'password', text: t.noPassword }); return; }
@@ -324,6 +337,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
           <div className="si-alert info" role="status"><Info size={18} /><span>{info}</span></div>
         )}
 
+        {codeMode && (
+          <CodeStart lang={lang} onLogin={(user) => onLogin('parent', user)} onSignIn={() => { setParentMode('signin'); setAuthError(null); setInfo(null); }} />
+        )}
+
+        {!codeMode && <>
         {isParent && googleCfg.google && googleCfg.clientId && (
           <GoogleSignInButton clientId={googleCfg.clientId} lang={lang} context={signingUp ? 'signup' : 'signin'} disabled={isLoading} onCredential={handleGoogle} orLabel={t.or} />
         )}
@@ -382,11 +400,18 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
             <button type="button" className="si-ghost" onClick={() => { setParentMode(signingUp ? 'signin' : 'signup'); setFieldError(null); setAuthError(null); }}>
               <UserRound size={16} />{signingUp ? t.parentHaveAccount : t.parentCreate}
             </button>
-            <button type="button" className="si-ghost" aria-pressed={linkIntent} onClick={() => rememberLinkIntent(!linkIntent)}>
-              <Link2 size={16} />{t.parentLink}
-            </button>
+            {codeSignup ? (
+              <button type="button" className="si-ghost" onClick={() => { setParentMode('code'); setFieldError(null); setAuthError(null); }} data-testid="parent-have-code">
+                <Link2 size={16} />{t.parentHaveCode}
+              </button>
+            ) : (
+              <button type="button" className="si-ghost" aria-pressed={linkIntent} onClick={() => rememberLinkIntent(!linkIntent)}>
+                <Link2 size={16} />{t.parentLink}
+              </button>
+            )}
           </div>
         )}
+        </>}
         <p className="si-hint"><Lock size={14} />{isParent ? t.parentManaged : t.managed}</p>
         </div>
 

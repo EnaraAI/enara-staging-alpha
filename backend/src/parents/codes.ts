@@ -12,6 +12,7 @@ import { logger } from '../utils/logging';
 import { tierOf } from './policy';
 import { endParentLink, endReasonFor } from './linkLifecycle';
 import { requireLearner } from './service';
+import { parentAccessOf, schoolAccessOffError } from './schoolAccess';
 
 // Parent link codes (decision 16 Nov 2026): the school admin issues a code for
 // a learner (any age); a parent redeems it once; the link is ACTIVE on confirm.
@@ -143,12 +144,17 @@ async function findUsable(parentUserId: string, input: unknown) {
   if (!normalized) return failed(parentUserId);
   const code = await ParentLinkCode.findOne({ codeHash: hashCode(normalized) }).lean();
   if (!code || code.status !== 'active' || code.expiresAt <= new Date()) return failed(parentUserId);
+  // Parents P1: a school with parent access Off accepts no new link (not a wrong code: no lockout).
+  if ((await parentAccessOf(code.institutionId)) === 'off') throw schoolAccessOffError();
   return code;
 }
 
 /** Minimal preview: learner first name + last initial, and school name. Nothing else. */
 export async function previewCode(parentUserId: string, input: unknown) {
-  const code = await findUsable(parentUserId, input);
+  return previewFor(await findUsable(parentUserId, input));
+}
+
+export async function previewFor(code: { studentId: string; institutionId: string }) {
   const student = await Student.findOne({ id: code.studentId }).select('name').lean();
   const school = await Institution.findOne({ id: code.institutionId }).select('name').lean();
   const parts = String(student?.name || '').trim().split(/\s+/).filter(Boolean);

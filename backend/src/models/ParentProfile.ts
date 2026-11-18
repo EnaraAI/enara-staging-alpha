@@ -9,6 +9,9 @@ export interface IParentProfile extends Document {
   // Code redemption abuse guard: 5 wrong codes -> 15-minute lockout.
   failedRedeems?: number;
   redeemLockedUntil?: Date;
+  // Parents P1: how the account was made. 'code': code only (no email, no
+  // password; signed in through a remembered device session).
+  signIn?: 'code' | 'password' | 'google';
 }
 
 const profileSchema = new Schema<IParentProfile>(
@@ -19,6 +22,7 @@ const profileSchema = new Schema<IParentProfile>(
     whatsappNumber: { type: String, select: false },
     failedRedeems: { type: Number, default: 0 },
     redeemLockedUntil: Date,
+    signIn: { type: String, enum: ['code', 'password', 'google'] },
   },
   { collection: 'parent_profiles', versionKey: false, timestamps: true },
 );

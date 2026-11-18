@@ -29,6 +29,8 @@ import { LMS_MIC_MODELS, LMS_MODELS, LMS_P0_MODELS, LMS_PHASE1A_MODELS, LMS_PHAS
 import { ClassEnrollment } from '../models/ClassEnrollment';
 import { ReminderLog } from '../models/ReminderLog';
 import { SignInEvent } from '../models/SignInEvent';
+import { ParentDeviceSession } from '../models/ParentDeviceSession';
+import { ParentUsageDaily, ParentUsageEvent, USAGE_RETENTION_DAYS } from '../models/ParentUsage';
 import { dataLogRetentionDays } from '../config/retention';
 import type { Migration } from './runner';
 
@@ -503,6 +505,15 @@ export const MIGRATIONS: Migration[] = [
       for (const model of LMS_EMAIL_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
       await LmsAuditLog.collection.createIndex({ event: 1, createdAt: 1 });
       if (!(await LmsEmailLog.collection.indexes()).some((i) => i.key.key === 1 && i.unique)) throw new Error('lms_email_log key unique index missing');
+    },
+  },
+  {
+    id: '2026-11-26-parents-p1',
+    description: 'Parents P1: parent_usage_events and parent_usage_daily (13-month TTL on at), parent_device_sessions (unique token hash, TTL on expiresAt); new collections, nothing removed',
+    up: async () => {
+      for (const model of [ParentUsageEvent, ParentUsageDaily, ParentDeviceSession]) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
+      const ttl = (await ParentUsageEvent.collection.indexes()).find((i) => i.key.at === 1 && i.expireAfterSeconds !== undefined);
+      if (ttl?.expireAfterSeconds !== USAGE_RETENTION_DAYS * 86400) throw new Error('parent_usage_events 13-month TTL index missing');
     },
   },
 ];

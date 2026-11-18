@@ -109,7 +109,7 @@ function toUrl(path: string): string {
   return `${API_BASE}${path.replace(/^\/api(?=\/|$)/, '')}`;
 }
 
-async function request<T = any>(method: string, path: string, body?: unknown, isForm = false): Promise<T> {
+async function request<T = any>(method: string, path: string, body?: unknown, isForm = false, retried = false): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -139,6 +139,10 @@ async function request<T = any>(method: string, path: string, body?: unknown, is
 
   if (!res.ok) {
     const message = data?.error?.message || data?.message || (typeof data?.error === 'string' ? data.error : '') || `Request failed (${res.status})`;
+    // Parents P1: a remembered parent device gets a fresh session token and the request is tried once more.
+    if (res.status === 401 && token && !retried && !path.startsWith('/api/auth/') && !path.startsWith('/api/parents/device/') && getParentDeviceToken()) {
+      if (await resumeParentDevice().catch(() => null)) return request<T>(method, path, body, isForm, true);
+    }
     if (res.status === 401 && token && !path.startsWith('/api/auth/')) {
       clearSession();
       window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
@@ -198,7 +202,7 @@ export async function registerParent(name: string, email: string, password: stri
 }
 
 // Parents Portal: which sign-in methods to offer. The Google client ID is public.
-export async function fetchParentAuthConfig(): Promise<{ google: boolean; clientId?: string }> {
+export async function fetchParentAuthConfig(): Promise<{ google: boolean; clientId?: string; codeSignup?: boolean }> {
   return request('GET', '/api/parents/auth-config');
 }
 
@@ -209,6 +213,59 @@ export async function googleParentSignIn(credential: string, language: 'en' | 'a
   saveSession(data.token, data.user);
   return data.user;
 }
+
+// ---------------------------------------------------------------------------
+// Parents P1 (PARENT_CODE_SIGNUP_ENABLED): code-first entry and the remembered
+// device. The device token lives in this browser only (localStorage) and is
+// exchanged for a short session token; the link code is only ever sent in a
+// request body, never put in a URL.
+const PARENT_DEVICE_KEY = 'enara_parent_device';
+export function getParentDeviceToken(): string | null {
+  try { return localStorage.getItem(PARENT_DEVICE_KEY); } catch { return null; }
+}
+export function setParentDeviceToken(token: string | null): void {
+  try { if (token) localStorage.setItem(PARENT_DEVICE_KEY, token); else localStorage.removeItem(PARENT_DEVICE_KEY); } catch { /* storage unavailable */ }
+}
+export async function previewStartCode(code: string): Promise<{ learner: string; school: string | null }> {
+  return request('POST', '/api/parents/start/preview', { code });
+}
+export async function startWithCode(code: string, language: 'en' | 'ar'): Promise<SessionUser> {
+  const data = await request<{ token: string; user: SessionUser; deviceToken: string }>('POST', '/api/parents/start', { code, language });
+  saveSession(data.token, data.user);
+  setParentDeviceToken(data.deviceToken);
+  return data.user;
+}
+let resuming: Promise<SessionUser | null> | null = null;
+/** A fresh session for a remembered parent device; null (and the device forgotten) when it no longer works. */
+export function resumeParentDevice(): Promise<SessionUser | null> {
+  const deviceToken = getParentDeviceToken();
+  if (!deviceToken) return Promise.resolve(null);
+  resuming ??= (async () => {
+    try {
+      const res = await fetch(toUrl('/api/parents/device/session'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deviceToken }) });
+      if (res.status === 401) { setParentDeviceToken(null); return null; }
+      if (!res.ok) return null;
+      const data = (await res.json()) as { token: string; user: SessionUser };
+      saveSession(data.token, data.user);
+      try { localStorage.setItem('enara_ui_role', 'parent'); } catch { /* storage unavailable */ }
+      return data.user;
+    } finally {
+      resuming = null;
+    }
+  })();
+  return resuming;
+}
+
+// Parents P1 (PARENT_SETTINGS_ENABLED; the API answers 404 when off): parent access per school and usage.
+export type ParentAccess = 'off' | 'free';
+export interface ParentsSchoolRow {
+  id: string; name: string; status: string; access: ParentAccess; accessUpdatedAt: string | null;
+  usage: { linkedParents: number; active7: number; active30: number; logins30: number; topScreens: { screen: string; views: number }[] };
+}
+export const fetchParentsAdminStatus = () => request<{ enabled: boolean; canChangeAccess: boolean }>('GET', '/api/parents-admin/status');
+export const fetchParentsAdminSchools = () => request<{ generatedAt: string; canChangeAccess: boolean; schools: ParentsSchoolRow[] }>('GET', '/api/parents-admin/schools');
+export const setSchoolParentAccess = (institutionId: string, access: ParentAccess) =>
+  request<{ institutionId: string; access: ParentAccess }>('PUT', `/api/parents-admin/schools/${encodeURIComponent(institutionId)}/access`, { access });
 
 // Shared client for the Parents Portal (frontend/parents) and its admin panel.
 export function apiRequest<T = any>(method: string, path: string, body?: unknown): Promise<T> {
@@ -249,6 +306,8 @@ export function logout() {
   }
   if (getToken()) void request('POST', '/api/auth/logout').catch(() => undefined);
   clearSession();
+  // Signing out forgets this parent device too (the server logout also ends every device session).
+  setParentDeviceToken(null);
 }
 
 /** Admin-only: create a login account (used to give students credentials). */
