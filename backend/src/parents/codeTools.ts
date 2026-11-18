@@ -7,7 +7,7 @@ import { Student } from '../models/Student';
 import { recordAudit } from '../services/auditTrail';
 import { classStudentIds } from '../services/learningAccess';
 import { CODE_TTL_MS, generateCode, hashCode } from './codes';
-import { parentCodeToolsEnabled } from './flags';
+import { parentCodeToolsEnabled, parentGradesAfterReviewEnabled } from './flags';
 import { parentAccessOf, schoolAccessOffError } from './schoolAccess';
 
 // Parents P2 (PARENT_CODE_TOOLS_ENABLED): class code sheets and the school's code settings.
@@ -27,12 +27,17 @@ type Actor = { id: string; role: string; institutionId?: string };
 const DAY = 86_400_000;
 export const DEFAULT_CODE_TTL_DAYS = 7;
 
-export interface SchoolParentSettings { codeTtlDays: number; teachersMayIssueCodes: boolean }
+export interface SchoolParentSettings { codeTtlDays: number; teachersMayIssueCodes: boolean; showResults: 'immediately' | 'after_release' }
 
 export async function schoolParentSettings(institutionId: string | undefined): Promise<SchoolParentSettings> {
   const s = institutionId ? await Institution.findOne({ id: institutionId }).select('parentPortal').lean() : null;
   const days = s?.parentPortal?.codeTtlDays;
-  return { codeTtlDays: Number.isInteger(days) && days! >= 1 && days! <= 60 ? days! : DEFAULT_CODE_TTL_DAYS, teachersMayIssueCodes: s?.parentPortal?.teachersMayIssueCodes === true };
+  return {
+    codeTtlDays: Number.isInteger(days) && days! >= 1 && days! <= 60 ? days! : DEFAULT_CODE_TTL_DAYS,
+    teachersMayIssueCodes: s?.parentPortal?.teachersMayIssueCodes === true,
+    // Parents P3: unset = after release (D7); read for scores through parents/resultVisibility.ts.
+    showResults: s?.parentPortal?.showResults === 'immediately' ? 'immediately' : 'after_release',
+  };
 }
 
 /** How long a new code of this school lasts (7 days with the switch off, as before). */
@@ -45,6 +50,14 @@ export async function codeTtlMsFor(institutionId: string | undefined): Promise<n
 export async function setSchoolParentSettings(actor: Actor, institutionId: string, body: Record<string, unknown>) {
   if (actor.role !== 'enara-admin' && (actor.role !== 'admin' || actor.institutionId !== institutionId)) throw new AppError('Access denied', 403, 'FORBIDDEN');
   const set: Record<string, unknown> = {};
+  const tools = parentCodeToolsEnabled();
+  const grades = parentGradesAfterReviewEnabled();
+  if (body.showResults !== undefined) {
+    if (!grades) throw new AppError('showResults is not available', 400, 'VALIDATION_ERROR');
+    if (body.showResults !== 'immediately' && body.showResults !== 'after_release') throw new AppError('showResults must be immediately or after_release', 400, 'VALIDATION_ERROR');
+    set['parentPortal.showResults'] = body.showResults;
+  }
+  if ((body.codeTtlDays !== undefined || body.teachersMayIssueCodes !== undefined) && !tools) throw new AppError('Code settings are not available', 400, 'VALIDATION_ERROR');
   if (body.codeTtlDays !== undefined) {
     const d = Number(body.codeTtlDays);
     if (!Number.isInteger(d) || d < 1 || d > 60) throw new AppError('codeTtlDays must be a whole number of days from 1 to 60', 400, 'VALIDATION_ERROR');

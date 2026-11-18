@@ -59,9 +59,10 @@ test.describe.serial('11 · Parents P2: class code sheet, add your email, second
     await page.getByRole('button', { name: 'Parents', exact: true }).first().click();
     const tools = page.getByTestId('parent-code-tools');
     await expect(tools).toBeVisible();
-    await tools.getByTestId('pc-ttl').fill('10');
-    await tools.getByTestId('pc-save').click();
-    await expect(tools.getByTestId('pc-note')).toHaveText('Saved.');
+    const settings = page.getByTestId('parent-school-settings');
+    await settings.getByTestId('pc-ttl').fill('10');
+    await settings.getByTestId('pc-save').click();
+    await expect(settings.getByTestId('ps-note')).toHaveText('Saved.');
     // The Moodle-made class (scenario 5: its students came from the roster sync), listed under its ENARA class name;
     // any class with students otherwise.
     const listed = (await enaraApi.get('/api/parents-admin/classes', await login('admin.a'))).classes as { id: string; name: string; students: number }[];

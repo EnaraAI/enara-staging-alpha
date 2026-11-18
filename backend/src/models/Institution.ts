@@ -30,6 +30,10 @@ export interface IInstitution extends Document {
     // link codes last (1-60 days, unset = 7) and whether teachers may issue
     // codes for their own classes (unset = no, D3).
     codeTtlDays?: number; teachersMayIssueCodes?: boolean;
+    // Parents P3 (PARENT_GRADES_AFTER_REVIEW_ENABLED): when parents see a result.
+    // Unset = 'after_release' (D7). A result an assignment releases automatically
+    // counts as released (owner decision 3).
+    showResults?: 'immediately' | 'after_release';
   };
   // P2: documents are deleted retentionDays after pilotEndsAt (default 180).
   documentRetention?: { pilotEndsAt?: Date; retentionDays?: number };
@@ -62,7 +66,7 @@ const institutionSchema = new Schema<IInstitution>(
     country: { type: String, maxlength: 2 },
     emailLanguage: { type: String, enum: ['ar', 'en'] },
     features: { type: Map, of: Boolean, default: undefined },
-    parentPortal: { type: { access: { type: String, enum: ['off', 'free'] }, updatedAt: Date, updatedBy: String, codeTtlDays: { type: Number, min: 1, max: 60 }, teachersMayIssueCodes: Boolean, _id: false }, default: undefined },
+    parentPortal: { type: { access: { type: String, enum: ['off', 'free'] }, updatedAt: Date, updatedBy: String, codeTtlDays: { type: Number, min: 1, max: 60 }, teachersMayIssueCodes: Boolean, showResults: { type: String, enum: ['immediately', 'after_release'] }, _id: false }, default: undefined },
     documentRetention: { type: { pilotEndsAt: Date, retentionDays: { type: Number, min: 1, max: 3650 }, _id: false }, default: undefined },
     learningSettings: {
       diagnosticMaxQuestions: { type: Number, min: 3, max: 30 },

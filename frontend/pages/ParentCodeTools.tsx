@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Download, Printer, ShieldAlert } from 'lucide-react';
-import { fetchCodeClasses, printClassCodes, revokeClassCodes, saveSchoolParentSettings, getSessionUser, type ParentCodeSheet, type ParentsAdminStatus } from '../services/apiService';
+import { fetchCodeClasses, printClassCodes, revokeClassCodes, type ParentCodeSheet, type ParentsAdminStatus } from '../services/apiService';
 
 // Parents P2 (PARENT_CODE_TOOLS_ENABLED) on the staff Parents page:
-//   - school admin: the school's code settings (expiry 1-60 days, "teachers may issue codes");
 //   - school admin, ENARA admin's school, or an allowed teacher (own classes only):
 //     "Print parent codes" per class. The sheet (student, class, code, expiry) is shown
 //     ONCE, printable, with a CSV download made in the browser; the codes are never in a
@@ -49,24 +48,16 @@ const csvCell = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
 
 const PRINT_CSS = '@media print { body * { visibility: hidden !important; } .pc-sheet, .pc-sheet * { visibility: visible !important; } .pc-sheet { position: absolute; inset: 0; padding: 24px; } .pc-noprint { display: none !important; } }';
 
-export const ParentCodeTools: React.FC<{ lang: Lang; status: ParentsAdminStatus }> = ({ lang, status }) => {
+export const ParentCodeTools: React.FC<{ lang: Lang; status: ParentsAdminStatus }> = ({ lang }) => {
   const t = TEXT[lang];
   const [classes, setClasses] = useState<{ id: string; name: string; students: number; activeCodes: number }[] | null>(null);
   const [sheet, setSheet] = useState<ParentCodeSheet | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [ttl, setTtl] = useState(String(status.settings?.codeTtlDays ?? 7));
-  const [teachers, setTeachers] = useState(!!status.settings?.teachersMayIssueCodes);
   const load = useCallback(() => { fetchCodeClasses().then((r) => setClasses(r.classes)).catch(() => setClasses([])); }, []);
   useEffect(load, [load]);
 
   const fail = (e: any) => setNote(e?.code === 'PARENT_SCHOOL_ACCESS_OFF' ? t.off : t.failed);
-  const saveSettings = async () => {
-    setNote(null);
-    const school = getSessionUser()?.institutionId;
-    if (!school) return;
-    try { await saveSchoolParentSettings(school, { codeTtlDays: Number(ttl), teachersMayIssueCodes: teachers }); setNote(t.saved); } catch { setNote(t.saveFailed); }
-  };
   const print = async (c: { id: string; activeCodes: number }) => {
     if (c.activeCodes > 0 && !window.confirm(t.reprintWarn)) return;
     setBusy(true); setNote(null);
@@ -91,17 +82,6 @@ export const ParentCodeTools: React.FC<{ lang: Lang; status: ParentsAdminStatus 
   return (
     <div className="space-y-6" data-testid="parent-code-tools">
       <style>{PRINT_CSS}</style>
-      {status.canChangeSettings && (
-        <section className="rounded-xl border border-slate-200 bg-white p-5 space-y-3 pc-noprint" aria-labelledby="pc-settings">
-          <h2 id="pc-settings" className="text-lg font-semibold text-slate-900">{t.settings}</h2>
-          <label className="flex items-center gap-3 text-sm">{t.ttl}
-            <input type="number" min={1} max={60} value={ttl} onChange={(e) => setTtl(e.target.value)} className="w-20 rounded border border-slate-300 px-2 py-1" data-testid="pc-ttl" />
-          </label>
-          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={teachers} onChange={(e) => setTeachers(e.target.checked)} data-testid="pc-teachers" />{t.teachers}</label>
-          <button type="button" className="rounded bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white" onClick={() => void saveSettings()} data-testid="pc-save">{t.save}</button>
-        </section>
-      )}
-
       <section className="rounded-xl border border-slate-200 bg-white p-5 space-y-3 pc-noprint" aria-labelledby="pc-classes">
         <h2 id="pc-classes" className="text-lg font-semibold text-slate-900">{t.sheets}</h2>
         <p className="text-sm text-slate-600">{t.sheetsHelp}</p>
