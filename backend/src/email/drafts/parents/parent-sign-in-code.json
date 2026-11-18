@@ -1,0 +1,56 @@
+{
+  "alias": "parent-sign-in-code",
+  "number": "P7",
+  "group": "parents",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – Parents: sign-in code (6 digits)",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "Parent (verified email on their Enara Parents account)",
+  "trigger": "Parent asks to sign in with their email (passwordless)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per request (rate-limited; a new request replaces the old code)",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "parent-sign-in-code-en.html",
+    "ar": "parent-sign-in-code-ar.html"
+  },
+  "subject": {
+    "en": "Your Enara Parents sign-in code: {{{CODE}}}",
+    "ar": "رمز الدخول إلى بوابة أولياء الأمور في إنارة: {{{CODE}}}"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Sara",
+        "ar": "سارة"
+      }
+    },
+    {
+      "key": "CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "730 256",
+        "ar": "730 256"
+      }
+    },
+    {
+      "key": "EXPIRES_IN",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "10 minutes",
+        "ar": "10 دقائق"
+      }
+    }
+  ]
+}

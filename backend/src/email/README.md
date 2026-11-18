@@ -223,3 +223,16 @@ path can send them): `<alias>-en.html`, `<alias>-ar.html` and one bilingual `<al
 `subject.{en,ar}`, `variables[].{key, fallback_value.{en,ar}, sample.{en,ar}}`, recipient, trigger,
 delivery, frequency). `render-previews.mjs` renders them too. On approval, split the JSON into
 `<alias>-<lang>.json`, move the pair into `lms/` or `parents/`, add `status`/`approvedOn` and re-bundle.
+
+**Parent drafts awaiting the owner's approval (Parents sign-up flow, 18 Nov 2026):**
+
+| Draft | What | Replaces |
+|---|---|---|
+| `parent-email-verify` | 6-digit code to confirm the email a parent adds in the portal (10 min, one use) | (new) |
+| `parent-sign-in-code` | 6-digit passwordless sign-in code | (new) |
+| `parent-weekly-summary-v2` | ONE weekly email per parent, a section per child (`CHILD_SECTIONS`, built by code) | `parent-weekly-summary` |
+| `parent-invite-v2` | code-first steps, the secret-code warning, one email listing every child of a CSV group (`CHILD_CODES`, built by code) | `parent-invite` |
+
+The codes are in the email body only; none of these emails has a link that carries a code (the two code
+emails have no link at all). Until approved, the code that sends them is built but the drafts stay here and
+nothing sends them (docs/parents/SIGN_UP_FLOW.md).

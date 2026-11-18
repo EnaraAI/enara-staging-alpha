@@ -1,0 +1,101 @@
+{
+  "alias": "parent-invite-v2",
+  "number": "P9",
+  "group": "parents",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "replaces": "parent-invite",
+  "name": "Enara – Parents: invitation with link code(s), secret-code warning",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "Parent (email given by the school: single code, or CSV invite grouped by parent email)",
+  "trigger": "School sends a parent link code (single), or CSV invitations (P5: rows with the same parent email are grouped into one email)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per invite (one email per parent email per CSV upload)",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "parent-invite-v2-en.html",
+    "ar": "parent-invite-v2-ar.html"
+  },
+  "subject": {
+    "en": "{{{SCHOOL_NAME}}} invites you to follow {{{CHILDREN_NAMES}}} on Enara",
+    "ar": "{{{SCHOOL_NAME}}} تدعوك لمتابعة {{{CHILDREN_NAMES}}} على إنارة"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Sara",
+        "ar": "سارة"
+      }
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Nile Valley International School",
+        "ar": "مدرسة وادي النيل الدولية"
+      }
+    },
+    {
+      "key": "CHILDREN_NAMES",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Omar and Laila",
+        "ar": "عمر وليلى"
+      }
+    },
+    {
+      "key": "CHILD_CODES",
+      "type": "html",
+      "fallback_value": null,
+      "note": "Built by code: one row per child (first name, school, code). Codes in the email BODY only, never in a link (D15).",
+      "sample": {
+        "en": "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:16px;\"><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;\">Omar<br><span style=\"font-size:13px;color:#666666;\">Nile Valley International School</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:right;\" align=\"right\">ENR-7K4M-Q2XD</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;\">Laila<br><span style=\"font-size:13px;color:#666666;\">Delta Language School</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:right;\" align=\"right\">ENR-R9TB-3HWP</td></tr></table>",
+        "ar": "<table dir=\"rtl\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:16px;\"><tr><td style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;text-align:right;\" align=\"right\">عمر<br><span style=\"font-size:13px;color:#666666;\">مدرسة وادي النيل الدولية</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:left;\" align=\"left\">ENR-7K4M-Q2XD</td></tr><tr><td style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;text-align:right;\" align=\"right\">ليلى<br><span style=\"font-size:13px;color:#666666;\">مدرسة الدلتا للغات</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:left;\" align=\"left\">ENR-R9TB-3HWP</td></tr></table>"
+      }
+    },
+    {
+      "key": "EXPIRES_IN",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "7 days",
+        "ar": "7 أيام"
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/parents/link",
+        "ar": "https://enara.app/parents/link"
+      }
+    }
+  ],
+  "preview_variants": [
+    {
+      "id": "one-child",
+      "label": "one child",
+      "samples": {
+        "en": {
+          "CHILDREN_NAMES": "Omar",
+          "CHILD_CODES": "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:16px;\"><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;\">Omar<br><span style=\"font-size:13px;color:#666666;\">Nile Valley International School</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:right;\" align=\"right\">ENR-7K4M-Q2XD</td></tr></table>"
+        },
+        "ar": {
+          "CHILDREN_NAMES": "عمر",
+          "CHILD_CODES": "<table dir=\"rtl\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:16px;\"><tr><td style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;text-align:right;\" align=\"right\">عمر<br><span style=\"font-size:13px;color:#666666;\">مدرسة وادي النيل الدولية</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:left;\" align=\"left\">ENR-7K4M-Q2XD</td></tr></table>"
+        }
+      }
+    }
+  ]
+}
