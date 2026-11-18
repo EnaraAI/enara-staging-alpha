@@ -31,7 +31,9 @@ export function mountStagingFrontend(app: Express, dir: string): void {
     res.status(404).json({ message: 'Not available in staging' });
   });
   app.use(express.static(root, { index: false, setHeaders: (res) => res.removeHeader('Content-Security-Policy') }));
-  app.get(/^\/(?!api(?:\/|$)|uploads(?:\/|$)|health$|ready$|api-docs).*/, noCsp, (_req, res) => {
+  // LMS (LTI) routes are API routes too: /lti/* (login, launch, registration)
+  // and /.well-known/jwks.json must never get the SPA's index.html.
+  app.get(/^\/(?!api(?:\/|$)|uploads(?:\/|$)|health$|ready$|api-docs|lti(?:\/|$)|\.well-known(?:\/|$)).*/, noCsp, (_req, res) => {
     res.sendFile(indexFile);
   });
 }
@@ -76,9 +78,9 @@ export function idleDbController(
   timer.unref();
 
   const middleware: express.RequestHandler = (req, res, next) => {
-    // Only the API, uploads and the readiness check use the database; static
+    // Only the API (incl. LTI /lti and /.well-known), uploads and the readiness check use the database; static
     // SPA files and /health never wake it.
-    if (!/^\/(api|uploads)(\/|$)|^\/ready$/.test(req.path)) return next();
+    if (!/^\/(api|uploads|lti|\.well-known)(\/|$)|^\/ready$/.test(req.path)) return next();
     active += 1;
     lastActivity = Date.now();
     let done = false;

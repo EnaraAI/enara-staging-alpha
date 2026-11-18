@@ -171,6 +171,12 @@ export interface LmsConfig {
    * cookieless path is unchanged. Default true (a kill switch, not a feature flag).
    */
   platformStorageEnabled: boolean;
+  /**
+   * LMS step 2: LMS emails (e.g. lms-invite-connect). Off by default; an email
+   * is sent only when this AND REMINDERS_ENABLED AND RESEND_API_KEY are set.
+   * lms-test keeps it off (the invite text is copied by hand).
+   */
+  emailsEnabled: boolean;
   google: { clientId?: string; clientSecret?: string; redirectUri?: string };
   problem?: string;
   /** Something to check that does not switch the LMS off (e.g. APP_URL unset, so the one-host rule could not be checked). Names variables only. */
@@ -305,6 +311,7 @@ export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
     drainTriggers: [...new Set(drainTriggers)],
     schoolConnectionsRequireApproval: readBoolean(source, 'LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL', true),
     platformStorageEnabled: readBoolean(source, 'LMS_PLATFORM_STORAGE_ENABLED', true),
+    emailsEnabled: readBoolean(source, 'LMS_EMAILS_ENABLED', false),
     google: {
       clientId: readString(source, 'GOOGLE_CLASSROOM_CLIENT_ID'),
       clientSecret: readString(source, 'GOOGLE_CLASSROOM_CLIENT_SECRET'),

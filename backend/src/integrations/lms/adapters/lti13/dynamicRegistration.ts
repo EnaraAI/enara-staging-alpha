@@ -9,10 +9,13 @@ import {
   attachPlatformToCode,
   finalizeRegistrationCode,
   findRegistrationCode,
+  linkMakesActive,
+  markRegistrationCodeOpened,
   releaseRegistrationCode,
   reserveRegistrationCode,
 } from '../../core/registrationCode';
-import { LmsDeployment, LmsPlatform, LmsRegistrationCode, type ILmsPlatform, type ILmsRegistrationCode } from '../../models';
+import { runInBackground } from '../../core/drain';
+import { LmsDeployment, LmsOnboarding, LmsPlatform, LmsRegistrationCode, type ILmsPlatform, type ILmsRegistrationCode } from '../../models';
 import { LtiError, type LtiErrorCode } from './errors';
 import { isAcceptableKeysetUrl } from './jwks';
 
@@ -290,6 +293,8 @@ export async function dynamicRegistration(params: { code: unknown; openidConfigu
 
   // 1. The code (nothing reserved yet).
   const found = await findRegistrationCode(params.code);
+  // Step 2: the status page's "link opened" (any attempt with a known link).
+  if (found.row) await markRegistrationCodeOpened(found.row.id);
   if (found.problem) return refuse(found.problem, found.row);
   const row = found.row!;
 
@@ -385,7 +390,9 @@ async function registerWithPlatform(
     throw new Refusal(now?.status === 'revoked' ? 'registration_code_invalid' : 'registration_code_used', { reason: 'reservation_lost' });
   }
 
-  const status: 'active' | 'pending' = row.createdByRole === 'enara-admin' || !lmsSettings().schoolConnectionsRequireApproval ? 'active' : 'pending';
+  const status: 'active' | 'pending' = linkMakesActive(row, lmsSettings().schoolConnectionsRequireApproval) ? 'active' : 'pending';
+  // Who approved an active connection: the link's maker, or the ENARA admin whose onboarding pre-approved it.
+  const approver = row.preApprovedBy ?? row.createdBy;
   let platform: ILmsPlatform;
   let reused = false;
   if (sameClient) {
@@ -411,7 +418,7 @@ async function registerWithPlatform(
           // first launch records its deployment as pending, for approval.
           autoCreateDeployments: !deploymentId,
           createdBy: row.createdBy,
-          ...(status === 'active' ? { approvedBy: row.createdBy, approvedAt: new Date() } : {}),
+          ...(status === 'active' ? { approvedBy: approver, approvedAt: new Date() } : {}),
         })
       ).toObject();
     } catch (error) {
@@ -431,7 +438,7 @@ async function registerWithPlatform(
           institutionId: row.institutionId,
           status: reused ? (platform.status === 'active' && status === 'active' ? 'active' : 'pending') : status,
           createdBy: row.createdBy,
-          ...(status === 'active' ? { approvedBy: row.createdBy } : {}),
+          ...(status === 'active' ? { approvedBy: approver } : {}),
         },
       },
       { upsert: true },
@@ -461,6 +468,12 @@ async function registerWithPlatform(
       actor: row.createdBy,
       refIds: { registrationId: row.id, newPlatformId: platform.id, existingPlatformIds: (reused ? [platform.id, ...others] : others).slice(0, 10).join(',') },
     });
+  }
+  // Step 2 (S3): the automatic connection check runs right after the
+  // registration, in the background, for a school onboarded with "New school".
+  if (row.onboardingId || (await LmsOnboarding.exists({ institutionId: row.institutionId }))) {
+    const platformId = platform.id;
+    runInBackground('connection_check_registration', async () => (await import('../../core/connectionCheck')).runConnectionCheck(platformId, { trigger: 'registration' }));
   }
   return { platform, registrationId: row.id, status: platform.status === 'active' ? 'active' : 'pending', alreadyConnected, clientName };
 }

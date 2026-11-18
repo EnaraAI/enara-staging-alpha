@@ -3,6 +3,7 @@ import { LmsContext, LmsEnrollment, LmsLineItem, LmsResourceLink, LmsUser } from
 import { GoogleConnection } from './google';
 import { LmsGradeSyncJob, LmsLock } from './outbox';
 import { LmsDeployment, LmsPlatform } from './platform';
+import { LmsConnectionCheck, LmsOnboarding } from './onboarding';
 import { LmsRegistrationCode } from './registration';
 import { LmsOrgSettings } from './seats';
 import { LmsAccessToken, LmsOidcState, LmsToolKey } from './security';
@@ -13,6 +14,7 @@ import { LmsSuppressedIdentity } from './suppression';
 export * from './audit';
 export * from './context';
 export * from './google';
+export * from './onboarding';
 export * from './outbox';
 export * from './platform';
 export * from './registration';
@@ -60,5 +62,9 @@ export const LMS_MIC_MODELS = [LmsHandoffCode, LmsMicDaily] as const;
 // one-URL "Connect Moodle" links (LTI Dynamic Registration).
 export const LMS_PHASE1B_MODELS = [LmsRegistrationCode] as const;
 
+// Added in step 2, self-serve onboarding (migration 2026-11-24-lms-onboarding):
+// the "New school" onboardings and the per-connection automatic checks.
+export const LMS_ONBOARDING_MODELS = [LmsOnboarding, LmsConnectionCheck] as const;
+
 /** Every LMS collection, for the cleanup script and the tests. */
-export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS, ...LMS_P0_MODELS, ...LMS_MIC_MODELS, ...LMS_PHASE1B_MODELS] as const;
+export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS, ...LMS_P0_MODELS, ...LMS_MIC_MODELS, ...LMS_PHASE1B_MODELS, ...LMS_ONBOARDING_MODELS] as const;

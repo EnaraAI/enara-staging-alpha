@@ -97,11 +97,12 @@ const Help: React.FC<{ g: LmsProblemGroup | LmsOpenProblem; lang: Lang; t: (type
   </dl>
 );
 
-export const LmsProblems: React.FC<{ isEnara: boolean }> = ({ isEnara }) => {
+export const LmsProblems: React.FC<{ isEnara: boolean; institutionId?: string }> = ({ isEnara, institutionId }) => {
   const [lang, setLang] = useState<Lang>(initialLang);
   const [days, setDays] = useState<1 | 7>(1);
-  const [school, setSchool] = useState('');
-  const [applied, setApplied] = useState('');
+  // Step 2: the school connection status page opens this view for one school.
+  const [school, setSchool] = useState(institutionId ?? '');
+  const [applied, setApplied] = useState(institutionId ?? '');
   const [data, setData] = useState<LmsProblemsData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

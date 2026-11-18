@@ -47,6 +47,8 @@ import { AdminAvatarControlCenter } from './components/enara/AdminAvatarControlC
 import { LmsFrameBar, LmsLaunch, LmsPreviewBanner, onLmsLaunchPath } from './pages/LmsLaunch';
 import { LmsPicker, onLmsPickerPath } from './pages/LmsPicker';
 import { LmsConnections } from './pages/LmsConnections';
+import { LmsOnboarding } from './pages/LmsOnboarding';
+import { LmsSchoolStatus } from './pages/LmsSchoolStatus';
 import { isLmsPreview, isLmsSession, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
@@ -92,6 +94,9 @@ const App: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     const courseId = params.get('course');
     const assessmentId = params.get('assessment');
+    // LMS step 2: the invite email's "Start connecting" opens the school connection status page.
+    const lmsStatusLink = params.get('page') === 'lms-status';
+    if (lmsStatusLink) window.history.replaceState({}, document.title, window.location.pathname);
     
     // Clear the URL parameters so they don't persist on refresh or navigation
     if (courseId || assessmentId) {
@@ -107,7 +112,7 @@ const App: React.FC = () => {
     const role = isLmsPreview() && (session?.role === 'teacher' || session?.role === 'admin') ? 'student' : restoreUiRole(session?.role, savedRole);
     return {
       role,
-      page: role === 'student' && courseId ? 'courses' : role === 'admin' ? staffLandingPage(session?.role) : 'dashboard',
+      page: role === 'student' && courseId ? 'courses' : role === 'admin' ? (lmsStatusLink && session?.role === 'admin' ? 'lms-status' : staffLandingPage(session?.role)) : 'dashboard',
       activeAssessment: null,
       selectedStudent: null,
       sharedCourseId: courseId,
@@ -555,6 +560,7 @@ const App: React.FC = () => {
             {state.page === 'credit-management' && <EnaraCreditManagement />}
             {state.page === 'integrations' && <Integrations />}
             {state.page === 'lms' && lmsEnabled && <LmsConnections />}
+            {state.page === 'lms-onboarding' && lmsEnabled && <LmsOnboarding />}
             {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
             {state.page === 'settings' && <div className="p-20 text-center text-slate-400">Platform Global Settings</div>}
           </main>
@@ -618,6 +624,8 @@ const App: React.FC = () => {
           {state.page === 'savings' && sessionUser()?.role === 'admin' && <SavingsCenter />}
           {/* LMS connections (docs/lms): school admins; the server enforces it and is off unless LMS_LTI_ENABLED. */}
           {state.page === 'lms' && lmsEnabled && sessionUser()?.role === 'admin' && <LmsConnections />}
+          {/* LMS step 2 (S5): the school connection status page, own school only (server-enforced; teachers never). */}
+          {state.page === 'lms-status' && lmsEnabled && sessionUser()?.role === 'admin' && sessionUser()?.institutionId && <LmsSchoolStatus institutionId={sessionUser()!.institutionId!} isEnara={false} />}
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments initialClassId={state.lmsTarget?.classId ?? undefined} initialAssignmentId={state.lmsTarget?.assignmentId} />}
           {state.page === 'grading' && <GradingReview />}

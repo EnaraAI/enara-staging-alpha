@@ -106,7 +106,8 @@ describe('staging SPA hosting', () => {
 
   it('never answers API, upload or health paths with the SPA', async () => {
     expect((await request(app).get('/api/health-like')).body).toEqual({ ok: true });
-    for (const url of ['/api/unknown', '/api', '/uploads/x.png', '/ready', '/health']) {
+    // LMS: /lti/* (login, launch, registration) and the JWKS are API routes (found by the LMS E2E suite).
+    for (const url of ['/api/unknown', '/api', '/uploads/x.png', '/ready', '/health', '/lti/register/abc', '/lti/login', '/.well-known/jwks.json']) {
       const r = await request(app).get(url);
       expect(r.status, url).toBe(404);
       expect(r.body, url).toEqual({ code: 'NOT_FOUND' });

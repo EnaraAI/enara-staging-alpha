@@ -3,6 +3,16 @@
  * Used by sendTemplate.ts and by scripts/email/{pull,push}-templates.ts.
  */
 export const EMAIL_SENDER = 'The Enara Team <noreply@test.enara.app>' as const;
+
+/**
+ * The From address actually used (owner decision D11: configurable). The
+ * EMAIL_SENDER environment variable overrides the default above; a production
+ * sender (and a support reply-to) is needed before any real school.
+ */
+export function emailSender(): string {
+  const v = process.env.EMAIL_SENDER?.trim();
+  return v && v.length <= 200 && /@/.test(v) && !/[\r\n]/.test(v) ? v : EMAIL_SENDER;
+}
 export const EMAIL_LOGO_URL = 'https://assets.enara.app/email/enara-logo.png' as const;
 
 export const TEMPLATE_REGISTRY = {

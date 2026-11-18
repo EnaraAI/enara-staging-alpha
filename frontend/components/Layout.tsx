@@ -229,6 +229,8 @@ export const AdminSidebar: React.FC<{
     { id: 'savings', label: 'AI Savings Center', icon: PiggyBank, workspaceAdminOnly: true },
     { id: 'learning-events', label: 'Learning Events', icon: ListChecks },
     ...(showLms ? [{ id: 'lms', label: 'LMS connections', icon: Share2, workspaceAdminOnly: true }] : []),
+    // LMS step 2 (S5): the school connection status page, school admins only.
+    ...(showLms ? [{ id: 'lms-status', label: 'LMS connection status', icon: ListChecks, workspaceAdminOnly: true }] : []),
   ];
 
   const enaraMenuItems = [
@@ -247,6 +249,8 @@ export const AdminSidebar: React.FC<{
     { id: 'learning-events', label: 'Learning Events', icon: ListChecks },
     { id: 'integrations', label: 'Integrations', icon: Share2 },
     ...(showLms ? [{ id: 'lms', label: 'LMS connections', icon: Share2 }] : []),
+    // LMS step 2: "New school" (self-serve onboarding) and every school's status page.
+    ...(showLms ? [{ id: 'lms-onboarding', label: 'New school (LMS)', icon: Building2 }] : []),
     { id: 'credits', label: 'Credit Reports', icon: Zap },
     { id: 'credit-management', label: 'Credit Management', icon: ShieldAlert },
   ];
