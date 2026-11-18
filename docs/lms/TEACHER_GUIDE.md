@@ -2,6 +2,35 @@
 
 This guide is for teachers and school admins who add ENARA activities to a Moodle course. The menu names are for Moodle 4.x.
 
+## Adding ENARA to your course
+
+In your Moodle course, turn editing on, add an **ENARA** activity (External tool), and click **Select content**. The ENARA picker opens in your language (English or Arabic). Pick one or more items and click **Add**. Moodle creates one activity per item.
+
+### The ENARA course link (one link for everyone)
+
+Pick **ENARA home (course link)**. Add it once, for example at the top of the course. Everyone uses the same link, and ENARA opens the right page for each person:
+- a **student** opens their ENARA home (dashboard), in this course's class;
+- a **teacher** opens the **Teaching Dashboard** for this course's class.
+
+The course link has no grade. If Moodle shows a grade column for it, you can ignore it or remove it (see "Activities that are really ungraded" below).
+
+### Links to ENARA pages
+
+Under **ENARA pages** you can add a direct link to one page, for example **My progress** or **Grading**. These links have no grade.
+
+- **Student pages:** My learning, My progress, My assignments, Study plan, My results.
+- **Teacher pages** (badge **Teachers only**): Teaching Dashboard, Class assignments, Grading, Class insights, Lesson planner, Assessment builder, Curriculum. Teacher pages open for this course's class where the page has a class.
+
+**Hide teacher-only links from students.** In Moodle, hide a teacher-only link from students, or make it **available but not shown on the course page** (in Moodle 4.x: the activity's **Availability** setting, "Make available but don't show on course page", if your site allows it). If a student opens a teacher-only link anyway, ENARA opens **their own home**; they never see a teacher page.
+
+### Due dates
+
+When you pick a quiz, test or assignment, you can give it a **due date** (optional). Enter the date and time in **your school's time** (for example Cairo time); the picker shows which time zone it uses. The date must be in the future and within 2 years.
+
+- The due date is **stored in ENARA**: it becomes the due date of the ENARA assignment the first time the activity is opened. Without a date, the activity stays open for a year, as before.
+- Moodle's activity has no due-date field, so ENARA also adds one line to the activity's **description** in Moodle when the activity is created, in your language, for example "Due: 25 Nov 2026, 11:59 PM (Cairo time)" or "موعد التسليم: 25 نوفمبر 2026، 11:59 م (توقيت القاهرة)".
+- **To change the date later, change it in ENARA** (Class assignments). ENARA uses the new date. The line in Moodle's description is **not** updated: edit or remove it in Moodle yourself if you change the date.
+
 ## Grades from ENARA activities
 
 ### What ENARA sends
@@ -29,7 +58,7 @@ Two related settings:
 
 ### Activities that are really ungraded
 
-Moodle creates a grade column for every external tool activity. For an ENARA activity that should have no grade at all (later: tutor sessions or the avatar), remove the column in Moodle. Open the activity, then go to **Settings** › **Grade** › **Type**, choose **None**, and click **Save and return to course**.
+Moodle creates a grade column for every external tool activity. For an ENARA activity that should have no grade at all (the ENARA course link, links to ENARA pages, and later tutor sessions or the avatar), remove the column in Moodle. ENARA never sends a grade for these. Open the activity, then go to **Settings** › **Grade** › **Type**, choose **None**, and click **Save and return to course**.
 
 ### A cell marked (*) is "overridden"
 

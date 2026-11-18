@@ -10,6 +10,7 @@ import { writeLmsAudit } from './audit';
 import { AGS_SCOPE } from './capabilities';
 import { lmsFlags } from './flags';
 import { LMS_VALUE_DIFFERS, lmsSlotHeld, recordGradeSyncTry } from './gradeSyncLog';
+import { TARGET_PARAM } from './pageTargets';
 import { effectivePolicy, pickForPolicy, toLmsScore, withNewerAttemptWaiting, type LmsScore, type ScoreAttempt, type ScoreCourse, type ScoreQuestion } from './scoring';
 
 // The grade outbox (plan §5, Phase 3): lms_grade_sync_jobs.
@@ -153,7 +154,8 @@ export type EnqueueOutcome =
   | 'nothing_to_send'
   | 'lineitem_gone'
   | 'assignment_archived'
-  | 'kept_released';
+  | 'kept_released'
+  | 'page_target';
 
 /** The link's bound work is practice: its kind from the binding, else the assignment's (or its assessment's) kind. */
 async function boundToPractice(link: ILmsResourceLink): Promise<boolean> {
@@ -186,6 +188,9 @@ export async function enqueueForLink(link: ILmsResourceLink, studentId: string, 
   // Phase 3 follow-ups: nothing for an activity the LMS said is gone (until it
   // is launched again), nor for an assignment a teacher archived.
   if (link.lineItemGoneAt) return { outcome: 'lineitem_gone' };
+  // Phase 2b: a link to a page of ENARA (enara_target, e.g. the course link) is
+  // never graded, even if the activity was bound to work before it was changed.
+  if ((link.customParams as Record<string, string> | undefined)?.[TARGET_PARAM]?.trim()) return { outcome: 'page_target' };
   // Phase 2: an item added through the picker without a grade column
   // (enara_graded=0). Owner decision D3: practice is graded (best attempt), so
   // the flag is ignored when the bound work is practice; practice activities

@@ -2,7 +2,10 @@ import { randomUUID } from 'crypto';
 import { Assessment } from '../../../models/Assessment';
 import { Assignment, type IAssignment } from '../../../models/Assignment';
 import { LmsResourceLink, type ILmsContext, type ILmsResourceLink } from '../models';
+import { institutionTimeZone } from '../../../services/institutionTimeZone';
 import { writeLmsAudit } from './audit';
+import { DUE_PARAM, MAX_DUE_AHEAD_MS, parseDueParam } from './dueDate';
+import { TARGET_PARAM } from './pageTargets';
 import type { GradableKind } from './scoring';
 
 // Which ENARA work an LMS activity opens (Phase 3, until Phase 2's Activity
@@ -20,6 +23,17 @@ import type { GradableKind } from './scoring';
 // another class, gets an assignment in the LMS class with the same settings.
 // The resource link stores the binding (enaraActivityId = that assignment).
 // A preview launch never binds or creates anything.
+//
+// Phase 2b: an activity that names a page instead (enara_target, pageTargets.ts)
+// binds nothing; naming both a page and work refuses the launch
+// (invalid_activity_binding, reason target_and_work).
+// A due date picked in the activity picker (enara_due=<ISO UTC>, dueDate.ts)
+// replaces the one-year default when the assignment is created at the first
+// binding, and only then: later edits in ENARA win, and later launches never
+// apply it again (the link is already bound). It is used only while it is
+// still in the future (otherwise the default applies, and the audit says so).
+// An assignment already in the course's class is used as it is: its own due
+// date stays.
 
 export const BINDING_PARAM = { assessment: 'enara_assessment', assignment: 'enara_assignment' } as const;
 const ID = /^[A-Za-z0-9][\w.:-]{0,127}$/;
@@ -29,7 +43,7 @@ const DEFAULT_OPEN_DAYS = 365;
 export type BindingSourceType = keyof typeof BINDING_PARAM;
 
 export class BindingError extends Error {
-  constructor(public readonly reason: 'malformed' | 'ambiguous' | 'not_found' | 'not_published' | 'not_available') {
+  constructor(public readonly reason: 'malformed' | 'ambiguous' | 'target_and_work' | 'not_found' | 'not_published' | 'not_available') {
     super(reason);
     this.name = 'BindingError';
   }
@@ -38,6 +52,8 @@ export class BindingError extends Error {
 export interface BindingRequest {
   type: BindingSourceType;
   id: string;
+  /** Phase 2b: the due date picked in the activity picker (enara_due), if any. */
+  due?: Date;
 }
 
 /** The binding the activity's custom parameters ask for; null when it names none. Throws BindingError when malformed. */
@@ -46,10 +62,13 @@ export function bindingRequest(custom: Record<string, string> | undefined): Bind
   const assignment = custom?.[BINDING_PARAM.assignment]?.trim();
   if (!assessment && !assignment) return null;
   if (assessment && assignment) throw new BindingError('ambiguous');
+  // Phase 2b: a page target and ENARA work are mutually exclusive.
+  if (custom?.[TARGET_PARAM]?.trim()) throw new BindingError('target_and_work');
   const id = (assessment || assignment)!;
   // An unsubstituted LMS variable (e.g. "$ResourceLink.id") or anything that is not a plain id.
   if (!ID.test(id)) throw new BindingError('malformed');
-  return { type: assessment ? 'assessment' : 'assignment', id };
+  const due = parseDueParam(custom?.[DUE_PARAM]);
+  return { type: assessment ? 'assessment' : 'assignment', id, ...(due ? { due } : {}) };
 }
 
 export interface ValidatedBinding extends BindingRequest {
@@ -83,13 +102,21 @@ export async function validateBinding(req: BindingRequest, institutionId: string
   return { ...req, assessmentId: s.assessmentId, kind: kindOf(s.assessmentKind ?? assessment?.assessmentKind), assignment: s };
 }
 
+export type DueSource = 'picker' | 'picker_passed' | 'source' | 'default';
+
 /** Creates the assignment of the bound work in the LMS course's own class. */
-async function materialize(v: ValidatedBinding, context: ILmsContext, link: ILmsResourceLink): Promise<string> {
+async function materialize(v: ValidatedBinding, context: ILmsContext, link: ILmsResourceLink): Promise<{ id: string; dueFrom: DueSource }> {
   const now = new Date();
   const s = v.assignment;
   const a = v.assessment;
   const later = new Date(now.getTime() + DEFAULT_OPEN_DAYS * 86_400_000);
-  const dueAt = s && new Date(s.dueAt).getTime() > now.getTime() ? new Date(s.dueAt) : later;
+  // Phase 2b: the picker's due date, while it is still in the future (and sane).
+  const pickerDue = v.due && v.due.getTime() > now.getTime() && v.due.getTime() - now.getTime() <= MAX_DUE_AHEAD_MS + 86_400_000 ? v.due : undefined;
+  const sourceDue = s && new Date(s.dueAt).getTime() > now.getTime() ? new Date(s.dueAt) : undefined;
+  const dueAt = pickerDue ?? sourceDue ?? later;
+  const dueFrom: DueSource = pickerDue ? 'picker' : v.due ? 'picker_passed' : sourceDue ? 'source' : 'default';
+  const sourceOpens = s && new Date(s.opensAt).getTime() > now.getTime() ? new Date(s.opensAt) : undefined;
+  const opensAt = sourceOpens && sourceOpens.getTime() < dueAt.getTime() ? sourceOpens : now;
   const id = `asg-lms-${randomUUID()}`;
   await Assignment.create({
     id,
@@ -100,10 +127,10 @@ async function materialize(v: ValidatedBinding, context: ILmsContext, link: ILms
     instructions: s?.instructions ?? a?.instructions,
     classId: context.enaraClassId!,
     state: 'published',
-    opensAt: s && new Date(s.opensAt).getTime() > now.getTime() ? new Date(s.opensAt) : now,
+    opensAt,
     dueAt,
     ...(s?.latePolicy === 'accept_late' && s.closesAt && new Date(s.closesAt) > dueAt ? { closesAt: new Date(s.closesAt), latePolicy: 'accept_late' } : { latePolicy: 'not_accepted' }),
-    timeZone: s?.timeZone ?? 'UTC',
+    timeZone: pickerDue ? await institutionTimeZone(context.institutionId) : s?.timeZone ?? 'UTC',
     maxAttempts: Math.min(10, Math.max(1, s?.maxAttempts ?? a?.maxAttempts ?? 1)),
     ...(s?.timeLimitMinutes ? { timeLimitMinutes: s.timeLimitMinutes } : {}),
     releasePolicy: s?.releasePolicy ?? 'auto',
@@ -115,10 +142,10 @@ async function materialize(v: ValidatedBinding, context: ILmsContext, link: ILms
     ...(s?.speaking ? { speaking: { ...s.speaking, accommodationStudentIds: [] } } : {}),
     extensions: [],
     createdBy: SYSTEM_ACTOR,
-    history: [{ at: now, by: SYSTEM_ACTOR, action: 'published', detail: { lmsResourceLinkId: link.id, source: v.type, sourceId: v.id } }],
+    history: [{ at: now, by: SYSTEM_ACTOR, action: 'published', detail: { lmsResourceLinkId: link.id, source: v.type, sourceId: v.id, dueFrom } }],
     origin: 'live',
   });
-  return id;
+  return { id, dueFrom };
 }
 
 /**
@@ -129,7 +156,8 @@ export async function bindResourceLink(link: ILmsResourceLink, context: ILmsCont
   if (link.enaraSourceType === v.type && link.enaraSourceId === v.id && link.enaraActivityId) return link;
   if (!context.enaraClassId) return link;
   const direct = v.assignment && v.assignment.classId === context.enaraClassId ? v.assignment.id : undefined;
-  const assignmentId = direct ?? (await materialize(v, context, link));
+  const made = direct ? undefined : await materialize(v, context, link);
+  const assignmentId = direct ?? made!.id;
   const won = await LmsResourceLink.findOneAndUpdate(
     { id: link.id, enaraSourceType: link.enaraSourceType ?? null, enaraSourceId: link.enaraSourceId ?? null },
     { $set: { enaraSourceType: v.type, enaraSourceId: v.id, enaraActivityId: assignmentId, activityKind: v.kind, boundAt: new Date() } },
@@ -141,7 +169,7 @@ export async function bindResourceLink(link: ILmsResourceLink, context: ILmsCont
       outcome: 'ok',
       institutionId: context.institutionId,
       platformId: context.platformId,
-      refIds: { resourceLinkId: link.id, contextId: context.id, source: v.type, sourceId: v.id, assignmentId, created: !direct, kind: v.kind },
+      refIds: { resourceLinkId: link.id, contextId: context.id, source: v.type, sourceId: v.id, assignmentId, created: !direct, kind: v.kind, ...(made ? { dueFrom: made.dueFrom } : v.due ? { dueFrom: 'existing' } : {}) },
     });
     return won;
   }

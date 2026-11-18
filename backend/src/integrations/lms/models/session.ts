@@ -20,6 +20,8 @@ export interface ILmsLaunchToken {
   resourceLinkId?: string;
   /** Phase 3: the ENARA assignment the activity is bound to; the landing page opens it. */
   targetAssignmentId?: string;
+  /** Phase 2b: the app page an enara_target launch opens, already resolved for the role (pageTargets.ts). */
+  targetPage?: string;
   presentation?: 'iframe' | 'window';
   cookieless: boolean;
   /** Student preview by a staff account (enaraRole is then 'student', the view; the account keeps its own role). */
@@ -42,6 +44,7 @@ const launchTokenSchema = new Schema<ILmsLaunchToken>(
     enaraClassId: String,
     resourceLinkId: String,
     targetAssignmentId: String,
+    targetPage: String,
     presentation: { type: String, enum: ['iframe', 'window'] },
     cookieless: { type: Boolean, default: false },
     preview: Boolean,
@@ -74,6 +77,8 @@ export interface ILmsDeepLinkSession {
   lmsUserSub: string;
   role: 'teacher' | 'admin';
   locale: 'en' | 'ar';
+  /** Phase 2b: the school's time zone (IANA); picker due dates are entered and shown in it. */
+  timeZone?: string;
   returnUrl: string;
   /** Echoed back unchanged (LTI DL `data`). */
   data?: string;
@@ -100,6 +105,7 @@ const deepLinkSessionSchema = new Schema<ILmsDeepLinkSession>(
     lmsUserSub: { type: String, required: true },
     role: { type: String, enum: ['teacher', 'admin'], required: true },
     locale: { type: String, enum: ['en', 'ar'], default: 'en' },
+    timeZone: String,
     returnUrl: { type: String, required: true },
     data: String,
     acceptMultiple: { type: Boolean, default: false },

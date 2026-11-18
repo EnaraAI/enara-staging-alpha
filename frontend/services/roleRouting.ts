@@ -127,3 +127,19 @@ export function lmsLandingPage(uiRole: UiRole, backendRole: string | undefined, 
   if (uiRole === 'admin') return staffPageAllowed(backendRole, page) ? page : staffLandingPage(backendRole);
   return fallback;
 }
+
+// LMS Phase 2b: a launch with enara_target lands on a page the server already
+// resolved for the role (backend core/pageTargets.ts). Enara Kids students get
+// the kids equivalent of a student page, or kids home.
+export type KidsLmsTab = 'home' | 'learning' | 'progress' | 'assignments' | 'plan' | 'results';
+const KIDS_TAB_FOR_PAGE: Record<string, KidsLmsTab> = {
+  dashboard: 'home',
+  courses: 'learning',
+  progress: 'progress',
+  'assignments-student': 'assignments',
+  'study-plan': 'plan',
+  results: 'results',
+};
+export function kidsTabForLmsPage(page: string | null | undefined): KidsLmsTab {
+  return (page && Object.prototype.hasOwnProperty.call(KIDS_TAB_FOR_PAGE, page) ? KIDS_TAB_FOR_PAGE[page] : 'home');
+}

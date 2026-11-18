@@ -3,9 +3,12 @@ import { asyncHandler } from '../../../middleware/errorHandler';
 import { buildDeepLinkResponse, findPickerSession } from '../adapters/lti13/deepLinking';
 import { LtiError } from '../adapters/lti13/errors';
 import { lmsFlags } from '../core/flags';
+import { checkPickerDue, DUE_PARAM, formatDueLine } from '../core/dueDate';
 import { alreadyAddedKeys, itemKey, pickerType, pickerTypes, type PickerItem } from '../core/picker';
 import '../core/pickerTypes';
+import '../core/pickerPages';
 import { LmsPlatform } from '../models';
+import { DEFAULT_SCHOOL_TIME_ZONE } from '../../../services/institutionTimeZone';
 
 // Phase 2 activity picker API (the picker page inside the LMS). No ENARA
 // sign-in: the caller holds the picker session secret (header X-Lms-Picker),
@@ -13,9 +16,14 @@ import { LmsPlatform } from '../models';
 // lives 10 minutes and is used once. Everything is scoped to that session's
 // school and LMS course. 404 unless LMS_DEEP_LINKING_ENABLED (and LTI) is on.
 //
-//   GET  /api/lms/picker/session   locale, course title, item types, multi-select
+//   GET  /api/lms/picker/session   locale, course title, item types, multi-select, school time zone
 //   GET  /api/lms/picker/items     the school's items, with "already added in this course"
-//   POST /api/lms/picker/submit    { items: [{ type, id }] } -> { returnUrl, jwt }
+//   POST /api/lms/picker/submit    { items: [{ type, id, due? }] } -> { returnUrl, jwt }
+//
+// Phase 2b (D13): `due` is an optional local date-time ("YYYY-MM-DDTHH:mm") in
+// the school's time zone, for item types with dueDate (assessments and
+// assignments). It is checked (future, at most 2 years ahead), sent to the LMS
+// as enara_due=<ISO UTC> and added as a "Due: ..." line to the description.
 
 const LIST_LIMIT = 200;
 export const pickerRouter = Router();
@@ -38,6 +46,9 @@ async function session(req: Request, res: Response) {
   return found.session;
 }
 
+/** The item as the teacher's language shows it (title and description sent to the LMS). */
+const localized = (i: PickerItem, locale: 'en' | 'ar'): PickerItem => (locale === 'ar' && i.ar ? { ...i, title: i.ar.title, description: i.ar.description ?? i.description } : i);
+
 const publicItem = (i: PickerItem, added: Set<string>) => {
   const { custom, ...rest } = i;
   void custom;
@@ -54,7 +65,8 @@ pickerRouter.get(
       courseTitle: s.contextTitle ?? null,
       acceptMultiple: s.acceptMultiple,
       expiresAt: s.expiresAt,
-      types: pickerTypes().map((t) => ({ type: t.type, label: t.label })),
+      timeZone: s.timeZone ?? DEFAULT_SCHOOL_TIME_ZONE,
+      types: pickerTypes().map((t) => ({ type: t.type, label: t.label, dueDate: t.dueDate === true })),
     });
   }),
 );
@@ -92,10 +104,30 @@ pickerRouter.post(
       }
       if (seen.has(itemKey(type, id))) continue;
       seen.add(itemKey(type, id));
-      const item = await t.resolve(s.institutionId, id); // re-checked: this school, still usable
-      if (!item) {
+      const resolved = await t.resolve(s.institutionId, id); // re-checked: this school, still usable
+      if (!resolved) {
         res.status(409).json({ error: 'item_not_available', type, id });
         return;
+      }
+      let item = localized(resolved, s.locale);
+      const due = r?.due;
+      if (due !== undefined && due !== null && due !== '') {
+        if (!t.dueDate) {
+          res.status(400).json({ error: 'due_not_supported', type, id });
+          return;
+        }
+        const tz = s.timeZone ?? DEFAULT_SCHOOL_TIME_ZONE;
+        const checked = checkPickerDue(due, tz);
+        if (!checked.ok) {
+          res.status(400).json({ error: checked.error, type, id });
+          return;
+        }
+        const line = formatDueLine(checked.due, tz, s.locale);
+        item = {
+          ...item,
+          custom: { ...item.custom, [DUE_PARAM]: checked.due.toISOString() },
+          description: item.description ? `${item.description}\n\n${line}` : line,
+        };
       }
       items.push(item);
     }

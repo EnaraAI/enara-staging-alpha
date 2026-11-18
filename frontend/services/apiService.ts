@@ -1534,10 +1534,17 @@ export interface LmsPickerItem {
   type: string; id: string; title: string; description?: string; subject?: string; kind?: string; difficulty?: string;
   language?: { level?: string; skills?: string[] }; questions?: number; points?: number;
   graded: boolean; needsMedia: boolean; meta?: string; alreadyAdded: boolean;
+  /** Phase 2b: a page only teachers can open ("Teachers only" badge). */
+  teacherOnly?: boolean;
+  /** Phase 2b: the Arabic title and description. */
+  ar?: { title: string; description?: string };
 }
 export interface LmsPickerSession {
   locale: 'en' | 'ar'; courseTitle: string | null; acceptMultiple: boolean; expiresAt: string;
-  types: { type: string; label: { en: string; ar: string } }[];
+  /** Phase 2b: the school's time zone; picker due dates are entered in it. */
+  timeZone: string;
+  /** dueDate: the picker offers an optional due date for this type's items (D13). */
+  types: { type: string; label: { en: string; ar: string }; dueDate?: boolean }[];
 }
 async function pickerCall<T>(secret: string, method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
   const res = await fetch(toUrl(`/api/lms/picker${path}`), {
@@ -1546,10 +1553,16 @@ async function pickerCall<T>(secret: string, method: 'GET' | 'POST', path: strin
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new ApiError(typeof data?.error === 'string' ? data.error : `Request failed (${res.status})`, res.status, typeof data?.error === 'string' ? data.error : undefined);
+  if (!res.ok) {
+    const err = new ApiError(typeof data?.error === 'string' ? data.error : `Request failed (${res.status})`, res.status, typeof data?.error === 'string' ? data.error : undefined);
+    // Phase 2b: which picked item a refusal is about (e.g. a due date in the past).
+    if (typeof data?.type === 'string' && typeof data?.id === 'string') (err as ApiError & { item?: { type: string; id: string } }).item = { type: data.type, id: data.id };
+    throw err;
+  }
   return data as T;
 }
 export const fetchLmsPickerSession = (secret: string) => pickerCall<LmsPickerSession>(secret, 'GET', '/session');
 export const fetchLmsPickerItems = (secret: string) => pickerCall<{ items: LmsPickerItem[] }>(secret, 'GET', '/items');
-export const submitLmsPicker = (secret: string, items: { type: string; id: string }[]) =>
+/** due: optional local date-time "YYYY-MM-DDTHH:mm" in the school's time zone (Phase 2b). */
+export const submitLmsPicker = (secret: string, items: { type: string; id: string; due?: string }[]) =>
   pickerCall<{ returnUrl: string; jwt: string }>(secret, 'POST', '/submit', { items });

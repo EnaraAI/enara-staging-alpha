@@ -357,6 +357,7 @@ const App: React.FC = () => {
           sharedAssessmentId={state.sharedAssessmentId}
           sharedCourseId={state.sharedCourseId}
           lmsAssignmentId={state.lmsTarget?.assignmentId}
+          lmsPage={state.lmsTarget?.page}
           lmsStudent={isLmsStudent()}
           onSignOut={handleLogout}
         />
@@ -548,7 +549,7 @@ const App: React.FC = () => {
             {state.page === 'audit' && <AuditCompliance />}
             {state.page === 'learning-events' && <LearningEvents />}
             {state.page === 'learning-objectives' && <LearningObjectives />}
-            {state.page === 'class-insights' && <ClassInsights />}
+            {state.page === 'class-insights' && <ClassInsights initialClassId={state.lmsTarget?.classId ?? undefined} />}
             {state.page === 'school-insights' && <SchoolInsights isEnaraAdmin />}
             {state.page === 'credits' && <AICredits isEnaraAdmin={true} />}
             {state.page === 'credit-management' && <EnaraCreditManagement />}
@@ -620,7 +621,7 @@ const App: React.FC = () => {
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments initialClassId={state.lmsTarget?.classId ?? undefined} initialAssignmentId={state.lmsTarget?.assignmentId} />}
           {state.page === 'grading' && <GradingReview />}
-          {state.page === 'teaching' && <TeachingDashboard />}
+          {state.page === 'teaching' && <TeachingDashboard initialClassId={state.lmsTarget?.classId ?? undefined} />}
           {state.page === 'lesson-planner' && <LessonPlanner />}
           {state.page === 'operations' && <div className="p-20 text-center text-slate-400">Operational Efficiency & Resource Management</div>}
           {/* Integrations (API keys) is for Enara admins only. */}

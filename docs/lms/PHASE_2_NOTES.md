@@ -66,7 +66,7 @@ Phase 2 registers `assessment` and `assignment` in `core/pickerTypes.ts`.
 
 ## Due dates
 
-**Skipped.** Moodle's LTI activity has **no due-date field**, and Moodle doesn't use the date fields of a deep-linking response. A date set in the picker would therefore not show in Moodle. As before, the ENARA assignment keeps its own due date, which comes from the assignment or defaults to one year. If wanted later, the picker could set the ENARA due date, but it would show only in ENARA.
+Moodle's LTI activity has **no due-date field**, and Moodle doesn't use the date fields of a deep-linking response. Phase 2 therefore skipped due dates. **Phase 2b adds an optional due date in the picker (owner decision D13)**: it is stored on the ENARA assignment and written into the Moodle description text when the activity is created. See "Phase 2b" below.
 
 ## One host (startup check)
 
@@ -119,3 +119,98 @@ These results come from the owner's tests, with the ENARA side confirmed from th
 **Found during the test:**
 1. **Moodle creates a grade column anyway** for an activity whose content item has no `lineItem`. The launch carries that line item (here line item 17), so the column exists but stays empty. ENARA cannot stop this, and cannot remove the activity's own column through AGS. Owner decision D3 (practice graded with "best") resolves it for practice: **done** (see "The signed response"); once deployed, the practice activity above sends its best attempt to line item 17 (not yet verified on MoodleCloud). For items that are genuinely ungraded (later: tutor sessions, the avatar), the teacher guide (`TEACHER_GUIDE.md`) tells teachers to set **Grade › Type: None** on that Moodle activity, and how to give practice weight 0 in the course total.
 2. **A (\*) override on "ENARA graded quiz."** in the Moodle gradebook: Moodle ignores tool grades on an overridden cell. The fix is on the Moodle side: untick **Overridden** on that cell. ENARA's ledger shows a difference as "Changed in LMS".
+
+---
+
+# Phase 2b: page links, the course link and due dates
+
+Branch `claude/lms-phase2b`. Same switches as Phase 2 (`LMS_LTI_ENABLED`, `LMS_DEEP_LINKING_ENABLED`); nothing new to switch on. lms-test only.
+
+## 1. A generic launch target: `enara_target` (owner decision D12)
+
+An LMS activity can name a **page** of ENARA instead of ENARA work. It carries one LTI custom parameter:
+
+```
+enara_target=<page key>
+```
+
+`core/pageTargets.ts` holds the fixed allowlist. Each key names the page a student opens and/or the page a staff account opens:
+
+| Key | Student lands on | Teacher (and school admin) lands on | Picker |
+|---|---|---|---|
+| `home` | Home (dashboard) | Teaching Dashboard **for the course's class** | "ENARA home (course link)" |
+| `my-learning` | My learning (`courses`) | Teaching Dashboard (home) | ENARA pages |
+| `my-progress` | My progress (`progress`) | Teaching Dashboard (home) | ENARA pages |
+| `my-assignments` | Assignments (`assignments-student`) | Teaching Dashboard (home) | ENARA pages |
+| `study-plan` | Study plan | Teaching Dashboard (home) | ENARA pages |
+| `results` | Results | Teaching Dashboard (home) | ENARA pages |
+| `teaching` | Home (dashboard) | Teaching Dashboard for the course's class | ENARA pages, **Teachers only** |
+| `class-assignments` | Home (dashboard) | Class assignments for the course's class | ENARA pages, **Teachers only** |
+| `grading` | Home (dashboard) | Grading | ENARA pages, **Teachers only** |
+| `class-insights` | Home (dashboard) | Class insights (the course's class selected) | ENARA pages, **Teachers only** |
+| `lesson-planner` | Home (dashboard) | Lesson planner | ENARA pages, **Teachers only** |
+| `assessment-builder` | Home (dashboard) | Assessment builder | ENARA pages, **Teachers only** |
+| `curriculum` | Home (dashboard) | Curriculum | ENARA pages, **Teachers only** |
+
+Rules:
+- **By role, always.** The launch resolves the key for the role the session opens (`resolvePageTarget`), so a student only ever gets student pages and staff only staff pages. No school-admin page is on the list (admins sign in to ENARA directly, D10), and the app's own guard (`staffPageAllowed`) still keeps a teacher off school-admin pages.
+- **Unknown or forbidden key → that role's home.** A student who opens a teacher-only link lands on their own home; a teacher who opens a student page lands on the Teaching Dashboard. The key is case-insensitive. The launch audit (`lti.launch`) records `pageTarget`, `page` and, on a fallback, `pageFallback: unknown | forbidden`.
+- **Student preview** (a teacher using Moodle's "Switch role to Student"): resolved as a student.
+- **Enara Kids:** students in the kids interface get the kids equivalent (`frontend/services/roleRouting.ts › kidsTabForLmsPage`: home, learning, progress, assignments, plan, results), otherwise kids home.
+- **Exclusive with work.** `enara_target` together with `enara_assessment` or `enara_assignment` refuses the launch: `invalid_activity_binding`, audit reason `target_and_work`. Nothing is created.
+- **Never graded.** A page link binds no ENARA work, so no grade can come from it; the grade outbox also refuses a link with `enara_target` explicitly (`enqueueForLink` → `page_target`), even if the activity was bound to work before it was changed into a page link. The launch opens the page, never that older work.
+- **How it lands.** The launch token carries the resolved app page (`lms_launch_tokens.targetPage`); `POST /api/lms/launch/exchange` returns `launch.target = {kind: 'page', page}` and `launch.classId` (the course's class). The app opens the page with that class selected (`TeachingDashboard`, `ClassInsights` and `ClassAssignments` take the class). For students, the launch already makes the course's class their current class (P0 item 5). "Open in new tab" lands on the same page.
+
+## 2. The course link: "ENARA home (course link)"
+
+One role-routed ENARA link for everyone in the course (D12). It is the picker type `course_link` with one item, custom `{enara_target: 'home'}`, **no grade column** (no `lineItem`). A student lands on their dashboard (in the course's class); a teacher lands on the Teaching Dashboard for the course's class.
+
+Moodle may still create a grade column for it (see "Found during the test" above). The owner will test the tool setting "Accept grades from the tool: Delegate to teacher" separately; no Moodle setting was changed here.
+
+**Course navigation:** whether Moodle can show ENARA in the course menu is still to be checked on MoodleCloud; until then the course link is the way.
+
+## 3. Page links in the picker: "ENARA pages"
+
+`core/pickerPages.ts` registers two plug-in types with `registerPickerType` (no change to the picker screen's flow, its API or the signed response):
+- `course_link` — "ENARA home (course link)" / "الصفحة الرئيسية لإنارة (رابط المقرر)";
+- `enara_page` — "ENARA pages" / "صفحات إنارة", one item per page key above except `home`.
+
+Each item: `graded: false` (no `lineItem`), `needsMedia: false`, `kind: 'page'`, custom `{enara_target: '<key>'}`, and an Arabic title and description (`PickerItem.ar`; an Arabic picker shows them and sends them to the LMS as the activity's title and text). Teacher-only pages carry **`teacherOnly: true`** (new optional field on `PickerItem`). The picker shows a **"Teachers only" / "للمعلمين فقط"** badge on them, and, when any is listed, this note (EN and AR):
+
+> Hide teacher-only links from students in Moodle (or make them 'Available but not shown on course page'). Students who open one land on their own home.
+
+"Already added in this course" also covers page links (earlier picks, and activities launched with `enara_target`).
+
+## 4. The optional due date (owner decision D13)
+
+- **Picker.** For assessments and assignments only (`PickerItemType.dueDate: true`), each picked item shows an optional **Due** date-and-time field. `GET /api/lms/picker/session` returns the school's **time zone** (`timeZone`) and, per type, `dueDate`. The picker sends the local date-time (`YYYY-MM-DDTHH:mm`) as `items[].due`.
+- **School time zone.** Institutions had no time zone field. Phase 2b adds an optional **`timeZone`** setting on the institution (IANA name; `models/Institution.ts`), read by `services/institutionTimeZone.ts › institutionTimeZone()`. Unset (or invalid) means the default **`Africa/Cairo`** for now, so Test School A is on Cairo time without any data change. The picker session stores the zone when it opens (`lms_deep_link_sessions.timeZone`).
+- **Server checks** (`core/dueDate.ts › checkPickerDue`): the local time is converted to UTC in the school's zone (daylight saving included); it must be **in the future** and **at most 2 years ahead**. Refusals are `400 {error: 'due_in_past' | 'due_too_far' | 'due_invalid' | 'due_not_supported', type, id}`; the picker shows the message next to the item and the session stays usable.
+- **What is sent.** The content item gets custom `enara_due=<ISO UTC>` and one line appended to its description (`text`), in the **picker's language** and the **school's time zone**, with Western digits:
+  - EN: `Due: 25 Nov 2026, 11:59 PM (Cairo time)`
+  - AR: `موعد التسليم: 25 نوفمبر 2026، 11:59 م (توقيت القاهرة)`
+- **Applied once.** At the activity's first binding, `binding.ts › materialize()` uses `enara_due` as the ENARA assignment's due date instead of the one-year default (and sets the assignment's time zone to the school's). It is never applied again: once the link is bound, later launches change nothing, so a later edit of the date in ENARA wins. The `activity.bound` audit records `dueFrom: picker | source | default | picker_passed`.
+- **Edge cases.** A picked date that has already passed by the first launch is not used (the default applies; `dueFrom: picker_passed`). A malformed `enara_due` (typed by hand) is ignored, not a launch error. A picked assignment that is already in the course's own class is used as it is: its own due date stays.
+- **The Moodle text is not updated later.** The "Due: ..." line is written once, when Moodle creates the activity. Changing the date later in ENARA does not change Moodle's description.
+
+## Tests
+
+`test/lms/phase2b.test.ts` (19 tests) against the mock LMS:
+- every page key for student, teacher and admin (allowed, forbidden, unknown), case-insensitive keys, no school-admin pages;
+- the app side: `lmsLandingPage` keeps the resolved page per role; Kids mapping (`kidsTabForLmsPage`);
+- launches: a student on student pages and on teacher-only/unknown links (own home, audited), a teacher on teacher pages with the course's class, a student preview of a teacher-only link;
+- `enara_target` with `enara_assessment` / `enara_assignment` refused (`invalid_activity_binding`, `target_and_work`), nothing created;
+- no grade for page links (nothing bound; outbox `page_target`, also for a link that was bound before);
+- the course link for a student and a teacher (same link, the course's class, enrolment and instructor);
+- the picker: the two new types (labels EN/AR, `dueDate`), items (`teacherOnly` on teacher pages only, ungraded, Arabic titles, no custom parameters leaked), content items (`enara_target`, no `lineItem`, no window), Arabic titles, unknown keys refused, "already added" for the course link, the school time zone (default Cairo; school B on `Asia/Riyadh`);
+- the due date: helpers (Cairo winter and summer time, Riyadh), a valid date (`enara_due` in UTC and the English line in `text` after the description), the Arabic line, past / too far / malformed / unsupported refused, the first binding stores the UTC date on the materialized assignment (assessment and other-class assignment), applied once (an ENARA edit wins; later launches with another `enara_due` change nothing), missing → one-year default, already passed → default.
+
+`test/lms/phase2.test.ts` now lists the two new types in the session and filters the work items by type.
+
+## Still to do on MoodleCloud (owner)
+
+- Add the course link and one page link with the picker; open them as teacher.test and student.test (a teacher-only link as the student: own home).
+- Hide a teacher-only link from students (or "Available but not shown on course page").
+- Add an activity with a due date; check the "Due: ..." line in its description and the date on the ENARA assignment.
+- Check whether Moodle still makes a grade column for the course link and page links, with "Accept grades from the tool: Delegate to teacher".
+- Check whether the course navigation menu can show ENARA.

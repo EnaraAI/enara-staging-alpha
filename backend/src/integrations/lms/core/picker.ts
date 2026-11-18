@@ -1,5 +1,6 @@
 import { LmsContext, LmsDeepLinkSession, LmsResourceLink } from '../models';
 import { BINDING_PARAM } from './binding';
+import { TARGET_PARAM } from './pageTargets';
 
 // Phase 2 activity picker: the registry of item types. The picker screen,
 // its API and the Deep Linking response know nothing about assessments or
@@ -30,11 +31,20 @@ export interface PickerItem {
   custom: Record<string, string>;
   /** Extra line shown in the list (e.g. the class and due date of an assignment). */
   meta?: string;
+  /**
+   * Phase 2b: only teachers can open it (a page target such as Grading). The
+   * picker shows a "Teachers only" badge; a student who opens it lands on their own home.
+   */
+  teacherOnly?: boolean;
+  /** Phase 2b: the Arabic title and description (an Arabic picker shows them and sends them to the LMS). */
+  ar?: { title: string; description?: string };
 }
 
 export interface PickerItemType {
   type: string;
   label: { en: string; ar: string };
+  /** Phase 2b (D13): the picker offers an optional due date for this type's items (graded ENARA work only). */
+  dueDate?: boolean;
   /** The school's items of this type (published / usable only). */
   list(institutionId: string, limit: number): Promise<PickerItem[]>;
   /** Re-checks one item at submit time (null: not found, other school, or not usable). */
@@ -58,6 +68,11 @@ export function pickerType(type: string): PickerItemType | undefined {
 
 export const itemKey = (type: string, id: string) => `${type}:${id}`;
 
+/** Picker types of page targets (Phase 2b, pickerPages.ts): the course link is enara_target=home, every other page key is a page item. */
+export const COURSE_LINK_TYPE = 'course_link';
+export const PAGE_TYPE = 'enara_page';
+export const pageTargetItemKey = (target: string) => (target === 'home' ? itemKey(COURSE_LINK_TYPE, 'home') : itemKey(PAGE_TYPE, target));
+
 /** Items already added in this LMS course: earlier picks, plus activities launched with a binding. */
 export async function alreadyAddedKeys(platformId: string, institutionId: string, externalContextId: string): Promise<Set<string>> {
   const keys = new Set<string>();
@@ -69,6 +84,7 @@ export async function alreadyAddedKeys(platformId: string, institutionId: string
     for (const l of links) {
       const c = (l.customParams ?? {}) as Record<string, string>;
       for (const [type, param] of Object.entries(BINDING_PARAM)) if (c[param]) keys.add(itemKey(type, c[param]));
+      if (c[TARGET_PARAM]) keys.add(pageTargetItemKey(c[TARGET_PARAM].trim()));
     }
   }
   return keys;

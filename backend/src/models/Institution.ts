@@ -9,6 +9,10 @@ export interface IInstitution extends Document {
   contactPhone?: string;
   status: 'active' | 'suspended';
   createdBy?: string;
+  // The school's IANA time zone (e.g. 'Africa/Cairo'). Optional: unset means
+  // the default in services/institutionTimeZone.ts (Africa/Cairo for now).
+  // LMS Phase 2b: the picker's due dates are entered and shown in this zone.
+  timeZone?: string;
   // Feature flags for this school (see services/featureFlags.ts). Missing = off.
   features?: Map<string, boolean>;
   // P2: documents are deleted retentionDays after pilotEndsAt (default 180).
@@ -38,6 +42,7 @@ const institutionSchema = new Schema<IInstitution>(
     contactPhone: String,
     status: { type: String, enum: ['active', 'suspended'], default: 'active', index: true },
     createdBy: String,
+    timeZone: { type: String, maxlength: 60 },
     features: { type: Map, of: Boolean, default: undefined },
     documentRetention: { type: { pilotEndsAt: Date, retentionDays: { type: Number, min: 1, max: 3650 }, _id: false }, default: undefined },
     learningSettings: {

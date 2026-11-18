@@ -168,10 +168,11 @@ function Profile({ studentId, classId, origin, onClose }: { studentId: string; c
   );
 }
 
-export const TeachingDashboard: React.FC = () => {
+/** initialClassId: opened from an LMS course (Phase 2b course link / page link): that course's class. */
+export const TeachingDashboard: React.FC<{ initialClassId?: string }> = ({ initialClassId }) => {
   const [o, setO] = useState<any>(null);
   const [disabled, setDisabled] = useState(false);
-  const [classId, setClassId] = useState<string | null>(null);
+  const [classId, setClassId] = useState<string | null>(initialClassId ?? null);
   const [roster, setRoster] = useState<any>(null);
   const [studentId, setStudentId] = useState<string | null>(null);
   // Live data unless the teacher deliberately picks demo data; every request states its view.

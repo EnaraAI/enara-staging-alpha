@@ -9,7 +9,7 @@ import * as api from '../services/apiService';
 import { toast } from '../services/toastService';
 import { SpeakingExam } from '../components/SpeakingExam';
 import * as D from './kidsData';
-import { showOldAssessmentsTab } from '../services/roleRouting';
+import { kidsTabForLmsPage, showOldAssessmentsTab } from '../services/roleRouting';
 
 type Tab = 'home' | 'learning' | 'progress' | 'assignments' | 'plan' | 'quizzes' | 'results';
 type Route =
@@ -63,12 +63,14 @@ export interface KidsAppProps {
   sharedCourseId?: string | null;
   /** Opened from an LMS activity bound to ENARA work: the assignment to open first (as the standard student app does). */
   lmsAssignmentId?: string | null;
+  /** LMS Phase 2b: a launch with a page target (enara_target): the student app page, mapped to its kids tab. */
+  lmsPage?: string | null;
   /** P0 item 6: an LMS student; the older quiz list (attempts without an assignment) is not offered. */
   lmsStudent?: boolean;
   onSignOut: () => void;
 }
 
-export default function KidsApp({ tourPending, sharedAssessmentId, sharedCourseId, lmsAssignmentId, lmsStudent = false, onSignOut }: KidsAppProps) {
+export default function KidsApp({ tourPending, sharedAssessmentId, sharedCourseId, lmsAssignmentId, lmsPage, lmsStudent = false, onSignOut }: KidsAppProps) {
   const [lang, setLang] = useState<Lang>(() => {
     try {
       const saved = localStorage.getItem(LANG_KEY) as Lang | null;
@@ -78,9 +80,11 @@ export default function KidsApp({ tourPending, sharedAssessmentId, sharedCourseI
   });
   const [route, setRoute] = useState<Route>(() =>
     lmsAssignmentId ? { tab: 'assignments', id: lmsAssignmentId }
+      : lmsPage ? { tab: kidsTabForLmsPage(lmsPage) }
       : sharedAssessmentId ? { tab: 'quizzes', id: sharedAssessmentId } : sharedCourseId ? { tab: 'learning', courseId: sharedCourseId } : { tab: 'home' });
   // A later launch in the same tab (a new LMS activity) opens its assignment too.
   useEffect(() => { if (lmsAssignmentId) setRoute({ tab: 'assignments', id: lmsAssignmentId }); }, [lmsAssignmentId]);
+  useEffect(() => { if (lmsPage && !lmsAssignmentId) setRoute({ tab: kidsTabForLmsPage(lmsPage) }); }, [lmsPage, lmsAssignmentId]);
   const [tutor, setTutor] = useState<Tutor>({ open: false });
   const [tourStep, setTourStep] = useState(tourPending ? 1 : 0);
   const [night, setNight] = useState(() => window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false);

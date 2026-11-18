@@ -64,6 +64,7 @@ function assessmentItem(a: AssessmentRow, lang: LangInfo): PickerItem {
 registerPickerType({
   type: 'assessment',
   label: { en: 'Assessments', ar: 'التقييمات' },
+  dueDate: true,
   async list(institutionId, limit) {
     const rows = (await Assessment.find({ institutionId, lifecycle: 'published', publishedVersion: { $gte: 1 }, origin: { $ne: 'demo_seed' } })
       .select(ASSESSMENT_FIELDS).sort({ updatedAt: -1 }).limit(limit).lean()) as unknown as AssessmentRow[];
@@ -114,6 +115,7 @@ async function assignmentItems(institutionId: string, rows: AssignmentRow[]): Pr
 registerPickerType({
   type: 'assignment',
   label: { en: 'Assignments', ar: 'الواجبات' },
+  dueDate: true,
   async list(institutionId, limit) {
     const rows = (await Assignment.find({ institutionId, state: { $in: ['published', 'closed'] }, origin: { $ne: 'demo_seed' }, id: { $not: /^asg-lms-/ } })
       .select(ASSIGNMENT_FIELDS).sort({ dueAt: -1 }).limit(limit).lean()) as unknown as AssignmentRow[];

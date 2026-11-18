@@ -8,6 +8,11 @@ import { fetchLmsPickerItems, fetchLmsPickerSession, submitLmsPicker, type LmsPi
 // lets the teacher pick one or several, and posts ENARA's signed answer back
 // to the LMS, which creates the activities. Arabic or English follows the
 // teacher's LMS language (launch_presentation.locale).
+//
+// Phase 2b: page links ("ENARA home (course link)", "ENARA pages") are plug-in
+// types too; pages only teachers can open carry a "Teachers only" badge and a
+// note on hiding them from students. Assessments and assignments get an
+// optional due date (owner decision D13), entered in the school's time zone.
 
 export const onLmsPickerPath = () => window.location.pathname.replace(/\/$/, '') === '/lms/picker';
 
@@ -50,6 +55,13 @@ const T = {
     noSession: 'This picker link is missing its sign-in information. Click "Select content" again in your LMS.',
     expired: 'This picker has expired or was already used. Click "Select content" again in your LMS.',
     failed: 'Something went wrong. Please try again; if it keeps happening, send this reference to ENARA support:',
+    teachersOnly: 'Teachers only',
+    teachersOnlyNote: "Hide teacher-only links from students in Moodle (or make them 'Available but not shown on course page'). Students who open one land on their own home.",
+    due: 'Due (optional)',
+    dueHint: (tz: string) => `School time (${tz}). Saved in ENARA and added to the activity description in Moodle.`,
+    due_in_past: 'The due date must be in the future.',
+    due_too_far: 'The due date must be within 2 years.',
+    due_invalid: 'The due date is not valid.',
   },
   ar: {
     title: 'إضافة أنشطة إنارة',
@@ -81,6 +93,13 @@ const T = {
     noSession: 'رابط الاختيار هذا لا يحتوي على بيانات الدخول. اضغط "اختيار المحتوى" مرة أخرى في نظام إدارة التعلم.',
     expired: 'انتهت صلاحية أداة الاختيار أو استُخدمت من قبل. اضغط "اختيار المحتوى" مرة أخرى في نظام إدارة التعلم.',
     failed: 'حدث خطأ. حاول مرة أخرى، وإذا تكرر أرسل هذا المرجع إلى دعم إنارة:',
+    teachersOnly: 'للمعلمين فقط',
+    teachersOnlyNote: 'أخفِ الروابط الخاصة بالمعلمين عن الطلاب في Moodle (أو اجعلها «متاحة ولكن غير معروضة في صفحة المقرر»). الطالب الذي يفتح أحدها يصل إلى صفحته الرئيسية.',
+    due: 'موعد التسليم (اختياري)',
+    dueHint: (tz: string) => `بتوقيت المدرسة (${tz}). يُحفظ في إنارة ويُضاف إلى وصف النشاط في Moodle.`,
+    due_in_past: 'يجب أن يكون موعد التسليم في المستقبل.',
+    due_too_far: 'يجب أن يكون موعد التسليم خلال سنتين.',
+    due_invalid: 'موعد التسليم غير صالح.',
   },
 };
 
@@ -96,7 +115,11 @@ const KIND_LABEL: Record<string, { en: string; ar: string }> = {
   retention_check: { en: 'Retention check', ar: 'اختبار احتفاظ' },
   practice: { en: 'Practice', ar: 'تدريب' },
   speaking: { en: 'Speaking', ar: 'محادثة' },
+  page: { en: 'Page', ar: 'صفحة' },
 };
+
+const DUE_ERRORS = ['due_in_past', 'due_too_far', 'due_invalid'] as const;
+type DueError = (typeof DUE_ERRORS)[number];
 
 /** Posts the signed answer to the LMS (a normal form post, as LTI Deep Linking requires). */
 function postToLms(returnUrl: string, jwt: string) {
@@ -120,6 +143,9 @@ export const LmsPicker: React.FC = () => {
   const [items, setItems] = useState<LmsPickerItem[] | null>(null);
   const [error, setError] = useState<{ key: 'noSession' | 'expired' | 'failed'; ref?: string } | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
+  // Phase 2b: optional due date per picked item (local "YYYY-MM-DDTHH:mm", school time zone).
+  const [dues, setDues] = useState<Record<string, string>>({});
+  const [dueError, setDueError] = useState<{ key: string; error: DueError } | null>(null);
   const [sending, setSending] = useState(false);
   const [q, setQ] = useState('');
   const [type, setType] = useState('');
@@ -147,6 +173,8 @@ export const LmsPicker: React.FC = () => {
   const lang = session?.locale ?? (navigator.language?.startsWith('ar') ? 'ar' : 'en');
   const t = T[lang];
   const key = (i: { type: string; id: string }) => `${i.type}:${i.id}`;
+  const titleOf = (i: LmsPickerItem) => (lang === 'ar' && i.ar ? i.ar.title : i.title);
+  const takesDue = (i: LmsPickerItem) => !!session?.types.find((x) => x.type === i.type)?.dueDate;
 
   const language = useMemo(() => (items ?? []).filter((i) => i.language), [items]);
   const options = useMemo(
@@ -166,7 +194,7 @@ export const LmsPicker: React.FC = () => {
       (!kind || i.kind === kind) &&
       (!level || i.language?.level === level) &&
       (!skill || i.language?.skills?.includes(skill)) &&
-      (!q.trim() || i.title.toLowerCase().includes(q.trim().toLowerCase())),
+      (!q.trim() || titleOf(i).toLowerCase().includes(q.trim().toLowerCase())),
   );
 
   const toggle = (i: LmsPickerItem) => {
@@ -180,13 +208,20 @@ export const LmsPicker: React.FC = () => {
     try {
       const picks = keys.map((k) => {
         const [itemType, ...rest] = k.split(':');
-        return { type: itemType, id: rest.join(':') };
+        return { type: itemType, id: rest.join(':'), ...(dues[k] ? { due: dues[k] } : {}) };
       });
+      setDueError(null);
       const { returnUrl, jwt } = await submitLmsPicker(secret.current, picks);
       postToLms(returnUrl, jwt);
     } catch (e) {
-      const err = e as { status?: number; code?: string; message?: string };
+      const err = e as { status?: number; code?: string; message?: string; item?: { type: string; id: string } };
       setSending(false);
+      // A due date the server refused: keep the picks and show it next to the item.
+      if (err.status === 400 && (DUE_ERRORS as readonly string[]).includes(err.code ?? '')) {
+        const bad = err.item ? key(err.item) : keys.find((k) => dues[k]) ?? keys[0];
+        setDueError({ key: bad, error: err.code as DueError });
+        return;
+      }
       setError(err.status === 401 || err.status === 410 ? { key: 'expired' } : { key: 'failed', ref: err.code || err.message });
     }
   };
@@ -231,6 +266,11 @@ export const LmsPicker: React.FC = () => {
               {options.skills.length > 0 && select(skill, setSkill, t.allSkills, options.skills, (v) => v, t.skill)}
             </div>
             {session?.acceptMultiple === false && <p className="mt-2 text-sm text-slate-500">{t.one}</p>}
+            {shown.some((i) => i.teacherOnly) && (
+              <p data-testid="picker-teacher-only-note" className="mt-2 text-sm bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-3 py-2">
+                {t.teachersOnlyNote}
+              </p>
+            )}
 
             <ul className="mt-4 space-y-2 pb-24">
               {shown.length === 0 && <li className="text-slate-500 text-sm">{t.none}</li>}
@@ -243,7 +283,7 @@ export const LmsPicker: React.FC = () => {
                       <input type={session?.acceptMultiple === false ? 'radio' : 'checkbox'} name="enara-pick" checked={on} onChange={() => toggle(i)} className="mt-1" />
                       <span className="flex-1 min-w-0">
                         <span className="flex flex-wrap items-center gap-2">
-                          <span className="font-semibold">{i.title}</span>
+                          <span className="font-semibold">{titleOf(i)}</span>
                           {i.alreadyAdded && <span className="text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2 py-0.5">{t.already}</span>}
                         </span>
                         <span className="block text-sm text-slate-500 mt-1">
@@ -262,9 +302,30 @@ export const LmsPicker: React.FC = () => {
                         <span className="flex flex-wrap gap-2 mt-2 text-xs">
                           <span className={`rounded-full px-2 py-0.5 border ${i.graded ? 'bg-green-50 text-green-800 border-green-200' : 'bg-slate-50 text-slate-600 border-slate-200'}`}>{i.graded ? t.graded : t.notGraded}</span>
                           {i.needsMedia && <span className="rounded-full px-2 py-0.5 border bg-blue-50 text-blue-800 border-blue-200" title={t.newWindowHint}>{t.newWindow}</span>}
+                          {i.teacherOnly && <span className="rounded-full px-2 py-0.5 border bg-amber-50 text-amber-900 border-amber-300">{t.teachersOnly}</span>}
                         </span>
                       </span>
                     </label>
+                    {on && takesDue(i) && (
+                      <div className="mt-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm">
+                        <label className="flex flex-wrap items-center gap-2">
+                          <span className="font-medium">{t.due}</span>
+                          <input
+                            type="datetime-local"
+                            dir="ltr"
+                            value={dues[k] ?? ''}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              setDues((cur) => ({ ...cur, [k]: v }));
+                              if (dueError?.key === k) setDueError(null);
+                            }}
+                            className="border border-slate-200 rounded-lg px-2 py-1"
+                          />
+                        </label>
+                        <span className="block text-xs text-slate-500 mt-1">{t.dueHint(session?.timeZone ?? '')}</span>
+                        {dueError?.key === k && <span role="alert" className="block text-xs text-red-700 mt-1">{t[dueError.error]}</span>}
+                      </div>
+                    )}
                   </li>
                 );
               })}

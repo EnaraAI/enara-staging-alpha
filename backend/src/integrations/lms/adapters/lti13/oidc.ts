@@ -3,6 +3,7 @@ import type { JWTPayload } from 'jose';
 import { isInstitutionSuspended } from '../../../../middleware/auth.middleware';
 import { writeLmsAudit } from '../../core/audit';
 import { BindingError, bindingRequest, validateBinding, type ValidatedBinding } from '../../core/binding';
+import { pageTargetRequest, resolvePageTarget, type ResolvedPageTarget } from '../../core/pageTargets';
 import { sha256Hex } from '../../core/crypto';
 import { findStudentPreview, LmsProvisionError, provisionLaunch, type ProvisionInput, type ProvisionRole } from '../../core/domainService';
 import { lmsFlags, lmsSettings } from '../../core/flags';
@@ -332,6 +333,11 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
     if (error instanceof BindingError) return fail('invalid_activity_binding', 'lti.launch', { platform, refIds: { reason: error.reason } });
     throw error;
   }
+  // Phase 2b: a page of ENARA instead of work (enara_target; never both, checked
+  // above). Resolved for the role the session opens: never a page that role
+  // may not open (an unknown or forbidden page lands on that role's home).
+  const requestedPage = pageTargetRequest(customParams);
+  const pageFor = (role: 'student' | 'teacher' | 'admin'): ResolvedPageTarget | undefined => (requestedPage === null ? undefined : resolvePageTarget(requestedPage, role));
 
   const input: ProvisionInput = {
     platformId: platform.id,
@@ -371,7 +377,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
       contextId: preview.contextId,
       enaraClassId: preview.enaraClassId,
       resourceLinkId: preview.resourceLinkId,
-      targetAssignmentId: preview.targetAssignmentId,
+      ...(requestedPage === null ? { targetAssignmentId: preview.targetAssignmentId } : { targetPage: pageFor('student')!.page }),
       presentation: preview.presentation,
       cookieless,
     });
@@ -424,6 +430,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
     { $inc: { launchCount: 1, ...(cookieless ? { cookielessLaunchCount: 1 } : {}) }, $set: { lastLaunchAt: new Date() } },
   );
   const tokenRole = mapped.role as ProvisionRole;
+  const page = pageFor(tokenRole);
   const token = await issueLaunchToken({
     institutionId: platform.institutionId,
     enaraUserId: provisioned.enaraUserId,
@@ -434,7 +441,8 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
     contextId: provisioned.context.id,
     enaraClassId: provisioned.enaraClassId,
     resourceLinkId: provisioned.resourceLink.id,
-    targetAssignmentId: provisioned.resourceLink.enaraActivityId,
+    // A page target opens its page, never work the link may have been bound to before.
+    ...(page ? { targetPage: page.page } : { targetAssignmentId: provisioned.resourceLink.enaraActivityId }),
     presentation: provisioned.resourceLink.presentation,
     cookieless,
   });
@@ -464,6 +472,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
       createdContext: provisioned.createdContext,
       overSeatLimit: !!provisioned.seat?.overLimit,
       ...(rosterSyncStarted ? { rosterSyncStarted } : {}),
+      ...(page ? { pageTarget: page.key, page: page.page, ...(page.fallback ? { pageFallback: page.fallback } : {}) } : {}),
     },
   });
   return {
@@ -476,7 +485,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
       enaraRole: mapped.role,
       enaraOrgId: platform.institutionId,
       enaraClassId: provisioned.enaraClassId,
-      targetActivityId: provisioned.resourceLink.enaraActivityId,
+      targetActivityId: page ? undefined : provisioned.resourceLink.enaraActivityId,
       presentation: provisioned.resourceLink.presentation,
       returnUrl: str(obj(claims[CLAIM.launchPresentation])?.return_url),
     },

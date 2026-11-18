@@ -3,6 +3,9 @@ import { writeLmsAudit } from '../../core/audit';
 import { lmsSettings } from '../../core/flags';
 import { getSigningKey } from '../../core/keys';
 import { loadJose } from '../../core/jose';
+import { institutionTimeZone } from '../../../../services/institutionTimeZone';
+import { DUE_PARAM } from '../../core/dueDate';
+import { TARGET_PARAM } from '../../core/pageTargets';
 import { itemKey, type PickerItem } from '../../core/picker';
 import { LmsDeepLinkSession, type ILmsDeepLinkSession, type ILmsPlatform } from '../../models';
 import { CLAIM, DEEP_LINKING_RESPONSE, LTI_VERSION } from './claims';
@@ -99,6 +102,7 @@ export async function startDeepLinking(input: DeepLinkStart): Promise<string> {
     lmsUserSub: input.sub,
     role: input.role as 'teacher' | 'admin',
     locale,
+    timeZone: await institutionTimeZone(platform.institutionId),
     returnUrl,
     data,
     acceptMultiple: settings?.accept_multiple !== false,
@@ -197,6 +201,8 @@ export async function buildDeepLinkResponse(
       items: items.length,
       graded: items.filter((i) => i.graded).length,
       newWindow: items.filter((i) => i.needsMedia).length,
+      withDue: items.filter((i) => i.custom[DUE_PARAM]).length,
+      pages: items.filter((i) => i.custom[TARGET_PARAM]).length,
       itemIds: items.map((i) => itemKey(i.type, i.id)).join(',').slice(0, 200),
     },
   });

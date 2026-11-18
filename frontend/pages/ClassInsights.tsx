@@ -30,9 +30,10 @@ const CELL: Record<string, { short: string; label: string; tone: string }> = {
 
 const errorText = (err: unknown) => (err instanceof Error ? err.message : 'Something went wrong');
 
-export const ClassInsights: React.FC = () => {
+/** initialClassId: opened from an LMS course (Phase 2b page link): that course's class, when the teacher has it. */
+export const ClassInsights: React.FC<{ initialClassId?: string }> = ({ initialClassId }) => {
   const [classes, setClasses] = useState<{ id: string; courseName: string }[] | null>(null);
-  const [classId, setClassId] = useState('');
+  const [classId, setClassId] = useState(initialClassId ?? '');
   const [data, setData] = useState<any>(null);
   const [ttu, setTtu] = useState<any>(null);
   const [disabled, setDisabled] = useState(false);

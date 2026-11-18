@@ -227,7 +227,8 @@ describe('switch and access', () => {
     expect(await M.LmsUser.countDocuments()).toBe(users);
     const s = await api(secret).session();
     expect(s.body).toMatchObject({ locale: 'ar', courseTitle: 'English (LMS)', acceptMultiple: true });
-    expect(s.body.types.map((t: { type: string }) => t.type)).toEqual(['assessment', 'assignment']);
+    // Phase 2b adds the page plug-in types (phase2b.test.ts).
+    expect(s.body.types.map((t: { type: string }) => t.type)).toEqual(['assessment', 'assignment', 'course_link', 'enara_page']);
     expect((await request(app).get('/api/lms/picker/session').set('X-Lms-Picker', 'wrong-secret-0000000000000')).status).toBe(401);
   });
 });
@@ -236,7 +237,8 @@ describe('items', () => {
   it("this school's published items only, language facts only for language courses, no custom parameters", async () => {
     const r = await api(await openPicker(pA)).items();
     expect(r.status).toBe(200);
-    const keys = r.body.items.map((i: { type: string; id: string }) => `${i.type}:${i.id}`).sort();
+    const work = r.body.items.filter((i: { type: string }) => i.type === 'assessment' || i.type === 'assignment'); // pages: phase2b.test.ts
+    const keys = work.map((i: { type: string; id: string }) => `${i.type}:${i.id}`).sort();
     expect(keys).toEqual(['assessment:AS-ENG', 'assessment:AS-MATH', 'assessment:AS-PRACTICE', 'assignment:ASG-QUIZ', 'assignment:ASG-SPEAK']);
     const by = (id: string) => r.body.items.find((i: { id: string }) => i.id === id);
     expect(by('AS-ENG').language).toEqual({ level: 'A2', skills: ['reading', 'speaking'] });
@@ -296,7 +298,7 @@ describe('the signed response', () => {
     expect((await api(s1).submit([{ type: 'lesson', id: 'L1' }])).status).toBe(400);
     expect((await api(s1).submit([{ type: 'assignment', id: 'ASG-DRAFT' }])).status).toBe(409);
     const s2 = await openPicker(pB);
-    expect((await api(s2).items()).body.items.map((i: { id: string }) => i.id)).toEqual(['AS-B']);
+    expect((await api(s2).items()).body.items.filter((i: { type: string }) => i.type === 'assessment' || i.type === 'assignment').map((i: { id: string }) => i.id)).toEqual(['AS-B']);
     expect((await api(s2).submit([{ type: 'assessment', id: 'AS-ENG' }])).status).toBe(409);
     const single = await openPicker(pA, { settings: { accept_multiple: false } });
     expect((await api(single).submit([{ type: 'assessment', id: 'AS-ENG' }, { type: 'assessment', id: 'AS-MATH' }])).status).toBe(400);
