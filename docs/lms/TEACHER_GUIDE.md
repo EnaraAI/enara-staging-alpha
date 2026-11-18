@@ -2,35 +2,38 @@
 
 This guide is for teachers and school admins who add ENARA activities to a Moodle course. The menu names are for Moodle 4.x.
 
+> **Status today:** ENARA's Moodle connection runs on ENARA's test site (lms-test) only. Grades go to Moodle there; for real schools, grades stay off until ENARA's automatic grader passes ENARA's accuracy bar, and ENARA then switches them on. On the test site, ENARA's emails go only to ENARA's test inbox.
+
 ## Recommended Moodle tool setting (school admin)
 
 In **Site administration › Plugins › Activity modules › External tool › Manage tools › ENARA › edit › Privacy**, keep **Accept grades from the tool = Always** (owner decision, 18 Nov 2026). Moodle then creates a grade column for every ENARA activity. For links that have no grade, set the activity's **Grade › Type** to **None**; see "Activities that are really ungraded" below.
 
 ## School admin: connecting Moodle with one link
 
-ENARA gives you (or your Moodle site administrator) a **Moodle link** from **LMS connections › Connect Moodle (one URL)**. The link is for your school, works once, and expires after 7 days.
+The full steps, in English and Arabic, are in the school guide, [SCHOOL_GUIDE.md](./SCHOOL_GUIDE.md). In short:
 
-1. In Moodle, go to **Site administration › Plugins › Activity modules › External tool › Manage tools**.
-2. Paste the link in **Tool URL** and click **Add LTI Advantage**.
+1. Get the school's **Moodle link** (it works once and expires after 7 days). ENARA sends it, or the school admin signs in to ENARA, opens **LMS connection status** and clicks **New link**. ENARA's emails never contain the link.
+2. In Moodle, go to **Site administration › Plugins › Activity modules › External tool › Manage tools**, paste the link in **Tool URL** and click **Add LTI Advantage**.
 3. If Moodle says "There are existing tools attached to the registration's domain", click **Register as a new external tool**. Do not click **Update**: ENARA refuses it, and your other ENARA tool stays as it is.
-4. The window shows **"ENARA is registered. Click Activate in Moodle."** and then closes.
+4. The window shows **"ENARA is registered. Click Activate in Moodle."** and then closes. If it shows "ENARA could not be connected", send the **Reference** code on it to ENARA. In most cases the same link still works: try again.
 5. Do the steps in "School admin: after connecting" below.
-
-If the window shows "ENARA could not be connected", send the **Reference** code on it to ENARA. In most cases the same link still works: try again from step 1.
 
 ## School admin: after connecting
 
-Moodle takes most settings from the link. These it **cannot** take, so set them by hand once (the full school guide, in English and Arabic, is [SCHOOL_GUIDE.md](./SCHOOL_GUIDE.md); on ENARA's **LMS connection status** page, tick each setting when it is done):
+Moodle takes most settings from the link. These it **cannot** take, so set them by hand once. Then, on ENARA's **LMS connection status** page, tick all 4 items under "Moodle settings to set by hand" (ENARA cannot see them in Moodle):
 
-1. **Activate the tool.** In **Site administration › Plugins › Activity modules › External tool › Manage tools**, find the new **ENARA** card (it says **Pending**) and click **Activate**.
+1. **Activate the tool.** In **Manage tools**, find the new **ENARA** card (it says **Pending**) and click **Activate**.
 2. **Open its settings.** On the ENARA card, click the **gear icon** (Edit).
 3. **Show it in the activity chooser.** Under **Tool settings**, set **Tool configuration usage** to **Show in activity chooser and as a preconfigured tool**. (Moodle sets "Show as preconfigured tool when adding an external tool", so teachers would not see ENARA in **Add an activity or resource**.)
 4. **Accept grades = Always.** Under **Privacy**, set **Accept grades from the tool** to **Always**. (Moodle sets "Delegate to teacher".)
-5. Click **Save changes**.
+5. **Restrict to category** (Moodle 4.3 or later): only when this Moodle serves more than one school (see below). Tick it on the status page in any case.
+6. Click **Save changes**.
 
 Already set by the link (no change needed; you can check them on the same page): **Default launch container** = Embed, without blocks; **Supports Deep Linking (Content-Item Message)** ticked; **IMS LTI Assignment and Grade Services** = Use this service for grade sync and column management; **IMS LTI Names and Role Provisioning** = Use this service to retrieve members' information as per privacy settings; **Share launcher's name with the tool** = Always; **Share launcher's email with the tool** = Always.
 
-If the connection was made with a school admin's link, ENARA approves it before teachers and students can open ENARA. Until then a launch shows "This LMS connection is waiting for approval by ENARA".
+A link made by ENARA, or with **New link** before the school is connected, connects at once. A link a school admin makes in **LMS connections › Connect Moodle (one URL)**, and a connection made by hand, wait for ENARA's approval. Until then a launch shows "This LMS connection is waiting for approval by ENARA".
+
+**Never enrol parents in Moodle courses that contain ENARA activities.** ENARA would treat them as students. Parents get access in ENARA itself, with an invite code the school admin gives them from the student's profile (**Parent access**).
 
 ### One Moodle site for two schools
 
@@ -62,7 +65,7 @@ Under **ENARA pages** you can add a direct link to one page, for example **My pr
 In the picker, **AI tutor sessions**, **Live avatar sessions** and **Diagnostic checks** each add one activity, marked **No grade column**:
 - **AI tutor session:** the student talks with ENARA's AI tutor about the course (typing or voice).
 - **Live avatar session:** a live voice call with ENARA's video tutor. It needs the microphone.
-- **Diagnostic check:** a short adaptive check, objective by objective. The student gets a report, not a grade. It works when the course's ENARA class has a curriculum with approved learning objectives.
+- **Diagnostic check:** a short adaptive check, objective by objective. The student gets a report, not a grade. It works when the course's ENARA class has a curriculum with approved learning objectives. A class that ENARA made for a Moodle course has no curriculum yet, so ask ENARA to link one; until then students see a message that it is not ready.
 
 When the microphone is blocked inside Moodle, the student sees **Open in a new tab**, which opens the same activity in a new tab, already signed in. If the tutor or the avatar is not set up on your ENARA site yet, students see a clear message (English and Arabic) instead of a session. When you open the activity yourself, you see whether it is ready and how many students of the class used it in the last 7 days. ENARA never sends a grade for these activities; Moodle still makes an empty grade column for each (see "Activities that are really ungraded").
 
@@ -79,7 +82,7 @@ When you pick a quiz, test or assignment, you can give it a **due date** (option
 ### What ENARA sends
 
 - **Every ENARA activity has its own grade column** in the Moodle gradebook, out of 100.
-- **Quizzes and tests** send the student's **latest** released result.
+- **Quizzes and tests** send the student's **latest** released result. If a newer attempt waits for your review, Moodle keeps the last released grade, with the note "A newer attempt is waiting for teacher review.", until you release the newer one.
 - **Practice** also sends a grade (owner decision D3). It sends the student's **best** attempt, so a weaker later try never lowers it. This includes practice activities added before this change.
 - Grades go to Moodle automatically after each attempt. You do not need to do anything in ENARA.
 
@@ -103,15 +106,20 @@ Two related settings:
 
 Moodle creates a grade column for every external tool activity. For an ENARA activity that should have no grade at all (the ENARA course link, links to ENARA pages, AI tutor sessions, live avatar sessions and diagnostic checks), remove the column in Moodle. ENARA never sends a grade for these. Open the activity, then go to **Settings** › **Grade** › **Type**, choose **None**, and click **Save and return to course**.
 
-### A cell marked (*) is "overridden"
+### A grade changed in Moodle ("Changed in LMS")
 
-If you typed a grade into the gradebook yourself, Moodle marks the cell as overridden. Moodle then **ignores every grade ENARA sends to that cell**. In ENARA, the grade shows as "Changed in LMS".
+If you type a grade into the Moodle gradebook yourself, Moodle marks the cell as overridden (*) and **ignores every grade ENARA sends to that cell**. ENARA checks Moodle's grades once a day, and when an admin clicks **Re-sync grades**. When it finds a different value, the student's row in **Class assignments** shows **Changed in LMS**, and ENARA stops sending grades to that cell, so your Moodle grade is not overwritten.
 
-To let ENARA's grades through again:
+Open **Grade history** on that student's row and choose:
+- **Keep LMS value**: ENARA keeps your Moodle grade and sends nothing now.
+- **Keep ENARA value**: ENARA sends its grade again. For Moodle to show it, also remove the override in Moodle:
+  1. Go to **Grades**, and in the drop-down menu choose **Single view**.
+  2. Choose the ENARA grade item.
+  3. On the student's row, untick **Override**.
+  4. Click **Save**.
 
-1. Go to **Grades**, and in the drop-down menu choose **Single view**.
-2. Choose the ENARA grade item.
-3. On the student's row, untick **Override**.
-4. Click **Save**.
+If you remove the override in Moodle first, the cell goes back to ENARA's grade, and ENARA's next check clears "Changed in LMS" by itself.
 
-The next grade ENARA sends will fill the cell.
+## Emails from ENARA (optional)
+
+The first time you open ENARA from Moodle, ENARA asks **"Email me Enara updates?"**, with the email address Moodle shared already filled in (you can change it). **Yes, email me** sends a welcome email, then notes when grades were changed in Moodle, when a newer attempt waits for your review, when an activity may have been deleted in Moodle, and on Mondays how many students have not started. **No thanks**, or no answer: no emails. Emails come in your school's language (Arabic by default for schools in Egypt), never contain student names or scores, and every link opens ENARA, where you sign in.
