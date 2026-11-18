@@ -15,6 +15,8 @@ import * as svc from './service';
 import { confirmCode, previewCode, setGuardianRole, unlink } from './codes';
 import { reportSenders, type WeeklySummary } from './reportSender';
 import { parentEmailBlocked, parentEmailBlockedBody, parentEmailState } from './emailBlock';
+import { parentEmailsEnabled } from '../email/sendParentTemplate';
+import { sendWeeklySummary } from './parentEmails';
 import { mockPlan } from './mock';
 import { authConfig, googleParentSignIn } from './google';
 import { recordSignIn } from '../services/signInHistory';
@@ -218,6 +220,17 @@ router.post('/learners/:studentId/report/share', h(async (req, res) => {
     res.status(409).json(parentEmailBlockedBody(req.requestId));
     return;
   }
+  if (channel === 'email' && parentEmailsEnabled()) {
+    // Parents P4: the approved parent-weekly-summary with this child's section, to the
+    // parent's own address, through the email safety path. A double tap within a minute sends once.
+    const { cairoDay, weekStartDay } = await import('./time');
+    const now = new Date();
+    const r = await sendWeeklySummary(uid(req), { key: `share:${ctx.link.id}:${Math.floor(now.getTime() / 60_000)}`, at: now, weekStart: weekStartDay(now), weekEnd: cairoDay(now), only: ctx.student.id, ignorePrefs: true });
+    await track(req, ctx, 'feature', 'share_report');
+    const ok = r.status === 'sent' || r.status === 'captured' || r.status === 'duplicate';
+    res.status(ok ? 200 : r.status === 'no_recipient' ? 409 : 502).json(ok ? { ok: true, channel: 'email' } : { ok: false, channel: 'email', code: r.status === 'no_recipient' ? 'NO_PARENT_EMAIL' : r.code ?? r.status });
+    return;
+  }
   const r = (await svc.weeklyReport(ctx)).report;
   const parent = await User.findById(uid(req)).select('name email').lean();
   const summary: WeeklySummary = {
@@ -284,7 +297,11 @@ router.get('/account', h(async (req, res) => {
       ...(parentEmailSigninEnabled() ? { emailSignin: true, ...(codeOnly ? {} : { email: req.user!.email, emailVerified: !!profile?.emailVerifiedAt }) } : {}),
     },
     ...(learners.hiddenBySchool ? { hiddenBySchool: learners.hiddenBySchool } : {}),
-    preferences: { mock: false, language: profile?.language ?? 'en', alertChannels: profile?.alertChannels ?? ['push', 'whatsapp'], summary: 'on_demand' },
+    preferences: {
+      mock: false, language: profile?.language ?? 'en', alertChannels: profile?.alertChannels ?? ['push', 'whatsapp'], summary: parentEmailsEnabled() ? 'weekly' : 'on_demand',
+      // Parents P4: the parent's own on/off for the weekly summary and new results emails (the school's switches apply first).
+      ...(parentEmailsEnabled() ? { emails: { weeklySummary: profile?.emailPrefs?.weeklySummary !== false, newResults: profile?.emailPrefs?.newResults !== false } } : {}),
+    },
   });
 }));
 router.put('/account/preferences', h(async (req, res) => {
@@ -292,6 +309,8 @@ router.put('/account/preferences', h(async (req, res) => {
   const set: Record<string, unknown> = {};
   if (body.language === 'en' || body.language === 'ar') set.language = body.language;
   if (Array.isArray(body.alertChannels)) set.alertChannels = body.alertChannels.filter((c) => c === 'push' || c === 'whatsapp' || c === 'email');
+  if (typeof body.weeklySummaryEmail === 'boolean') set['emailPrefs.weeklySummary'] = body.weeklySummaryEmail;
+  if (typeof body.newResultsEmail === 'boolean') set['emailPrefs.newResults'] = body.newResultsEmail;
   await ParentProfile.updateOne({ userId: uid(req) }, { $set: set, $setOnInsert: { userId: uid(req) } }, { upsert: true });
   res.json({ ok: true, ...set });
 }));

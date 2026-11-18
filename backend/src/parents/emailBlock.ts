@@ -1,12 +1,15 @@
 import { getConfig } from '../config/env';
 import { isStagingMode } from '../config/stagingGuard';
 import { AppError } from '../middleware/errorHandler';
+import { parentEmailsEnabled } from '../email/sendParentTemplate';
 
 // Owner rule (lms-test): on a staging deployment (ENARA_STAGING=true) the two
 // parent email buttons, "Send code by email" (school admin, student profile)
 // and "Share this week -> Email" (parent portal), are BLOCKED: the API answers
 // 409 PARENT_EMAIL_BLOCKED_STAGING and the UI disables them with this note.
-// Parents P4 brings them back through the safe path (email/testInbox.ts).
+// Parents P4 brings them back through the safe path (email/testInbox.ts): with
+// PARENT_EMAILS_ENABLED on, they are no longer blocked and send the approved
+// parent templates (test inbox redirect, [lms-test] prefix, ceiling on staging).
 // Every other email path stays on the test inbox redirect. Not staging: unchanged.
 
 export const PARENT_EMAIL_BLOCKED_CODE = 'PARENT_EMAIL_BLOCKED_STAGING';
@@ -22,7 +25,7 @@ export function parentEmailBlocked(): boolean {
   } catch {
     staging = false;
   }
-  return staging || isStagingMode(process.env);
+  return (staging || isStagingMode(process.env)) && !parentEmailsEnabled();
 }
 
 /** What the UI needs to disable a parent email button (and say why). */

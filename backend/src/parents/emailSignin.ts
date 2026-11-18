@@ -17,6 +17,7 @@ import { recordAudit } from '../services/auditTrail';
 import { logger } from '../utils/logging';
 import { normalizeEmail } from '../utils/validation';
 import { isCodeOnlyEmail } from './codeSignup';
+import { escapeHtml } from './emailBlocks';
 
 // Parents P2 (PARENT_EMAIL_SIGNIN_ENABLED), owner decisions b) and "Parents with
 // more than one child" 2), 18 Nov 2026:
@@ -105,7 +106,7 @@ async function sendCode(template: 'parent-email-verify' | 'parent-sign-in-code',
     await ParentCapturedCode.updateOne({ emailHash: hashEmail(to), purpose }, { $set: { code: fmt(code), at: new Date() } }, { upsert: true });
   }
   const alias = `${template}-${lang}` as const;
-  const result = await sendCodeTemplate('parent', PARENT_TEMPLATES_BUNDLE, alias, to, { NAME: name && !PLACEHOLDER_NAMES.has(name) ? name.split(/\s+/)[0] : '', CODE: fmt(code), EXPIRES_IN: EXPIRES_IN[lang] });
+  const result = await sendCodeTemplate('parent', PARENT_TEMPLATES_BUNDLE, alias, to, { NAME: name && !PLACEHOLDER_NAMES.has(name) ? escapeHtml(name.split(/\s+/)[0]) : '', CODE: fmt(code), EXPIRES_IN: EXPIRES_IN[lang] });
   if (!result.ok) {
     logger.warn('parents.email_code_not_sent', { template, code: result.code });
     throw new AppError('The code email could not be sent. Try again later.', 503, 'EMAIL_CODE_NOT_SENT');

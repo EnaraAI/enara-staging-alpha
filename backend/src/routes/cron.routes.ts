@@ -26,6 +26,8 @@ import { runLmsEmailDaily } from '../integrations/lms/core/lmsEmailDaily';
 import { lmsEmailsActive } from '../integrations/lms/core/lmsEmail';
 import { parentSettingsEnabled } from '../parents/flags';
 import { runParentUsageRollup } from '../parents/usage';
+import { parentEmailsEnabled } from '../email/sendParentTemplate';
+import { runWeeklySummaries } from '../parents/parentEmails';
 
 // Meant to be called once a day by a scheduler that sends
 // "Authorization: Bearer <CRON_SECRET>". Staging deliberately has no Vercel
@@ -108,6 +110,8 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     }
     // Parents P1: nightly rollup of parent usage events (inert unless PARENT_SETTINGS_ENABLED).
     if (parentSettingsEnabled()) await run('parentUsage', () => runParentUsageRollup());
+    // Parents P4: the weekly summary (one email per parent), once Sunday 18:00 Cairo has passed; at most 10 s.
+    if (parentEmailsEnabled()) await run('parentWeekly', () => runWeeklySummaries({ budgetMs: Math.max(2_000, Math.min(10_000, 58_000 - (Date.now() - startedAt))) }));
     await run('reminders', () => sendReminders({}));
     if (new Date().getUTCDay() === 1) await run('weekly', () => sendWeeklySummaries());
     logger.info('cron_daily', { ...results, failed });

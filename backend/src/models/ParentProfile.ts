@@ -17,6 +17,9 @@ export interface IParentProfile extends Document {
   // verified email, which account it was merged into (the row is disabled).
   emailVerifiedAt?: Date;
   mergedInto?: string;
+  // Parents P4: the parent's own on/off for the weekly summary and new results
+  // emails (unset = on; the school's switches apply first).
+  emailPrefs?: { weeklySummary?: boolean; newResults?: boolean };
 }
 
 const profileSchema = new Schema<IParentProfile>(
@@ -30,6 +33,7 @@ const profileSchema = new Schema<IParentProfile>(
     signIn: { type: String, enum: ['code', 'password', 'google'] },
     emailVerifiedAt: Date,
     mergedInto: String,
+    emailPrefs: { type: { weeklySummary: Boolean, newResults: Boolean, _id: false }, default: undefined },
   },
   { collection: 'parent_profiles', versionKey: false, timestamps: true },
 );

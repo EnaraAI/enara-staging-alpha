@@ -57,6 +57,9 @@ export async function endParentLink(link: LinkRow, reason: ParentLinkEndReason, 
   );
   if (!r.modifiedCount) return false;
   await recordAudit('parent_link_ended', actor, { institutionId: link.institutionId, type: 'student', id: link.studentId }, { linkId: link.id, parentUserId: link.parentUserId, reason, previousStatus: link.status });
+  // Parents P4: parent-link-ended for a school unlink, archive or leaving only (owner
+  // decision 2); never for the parent's own unlink or a PDPL deletion. Never fails the end.
+  if (link.status === 'active') await (await import('./parentEmails')).notifyLinkEnded(link, reason, now);
   return true;
 }
 

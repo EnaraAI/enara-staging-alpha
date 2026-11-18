@@ -4,6 +4,7 @@ import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { Institution } from '../models/Institution';
 import { ensurePlainObject } from '../utils/validation';
 import { parentCodeToolsEnabled, parentGradesAfterReviewEnabled, parentSettingsEnabled } from './flags';
+import { parentEmailsEnabled } from '../email/sendParentTemplate';
 import { canIssueCodes, classesForCodes, issueClassSheet, listClassCodes, revokeClassCodes, schoolParentSettings, setSchoolParentSettings } from './codeTools';
 import { accessFromDoc, setParentAccess } from './schoolAccess';
 import { schoolUsage } from './usage';
@@ -21,25 +22,26 @@ const notFound = () => new AppError('Route not found', 404, 'NOT_FOUND');
 const actor = (req: AuthRequest) => ({ id: req.user!.id, role: req.user!.role, institutionId: req.user!.institutionId });
 const settingsOnly = (_req: unknown, _res: unknown, next: (e?: unknown) => void) => (parentSettingsEnabled() ? next() : next(notFound()));
 const toolsOnly = (_req: unknown, _res: unknown, next: (e?: unknown) => void) => (parentCodeToolsEnabled() ? next() : next(notFound()));
-// The school's parent settings: code expiry and teachers (P2), when results show (P3).
-const schoolSettingsOnly = (_req: unknown, _res: unknown, next: (e?: unknown) => void) => (parentCodeToolsEnabled() || parentGradesAfterReviewEnabled() ? next() : next(notFound()));
+// The school's parent settings: code expiry and teachers (P2), when results show (P3), which emails (P4).
+const anySchoolSettings = () => parentCodeToolsEnabled() || parentGradesAfterReviewEnabled() || parentEmailsEnabled();
+const schoolSettingsOnly = (_req: unknown, _res: unknown, next: (e?: unknown) => void) => (anySchoolSettings() ? next() : next(notFound()));
 const staff = requireRole('admin', 'enara-admin');
 
-router.use((_req, _res, next) => (parentSettingsEnabled() || parentCodeToolsEnabled() || parentGradesAfterReviewEnabled() ? next() : next(notFound())));
+router.use((_req, _res, next) => (parentSettingsEnabled() || anySchoolSettings() ? next() : next(notFound())));
 router.use(authMiddleware, requireRole('admin', 'enara-admin', 'teacher'));
 
 router.get('/status', h(async (req, res) => {
   const codeTools = await canIssueCodes(actor(req));
   const usage = parentSettingsEnabled() && req.user!.role !== 'teacher';
-  const schoolSettings = (parentCodeToolsEnabled() || parentGradesAfterReviewEnabled()) && req.user!.role === 'admin';
+  const schoolSettings = anySchoolSettings() && req.user!.role === 'admin';
   if (!usage && !codeTools && !schoolSettings) throw notFound();
   res.json({
     enabled: true,
     usage,
     canChangeAccess: parentSettingsEnabled() && req.user!.role === 'enara-admin',
     codeTools,
-    ...((parentCodeToolsEnabled() || parentGradesAfterReviewEnabled()) && req.user!.institutionId ? { settings: await schoolParentSettings(req.user!.institutionId), canChangeSettings: req.user!.role === 'admin' } : {}),
-    settingsAvailable: { codes: parentCodeToolsEnabled(), results: parentGradesAfterReviewEnabled() },
+    ...(anySchoolSettings() && req.user!.institutionId ? { settings: await schoolParentSettings(req.user!.institutionId), canChangeSettings: req.user!.role === 'admin' } : {}),
+    settingsAvailable: { codes: parentCodeToolsEnabled(), results: parentGradesAfterReviewEnabled(), emails: parentEmailsEnabled() },
   });
 }));
 

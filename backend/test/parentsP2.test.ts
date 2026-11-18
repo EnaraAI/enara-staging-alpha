@@ -250,7 +250,7 @@ describe('class code sheets (PARENT_CODE_TOOLS_ENABLED)', () => {
     expect((await as('adminB').put('/api/parents-admin/schools/p2-A/settings', { codeTtlDays: 10 })).status).toBe(403);
     expect((await as('t1').put('/api/parents-admin/schools/p2-A/settings', { teachersMayIssueCodes: true })).status).toBe(403);
     const r = await as('adminA').put('/api/parents-admin/schools/p2-A/settings', { codeTtlDays: 14 });
-    expect(r.body).toEqual({ institutionId: 'p2-A', codeTtlDays: 14, teachersMayIssueCodes: false, showResults: 'after_release' });
+    expect(r.body).toMatchObject({ institutionId: 'p2-A', codeTtlDays: 14, teachersMayIssueCodes: false, showResults: 'after_release' });
     expect(await M.AuditEvent.exists({ action: 'parent_settings_changed', targetId: 'p2-A' })).toBeTruthy();
     const c = await as('adminA').post('/api/students/a2/parent-codes');
     expect(Math.round((new Date(c.body.expiresAt).getTime() - Date.now()) / 86_400_000)).toBe(14);

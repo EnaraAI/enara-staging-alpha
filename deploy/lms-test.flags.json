@@ -16,6 +16,7 @@
     { "name": "Parents P2: class code sheets, teachers issuing codes, per-school code expiry", "docs": "docs/parents/P2_NOTES.md", "flags": { "PARENT_CODE_TOOLS_ENABLED": "true" } },
     { "name": "Parents P2: add your email (6-digit code), passwordless email sign-in, merge on a verified email (codes go to the test inbox on lms-test)", "docs": "docs/parents/P2_NOTES.md", "flags": { "PARENT_EMAIL_SIGNIN_ENABLED": "true" } },
     { "name": "Parents P3: results reach parents only after the teacher releases them (school setting, default after release)", "docs": "docs/parents/P3_NOTES.md", "flags": { "PARENT_GRADES_AFTER_REVIEW_ENABLED": "true" } },
+    { "name": "Parents P4: the approved parent emails (link confirmed / ended, new results, weekly summary, invite) and the two parent email buttons, through the email safety path (test inbox on lms-test)", "docs": "docs/parents/P4_NOTES.md", "flags": { "PARENT_EMAILS_ENABLED": "true" } },
     { "name": "Test-site maintenance routes (migrations and the deploy health check)", "docs": "docs/lms/CONTINUOUS_DELIVERY.md", "flags": { "MAINTENANCE_ENDPOINTS_ENABLED": "true" } }
   ],
   "notManaged": {
@@ -40,7 +41,6 @@
     "EMAIL_SUBJECT_PREFIX": "[lms-test], set by hand (brackets are not a plain flag value)",
     "LMS_OPS_EMAILS": "addresses (the ops mailbox), set by hand",
     "RESEND_API_KEY": "a secret (Sensitive), set by hand",
-    "LMS_EMAIL_CAPTURE": "never on lms-test: the Docker E2E stack only (emails recorded, never sent)",
-    "PARENT_EMAILS_ENABLED": "leave unset: parent emails come with Parents P4 (sent through the LMS email safety rules)"
+    "LMS_EMAIL_CAPTURE": "never on lms-test: the Docker E2E stack only (emails recorded, never sent)"
   }
 }

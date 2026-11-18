@@ -118,6 +118,8 @@ export async function finalizeAttempt(attempt: AttemptDoc, by: string, questions
   await updateLearningIntelligence(updated.id, questions, subject);
   await recordGradeChange(updated.id, 'teacher_finalized', by);
   await lmsResultChanged(updated.id, 'finalized');
+  // Parents P4: a school showing results "immediately" sends parent-new-results at finalize.
+  await (await import('../parents/parentEmails')).notifyResultVisible(updated.id);
   return updated;
 }
 
@@ -137,6 +139,8 @@ export async function releaseAttempt(attempt: AttemptDoc, by: string) {
   // Grade ledger, then LMS grade passback (both inert unless switched on).
   await recordGradeChange(updated.id, 'released', by);
   await lmsResultChanged(updated.id, 'released');
+  // Parents P4: parent-new-results (inert unless PARENT_EMAILS_ENABLED; never fails the release).
+  await (await import('../parents/parentEmails')).notifyResultVisible(updated.id);
   return updated;
 }
 
