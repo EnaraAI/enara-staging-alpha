@@ -218,6 +218,26 @@ export async function seedLmsTest(password: string): Promise<SeedResult> {
       { upsert: true },
     );
   }
+  // Phase 2 picker test items (Test School A): one graded quiz and one practice set,
+  // properly published (the items above have no published version, so the picker
+  // does not list them). Skipped when an item with the same title already exists
+  // (they were first added on lms-test through the app on 18 Nov 2026).
+  const { publishAssessment } = await import('../services/assessmentVersions');
+  const mc = (i: number, text: string, options: string[], correctAnswer: string) => ({ id: `q${i}`, type: 'multiple-choice', text, options, correctAnswer, explanation: '', points: 1, source: 'manual' });
+  const PICKER = [
+    { id: 'LT-AS-PICK-GRADED', title: 'Moodle picker graded quiz (fake)', kind: 'quiz', maxAttempts: 3, questions: [mc(1, 'What is 4 + 4?', ['6', '7', '8', '9'], '8'), mc(2, 'What is 10 - 3?', ['5', '6', '7', '8'], '7'), mc(3, 'What is 3 x 3?', ['6', '9', '12', '15'], '9')] },
+    { id: 'LT-AS-PICK-PRACTICE', title: 'Moodle picker practice (fake)', kind: 'practice', maxAttempts: 10, questions: [mc(1, 'What is 2 + 2?', ['3', '4', '5', '6'], '4'), mc(2, 'What is 5 + 1?', ['5', '6', '7', '8'], '6'), mc(3, 'What is 9 - 4?', ['3', '4', '5', '6'], '5')] },
+  ];
+  for (const p of PICKER) {
+    if (await Assessment.exists({ institutionId: 'LT-SCHOOL-A', title: p.title })) continue;
+    const doc = await Assessment.create({
+      id: p.id, title: p.title, subject: 'Maths', institutionId: 'LT-SCHOOL-A', assessmentKind: p.kind, difficulty: 'Easy', duration: 10, status: 'active',
+      lifecycle: 'draft', maxAttempts: p.maxAttempts, answerReveal: 'after-submit', questions: p.questions, origin: 'live',
+      instructions: 'Fake test item for the LMS activity picker.',
+    });
+    await publishAssessment(doc, 'seed');
+  }
+
   let attempts = 0;
   for (const [i, sid] of ['LT-S-A01', 'LT-S-A02', 'LT-S-A03'].entries()) {
     const score = [100, 50, 0][i];

@@ -147,6 +147,7 @@ export type EnqueueOutcome =
   | 'context_inactive'
   | 'platform_not_active'
   | 'no_ags'
+  | 'not_graded'
   | 'no_score_scope'
   | 'not_linked'
   | 'nothing_to_send'
@@ -174,6 +175,8 @@ export async function enqueueForLink(link: ILmsResourceLink, studentId: string, 
   // Phase 3 follow-ups: nothing for an activity the LMS said is gone (until it
   // is launched again), nor for an assignment a teacher archived.
   if (link.lineItemGoneAt) return { outcome: 'lineitem_gone' };
+  // Phase 2: an item added through the picker without a grade column (practice).
+  if ((link.customParams as Record<string, string> | undefined)?.enara_graded === '0') return { outcome: 'not_graded' };
   if (link.enaraActivityId && (await Assignment.exists({ id: link.enaraActivityId, institutionId: link.institutionId, state: 'archived' }))) return { outcome: 'assignment_archived' };
   const context = await LmsContext.findOne({ id: link.contextId, institutionId: link.institutionId, status: 'active' }).lean();
   if (!context) return { outcome: 'context_inactive' };

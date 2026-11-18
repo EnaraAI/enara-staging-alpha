@@ -14,7 +14,10 @@ export const lti13Provider: LmsProvider = {
   },
   async handleLaunch(input: unknown): Promise<LaunchResult> {
     const { body, cookieHeader } = (input ?? {}) as { body?: Record<string, unknown>; cookieHeader?: string };
-    return (await oidcLaunch(body ?? {}, cookieHeader)).result;
+    const out = await oidcLaunch(body ?? {}, cookieHeader);
+    // The provider interface signs people in; an activity-picker request is handled by /lti/launch only.
+    if ('pickerSecret' in out) throw new Error('deep_linking_request_not_a_launch');
+    return out.result;
   },
   pushScore,
 };

@@ -141,11 +141,17 @@ router.post('/dangling-class-members', async (req, res, next) => {
 // are stored in these collections; this route returns them as stored).
 router.get('/lms-evidence', async (req, res, next) => {
   try {
-    const { LmsAuditLog, LmsGradeSyncJob } = await import('../integrations/lms/models');
+    const { LmsAuditLog, LmsGradeSyncJob, LmsResourceLink } = await import('../integrations/lms/models');
     const n = Math.min(500, Math.max(1, Number(req.query.limit) || 200));
     const jobs = await LmsGradeSyncJob.find({}).sort({ createdAt: -1 }).limit(n).lean();
     const audit = await LmsAuditLog.find({}).sort({ createdAt: -1 }).limit(n).lean();
+    // Phase 2 check: each LMS activity, its binding and whether the LMS gave it a grade column (line item).
+    const links = await LmsResourceLink.find({}).sort({ createdAt: -1 }).limit(n).select('id contextId title enaraActivityId lineItemUrl customParams presentation createdAt').lean();
     res.json({
+      links: links.map((l) => ({
+        id: l.id, contextId: l.contextId, title: l.title ?? null, enaraActivityId: l.enaraActivityId ?? null, presentation: l.presentation,
+        lineItem: l.lineItemUrl ? new URL(l.lineItemUrl).pathname : null, custom: l.customParams ?? {}, createdAt: (l as { createdAt?: Date }).createdAt,
+      })),
       jobs: jobs.map((j) => { const { _id, ...rest } = j as Record<string, unknown>; void _id; return rest; }),
       audit: audit.map((a) => { const { _id, ...rest } = a as Record<string, unknown>; void _id; return rest; }),
     });

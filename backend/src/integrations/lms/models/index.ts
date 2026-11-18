@@ -5,7 +5,7 @@ import { LmsGradeSyncJob, LmsLock } from './outbox';
 import { LmsDeployment, LmsPlatform } from './platform';
 import { LmsOrgSettings } from './seats';
 import { LmsAccessToken, LmsOidcState, LmsToolKey } from './security';
-import { LmsLaunchToken } from './session';
+import { LmsDeepLinkSession, LmsLaunchToken } from './session';
 
 export * from './audit';
 export * from './context';
@@ -40,4 +40,7 @@ export const LMS_MODELS = [
 export const LMS_PHASE1A_MODELS = [LmsLaunchToken, LmsOrgSettings] as const;
 
 /** Every LMS collection, for the cleanup script. */
-export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS] as const;
+// Added in Phase 2 (migration 2026-11-20-lms-phase2-deep-linking).
+export const LMS_PHASE2_MODELS = [LmsDeepLinkSession] as const;
+
+export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS] as const;

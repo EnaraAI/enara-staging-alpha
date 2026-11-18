@@ -45,6 +45,7 @@ import { StudentDeepAnalytics } from './pages/StudentDeepAnalytics';
 import { Integrations } from '@/pages/Integrations';
 import { AdminAvatarControlCenter } from './components/enara/AdminAvatarControlCenter';
 import { LmsFrameBar, LmsLaunch, LmsPreviewBanner, onLmsLaunchPath } from './pages/LmsLaunch';
+import { LmsPicker, onLmsPickerPath } from './pages/LmsPicker';
 import { LmsConnections } from './pages/LmsConnections';
 import { isLmsPreview, takeLmsTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
 
@@ -308,6 +309,8 @@ const App: React.FC = () => {
 
   // A launch from an LMS (docs/lms): exchange the one-time token, then open the app.
   if (onLmsLaunchPath()) return <LmsLaunch onReady={handleLogin} />;
+  // LMS Phase 2: the activity picker (a teacher's "Select content" in the LMS).
+  if (onLmsPickerPath()) return <LmsPicker />;
 
   // Invitation and password-reset links open their own page (P22).
   const accountLink = accountLinkFromLocation();

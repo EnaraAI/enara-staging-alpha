@@ -1450,3 +1450,30 @@ export interface MyClasses {
 /** Student: my classes and the one I use now (the switcher shows only with 2+ classes). */
 export const fetchMyClasses = () => request<MyClasses>('GET', '/api/multi-class/me/classes');
 export const setMyCurrentClass = (classId: string) => request<MyClasses>('PUT', '/api/multi-class/me/classes/current', { classId });
+
+// LMS PHASE 2: THE ACTIVITY PICKER (LTI Deep Linking). No ENARA sign-in: the
+// picker page holds the one-time picker secret from the LMS request (header
+// X-Lms-Picker). The backend answers 404 unless LMS_DEEP_LINKING_ENABLED.
+export interface LmsPickerItem {
+  type: string; id: string; title: string; description?: string; subject?: string; kind?: string; difficulty?: string;
+  language?: { level?: string; skills?: string[] }; questions?: number; points?: number;
+  graded: boolean; needsMedia: boolean; meta?: string; alreadyAdded: boolean;
+}
+export interface LmsPickerSession {
+  locale: 'en' | 'ar'; courseTitle: string | null; acceptMultiple: boolean; expiresAt: string;
+  types: { type: string; label: { en: string; ar: string } }[];
+}
+async function pickerCall<T>(secret: string, method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
+  const res = await fetch(toUrl(`/api/lms/picker${path}`), {
+    method,
+    headers: { 'X-Lms-Picker': secret, ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}) },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new ApiError(typeof data?.error === 'string' ? data.error : `Request failed (${res.status})`, res.status, typeof data?.error === 'string' ? data.error : undefined);
+  return data as T;
+}
+export const fetchLmsPickerSession = (secret: string) => pickerCall<LmsPickerSession>(secret, 'GET', '/session');
+export const fetchLmsPickerItems = (secret: string) => pickerCall<{ items: LmsPickerItem[] }>(secret, 'GET', '/items');
+export const submitLmsPicker = (secret: string, items: { type: string; id: string }[]) =>
+  pickerCall<{ returnUrl: string; jwt: string }>(secret, 'POST', '/submit', { items });
