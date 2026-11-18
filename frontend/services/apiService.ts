@@ -26,6 +26,8 @@ export interface SessionUser {
   tourPending?: boolean;
   // 'kids' only for a student the school moved to the Enara Kids interface.
   uiMode?: 'standard' | 'kids';
+  // P0 item 6: a student account that came from an LMS (while LMS launches are on).
+  lmsAccount?: boolean;
 }
 
 export class ApiError extends Error {

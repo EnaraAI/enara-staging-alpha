@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { exchangeLmsLaunch, isLmsPreview, isLmsSession, lmsNewTabUrl, SessionUser } from '../services/apiService';
-import type { UiRole } from '../services/roleRouting';
+import { ApiError, clearSession, exchangeLmsLaunch, isLmsPreview, isLmsSession, lmsNewTabUrl, SessionUser } from '../services/apiService';
+import { lmsLaunchPortal, type UiRole } from '../services/roleRouting';
 
 // Landing page for a launch from an LMS: /lms/launch#lt=<one-time token>.
 // The token is read from the fragment (never sent to a server by the browser),
@@ -18,13 +18,12 @@ const inFrame = (() => {
   }
 })();
 
-export function uiRoleForLms(role: string, preview = false): UiRole {
-  // A staff preview opens the student view; the account keeps its own role.
-  return preview || role === 'student' ? 'student' : 'admin';
-}
+const ROLE_NOT_SUPPORTED = 'ENARA does not open this kind of account from your LMS. Ask your school administrator.';
 
 export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) => void }> = ({ onReady }) => {
   const [error, setError] = useState<string | null>(null);
+  // Shown under the message so support can find the cause (e.g. lms_role_not_supported).
+  const [reference, setReference] = useState<string | null>(null);
   const [blocked, setBlocked] = useState<{ token: string; classId: string | null; assignmentId: string | null } | null>(null);
   const [opening, setOpening] = useState(false);
   const started = useRef(false);
@@ -41,14 +40,27 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
     }
     exchangeLmsLaunch(token)
       .then((res) => {
+        // The portal comes from the ENARA account's role; an unsupported role
+        // never opens the staff portal (P0 item 1). The server refuses these
+        // too; this is a second guard, and drops the session just stored.
+        const portal = lmsLaunchPortal(res.user.role, res.launch.preview === true);
+        if (!portal.role) {
+          clearSession();
+          setReference(portal.code ?? 'lms_role_not_supported');
+          setError(ROLE_NOT_SUPPORTED);
+          return;
+        }
         if (!res.stored) {
           setBlocked({ token: res.token, classId: res.launch.classId, assignmentId: res.launch.target?.assignmentId ?? null });
           return;
         }
         window.history.replaceState({}, document.title, '/');
-        onReady(uiRoleForLms(res.user.role, res.launch.preview === true), res.user);
+        onReady(portal.role, res.user);
       })
-      .catch((e: Error) => setError(e.message || 'We could not sign you in. Please open the activity again from your LMS.'));
+      .catch((e: Error) => {
+        if (e instanceof ApiError && e.code) setReference(e.code.toLowerCase());
+        setError(e.message || 'We could not sign you in. Please open the activity again from your LMS.');
+      });
   }, [onReady]);
 
   const openNewTab = async () => {
@@ -70,6 +82,11 @@ export const LmsLaunch: React.FC<{ onReady: (role: UiRole, user: SessionUser) =>
           <>
             <h1 className="text-xl font-bold text-slate-900 mb-2">We couldn't open ENARA</h1>
             <p className="text-slate-600">{error}</p>
+            {reference && (
+              <p data-testid="lms-launch-reference" className="text-xs text-slate-400 mt-4">
+                Reference code: <code>{reference}</code>
+              </p>
+            )}
           </>
         ) : blocked ? (
           <>

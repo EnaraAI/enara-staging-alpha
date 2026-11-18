@@ -75,3 +75,39 @@ export function originOptionsFor(backendRole: string | undefined): OriginView[] 
 export function withOrigin(path: string, view: OriginView = 'live'): string {
   return `${path}${path.includes('?') ? '&' : '?'}origin=${encodeURIComponent(view)}`;
 }
+
+// LMS launch (P0 item 1): the portal a launch opens, from the ENARA account's
+// own role (never from the LMS role claim). An unknown or unsupported role
+// NEVER falls back to the staff portal: it gets the launch error view with a
+// reference code. The server refuses these launches too
+// (POST /api/lms/launch/exchange answers LMS_ROLE_NOT_SUPPORTED).
+//   student            -> student app
+//   teacher, admin     -> staff portal ('admin'); staffPageAllowed /
+//                         staffLandingPage keep a teacher on teacher pages,
+//                         landing on the Teaching Dashboard
+//   parent             -> Parents Portal
+//   anything else      -> error lms_role_not_supported
+// A student preview (staff opening the activity as a learner) stays the
+// student view, and only a teacher or school admin account may preview.
+export const LMS_ROLE_NOT_SUPPORTED = 'lms_role_not_supported';
+/** role: the portal to open, or null with the reference code to show instead. */
+export type LmsLaunchPortal = { role: UiRole; code: null } | { role: null; code: typeof LMS_ROLE_NOT_SUPPORTED };
+
+const LMS_LAUNCH_PORTAL: Record<string, UiRole> = { student: 'student', teacher: 'admin', admin: 'admin', parent: 'parent' };
+
+export function lmsLaunchPortal(backendRole: string | null | undefined, preview = false): LmsLaunchPortal {
+  const role = typeof backendRole === 'string' && Object.prototype.hasOwnProperty.call(LMS_LAUNCH_PORTAL, backendRole) ? LMS_LAUNCH_PORTAL[backendRole] : null;
+  const refused: LmsLaunchPortal = { role: null, code: LMS_ROLE_NOT_SUPPORTED };
+  if (preview) return backendRole === 'teacher' || backendRole === 'admin' ? { role: 'student', code: null } : refused;
+  return role ? { role, code: null } : refused;
+}
+
+// P0 item 6: students whose ENARA account came from an LMS (or any LMS
+// session, including a staff "preview as student") do their work through class
+// assignments, which reach the LMS gradebook. The older "Assessments" list
+// (attempts without an assignment) is not offered to them; the server also
+// refuses to start such an attempt (LMS_USE_CLASS_ASSIGNMENT).
+export function showOldAssessmentsTab(opts: { assignmentsEnabled: boolean; oldAssessmentCount: number; lmsStudent: boolean }): boolean {
+  if (opts.lmsStudent) return false;
+  return !opts.assignmentsEnabled || opts.oldAssessmentCount > 0;
+}

@@ -285,6 +285,27 @@ export async function rememberClassUse(studentId: string, classId: string | unde
   await saveChoice(student as { id: string; institutionId: string }, classId);
 }
 
+/**
+ * LMS P0 item 5: a launch from an LMS course opens that course's ENARA class as
+ * the student's current class. Same rules as the student's own switcher:
+ * only while multi-class is in effect, only for a multi-class student (a
+ * single-class student sees every class, as without the switch), and only
+ * when the student is actively enrolled in that class. Never throws for an
+ * ordinary "no": the outcome says why nothing changed.
+ */
+export type LaunchClassOutcome = 'selected' | 'unchanged' | 'off' | 'single_class' | 'not_enrolled' | 'no_student';
+export async function selectLaunchClass(studentId: string, classId: string, institutionId: string): Promise<LaunchClassOutcome> {
+  if (!multiClassOn()) return 'off';
+  const student = await studentRecord(studentId);
+  if (!student?.institutionId || student.institutionId !== institutionId) return 'no_student';
+  if (!(await isMultiClassStudent(student))) return 'single_class';
+  if (!(await getEnrolledInstances(studentId)).some((c) => c.id === classId)) return 'not_enrolled';
+  const choice = await StudentClassChoice.findOne({ studentId }).select('classId').lean();
+  if (choice?.classId === classId) return 'unchanged';
+  await saveChoice(student as { id: string; institutionId: string }, classId);
+  return 'selected';
+}
+
 // ---------------------------------------------------------------------------
 // Q4. Teachers see only their own class's work for a multi-class student, plus
 // the shared learner profile (mastery, CEFR, skills, misconceptions, pathway).

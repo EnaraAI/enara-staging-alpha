@@ -47,13 +47,16 @@ import { AdminAvatarControlCenter } from './components/enara/AdminAvatarControlC
 import { LmsFrameBar, LmsLaunch, LmsPreviewBanner, onLmsLaunchPath } from './pages/LmsLaunch';
 import { LmsPicker, onLmsPickerPath } from './pages/LmsPicker';
 import { LmsConnections } from './pages/LmsConnections';
-import { isLmsPreview, takeLmsTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
+import { isLmsPreview, isLmsSession, takeLmsTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
 // Parents Portal: parent accounts only, under /parents. Loaded on demand.
 const ParentsApp = React.lazy(() => import('./parents/ParentsApp'));
 const onParentsPath = () => /^\/parents(\/|$)/.test(window.location.pathname);
+// P0 item 6: a student whose ENARA account came from an LMS (the server says
+// so at sign-in), or any LMS session (a staff "preview as student" included).
+export const isLmsStudent = () => isLmsSession() || getSessionUser()?.lmsAccount === true;
 export const usesKidsApp = (role: string | null | undefined, user: Pick<SessionUser, 'role' | 'uiMode'> | null | undefined) =>
   role === 'student' && user?.role === 'student' && user?.uiMode === 'kids';
 import { KnowledgeMap } from './pages/KnowledgeMap';
@@ -63,7 +66,7 @@ import { Outcomes } from './pages/workspace/Outcomes';
 import { Usage } from './pages/workspace/Usage';
 import { SavingsCenter } from './pages/workspace/SavingsCenter';
 import { getSessionUser as sessionUser } from './services/apiService';
-import { ACADEMIC_MANAGER_PAGES, academicManagerPage, restoreUiRole, staffLandingPage, staffPageAllowed, UiRole } from './services/roleRouting';
+import { ACADEMIC_MANAGER_PAGES, academicManagerPage, restoreUiRole, showOldAssessmentsTab, staffLandingPage, staffPageAllowed, UiRole } from './services/roleRouting';
 import { Assessment, Student } from './types';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -132,7 +135,9 @@ const App: React.FC = () => {
     // The academic manager portal loads only its own read-only analytics.
     if (!state.role || state.role === 'academic-manager') return;
     let cancelled = false;
-    const loadAssessments = state.role === 'student' ? fetchMyAssessments : fetchAssessments;
+    // LMS students do their work through class assignments (P0 item 6): the
+    // older assessment list is not loaded for them.
+    const loadAssessments = state.role === 'student' ? (isLmsStudent() ? async () => [] as Assessment[] : fetchMyAssessments) : fetchAssessments;
     loadAssessments()
       .then(list => { if (!cancelled) setAssessments(list); })
       .catch(err => console.warn('Could not load assessments:', err));
@@ -291,7 +296,9 @@ const App: React.FC = () => {
   // "Assessments" tab: with class assignments on, a student's quizzes live
   // under "Assignments"; this older list is shown only when it has something,
   // so students don't see two similar tabs, one of them empty.
-  const showAssessmentsTab = !assignmentsEnabled || assessments.length > 0;
+  // LMS students never get it (P0 item 6): their work goes through class
+  // assignments, which reach the LMS gradebook.
+  const showAssessmentsTab = showOldAssessmentsTab({ assignmentsEnabled, oldAssessmentCount: assessments.length, lmsStudent: isLmsStudent() });
   // "Study plan" tab: only when the school has study plans on.
   const [studyPlanEnabled, setStudyPlanEnabled] = useState(false);
   useEffect(() => {
@@ -348,6 +355,8 @@ const App: React.FC = () => {
           tourPending={getSessionUser()?.tourPending}
           sharedAssessmentId={state.sharedAssessmentId}
           sharedCourseId={state.sharedCourseId}
+          lmsAssignmentId={state.lmsTarget?.assignmentId}
+          lmsStudent={isLmsStudent()}
           onSignOut={handleLogout}
         />
       </React.Suspense>

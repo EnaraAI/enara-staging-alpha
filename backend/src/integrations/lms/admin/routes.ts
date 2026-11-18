@@ -6,6 +6,8 @@ import { Assignment } from '../../../models/Assignment';
 import { CourseInstance } from '../../../models/CourseInstance';
 import { Institution } from '../../../models/Institution';
 import { User } from '../../../models/User';
+import { selectLaunchClass } from '../../../services/multiClass';
+import { logger, serializeError } from '../../../utils/logging';
 import { ensurePlainObject, getOptionalBoolean, getOptionalId, rejectMongoOperators } from '../../../utils/validation';
 import { isAcceptableKeysetUrl } from '../adapters/lti13/jwks';
 import { writeLmsAudit } from '../core/audit';
@@ -115,6 +117,28 @@ function roleForToken(role: string): 'student' | 'teacher' | 'admin' | undefined
 
 // ------------------------------------------------------------ sessions
 
+/** ENARA account roles a launch may open (P0 item 1); anything else: LMS_ROLE_NOT_SUPPORTED. */
+export const LAUNCH_ACCOUNT_ROLES: ReadonlySet<string> = new Set(['student', 'teacher', 'admin', 'parent']);
+
+/** Selects the launch's class as current; audited with IDs only. A failure never blocks the launch. */
+async function selectCurrentClassForLaunch(row: { institutionId: string; platformId?: string; lmsUserId?: string; contextId?: string; enaraClassId?: string }, studentId: string) {
+  try {
+    const outcome = await selectLaunchClass(studentId, row.enaraClassId!, row.institutionId);
+    if (outcome === 'off' || outcome === 'single_class' || outcome === 'unchanged') return;
+    await writeLmsAudit({
+      event: 'lms.current_class',
+      outcome: outcome === 'selected' ? 'ok' : 'warn',
+      institutionId: row.institutionId,
+      platformId: row.platformId,
+      actor: row.lmsUserId,
+      code: outcome,
+      refIds: { studentId, enaraClassId: row.enaraClassId, contextId: row.contextId },
+    });
+  } catch (error) {
+    logger.warn('lms_current_class_failed', { institutionId: row.institutionId, enaraClassId: row.enaraClassId, error: serializeError(error) });
+  }
+}
+
 lmsAdminRouter.post(
   '/launch/exchange',
   asyncHandler(async (req, res: Response) => {
@@ -135,11 +159,23 @@ lmsAdminRouter.post(
       throw new AppError('Your ENARA account is not available. Ask your school administrator.', 403, 'LMS_ACCOUNT_UNAVAILABLE');
     }
     if (await isInstitutionSuspended(row.institutionId)) throw new AppError("Your school's ENARA access is suspended.", 403, 'INSTITUTION_SUSPENDED');
+    // P0 item 1: only these ENARA accounts open from an LMS (student app, staff
+    // portal, Parents Portal). Any other role (ENARA admin, academic manager,
+    // an unknown one) gets no session, and never the admin portal.
+    if (!LAUNCH_ACCOUNT_ROLES.has(user.role)) {
+      await writeLmsAudit({ event: 'lms.session', outcome: 'fail', institutionId: row.institutionId, platformId: row.platformId, actor: row.lmsUserId, code: 'role_not_supported', refIds: { purpose: row.purpose } });
+      throw new AppError('ENARA does not open this kind of account from your LMS. Ask your school administrator.', 403, 'LMS_ROLE_NOT_SUPPORTED');
+    }
     // A student preview is only for a staff account (its role may have changed since the launch).
     const preview = row.preview === true;
     if (preview && user.role !== 'teacher' && user.role !== 'admin') {
       await writeLmsAudit({ event: 'lms.session', outcome: 'fail', institutionId: row.institutionId, platformId: row.platformId, code: 'preview_not_staff' });
       throw new AppError('Your ENARA account is not available. Ask your school administrator.', 403, 'LMS_ACCOUNT_UNAVAILABLE');
+    }
+    // P0 item 5: a student's launch from an LMS course makes that course's
+    // ENARA class their current class (multi-class only; see selectLaunchClass).
+    if (!preview && row.purpose === 'launch' && user.role === 'student' && user.studentId && row.enaraClassId) {
+      await selectCurrentClassForLaunch(row, user.studentId);
     }
     await writeLmsAudit({
       event: 'lms.session',

@@ -14,6 +14,7 @@ import {
   UserRole as Role,
 } from '../auth/roles';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { isLmsStudentAccount } from '../integrations/lms/core/lmsStudent';
 import { currentUser, resolveWriteInstitutionId } from '../auth/authorization';
 import {
   ensurePlainObject,
@@ -110,6 +111,8 @@ export async function sessionUser(user: InstanceType<typeof User>) {
     institutionId: user.institutionId,
     tourPending: tourPending(user),
     uiMode: await uiModeFor(user),
+    // P0 item 6: a student account that came from an LMS (the app hides the older "Assessments" tab).
+    ...((await isLmsStudentAccount({ id: user._id.toString(), role: user.role, institutionId: user.institutionId })) ? { lmsAccount: true } : {}),
   };
 }
 
