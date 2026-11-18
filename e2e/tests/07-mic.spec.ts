@@ -67,13 +67,38 @@ test.describe.serial('7 · microphone checks (Chrome)', () => {
       const { page, context } = await moodleSession(browser, 'student.test');
       const f = await openSpeakingExam(page, s.activities.speaking, 'blocked');
       await f.getByRole('button', { name: 'Test microphone' }).click();
+      // The on-load check may already show the notice: wait until the probe
+      // the click started has settled too ("Not working"), so the notice is final.
+      await expect(f.getByText('Not working')).toBeVisible({ timeout: 30_000 });
       const notice = f.getByTestId('mic-problem-blocked_in_frame');
       await expect(notice).toBeVisible({ timeout: 30_000 }).catch(async (e) => {
         await shot(page, '07-mic-blocked-failed');
         throw e;
       });
+      const open = notice.getByRole('button', { name: 'Open in a new tab' });
+      // Keep the button away from the frame's edges: Playwright cannot see an
+      // element of the (Moodle) parent page lying over a cross-origin frame.
+      await open.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      await expect(open).toBeEnabled();
       await shot(page, '07-mic-blocked');
-      const [tab] = await Promise.all([context.waitForEvent('page'), notice.getByRole('button', { name: 'Open in a new tab' }).click()]);
+      const tabPromise = context.waitForEvent('page', { timeout: 30_000 });
+      await open.click();
+      // The product's outcomes: a new tab ("Opened in a new tab"), or the
+      // browser blocked it (a one-minute link to click), or an error.
+      const outcome = notice.getByText(/Opened in a new tab|Your browser blocked the new tab/).or(notice.getByRole('alert'));
+      await expect(outcome.first()).toBeVisible({ timeout: 30_000 }).catch(async (e) => {
+        await shot(page, '07-mic-blocked-no-outcome');
+        console.log('NOTICE AFTER CLICK:', await notice.innerText().catch(() => '(gone)'));
+        throw e;
+      });
+      const blockedLink = notice.getByRole('link', { name: /Open ENARA in a new tab/ });
+      let tab;
+      if (await blockedLink.isVisible()) {
+        console.log('The browser blocked the blank tab; following the product\'s one-minute link.');
+        [tab] = await Promise.all([context.waitForEvent('page'), blockedLink.click()]);
+      } else {
+        tab = await tabPromise;
+      }
       await tab.waitForURL(/\/(assignments|lms|$)/, { timeout: 60_000 });
       await expect.poll(() => tab.evaluate(() => !!sessionStorage.getItem('enara_token')), { timeout: 60_000 }).toBe(true);
       expect(await tab.evaluate(() => window.self === window.top)).toBe(true);

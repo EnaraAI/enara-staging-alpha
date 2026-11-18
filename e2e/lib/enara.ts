@@ -50,7 +50,13 @@ export async function enaraFrame(page: Page, timeout = 90_000): Promise<Frame> {
     const f = page.frames().find((fr) => {
       try { return new URL(fr.url()).host === host && !/\/lti\//.test(new URL(fr.url()).pathname); } catch { return false; }
     });
-    if (f) return f;
+    if (f) {
+      // Moodle's view.php resizes #contentframe from 600px to the window height
+      // with YUI, after its modules load (late on a slow runner). Wait for it:
+      // a click while the frame resizes lands at stale coordinates.
+      await page.waitForFunction(() => { const el = document.getElementById('contentframe'); return !el || !!el.style.height; }, undefined, { timeout: 20_000 }).catch(() => undefined);
+      return f;
+    }
     if (Date.now() > deadline) throw new Error(`no ENARA frame on ${page.url()} (frames: ${page.frames().map((x) => x.url()).join(', ')})`);
     await page.waitForTimeout(250);
   }
