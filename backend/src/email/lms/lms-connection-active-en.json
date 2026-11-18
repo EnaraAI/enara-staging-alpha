@@ -1,0 +1,52 @@
+{
+  "id": null,
+  "name": "Enara – LMS: connection active (EN)",
+  "subject": "{{{LMS_NAME}}} is now connected to Enara",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "there",
+      "sample": "Mona"
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Nile Valley International School"
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Moodle (moodle.nilevalley.example)"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4"
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "lmsp_7f3a9c21e4"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-connection-active",
+  "language": "en",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "3 (also 4b)",
+  "group": "lms",
+  "recipient": "School admins",
+  "trigger": "platform.registered with status 'active', and platform.approved (also when switched back on)",
+  "delivery": "immediate",
+  "frequency": "Immediate; key active:<platformId>:<approvedAt>"
+}

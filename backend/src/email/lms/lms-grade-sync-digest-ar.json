@@ -1,0 +1,82 @@
+{
+  "id": null,
+  "name": "Enara – LMS: grades not sent (daily) (AR)",
+  "subject": "{{{SCHOOL_NAME}}}: درجات لم تُرسَل إلى Moodle ({{{DATE}}})",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "منى"
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "مدرسة وادي النيل الدولية"
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Moodle (moodle.nilevalley.example)"
+    },
+    {
+      "key": "DATE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "17 نوفمبر 2026"
+    },
+    {
+      "key": "FAILED_COUNT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "6"
+    },
+    {
+      "key": "RETRYING_COUNT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "2"
+    },
+    {
+      "key": "COURSES_AFFECTED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "2"
+    },
+    {
+      "key": "TOP_REASON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "رفض Moodle الوصول"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=grades"
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "lmsp_7f3a9c21e4"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-grade-sync-digest",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "8",
+  "group": "lms",
+  "recipient": "School admins",
+  "trigger": "Daily cron after the lmsGrades drain: grade jobs that became 'dead' in the last 24 h, excluding held LMS_VALUE_DIFFERS jobs",
+  "delivery": "digest",
+  "frequency": "Daily digest, only if FAILED_COUNT >= 1; one per platform per day"
+}

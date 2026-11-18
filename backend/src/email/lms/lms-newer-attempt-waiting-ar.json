@@ -1,0 +1,46 @@
+{
+  "id": null,
+  "name": "Enara – LMS: newer attempts waiting (AR)",
+  "subject": "محاولات أحدث بانتظار مراجعتك",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "أحمد"
+    },
+    {
+      "key": "WAITING_COUNT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "5"
+    },
+    {
+      "key": "COURSE_LABEL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "مقرران"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=class-assignments&class=cls_3e91a7&filter=newer-attempt"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-newer-attempt-waiting",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "17",
+  "group": "lms",
+  "recipient": "Teachers of the class (opt-in, D2)",
+  "trigger": "grade.kept_released (owner decision G2)",
+  "delivery": "digest",
+  "frequency": "Daily digest per teacher; once per attempt"
+}

@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { enaraApi, enaraFrame, enaraUiSession, frameSession, login } from '../lib/enara';
+import { enaraApi, enaraFrame, enaraUiSession, frameSession, login, maintenance } from '../lib/enara';
 import { MOODLE } from '../lib/env';
 import { moodleCli, moodleProvision, moodleSession, moodleTools } from '../lib/moodle';
 import { activityByName, activityUrl, addThroughPicker } from '../lib/picker';
@@ -24,8 +24,8 @@ async function openStatus(page: Page, institutionId: string) {
 }
 
 // Scenario 8 (LMS step 2): self-serve onboarding of Test School C, timed.
-// ENARA admin "New school" → invite text (EN/AR; emails are off in this
-// stack, the text is copied) → the Moodle admin pastes the one link in "Add
+// ENARA admin "New school" → invite text (EN/AR; emails are only captured in
+// this stack, never sent; the text is copied) → the Moodle admin pastes the one link in "Add
 // LTI Advantage" → automatic connection check → status page (checklist, the
 // 4 hand-ticked Moodle settings) → first teacher and student launch. The
 // status page's timer must stay under the 15-minute goal.
@@ -52,11 +52,15 @@ test.describe.serial('8 · step 2 onboarding (timed)', () => {
     await expect(page.getByTestId('lms-invite-text-en')).toContainText(url);
     await expect(page.getByTestId('lms-invite-text-ar')).toContainText(url);
     expect(await page.getByTestId('lms-invite-text-ar').innerText()).toMatch(/[؀-ۿ]/);
-    // Owner rule: no real email from this stack. "Send email" is off; the API refuses too.
-    await expect(page.getByTestId('lms-invite-email-off')).toBeVisible();
-    await expect(page.getByTestId('lms-invite-send-email')).toBeDisabled();
-    const refused = await enaraApi.post(`/api/lms/onboarding/${institutionId}/send-email`, await login('enara.admin'), {}, [409]);
-    expect(JSON.stringify(refused)).toContain('LMS_EMAILS_OFF');
+    // Owner rule: no real email from this stack. LMS emails are CAPTURED (no
+    // Resend key, LMS_EMAIL_CAPTURE): "Send email" renders lms-invite-connect in
+    // the school's language (EG: Arabic) for the test inbox and records it; nothing is sent.
+    await expect(page.getByTestId('lms-invite-send-email')).toBeEnabled();
+    await enaraApi.post(`/api/lms/onboarding/${institutionId}/send-email`, await login('enara.admin'), {});
+    const invites = ((await maintenance('GET', '/lms-emails?template=lms-invite-connect')).emails as any[]).filter((e) => e.institutionId === institutionId);
+    expect(invites).toHaveLength(1);
+    expect(invites[0]).toMatchObject({ status: 'captured', lang: 'ar', redirected: true });
+    expect(invites[0].subject).toMatch(/^\[lms-test\] /);
     // The admin copies the invite text (this starts the 15-minute timer).
     await page.getByTestId('lms-invite-copy-en').click();
     await expect.poll(async () => itemDone(await status(institutionId), 'invite_sent'), { timeout: 30_000 }).toBe(true);

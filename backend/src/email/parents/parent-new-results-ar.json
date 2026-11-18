@@ -1,0 +1,64 @@
+{
+  "id": null,
+  "name": "Enara – Parents: new result (AR)",
+  "subject": "نتيجة جديدة لـ{{{CHILD_NAME}}}: {{{TEST_NAME}}}",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "سارة"
+    },
+    {
+      "key": "CHILD_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "عمر"
+    },
+    {
+      "key": "TEST_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Unit 3 Reading Check"
+    },
+    {
+      "key": "CLASS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "اللغة الإنجليزية - الصف الثامن"
+    },
+    {
+      "key": "SCORE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "17 / 20"
+    },
+    {
+      "key": "LEVEL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "A2"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/parents"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "parent-new-results",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "P5",
+  "group": "parents",
+  "recipient": "Parent",
+  "trigger": "A result becomes visible to the parent (per the school's grades setting; default after teacher review, D7)",
+  "delivery": "digest",
+  "frequency": "At most one email a day per child (off by default, D11)"
+}

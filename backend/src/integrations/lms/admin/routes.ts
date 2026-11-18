@@ -13,6 +13,9 @@ import { logger, serializeError } from '../../../utils/logging';
 import { ensurePlainObject, getOptionalBoolean, getOptionalId, rejectMongoOperators } from '../../../utils/validation';
 import { isAcceptableKeysetUrl, parsePlatformPublicKey } from '../adapters/lti13/jwks';
 import { writeLmsAudit } from '../core/audit';
+import { REJECT_REASON_CODES } from '../core/lmsEmailText';
+import { lmsEmailsActive } from '../core/lmsEmail';
+import { moodleAddressOf, notifyTeacherWelcome } from '../core/lmsEmailEvents';
 import { anyLmsFlagSet, lmsFlags, lmsSettings } from '../core/flags';
 import { runInBackground, triggerOn } from '../core/drain';
 import { consumeHandoffCode, HANDOFF_CODE_TTL_SECONDS, HandoffCodeError, mintHandoffCode } from '../core/handoffCode';
@@ -24,7 +27,7 @@ import { drainGradeJobs, gradeStats, passbackOn, resyncGrades, retryDead } from 
 import { contextRosterViews, manualSyncTooSoon, notStartedStudents, rosterOn, syncContextRoster } from '../core/roster';
 import { seatView, updateSeatSettings } from '../core/seats';
 import { liftSuppression, listSuppressions } from '../core/suppression';
-import { LmsContext, LmsDeployment, LmsOrgSettings, LmsPlatform, LmsRegistrationCode, LmsResourceLink, LmsUser, type ILmsContext, type ILmsDeployment, type ILmsHandoffCode, type ILmsPlatform } from '../models';
+import { LmsContext, LmsDeployment, LmsEmailOptIn, LmsEnrollment, LmsOrgSettings, LmsPlatform, LmsRegistrationCode, LmsResourceLink, LmsUser, type ILmsContext, type ILmsDeployment, type ILmsHandoffCode, type ILmsPlatform } from '../models';
 import { isKnownVendor, listPresets } from '../presets';
 import { requireLti } from '../routes';
 import { onboardingRouter } from './onboardingRoutes';
@@ -106,6 +109,7 @@ function platformView(p: ILmsPlatform, deployments: ILmsDeployment[]) {
     registeredVia: p.registeredVia,
     createdAt: p.createdAt,
     approvedAt: p.approvedAt ?? null,
+    ...(p.status === 'rejected' ? { rejectedReason: p.rejectedReason ?? null, rejectedAt: p.rejectedAt ?? null } : {}),
     launchCount: p.launchCount ?? 0,
     cookielessLaunchCount: p.cookielessLaunchCount ?? 0,
     storageLaunchCount: p.storageLaunchCount ?? 0,
@@ -490,6 +494,66 @@ lmsAdminRouter.get(
 );
 
 
+// --------------------------------------------------------------- email opt-in (D2)
+//
+// Owner decision D2: a teacher who opens ENARA from the LMS is asked once,
+// "Email me Enara updates at ...?", pre-filled with the address Moodle shared
+// (lms_users.email), which they confirm, change or decline. Never silent: no
+// answer = no teacher email. 'off' when LMS emails are off or the account is
+// not an LMS teacher. A yes sends lms-teacher-welcome once (background).
+
+const OPTIN_EMAIL = /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]+$/;
+
+async function lmsTeacherOf(req: AuthRequest): Promise<{ enaraUserId: string; institutionId: string } | null> {
+  const user = req.user!;
+  if (user.role !== 'teacher' || !user.institutionId) return null;
+  const linked = await LmsUser.exists({ enaraUserId: user.id, institutionId: user.institutionId });
+  return linked ? { enaraUserId: user.id, institutionId: user.institutionId } : null;
+}
+
+lmsAdminRouter.get(
+  '/email-optin',
+  authMiddleware,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const me = lmsEmailsActive() ? await lmsTeacherOf(req) : null;
+    if (!me) return void res.json({ state: 'off' });
+    const row = await LmsEmailOptIn.findOne({ enaraUserId: me.enaraUserId }).lean();
+    if (row) return void res.json({ state: row.state, email: row.email ?? null });
+    res.json({ state: 'ask', prefill: (await moodleAddressOf(me.enaraUserId)).email ?? null });
+  }),
+);
+
+lmsAdminRouter.post(
+  '/email-optin',
+  authMiddleware,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const me = lmsEmailsActive() ? await lmsTeacherOf(req) : null;
+    if (!me) throw new AppError('Enara emails are not available for this account', 409, 'LMS_EMAILS_OFF');
+    const body = ensurePlainObject(req.body ?? {});
+    if (typeof body.optIn !== 'boolean') throw new AppError('optIn must be true or false', 400, 'VALIDATION_ERROR');
+    const now = new Date();
+    if (!body.optIn) {
+      await LmsEmailOptIn.updateOne({ enaraUserId: me.enaraUserId }, { $set: { institutionId: me.institutionId, state: 'out', decidedAt: now }, $unset: { email: 1 } }, { upsert: true });
+      await writeLmsAudit({ event: 'email.optin', outcome: 'ok', institutionId: me.institutionId, actor: me.enaraUserId, refIds: { enaraUserId: me.enaraUserId, optIn: false } });
+      return void res.json({ state: 'out', email: null });
+    }
+    const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+    if (!OPTIN_EMAIL.test(email) || email.length > 254 || /\.test$/i.test(email)) throw new AppError('Enter a valid email address', 400, 'VALIDATION_ERROR');
+    // The course of their latest LMS launch as a teacher: the welcome names it.
+    const lmsUserIds = (await LmsUser.find({ enaraUserId: me.enaraUserId }).select('id').lean()).map((u) => u.id);
+    const latest = lmsUserIds.length ? await LmsEnrollment.findOne({ lmsUserId: { $in: lmsUserIds }, enaraRole: { $in: ['teacher', 'admin'] }, status: 'active' }).sort({ updatedAt: -1 }).select('contextId').lean() : null;
+    await LmsEmailOptIn.updateOne(
+      { enaraUserId: me.enaraUserId },
+      { $set: { institutionId: me.institutionId, state: 'in', email, decidedAt: now, ...(latest ? { contextId: latest.contextId } : {}) } },
+      { upsert: true },
+    );
+    await writeLmsAudit({ event: 'email.optin', outcome: 'ok', institutionId: me.institutionId, actor: me.enaraUserId, refIds: { enaraUserId: me.enaraUserId, optIn: true } });
+    runInBackground('lms_email_teacher_welcome', () => notifyTeacherWelcome(me.enaraUserId));
+    res.json({ state: 'in', email });
+  }),
+);
+
+
 // --------------------------------------------------------------- roster
 //
 // Phase 4. The app's normal 404 unless LMS_ROSTER_SYNC_ENABLED is on too.
@@ -726,9 +790,29 @@ lmsAdminRouter.post(
     if (!isEnara(req)) throw new AppError('Only ENARA admins can approve an LMS connection', 403, 'FORBIDDEN');
     // Also switches a disabled connection back on.
     const p = await ownPlatform(req, String(req.params.id));
-    await LmsPlatform.updateOne({ id: p.id }, { $set: { status: 'active', approvedBy: req.user!.id, approvedAt: new Date() } });
+    await LmsPlatform.updateOne({ id: p.id }, { $set: { status: 'active', approvedBy: req.user!.id, approvedAt: new Date() }, $unset: { rejectedReason: 1, rejectedBy: 1, rejectedAt: 1 } });
     await LmsDeployment.updateMany({ platformId: p.id, status: 'pending' }, { $set: { status: 'active', approvedBy: req.user!.id } });
     await writeLmsAudit({ event: 'platform.approved', outcome: 'ok', institutionId: p.institutionId, platformId: p.id, actor: req.user!.id });
+    res.json({ platform: await viewOne((await LmsPlatform.findOne({ id: p.id }).lean())!) });
+  }),
+);
+
+// Owner decision D6: an ENARA admin refuses a PENDING connection with a reason
+// from a fixed list (no free text). The connection becomes 'rejected' (launches
+// are refused like a switched-off one; approve can still switch it on later),
+// and the school's admins get lms-connection-rejected (when LMS emails are on).
+lmsAdminRouter.post(
+  '/platforms/:id/reject',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!isEnara(req)) throw new AppError('Only ENARA admins can reject an LMS connection', 403, 'FORBIDDEN');
+    const p = await ownPlatform(req, String(req.params.id));
+    const body = ensurePlainObject(req.body ?? {});
+    const reason = typeof body.reason === 'string' ? body.reason : '';
+    if (!REJECT_REASON_CODES.includes(reason)) throw new AppError(`reason must be one of: ${REJECT_REASON_CODES.join(', ')}`, 400, 'VALIDATION_ERROR');
+    if (p.status !== 'pending') throw new AppError('Only a connection waiting for approval can be rejected', 409, 'LMS_PLATFORM_NOT_PENDING');
+    const done = await LmsPlatform.updateOne({ id: p.id, status: 'pending' }, { $set: { status: 'rejected', rejectedReason: reason, rejectedBy: req.user!.id, rejectedAt: new Date() } });
+    if (!done.modifiedCount) throw new AppError('Only a connection waiting for approval can be rejected', 409, 'LMS_PLATFORM_NOT_PENDING');
+    await writeLmsAudit({ event: 'platform.rejected', outcome: 'ok', institutionId: p.institutionId, platformId: p.id, actor: req.user!.id, code: reason, refIds: { reason } });
     res.json({ platform: await viewOne((await LmsPlatform.findOne({ id: p.id }).lean())!) });
   }),
 );
@@ -769,19 +853,20 @@ lmsAdminRouter.post(
   '/platforms/:id/deployments',
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const p = await ownPlatform(req, String(req.params.id));
-    if (p.status === 'disabled') throw new AppError('This connection is switched off', 409, 'LMS_PLATFORM_DISABLED');
+    if (p.status === 'disabled' || p.status === 'rejected') throw new AppError('This connection is switched off', 409, 'LMS_PLATFORM_DISABLED');
     const body = ensurePlainObject(req.body);
     const deploymentId = text(body, 'deploymentId', 200);
     // A school admin's new deployment waits for approval like a new connection.
     const trusted = isEnara(req) || !lmsSettings().schoolConnectionsRequireApproval;
     const status = trusted && p.status === 'active' ? 'active' : 'pending';
+    let createdId: string;
     try {
-      await LmsDeployment.create({ platformId: p.id, deploymentId, institutionId: p.institutionId, status, createdBy: req.user!.id, ...(status === 'active' ? { approvedBy: req.user!.id } : {}) });
+      createdId = (await LmsDeployment.create({ platformId: p.id, deploymentId, institutionId: p.institutionId, status, createdBy: req.user!.id, ...(status === 'active' ? { approvedBy: req.user!.id } : {}) })).id;
     } catch (error) {
       if ((error as { code?: number }).code === 11000) throw new AppError('This deployment ID is already registered', 409, 'LMS_DEPLOYMENT_EXISTS');
       throw error;
     }
-    await writeLmsAudit({ event: 'deployment.registered', outcome: 'ok', institutionId: p.institutionId, platformId: p.id, actor: req.user!.id, refIds: { status } });
+    await writeLmsAudit({ event: 'deployment.registered', outcome: 'ok', institutionId: p.institutionId, platformId: p.id, actor: req.user!.id, refIds: { status, deploymentId: createdId } });
     res.status(201).json({ platform: await viewOne(p) });
   }),
 );

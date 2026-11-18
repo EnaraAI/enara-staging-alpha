@@ -110,10 +110,10 @@ services:
       # mode) on purpose: the suite then checks that it leaves /lti/* and
       # /.well-known/* to the API (stagingSingleService.ts).
       # Owner rule: this stack never sends a real email. No Resend key (every
-      # sender is a no-op without one; scripts/up.sh checks it), LMS emails off,
-      # and Resend's base URL points at an address that does not exist.
+      # sender is a no-op without one; scripts/up.sh checks it), LMS emails only
+      # CAPTURED (LMS_EMAIL_CAPTURE, below: recorded, Resend never called), and
+      # Resend's base URL points at an address that does not exist.
       RESEND_API_KEY: ""
-      LMS_EMAILS_ENABLED: "false"
       RESEND_BASE_URL: http://no-email.invalid
       ENARA_STAGING: "true"
       PORT: "3001"
@@ -148,6 +148,18 @@ services:
       LMS_NO_GRADE_ACTIVITIES_ENABLED: "true"
       GRADE_LEDGER_ENABLED: "true"
       MAINTENANCE_ENDPOINTS_ENABLED: "true"
+      # LMS emails (docs/lms/LMS_EMAILS.md) as on lms-test (test inbox redirect,
+      # "[lms-test]" prefix), but CAPTURED: rendered and recorded in lms_email_log,
+      # never sent. There is deliberately NO RESEND_API_KEY in this stack, so even
+      # without the capture nothing could be sent. Fake addresses only. The cap is
+      # raised so the suite's order cannot hold back the emails it asserts.
+      LMS_EMAILS_ENABLED: "true"
+      REMINDERS_ENABLED: "true"
+      LMS_EMAIL_CAPTURE: "true"
+      REMINDER_TEST_RECIPIENT: lms-e2e-inbox@enara-e2e.app
+      EMAIL_SUBJECT_PREFIX: "[lms-test]"
+      LMS_TEST_DAILY_CAP: "500"
+      LMS_OPS_EMAILS: lms-e2e-ops@enara-e2e.app
       ENROLLMENT_DUAL_WRITE: "true"
       ENROLLMENT_READ_FROM: student_app,teacher_rosters,assessments,analytics,profile_context,credits,attendance
       ENROLLMENT_MULTI_CLASS: "true"

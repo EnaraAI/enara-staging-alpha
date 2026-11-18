@@ -10,6 +10,7 @@
     { "name": "Grade ledger", "docs": "docs/lms/GRADE_LEDGER_NOTES.md", "flags": { "GRADE_LEDGER_ENABLED": "true" } },
     { "name": "Multi-class step 2: enrollment dual write", "docs": "docs/multi-class/STEP_2_NOTES.md", "flags": { "ENROLLMENT_DUAL_WRITE": "true" } },
     { "name": "Multi-class step 4: enrollment shadow check", "docs": "docs/multi-class/STEP_4_NOTES.md", "flags": { "ENROLLMENT_SHADOW": "true" } },
+    { "name": "LMS emails: approved templates wired to events (sent only to the test inbox, capped)", "docs": "docs/lms/LMS_EMAILS.md", "flags": { "LMS_EMAILS_ENABLED": "true" } },
     { "name": "Test-site maintenance routes (migrations and the deploy health check)", "docs": "docs/lms/CONTINUOUS_DELIVERY.md", "flags": { "MAINTENANCE_ENDPOINTS_ENABLED": "true" } }
   ],
   "notManaged": {
@@ -26,6 +27,14 @@
     "ENROLLMENT_STUDENT_ARCHIVE": "multi-class step 6 archiving: not yet recorded as on (docs/multi-class/ARCHIVE_NOTES.md)",
     "ENROLLMENT_ATTENDANCE_FIX": "multi-class step 5 Q7: not yet recorded as on",
     "ENROLLMENT_AGE_FROM_BIRTHDATE": "multi-class step 5 Q8: has no effect yet",
-    "MOODLE_TEST_WS_ENABLED": "the test-only Moodle Web Services tool, set by hand with its token"
+    "MOODLE_TEST_WS_ENABLED": "the test-only Moodle Web Services tool, set by hand with its token",
+    "REMINDERS_ENABLED": "LMS emails need it (true); not an LMS_* switch, so set by hand (docs/lms/LMS_EMAILS.md). Staging refuses it without REMINDER_TEST_RECIPIENT",
+    "REMINDER_TEST_RECIPIENT": "an address (the owner's test inbox), set by hand; never in the repo. Without it LMS emails stay off on lms-test (interlock)",
+    "REMINDER_FROM": "leave unset on lms-test, so the older reminder and weekly-summary emails stay off and only the capped LMS emails reach the test inbox",
+    "EMAIL_SUBJECT_PREFIX": "[lms-test], set by hand (brackets are not a plain flag value)",
+    "LMS_OPS_EMAILS": "addresses (the ops mailbox), set by hand",
+    "RESEND_API_KEY": "a secret (Sensitive), set by hand",
+    "LMS_EMAIL_CAPTURE": "never on lms-test: the Docker E2E stack only (emails recorded, never sent)",
+    "PARENT_EMAILS_ENABLED": "leave unset: parent emails come with Parents P1-P5"
   }
 }

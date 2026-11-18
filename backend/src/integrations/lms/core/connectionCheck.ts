@@ -24,6 +24,8 @@ import { AGS_SCOPE, NRPS_SCOPE } from './capabilities';
 import { checkText, type CheckHelp } from './connectionCheckText';
 import { lmsFlags } from './flags';
 import { passbackOn } from './outbox';
+import { runInBackground } from './drain';
+import { lmsEmailsActive } from './lmsEmail';
 
 // Step 2: the automatic connection check of one LMS connection (a Moodle tool
 // registered for one school). Six steps, each ok | fail | waiting with a plain
@@ -258,7 +260,7 @@ async function checkGrades(p: ILmsPlatform, unreachable: boolean): Promise<StepO
 }
 
 async function checkRegistered(p: ILmsPlatform): Promise<StepOut> {
-  if (p.status === 'disabled') return { status: 'fail', code: 'platform_disabled' };
+  if (p.status === 'disabled' || p.status === 'rejected') return { status: 'fail', code: 'platform_disabled' };
   const deployments = await LmsDeployment.countDocuments({ platformId: p.id });
   if (!deployments && !p.autoCreateDeployments) return { status: 'fail', code: 'no_deployment' };
   if (p.status === 'pending') return { status: 'waiting', code: 'platform_pending', at: p.createdAt };
@@ -309,6 +311,7 @@ export async function runConnectionCheck(platformId: string, opts: { trigger: 'r
     result = { steps: [], outcome: 'fail', unreachable: false, reasons: { error: 'internal_error' } };
   }
   const checkedAt = new Date();
+  const before = await LmsConnectionCheck.findOne({ platformId }).select('outcome').lean();
   const row = await LmsConnectionCheck.findOneAndUpdate(
     { platformId },
     {
@@ -327,6 +330,12 @@ export async function runConnectionCheck(platformId: string, opts: { trigger: 'r
     code: firstFail?.code ?? (result.outcome === 'waiting' ? 'waiting' : undefined),
     refIds: { trigger: opts.trigger, unreachable: result.unreachable, ...Object.fromEntries(result.steps.map((s) => [s.key, s.status])), ...result.reasons },
   });
+  // 5 lms-connection-check-failed: only when the check changed from OK (or never run) to failed,
+  // at most once per connection and cause per 24 h. Background; only when LMS emails are on.
+  if (firstFail && result.outcome === 'fail' && before?.outcome !== 'fail' && lmsEmailsActive()) {
+    const host = platformHost(p);
+    runInBackground('lms_email_check_failed', async () => (await import('./lmsEmailEvents')).notifyConnectionCheckFailed(p, firstFail, checkedAt, host));
+  }
   return checkView(row, p);
 }
 
@@ -346,7 +355,7 @@ export async function recheckFailedConnections(opts: { budgetMs: number; limit?:
     // One check can take about 20 s at worst (5 s keys, 8 s token, 8 s line items).
     if (Date.now() > deadline - 2_000) break;
     const p = await LmsPlatform.findOne({ id: r.platformId }).select('status').lean();
-    if (!p || p.status === 'disabled') continue;
+    if (!p || p.status === 'disabled' || p.status === 'rejected') continue;
     const view = await runConnectionCheck(r.platformId, { trigger: 'nightly' });
     checked++;
     if (view?.outcome === 'fail') stillFailing++;

@@ -1,0 +1,63 @@
+{
+  "id": null,
+  "name": "Enara – LMS ops: approval needed (EN)",
+  "subject": "[LMS] Approval needed: {{{SCHOOL_NAME}}}",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Nile Valley International School"
+    },
+    {
+      "key": "INSTITUTION_ID",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "inst_5b20e9"
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Moodle (moodle.nilevalley.example)"
+    },
+    {
+      "key": "ITEM",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "new connection added by a school admin"
+    },
+    {
+      "key": "WAITING_SINCE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "18 November 2026, 08:05"
+    },
+    {
+      "key": "PLATFORM_ID",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "lmsp_7f3a9c21e4"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&institution=inst_5b20e9"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-ops-approval-needed",
+  "language": "en",
+  "languages": [
+    "en"
+  ],
+  "number": "19",
+  "group": "lms",
+  "recipient": "ENARA ops (LMS_OPS_EMAILS)",
+  "trigger": "platform.registered pending, deployment.registered pending, deployment auto-created at launch",
+  "delivery": "immediate",
+  "frequency": "Immediate, then a daily reminder while still pending; max 1 per item per day"
+}

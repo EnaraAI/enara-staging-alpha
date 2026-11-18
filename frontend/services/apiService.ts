@@ -1431,7 +1431,8 @@ export function reportMicTelemetry(event: { event: string; browserFamily: string
 export interface LmsPlatformView {
   id: string; institutionId: string; vendor: string; issuer: string; clientId: string;
   authLoginUrl: string | null; authTokenUrl: string | null; keysetUrl: string | null; hasPublicKey?: boolean;
-  status: 'pending' | 'active' | 'disabled'; registeredVia?: 'dynamic' | 'manual' | 'google_oauth'; createdAt: string; approvedAt: string | null;
+  status: 'pending' | 'active' | 'disabled' | 'rejected'; registeredVia?: 'dynamic' | 'manual' | 'google_oauth'; createdAt: string; approvedAt: string | null;
+  rejectedReason?: string | null; rejectedAt?: string | null;
   launchCount: number; cookielessLaunchCount: number; storageLaunchCount?: number; lastLaunchAt: string | null;
   deployments: { id: string; deploymentId: string; status: 'pending' | 'active' | 'disabled' }[];
 }
@@ -1465,6 +1466,17 @@ export const fetchLmsPlatforms = () => request<{ platforms: LmsPlatformView[] }>
 export const createLmsPlatform = (body: Record<string, unknown>) => request<{ platform: LmsPlatformView }>('POST', '/api/lms/platforms', body);
 export const approveLmsPlatform = (id: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(id)}/approve`);
 export const disableLmsPlatform = (id: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(id)}/disable`);
+/** ENARA admins: refuse a pending connection with a fixed reason (owner decision D6). */
+export const LMS_REJECT_REASONS = [
+  { code: 'values_mismatch', label: "Platform ID or Client ID doesn't match the Moodle site" },
+  { code: 'already_connected', label: 'Moodle site already connected to another school' },
+  { code: 'school_not_confirmed', label: "Couldn't confirm the Moodle site belongs to the school" },
+] as const;
+export const rejectLmsPlatform = (id: string, reason: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(id)}/reject`, { reason });
+/** LMS emails, owner decision D2: a teacher's answer to "Email me Enara updates at ...?" (asked once, on an LMS launch). */
+export interface LmsEmailOptInState { state: 'off' | 'ask' | 'in' | 'out'; email?: string | null; prefill?: string | null }
+export const fetchLmsEmailOptIn = () => request<LmsEmailOptInState>('GET', '/api/lms/email-optin');
+export const saveLmsEmailOptIn = (body: { optIn: boolean; email?: string }) => request<LmsEmailOptInState>('POST', '/api/lms/email-optin', body);
 export const addLmsDeployment = (id: string, deploymentId: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(id)}/deployments`, { deploymentId });
 export const approveLmsDeployment = (id: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/deployments/${encodeURIComponent(id)}/approve`);
 /** Grade passback (Phase 3), per platform. The API answers 404 while LMS_GRADE_PASSBACK_ENABLED is off. */

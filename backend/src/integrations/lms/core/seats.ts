@@ -1,4 +1,3 @@
-import { emailLayout, sendEmail } from '../../../services/emailService';
 import { ClassEnrollment } from '../../../models/ClassEnrollment';
 import { CourseInstance } from '../../../models/CourseInstance';
 import { Student } from '../../../models/Student';
@@ -6,6 +5,9 @@ import { User } from '../../../models/User';
 import { logger, serializeError } from '../../../utils/logging';
 import { LmsOrgSettings, LmsUser, type ILmsOrgSettings } from '../models';
 import { writeLmsAudit } from './audit';
+import { runInBackground } from './drain';
+import { notifyBillingFlag, notifyHardCap, notifySeatsOverLimit, notifySeatsWarning } from './lmsEmailEvents';
+import { lmsEmailsActive } from './lmsEmail';
 
 // Seats (plan §6, owner decision Q1): one seat = one distinct student in the
 // school, however many classes or LMS courses they are in. Checked only when
@@ -101,10 +103,14 @@ export async function checkSeatForNewStudent(institutionId: string, actor?: stri
   const limit = settings.seatLimit;
   if (projected <= limit) {
     await LmsOrgSettings.updateOne({ institutionId }, { $set: { seatsUsed: projected } });
+    // 10a lms-seats-warning (80 % / 90 %): background, only when LMS emails are on.
+    if (lmsEmailsActive()) runInBackground('lms_email_seats_warning', () => notifySeatsWarning(institutionId, projected, limit));
     return { allowed: true, overLimit: false, seatsUsed: projected, seatLimit: limit };
   }
   if (settings.hardCap) {
     await writeLmsAudit({ event: 'seats.hard_cap', outcome: 'fail', institutionId, actor, refIds: { seatsUsed: used, seatLimit: limit }, code: 'seat_limit_reached' });
+    // E1 lms-seats-hard-cap: at most once per school per 24 h.
+    if (lmsEmailsActive()) runInBackground('lms_email_hard_cap', () => notifyHardCap(institutionId, used, limit));
     return { allowed: false, overLimit: true, seatsUsed: used, seatLimit: limit };
   }
   await markOverLimit(institutionId, projected, limit, actor);
@@ -115,7 +121,12 @@ async function markOverLimit(institutionId: string, seatsUsed: number, seatLimit
   const now = new Date();
   await LmsOrgSettings.updateOne({ institutionId }, { $set: { overLimit: true, seatsUsed } });
   // Billing flag: set once, kept until an ENARA admin clears it.
-  await LmsOrgSettings.updateOne({ institutionId, billingFlaggedAt: { $exists: false } }, { $set: { billingFlaggedAt: now } });
+  const flagged = await LmsOrgSettings.updateOne({ institutionId, billingFlaggedAt: { $exists: false } }, { $set: { billingFlaggedAt: now } });
+  // E2 lms-ops-billing-flag: once per flag (the update above sets it only once).
+  if (flagged.modifiedCount === 1 && lmsEmailsActive()) {
+    const hardCap = !!(await LmsOrgSettings.findOne({ institutionId }).select('hardCap').lean())?.hardCap;
+    runInBackground('lms_email_billing_flag', () => notifyBillingFlag(institutionId, seatsUsed, seatLimit, hardCap, now));
+  }
   // One alert a day at most, across all instances (atomic claim of the slot).
   const claimed = await LmsOrgSettings.findOneAndUpdate(
     { institutionId, $or: [{ lastAlertAt: { $exists: false } }, { lastAlertAt: { $lte: new Date(now.getTime() - ALERT_EVERY_MS) } }] },
@@ -123,20 +134,16 @@ async function markOverLimit(institutionId: string, seatsUsed: number, seatLimit
     { new: true },
   ).lean();
   await writeLmsAudit({ event: 'seats.over_limit', outcome: 'warn', institutionId, actor, refIds: { seatsUsed, seatLimit, alerted: !!claimed }, code: 'over_seat_limit' });
-  if (claimed) void alertSchoolAdmins(institutionId, seatsUsed, seatLimit);
-}
-
-async function alertSchoolAdmins(institutionId: string, seatsUsed: number, seatLimit: number): Promise<void> {
-  try {
-    const admins = await User.find({ institutionId, role: 'admin', status: 'active' }).select('email').limit(20).lean();
-    const html = emailLayout('Your school is over its ENARA seat limit', [
-      `Your school now has ${seatsUsed} students on ENARA. Your plan includes ${seatLimit} seats.`,
-      'New students arriving from your LMS can still sign in. Your ENARA contact will be in touch about your plan.',
-      'You can see the current count on the LMS connections page.',
-    ]);
-    for (const a of admins) await sendEmail({ to: a.email, subject: 'ENARA seat limit reached', html });
-  } catch (error) {
-    logger.warn('lms_seat_alert_failed', { institutionId, error: serializeError(error) });
+  // 10b lms-seats-over-limit (replaces the inline English email; owner decision D13): the
+  // school's admins, in the school's language, behind LMS_EMAILS_ENABLED like every LMS email.
+  if (claimed && lmsEmailsActive()) {
+    runInBackground('lms_email_over_limit', async () => {
+      try {
+        await notifySeatsOverLimit(institutionId, seatsUsed, seatLimit, now);
+      } catch (error) {
+        logger.warn('lms_seat_alert_failed', { institutionId, error: serializeError(error) });
+      }
+    });
   }
 }
 

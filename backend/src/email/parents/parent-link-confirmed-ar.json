@@ -1,0 +1,46 @@
+{
+  "id": null,
+  "name": "Enara – Parents: link confirmed (AR)",
+  "subject": "تم ربط حسابك بـ{{{CHILD_NAME}}} على إنارة",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "سارة"
+    },
+    {
+      "key": "CHILD_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "عمر"
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "مدرسة وادي النيل الدولية"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/parents"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "parent-link-confirmed",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "P2",
+  "group": "parents",
+  "recipient": "Parent",
+  "trigger": "A parent link becomes active (any source)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per link (on by default, D11)"
+}

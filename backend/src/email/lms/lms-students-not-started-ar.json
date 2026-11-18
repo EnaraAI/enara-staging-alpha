@@ -1,0 +1,46 @@
+{
+  "id": null,
+  "name": "Enara – LMS: students not started (AR)",
+  "subject": "بعض الطلاب لم يفتحوا إنارة بعد",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "أحمد"
+    },
+    {
+      "key": "NOT_STARTED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "9"
+    },
+    {
+      "key": "COURSE_LABEL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "3 مقررات"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=class-assignments&class=cls_3e91a7&filter=not-started"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-students-not-started",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "14",
+  "group": "lms",
+  "recipient": "Teachers (opt-in, D2)",
+  "trigger": "Weekly cron over notStartedStudents(context) per teacher's courses; needs LMS_ROSTER_SYNC_ENABLED",
+  "delivery": "digest",
+  "frequency": "Weekly (Monday), one email per teacher; a course at most 3 weeks in a row, then only if its count rises"
+}
