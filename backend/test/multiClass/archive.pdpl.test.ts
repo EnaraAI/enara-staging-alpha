@@ -1,5 +1,7 @@
+import { randomBytes } from 'crypto';
 import mongoose from 'mongoose';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { resetConfigForTests } from '../../src/config/env';
 import { ALL_OFF, ALL_ON, api, ctx, expectConsistent, mkClass, mkGroup, mkStudent, setSwitches, startArchiveFixture, stopFixture } from './archive.helpers';
 
 // Owner's PDPL decisions for "Delete permanently" (2026-11-17,
@@ -33,8 +35,17 @@ beforeAll(async () => {
   }
   M().HybridShadowResult = (await import('../../src/models/HybridShadowResult')).HybridShadowResult;
   M().LmsUser = (await import('../../src/integrations/lms/models')).LmsUser;
+  // LMS Priority 0: a student with an LMS identity goes on the PDPL suppression
+  // list (a hash keyed from LMS_KEK) before deletion; without the key the
+  // deletion stops (studentErasure.ts). The key alone switches nothing on.
+  process.env.LMS_KEK = randomBytes(32).toString('base64');
+  resetConfigForTests();
 }, 120_000);
-afterAll(stopFixture);
+afterAll(async () => {
+  delete process.env.LMS_KEK;
+  resetConfigForTests();
+  await stopFixture();
+});
 afterEach(() => setSwitches(ALL_ON));
 
 type S = { id: string; email: string };
@@ -135,7 +146,7 @@ describe('PDPL P1: results kept anonymised, everything the student wrote removed
 
     const r = await del(co.target);
     expect(r.status).toBe(200);
-    expect(r.body.anonymised).toMatchObject({ assessment_attempts: 1, grading_proposals: 1 });
+    expect(r.body.anonymised).toMatchObject({ assessment_attempts: 1, grading_proposals: 1, lms_identities_suppressed: 1 });
     expect(r.body.removed).toMatchObject({ assessment_attempts: 2, grading_proposals: 1, tutor_sessions: 1, tutor_messages: 1, learning_events: 1, reminder_logs: 1, lms_users: 1, student_class_choices: 1, hybrid_shadow_results: 1, assessments_for_this_student_only: 1 });
     expect(r.body.kept).toEqual({ usage_ledger_rows_with_ids: 1, safety_alerts: 1 });
 
@@ -180,6 +191,9 @@ describe('PDPL P1: results kept anonymised, everything the student wrote removed
     expect(where(all, co.target.id)).toEqual(['audit_events', 'safety_alerts', 'usage_ledger']);
     expect(where(all, uid).filter((n) => !['audit_events', 'usage_ledger'].includes(n))).toEqual([]);
     expect(where(all, co.target.email)).toEqual([]);
+    // The LMS identity is on the suppression list as a keyed hash only (never the raw LMS user id).
+    expect(all.lms_suppressed_identities).toHaveLength(1);
+    expect(where(all, `ext-${co.target.id}`)).toEqual([]);
     expect(where(all, marker)).toEqual([]); // answers, essays, feedback quoting them, transcripts, appeals, drafts, tutor and event text
     expect(where(all, `ALERT-${co.target.id}`)).toEqual(['safety_alerts']);
     // The old attempt ID survives only in the usage ledger row (P3), and nothing links it to the new one.

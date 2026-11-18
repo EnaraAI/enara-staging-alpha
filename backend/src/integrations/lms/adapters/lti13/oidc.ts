@@ -11,6 +11,7 @@ import { issueLaunchToken } from '../../core/launchToken';
 import { scheduleTargetedFlush } from '../../core/drain';
 import { nrpsStudentPreview, scheduleRosterSyncOnLaunch } from '../../core/roster';
 import { isTestUser, mapLtiRoles } from '../../core/roleMap';
+import { findSuppression } from '../../core/suppression';
 import type { LaunchResult } from '../../core/types';
 import { LmsDeployment, LmsOidcState, LmsPlatform, type ILmsPlatform } from '../../models';
 import { getPreset } from '../../presets';
@@ -289,6 +290,10 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
   if (!resourceLinkId && !deepLink) return fail('missing_resource_link', 'lti.launch', { platform });
 
   if (await isInstitutionSuspended(platform.institutionId)) return fail('institution_suspended', 'lti.launch', { platform });
+  // PDPL (Priority 0): a permanently deleted student's LMS identity is never
+  // re-created. Refused before any preview, picker or provisioning.
+  const suppressed = await findSuppression(platform.id, sub);
+  if (suppressed) return fail('identity_suppressed', 'lti.launch', { platform, refIds: { deploymentId: deployment.id, suppressionId: suppressed.id } });
 
   const preset = getPreset(platform.vendor);
   const mapped = mapLtiRoles(roles, {

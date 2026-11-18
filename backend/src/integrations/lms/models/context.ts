@@ -48,6 +48,8 @@ export interface ILmsRosterSyncState {
   deferred?: number;
   instructorsAdded?: number;
   instructorsRemoved?: number;
+  /** PDPL (Priority 0): members skipped because their identity is on the suppression list. */
+  suppressed?: number;
   lastErrorCode?: string;
   lastErrorAt?: Date;
 }

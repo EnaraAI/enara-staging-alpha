@@ -16,6 +16,7 @@ import { flaggedActivities } from '../core/activityHealth';
 import { drainGradeJobs, gradeStats, passbackOn, resyncGrades, retryDead } from '../core/outbox';
 import { contextRosterViews, manualSyncTooSoon, notStartedStudents, rosterOn, syncContextRoster } from '../core/roster';
 import { seatView, updateSeatSettings } from '../core/seats';
+import { liftSuppression, listSuppressions } from '../core/suppression';
 import { LmsContext, LmsDeployment, LmsOrgSettings, LmsPlatform, LmsUser, type ILmsContext, type ILmsDeployment, type ILmsPlatform } from '../models';
 import { isKnownVendor, listPresets } from '../presets';
 import { requireLti } from '../routes';
@@ -29,6 +30,8 @@ import { requireLti } from '../routes';
 //             last error per platform, "Re-sync grades", "Retry dead jobs"
 //   Roster (Phase 4, also needs LMS_ROSTER_SYNC_ENABLED): per course sync
 //             status, not-started students, "Sync roster now"
+//   Suppression list (Priority 0, PDPL; ENARA admins only): list per school,
+//             lift one row
 // School admins see and change only their own school. A school admin's new
 // connection is 'pending' until an ENARA admin approves it
 // (LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL, default on). ENARA admins see and
@@ -504,5 +507,33 @@ lmsAdminRouter.put(
     const hardCap = getOptionalBoolean(body, 'hardCap');
     const clearBillingFlag = getOptionalBoolean(body, 'clearBillingFlag');
     res.json({ seats: await updateSeatSettings(institutionId, { seatLimit, hardCap, clearBillingFlag }, req.user!.id) });
+  }),
+);
+
+// ---------------------------------------------------- suppression list
+//
+// Priority 0 (PDPL). ENARA admins only: the LMS identities of permanently
+// deleted students (counts and IDs per school; never a hash, name or LMS id),
+// and "lift" (the identity may be created again by a sync or a launch).
+
+lmsAdminRouter.get(
+  '/suppressions',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!isEnara(req)) throw new AppError('Only ENARA admins can see the LMS suppression list', 403, 'FORBIDDEN');
+    const institutionId = typeof req.query.institutionId === 'string' && req.query.institutionId ? req.query.institutionId.slice(0, 200) : undefined;
+    const platformId = typeof req.query.platformId === 'string' && req.query.platformId ? req.query.platformId.slice(0, 200) : undefined;
+    const includeLifted = req.query.includeLifted === 'true' || req.query.includeLifted === '1';
+    res.json(await listSuppressions({ institutionId, platformId, includeLifted }));
+  }),
+);
+
+lmsAdminRouter.post(
+  '/suppressions/:id/lift',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!isEnara(req)) throw new AppError('Only ENARA admins can lift an LMS suppression', 403, 'FORBIDDEN');
+    const out = await liftSuppression(String(req.params.id).slice(0, 200), req.user!.id);
+    if (!out.ok && out.reason === 'not_found') throw new AppError('Suppression not found', 404, 'LMS_SUPPRESSION_NOT_FOUND');
+    if (!out.ok) throw new AppError('This suppression was already lifted', 409, 'LMS_SUPPRESSION_ALREADY_LIFTED');
+    res.json({ suppression: out.suppression });
   }),
 );

@@ -41,6 +41,8 @@ import { UsageEvent } from '../models/UsageEvent';
 import { UsageLedger } from '../models/UsageLedger';
 import { User } from '../models/User';
 import { GoogleConnection, LmsEnrollment, LmsGradeSyncJob, LmsUser } from '../integrations/lms/models';
+import { SuppressionKeyError, suppressIdentities } from '../integrations/lms/core/suppression';
+import { AppError } from '../middleware/errorHandler';
 import { logger, serializeError } from '../utils/logging';
 import { anonymiseGradeLedger } from './gradeLedger';
 import { anonymiseAttempt, anonymiseProposal, keepsFinalResult, newAnonymousAttemptId, newAnonymousProposalId, newAnonymousStudentId } from './anonymisedResults';
@@ -161,10 +163,36 @@ async function anonymiseResults(sid: string, removed: Record<string, number>, an
 
 const escapeRegex = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+/**
+ * PDPL suppression list (LMS Priority 0): every LMS identity (platform + LMS
+ * user id) linked to the student's accounts goes on lms_suppressed_identities
+ * (a keyed hash, no name, email or raw id) BEFORE anything is removed, so a
+ * roster sync or a launch never re-creates the person. If the list cannot be
+ * written (LMS_KEK not set), the deletion stops here with nothing deleted.
+ */
+async function suppressLmsIdentities(userIds: string[], actor: Actor): Promise<number> {
+  if (!userIds.length) return 0;
+  const lmsUsers = await LmsUser.find({ enaraUserId: { $in: userIds } }).select('institutionId platformId externalUserId').lean();
+  try {
+    return (await suppressIdentities(lmsUsers.map((u) => ({ institutionId: u.institutionId, platformId: u.platformId, externalUserId: u.externalUserId })), actor?.id)).length;
+  } catch (error) {
+    if (error instanceof SuppressionKeyError) {
+      throw new AppError('This student has LMS accounts and the LMS key (LMS_KEK) is not set, so ENARA cannot record that they must never be re-created from the LMS. Nothing was deleted. Ask ENARA support.', 503, 'LMS_SUPPRESSION_UNAVAILABLE');
+    }
+    throw error;
+  }
+}
+
 export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Promise<ErasureResult> {
   const removed: Record<string, number> = {};
   const anonymised: Record<string, number> = {};
   const sid = s.id;
+  // Login accounts (read first: the LMS suppression list is written before anything is removed).
+  const users = await User.find(await studentUserFilter(s)).select('_id email role').lean();
+  const studentUsers = users.filter((u) => u.role === 'student');
+  const userIds = studentUsers.map((u) => String(u._id));
+  const lmsSuppressed = await suppressLmsIdentities(userIds, actor);
+  if (lmsSuppressed) anonymised.lms_identities_suppressed = lmsSuppressed;
   // Multi-class S4: the groups whose live count must drop ([] while off; read before the rows go).
   const groupsToRecount = await groupsOfStudent(sid);
 
@@ -195,10 +223,7 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
   // P2: safety alerts are kept for safeguarding (admins only, retention purge).
   const keptAlerts = (await SafetyAlert.updateMany({ studentId: sid }, { $set: { subjectDeleted: true }, $unset: { sessionId: 1 } })).matchedCount;
 
-  // Login accounts and what hangs off them.
-  const users = await User.find(await studentUserFilter(s)).select('_id email role').lean();
-  const studentUsers = users.filter((u) => u.role === 'student');
-  const userIds = studentUsers.map((u) => String(u._id));
+  // Login accounts (read above) and what hangs off them.
   if (userIds.length) {
     removed.avatar_sessions = (removed.avatar_sessions ?? 0) + (await AvatarSession.deleteMany({ userId: { $in: userIds } })).deletedCount;
     removed.password_resets = (await PasswordReset.deleteMany({ userId: { $in: userIds } })).deletedCount;
@@ -216,7 +241,8 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
     ...(userIds.length ? [{ recipientKey: { $in: userIds } }] : []),
   ] })).deletedCount;
   // LMS identities of the student's accounts (names and email from the LMS),
-  // their LMS memberships and unsent grade copies. The LMS audit log is not touched.
+  // their LMS memberships and unsent grade copies. The LMS audit log is not
+  // touched. Each identity is already on the suppression list (above).
   if (userIds.length) {
     const lmsUserIds = (await LmsUser.find({ enaraUserId: { $in: userIds } }).select('id').lean()).map((u) => u.id);
     if (lmsUserIds.length) {
