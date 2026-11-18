@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 import { writeLmsAudit } from '../integrations/lms/core/audit';
-import { LmsPlatform } from '../integrations/lms/models';
+import { LmsContext, LmsPlatform } from '../integrations/lms/models';
 
 // TEST-ONLY Moodle Web Services client for lms-test.enara.app (Phase 4 checks
 // run without the owner clicking in Moodle). Reached only through the
@@ -12,10 +12,10 @@ import { LmsPlatform } from '../integrations/lms/models';
 //   - MOODLE_TEST_WS_URL is https and equals the issuer of an LMS platform
 //     registered in this (test) database.
 // Only the fixed actions below exist: no pass-through of arbitrary Moodle
-// functions. Writes are limited to the one fake course and the fake test
-// users. Every call is audited in lms_audit_log with Moodle IDs only.
+// functions. Writes are limited to a Moodle course already linked to ENARA
+// (an active lms_contexts row of that platform, matched by Moodle course ID)
+// and to the fake test users. Every call is audited in lms_audit_log with Moodle IDs only.
 
-export const ALLOWED_COURSE = 'ENARATEST';
 /** Fake users the tool may create, delete, enrol or unenrol. */
 export const CREATABLE_USERS = ['student2.test'] as const;
 /** Fake users whose grade the tool may change (check 5). */
@@ -49,13 +49,17 @@ interface Ctx {
   token: string;
   institutionId: string;
   platformId: string;
+  /** Moodle course IDs linked to ENARA on this platform (LTI context id = Moodle course id). */
+  linkedCourseIds: number[];
 }
 
 async function resolveCtx(env: NodeJS.ProcessEnv): Promise<Ctx> {
   const base = (env.MOODLE_TEST_WS_URL ?? '').replace(/\/$/, '');
   const platform = await LmsPlatform.findOne({ issuer: base, status: 'active' }).select('id institutionId issuer').lean();
   if (!platform) throw new MoodleWsError('platform_not_registered', 409, 'MOODLE_TEST_WS_URL is not the issuer of an active registered LMS platform');
-  return { base, token: env.MOODLE_TEST_WS_TOKEN!, institutionId: platform.institutionId, platformId: platform.id };
+  const contexts = await LmsContext.find({ platformId: platform.id, institutionId: platform.institutionId, status: 'active' }).select('externalContextId').lean();
+  const linkedCourseIds = contexts.map((c) => Number(c.externalContextId)).filter((n) => Number.isInteger(n) && n > 1);
+  return { base, token: env.MOODLE_TEST_WS_TOKEN!, institutionId: platform.institutionId, platformId: platform.id, linkedCourseIds };
 }
 
 async function call<T>(ctx: Ctx, wsfunction: string, params: Record<string, unknown>): Promise<T> {
@@ -98,11 +102,14 @@ function oneOf<T extends readonly string[]>(v: unknown, allowed: T, field: strin
   return s as T[number];
 }
 
-async function courseId(ctx: Ctx): Promise<number> {
-  const r = await call<{ courses?: { id: number; shortname: string }[] }>(ctx, 'core_course_get_courses_by_field', { field: 'shortname', value: ALLOWED_COURSE });
-  const c = r.courses?.find((x) => x.shortname === ALLOWED_COURSE);
+async function course(ctx: Ctx, requested: unknown): Promise<{ id: number; shortname: string }> {
+  // One linked course: that one. Several: the caller names it (courseId).
+  const wanted = requested === undefined && ctx.linkedCourseIds.length === 1 ? ctx.linkedCourseIds[0] : Number(requested);
+  if (!ctx.linkedCourseIds.includes(wanted)) throw new MoodleWsError('course_not_linked', 400, `courseId must be a Moodle course linked to ENARA: ${ctx.linkedCourseIds.join(', ') || 'none'}`);
+  const r = await call<{ courses?: { id: number; shortname: string }[] }>(ctx, 'core_course_get_courses_by_field', { field: 'id', value: wanted });
+  const c = r.courses?.find((x) => x.id === wanted);
   if (!c) throw new MoodleWsError('course_not_found', 404);
-  return c.id;
+  return { id: c.id, shortname: c.shortname };
 }
 
 async function userId(ctx: Ctx, username: string): Promise<number | null> {
@@ -147,11 +154,12 @@ export async function runMoodleWsAction(env: NodeJS.ProcessEnv, body: Record<str
 }
 
 async function perform(ctx: Ctx, action: MoodleWsAction, body: Record<string, unknown>, audit: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const cid = await courseId(ctx);
+  const c = await course(ctx, body.courseId);
+  const cid = c.id;
   audit.courseId = cid;
   switch (action) {
     case 'find-course':
-      return { courseId: cid, shortname: ALLOWED_COURSE };
+      return { courseId: cid, shortname: c.shortname, linkedCourseIds: ctx.linkedCourseIds };
     case 'find-activity': {
       const a = await ltiActivity(ctx, cid, str(body.name, 'name'));
       audit.cmId = a.cmid;

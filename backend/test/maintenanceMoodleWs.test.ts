@@ -37,7 +37,11 @@ function fakeMoodle() {
     calls.push({ fn, params: p });
     const json = (v: unknown) => new Response(JSON.stringify(v), { status: 200 });
     switch (fn) {
-      case 'core_course_get_courses_by_field': return json({ courses: [{ id: 7, shortname: 'ENARATEST' }] });
+      case 'core_course_get_courses_by_field': {
+        const id = Number(p.get('value'));
+        expect(p.get('field')).toBe('id');
+        return json({ courses: [7, 8].includes(id) ? [{ id, shortname: id === 7 ? 'Enara Test' : 'Other' }] : [] });
+      }
       case 'core_course_get_contents': return json([{ modules: [{ id: 41, instance: 4, name: 'ENARA graded quiz', modname: 'lti' }, { id: 42, instance: 1, name: 'Forum', modname: 'forum' }] }]);
       case 'core_user_get_users_by_field': {
         const u = p.get('values[0]')!;
@@ -68,8 +72,9 @@ beforeAll(async () => {
   resetConfig = (await import('../src/config/env')).resetConfigForTests;
   setEnv({ MONGODB_URI: mongo.getUri() });
   await mongoose.connect(mongo.getUri());
-  const { LmsPlatform } = await import('../src/integrations/lms/models');
-  await LmsPlatform.create({ institutionId: 'LT-SCHOOL-A', provider: 'lti13', vendor: 'moodle', issuer: BASE, clientId: 'c1', registeredVia: 'manual', status: 'active' });
+  const { LmsContext, LmsPlatform } = await import('../src/integrations/lms/models');
+  const p = await LmsPlatform.create({ institutionId: 'LT-SCHOOL-A', provider: 'lti13', vendor: 'moodle', issuer: BASE, clientId: 'c1', registeredVia: 'manual', status: 'active' });
+  await LmsContext.create({ institutionId: 'LT-SCHOOL-A', platformId: p.id, externalContextId: '7', title: 'Fake course', status: 'active' });
 });
 afterEach(() => { vi.unstubAllGlobals(); calls = []; });
 afterAll(async () => {
@@ -107,6 +112,10 @@ describe('guards: disabled everywhere except lms-test with its own switch', () =
     vi.stubGlobal('fetch', fakeMoodle());
     setEnv(ON);
     expect((await post({ action: 'core_user_update_users' })).body.error).toBe('action_not_allowed');
+    // A Moodle course that is not linked to ENARA is refused before any Moodle call.
+    expect((await post({ action: 'list-enrolled', courseId: 8 })).body.error).toBe('course_not_linked');
+    expect(calls).toEqual([]);
+    expect((await post({ action: 'find-course' })).body).toMatchObject({ courseId: 7, shortname: 'Enara Test', linkedCourseIds: [7] });
     expect((await post({ action: 'create-user', username: 'admin' })).body.error).toBe('username_not_allowed');
     expect((await post({ action: 'delete-user', username: 'student.test' })).body.error).toBe('username_not_allowed');
     expect((await post({ action: 'unenrol', username: 'teacher.test' })).body.error).toBe('username_not_allowed');
