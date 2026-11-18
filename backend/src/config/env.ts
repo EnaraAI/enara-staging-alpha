@@ -165,6 +165,12 @@ export interface LmsConfig {
   drainTriggers: LmsDrainTrigger[];
   /** A school admin's own LMS connection starts 'pending' until an ENARA admin approves (Phase 1a, decision 3:A). Default true. */
   schoolConnectionsRequireApproval: boolean;
+  /**
+   * Phase 1b: LTI platform storage (1EdTech postMessage storage, lti_storage_target).
+   * Used only when the platform asks for it in the login; otherwise the cookie /
+   * cookieless path is unchanged. Default true (a kill switch, not a feature flag).
+   */
+  platformStorageEnabled: boolean;
   google: { clientId?: string; clientSecret?: string; redirectUri?: string };
   problem?: string;
   /** Something to check that does not switch the LMS off (e.g. APP_URL unset, so the one-host rule could not be checked). Names variables only. */
@@ -298,6 +304,7 @@ export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
     kekPrevious: kekPrevious.value,
     drainTriggers: [...new Set(drainTriggers)],
     schoolConnectionsRequireApproval: readBoolean(source, 'LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL', true),
+    platformStorageEnabled: readBoolean(source, 'LMS_PLATFORM_STORAGE_ENABLED', true),
     google: {
       clientId: readString(source, 'GOOGLE_CLASSROOM_CLIENT_ID'),
       clientSecret: readString(source, 'GOOGLE_CLASSROOM_CLIENT_SECRET'),

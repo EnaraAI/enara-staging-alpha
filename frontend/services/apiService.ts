@@ -1408,7 +1408,7 @@ export interface LmsPlatformView {
   id: string; institutionId: string; vendor: string; issuer: string; clientId: string;
   authLoginUrl: string | null; authTokenUrl: string | null; keysetUrl: string | null;
   status: 'pending' | 'active' | 'disabled'; registeredVia?: 'dynamic' | 'manual' | 'google_oauth'; createdAt: string; approvedAt: string | null;
-  launchCount: number; cookielessLaunchCount: number; lastLaunchAt: string | null;
+  launchCount: number; cookielessLaunchCount: number; storageLaunchCount?: number; lastLaunchAt: string | null;
   deployments: { id: string; deploymentId: string; status: 'pending' | 'active' | 'disabled' }[];
 }
 export interface LmsStatus {
@@ -1472,6 +1472,29 @@ export interface LmsRosterOutcome extends LmsRosterSyncState { contextId: string
 export const fetchLmsContexts = () => request<{ contexts: LmsContextView[] }>('GET', '/api/lms/contexts');
 export const fetchLmsContextRoster = (contextId: string) => request<{ context: LmsContextView; notStarted: LmsNotStarted[] }>('GET', `/api/lms/contexts/${encodeURIComponent(contextId)}/roster`);
 export const syncLmsRoster = (contextId: string) => request<{ outcome: LmsRosterOutcome; context: LmsContextView }>('POST', `/api/lms/contexts/${encodeURIComponent(contextId)}/roster/sync`, {});
+
+// LMS Phase 1b: the Problems view (failures and warnings by reference code, EN and AR texts; IDs only).
+export interface LmsProblemText { what: string; fix: string }
+export interface LmsProblemHelp { known: boolean; en: LmsProblemText; ar: LmsProblemText }
+export type LmsProblemArea = 'launch' | 'sign_in' | 'grades' | 'roster' | 'registration' | 'seats' | 'other';
+export interface LmsProblemGroup {
+  code: string | null; event: string; area: LmsProblemArea; severity: 'fail' | 'warn';
+  count: number; failCount: number; warnCount: number; firstSeen: string; lastSeen: string;
+  platformIds: string[]; platformCount: number; contextIds: string[]; contextCount: number; institutionIds?: string[];
+  help: LmsProblemHelp;
+}
+export interface LmsOpenProblem {
+  code: string; count: number; lastSeen: string | null;
+  platformIds: string[]; platformCount: number; contextIds: string[]; contextCount: number; institutionIds?: string[];
+  help: LmsProblemHelp;
+}
+export interface LmsProblems {
+  days: 1 | 7; since: string; institutionId: string | null;
+  problems: LmsProblemGroup[];
+  open: { deadGradeJobs: LmsOpenProblem[]; failedRosterSyncs: LmsOpenProblem[] };
+}
+export const fetchLmsProblems = (days: 1 | 7, institutionId?: string) =>
+  request<LmsProblems>('GET', `/api/lms/problems?days=${days}${institutionId ? `&institutionId=${encodeURIComponent(institutionId)}` : ''}`);
 
 // MULTI-CLASS STEP 6: ARCHIVING (backend switches ENROLLMENT_GROUP_ARCHIVE /
 // ENROLLMENT_STUDENT_ARCHIVE). The settings route answers 404 while both are

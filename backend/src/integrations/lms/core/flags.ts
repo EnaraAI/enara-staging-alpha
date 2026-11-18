@@ -33,9 +33,9 @@ export function anyLmsFlagSet(): boolean {
 }
 
 /** Phase 1a settings read by the LTI and admin routes. */
-export function lmsSettings(): { toolBaseUrl?: string; schoolConnectionsRequireApproval: boolean } {
+export function lmsSettings(): { toolBaseUrl?: string; schoolConnectionsRequireApproval: boolean; platformStorageEnabled: boolean } {
   const lms = getConfig().lms;
-  return { toolBaseUrl: lms.toolBaseUrl, schoolConnectionsRequireApproval: lms.schoolConnectionsRequireApproval };
+  return { toolBaseUrl: lms.toolBaseUrl, schoolConnectionsRequireApproval: lms.schoolConnectionsRequireApproval, platformStorageEnabled: lms.platformStorageEnabled !== false };
 }
 
 let startupLogged = false;

@@ -4,7 +4,8 @@ import { logger, serializeError } from '../../../../utils/logging';
 import { lmsSettings } from '../../core/flags';
 import { dynamicRegistration } from './dynamicRegistration';
 import { LtiError } from './errors';
-import { oidcLaunch, oidcLogin, platformFrameOrigins } from './oidc';
+import { oidcLaunch, oidcLaunchVerify, oidcLogin, platformFrameOrigins, type LaunchOutcome, type PickerOutcome } from './oidc';
+import { renderStoragePage, STORAGE_SCRIPT_HASH } from './platformStorage';
 
 // Express glue for /lti/login and /lti/launch: frame headers, cookies, the
 // redirect to the ENARA landing page, and a plain error page.
@@ -26,12 +27,14 @@ function escapeHtml(v: string): string {
  * (or, when the platform is unknown, by any https page: error pages carry no
  * actions and no data).
  */
-export function setFrameHeaders(res: Response, origins: string[] | 'any-https', opts: { scriptNonce?: string } = {}): void {
+export function setFrameHeaders(res: Response, origins: string[] | 'any-https', page: { scriptNonce?: string; scriptHash?: string; formAction?: string } = {}): void {
   res.removeHeader('X-Frame-Options');
   const ancestors = origins === 'any-https' ? "'self' https:" : ["'self'", ...origins].join(' ');
-  // Only the registration pages run a script (the spec's "close" message), by nonce.
-  const script = opts.scriptNonce ? `; script-src 'nonce-${opts.scriptNonce}'` : '';
-  res.setHeader('Content-Security-Policy', `default-src 'none'; style-src 'unsafe-inline'${script}; frame-ancestors ${ancestors}; base-uri 'none'; form-action 'none'`);
+  // Phase 1b: the registration pages run one script by nonce (the spec's "close"
+  // message); the platform-storage pages run one static script allowed by its hash.
+  const sources = [page.scriptNonce ? `'nonce-${page.scriptNonce}'` : '', page.scriptHash ? `'${page.scriptHash}'` : ''].filter(Boolean);
+  const script = sources.length ? `; script-src ${sources.join(' ')}` : '';
+  res.setHeader('Content-Security-Policy', `default-src 'none'${script}; style-src 'unsafe-inline'; frame-ancestors ${ancestors}; base-uri 'none'; form-action ${page.formAction ?? "'none'"}`);
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Referrer-Policy', 'no-referrer');
 }
@@ -76,14 +79,42 @@ function params(req: Request): Record<string, unknown> {
 
 export const ltiLogin = handle(async (req, res) => {
   const out = await oidcLogin(params(req));
-  setFrameHeaders(res, platformFrameOrigins(out.platform));
+  // The state cookie is set in both cases: when the browser keeps it, the launch needs nothing else.
   res.append('Set-Cookie', stateCookie(out.cookieName, '1', STATE_COOKIE_MAX_AGE));
+  if (out.storage) {
+    // Phase 1b: put state and nonce into the platform's storage, then go on to its auth URL.
+    setFrameHeaders(res, platformFrameOrigins(out.platform), { scriptHash: STORAGE_SCRIPT_HASH });
+    res.status(200).type('html').send(renderStoragePage({ mode: 'put', ...out.storage, next: out.redirectUrl }));
+    return;
+  }
+  setFrameHeaders(res, platformFrameOrigins(out.platform));
   res.redirect(302, out.redirectUrl);
 });
 
+function bodyOf(req: Request): Record<string, unknown> {
+  return req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? (req.body as Record<string, unknown>) : {};
+}
+
 export const ltiLaunch = handle(async (req, res) => {
-  const body = req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? (req.body as Record<string, unknown>) : {};
-  const out = await oidcLaunch(body, req.headers.cookie);
+  const out = await oidcLaunch(bodyOf(req), req.headers.cookie);
+  if ('kind' in out && out.kind === 'storage_check') {
+    // Phase 1b: read state and nonce back from the platform's storage, then POST /lti/launch/verify.
+    const base = lmsSettings().toolBaseUrl!;
+    setFrameHeaders(res, platformFrameOrigins(out.platform), { scriptHash: STORAGE_SCRIPT_HASH, formAction: base });
+    res
+      .status(200)
+      .type('html')
+      .send(renderStoragePage({ mode: 'get', target: out.target, origin: out.origin, state: out.state, nonce: out.nonce, handle: out.handle, verifyUrl: `${base}/lti/launch/verify` }));
+    return;
+  }
+  finishLaunch(res, out);
+});
+
+export const ltiLaunchVerify = handle(async (req, res) => {
+  finishLaunch(res, await oidcLaunchVerify(bodyOf(req)));
+});
+
+function finishLaunch(res: Response, out: LaunchOutcome | PickerOutcome): void {
   setFrameHeaders(res, platformFrameOrigins(out.platform));
   if (!out.cookieless) res.append('Set-Cookie', stateCookie(out.stateCookieName, '', 0));
   // Phase 2: the activity picker (the secret travels in the fragment, like the launch token).
@@ -95,7 +126,7 @@ export const ltiLaunch = handle(async (req, res) => {
   const params = new URLSearchParams({ lt: out.token });
   if (out.cookieless) params.set('c', '1');
   res.redirect(303, `${lmsSettings().toolBaseUrl}/lms/launch#${params.toString()}`);
-});
+}
 
 // ------------------------------------------------- Dynamic Registration (Phase 1b)
 //
