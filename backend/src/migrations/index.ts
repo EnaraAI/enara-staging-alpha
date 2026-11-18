@@ -25,7 +25,7 @@ import { LessonProgress } from '../models/LessonProgress';
 import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
-import { LMS_MODELS, LMS_PHASE1A_MODELS, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsLaunchToken, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsToolKey } from '../integrations/lms/models';
+import { LMS_MODELS, LMS_P0_MODELS, LMS_PHASE1A_MODELS, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsLaunchToken, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsSuppressedIdentity, LmsToolKey } from '../integrations/lms/models';
 import { ClassEnrollment } from '../models/ClassEnrollment';
 import { ReminderLog } from '../models/ReminderLog';
 import { SignInEvent } from '../models/SignInEvent';
@@ -458,6 +458,16 @@ export const MIGRATIONS: Migration[] = [
     description: 'LMS Phase 2 (activity picker): lms_deep_link_sessions indexes (new collection; nothing existing touched)',
     up: async () => {
       await LmsDeepLinkSession.createIndexes();
+    },
+  },
+  {
+    id: '2026-11-21-lms-p0-suppressed-identities',
+    description: 'LMS Priority 0 (PDPL suppression list): lms_suppressed_identities indexes (new collection; nothing existing touched)',
+    up: async () => {
+      for (const model of LMS_P0_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
+      if (!(await LmsSuppressedIdentity.collection.indexes()).some((i) => i.key.platformId === 1 && i.key.identityHash === 1 && i.unique)) {
+        throw new Error('lms_suppressed_identities platformId+identityHash unique index missing');
+      }
     },
   },
 ];

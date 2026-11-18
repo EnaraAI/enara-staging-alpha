@@ -254,6 +254,7 @@ export const LmsConnections: React.FC = () => {
                         {c.sync?.outcome && ` · ${c.sync.outcome}${c.sync.trigger ? ` (${c.sync.trigger})` : ''}: ${c.sync.added ?? 0} added, ${c.sync.reactivated ?? 0} back, ${c.sync.removed ?? 0} removed, ${c.sync.unchanged ?? 0} unchanged`}
                         {(c.sync?.conflicts ?? 0) > 0 && ` · ${c.sync!.conflicts} role conflicts`}
                         {(c.sync?.deferred ?? 0) > 0 && ` · ${c.sync!.deferred} more next run`}
+                        {(c.sync?.suppressed ?? 0) > 0 && ` · ${c.sync!.suppressed} skipped (permanently deleted at the school's request)`}
                         {c.sync?.lastErrorCode && <> · last error <code className="bg-slate-50 px-1 rounded">{c.sync.lastErrorCode}</code>{c.sync.lastErrorAt ? ` (${new Date(c.sync.lastErrorAt).toLocaleString()})` : ''}</>}
                       </p>
                       <div className="flex flex-wrap gap-3 mt-1">

@@ -10,6 +10,7 @@ import { initialsFromName } from '../../../utils/idGenerator';
 import { LmsContext, LmsEnrollment, LmsResourceLink, LmsUser, type ILmsContext, type ILmsResourceLink, type ILmsUser } from '../models';
 import { bindResourceLink, type ValidatedBinding } from './binding';
 import { checkSeatForNewStudent, isNotStartedLmsAccount } from './seats';
+import { findSuppression } from './suppression';
 import type { LmsEnaraRole } from './types';
 
 // The LMS domain service (plan §2.2): turns a validated, provider-neutral
@@ -30,7 +31,7 @@ import type { LmsEnaraRole } from './types';
 
 export class LmsProvisionError extends Error {
   constructor(
-    public readonly code: 'role_conflict' | 'student_as_instructor' | 'test_user_not_supported' | 'account_disabled' | 'seat_limit_reached' | 'account_conflict',
+    public readonly code: 'role_conflict' | 'student_as_instructor' | 'test_user_not_supported' | 'account_disabled' | 'seat_limit_reached' | 'account_conflict' | 'identity_suppressed',
     message?: string,
   ) {
     super(message ?? code);
@@ -124,6 +125,9 @@ export async function createEnaraAccount(
   lmsUser: ILmsUser,
   opts: { noSeatYet?: boolean } = {},
 ): Promise<{ userId: string; studentId?: string; created: boolean; seat?: ProvisionResult['seat'] }> {
+  // PDPL (Priority 0): never re-create a permanently deleted person. The launch
+  // and the roster sync check this first; this is the last guard.
+  if (await findSuppression(lmsUser.platformId, lmsUser.externalUserId)) throw new LmsProvisionError('identity_suppressed');
   let seat: ProvisionResult['seat'];
   if (input.role === 'student' && !opts.noSeatYet) {
     const decision = await checkSeatForNewStudent(input.institutionId, lmsUser.id);

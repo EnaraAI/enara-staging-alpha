@@ -1374,7 +1374,7 @@ export const updateLmsSeats = (body: { institutionId: string; seatLimit?: number
 export interface LmsRosterSyncState {
   lastAttemptAt?: string; trigger?: string; outcome?: 'ok' | 'partial' | 'failed';
   members?: number; pages?: number; added?: number; reactivated?: number; removed?: number; unchanged?: number;
-  conflicts?: number; ignored?: number; deferred?: number; instructorsAdded?: number; instructorsRemoved?: number;
+  conflicts?: number; ignored?: number; deferred?: number; instructorsAdded?: number; instructorsRemoved?: number; suppressed?: number;
   lastErrorCode?: string; lastErrorAt?: string;
 }
 export interface LmsContextView {

@@ -15,6 +15,7 @@ import { runInBackground } from './drain';
 import { lmsFlags } from './flags';
 import { isTestUser, mapLtiRoles } from './roleMap';
 import { afterRosterSync } from './rosterHooks';
+import { suppressedExternalIds } from './suppression';
 
 // LMS Phase 4: roster sync through LTI NRPS (docs/lms/PHASE_4_NOTES.md).
 //
@@ -35,6 +36,9 @@ import { afterRosterSync } from './rosterHooks';
 //   - Role conflicts are handled as a launch does: an account never changes
 //     role. A student account listed as Instructor, or a staff account listed
 //     as Learner, is left unchanged and audited.
+//   - PDPL (Priority 0): a member whose LMS identity is on the suppression
+//     list (a permanently deleted student, core/suppression.ts) is skipped:
+//     no account, student, enrollment or seat. Counted as `suppressed`.
 // Ownership (owner decision): a sync changes only what this course of this
 // LMS connection added: class enrollments with source 'lms' and this course's
 // lmsContextId, and instructors the LMS added (lms_enrollments.addedInstructor).
@@ -60,6 +64,8 @@ export interface RosterCounts {
   deferred: number;
   instructorsAdded: number;
   instructorsRemoved: number;
+  /** PDPL: members skipped because their identity is on the suppression list. */
+  suppressed: number;
 }
 
 export interface RosterSyncOutcome extends RosterCounts {
@@ -90,7 +96,7 @@ export function rosterTriggerOn(trigger: 'daily' | 'cron'): boolean {
   return rosterOn() && getConfig().lms.drainTriggers.includes(trigger);
 }
 
-const emptyCounts = (): RosterCounts => ({ members: 0, pages: 0, added: 0, reactivated: 0, removed: 0, unchanged: 0, conflicts: 0, ignored: 0, deferred: 0, instructorsAdded: 0, instructorsRemoved: 0 });
+const emptyCounts = (): RosterCounts => ({ members: 0, pages: 0, added: 0, reactivated: 0, removed: 0, unchanged: 0, conflicts: 0, ignored: 0, deferred: 0, instructorsAdded: 0, instructorsRemoved: 0, suppressed: 0 });
 const isObjectId = (id: unknown): id is string => typeof id === 'string' && /^[a-f0-9]{24}$/i.test(id);
 
 type Account = { _id: unknown; role: string; status?: string; institutionId?: string; studentId?: string };
@@ -272,11 +278,17 @@ async function applyRoster(
   }
 
   // ---- additions and updates: people with an account first (cheap), new people last (bounded).
+  // PDPL: identities on the suppression list are never (re-)created.
+  const suppressed = await suppressedExternalIds(platform.id, [...active.keys()]);
   const members = [...active.values()].sort((a, b) => Number(!!byExt.get(b.userId)?.enaraUserId) - Number(!!byExt.get(a.userId)?.enaraUserId));
   let created = 0;
   for (const m of members) {
     if (Date.now() > o.deadline) {
       counts.deferred++;
+      continue;
+    }
+    if (suppressed.has(m.userId)) {
+      counts.suppressed++;
       continue;
     }
     const role = roleOf(m, platform);
@@ -323,8 +335,14 @@ async function applyRoster(
         createdAccount = made.created;
         created++;
       } catch (error) {
+        const code = (error as { code?: string }).code;
+        if (code === 'identity_suppressed') {
+          // Put on the list while this sync ran (createEnaraAccount's guard).
+          counts.suppressed++;
+          continue;
+        }
         counts.conflicts++;
-        await audit('roster.member_conflict', 'warn', { lmsUserId: lu.id, role }, (error as { code?: string }).code === 'account_conflict' ? 'account_conflict' : 'account_error');
+        await audit('roster.member_conflict', 'warn', { lmsUserId: lu.id, role }, code === 'account_conflict' ? 'account_conflict' : 'account_error');
         continue;
       }
     }
@@ -427,7 +445,7 @@ export async function scheduledRosterSync(opts: { trigger: 'nightly' | 'cron'; b
     .limit(opts.limit ?? 25)
     .select('id')
     .lean();
-  const out = { contexts: 0, ok: 0, partial: 0, failed: 0, busy: 0, skipped: 0, added: 0, removed: 0, notReached: 0 };
+  const out = { contexts: 0, ok: 0, partial: 0, failed: 0, busy: 0, skipped: 0, added: 0, removed: 0, suppressed: 0, notReached: 0 };
   for (const c of contexts) {
     const left = deadline - Date.now();
     if (left < 5_000) {
@@ -439,6 +457,7 @@ export async function scheduledRosterSync(opts: { trigger: 'nightly' | 'cron'; b
     out[r.status === 'ok' ? 'ok' : r.status === 'partial' ? 'partial' : r.status === 'failed' ? 'failed' : r.status === 'busy' ? 'busy' : 'skipped']++;
     out.added += r.added;
     out.removed += r.removed;
+    out.suppressed += r.suppressed;
   }
   return out;
 }
