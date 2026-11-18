@@ -1,7 +1,7 @@
 import { test, expect, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { enaraApi, enaraUiSession, login, maintenance } from '../lib/enara';
 import { ENARA } from '../lib/env';
-import { saveState, shot } from '../lib/state';
+import { readState, saveState, shot } from '../lib/state';
 
 // Scenario 11 (Parents P2, docs/parents/P2_NOTES.md). Switches on as on lms-test:
 // PARENT_CODE_TOOLS_ENABLED, PARENT_EMAIL_SIGNIN_ENABLED (plus the P1 ones).
@@ -18,11 +18,11 @@ import { saveState, shot } from '../lib/state';
 //   4. Device 3: a code for a School B child makes a second account; adding the
 //      same email offers the merge; after it, every device shows both children.
 const CHILD_B = 'LT-S-B03';
-const SHEET_CLASS = 'LT-C-ENG-7B';
 const CODE_IN_URL = /ENR[-%20+]*[A-Z0-9]{4}[-%20+]*[A-Z0-9]{4}/i;
 const EMAIL = `parent.p2.${Date.now()}@enara-e2e.app`; // fake; captured, never sent
 const visited: string[] = [];
 let verifySentAt = 0;
+let SHEET_CLASS = '';
 const st: { code?: string; childA?: string; d1?: { context: BrowserContext; page: Page }; d2?: { context: BrowserContext; page: Page } } = {};
 
 async function device(browser: Browser, name: string) {
@@ -62,6 +62,12 @@ test.describe.serial('11 · Parents P2: class code sheet, add your email, second
     await tools.getByTestId('pc-ttl').fill('10');
     await tools.getByTestId('pc-save').click();
     await expect(tools.getByTestId('pc-note')).toHaveText('Saved.');
+    // The Moodle-made class (scenario 5: its students came from the roster sync), listed under its ENARA class name;
+    // any class with students otherwise.
+    const listed = (await enaraApi.get('/api/parents-admin/classes', await login('admin.a'))).classes as { id: string; name: string; students: number }[];
+    const moodleClass = readState().courseContext?.enaraClassId;
+    SHEET_CLASS = (listed.find((c) => c.id === moodleClass && c.students > 0) ?? listed.find((c) => c.students > 0))?.id ?? '';
+    expect(SHEET_CLASS, `a class with students (${JSON.stringify(listed)})`).not.toBe('');
     const row = tools.getByTestId(`pc-class-${SHEET_CLASS}`);
     await row.getByRole('button', { name: 'Print parent codes' }).click();
     const sheet = page.getByTestId('pc-sheet');
