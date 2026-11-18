@@ -72,43 +72,45 @@ jobs:
 
       - name: Pull images
         working-directory: e2e
-        run: docker compose pull --quiet postgres mongo caddy moodle
+        run: |
+          docker pull --quiet mcr.microsoft.com/playwright:v1.65.1-noble &
+          docker compose pull --quiet postgres mongo caddy moodle
+          wait
 
       - name: Start the stack, install and provision Moodle
         working-directory: e2e
         run: ./scripts/up.sh
 
-      - name: Playwright (npm)
+      - name: Playwright (npm; the browsers come with the image below)
         working-directory: e2e
         timeout-minutes: 5
         run: npm ci --no-audit --no-fund
 
-      - name: Playwright browsers (cache)
-        id: pw-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: pw-${{ runner.os }}-${{ hashFiles('e2e/package-lock.json') }}
-
-      - name: Playwright browsers (Chromium, WebKit)
-        if: steps.pw-cache.outputs.cache-hit != 'true'
-        working-directory: e2e
-        timeout-minutes: 10
-        run: npx playwright install chromium webkit
-
-      - name: Playwright system libraries
-        working-directory: e2e
-        timeout-minutes: 15
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: sudo -E env "PATH=$PATH" npx playwright install-deps chromium webkit
-
-      - name: Run the scenarios
+      # The browsers run from the official Playwright image (browsers and all
+      # their system libraries included): installing WebKit's libraries with
+      # apt took 1 to 15+ minutes on the runners (runs 2 and 10 timed out).
+      # The tests drive Moodle's CLI with "docker compose exec", so the
+      # container gets a static docker CLI and the runner's compose plugin.
+      - name: Run the scenarios (Playwright image)
         id: tests
         working-directory: e2e
         timeout-minutes: 30
-        run: npx playwright test
         continue-on-error: true
+        env:
+          PW_IMAGE: mcr.microsoft.com/playwright:v1.65.1-noble
+        run: |
+          bin="$RUNNER_TEMP/e2e-bin"; mkdir -p "$bin"
+          curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-28.5.1.tgz | tar -xz -C "$bin" --strip-components=1 docker/docker
+          compose=$(docker info --format '{{range .ClientInfo.Plugins}}{{if eq .Name "compose"}}{{.Path}}{{end}}{{end}}')
+          src=$(realpath "$MOODLE_SRC")
+          docker run --rm --network host --ipc=host \
+            --add-host "moodle.school.test:127.0.0.1" --add-host "enara.tool.test:127.0.0.1" \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$bin/docker:/usr/local/bin/docker:ro" \
+            -v "$compose:/usr/local/lib/docker/cli-plugins/docker-compose:ro" \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v "$src:$src:ro" \
+            -w "$GITHUB_WORKSPACE/e2e" -e MOODLE_BRANCH -e MOODLE_SRC="$src" -e CI=true \
+            "$PW_IMAGE" npx playwright test
 
       - name: Summary
         if: always()
