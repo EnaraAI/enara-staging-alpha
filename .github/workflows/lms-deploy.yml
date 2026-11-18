@@ -1,0 +1,295 @@
+# Continuous delivery to lms-test.enara.app (docs/lms/CONTINUOUS_DELIVERY.md).
+#
+# Called by the LMS E2E workflow (lms-e2e.yml) after the full E2E suite passed
+# on a pull request whose base is lms-test-live. In order:
+#   guard   the Vercel project is exactly enara-lms-test and test.enara.app is
+#           not one of its domains (else stop: nothing merged, nothing deployed)
+#   merge   the PR into lms-test-live (merge commit, exactly the tested head)
+#   deploy  lms-test-live -> Vercel production of enara-lms-test: flags from
+#           deploy/lms-test.flags.json, `vercel deploy --prod`, wait for /ready,
+#           migrations, health check against the built-in mock LMS; on any
+#           failure after the deploy started: roll back to the previous
+#           production deployment (Vercel promote) and wait until it serves
+#   report  one line in the step summary and as a PR comment
+#
+# test.enara.app is FROZEN: this workflow can only target the enara-lms-test
+# project (ids are constants in deploy/lms-test/lib.mjs) and only calls
+# https://lms-test.enara.app. Secrets are never echoed.
+
+name: LMS deploy to lms-test
+
+on:
+  workflow_call:
+    inputs:
+      pr_number:
+        description: Pull request to merge into lms-test-live and deploy
+        required: true
+        type: number
+      pr_title:
+        description: The pull request title (used in the result line)
+        required: true
+        type: string
+    secrets:
+      VERCEL_TOKEN:
+        required: true
+      LMSTEST_MAINTENANCE_TOKEN:
+        required: true
+    outputs:
+      result:
+        description: The one-line result
+        value: ${{ jobs.report.outputs.line }}
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+  VERCEL_CLI: vercel@65.9.0
+  LIVE_BRANCH: lms-test-live
+
+jobs:
+  guard:
+    name: Guard (enara-lms-test only, test.enara.app frozen)
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      reason: ${{ steps.guard.outputs.reason }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.LIVE_BRANCH }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Check the Vercel project
+        id: guard
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: node deploy/lms-test/cli.mjs guard
+
+  merge:
+    name: Merge into lms-test-live
+    needs: guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      merge_sha: ${{ steps.merge.outputs.merge_sha }}
+      reason: ${{ steps.merge.outputs.reason }}
+    steps:
+      - name: Merge the tested head (merge commit)
+        id: merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ inputs.pr_number }}
+          TITLE: ${{ inputs.pr_title }}
+          TESTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          fail() { echo "reason=$1" >> "$GITHUB_OUTPUT"; echo "::error::$1"; exit 1; }
+          [[ "$PR" =~ ^[0-9]+$ ]] || fail "bad PR number"
+          pr=""
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            pr=$(gh api "repos/$REPO/pulls/$PR") || fail "could not read PR #$PR"
+            [ "$(jq -r .mergeable <<<"$pr")" != "null" ] && break
+            sleep 6
+          done
+          base=$(jq -r .base.ref <<<"$pr")
+          head=$(jq -r .head.sha <<<"$pr")
+          [ "$base" = "$LIVE_BRANCH" ] || fail "PR base is $base, not $LIVE_BRANCH"
+          if [ -n "$TESTED_SHA" ] && [ "$head" != "$TESTED_SHA" ]; then fail "the PR changed after the E2E run (head is not the tested commit)"; fi
+          if [ "$(jq -r .merged <<<"$pr")" = "true" ]; then
+            echo "PR #$PR is already merged (re-run): deploying its merge commit"
+            echo "merge_sha=$(jq -r .merge_commit_sha <<<"$pr")" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          [ "$(jq -r .state <<<"$pr")" = "open" ] || fail "PR is closed"
+          [ "$(jq -r .mergeable <<<"$pr")" = "true" ] || fail "PR is not mergeable ($(jq -r .mergeable_state <<<"$pr"))"
+          res=$(gh api -X PUT "repos/$REPO/pulls/$PR/merge" -f merge_method=merge -f sha="$head" -f commit_title="Merge PR #$PR into $LIVE_BRANCH: $TITLE") \
+            || fail "GitHub refused the merge (branch protection, conflict or a newer head)"
+          sha=$(jq -r .sha <<<"$res")
+          [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || fail "merge gave no commit"
+          echo "merge_sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Merged PR #$PR into $LIVE_BRANCH as $sha"
+
+  deploy:
+    name: Deploy, migrate, health check (rollback on failure)
+    needs: [guard, merge]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # One deploy to lms-test at a time; a newer one waits.
+    concurrency:
+      group: lms-test-deploy
+      cancel-in-progress: false
+    env:
+      # Constants (not secret): the enara-lms-test project only.
+      VERCEL_ORG_ID: team_xbSucLT1roYt4njeB4tRPfKQ
+      VERCEL_PROJECT_ID: prj_tuRpwEJLz1dEQOj6RSEk2xUpqtIn
+      VERCEL_TELEMETRY_DISABLED: '1'
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+    outputs:
+      outcome: ${{ steps.result.outputs.outcome }}
+      reason: ${{ steps.result.outputs.reason }}
+      deploy_sha: ${{ steps.sha.outputs.deploy_sha }}
+      flags_changed: ${{ steps.flags.outputs.flags_changed }}
+      migrations: ${{ steps.migrate.outputs.migrations_applied }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.LIVE_BRANCH }}
+          fetch-depth: 200
+          persist-credentials: false
+      - name: The checkout contains the merge
+        id: sha
+        env:
+          MERGE_SHA: ${{ needs.merge.outputs.merge_sha }}
+        run: |
+          set -euo pipefail
+          # lms-test-live may have moved on (another PR merged meanwhile): deploy its head, which must contain this merge.
+          if ! git merge-base --is-ancestor "$MERGE_SHA" HEAD; then
+            echo "reason=lms-test-live does not contain the merge commit" >> "$GITHUB_OUTPUT"; exit 1
+          fi
+          echo "deploy_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Guard again
+        id: guard
+        run: node deploy/lms-test/cli.mjs guard
+      - name: Record the current production deployment (for rollback)
+        id: prev
+        run: node deploy/lms-test/cli.mjs current-production
+      - name: Link the checkout to enara-lms-test
+        run: |
+          mkdir -p .vercel
+          printf '{"projectId":"%s","orgId":"%s"}\n' "$VERCEL_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
+      - name: Set feature flags from deploy/lms-test.flags.json (Production, plain, never removes, never Sensitive)
+        id: flags
+        run: node deploy/lms-test/cli.mjs apply-flags
+      - name: vercel deploy --prod
+        id: vdeploy
+        run: |
+          set -uo pipefail
+          echo "started=true" >> "$GITHUB_OUTPUT"
+          if ! url=$(npx --yes "$VERCEL_CLI" deploy --prod --yes --token "$VERCEL_TOKEN" 2>vercel-deploy.log); then
+            tail -n 40 vercel-deploy.log || true
+            echo "reason=vercel deploy failed (build or upload)" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+          echo "url=$(tail -n 1 <<<"$url")" >> "$GITHUB_OUTPUT"
+      - name: Check the new deployment (this project, production; promote if needed)
+        id: dep
+        env:
+          DEPLOY_URL: ${{ steps.vdeploy.outputs.url }}
+        run: node deploy/lms-test/cli.mjs deployment "$DEPLOY_URL"
+      - name: Wait until lms-test serves it and /ready says mongo ok
+        id: serving
+        env:
+          NEW_URL: ${{ steps.dep.outputs.new_url }}
+        run: node deploy/lms-test/cli.mjs wait-serving "$NEW_URL" --timeout 300
+      - name: Site up, tool keys published
+        id: site
+        run: node deploy/lms-test/cli.mjs check-site
+      - name: Migrations on the lms-test database
+        id: migrate
+        run: node deploy/lms-test/cli.mjs maintenance migrate
+      - name: Health check setup (mock LMS for LT-SCHOOL-A)
+        id: setup
+        run: node deploy/lms-test/cli.mjs maintenance setup
+      - name: Health check run (LTI login, launch, exchange, grade to the mock)
+        id: health
+        run: node deploy/lms-test/cli.mjs maintenance run
+      - name: Passed
+        id: passed
+        run: echo "ok=true" >> "$GITHUB_OUTPUT"
+
+      - name: Roll back to the previous production deployment
+        id: rollback
+        if: (failure() || cancelled()) && steps.vdeploy.outputs.started == 'true' && steps.prev.outputs.prev_id != ''
+        env:
+          PREV_ID: ${{ steps.prev.outputs.prev_id }}
+          PREV_URL: ${{ steps.prev.outputs.prev_url }}
+        run: |
+          set -uo pipefail
+          if node deploy/lms-test/cli.mjs rollback "$PREV_ID" "$PREV_URL"; then exit 0; fi
+          echo "::warning::rollback through the Vercel API failed; trying vercel rollback"
+          npx --yes "$VERCEL_CLI" rollback "$PREV_URL" --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" \
+            && node deploy/lms-test/cli.mjs check-site
+
+      - name: Result
+        id: result
+        if: always()
+        env:
+          PASSED: ${{ steps.passed.outputs.ok }}
+          STARTED: ${{ steps.vdeploy.outputs.started }}
+          ROLLBACK: ${{ steps.rollback.outcome }}
+          REASON: ${{ steps.sha.outputs.reason || steps.guard.outputs.reason || steps.prev.outputs.reason || steps.flags.outputs.reason || steps.vdeploy.outputs.reason || steps.dep.outputs.reason || steps.serving.outputs.reason || steps.site.outputs.reason || steps.migrate.outputs.reason || steps.setup.outputs.reason || steps.health.outputs.reason }}
+        run: |
+          if [ "$PASSED" = "true" ]; then outcome=passed
+          elif [ "$STARTED" != "true" ]; then outcome=not_deployed
+          elif [ "$ROLLBACK" = "success" ]; then outcome=rolled_back
+          else outcome=rollback_failed
+          fi
+          [ -n "$REASON" ] || REASON="deploy job stopped (cancelled or timed out)"
+          echo "outcome=$outcome" >> "$GITHUB_OUTPUT"
+          echo "reason=$(tr -d '\r\n' <<<"$REASON" | cut -c1-200)" >> "$GITHUB_OUTPUT"
+          echo "outcome: $outcome"
+
+  report:
+    name: Report
+    needs: [guard, merge, deploy]
+    if: always() && needs.guard.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    outputs:
+      line: ${{ steps.report.outputs.line }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.LIVE_BRANCH }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: One-line result (step summary)
+        id: report
+        env:
+          PR_TITLE: ${{ inputs.pr_title }}
+          GUARD: ${{ needs.guard.result }}
+          GUARD_REASON: ${{ needs.guard.outputs.reason }}
+          MERGE: ${{ needs.merge.result }}
+          MERGE_REASON: ${{ needs.merge.outputs.reason }}
+          DEPLOY: ${{ needs.deploy.result }}
+          DEPLOY_OUTCOME: ${{ needs.deploy.outputs.outcome }}
+          DEPLOY_REASON: ${{ needs.deploy.outputs.reason }}
+          DEPLOY_SHA: ${{ needs.deploy.outputs.deploy_sha }}
+          FLAGS_CHANGED: ${{ needs.deploy.outputs.flags_changed }}
+          MIGRATIONS: ${{ needs.deploy.outputs.migrations }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMENT_FILE: lms-deploy-comment.md
+        run: |
+          if [ -n "$DEPLOY_OUTCOME" ]; then export OUTCOME="$DEPLOY_OUTCOME" REASON="$DEPLOY_REASON"
+          elif [ "$GUARD" != "success" ]; then export OUTCOME=not_deployed REASON="guard: ${GUARD_REASON:-$GUARD}"
+          elif [ "$MERGE" != "success" ]; then export OUTCOME=not_deployed REASON="merge: ${MERGE_REASON:-$MERGE}"
+          else export OUTCOME=not_deployed REASON="deploy job $DEPLOY before the deploy step; check the run"
+          fi
+          node deploy/lms-test/cli.mjs report
+          echo "outcome=$OUTCOME" >> "$GITHUB_OUTPUT"
+      - name: Comment on the PR
+        if: always() && hashFiles('lms-deploy-comment.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ inputs.pr_number }}
+        run: gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file lms-deploy-comment.md
+      - name: Fail the run unless it passed
+        if: steps.report.outputs.outcome != 'passed'
+        run: exit 1
