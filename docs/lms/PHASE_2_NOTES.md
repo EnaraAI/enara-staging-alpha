@@ -124,6 +124,8 @@ These results come from the owner's tests, with the ENARA side confirmed from th
 
 # Phase 2b: page links, the course link and due dates
 
+**Status: DONE** (owner, 18 Nov 2026). Deployed to lms-test. The owner skipped the "Delegate to teacher" grade-column test. The recommended tool setting stays **Accept grades from the tool = Always**, and the teacher guide keeps **Grade type: None** for links without a grade.
+
 Branch `claude/lms-phase2b`. Same switches as Phase 2 (`LMS_LTI_ENABLED`, `LMS_DEEP_LINKING_ENABLED`); nothing new to switch on. lms-test only.
 
 ## 1. A generic launch target: `enara_target` (owner decision D12)

@@ -2,6 +2,10 @@
 
 This guide is for teachers and school admins who add ENARA activities to a Moodle course. The menu names are for Moodle 4.x.
 
+## Recommended Moodle tool setting (school admin)
+
+In **Site administration › Plugins › Activity modules › External tool › Manage tools › ENARA › edit › Privacy**, keep **Accept grades from the tool = Always** (owner decision, 18 Nov 2026). Moodle then creates a grade column for every ENARA activity. For links that have no grade, set the activity's **Grade › Type** to **None**; see "Activities that are really ungraded" below.
+
 ## Adding ENARA to your course
 
 In your Moodle course, turn editing on, add an **ENARA** activity (External tool), and click **Select content**. The ENARA picker opens in your language (English or Arabic). Pick one or more items and click **Add**. Moodle creates one activity per item.
