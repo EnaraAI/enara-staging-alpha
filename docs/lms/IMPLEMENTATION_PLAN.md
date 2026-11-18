@@ -1,5 +1,23 @@
 # ENARA LMS Integration: Implementation Plan
 
+> ## STANDING RULE: lms-test only (owner, 18 Nov 2026)
+>
+> Until Mohamed explicitly says otherwise, **ALL work happens on https://lms-test.enara.app only**.
+>
+> **test.enara.app and its database stay frozen.** That means:
+> - no deploy;
+> - no migration;
+> - no flag or env change;
+> - no data copy;
+> - no backup or dry run;
+> - **no reads**.
+>
+> Plans and timelines never include test.enara.app steps. Any such step is marked **"frozen until Mohamed reopens"**.
+>
+> Where this document says `https://test.enara.app` (for example `LMS_TOOL_BASE_URL` below), read `https://lms-test.enara.app` for all current work. The production values are frozen until Mohamed reopens.
+>
+> Every session working on this repository must follow this rule.
+
 Status: **approved with changes (2026-11-16)**. This version includes Mohamed's answers to the 15 questions, plus his note that **not every student is a language student**. Spec: `ENARA_LMS_Integration_Spec.md` v1.2.
 Release 1 ships and is tested on **Moodle + Google Classroom (Mode A) only**. The design must let any other LMS be added without changing core code or the data model.
 
@@ -212,3 +230,10 @@ Mohamed adds these in Vercel himself. **Secrets are never pasted in chat.**
 - Google Workspace for Education test domain (Mohamed is requesting one) is needed for Phase 5.
 - Google OAuth app verification for Classroom scopes. Start it early, because it can take weeks.
 - A Vercel Pro review before the first real school.
+
+
+---
+
+## Backlog (not scheduled)
+
+- **Move a student to another school** (owner, 18 Nov 2026). There is no such action today. When it is built, it must end the student's parent links with reason `left_school` (Priority 0 item 2), move or close their class enrollments and LMS links, and keep seats correct in both schools. Today, "left school" is only detected when a parent reads the data.

@@ -171,14 +171,25 @@ const escapeRegex = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
  * roster sync or a launch never re-creates the person. If the list cannot be
  * written (LMS_KEK not set), the deletion stops here with nothing deleted.
  */
-async function suppressLmsIdentities(userIds: string[], actor: Actor): Promise<number> {
+async function suppressLmsIdentities(userIds: string[], actor: Actor, student?: { id: string; institutionId?: string }): Promise<number> {
   if (!userIds.length) return 0;
   const lmsUsers = await LmsUser.find({ enaraUserId: { $in: userIds } }).select('institutionId platformId externalUserId').lean();
   try {
     return (await suppressIdentities(lmsUsers.map((u) => ({ institutionId: u.institutionId, platformId: u.platformId, externalUserId: u.externalUserId })), actor?.id)).length;
   } catch (error) {
     if (error instanceof SuppressionKeyError) {
-      throw new AppError('This student has LMS accounts and the LMS key (LMS_KEK) is not set, so ENARA cannot record that they must never be re-created from the LMS. Nothing was deleted. Ask ENARA support.', 503, 'LMS_SUPPRESSION_UNAVAILABLE');
+      // Owner decision (P0 follow-up 1): the deletion stops, but a PDPL request
+      // can't wait, so ENARA ops are alerted at once (critical alert + audit,
+      // IDs only) and the admin is told the request is recorded. Runbook:
+      // docs/lms/OPS_RUNBOOK.md, "Permanent deletion stopped: LMS_KEK missing".
+      const { recordAlert, recordAudit } = await import('./auditTrail');
+      await recordAlert('pdpl_erasure_blocked_lms_kek', 'critical', { scope: 'student_erasure', studentId: student?.id, lmsIdentities: lmsUsers.length }, student?.institutionId);
+      await recordAudit('student_erasure_blocked', actor, { institutionId: student?.institutionId, type: 'student', id: student?.id }, { reason: 'lms_kek_missing', lmsIdentities: lmsUsers.length });
+      throw new AppError(
+        'This student could not be permanently deleted yet: ENARA must first record that they are never re-created from your LMS, and that safeguard is unavailable right now. Nothing was deleted. Your request is recorded and ENARA operations have been alerted to complete it urgently. Reference: LMS_SUPPRESSION_UNAVAILABLE.',
+        503,
+        'LMS_SUPPRESSION_UNAVAILABLE',
+      );
     }
     throw error;
   }
@@ -192,7 +203,7 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
   const users = await User.find(await studentUserFilter(s)).select('_id email role').lean();
   const studentUsers = users.filter((u) => u.role === 'student');
   const userIds = studentUsers.map((u) => String(u._id));
-  const lmsSuppressed = await suppressLmsIdentities(userIds, actor);
+  const lmsSuppressed = await suppressLmsIdentities(userIds, actor, { id: sid, institutionId: (s as { institutionId?: string }).institutionId });
   if (lmsSuppressed) anonymised.lms_identities_suppressed = lmsSuppressed;
   // Multi-class S4: the groups whose live count must drop ([] while off; read before the rows go).
   const groupsToRecount = await groupsOfStudent(sid);

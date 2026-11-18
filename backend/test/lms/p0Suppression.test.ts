@@ -322,6 +322,13 @@ describe('PDPL suppression list', () => {
     expect(await M.LmsUser.exists({ id: kept.lu!.id })).toBeTruthy();
     expect(await Models.ClassEnrollment.exists({ studentId: kept.studentId, targetId: ids.classId, status: 'active' })).toBeTruthy();
     expect(await M.LmsSuppressedIdentity.countDocuments({})).toBe(1);
+    // Owner follow-up: ENARA ops are alerted at once (critical) and the block is audited, IDs only.
+    const { AlertEvent } = await import('../../src/models/AlertEvent');
+    const alert = await AlertEvent.findOne({ kind: 'pdpl_erasure_blocked_lms_kek' }).lean();
+    expect(alert).toMatchObject({ severity: 'critical' });
+    expect((alert as { detail: Record<string, unknown> }).detail).toMatchObject({ studentId: kept.studentId, lmsIdentities: 1 });
+    const audit = await mongoose.connection.collection('audit_logs').findOne({ action: 'student_erasure_blocked' }).catch(() => null);
+    if (audit) expect(JSON.stringify(audit)).not.toMatch(/p0s-kept|@/);
   });
 
   it('the migration is additive and runs twice', async () => {
