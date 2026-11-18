@@ -1,0 +1,51 @@
+# Calls lms-test's daily job once a day (GET /api/cron/daily: LMS email digests,
+# the nightly roster sync, the grade drain, reminders; docs/lms/LMS_EMAILS.md).
+# lms-test has no Vercel cron (vercel.json is shared with the other staging
+# project and must stay cron-free, test p6VercelStaging). lms-test.enara.app only;
+# test.enara.app is frozen and never called.
+#
+# Needs the repository secret LMSTEST_CRON_SECRET = the CRON_SECRET of the Vercel
+# project enara-lms-test (Production). Without it the job says so and stops
+# (green), so nothing breaks before the secret is added.
+# GitHub runs `schedule` only from the default branch (main): until this file is
+# on main, run it by hand (Actions > "lms-test daily job" > Run workflow).
+name: lms-test daily job
+
+on:
+  schedule:
+    - cron: '23 4 * * *' # 04:23 UTC = 06:23 Cairo (07:23 in summer time)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lms-test-daily
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: GET https://lms-test.enara.app/api/cron/daily
+        env:
+          CRON_SECRET: ${{ secrets.LMSTEST_CRON_SECRET }}
+        run: |
+          set -uo pipefail
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "::warning::LMSTEST_CRON_SECRET is not set; nothing called"
+            exit 0
+          fi
+          code=$(curl -sS -o daily.json -w '%{http_code}' --max-time 120 \
+            -H "Authorization: Bearer ${CRON_SECRET}" https://lms-test.enara.app/api/cron/daily) || { echo "::error::request failed"; exit 1; }
+          echo "HTTP $code"
+          # The answer holds job counts only (no secrets, no personal data).
+          head -c 4000 daily.json; echo
+          echo "lms-test daily job: HTTP $code" >> "$GITHUB_STEP_SUMMARY"
+          case "$code" in
+            200) ;;
+            207) echo "::warning::some daily jobs failed (see the answer above)" ;;
+            *) echo "::error::daily job answered HTTP $code"; exit 1 ;;
+          esac

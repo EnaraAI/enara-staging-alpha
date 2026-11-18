@@ -24,7 +24,11 @@ export interface ILmsPlatform {
    */
   publicJwks?: string;
   tokenAudience?: string;
-  status: 'pending' | 'active' | 'disabled';
+  /** 'rejected': an ENARA admin refused a pending connection (fixed reason, owner decision D6); like 'disabled' for launches. */
+  status: 'pending' | 'active' | 'disabled' | 'rejected';
+  rejectedReason?: string;
+  rejectedBy?: string;
+  rejectedAt?: Date;
   registeredVia: 'dynamic' | 'manual' | 'google_oauth';
   scopes: string[];
   /** Trusted platforms may auto-create unknown deployments as `pending` (Spec §4). */
@@ -59,7 +63,10 @@ const platformSchema = new Schema<ILmsPlatform>(
     keysetUrl: String,
     publicJwks: { type: String, maxlength: 20_000 },
     tokenAudience: String,
-    status: { type: String, enum: ['pending', 'active', 'disabled'], default: 'pending' },
+    status: { type: String, enum: ['pending', 'active', 'disabled', 'rejected'], default: 'pending' },
+    rejectedReason: { type: String, maxlength: 40 },
+    rejectedBy: String,
+    rejectedAt: Date,
     registeredVia: { type: String, enum: ['dynamic', 'manual', 'google_oauth'], required: true },
     scopes: { type: [String], default: [] },
     autoCreateDeployments: { type: Boolean, default: false },

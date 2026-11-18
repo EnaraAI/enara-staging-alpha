@@ -1,0 +1,64 @@
+{
+  "id": null,
+  "name": "Enara – LMS: seats 80% / 90% used (AR)",
+  "subject": "استخدمت {{{SCHOOL_NAME}}} ‏{{{PERCENT}}}% من مقاعد إنارة",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "منى"
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "مدرسة وادي النيل الدولية"
+    },
+    {
+      "key": "PERCENT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "80"
+    },
+    {
+      "key": "SEATS_USED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "400"
+    },
+    {
+      "key": "SEAT_LIMIT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "500"
+    },
+    {
+      "key": "SEATS_LEFT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "100"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=seats"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-seats-warning",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "10a",
+  "group": "lms",
+  "recipient": "School admins",
+  "trigger": "New code needed: threshold check after checkSeatForNewStudent updates seatsUsed (PERCENT = 80 or 90)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per threshold per seat limit; reset when the limit changes or usage drops under 75%"
+}

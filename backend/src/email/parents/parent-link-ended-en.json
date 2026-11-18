@@ -1,0 +1,40 @@
+{
+  "id": null,
+  "name": "Enara – Parents: link ended (EN)",
+  "subject": "Your access to {{{CHILD_NAME}}}'s Enara progress has ended",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "there",
+      "sample": "Sara"
+    },
+    {
+      "key": "CHILD_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Omar"
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Nile Valley International School"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "parent-link-ended",
+  "language": "en",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "P3",
+  "group": "parents",
+  "recipient": "Parent",
+  "trigger": "The school unlinks the parent, or the student is archived / leaves (link kept as \"ended\", D8)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per link (on by default, D11)"
+}

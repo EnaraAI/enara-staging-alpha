@@ -1,0 +1,58 @@
+{
+  "id": null,
+  "name": "Enara – LMS: connection not approved (AR)",
+  "subject": "لم تتم الموافقة على طلب ربط Moodle",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "منى"
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Moodle (moodle.nilevalley.example)"
+    },
+    {
+      "key": "REASON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "معرّف المنصة أو معرّف العميل لا يطابق موقع Moodle."
+    },
+    {
+      "key": "FIX",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "انسخهما مرة أخرى من تفاصيل إعداد الأداة في Moodle."
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4"
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "lmsp_7f3a9c21e4"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-connection-rejected",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "4c",
+  "group": "lms",
+  "recipient": "School admins",
+  "trigger": "New code needed: ENARA admin 'Reject' with a reason from a fixed list; new status 'rejected'",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per rejection"
+}

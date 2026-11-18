@@ -1,0 +1,58 @@
+{
+  "id": null,
+  "name": "Enara – Parents: invitation with link code (AR)",
+  "subject": "{{{SCHOOL_NAME}}} تدعوك لمتابعة تقدّم {{{CHILD_NAME}}} في اللغة الإنجليزية على إنارة",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "سارة"
+    },
+    {
+      "key": "CHILD_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "عمر"
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "مدرسة وادي النيل الدولية"
+    },
+    {
+      "key": "LINK_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "ENR-7K4M-Q2XD"
+    },
+    {
+      "key": "EXPIRES_IN",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "7 أيام"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/parents/link"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "parent-invite",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "P1",
+  "group": "parents",
+  "recipient": "Parent (email given by the school: single code or CSV invite)",
+  "trigger": "School sends a parent link code (single, or CSV invitations P5)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per invite / code"
+}

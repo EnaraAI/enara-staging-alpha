@@ -55,6 +55,8 @@ import { lmsAdminRouter, lmsConfigProblemRouter } from './integrations/lms/admin
 import { pickerRouter } from './integrations/lms/admin/pickerRoutes';
 import { lmsFlags, logLmsConfigOnce } from './integrations/lms/core/flags';
 import { piggybackDrain } from './integrations/lms/core/drain';
+// LMS emails: listens to the LMS audit log (inert unless LMS emails are on).
+import './integrations/lms/core/lmsEmailEvents';
 import maintenanceRoutes from './maintenance/routes';
 import { getPostgresPool } from './config/postgres';
 import mongoose from 'mongoose';

@@ -49,6 +49,7 @@ import { LmsPicker, onLmsPickerPath } from './pages/LmsPicker';
 import { LmsConnections } from './pages/LmsConnections';
 import { LmsOnboarding } from './pages/LmsOnboarding';
 import { LmsSchoolStatus } from './pages/LmsSchoolStatus';
+import { LmsEmailOptIn } from './components/LmsEmailOptIn';
 import { isLmsPreview, isLmsSession, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
@@ -96,7 +97,10 @@ const App: React.FC = () => {
     const assessmentId = params.get('assessment');
     // LMS step 2: the invite email's "Start connecting" opens the school connection status page.
     const lmsStatusLink = params.get('page') === 'lms-status';
-    if (lmsStatusLink) window.history.replaceState({}, document.title, window.location.pathname);
+    // LMS emails: "View the connection" (?page=lms, school admins) and a teacher's class (?page=class-assignments&class=...).
+    const lmsPageLink = params.get('page') === 'lms';
+    const classLink = params.get('page') === 'class-assignments' ? params.get('class') : null;
+    if (lmsStatusLink || lmsPageLink || classLink) window.history.replaceState({}, document.title, window.location.pathname);
     
     // Clear the URL parameters so they don't persist on refresh or navigation
     if (courseId || assessmentId) {
@@ -112,7 +116,13 @@ const App: React.FC = () => {
     const role = isLmsPreview() && (session?.role === 'teacher' || session?.role === 'admin') ? 'student' : restoreUiRole(session?.role, savedRole);
     return {
       role,
-      page: role === 'student' && courseId ? 'courses' : role === 'admin' ? (lmsStatusLink && session?.role === 'admin' ? 'lms-status' : staffLandingPage(session?.role)) : 'dashboard',
+      page: role === 'student' && courseId ? 'courses' : role === 'admin'
+        ? (lmsStatusLink && session?.role === 'admin' ? 'lms-status'
+          : lmsPageLink && session?.role === 'admin' ? 'lms'
+          : classLink && (session?.role === 'teacher' || session?.role === 'admin') ? 'class-assignments'
+          : staffLandingPage(session?.role))
+        : 'dashboard',
+      ...(classLink && role === 'admin' && (session?.role === 'teacher' || session?.role === 'admin') ? { lmsTarget: { classId: classLink } } : {}),
       activeAssessment: null,
       selectedStudent: null,
       sharedCourseId: courseId,
@@ -592,6 +602,8 @@ const App: React.FC = () => {
           showLms={lmsEnabled}
         />
         <main className="flex-1 overflow-y-auto">
+          {/* LMS emails (D2): a teacher from the LMS is asked once whether Enara may email them. */}
+          {isLmsSession() && !isLmsPreview() && sessionUser()?.role === 'teacher' && <LmsEmailOptIn />}
           {state.page === 'dashboard' && <AdminDashboard onNavigate={navigate} students={students} setStudents={setStudents} onViewStudent={viewStudentProfile} onViewDeepAnalytics={viewStudentDeepAnalytics} />}
           {state.page === 'course-intelligence' && <CourseTeacherAnalytics onViewStudent={viewStudentDeepAnalytics} />}
           {state.page === 'institution-analytics' && <InstitutionAnalytics />}

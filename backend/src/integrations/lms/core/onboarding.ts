@@ -7,7 +7,6 @@ import { createInvitation, INVITATION_TTL_MS } from '../../../services/accountTo
 import { generateInstitutionId } from '../../../services/apiKeyService';
 import { ALL_FLAGS } from '../../../services/featureFlags';
 import { DEFAULT_SCHOOL_TIME_ZONE, isValidTimeZone } from '../../../services/institutionTimeZone';
-import { sendLmsTemplate } from '../../../email/sendLmsTemplate';
 import {
   LmsAuditLog,
   LmsConnectionCheck,
@@ -28,6 +27,7 @@ import { formatSchoolDateTime } from './dueDate';
 import { lmsSettings } from './flags';
 import { codeState, createRegistrationCode, linkMakesActive, registrationCodeView, registrationUrl, REGISTRATION_CODE_TTL_MS, revokeRegistrationCode } from './registrationCode';
 import { updateSeatSettings } from './seats';
+import { firstName, lmsEmailsActive, sendLmsEmail } from './lmsEmail';
 
 // Step 2: self-serve school onboarding (docs/lms/SCHOOL_GUIDE.md).
 //   - "New school" (ENARA admins): the school, its school-admin invitation
@@ -54,10 +54,9 @@ export function defaultEmailLanguage(country: string): Lang {
   return country === 'EG' ? 'ar' : 'en';
 }
 
-/** LMS emails are sent only when LMS_EMAILS_ENABLED, REMINDERS_ENABLED and RESEND_API_KEY are all set (and APP_URL for the link). */
+/** LMS emails are sent only when LMS_EMAILS_ENABLED, REMINDERS_ENABLED and RESEND_API_KEY (or the E2E capture) are all set, and APP_URL for the link (lmsEmail.ts). */
 export function lmsEmailsOn(): boolean {
-  const c = getConfig();
-  return c.lms.emailsEnabled === true && c.email.enabled && !!process.env.RESEND_API_KEY && !!(c as { appUrl?: string }).appUrl;
+  return lmsEmailsActive();
 }
 
 const appUrl = () => (((getConfig() as { appUrl?: string }).appUrl || '').trim().replace(/\/+$/, ''));
@@ -280,18 +279,28 @@ export async function sendInviteEmail(institutionId: string, actor: string) {
   if (!link || codeState(link) !== 'unused') throw new AppError('The current Moodle link was used, cancelled or expired. Make a new link first.', 409, 'LMS_ONBOARDING_NO_LINK');
   if (!school.contactEmail) throw new AppError('The school has no school admin email', 409, 'LMS_ONBOARDING_NO_RECIPIENT');
   const lang: Lang = school.emailLanguage === 'ar' ? 'ar' : 'en';
-  const to = getConfig().email.testRecipient || school.contactEmail;
-  const firstName = (school.contactName ?? '').trim().split(/\s+/)[0] ?? '';
-  const result = await sendLmsTemplate(lang === 'ar' ? 'lms-invite-connect-ar' : 'lms-invite-connect-en', to, {
-    NAME: firstName,
-    SCHOOL_NAME: school.name,
-    EXPIRES_ON: formatSchoolDateTime(link.expiresAt, tzOf(school), lang),
-    // D5: no bearer secret in the email; the school admin signs in to get the Moodle link.
-    ACTION_URL: `${appUrl()}/?page=lms-status`,
-    REFERENCE_CODE: onboarding.id,
+  // Through the one LMS email service (lmsEmail.ts): the test inbox redirect, the subject
+  // prefix and the daily cap apply. Every click is its own email (re-send by hand).
+  const result = await sendLmsEmail({
+    template: 'lms-invite-connect', key: `invite-connect:${onboarding.id}:${(onboarding.emailCount ?? 0) + 1}:${Date.now()}`, lang, institutionId,
+    recipients: [{ ref: `contact:${institutionId}`, email: school.contactEmail, name: school.contactName }],
+    vars: (r) => ({
+      NAME: firstName(r.name),
+      SCHOOL_NAME: school.name,
+      EXPIRES_ON: formatSchoolDateTime(link.expiresAt, tzOf(school), lang),
+      // D5: no bearer secret in the email; the school admin signs in to get the Moodle link.
+      ACTION_URL: `${appUrl()}/?page=lms-status`,
+      REFERENCE_CODE: onboarding.id,
+    }),
   });
-  if (!result.ok) {
-    await writeLmsAudit({ event: 'onboarding.invite_emailed', outcome: 'fail', institutionId, actor, code: result.code.slice(0, 80), refIds: { onboardingId: onboarding.id, lang } });
+  if (result.held) {
+    await writeLmsAudit({ event: 'onboarding.invite_emailed', outcome: 'warn', institutionId, actor, code: 'daily_cap', refIds: { onboardingId: onboarding.id, lang } });
+    throw new AppError("Today's test email limit is reached, so the email was not sent. Copy the invite text instead.", 429, 'LMS_EMAIL_HELD');
+  }
+  if (!result.sent && !result.captured) {
+    const code = result.codes[0] ?? (result.skipped ? 'no_recipient' : 'failed');
+    await writeLmsAudit({ event: 'onboarding.invite_emailed', outcome: 'fail', institutionId, actor, code: code.slice(0, 80), refIds: { onboardingId: onboarding.id, lang } });
+    if (code === 'no_recipient') throw new AppError('The school admin email cannot receive email (a reserved test address)', 409, 'LMS_ONBOARDING_NO_RECIPIENT');
     throw new AppError('The email could not be sent. Copy the invite text instead.', 502, 'LMS_EMAIL_FAILED');
   }
   await LmsOnboarding.updateOne({ id: onboarding.id }, { $set: { lastEmailAt: new Date() }, $inc: { emailCount: 1 } });

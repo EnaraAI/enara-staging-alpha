@@ -1,0 +1,63 @@
+{
+  "id": null,
+  "name": "Enara – LMS ops: billing flag (EN)",
+  "subject": "[LMS] Billing flag: {{{SCHOOL_NAME}}} is over its seat limit",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Nile Valley International School"
+    },
+    {
+      "key": "INSTITUTION_ID",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "inst_5b20e9"
+    },
+    {
+      "key": "SEATS_USED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "512"
+    },
+    {
+      "key": "SEAT_LIMIT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "500"
+    },
+    {
+      "key": "HARD_CAP",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "off"
+    },
+    {
+      "key": "FLAGGED_ON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "18 November 2026"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&institution=inst_5b20e9&tab=seats"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-ops-billing-flag",
+  "language": "en",
+  "languages": [
+    "en"
+  ],
+  "number": "E2",
+  "group": "lms",
+  "recipient": "ENARA ops (LMS_OPS_EMAILS)",
+  "trigger": "billingFlaggedAt first set (seats over the limit)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per flag (until cleared with clearBillingFlag)"
+}

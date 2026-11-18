@@ -33,5 +33,7 @@ const auditSchema = new Schema<ILmsAuditLog>(
 );
 auditSchema.index({ institutionId: 1, createdAt: -1 });
 auditSchema.index({ outcome: 1, createdAt: -1 });
+// LMS email digests read one event over the last day or week.
+auditSchema.index({ event: 1, createdAt: 1 });
 
 export const LmsAuditLog = (models.LmsAuditLog as Model<ILmsAuditLog>) || model<ILmsAuditLog>('LmsAuditLog', auditSchema);

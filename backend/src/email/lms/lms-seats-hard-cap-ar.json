@@ -1,0 +1,58 @@
+{
+  "id": null,
+  "name": "Enara – LMS: no seats left (hard cap) (AR)",
+  "subject": "لم يتبقَّ لدى {{{SCHOOL_NAME}}} مقاعد على إنارة",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "منى"
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "مدرسة وادي النيل الدولية"
+    },
+    {
+      "key": "SEATS_USED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "500"
+    },
+    {
+      "key": "SEAT_LIMIT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "500"
+    },
+    {
+      "key": "REFUSED_COUNT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "7"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=seats"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-seats-hard-cap",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "E1",
+  "group": "lms",
+  "recipient": "School admins (ops see it in the E5 digest)",
+  "trigger": "seats.hard_cap (student refused with seat_limit_reached)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per school per 24 h (new lastHardCapAlertAt claim)"
+}

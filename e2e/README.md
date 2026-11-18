@@ -1,8 +1,10 @@
 # ENARA LMS end-to-end suite (Moodle in Docker + Playwright)
 
 Fake data only. Never points at lms-test.enara.app or test.enara.app. Never
-sends a real email (owner rule): ENARA runs without RESEND_API_KEY and with
-LMS emails off, and `scripts/up.sh` stops if either is set. Needs no
+sends a real email (owner rule): ENARA runs without RESEND_API_KEY and LMS
+emails only in capture mode (rendered and recorded in lms_email_log, never
+sent); `scripts/up.sh` stops if a key is set or LMS emails are on without
+capture. Needs no
 repository secrets: `scripts/gen-env.sh` generates every secret and test
 password per run into `e2e/.env` (git-ignored).
 
@@ -14,7 +16,7 @@ password per run into `e2e/.env` (git-ignored).
 | `moodle` | `moodlehq/moodle-php-apache:8.3` + a Moodle checkout (`MOODLE_SRC`); trusts Caddy's CA; cURL security opened for the private network |
 | `postgres` | Moodle's database (17; also ENARA's `DATABASE_URL`, needed in production mode) |
 | `mongo` | ENARA's database on `enara-lms-test.local` (the maintenance routes accept only `enara-lms-test.*` hosts) |
-| `enara` | `Dockerfile.staging-single`, `NODE_ENV=production`, `ENARA_STAGING=true`, every LMS switch on, multi-class switches as on lms-test |
+| `enara` | `Dockerfile.staging-single`, `NODE_ENV=production`, `ENARA_STAGING=true`, every LMS switch on, multi-class switches as on lms-test. LMS emails on but **captured, never sent** (`LMS_EMAIL_CAPTURE`, no `RESEND_API_KEY`; `docs/lms/LMS_EMAILS.md`) |
 
 Scenarios (`tests/`, run in order, one worker): 1 registration + launches + preview,
 2 picker, 3 page links + due date, 4 grades, 5 roster + "Changed in LMS",

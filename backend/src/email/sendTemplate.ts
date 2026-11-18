@@ -24,7 +24,7 @@ export type SendTemplateResult =
 
 let client: Resend | null = null;
 
-/** The Resend client, or null without RESEND_API_KEY (also used by sendLmsTemplate). */
+/** The Resend client, or null without RESEND_API_KEY (also used by sendBundledTemplate). */
 export function getEmailClient(): Resend | null {
   return getClient();
 }
@@ -93,7 +93,8 @@ const LEFTOVER_PLACEHOLDER = /\{\{\{?\s*[A-Za-z0-9_]+\s*\}?\}\}/;
 // (P0 item 4, D15): the email is refused if any link in it carries one.
 // Code alphabet as in parents/codes.ts (no 0/O/1/I/L).
 const LINK_CODE_IN_TEXT = /(?<![A-Z0-9])ENR[\s\-_.+]*[A-HJKMNP-Z2-9]{4}[\s\-_.+]*[A-HJKMNP-Z2-9]{4}(?![A-Z0-9])/;
-function linkCarriesCode(html: string, code: unknown): boolean {
+/** True when any href/src/action in the HTML carries an ENR-XXXX-XXXX code or the given LINK_CODE (also used by sendBundledTemplate). */
+export function linkCarriesCode(html: string, code: unknown): boolean {
   const raw = typeof code === 'string' ? code.trim().toUpperCase() : '';
   const bare = raw.replace(/[^A-Z0-9]/g, '');
   for (const m of html.matchAll(/\b(?:href|src|action)\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)) {

@@ -1,0 +1,52 @@
+{
+  "id": null,
+  "name": "Enara – LMS: class list not fully updated (EN)",
+  "subject": "Class list not fully updated for {{{COURSE_NAME}}}",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "there",
+      "sample": "Mona"
+    },
+    {
+      "key": "COURSE_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Grade 8 English (Term 1)"
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Moodle (moodle.nilevalley.example)"
+    },
+    {
+      "key": "REASON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Moodle returned no active students. If the course really has none, you can ignore this."
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=roster"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-roster-removals-skipped",
+  "language": "en",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "E6",
+  "group": "lms",
+  "recipient": "School admins",
+  "trigger": "roster.removals_skipped warn, codes roster_truncated / empty_roster",
+  "delivery": "digest",
+  "frequency": "Daily batch; once per course+code per 7 days"
+}

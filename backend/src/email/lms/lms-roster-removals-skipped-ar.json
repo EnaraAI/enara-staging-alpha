@@ -1,0 +1,52 @@
+{
+  "id": null,
+  "name": "Enara – LMS: class list not fully updated (AR)",
+  "subject": "لم تُحدَّث قائمة الصف بالكامل في {{{COURSE_NAME}}}",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "منى"
+    },
+    {
+      "key": "COURSE_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "اللغة الإنجليزية - الصف الثامن"
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Moodle (moodle.nilevalley.example)"
+    },
+    {
+      "key": "REASON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "لم يُرجع Moodle أي طالب نشط. إذا كان المقرر خاليًا فعلًا، يمكنك تجاهل هذه الرسالة."
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=roster"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-roster-removals-skipped",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "E6",
+  "group": "lms",
+  "recipient": "School admins",
+  "trigger": "roster.removals_skipped warn, codes roster_truncated / empty_roster",
+  "delivery": "digest",
+  "frequency": "Daily batch; once per course+code per 7 days"
+}

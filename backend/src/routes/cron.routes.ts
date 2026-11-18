@@ -22,6 +22,8 @@ import { checkLmsResults } from '../integrations/lms/core/lmsResults';
 import { recheckFailedConnections } from '../integrations/lms/core/connectionCheck';
 import { lmsFlags } from '../integrations/lms/core/flags';
 import { gradeLedgerOn } from '../services/gradeLedger';
+import { runLmsEmailDaily } from '../integrations/lms/core/lmsEmailDaily';
+import { lmsEmailsActive } from '../integrations/lms/core/lmsEmail';
 
 // Meant to be called once a day by a scheduler that sends
 // "Authorization: Bearer <CRON_SECRET>". Staging deliberately has no Vercel
@@ -93,6 +95,14 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     if (lmsFlags().lti) {
       const budgetMs = Math.min(15_000, 55_000 - (Date.now() - startedAt));
       await run('lmsConnectionChecks', async () => (budgetMs < 5_000 ? { skipped: 'no_time' } : recheckFailedConnections({ budgetMs })));
+    }
+    // LMS emails (docs/lms/LMS_EMAILS.md): the daily digests (weekly ones on Cairo
+    // Mondays) and the ops daily digest. Inert unless LMS_EMAILS_ENABLED (and
+    // REMINDERS_ENABLED, RESEND_API_KEY, APP_URL) are set; at most 15 s, the ops
+    // digest always runs.
+    if (lmsEmailsActive()) {
+      const budgetMs = Math.max(3_000, Math.min(15_000, 57_000 - (Date.now() - startedAt)));
+      await run('lmsEmails', () => runLmsEmailDaily({ budgetMs }));
     }
     await run('reminders', () => sendReminders({}));
     if (new Date().getUTCDay() === 1) await run('weekly', () => sendWeeklySummaries());

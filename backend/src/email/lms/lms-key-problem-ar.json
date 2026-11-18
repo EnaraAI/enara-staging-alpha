@@ -1,0 +1,70 @@
+{
+  "id": null,
+  "name": "Enara – LMS: key problem (AR)",
+  "subject": "مطلوب إجراء: تعذّر التحقق المتبادل بين Moodle وإنارة",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "منى"
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Moodle (moodle.nilevalley.example)"
+    },
+    {
+      "key": "FIRST_SEEN",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "18 نوفمبر 2026، 07:15"
+    },
+    {
+      "key": "FAILED_COUNT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "14"
+    },
+    {
+      "key": "PROBLEM",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "لم يقبل Moodle مفتاح إنارة."
+    },
+    {
+      "key": "FIX",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "في إعدادات الأداة في Moodle اجعل نوع المفتاح العام <span dir=\"ltr\" style=\"unicode-bidi:embed;\">Keyset URL</span> واستخدم عنوان مفاتيح إنارة من صفحة ربط نظام التعلّم، ولا تلصق مفتاحًا ثابتًا."
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4"
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "lmsa_c3e8a1 · token_http_401"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-key-problem",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "7",
+  "group": "lms",
+  "recipient": "School admins (ops see it in the E5 digest)",
+  "trigger": "Audit fail codes jwks_unavailable, unknown_kid, invalid_signature (lti.launch/lti.login) and token_http_400/401 on grade or roster calls",
+  "delivery": "immediate",
+  "frequency": "Immediate after >=3 such failures in 60 min for the platform; max once per platform per 24 h"
+}
