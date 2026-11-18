@@ -280,7 +280,7 @@ export async function sendInviteEmail(institutionId: string, actor: string) {
   if (!school.contactEmail) throw new AppError('The school has no school admin email', 409, 'LMS_ONBOARDING_NO_RECIPIENT');
   const lang: Lang = school.emailLanguage === 'ar' ? 'ar' : 'en';
   // Through the one LMS email service (lmsEmail.ts): the test inbox redirect, the subject
-  // prefix and the daily cap apply. Every click is its own email (re-send by hand).
+  // prefix and the daily email safety ceiling apply. Every click is its own email (re-send by hand).
   const result = await sendLmsEmail({
     template: 'lms-invite-connect', key: `invite-connect:${onboarding.id}:${(onboarding.emailCount ?? 0) + 1}:${Date.now()}`, lang, institutionId,
     recipients: [{ ref: `contact:${institutionId}`, email: school.contactEmail, name: school.contactName }],
@@ -294,8 +294,9 @@ export async function sendInviteEmail(institutionId: string, actor: string) {
     }),
   });
   if (result.held) {
-    await writeLmsAudit({ event: 'onboarding.invite_emailed', outcome: 'warn', institutionId, actor, code: 'daily_cap', refIds: { onboardingId: onboarding.id, lang } });
-    throw new AppError("Today's test email limit is reached, so the email was not sent. Copy the invite text instead.", 429, 'LMS_EMAIL_HELD');
+    const code = result.codes.includes('provider_quota') ? 'provider_quota' : 'daily_ceiling';
+    await writeLmsAudit({ event: 'onboarding.invite_emailed', outcome: 'warn', institutionId, actor, code, refIds: { onboardingId: onboarding.id, lang } });
+    throw new AppError("Today's email limit is reached, so the email was not sent. Copy the invite text instead.", 429, 'LMS_EMAIL_HELD');
   }
   if (!result.sent && !result.captured) {
     const code = result.codes[0] ?? (result.skipped ? 'no_recipient' : 'failed');

@@ -3,6 +3,7 @@ import { getConfig } from '../../../config/env';
 import { LMS_TEMPLATES_BUNDLE } from '../../../email/lms/lmsTemplatesBundle';
 import { isReservedRecipient } from '../../../email/reservedRecipients';
 import { deliverRendered, renderCodeTemplate, variablesMismatch, type CodeTemplate } from '../../../email/sendBundledTemplate';
+import { cairoDay, CAIRO_TIME_ZONE, ceilingAllows, testCopy } from '../../../email/testInbox';
 import { Institution } from '../../../models/Institution';
 import { User } from '../../../models/User';
 import { logger, serializeError } from '../../../utils/logging';
@@ -22,9 +23,11 @@ import type { Lang } from './lmsEmailText';
 //   - is idempotent: lms_email_log.key is unique per (event key, recipient),
 //     so an email is never sent twice (a failed one is retried at most 3 times);
 //   - with REMINDER_TEST_RECIPIENT (lms-test) sends ONE copy per event to that
-//     inbox, with a "Test copy: this email was for ..." line, and at most
-//     LMS_TEST_DAILY_CAP (default 20) per Cairo day: above it the email is held
-//     (recorded, not sent), except the ops daily digest (alwaysSend);
+//     inbox, when the event happens, with a "Test copy: this email was for ..."
+//     line;
+//   - counts every email against the daily safety ceiling shared by every send
+//     path (EMAIL_DAILY_CEILING, default 300 on staging; email/testInbox.ts):
+//     above it the email is held (recorded, not sent) and one alert goes out;
 //   - puts EMAIL_SUBJECT_PREFIX (lms-test: "[lms-test]") in front of every subject;
 //   - HTML-escapes every value (school, course and LMS names are typed by people);
 //     code-owned sentences come from lmsEmailText.ts through owned().
@@ -53,8 +56,6 @@ export interface LmsEmailInput {
   recipients: LmsRecipient[];
   /** The template's variables for one recipient (all of them, no extras). */
   vars: (r: LmsRecipient) => Record<string, VarValue>;
-  /** The ops daily digest: goes even when the test inbox's daily cap is reached. */
-  alwaysSend?: boolean;
 }
 
 export interface LmsEmailResult {
@@ -70,7 +71,7 @@ export interface LmsEmailResult {
 const empty = (): LmsEmailResult => ({ sent: 0, captured: 0, held: 0, failed: 0, duplicate: 0, skipped: 0, codes: [] });
 const MAX_ATTEMPTS = 3;
 const EMAIL = /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]+$/;
-export const OPS_TIME_ZONE = 'Africa/Cairo';
+export const OPS_TIME_ZONE = CAIRO_TIME_ZONE;
 
 export function appUrl(): string {
   return ((getConfig() as { appUrl?: string }).appUrl || '').trim().replace(/\/+$/, '');
@@ -88,10 +89,8 @@ export function lmsEmailsActive(): boolean {
   return c.lms.emailsEnabled === true && c.email.enabled && (!!c.email.resendApiKey || c.lms.emailCapture === true) && !!appUrl();
 }
 
-/** YYYY-MM-DD in Cairo: the daily cap's day and the digests' day. */
-export function cairoDay(at = new Date()): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: OPS_TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(at);
-}
+// The digests' day and the daily safety ceiling, shared by every send path (email/testInbox.ts).
+export { cairoDay, ceilingCount, heldToday } from '../../../email/testInbox';
 
 // ------------------------------------------------------------ formatting
 
@@ -226,25 +225,6 @@ export async function claimWindow(key: string, windowMs: number, now = new Date(
   }
 }
 
-/** One slot of the test inbox's daily cap (atomic; false when the day's cap is used up). */
-async function takeCapSlot(day: string, cap: number): Promise<boolean> {
-  const _id = `cap:${day}`;
-  for (let i = 0; i < 2; i++) {
-    try {
-      const r = await LmsEmailClaim.findOneAndUpdate({ _id, count: { $lt: cap } }, { $inc: { count: 1 }, $set: { at: new Date() } }, { upsert: i === 0, new: true }).lean();
-      return !!r;
-    } catch (e) {
-      if (!isDup(e)) throw e; // a parallel first insert, or the cap is reached: look again without upserting
-    }
-  }
-  return false;
-}
-
-/** How many emails went to the test inbox on that Cairo day. */
-export async function capCount(day: string): Promise<number> {
-  return (await LmsEmailClaim.findById(`cap:${day}`).lean())?.count ?? 0;
-}
-
 async function claimRow(doc: Record<string, unknown> & { key: string }): Promise<boolean> {
   try {
     await LmsEmailLog.create({ ...doc, status: 'pending', attempts: 1 });
@@ -258,12 +238,6 @@ async function claimRow(doc: Record<string, unknown> & { key: string }): Promise
 }
 
 // ------------------------------------------------------------ send
-
-function testCopy(html: string, forWhom: string[]): string {
-  const line = `<div dir="ltr" style="font-family:Arial, Helvetica, sans-serif;font-size:13px;line-height:18px;color:#64748b;text-align:left;padding:8px 16px;border-bottom:1px solid #e2e8f0;background:#ffffff;">Test copy: this email was for ${escapeHtml(forWhom.join(', '))}.</div>`;
-  const m = /<body[^>]*>/i.exec(html);
-  return m ? html.slice(0, m.index + m[0].length) + line + html.slice(m.index + m[0].length) : line + html;
-}
 
 export function lmsTemplate(template: string, lang: Lang): { alias: string; t: CodeTemplate } | null {
   const alias = `${template}-${lang}`;
@@ -316,14 +290,10 @@ export async function sendLmsEmail(input: LmsEmailInput): Promise<LmsEmailResult
       continue;
     }
     try {
-      const cap = cfg.lms.testDailyCap;
-      if (redirect && cap > 0) {
-        if (input.alwaysSend) await LmsEmailClaim.updateOne({ _id: `cap:${day}` }, { $inc: { count: 1 }, $set: { at: new Date() } }, { upsert: true });
-        else if (!(await takeCapSlot(day, cap))) {
-          await LmsEmailLog.updateOne({ key }, { $set: { status: 'held', code: 'daily_cap' } });
-          out.held++;
-          continue;
-        }
+      if (!(await ceilingAllows('lms', found.alias))) {
+        await LmsEmailLog.updateOne({ key }, { $set: { status: 'held', code: 'daily_ceiling' } });
+        out.held++;
+        continue;
       }
       const values = input.vars(d.varsOf);
       const mismatch = variablesMismatch(found.t, values);
@@ -340,11 +310,16 @@ export async function sendLmsEmail(input: LmsEmailInput): Promise<LmsEmailResult
       const subject = `${cfg.email.subjectPrefix ?? ''}${renderCodeTemplate(found.t, textValues).subject}`.slice(0, 300);
       if (redirect) html = testCopy(html, d.forWhom.map((r) => r.email));
       const capture = cfg.lms.emailCapture === true;
-      const result = await deliverRendered({ kind: 'lms', alias: found.alias, to: d.to, subject, html, capture });
+      const result = await deliverRendered({ kind: 'lms', alias: found.alias, to: d.to, subject, html, capture, testInboxApplied: true });
       if (result.ok) {
         await LmsEmailLog.updateOne({ key }, { $set: { status: capture ? 'captured' : 'sent', subject, sentAt: new Date(), ...(capture ? {} : { resendId: result.id }) } });
         if (capture) out.captured++;
         else out.sent++;
+      } else if (result.code === 'provider_quota') {
+        // The provider's quota is used up today (email/provider.ts): held, never retried in a storm.
+        await LmsEmailLog.updateOne({ key }, { $set: { status: 'held', code: result.code, subject } });
+        out.held++;
+        out.codes.push(result.code);
       } else {
         await LmsEmailLog.updateOne({ key }, { $set: { status: 'failed', code: result.code.slice(0, 80), subject } });
         out.failed++;
@@ -358,10 +333,4 @@ export async function sendLmsEmail(input: LmsEmailInput): Promise<LmsEmailResult
     }
   }
   return out;
-}
-
-/** Emails held back by the test inbox's daily cap on that Cairo day, per template. */
-export async function heldToday(day = cairoDay()): Promise<{ total: number; byTemplate: { template: string; n: number }[] }> {
-  const rows = await LmsEmailLog.aggregate<{ _id: string; n: number }>([{ $match: { cairoDay: day, status: 'held' } }, { $group: { _id: '$template', n: { $sum: 1 } } }, { $sort: { n: -1, _id: 1 } }]);
-  return { total: rows.reduce((a, r) => a + r.n, 0), byTemplate: rows.map((r) => ({ template: r._id, n: r.n })) };
 }

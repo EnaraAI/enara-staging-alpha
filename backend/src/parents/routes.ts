@@ -14,6 +14,7 @@ import { canDo, tierOf, visibilityNotice } from './policy';
 import * as svc from './service';
 import { confirmCode, previewCode, setGuardianRole, unlink } from './codes';
 import { reportSenders, type WeeklySummary } from './reportSender';
+import { parentEmailBlocked, parentEmailBlockedBody, parentEmailState } from './emailBlock';
 import { mockPlan } from './mock';
 import { authConfig, googleParentSignIn } from './google';
 import { recordSignIn } from '../services/signInHistory';
@@ -120,12 +121,17 @@ router.get('/learners/:studentId/sessions/:sessionId/transcript', h(async (req, 
   }
 }));
 router.get('/learners/:studentId/alerts', h(async (req, res) => { res.json(await svc.alerts(await learner()(req))); }));
-router.get('/learners/:studentId/report', h(async (req, res) => { res.json(await svc.weeklyReport(await learner()(req))); }));
+router.get('/learners/:studentId/report', h(async (req, res) => { res.json({ ...(await svc.weeklyReport(await learner()(req))), shareEmail: parentEmailState() }); }));
 router.post('/learners/:studentId/report/share', h(async (req, res) => {
   const ctx = await learner('share_report')(req);
   const body = ensurePlainObject(req.body);
   const channel = body.channel === 'whatsapp' ? 'whatsapp' : body.channel === 'email' ? 'email' : null;
   if (!channel) throw new AppError('channel must be email or whatsapp', 400, 'VALIDATION_ERROR');
+  // lms-test: "Share this week -> Email" is blocked (emailBlock.ts); WhatsApp (a stub) is not.
+  if (channel === 'email' && parentEmailBlocked()) {
+    res.status(409).json(parentEmailBlockedBody(req.requestId));
+    return;
+  }
   const r = (await svc.weeklyReport(ctx)).report;
   const parent = await User.findById(uid(req)).select('name email').lean();
   const summary: WeeklySummary = {

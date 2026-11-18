@@ -25,7 +25,7 @@ export interface ILmsEmailLog {
   /** Sent to the test inbox (REMINDER_TEST_RECIPIENT) instead of the recipients. */
   redirected: boolean;
   status: LmsEmailStatus;
-  /** Why it failed or was held (e.g. daily_cap, missing_api_key). */
+  /** Why it failed or was held (e.g. daily_ceiling, provider_quota, missing_api_key). */
   code?: string;
   subject?: string;
   /** Calendar day in Cairo (YYYY-MM-DD) the row was made: the daily cap's day. */

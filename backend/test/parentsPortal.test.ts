@@ -525,6 +525,24 @@ describe('share this week (on demand)', () => {
     expect(w.body.preview).toMatch(/Omar/);
     const rep = await as('p1').get('/api/parents/learners/kid1/report');
     expect(rep.body.report).toMatchObject({ portalPath: '/parents', learned: { mock: true } });
+    expect(rep.body.shareEmail).toEqual({ blocked: false });
+  });
+
+  it('lms-test (ENARA_STAGING): "Share this week -> Email" is blocked (409 PARENT_EMAIL_BLOCKED_STAGING, EN/AR note), nothing sent; WhatsApp still works', async () => {
+    const env = await import('../src/config/env');
+    (env.getConfig() as { stagingMode: boolean }).stagingMode = true;
+    try {
+      mail.send.mockClear();
+      const e = await as('p1').post('/api/parents/learners/kid1/report/share', { channel: 'email' });
+      expect(e.status).toBe(409);
+      expect(e.body.error).toMatchObject({ code: 'PARENT_EMAIL_BLOCKED_STAGING', message: 'Parent emails are switched on in a later step.', messages: { en: 'Parent emails are switched on in a later step.', ar: expect.stringMatching(/[\u0600-\u06FF]/) } });
+      expect(mail.send).not.toHaveBeenCalled();
+      const rep = await as('p1').get('/api/parents/learners/kid1/report');
+      expect(rep.body.shareEmail).toMatchObject({ blocked: true, code: 'PARENT_EMAIL_BLOCKED_STAGING' });
+      expect((await as('p1').post('/api/parents/learners/kid1/report/share', { channel: 'whatsapp' })).body).toMatchObject({ ok: true, stub: true });
+    } finally {
+      env.resetConfigForTests();
+    }
   });
 });
 

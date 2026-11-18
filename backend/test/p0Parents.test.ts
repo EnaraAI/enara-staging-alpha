@@ -257,6 +257,30 @@ describe('item 4: the link code is never in a URL', () => {
     (await import('../src/email/sendTemplate')).resetEmailClientForTests();
   });
 
+  it('lms-test (ENARA_STAGING): "Send code by email" is blocked (409 PARENT_EMAIL_BLOCKED_STAGING, nothing created or sent); a code without email still works', async () => {
+    const env = await import('../src/config/env');
+    (env.getConfig() as { stagingMode: boolean }).stagingMode = true;
+    try {
+      const before = await M.ParentLinkCode.countDocuments({ studentId: 'st-mail' });
+      const r = await as('admin').post('/api/students/st-mail/parent-codes', { sendToEmail: 'family@qa.enara.app' });
+      expect(r.status).toBe(409);
+      expect(r.body.error).toMatchObject({ code: 'PARENT_EMAIL_BLOCKED_STAGING', message: 'Parent emails are switched on in a later step.' });
+      expect(r.body.error.messages.ar).toMatch(/[\u0600-\u06FF]/);
+      expect(await M.ParentLinkCode.countDocuments({ studentId: 'st-mail' })).toBe(before);
+      expect(sendMock).not.toHaveBeenCalled();
+      // The service refuses it too (any other caller).
+      const { createCode } = await import('../src/parents/codes');
+      await expect(createCode({ id: ADMIN.id, role: 'admin', institutionId: 'S1' } as never, 'st-mail', { sendToEmail: 'family@qa.enara.app' })).rejects.toMatchObject({ statusCode: 409, code: 'PARENT_EMAIL_BLOCKED_STAGING' });
+      // The UI is told, and a code without email still works.
+      expect((await as('admin').get('/api/students/st-mail/parent-codes')).body.parentEmail).toMatchObject({ blocked: true, code: 'PARENT_EMAIL_BLOCKED_STAGING' });
+      expect((await issue('st-mail')).emailed).toBeUndefined();
+      expect(sendMock).not.toHaveBeenCalled();
+    } finally {
+      env.resetConfigForTests();
+    }
+    expect((await as('admin').get('/api/students/st-mail/parent-codes')).body.parentEmail).toEqual({ blocked: false });
+  });
+
   it('the emailed code is in the body only; the button opens /parents/link with no code', async () => {
     const r = await issue('st-mail', { sendToEmail: 'family@qa.enara.app' });
     expect(r.emailed).toEqual({ ok: true });

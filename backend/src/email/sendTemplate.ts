@@ -1,45 +1,25 @@
-import { Resend } from 'resend';
 import { logger } from '../utils/logging';
 import {
-  emailSender,
   TEMPLATE_REGISTRY,
   isTemplateAlias,
   type TemplateAlias,
 } from './templateRegistry';
-import {
-  LOGO_CONTENT_ID,
-  LOGO_FILENAME,
-  LOGO_PNG_BASE64,
-  LOGO_WHITE_CONTENT_ID,
-  LOGO_WHITE_FILENAME,
-  LOGO_WHITE_PNG_BASE64,
-} from './logoInline';
+import { LOGO_CONTENT_ID, LOGO_WHITE_CONTENT_ID } from './logoInline';
+import { getEmailClient, resendSend, resetEmailProviderForTests } from './provider';
 import { TEMPLATES_BUNDLE } from './templatesBundle';
 import { MissingAppUrlError, TEMPLATE_LINKS, buildActionUrl, isLinkedAlias, type TemplateSendVariables } from './links';
 import { isReservedRecipient } from './reservedRecipients';
+import { guardOutgoing } from './testInbox';
 
 export type SendTemplateResult =
   | { ok: true; id: string }
   | { ok: false; code: string; message: string };
 
-let client: Resend | null = null;
+export { getEmailClient };
 
-/** The Resend client, or null without RESEND_API_KEY (also used by sendBundledTemplate). */
-export function getEmailClient(): Resend | null {
-  return getClient();
-}
-
-function getClient(): Resend | null {
-  if (client) return client;
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return null;
-  client = new Resend(key);
-  return client;
-}
-
-/** Test hook: drop the cached client so the next call re-reads RESEND_API_KEY. */
+/** Test hook: drop the cached client so the next call re-reads RESEND_API_KEY (and reset the provider's pacing/quota state). */
 export function resetEmailClientForTests(): void {
-  client = null;
+  resetEmailProviderForTests({ paceMs: 0 });
 }
 
 const EMAIL_PATTERN = /[^\s@<>"']+@[^\s@<>"']+/g;
@@ -182,28 +162,17 @@ export async function sendTemplate<A extends TemplateAlias>(
     return fail(alias, 'code_in_url', 'A link in the email carries a parent link code');
   }
 
-  const resend = getClient();
-  if (!resend) return fail(alias, 'missing_api_key', 'RESEND_API_KEY is not set');
+  // Staging (lms-test): only the test inbox, prefixed, capped, or captured (null: not staging, unchanged).
+  const guard = await guardOutgoing({ kind: 'template', alias, to: recipients, subject, html });
+  if (guard && !guard.send) return guard.result;
+  if (!guard || !guard.redirected) return sendRendered(alias, to, subject, html); // not staging: exactly as before
+  const result = await sendRendered(alias, guard.to, guard.subject, guard.html);
+  await guard.record(result);
+  return result;
+}
 
-  try {
-    const { data, error } = await resend.emails.send({
-      from: emailSender(),
-      to,
-      subject,
-      html,
-      // The rendered HTML references cid:enara-logo (light) and cid:enara-logo-white (dark mode), so both are always attached.
-      attachments: [
-        { filename: LOGO_FILENAME, content: LOGO_PNG_BASE64, contentType: 'image/png', contentId: LOGO_CONTENT_ID },
-        { filename: LOGO_WHITE_FILENAME, content: LOGO_WHITE_PNG_BASE64, contentType: 'image/png', contentId: LOGO_WHITE_CONTENT_ID },
-      ],
-    });
-    if (error || !data) {
-      return fail(alias, error?.name ?? 'unknown_error', error?.message ?? 'No data returned');
-    }
-    return { ok: true, id: data.id };
-  } catch (err) {
-    const e = err as { code?: unknown; name?: unknown; message?: unknown };
-    const code = typeof e?.code === 'string' ? e.code : typeof e?.name === 'string' ? e.name : 'exception';
-    return fail(alias, code, typeof e?.message === 'string' ? e.message : String(err));
-  }
+async function sendRendered(alias: string, to: string | string[], subject: string, html: string): Promise<SendTemplateResult> {
+  // Paced and quota-aware (email/provider.ts); never throws.
+  const r = await resendSend('template', alias, to, subject, html);
+  return r.ok ? r : fail(alias, r.code, r.message);
 }
