@@ -8,6 +8,8 @@ export interface LmsFlags {
   gradePassback: boolean;
   /** Phase 4 roster sync (NRPS). On only with LMS_LTI_ENABLED too. */
   roster: boolean;
+  /** Phase 2 activity picker (LTI Deep Linking). On only with LMS_LTI_ENABLED too. */
+  deepLinking: boolean;
   problem?: string;
 }
 
@@ -19,13 +21,14 @@ export function lmsFlags(): LmsFlags {
     googleClassroom: ok && lms.googleClassroomEnabled,
     gradePassback: ok && lms.gradePassbackEnabled,
     roster: ok && lms.ltiEnabled && lms.rosterSyncEnabled,
+    deepLinking: ok && lms.ltiEnabled && lms.deepLinkingEnabled,
     problem: lms.problem,
   };
 }
 
 export function anyLmsFlagSet(): boolean {
   const lms = getConfig().lms;
-  return lms.ltiEnabled || lms.googleClassroomEnabled || lms.gradePassbackEnabled || lms.rosterSyncEnabled;
+  return lms.ltiEnabled || lms.googleClassroomEnabled || lms.gradePassbackEnabled || lms.rosterSyncEnabled || lms.deepLinkingEnabled;
 }
 
 /** Phase 1a settings read by the LTI and admin routes. */

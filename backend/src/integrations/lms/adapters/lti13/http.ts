@@ -82,6 +82,11 @@ export const ltiLaunch = handle(async (req, res) => {
   const out = await oidcLaunch(body, req.headers.cookie);
   setFrameHeaders(res, platformFrameOrigins(out.platform));
   if (!out.cookieless) res.append('Set-Cookie', stateCookie(out.stateCookieName, '', 0));
+  // Phase 2: the activity picker (the secret travels in the fragment, like the launch token).
+  if ('pickerSecret' in out) {
+    res.redirect(303, `${lmsSettings().toolBaseUrl}/lms/picker#${new URLSearchParams({ ps: out.pickerSecret }).toString()}`);
+    return;
+  }
   // The token travels in the fragment: never sent to a server or in a Referer.
   const params = new URLSearchParams({ lt: out.token });
   if (out.cookieless) params.set('c', '1');

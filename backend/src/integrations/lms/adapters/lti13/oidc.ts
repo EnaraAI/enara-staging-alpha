@@ -5,7 +5,7 @@ import { writeLmsAudit } from '../../core/audit';
 import { BindingError, bindingRequest, validateBinding, type ValidatedBinding } from '../../core/binding';
 import { sha256Hex } from '../../core/crypto';
 import { findStudentPreview, LmsProvisionError, provisionLaunch, type ProvisionInput, type ProvisionRole } from '../../core/domainService';
-import { lmsSettings } from '../../core/flags';
+import { lmsFlags, lmsSettings } from '../../core/flags';
 import { loadJose } from '../../core/jose';
 import { issueLaunchToken } from '../../core/launchToken';
 import { scheduleTargetedFlush } from '../../core/drain';
@@ -14,7 +14,8 @@ import { isTestUser, mapLtiRoles } from '../../core/roleMap';
 import type { LaunchResult } from '../../core/types';
 import { LmsDeployment, LmsOidcState, LmsPlatform, type ILmsPlatform } from '../../models';
 import { getPreset } from '../../presets';
-import { CLAIM, LTI_VERSION, SUPPORTED_MESSAGE_TYPES } from './claims';
+import { CLAIM, DEEP_LINKING_REQUEST, LTI_VERSION, SUPPORTED_MESSAGE_TYPES } from './claims';
+import { startDeepLinking } from './deepLinking';
 import { LtiError, type LtiErrorCode } from './errors';
 import { platformKeySet } from './jwks';
 
@@ -143,6 +144,15 @@ export interface LaunchOutcome {
   stateCookieName: string;
 }
 
+/** Phase 2: a validated LtiDeepLinkingRequest opens the activity picker instead of signing in. */
+export interface PickerOutcome {
+  kind: 'picker';
+  pickerSecret: string;
+  cookieless: boolean;
+  platform: ILmsPlatform;
+  stateCookieName: string;
+}
+
 const JOSE_CODES: Record<string, LtiErrorCode> = {
   ERR_JWKS_NO_MATCHING_KEY: 'unknown_kid',
   ERR_JWKS_MULTIPLE_MATCHING_KEYS: 'invalid_signature',
@@ -192,7 +202,7 @@ function stringMap(v: unknown): Record<string, string> | undefined {
 
 const obj = (v: unknown): Record<string, unknown> | undefined => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : undefined);
 
-export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: string | undefined): Promise<LaunchOutcome> {
+export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: string | undefined): Promise<LaunchOutcome | PickerOutcome> {
   const state = str(body.state, 512);
   if (!state) return fail('state_missing', 'lti.launch');
   const idToken = str(body.id_token, MAX.idToken);
@@ -244,7 +254,8 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
   const claims = payload as Record<string, unknown>;
   if (claims[CLAIM.version] !== LTI_VERSION) return fail('invalid_version', 'lti.launch', { platform });
   const messageType = claims[CLAIM.messageType];
-  if (!(SUPPORTED_MESSAGE_TYPES as readonly unknown[]).includes(messageType)) {
+  const deepLink = messageType === DEEP_LINKING_REQUEST;
+  if (!(SUPPORTED_MESSAGE_TYPES as readonly unknown[]).includes(messageType) || (deepLink && !lmsFlags().deepLinking)) {
     return fail('unsupported_message_type', 'lti.launch', { platform, refIds: { messageType: typeof messageType === 'string' ? messageType.slice(0, 60) : 'none' } });
   }
   const externalDeploymentId = str(claims[CLAIM.deploymentId], 255);
@@ -275,7 +286,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
   if (!contextId) return fail('missing_context', 'lti.launch', { platform });
   const resourceLink = obj(claims[CLAIM.resourceLink]);
   const resourceLinkId = str(resourceLink?.id, 255);
-  if (!resourceLinkId) return fail('missing_resource_link', 'lti.launch', { platform });
+  if (!resourceLinkId && !deepLink) return fail('missing_resource_link', 'lti.launch', { platform });
 
   if (await isInstitutionSuspended(platform.institutionId)) return fail('institution_suspended', 'lti.launch', { platform });
 
@@ -285,6 +296,21 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
     overrides: { ...(preset?.roleOverrides ?? {}), ...((platform.roleOverrides as Record<string, string> | undefined) ?? {}) },
   });
   if (mapped.role === 'observer') return fail('observer_not_supported', 'lti.launch', { platform, refIds: { warnings: mapped.warnings.join(',') } });
+
+  // Phase 2: the activity picker. Nothing is provisioned; the picker session
+  // only carries IDs, and the picked items bind on their first launch.
+  if (deepLink) {
+    const pickerSecret = await startDeepLinking({
+      platform,
+      externalDeploymentId,
+      externalContextId: contextId,
+      contextTitle: str(context?.title, 200),
+      sub,
+      role: mapped.role,
+      claims,
+    });
+    return { kind: 'picker', pickerSecret, cookieless, platform, stateCookieName: cookieName };
+  }
 
   const ags = obj(claims[CLAIM.ags]);
   const nrps = obj(claims[CLAIM.nrps]);
@@ -311,7 +337,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
     rawRoles: roles.filter((r): r is string => typeof r === 'string'),
     testUser: isTestUser(roles),
     context: { externalId: contextId, title: str(context?.title, 200), label: str(context?.label, 120) },
-    resourceLink: { externalId: resourceLinkId, title: str(resourceLink?.title, 200), customParams, lineItemUrl: str(ags?.lineitem) },
+    resourceLink: { externalId: resourceLinkId!, title: str(resourceLink?.title, 200), customParams, lineItemUrl: str(ags?.lineitem) },
     services: { nrpsUrl: str(nrps?.context_memberships_url), agsLineItemsUrl: str(ags?.lineitems), agsScopes },
     binding,
   };

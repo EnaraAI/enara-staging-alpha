@@ -1,0 +1,278 @@
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { fetchLmsPickerItems, fetchLmsPickerSession, submitLmsPicker, type LmsPickerItem, type LmsPickerSession } from '../services/apiService';
+
+// LMS Phase 2: the activity picker, shown inside the LMS when a teacher clicks
+// "Select content" (LTI Deep Linking). /lms/picker#ps=<one-time secret>.
+// The secret is read from the fragment and removed from the address bar. The
+// page lists the school's items (each item type is a plug-in on the server),
+// lets the teacher pick one or several, and posts ENARA's signed answer back
+// to the LMS, which creates the activities. Arabic or English follows the
+// teacher's LMS language (launch_presentation.locale).
+
+export const onLmsPickerPath = () => window.location.pathname.replace(/\/$/, '') === '/lms/picker';
+
+const T = {
+  en: {
+    title: 'Add ENARA activities',
+    course: 'Course',
+    search: 'Search by title',
+    all: 'All',
+    type: 'Type',
+    subject: 'Subject',
+    kind: 'Kind',
+    level: 'CEFR level',
+    skill: 'Skill',
+    allSubjects: 'All subjects',
+    allKinds: 'All kinds',
+    allLevels: 'All levels',
+    allSkills: 'All skills',
+    questions: (n: number) => `${n} question${n === 1 ? '' : 's'}`,
+    points: (n: number) => `${n} pts`,
+    graded: 'Grade column',
+    notGraded: 'No grade column',
+    newWindow: 'Opens in a new window (microphone)',
+    already: 'Already added in this course',
+    add: (n: number) => (n ? `Add ${n} activit${n === 1 ? 'y' : 'ies'}` : 'Add'),
+    cancel: 'Cancel',
+    sending: 'Adding to your course…',
+    loading: 'Loading…',
+    none: 'No items match these filters.',
+    one: 'Your LMS accepts one activity at a time.',
+    noSession: 'This picker link is missing its sign-in information. Click "Select content" again in your LMS.',
+    expired: 'This picker has expired or was already used. Click "Select content" again in your LMS.',
+    failed: 'Something went wrong. Please try again; if it keeps happening, send this reference to ENARA support:',
+  },
+  ar: {
+    title: 'إضافة أنشطة إنارة',
+    course: 'المقرر',
+    search: 'ابحث بالعنوان',
+    all: 'الكل',
+    type: 'النوع',
+    subject: 'المادة',
+    kind: 'الصنف',
+    level: 'مستوى CEFR',
+    skill: 'المهارة',
+    allSubjects: 'كل المواد',
+    allKinds: 'كل الأصناف',
+    allLevels: 'كل المستويات',
+    allSkills: 'كل المهارات',
+    questions: (n: number) => `${n} ${n === 1 ? 'سؤال' : 'أسئلة'}`,
+    points: (n: number) => `${n} درجة`,
+    graded: 'عمود درجة',
+    notGraded: 'بدون عمود درجة',
+    newWindow: 'يفتح في نافذة جديدة (الميكروفون)',
+    already: 'أُضيف سابقاً في هذا المقرر',
+    add: (n: number) => (n ? `إضافة ${n} ${n === 1 ? 'نشاط' : 'أنشطة'}` : 'إضافة'),
+    cancel: 'إلغاء',
+    sending: 'جارٍ الإضافة إلى مقررك…',
+    loading: 'جارٍ التحميل…',
+    none: 'لا توجد عناصر مطابقة لهذه التصفية.',
+    one: 'نظام إدارة التعلم لديك يقبل نشاطاً واحداً في كل مرة.',
+    noSession: 'رابط الاختيار هذا لا يحتوي على بيانات الدخول. اضغط "اختيار المحتوى" مرة أخرى في نظام إدارة التعلم.',
+    expired: 'انتهت صلاحية أداة الاختيار أو استُخدمت من قبل. اضغط "اختيار المحتوى" مرة أخرى في نظام إدارة التعلم.',
+    failed: 'حدث خطأ. حاول مرة أخرى، وإذا تكرر أرسل هذا المرجع إلى دعم إنارة:',
+  },
+};
+
+const KIND_LABEL: Record<string, { en: string; ar: string }> = {
+  diagnostic: { en: 'Diagnostic', ar: 'تشخيصي' },
+  formative: { en: 'Formative', ar: 'تكويني' },
+  quiz: { en: 'Quiz', ar: 'اختبار قصير' },
+  unit_test: { en: 'Unit test', ar: 'اختبار وحدة' },
+  midterm: { en: 'Midterm', ar: 'اختبار منتصف الفصل' },
+  final: { en: 'Final', ar: 'اختبار نهائي' },
+  teacher_exam: { en: 'Teacher exam', ar: 'اختبار المعلم' },
+  standardized: { en: 'Standardized', ar: 'اختبار معياري' },
+  retention_check: { en: 'Retention check', ar: 'اختبار احتفاظ' },
+  practice: { en: 'Practice', ar: 'تدريب' },
+  speaking: { en: 'Speaking', ar: 'محادثة' },
+};
+
+/** Posts the signed answer to the LMS (a normal form post, as LTI Deep Linking requires). */
+function postToLms(returnUrl: string, jwt: string) {
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = returnUrl;
+  const input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'JWT';
+  input.value = jwt;
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+const uniq = (xs: (string | undefined)[]) => [...new Set(xs.filter((x): x is string => !!x))].sort();
+
+export const LmsPicker: React.FC = () => {
+  const secret = useRef<string | null>(null);
+  const [session, setSession] = useState<LmsPickerSession | null>(null);
+  const [items, setItems] = useState<LmsPickerItem[] | null>(null);
+  const [error, setError] = useState<{ key: 'noSession' | 'expired' | 'failed'; ref?: string } | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [sending, setSending] = useState(false);
+  const [q, setQ] = useState('');
+  const [type, setType] = useState('');
+  const [subject, setSubject] = useState('');
+  const [kind, setKind] = useState('');
+  const [level, setLevel] = useState('');
+  const [skill, setSkill] = useState('');
+
+  useEffect(() => {
+    if (secret.current !== null) return;
+    const s = new URLSearchParams(window.location.hash.slice(1)).get('ps');
+    secret.current = s ?? '';
+    window.history.replaceState({}, document.title, '/lms/picker');
+    if (!s) return void setError({ key: 'noSession' });
+    const fail = (e: { status?: number; code?: string; message?: string }) =>
+      setError(e.status === 401 || e.status === 410 ? { key: 'expired' } : { key: 'failed', ref: e.code || e.message });
+    fetchLmsPickerSession(s)
+      .then((sess) => {
+        setSession(sess);
+        return fetchLmsPickerItems(s).then((r) => setItems(r.items));
+      })
+      .catch(fail);
+  }, []);
+
+  const lang = session?.locale ?? (navigator.language?.startsWith('ar') ? 'ar' : 'en');
+  const t = T[lang];
+  const key = (i: { type: string; id: string }) => `${i.type}:${i.id}`;
+
+  const language = useMemo(() => (items ?? []).filter((i) => i.language), [items]);
+  const options = useMemo(
+    () => ({
+      subjects: uniq((items ?? []).map((i) => i.subject)),
+      kinds: uniq((items ?? []).map((i) => i.kind)),
+      levels: uniq(language.map((i) => i.language?.level)),
+      skills: uniq(language.flatMap((i) => i.language?.skills ?? [])),
+    }),
+    [items, language],
+  );
+
+  const shown = (items ?? []).filter(
+    (i) =>
+      (!type || i.type === type) &&
+      (!subject || i.subject === subject) &&
+      (!kind || i.kind === kind) &&
+      (!level || i.language?.level === level) &&
+      (!skill || i.language?.skills?.includes(skill)) &&
+      (!q.trim() || i.title.toLowerCase().includes(q.trim().toLowerCase())),
+  );
+
+  const toggle = (i: LmsPickerItem) => {
+    const k = key(i);
+    setSelected((cur) => (cur.includes(k) ? cur.filter((x) => x !== k) : session?.acceptMultiple === false ? [k] : [...cur, k]));
+  };
+
+  const send = async (keys: string[]) => {
+    if (!secret.current) return;
+    setSending(true);
+    try {
+      const picks = keys.map((k) => {
+        const [itemType, ...rest] = k.split(':');
+        return { type: itemType, id: rest.join(':') };
+      });
+      const { returnUrl, jwt } = await submitLmsPicker(secret.current, picks);
+      postToLms(returnUrl, jwt);
+    } catch (e) {
+      const err = e as { status?: number; code?: string; message?: string };
+      setSending(false);
+      setError(err.status === 401 || err.status === 410 ? { key: 'expired' } : { key: 'failed', ref: err.code || err.message });
+    }
+  };
+
+  const select = (value: string, set: (v: string) => void, all: string, opts: string[], label: (v: string) => string, aria: string) => (
+    <select aria-label={aria} value={value} onChange={(e) => set(e.target.value)} className="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white">
+      <option value="">{all}</option>
+      {opts.map((o) => (
+        <option key={o} value={o}>
+          {label(o)}
+        </option>
+      ))}
+    </select>
+  );
+
+  return (
+    <div dir={lang === 'ar' ? 'rtl' : 'ltr'} lang={lang} className="min-h-screen bg-slate-50 p-4 sm:p-6 text-slate-900">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-xl font-bold">{t.title}</h1>
+        {session?.courseTitle && (
+          <p className="text-sm text-slate-500 mt-1">
+            {t.course}: {session.courseTitle}
+          </p>
+        )}
+
+        {error ? (
+          <div className="mt-6 bg-white border border-slate-200 rounded-xl p-6">
+            <p className="text-slate-700">{t[error.key]}</p>
+            {error.ref && <code className="inline-block mt-2 bg-slate-100 px-2 py-1 rounded text-sm">{error.ref}</code>}
+          </div>
+        ) : !items ? (
+          <p className="mt-6 text-slate-500">{t.loading}</p>
+        ) : (
+          <>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.search} aria-label={t.search} className="border border-slate-200 rounded-lg px-3 py-2 text-sm flex-1 min-w-[180px]" />
+              {session && session.types.length > 1 && select(type, setType, t.all, session.types.map((x) => x.type), (v) => session.types.find((x) => x.type === v)?.label[lang] ?? v, t.type)}
+              {options.subjects.length > 1 && select(subject, setSubject, t.allSubjects, options.subjects, (v) => v, t.subject)}
+              {options.kinds.length > 1 && select(kind, setKind, t.allKinds, options.kinds, (v) => KIND_LABEL[v]?.[lang] ?? v, t.kind)}
+              {/* CEFR level and skill: only when the list has language-course items. */}
+              {options.levels.length > 0 && select(level, setLevel, t.allLevels, options.levels, (v) => v, t.level)}
+              {options.skills.length > 0 && select(skill, setSkill, t.allSkills, options.skills, (v) => v, t.skill)}
+            </div>
+            {session?.acceptMultiple === false && <p className="mt-2 text-sm text-slate-500">{t.one}</p>}
+
+            <ul className="mt-4 space-y-2 pb-24">
+              {shown.length === 0 && <li className="text-slate-500 text-sm">{t.none}</li>}
+              {shown.map((i) => {
+                const k = key(i);
+                const on = selected.includes(k);
+                return (
+                  <li key={k}>
+                    <label className={`flex gap-3 items-start bg-white border rounded-xl p-4 cursor-pointer ${on ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200'}`}>
+                      <input type={session?.acceptMultiple === false ? 'radio' : 'checkbox'} name="enara-pick" checked={on} onChange={() => toggle(i)} className="mt-1" />
+                      <span className="flex-1 min-w-0">
+                        <span className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold">{i.title}</span>
+                          {i.alreadyAdded && <span className="text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2 py-0.5">{t.already}</span>}
+                        </span>
+                        <span className="block text-sm text-slate-500 mt-1">
+                          {[
+                            session?.types.find((x) => x.type === i.type)?.label[lang],
+                            i.subject,
+                            i.kind ? KIND_LABEL[i.kind]?.[lang] ?? i.kind : undefined,
+                            i.language?.level,
+                            i.questions ? t.questions(i.questions) : undefined,
+                            i.points ? t.points(i.points) : undefined,
+                            i.meta,
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </span>
+                        <span className="flex flex-wrap gap-2 mt-2 text-xs">
+                          <span className={`rounded-full px-2 py-0.5 border ${i.graded ? 'bg-green-50 text-green-800 border-green-200' : 'bg-slate-50 text-slate-600 border-slate-200'}`}>{i.graded ? t.graded : t.notGraded}</span>
+                          {i.needsMedia && <span className="rounded-full px-2 py-0.5 border bg-blue-50 text-blue-800 border-blue-200">{t.newWindow}</span>}
+                        </span>
+                      </span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 p-3">
+              <div className="max-w-4xl mx-auto flex gap-2 justify-end">
+                <button type="button" disabled={sending} onClick={() => send([])} className="px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium disabled:opacity-50">
+                  {t.cancel}
+                </button>
+                <button type="button" disabled={sending || selected.length === 0} onClick={() => send(selected)} className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-bold disabled:opacity-50">
+                  {sending ? t.sending : t.add(selected.length)}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};

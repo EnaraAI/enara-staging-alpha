@@ -52,6 +52,7 @@ import parentsRoutes from './parents/routes';
 import multiClassRoutes from './routes/multiClass.routes';
 import { ltiRouter, wellKnownRouter } from './integrations/lms/routes';
 import { lmsAdminRouter } from './integrations/lms/admin/routes';
+import { pickerRouter } from './integrations/lms/admin/pickerRoutes';
 import { lmsFlags } from './integrations/lms/core/flags';
 import { piggybackDrain } from './integrations/lms/core/drain';
 import maintenanceRoutes from './maintenance/routes';
@@ -327,6 +328,7 @@ export function createApp() {
   // LMS (docs/lms): inert unless LMS_LTI_ENABLED is on and the LMS config is valid.
   app.use('/lti', ltiRouter);
   app.use('/.well-known', wellKnownRouter);
+  app.use('/api/lms/picker', pickerRouter);
   app.use('/api/lms', lmsAdminRouter);
 
   app.use((_req, _res, next) => {

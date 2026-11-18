@@ -25,7 +25,7 @@ import { LessonProgress } from '../models/LessonProgress';
 import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
-import { LMS_MODELS, LMS_PHASE1A_MODELS, LmsContext, LmsGradeSyncJob, LmsLaunchToken, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsToolKey } from '../integrations/lms/models';
+import { LMS_MODELS, LMS_PHASE1A_MODELS, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsLaunchToken, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsToolKey } from '../integrations/lms/models';
 import { ClassEnrollment } from '../models/ClassEnrollment';
 import { ReminderLog } from '../models/ReminderLog';
 import { SignInEvent } from '../models/SignInEvent';
@@ -451,6 +451,13 @@ export const MIGRATIONS: Migration[] = [
     up: async () => {
       await LmsContext.createIndexes();
       if (!(await LmsContext.collection.indexes()).some((i) => i.key.status === 1 && i.key.lastRosterSyncAt === 1)) throw new Error('lms_contexts roster sync index missing');
+    },
+  },
+  {
+    id: '2026-11-20-lms-phase2-deep-linking',
+    description: 'LMS Phase 2 (activity picker): lms_deep_link_sessions indexes (new collection; nothing existing touched)',
+    up: async () => {
+      await LmsDeepLinkSession.createIndexes();
     },
   },
 ];
