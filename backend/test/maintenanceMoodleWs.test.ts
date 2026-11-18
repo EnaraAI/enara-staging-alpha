@@ -115,6 +115,8 @@ describe('guards: disabled everywhere except lms-test with its own switch', () =
     // A Moodle course that is not linked to ENARA is refused before any Moodle call.
     expect((await post({ action: 'list-enrolled', courseId: 8 })).body.error).toBe('course_not_linked');
     expect(calls).toEqual([]);
+    expect((await post({ action: 'find-activity' })).body.activities).toEqual([{ cmId: 41, instanceId: 4, name: 'ENARA graded quiz' }]);
+    expect((await post({ action: 'set-grade', username: 'student.test', cmId: 42, grade: 10 })).body.error).toBe('activity_not_found');
     expect((await post({ action: 'find-course' })).body).toMatchObject({ courseId: 7, shortname: 'Enara Test', linkedCourseIds: [7] });
     expect((await post({ action: 'create-user', username: 'admin' })).body.error).toBe('username_not_allowed');
     expect((await post({ action: 'delete-user', username: 'student.test' })).body.error).toBe('username_not_allowed');

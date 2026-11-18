@@ -130,9 +130,15 @@ async function studentRoleId(ctx: Ctx, cid: number): Promise<number> {
   return 5; // Moodle's default student role id
 }
 
-async function ltiActivity(ctx: Ctx, cid: number, name: string): Promise<{ cmid: number; instance: number; name: string }> {
+async function ltiActivities(ctx: Ctx, cid: number): Promise<{ id: number; instance: number; name: string }[]> {
   const sections = await call<{ modules?: { id: number; instance: number; name: string; modname: string }[] }[]>(ctx, 'core_course_get_contents', { courseid: cid });
-  const m = sections.flatMap((s) => s.modules ?? []).find((x) => x.modname === 'lti' && x.name === name);
+  return sections.flatMap((s) => s.modules ?? []).filter((x) => x.modname === 'lti');
+}
+
+/** An external-tool (LTI) activity of the course, by name or by course-module id. */
+async function ltiActivity(ctx: Ctx, cid: number, by: { name?: unknown; cmId?: unknown }): Promise<{ cmid: number; instance: number; name: string }> {
+  const all = await ltiActivities(ctx, cid);
+  const m = by.cmId !== undefined ? all.find((x) => x.id === Number(by.cmId)) : all.find((x) => x.name === str(by.name, 'activity'));
   if (!m) throw new MoodleWsError('activity_not_found', 404);
   return { cmid: m.id, instance: m.instance, name: m.name };
 }
@@ -161,7 +167,10 @@ async function perform(ctx: Ctx, action: MoodleWsAction, body: Record<string, un
     case 'find-course':
       return { courseId: cid, shortname: c.shortname, linkedCourseIds: ctx.linkedCourseIds };
     case 'find-activity': {
-      const a = await ltiActivity(ctx, cid, str(body.name, 'name'));
+      if (body.name === undefined && body.cmId === undefined) {
+        return { activities: (await ltiActivities(ctx, cid)).map((m) => ({ cmId: m.id, instanceId: m.instance, name: m.name })) };
+      }
+      const a = await ltiActivity(ctx, cid, { name: body.name, cmId: body.cmId });
       audit.cmId = a.cmid;
       return { cmId: a.cmid, instanceId: a.instance, name: a.name };
     }
@@ -223,7 +232,7 @@ async function perform(ctx: Ctx, action: MoodleWsAction, body: Record<string, un
       if (!id) throw new MoodleWsError('user_not_found', 404);
       const grade = Number(body.grade);
       if (!Number.isFinite(grade) || grade < 0 || grade > 100) throw new MoodleWsError('grade_out_of_range', 400, 'grade must be 0-100');
-      const a = await ltiActivity(ctx, cid, str(body.activity, 'activity'));
+      const a = await ltiActivity(ctx, cid, { name: body.activity, cmId: body.cmId });
       audit.wsFunction = 'core_grades_update_grades';
       audit.moodleUserId = id;
       audit.cmId = a.cmid;
