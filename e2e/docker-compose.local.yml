@@ -1,0 +1,17 @@
+# Local development only (not used in CI): run ENARA from this worktree's
+# prebuilt backend/dist and frontend/dist instead of building the image.
+#   (cd backend && npx tsc -p .) && (cd frontend && VITE_API_URL=/api npx vite build)
+services:
+  enara-spa:
+    image: node:22-alpine
+    volumes:
+      - ../frontend/dist:/app/public:ro
+  enara:
+    image: node:22-alpine
+    working_dir: /app
+    command: ["node", "dist/index.js"]
+    user: node
+    volumes:
+      - ../backend/dist:/app/dist:ro
+      - ../backend/package.json:/app/package.json:ro
+      - ${LOCAL_NODE_MODULES:-../backend/node_modules}:/app/node_modules:ro
