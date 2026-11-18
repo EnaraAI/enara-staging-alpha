@@ -50,7 +50,7 @@ test.describe.serial('6 · School B on the same Moodle + isolation', () => {
     const platforms = await enaraApi.get('/api/lms/platforms?institutionId=LT-SCHOOL-B', admin);
     const p = ((platforms.platforms ?? platforms) as any[]).find((x) => x.clientId === b!.clientid);
     expect(p?.status).toBe('active');
-    moodleCli('tool-settings', { name: b!.name, category: 'School B' });
+    moodleCli('tool-settings', { typeid: b!.id, category: 'School B' });
     const after = moodleTools().find((t) => t.id === b!.id)!;
     expect(after.state).toBe(1);
     expect(after.categories).toEqual([moodleProvision().categories['School B']]);

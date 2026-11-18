@@ -11,7 +11,10 @@ services:
     working_dir: /app
     command: ["node", "dist/index.js"]
     user: node
+    environment:
+      SERVE_FRONTEND_DIR: /app/public   # as Dockerfile.staging-single sets it
     volumes:
+      - ../frontend/dist:/app/public:ro
       - ../backend/dist:/app/dist:ro
       - ../backend/package.json:/app/package.json:ro
       - ${LOCAL_NODE_MODULES:-../backend/node_modules}:/app/node_modules:ro

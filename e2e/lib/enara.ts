@@ -98,3 +98,22 @@ export async function enaraFrameAt(page: Page, path: RegExp, timeout = 90_000): 
     await page.waitForTimeout(250);
   }
 }
+
+/**
+ * A browser context signed in to ENARA's own site (not through an LMS) as a
+ * seeded account, through the sign-in page.
+ */
+export async function enaraUiSession(browser: import('@playwright/test').Browser, key: string, tab: 'ENARA team' | 'School staff' = 'ENARA team'): Promise<{ context: import('@playwright/test').BrowserContext; page: Page }> {
+  const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1366, height: 900 }, deviceScaleFactor: 1, permissions: ['clipboard-read', 'clipboard-write'] });
+  const page = await context.newPage();
+  page.on('pageerror', (e) => console.log(`[pageerror enara ${key}]`, String(e).slice(0, 500)));
+  // ENARA's first-visit product tour (not under test) opens over the page: skip it.
+  await page.addLocatorHandler(page.getByRole('button', { name: 'Skip tour' }), async (b) => { await b.click(); });
+  await page.goto(`${ENARA}/`);
+  await page.getByRole('tab', { name: tab, exact: true }).click();
+  await page.locator('#si-email').fill(seedEmail(key));
+  await page.locator('#si-pass').fill(secrets.enaraPassword);
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect.poll(() => page.evaluate(() => !!(sessionStorage.getItem('enara_token') || localStorage.getItem('enara_token'))), { timeout: 30_000 }).toBe(true);
+  return { context, page };
+}
