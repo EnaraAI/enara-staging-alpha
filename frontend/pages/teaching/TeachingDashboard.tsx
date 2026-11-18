@@ -10,6 +10,7 @@ import {
   fetchLearnerProfile,
   fetchTeachingOverview,
   isFeatureDisabled,
+  syncLmsRoster,
   updateEducatorIntervention,
 } from '../../services/apiService';
 import { toast } from '../../services/toastService';
@@ -179,7 +180,23 @@ export const TeachingDashboard: React.FC = () => {
     setO(null);
     fetchTeachingOverview(origin).then(setO).catch((err) => { if (isFeatureDisabled(err)) setDisabled(true); else toast.error('Could not load', errorText(err)); setO({ classes: [] }); });
   }, [origin]);
-  useEffect(() => { if (classId) { setRoster(null); fetchClassRoster(classId, origin).then(setRoster).catch((err) => toast.error('Could not load class', errorText(err))); } }, [classId, origin]);
+  const [rosterVersion, setRosterVersion] = useState(0);
+  const [syncing, setSyncing] = useState(false);
+  useEffect(() => { if (classId) { setRoster(null); fetchClassRoster(classId, origin).then(setRoster).catch((err) => toast.error('Could not load class', errorText(err))); } }, [classId, origin, rosterVersion]);
+  // LMS Phase 4: a class that is an LMS course can pull its roster from the LMS now.
+  const syncRoster = async (contextId: string) => {
+    setSyncing(true);
+    try {
+      const r = await syncLmsRoster(contextId);
+      if (r.outcome.status === 'failed') toast.error('Roster sync failed', r.outcome.code ?? 'error');
+      else toast.success('Roster synced', `${r.outcome.added ?? 0} added, ${r.outcome.removed ?? 0} removed`);
+      setRosterVersion((v) => v + 1);
+    } catch (err) {
+      toast.error('Roster sync failed', errorText(err));
+    } finally {
+      setSyncing(false);
+    }
+  };
   const selector = <OriginSelector value={origin} onChange={setOrigin} />;
 
   if (disabled) return <p className="max-w-4xl mx-auto p-8 text-slate-700">The teaching workflow isn't enabled for your school.</p>;
@@ -194,13 +211,30 @@ export const TeachingDashboard: React.FC = () => {
           <>
             <h1 className="text-2xl font-bold text-slate-900">{roster.class.courseName}</h1>
             <p className="text-sm text-slate-600">{roster.students.length} students · {roster.assignments} assignments</p>
+            {roster.lms && (
+              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600" data-testid="lms-class-roster">
+                <span>
+                  From your LMS{roster.lms.lastRosterSyncAt ? ` · roster synced ${new Date(roster.lms.lastRosterSyncAt).toLocaleString()}` : ' · roster not synced yet'}
+                  {roster.lms.notStarted ? ` · ${roster.lms.notStarted} not started` : ''}
+                  {roster.lms.lastOutcome === 'failed' && roster.lms.lastErrorCode ? ` · last sync failed (${roster.lms.lastErrorCode})` : ''}
+                </span>
+                {roster.lms.rosterAvailable && (
+                  <button disabled={syncing} onClick={() => syncRoster(roster.lms.contextId)} className="text-sm text-indigo-700 font-semibold disabled:opacity-50">
+                    {syncing ? 'Syncing…' : 'Sync roster now'}
+                  </button>
+                )}
+              </div>
+            )}
             <div className="overflow-x-auto bg-white border border-slate-200 rounded-xl">
               <table className="w-full text-sm">
                 <thead><tr className="text-left text-slate-500"><th className="p-3">Student</th><th className="p-3">Submitted</th><th className="p-3">Late</th><th className="p-3">Missing</th><th className="p-3">Last active</th><th className="p-3">Open follow-ups</th></tr></thead>
                 <tbody>
                   {roster.students.map((s: any) => (
                     <tr key={s.id} className="border-t border-slate-100">
-                      <td className="p-3"><button onClick={() => setStudentId(s.id)} className="font-semibold text-indigo-700">{s.name}</button></td>
+                      <td className="p-3">
+                        <button onClick={() => setStudentId(s.id)} className="font-semibold text-indigo-700">{s.name}</button>
+                        {s.lmsNotStarted && <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700" title="In the LMS course but has not opened ENARA yet">Not started</span>}
+                      </td>
                       <td className="p-3 tabular-nums">{s.submitted}</td>
                       <td className="p-3 tabular-nums">{s.late}</td>
                       <td className={`p-3 tabular-nums ${s.missing ? 'text-rose-700 font-semibold' : ''}`}>{s.missing}</td>

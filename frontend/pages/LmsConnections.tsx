@@ -5,17 +5,22 @@ import {
   approveLmsPlatform,
   createLmsPlatform,
   disableLmsPlatform,
+  fetchLmsContextRoster,
+  fetchLmsContexts,
   fetchLmsGrades,
   fetchLmsPlatforms,
   fetchLmsSeats,
   fetchLmsStatus,
   getSessionUser,
+  LmsContextView,
   LmsGradeStats,
+  LmsNotStarted,
   LmsPlatformView,
   LmsSeats,
   LmsStatus,
   resyncLmsGrades,
   retryLmsDeadGrades,
+  syncLmsRoster,
   updateLmsSeats,
 } from '../services/apiService';
 
@@ -26,6 +31,10 @@ import {
 // Phase 3: when grade passback is switched on, each connection also shows its
 // grade outbox (waiting, sent, failed, the last error code) with "Re-sync
 // grades" and "Retry failed".
+// Phase 4: when roster sync is switched on, each connection lists its LMS
+// courses: last roster sync, counts, the last error code, "Sync roster now",
+// and the students the LMS lists who have not opened ENARA yet ("not started",
+// shown separately from seats: they take no seat until their first launch).
 
 const EMPTY = { vendor: 'moodle', issuer: '', clientId: '', authLoginUrl: '', authTokenUrl: '', keysetUrl: '', deploymentIds: '', institutionId: '' };
 
@@ -51,10 +60,14 @@ export const LmsConnections: React.FC = () => {
   const [seatForm, setSeatForm] = useState({ institutionId: '', seatLimit: '', hardCap: false });
   // null: grade passback is off (the API answers 404).
   const [grades, setGrades] = useState<Record<string, LmsGradeStats> | null>(null);
+  // null: roster sync is off (the API answers 404).
+  const [contexts, setContexts] = useState<LmsContextView[] | null>(null);
+  const [notStarted, setNotStarted] = useState<Record<string, LmsNotStarted[]>>({});
 
   const load = useCallback(async () => {
     try {
-      const [s, p, seat, g] = await Promise.all([fetchLmsStatus(), fetchLmsPlatforms(), fetchLmsSeats(), fetchLmsGrades().catch(() => null)]);
+      const [s, p, seat, g, c] = await Promise.all([fetchLmsStatus(), fetchLmsPlatforms(), fetchLmsSeats(), fetchLmsGrades().catch(() => null), fetchLmsContexts().catch(() => null)]);
+      setContexts(c ? c.contexts : null);
       setStatus(s);
       setPlatforms(p.platforms);
       setSeats(seat.seats ?? null);
@@ -126,6 +139,11 @@ export const LmsConnections: React.FC = () => {
           <p className="text-sm text-slate-600 mt-1">
             {seats.seatsUsed} students{seats.seatLimit !== null ? ` of ${seats.seatLimit} seats` : ''} ({seats.lmsStudents} from your LMS). One seat per student, however many courses they are in.
           </p>
+          {typeof seats.notStarted === 'number' && (
+            <p className="text-sm text-slate-600" data-testid="lms-not-started-seats">
+              Not started: {seats.notStarted} (in your LMS courses but have not opened ENARA yet; not counted as seats until their first launch).
+            </p>
+          )}
           {seats.overLimit && <p className="text-sm text-amber-800 mt-2 font-semibold">Your school is over its seat limit. Students can still sign in; ENARA will contact you about your plan.</p>}
         </section>
       )}
@@ -212,6 +230,51 @@ export const LmsConnections: React.FC = () => {
                   </div>
                 );
               })()}
+              {contexts && (
+                <div className="mt-3 rounded-lg border border-slate-100 px-3 py-2 text-sm text-slate-700" data-testid="lms-roster">
+                  <span className="font-semibold">Courses and rosters</span>
+                  {contexts.filter((c) => c.platformId === p.id).length === 0 && <p className="text-slate-500">No course has opened ENARA yet.</p>}
+                  {contexts.filter((c) => c.platformId === p.id).map((c) => (
+                    <div key={c.id} className="py-2 border-t border-slate-100 first:border-t-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold text-slate-900">{c.title || c.label || c.id}</span>
+                        <span className="text-xs text-slate-500">
+                          {c.students.active} active · {c.students.notStarted} not started · {c.students.inactive} left
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600">
+                        {!c.rosterAvailable ? 'The LMS did not offer its roster service (Names and Role Provisioning) for this course.' : c.lastRosterSyncAt ? `Last roster sync ${new Date(c.lastRosterSyncAt).toLocaleString()}` : 'Roster not synced yet.'}
+                        {c.sync?.outcome && ` · ${c.sync.outcome}${c.sync.trigger ? ` (${c.sync.trigger})` : ''}: ${c.sync.added ?? 0} added, ${c.sync.reactivated ?? 0} back, ${c.sync.removed ?? 0} removed, ${c.sync.unchanged ?? 0} unchanged`}
+                        {(c.sync?.conflicts ?? 0) > 0 && ` · ${c.sync!.conflicts} role conflicts`}
+                        {(c.sync?.deferred ?? 0) > 0 && ` · ${c.sync!.deferred} more next run`}
+                        {c.sync?.lastErrorCode && <> · last error <code className="bg-slate-50 px-1 rounded">{c.sync.lastErrorCode}</code>{c.sync.lastErrorAt ? ` (${new Date(c.sync.lastErrorAt).toLocaleString()})` : ''}</>}
+                      </p>
+                      <div className="flex flex-wrap gap-3 mt-1">
+                        {c.rosterAvailable && (
+                          <button disabled={busy} className="text-sm font-semibold text-teal-700"
+                            onClick={() => act(async () => {
+                              const r = await syncLmsRoster(c.id);
+                              if (r.outcome.status === 'failed') throw new Error(`Roster sync failed (${r.outcome.code ?? 'error'}).`);
+                            }, 'Roster synced.')}>
+                            Sync roster now
+                          </button>
+                        )}
+                        {c.students.notStarted > 0 && (
+                          <button className="text-sm font-semibold text-slate-700"
+                            onClick={() => notStarted[c.id] ? setNotStarted((m) => { const n = { ...m }; delete n[c.id]; return n; }) : void fetchLmsContextRoster(c.id).then((r) => setNotStarted((m) => ({ ...m, [c.id]: r.notStarted }))).catch((e) => setMessage({ ok: false, text: (e as Error).message }))}>
+                            {notStarted[c.id] ? 'Hide not started' : `Show not started (${c.students.notStarted})`}
+                          </button>
+                        )}
+                      </div>
+                      {notStarted[c.id] && (
+                        <ul className="mt-1 list-disc pl-5 text-xs text-slate-600" data-testid="lms-not-started-list">
+                          {notStarted[c.id].map((n) => <li key={n.lmsUserId}>{n.name ?? n.lmsUserId} <span className="text-slate-400">· listed since {new Date(n.listedSince).toLocaleDateString()}</span></li>)}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="flex flex-wrap gap-3 mt-3">
                 {isEnara && p.status !== 'active' && (
                   <button disabled={busy} className="text-sm font-semibold text-teal-700" onClick={() => act(() => approveLmsPlatform(p.id), 'Connection approved.')}>

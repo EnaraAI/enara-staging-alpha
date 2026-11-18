@@ -1333,6 +1333,8 @@ export interface LmsStatus {
 }
 export interface LmsSeats {
   institutionId: string; seatsUsed: number; lmsStudents: number; seatLimit: number | null; hardCap: boolean;
+  /** Phase 4: students the LMS roster listed who have not opened ENARA yet; shown, not counted as seats. */
+  notStarted?: number;
   overLimit: boolean; billingFlaggedAt: string | null; lastAlertAt: string | null;
 }
 export const fetchLmsStatus = () => request<LmsStatus>('GET', '/api/lms/status');
@@ -1353,6 +1355,23 @@ export const resyncLmsGrades = (platformId: string) => request<{ links: number; 
 export const retryLmsDeadGrades = (platformId: string) => request<{ retried: number }>('POST', `/api/lms/platforms/${encodeURIComponent(platformId)}/grades/retry-dead`, {});
 export const fetchLmsSeats = () => request<{ seats?: LmsSeats; flagged?: LmsSeats[] }>('GET', '/api/lms/seats');
 export const updateLmsSeats = (body: { institutionId: string; seatLimit?: number | null; hardCap?: boolean; clearBillingFlag?: boolean }) => request<{ seats: LmsSeats }>('PUT', '/api/lms/seats', body);
+/** Roster sync (Phase 4), per LMS course. The API answers 404 while LMS_ROSTER_SYNC_ENABLED is off. */
+export interface LmsRosterSyncState {
+  lastAttemptAt?: string; trigger?: string; outcome?: 'ok' | 'partial' | 'failed';
+  members?: number; pages?: number; added?: number; reactivated?: number; removed?: number; unchanged?: number;
+  conflicts?: number; ignored?: number; deferred?: number; instructorsAdded?: number; instructorsRemoved?: number;
+  lastErrorCode?: string; lastErrorAt?: string;
+}
+export interface LmsContextView {
+  id: string; platformId: string; institutionId: string; title: string | null; label: string | null; enaraClassId: string | null;
+  rosterAvailable: boolean; lastRosterSyncAt: string | null; sync: LmsRosterSyncState | null;
+  students: { active: number; notStarted: number; inactive: number };
+}
+export interface LmsNotStarted { lmsUserId: string; studentId: string | null; name: string | null; listedSince: string }
+export interface LmsRosterOutcome extends LmsRosterSyncState { contextId: string; status: 'ok' | 'partial' | 'failed' | 'skipped' | 'busy'; code?: string }
+export const fetchLmsContexts = () => request<{ contexts: LmsContextView[] }>('GET', '/api/lms/contexts');
+export const fetchLmsContextRoster = (contextId: string) => request<{ context: LmsContextView; notStarted: LmsNotStarted[] }>('GET', `/api/lms/contexts/${encodeURIComponent(contextId)}/roster`);
+export const syncLmsRoster = (contextId: string) => request<{ outcome: LmsRosterOutcome; context: LmsContextView }>('POST', `/api/lms/contexts/${encodeURIComponent(contextId)}/roster/sync`, {});
 
 // MULTI-CLASS STEP 6: ARCHIVING (backend switches ENROLLMENT_GROUP_ARCHIVE /
 // ENROLLMENT_STUDENT_ARCHIVE). The settings route answers 404 while both are
