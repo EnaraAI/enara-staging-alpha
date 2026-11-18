@@ -202,7 +202,8 @@ export async function buildDeepLinkResponse(
       graded: items.filter((i) => i.graded).length,
       newWindow: items.filter((i) => i.needsMedia).length,
       withDue: items.filter((i) => i.custom[DUE_PARAM]).length,
-      pages: items.filter((i) => i.custom[TARGET_PARAM]).length,
+      pages: items.filter((i) => i.custom[TARGET_PARAM] && !i.activity).length,
+      noGradeActivities: items.filter((i) => i.activity).length,
       itemIds: items.map((i) => itemKey(i.type, i.id)).join(',').slice(0, 200),
     },
   });

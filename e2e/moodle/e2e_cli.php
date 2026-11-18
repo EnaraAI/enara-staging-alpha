@@ -10,6 +10,8 @@
 //   tool-settings --name=N|--typeid=ID --category=C   the 4 settings Moodle cannot take from
 //                             dynamic registration: Activate, show in activity
 //                             chooser, Accept grades = Always, Restrict to category
+//   tool-acceptgrades --typeid=N --value=0|1|2   Privacy › Accept grades from the tool:
+//                             Never (0), Always (1), Delegate to teacher (2) (Phase 8 grade-column check)
 //   enrol --user=U --course=SHORT [--role=student]
 //   unenrol --user=U --course=SHORT
 //   activities --course=SHORT the LTI activities of a course (id, cmid, name, typeid, intro)
@@ -194,6 +196,20 @@ switch ($cmd) {
         $DB->insert_record('lti_types_categories', (object) ['typeid' => $type->id, 'categoryid' => $catid]);
         purge_all_caches();
         out(['typeid' => (int) $type->id, 'category' => $catid]);
+    }
+
+    case 'tool-acceptgrades': {
+        $typeid = (int) opt($opts, 'typeid');
+        $value = (int) opt($opts, 'value');
+        if (!in_array($value, [LTI_SETTING_NEVER, LTI_SETTING_ALWAYS, LTI_SETTING_DELEGATE], true)) {
+            fwrite(STDERR, "--value must be 0, 1 or 2\n");
+            exit(2);
+        }
+        $DB->get_record('lti_types', ['id' => $typeid], 'id', MUST_EXIST);
+        lti_update_config((object) ['typeid' => $typeid, 'name' => 'acceptgrades', 'value' => $value]);
+        purge_all_caches();
+        $cfg = $DB->get_records_menu('lti_types_config', ['typeid' => $typeid], '', 'name, value');
+        out(['typeid' => $typeid, 'acceptgrades' => (int) ($cfg['acceptgrades'] ?? -1)]);
     }
 
     case 'enrol':

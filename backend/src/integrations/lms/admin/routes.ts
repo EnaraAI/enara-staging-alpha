@@ -32,6 +32,8 @@ import { isKnownVendor, listPresets } from '../presets';
 import { requireLti } from '../routes';
 import { onboardingRouter } from './onboardingRoutes';
 import { problemsRouter } from './problemsRoutes';
+import { activityRouter } from './activityRoutes';
+import { pageTargetRequest, resolvePageTarget } from '../core/pageTargets';
 
 // /api/lms (Phase 1a). Inert (the app's normal 404) unless LMS_LTI_ENABLED is
 // on and the LMS config is valid.
@@ -326,7 +328,7 @@ lmsAdminRouter.post(
     const requestedLink = getOptionalId(body, 'resourceLinkId');
     const rawPage = body.page;
     if (rawPage !== undefined && rawPage !== null && (typeof rawPage !== 'string' || !PAGE_KEY.test(rawPage))) throw new AppError('page is invalid', 400, 'VALIDATION_ERROR');
-    const targetPage = typeof rawPage === 'string' ? rawPage : undefined;
+    let targetPage = typeof rawPage === 'string' ? rawPage : undefined;
 
     // The LMS activity, when given: it must be this school's, on a platform this account came from.
     let platformId: string | undefined;
@@ -334,7 +336,7 @@ lmsAdminRouter.post(
     let resourceLinkId: string | undefined;
     let targetAssignmentId: string | undefined;
     if (requestedLink) {
-      const rl = await LmsResourceLink.findOne({ id: requestedLink, institutionId }).select('id contextId enaraActivityId').lean();
+      const rl = await LmsResourceLink.findOne({ id: requestedLink, institutionId }).select('id contextId enaraActivityId customParams').lean();
       const ctx = rl ? await LmsContext.findOne({ id: rl.contextId, institutionId }).select('id platformId').lean() : null;
       if (!rl || !ctx) throw targetNotFound();
       if (requestedAssignment && rl.enaraActivityId && requestedAssignment !== rl.enaraActivityId) {
@@ -343,7 +345,17 @@ lmsAdminRouter.post(
       platformId = ctx.platformId;
       contextId = ctx.id;
       resourceLinkId = rl.id;
-      targetAssignmentId = rl.enaraActivityId ?? requestedAssignment;
+      // Phase 8: a page-target activity (enara_target: a page link, or the tutor,
+      // live avatar or diagnostic) reopens its own page in the new tab when the
+      // caller names none (e.g. the mic notice's "Open in a new tab"), resolved
+      // for the role the session has. Never the work the link was bound to before.
+      const linkPage = pageTargetRequest((rl.customParams ?? {}) as Record<string, string>);
+      if (linkPage !== null) {
+        targetAssignmentId = requestedAssignment;
+        if (!targetPage && !requestedAssignment) targetPage = resolvePageTarget(linkPage, user.preview === true ? 'student' : role).page;
+      } else {
+        targetAssignmentId = rl.enaraActivityId ?? requestedAssignment;
+      }
     } else {
       targetAssignmentId = requestedAssignment;
     }
@@ -661,6 +673,10 @@ gradesRouter.post(
     res.json({ retried });
   }),
 );
+
+// Phase 8: tutor, live avatar and diagnostic activities (readiness and the teacher's overview).
+// Before the grades router, whose admin check applies to every path after it.
+lmsAdminRouter.use(activityRouter);
 
 lmsAdminRouter.use(gradesRouter);
 
