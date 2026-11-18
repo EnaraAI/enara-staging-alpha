@@ -71,8 +71,15 @@ test.describe.serial('12 · Parents P3: results reach parents only after release
     let item: any;
     await expect.poll(async () => { item = (await progressOf(token)).assessments.items.find((i: any) => i.id === st.attemptId); return item?.waiting === true; }, { timeout: 60_000 }).toBe(true);
     expect(item).toMatchObject({ score: null, passed: null, verified: false });
+    // "Score dropped" reads released results only: the two latest VISIBLE scores decide it, never the held one
+    // (the student's earlier released quiz results from scenario 4 may well be a real drop, 75 -> 25).
+    const visible = (await progressOf(token)).assessments.items.filter((i: any) => i.score !== null);
     const status = await enaraApi.get(`/api/parents/learners/${st.studentId}/status`, token);
-    expect(status.status.reason.code).not.toBe('score_drop');
+    if (visible.length >= 2 && visible[1].score - visible[0].score >= 20) {
+      expect(status.status.reason).toMatchObject({ code: 'score_drop', params: { from: visible[1].score, to: visible[0].score } });
+    } else {
+      expect(status.status.reason.code).not.toBe('score_drop');
+    }
     await page.getByRole('button', { name: 'Progress' }).click();
     const row = page.getByTestId('pp-result').filter({ hasText: TITLE });
     await expect(row).toBeVisible();
