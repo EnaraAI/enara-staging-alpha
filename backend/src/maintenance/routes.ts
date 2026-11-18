@@ -1,4 +1,3 @@
-import { timingSafeEqual } from 'crypto';
 import { Router, type NextFunction, type Request, type Response } from 'express';
 import mongoose from 'mongoose';
 import { getConfig } from '../config/env';
@@ -8,55 +7,67 @@ import { logger } from '../utils/logging';
 import { applyBackfill, planBackfill, undoBackfill } from '../services/enrollmentBackfill';
 import { shadowReport } from '../services/enrollmentShadowReport';
 import { cleanDanglingClassMembers, planDanglingClassMembers } from '../services/danglingClassMembers';
+import { maintenanceAllowed, maintenanceAuthorised } from './guards';
 import { seedLmsTest } from './lmsTestSeed';
+import { mockLmsRouter } from './mockLms';
+import { runHealthCheck, setupHealthCheck } from './healthCheck';
 
-// Maintenance for the LMS TEST deployment only (lms-test.enara.app). This
-// sandbox and the operator's tools can't reach the test database directly, so
-// migrations and the fake seed run inside the deployed app. Every request must
-// pass ALL of these, or the route answers 404 as if it did not exist:
-//   1. MAINTENANCE_ENDPOINTS_ENABLED=true (set only on the test project);
-//   2. MONGODB_URI points at the test cluster (host starts "enara-lms-test.");
-//   3. Authorization: Bearer <MAINTENANCE_TOKEN> (>= 32 chars), constant-time.
-// test.enara.app never has the switch or the token, and its database is a
-// different cluster, so these routes cannot run there.
-export const TEST_CLUSTER_HOST_PREFIX = 'enara-lms-test.';
-
-export function mongoHost(uri: string): string | null {
-  const m = /^mongodb(?:\+srv)?:\/\/([^/?]*)/.exec(uri.trim());
-  if (!m) return null;
-  const hosts = m[1].slice(m[1].lastIndexOf('@') + 1); // after the credentials (last @)
-  const first = hosts.split(',')[0].split(':')[0];
-  return first ? first.toLowerCase() : null;
-}
-
-export function maintenanceAllowed(env: NodeJS.ProcessEnv, mongoUri: string): boolean {
-  if (env.MAINTENANCE_ENDPOINTS_ENABLED !== 'true') return false;
-  if ((env.MAINTENANCE_TOKEN ?? '').length < 32) return false;
-  return (mongoHost(mongoUri) ?? '').startsWith(TEST_CLUSTER_HOST_PREFIX);
-}
-
-function authorised(header: unknown, token: string): boolean {
-  const given = Buffer.from(typeof header === 'string' ? header : '');
-  const expected = Buffer.from(`Bearer ${token}`);
-  return given.length === expected.length && timingSafeEqual(given, expected);
-}
+// Maintenance for the LMS TEST deployment only (lms-test.enara.app): 404 unless
+// switched on AND MONGODB_URI is the test cluster AND a maintenance token is
+// configured; then 401 without Bearer MAINTENANCE_TOKEN or MAINTENANCE_CI_TOKEN.
+// The rules are in guards.ts (re-exported here for callers and tests).
+export { TEST_CLUSTER_HOST_PREFIX, MIN_TOKEN_LENGTH, mongoHost, maintenanceTokens, maintenanceAllowed, maintenanceAuthorised } from './guards';
 
 const router = Router();
 
-router.use((req: Request, res: Response, next: NextFunction) => {
+router.use((_req: Request, _res: Response, next: NextFunction) => {
   if (!maintenanceAllowed(process.env, getConfig().mongoUri)) return next('router');
-  if (!authorised(req.headers.authorization, process.env.MAINTENANCE_TOKEN!)) {
+  next();
+});
+
+// The mock LMS for the deploy health check: its protocol endpoints have their own
+// checks instead of the maintenance token; its sign-in needs the token (mockLms.ts).
+router.use('/mock-lms', mockLmsRouter);
+
+router.use((req: Request, res: Response, next: NextFunction) => {
+  if (!maintenanceAuthorised(req.headers.authorization)) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
   next();
 });
 
+// Deploy health check (healthCheck.ts): registers the mock LMS for the fake
+// school, then runs login -> launch -> exchange -> submit -> grade over HTTP.
+router.post('/health-check/setup', async (_req, res, next) => {
+  try {
+    const out = await setupHealthCheck();
+    logger.info('maintenance_health_setup', { ok: out.ok, code: out.code });
+    res.status(out.ok ? 200 : 409).json(out);
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.post('/health-check/run', async (req, res, next) => {
+  try {
+    const out = await runHealthCheck({ authorization: String(req.headers.authorization) });
+    logger.info('maintenance_health_run', { ok: out.ok, failed: out.steps.filter((s) => !s.ok).map((s) => s.name).join(',') });
+    res.json(out); // 200 either way: the body's ok and steps say what failed
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.get('/status', async (_req, res, next) => {
   try {
     const pending = await pendingMigrations(MIGRATIONS);
     const collections = (await mongoose.connection.db!.listCollections().toArray()).map((c) => c.name).sort();
-    res.json({ database: mongoose.connection.db!.databaseName, pendingMigrations: pending.map((m) => m.id), collections: collections.length });
+    res.json({
+      database: mongoose.connection.db!.databaseName, pendingMigrations: pending.map((m) => m.id), collections: collections.length,
+      // Which Vercel deployment answered (the pipeline checks it after a deploy or a rollback).
+      deployment: { url: process.env.VERCEL_URL ?? null, id: process.env.VERCEL_DEPLOYMENT_ID ?? null },
+    });
   } catch (e) {
     next(e);
   }

@@ -1,0 +1,30 @@
+{
+  "$comment": "Feature switches each feature needs on lms-test.enara.app (Vercel project enara-lms-test, Production). Before every deploy the pipeline (deploy/lms-test/cli.mjs apply-flags) creates the ones that are missing and corrects the ones that differ, as plain variables. It never removes a variable and never touches a Sensitive one. Only switch names are allowed here (LMS_*, ENROLLMENT_*, GRADE_LEDGER_*, MAINTENANCE_ENDPOINTS_*, MOODLE_TEST_WS_*; nothing that looks like a key, token, password or address). A feature PR adds its own entry. test.enara.app is frozen: this file is for lms-test only. docs/lms/CONTINUOUS_DELIVERY.md",
+  "project": { "name": "enara-lms-test", "id": "prj_tuRpwEJLz1dEQOj6RSEk2xUpqtIn", "target": "production" },
+  "features": [
+    { "name": "LMS Phase 1a: LTI 1.3 launch", "docs": "docs/lms/PHASE_1A_NOTES.md", "flags": { "LMS_LTI_ENABLED": "true" } },
+    { "name": "LMS Phase 2: activity picker (LTI Deep Linking)", "docs": "docs/lms/PHASE_2_NOTES.md", "flags": { "LMS_DEEP_LINKING_ENABLED": "true" } },
+    { "name": "LMS Phase 3: grades to the LMS (AGS)", "docs": "docs/lms/PHASE_3_NOTES.md", "flags": { "LMS_GRADE_PASSBACK_ENABLED": "true" } },
+    { "name": "LMS Phase 4: roster sync (NRPS)", "docs": "docs/lms/PHASE_4_NOTES.md", "flags": { "LMS_ROSTER_SYNC_ENABLED": "true" } },
+    { "name": "Grade ledger", "docs": "docs/lms/GRADE_LEDGER_NOTES.md", "flags": { "GRADE_LEDGER_ENABLED": "true" } },
+    { "name": "Multi-class step 2: enrollment dual write", "docs": "docs/multi-class/STEP_2_NOTES.md", "flags": { "ENROLLMENT_DUAL_WRITE": "true" } },
+    { "name": "Multi-class step 4: enrollment shadow check", "docs": "docs/multi-class/STEP_4_NOTES.md", "flags": { "ENROLLMENT_SHADOW": "true" } },
+    { "name": "Test-site maintenance routes (migrations and the deploy health check)", "docs": "docs/lms/CONTINUOUS_DELIVERY.md", "flags": { "MAINTENANCE_ENDPOINTS_ENABLED": "true" } }
+  ],
+  "notManaged": {
+    "$comment": "Read by people only. Switches that exist but are NOT set by the pipeline, with the reason. Move one into features only with the owner's OK.",
+    "LMS_TOOL_BASE_URL": "an address, not a switch (https://lms-test.enara.app, set by hand)",
+    "LMS_KEK": "a secret (Sensitive), set by hand",
+    "MAINTENANCE_TOKEN": "a secret (Sensitive), set by hand",
+    "MAINTENANCE_CI_TOKEN": "a secret (Sensitive), same value as the GitHub secret LMSTEST_MAINTENANCE_TOKEN, set by hand",
+    "LMS_DRAIN_TRIGGERS": "leave unset (the default) per docs/lms/PHASE_3_NOTES.md",
+    "LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL": "leave unset (true) per docs/lms/PHASE_1A_NOTES.md",
+    "ENROLLMENT_READ_FROM": "multi-class step 5: features are switched on one at a time after the burst (docs/multi-class/STEP_5_PLAN.md); not yet recorded as on",
+    "ENROLLMENT_MULTI_CLASS": "multi-class step 6: needs dual write and all seven ENROLLMENT_READ_FROM features (docs/multi-class/STEP_6_NOTES.md); not yet recorded as on",
+    "ENROLLMENT_GROUP_ARCHIVE": "multi-class step 6 archiving: not yet recorded as on (docs/multi-class/ARCHIVE_NOTES.md)",
+    "ENROLLMENT_STUDENT_ARCHIVE": "multi-class step 6 archiving: not yet recorded as on (docs/multi-class/ARCHIVE_NOTES.md)",
+    "ENROLLMENT_ATTENDANCE_FIX": "multi-class step 5 Q7: not yet recorded as on",
+    "ENROLLMENT_AGE_FROM_BIRTHDATE": "multi-class step 5 Q8: has no effect yet",
+    "MOODLE_TEST_WS_ENABLED": "the test-only Moodle Web Services tool, set by hand with its token"
+  }
+}
