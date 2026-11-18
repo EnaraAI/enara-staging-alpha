@@ -21,6 +21,7 @@ import { originFilter, parseOriginView, studentsInView, type OriginView } from '
 import { assignmentStatus, studentStatus } from '../services/assignments';
 import { getFeatureFlags, isFeatureEnabled } from '../services/featureFlags';
 import { getEnrolledInstances } from '../services/studentCourseService';
+import { lmsRosterForClass } from '../integrations/lms/core/roster';
 import { attemptsInScope, eventsInScope, interventionInScope, sharedAttempts, teacherClassScope } from '../services/multiClass';
 import { ensurePlainObject, getOptionalId, getOptionalString, getRequiredId, getRequiredString, rejectMongoOperators } from '../utils/validation';
 
@@ -141,9 +142,15 @@ export const getRoster = asyncHandler(async (req: AuthRequest, res: Response) =>
   ]);
   const rows = await statusesFor(assignments as never, new Map([[cls.id, ids]]), view);
   const last = new Map(lastEvents.map((e: { _id: string; at: Date }) => [e._id, e.at]));
+  // LMS Phase 4: for a class that is an LMS course, the students the LMS
+  // roster listed who have not opened ENARA yet ("not started"). Null when
+  // roster sync is off or the class is not an LMS course.
+  const lms = await lmsRosterForClass(cls.id, cls.institutionId);
+  const notStartedInLms = new Set(lms?.notStartedStudentIds ?? []);
   res.json({
     origin: view,
     class: { id: cls.id, courseName: cls.courseName },
+    lms: lms ? { contextId: lms.contextId, rosterAvailable: lms.rosterAvailable, lastRosterSyncAt: lms.lastRosterSyncAt, lastOutcome: lms.lastOutcome, lastErrorCode: lms.lastErrorCode, notStarted: notStartedInLms.size } : null,
     assignments: assignments.length,
     students: students.map((s) => {
       const r = rows.filter((x) => x.studentId === s.id);
@@ -157,6 +164,7 @@ export const getRoster = asyncHandler(async (req: AuthRequest, res: Response) =>
         notStarted: r.filter((x) => x.status === 'not_started').length,
         lastActiveAt: last.get(s.id) ?? null,
         openInterventions: interventions.filter((i) => i.studentId === s.id).length,
+        ...(lms ? { lmsNotStarted: notStartedInLms.has(s.id) } : {}),
       };
     }),
   });

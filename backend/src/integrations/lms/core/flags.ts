@@ -6,6 +6,8 @@ export interface LmsFlags {
   lti: boolean;
   googleClassroom: boolean;
   gradePassback: boolean;
+  /** Phase 4 roster sync (NRPS). On only with LMS_LTI_ENABLED too. */
+  roster: boolean;
   problem?: string;
 }
 
@@ -16,13 +18,14 @@ export function lmsFlags(): LmsFlags {
     lti: ok && lms.ltiEnabled,
     googleClassroom: ok && lms.googleClassroomEnabled,
     gradePassback: ok && lms.gradePassbackEnabled,
+    roster: ok && lms.ltiEnabled && lms.rosterSyncEnabled,
     problem: lms.problem,
   };
 }
 
 export function anyLmsFlagSet(): boolean {
   const lms = getConfig().lms;
-  return lms.ltiEnabled || lms.googleClassroomEnabled || lms.gradePassbackEnabled;
+  return lms.ltiEnabled || lms.googleClassroomEnabled || lms.gradePassbackEnabled || lms.rosterSyncEnabled;
 }
 
 /** Phase 1a settings read by the LTI and admin routes. */

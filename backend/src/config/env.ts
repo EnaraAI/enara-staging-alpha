@@ -149,6 +149,8 @@ export interface LmsConfig {
   ltiEnabled: boolean;
   googleClassroomEnabled: boolean;
   gradePassbackEnabled: boolean;
+  /** Phase 4: roster sync through LTI NRPS (needs LMS_LTI_ENABLED). Default off. */
+  rosterSyncEnabled: boolean;
   toolBaseUrl?: string;
   /** Key-encryption key (32 bytes) and an optional previous one for rotation. */
   kek?: Buffer;
@@ -258,6 +260,7 @@ export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
     ltiEnabled,
     googleClassroomEnabled,
     gradePassbackEnabled: readBoolean(source, 'LMS_GRADE_PASSBACK_ENABLED', false),
+    rosterSyncEnabled: readBoolean(source, 'LMS_ROSTER_SYNC_ENABLED', false),
     toolBaseUrl,
     kek: kek.value,
     kekPrevious: kekPrevious.value,

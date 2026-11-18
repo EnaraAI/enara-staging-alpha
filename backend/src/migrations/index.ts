@@ -25,7 +25,7 @@ import { LessonProgress } from '../models/LessonProgress';
 import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
-import { LMS_MODELS, LMS_PHASE1A_MODELS, LmsGradeSyncJob, LmsLaunchToken, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsToolKey } from '../integrations/lms/models';
+import { LMS_MODELS, LMS_PHASE1A_MODELS, LmsContext, LmsGradeSyncJob, LmsLaunchToken, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsToolKey } from '../integrations/lms/models';
 import { ClassEnrollment } from '../models/ClassEnrollment';
 import { ReminderLog } from '../models/ReminderLog';
 import { SignInEvent } from '../models/SignInEvent';
@@ -433,6 +433,14 @@ export const MIGRATIONS: Migration[] = [
       const jobs = await LmsGradeSyncJob.collection.indexes();
       if (!jobs.some((i) => i.key.resourceLinkId === 1 && i.key.lmsUserId === 1)) throw new Error('lms_grade_sync_jobs slot index missing');
       if (!(await LmsResourceLink.collection.indexes()).some((i) => i.key.enaraActivityId === 1)) throw new Error('lms_resource_links enaraActivityId index missing');
+    },
+  },
+  {
+    id: '2026-11-19-lms-phase4-indexes',
+    description: 'LMS Phase 4 (roster sync): lms_contexts (status, lastRosterSyncAt) for the nightly sync (additive; no existing rows touched)',
+    up: async () => {
+      await LmsContext.createIndexes();
+      if (!(await LmsContext.collection.indexes()).some((i) => i.key.status === 1 && i.key.lastRosterSyncAt === 1)) throw new Error('lms_contexts roster sync index missing');
     },
   },
 ];

@@ -9,6 +9,7 @@ import { lmsSettings } from '../../core/flags';
 import { loadJose } from '../../core/jose';
 import { issueLaunchToken } from '../../core/launchToken';
 import { scheduleTargetedFlush } from '../../core/drain';
+import { nrpsStudentPreview, scheduleRosterSyncOnLaunch } from '../../core/roster';
 import { isTestUser, mapLtiRoles } from '../../core/roleMap';
 import type { LaunchResult } from '../../core/types';
 import { LmsDeployment, LmsOidcState, LmsPlatform, type ILmsPlatform } from '../../models';
@@ -320,6 +321,9 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
   let preview;
   try {
     preview = await findStudentPreview(input);
+    // Phase 4 (owner item): a first-ever launch already switched to student.
+    // No ENARA account yet: ask the LMS roster (NRPS) for the real course role.
+    if (!preview) preview = await nrpsStudentPreview(input, platform);
   } catch (error) {
     if (error instanceof LmsProvisionError) return fail(error.code, 'lti.launch', { platform, refIds: { role: mapped.role, testUser: !!input.testUser } });
     throw error;
@@ -406,6 +410,9 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
   // Plan §5 (d): a learner's launch flushes that learner's pending grades; a
   // teacher's launch flushes the course's. Background; inert unless passback is on.
   scheduleTargetedFlush(tokenRole === 'student' ? { lmsUserId: provisioned.lmsUser.id } : { contextId: provisioned.context.id });
+  // Phase 4: a teacher's launch syncs the roster in the background when the
+  // last sync is older than 24 h. Inert unless LMS_ROSTER_SYNC_ENABLED is on.
+  const rosterSyncStarted = tokenRole !== 'student' ? scheduleRosterSyncOnLaunch(provisioned.context) : false;
   await writeLmsAudit({
     event: 'lti.launch',
     outcome: mapped.warnings.length || cookieless || provisioned.seat?.overLimit ? 'warn' : 'ok',
@@ -425,6 +432,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
       createdUser: provisioned.createdUser,
       createdContext: provisioned.createdContext,
       overSeatLimit: !!provisioned.seat?.overLimit,
+      ...(rosterSyncStarted ? { rosterSyncStarted } : {}),
     },
   });
   return {

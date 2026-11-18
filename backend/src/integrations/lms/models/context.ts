@@ -20,10 +20,36 @@ export interface ILmsContext {
   agsLineItemsUrl?: string;
   /** AGS scopes the last launch's endpoint claim granted (Phase 3: what the token may ask for, and whether line items may be created). */
   agsScopes?: string[];
+  /** Phase 4: when the roster was last read from the LMS in full (NRPS) and applied. */
   lastRosterSyncAt?: Date;
+  /** Phase 4: the last sync attempt's outcome (IDs, counts and codes only). */
+  rosterSync?: ILmsRosterSyncState;
+  /** Phase 4: one sync at a time per course (lease, across instances). */
+  rosterSyncLeaseUntil?: Date;
   status: 'active' | 'inactive';
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ILmsRosterSyncState {
+  lastAttemptAt?: Date;
+  /** What started it: launch (teacher launch, 24 h), nightly, manual ("Sync roster now"), cron. */
+  trigger?: string;
+  /** ok | partial (more to do next run) | failed */
+  outcome?: 'ok' | 'partial' | 'failed';
+  members?: number;
+  pages?: number;
+  added?: number;
+  reactivated?: number;
+  removed?: number;
+  unchanged?: number;
+  conflicts?: number;
+  refused?: number;
+  deferred?: number;
+  instructorsAdded?: number;
+  instructorsRemoved?: number;
+  lastErrorCode?: string;
+  lastErrorAt?: Date;
 }
 
 const contextSchema = new Schema<ILmsContext>(
@@ -40,11 +66,15 @@ const contextSchema = new Schema<ILmsContext>(
     agsLineItemsUrl: String,
     agsScopes: { type: [String], default: undefined },
     lastRosterSyncAt: Date,
+    rosterSync: { type: Schema.Types.Mixed },
+    rosterSyncLeaseUntil: Date,
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   },
   { collection: 'lms_contexts', versionKey: false, timestamps: true },
 );
 contextSchema.index({ platformId: 1, externalContextId: 1 }, { unique: true });
+// Phase 4: the nightly sync takes the courses synced longest ago first.
+contextSchema.index({ status: 1, lastRosterSyncAt: 1 });
 
 // lms_users: identity is (platform, sub), never email (Spec §4, §8).
 export interface ILmsUser {
@@ -79,6 +109,10 @@ userSchema.index({ platformId: 1, externalUserId: 1 }, { unique: true });
 userSchema.index({ institutionId: 1, enaraUserId: 1 });
 
 // lms_enrollments: a user's membership in a context.
+// Phase 4 (roster sync): 'invited' = listed by the LMS roster (NRPS) but has
+// never opened ENARA from this course ("not started"); the first launch makes
+// it 'active' (firstLaunchAt). 'inactive' = gone from the LMS roster or
+// Inactive there (endedAt); history, grades and the account are kept.
 export interface ILmsEnrollment {
   id: string;
   contextId: string;
@@ -86,8 +120,16 @@ export interface ILmsEnrollment {
   institutionId: string;
   ltiRoles: string[];
   enaraRole: 'student' | 'teacher' | 'admin' | 'observer';
-  status: 'active' | 'inactive' | 'deleted';
+  status: 'invited' | 'active' | 'inactive' | 'deleted';
   source: 'launch' | 'nrps' | 'google_api';
+  /** First launch from this course (Phase 4). Rows created by a launch before Phase 4 have none but source 'launch'. */
+  firstLaunchAt?: Date;
+  /** Last roster sync that listed this member as active. */
+  lastSeenAt?: Date;
+  /** When a roster sync ended the membership. */
+  endedAt?: Date;
+  /** Staff: the LMS (a launch or a sync) added them to the class's instructors; a sync removes only these. */
+  addedInstructor?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -100,8 +142,12 @@ const enrollmentSchema = new Schema<ILmsEnrollment>(
     institutionId: requiredOrg,
     ltiRoles: { type: [String], default: [] },
     enaraRole: { type: String, enum: ['student', 'teacher', 'admin', 'observer'], required: true },
-    status: { type: String, enum: ['active', 'inactive', 'deleted'], default: 'active' },
+    status: { type: String, enum: ['invited', 'active', 'inactive', 'deleted'], default: 'active' },
     source: { type: String, enum: ['launch', 'nrps', 'google_api'], required: true },
+    firstLaunchAt: Date,
+    lastSeenAt: Date,
+    endedAt: Date,
+    addedInstructor: Boolean,
   },
   { collection: 'lms_enrollments', versionKey: false, timestamps: true },
 );

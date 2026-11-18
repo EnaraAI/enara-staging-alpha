@@ -17,6 +17,7 @@ import { sweepDocumentScans } from '../services/documentSafety';
 import { sweepDocumentRetention } from '../services/documentRetention';
 import { sweepSpeakingTranscripts } from '../services/speakingExam';
 import { scheduledDrain, triggerOn } from '../integrations/lms/core/drain';
+import { rosterTriggerOn, scheduledRosterSync } from '../integrations/lms/core/roster';
 
 // Meant to be called once a day by a scheduler that sends
 // "Authorization: Bearer <CRON_SECRET>". Staging deliberately has no Vercel
@@ -41,6 +42,7 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     return;
   }
   try {
+    const startedAt = Date.now();
     const results: Record<string, unknown> = {};
     const failed: string[] = [];
     const run = async (name: string, job: () => Promise<unknown>) => {
@@ -72,6 +74,13 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     await run('demoSessions', () => sweepDemoSessions({ limit: 200 }));
     // LMS grade outbox, last safety net (plan §5 e). Skipped unless passback is on.
     if (triggerOn('daily')) await run('lmsGrades', () => scheduledDrain('daily'));
+    // LMS roster sync, nightly (plan §5 e, Phase 4). Skipped unless roster sync is
+    // on. It gets what is left of a 50 s window (at most 20 s), so the whole run
+    // stays under the 60 s function limit; courses not reached go first next night.
+    if (rosterTriggerOn('daily')) {
+      const budgetMs = Math.min(20_000, 50_000 - (Date.now() - startedAt));
+      await run('lmsRoster', async () => (budgetMs < 5_000 ? { skipped: 'no_time' } : scheduledRosterSync({ trigger: 'nightly', budgetMs })));
+    }
     await run('reminders', () => sendReminders({}));
     if (new Date().getUTCDay() === 1) await run('weekly', () => sendWeeklySummaries());
     logger.info('cron_daily', { ...results, failed });
@@ -93,6 +102,24 @@ router.get('/lms-drain', async (req: Request, res: Response, next: NextFunction)
   }
   try {
     res.json(await scheduledDrain('cron'));
+  } catch (error) {
+    next(error);
+  }
+});
+
+// The roster sync for the same future per-minute (or hourly) scheduler: only
+// courses not synced for 20 h are taken, so calling it often is cheap. Needs
+// LMS_ROSTER_SYNC_ENABLED and 'cron' in LMS_DRAIN_TRIGGERS; otherwise the
+// app's normal 404.
+router.get('/lms-roster', async (req: Request, res: Response, next: NextFunction) => {
+  if (!rosterTriggerOn('cron')) return next();
+  const secret = getConfig().cronSecret;
+  if (!secret || !authorised(req.headers.authorization, secret)) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  try {
+    res.json(await scheduledRosterSync({ trigger: 'cron', budgetMs: 40_000 }));
   } catch (error) {
     next(error);
   }

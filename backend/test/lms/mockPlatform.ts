@@ -9,6 +9,9 @@ import { SignJWT, exportJWK, generateKeyPair, type JWK, type JWTPayload } from '
 // with a JWT client assertion), a line items container (GET by resource link,
 // POST to create) and {lineitem}/scores. Every request is recorded, and
 // failures can be injected (status codes, delays).
+// Phase 4 adds LTI NRPS: GET /memberships/<course> (membership container,
+// `limit` paging with Link rel="next", member statuses, the `role` filter),
+// with the same token check; members are set per course by the test.
 
 export const LIS = 'http://purl.imsglobal.org/vocab/lis/v2/membership#';
 export const ROLE = {
@@ -48,6 +51,16 @@ export interface MockLineItem {
   tag?: string;
 }
 
+export interface MockMember {
+  user_id: string;
+  roles: string[];
+  status?: 'Active' | 'Inactive' | 'Deleted';
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+  email?: string;
+}
+
 export class MockPlatform {
   keys: Key[] = [];
   jwksStatus = 200;
@@ -69,6 +82,16 @@ export class MockPlatform {
   lineItemPosts: Record<string, unknown>[] = [];
   lineItemGets: string[] = [];
   private tokenCount = 0;
+  /** NRPS: members per course id. */
+  memberships: Record<string, MockMember[]> = {};
+  /** NRPS: page size when the request has no (or a larger) `limit`. */
+  nrpsPageSize = 100;
+  /** NRPS: status for the next membership requests (shifted per request); empty = 200. */
+  nrpsStatuses: number[] = [];
+  nrpsRequests: { path: string; query: string; accept: string; auth: string }[] = [];
+  nrpsHonoursRoleFilter = true;
+  /** NRPS: if set, the next-page links point at this origin instead (security test). */
+  nrpsNextOrigin?: string;
 
   constructor(
     public readonly issuer: string,
@@ -103,6 +126,25 @@ export class MockPlatform {
         ...(opts.lineitem === null ? {} : { lineitem: opts.lineitem ?? this.lineItemUrl() }),
       },
     };
+  }
+
+  /** The course's context memberships URL (what Moodle sends in the launch's NRPS claim). */
+  membershipsUrl(course = 'course-101') {
+    return `${this.serviceBase}/memberships/${course}`;
+  }
+
+  /** The NRPS launch claim with this mock's memberships URL. */
+  nrpsClaim(course = 'course-101') {
+    return { 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice': { context_memberships_url: this.membershipsUrl(course), service_versions: ['2.0'] } };
+  }
+
+  resetNrps() {
+    this.memberships = {};
+    this.nrpsPageSize = 100;
+    this.nrpsStatuses = [];
+    this.nrpsRequests = [];
+    this.nrpsHonoursRoleFilter = true;
+    this.nrpsNextOrigin = undefined;
   }
 
   resetAgs() {
@@ -146,6 +188,26 @@ export class MockPlatform {
     }
     const auth = String(req.headers.authorization ?? '');
     if (!this.validTokens.has(auth.replace(/^Bearer /, ''))) return this.json(res, 401, { error: 'unauthorized' });
+    const nrps = /^\/memberships\/([\w.-]+)$/.exec(url.pathname);
+    if (nrps && req.method === 'GET') {
+      this.nrpsRequests.push({ path: url.pathname, query: url.search, accept: String(req.headers.accept ?? ''), auth });
+      const status = this.nrpsStatuses.shift() ?? 200;
+      if (status !== 200) return this.json(res, status, { error: 'nope' });
+      const course = nrps[1];
+      const role = url.searchParams.get('role');
+      let all = this.memberships[course] ?? [];
+      if (role && this.nrpsHonoursRoleFilter) all = all.filter((m) => m.roles.includes(role));
+      const limit = Math.min(Number(url.searchParams.get('limit')) || this.nrpsPageSize, this.nrpsPageSize);
+      const from = Number(url.searchParams.get('from')) || 0;
+      const page = all.slice(from, from + limit);
+      if (from + limit < all.length) {
+        const next = new URL(url.toString());
+        next.searchParams.set('from', String(from + limit));
+        const href = this.nrpsNextOrigin ? `${this.nrpsNextOrigin}${next.pathname}${next.search}` : next.toString();
+        res.setHeader('Link', `<${href}>; rel="next"`);
+      }
+      return this.json(res, 200, { id: url.toString(), context: { id: course, label: 'ENG', title: 'English (LMS)' }, members: page }, 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json');
+    }
     if (url.pathname === '/lineitems' && req.method === 'GET') {
       this.lineItemGets.push(url.search);
       const rl = url.searchParams.get('resource_link_id');

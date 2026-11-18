@@ -13,8 +13,9 @@ import { lmsSettings } from '../core/flags';
 import { runInBackground, triggerOn } from '../core/drain';
 import { consumeLaunchToken, issueLaunchToken, LaunchTokenError } from '../core/launchToken';
 import { drainGradeJobs, gradeStats, passbackOn, resyncGrades, retryDead } from '../core/outbox';
+import { contextRosterViews, manualSyncTooSoon, notStartedStudents, rosterOn, syncContextRoster } from '../core/roster';
 import { seatView, updateSeatSettings } from '../core/seats';
-import { LmsDeployment, LmsOrgSettings, LmsPlatform, LmsUser, type ILmsDeployment, type ILmsPlatform } from '../models';
+import { LmsContext, LmsDeployment, LmsOrgSettings, LmsPlatform, LmsUser, type ILmsContext, type ILmsDeployment, type ILmsPlatform } from '../models';
 import { isKnownVendor, listPresets } from '../presets';
 import { requireLti } from '../routes';
 
@@ -25,6 +26,8 @@ import { requireLti } from '../routes';
 //   Admins:   status, platforms (manual "Add LMS"), deployments, seats
 //   Grades (Phase 3, also needs LMS_GRADE_PASSBACK_ENABLED): outbox counts and
 //             last error per platform, "Re-sync grades", "Retry dead jobs"
+//   Roster (Phase 4, also needs LMS_ROSTER_SYNC_ENABLED): per course sync
+//             status, not-started students, "Sync roster now"
 // School admins see and change only their own school. A school admin's new
 // connection is 'pending' until an ENARA admin approves it
 // (LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL, default on). ENARA admins see and
@@ -197,6 +200,70 @@ lmsAdminRouter.post(
   }),
 );
 
+// --------------------------------------------------------------- roster
+//
+// Phase 4. The app's normal 404 unless LMS_ROSTER_SYNC_ENABLED is on too.
+// Per LMS course (lms_contexts): last sync, counts, last error code, the
+// students not started yet, and "Sync roster now". School admins: their own
+// school; ENARA admins: every school; a teacher: only a course whose ENARA
+// class they teach. Anyone else: 403; another school's course: 404.
+
+const rosterRouter = Router();
+rosterRouter.use((_req: Request, _res: Response, next: NextFunction) => (rosterOn() ? next() : next('router')));
+rosterRouter.use(authMiddleware, (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (['admin', 'enara-admin', 'teacher'].includes(req.user?.role ?? '')) return next();
+  res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Not allowed' }, message: 'Not allowed' });
+});
+
+/** A course the caller may see and sync, or 404 (never reveals another school's rows or another teacher's course). */
+async function ownContext(req: AuthRequest, id: string): Promise<ILmsContext> {
+  const user = req.user!;
+  const context = await LmsContext.findOne(isEnara(req) ? { id } : { id, institutionId: user.institutionId ?? '__none__' }).lean();
+  if (!context) throw new AppError('LMS course not found', 404, 'LMS_CONTEXT_NOT_FOUND');
+  if (user.role === 'teacher') {
+    const teaches = context.enaraClassId && (await CourseInstance.exists({ id: context.enaraClassId, institutionId: context.institutionId, instructorIds: user.id }));
+    if (!teaches) throw new AppError('LMS course not found', 404, 'LMS_CONTEXT_NOT_FOUND');
+  }
+  return context;
+}
+
+rosterRouter.get(
+  '/',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!isEnara(req) && req.user!.role !== 'admin') throw new AppError('Admin access required', 403, 'ADMIN_REQUIRED');
+    const requested = typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined;
+    const filter: Record<string, unknown> = isEnara(req) ? (requested ? { institutionId: requested } : {}) : { institutionId: req.user!.institutionId ?? '__none__' };
+    if (typeof req.query.platformId === 'string') filter.platformId = req.query.platformId;
+    const contexts = await LmsContext.find(filter).sort({ updatedAt: -1 }).limit(200).lean();
+    res.json({ contexts: await contextRosterViews(contexts) });
+  }),
+);
+
+rosterRouter.get(
+  '/:id/roster',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const context = await ownContext(req, String(req.params.id));
+    const [view] = await contextRosterViews([context]);
+    res.json({ context: view, notStarted: await notStartedStudents(context) });
+  }),
+);
+
+rosterRouter.post(
+  '/:id/roster/sync',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const context = await ownContext(req, String(req.params.id));
+    if (manualSyncTooSoon(context)) throw new AppError('A sync just ran for this course. Try again in a minute.', 429, 'LMS_ROSTER_SYNC_TOO_SOON');
+    const outcome = await syncContextRoster(context.id, { trigger: 'manual', actor: req.user!.id });
+    if (outcome.status === 'busy') throw new AppError('A sync is already running for this course.', 409, 'LMS_ROSTER_SYNC_BUSY');
+    const [view] = await contextRosterViews([(await LmsContext.findOne({ id: context.id }).lean())!]);
+    res.json({ outcome, context: view });
+  }),
+);
+
+// Mounted on /contexts only (and before the grade and admin routers, whose
+// admin-only checks would otherwise stop teachers).
+lmsAdminRouter.use('/contexts', rosterRouter);
+
 // --------------------------------------------------------------- grades
 //
 // Phase 3. The app's normal 404 unless LMS_GRADE_PASSBACK_ENABLED is on too.
@@ -244,6 +311,7 @@ gradesRouter.post(
 );
 
 lmsAdminRouter.use(gradesRouter);
+
 
 // ---------------------------------------------------------------- admin
 

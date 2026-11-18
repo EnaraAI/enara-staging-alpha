@@ -31,14 +31,15 @@ const WANTED_SCOPES: string[] = [AGS_SCOPE.lineItem, AGS_SCOPE.resultReadOnly, A
 const TOKEN_MARGIN_MS = 60_000;
 let callTimeoutMs = 8_000;
 
-class AgsFailure extends Error {
+/** A failed LTI service call (AGS here, NRPS in nrps.ts): a short code, never a response body. */
+export class AgsFailure extends Error {
   constructor(public readonly code: string, public readonly retryable: boolean, public readonly status?: number, public readonly retryAfterSeconds?: number) {
     super(code);
   }
 }
 
 /** Only https (plain http to this machine outside production, for tests). */
-function safeUrl(url: string | undefined, code: string): string {
+export function safeUrl(url: string | undefined, code: string): string {
   if (!url || !isAcceptableKeysetUrl(url)) throw new AgsFailure(code, false);
   return url;
 }
@@ -57,7 +58,7 @@ function retryAfter(res: Response): number | undefined {
   return Number.isFinite(v) && v > 0 ? Math.min(v, 24 * 3600) : undefined;
 }
 
-function httpFailure(prefix: string, res: Response): AgsFailure {
+export function httpFailure(prefix: string, res: Response): AgsFailure {
   const retryable = res.status === 408 || res.status === 425 || res.status === 429 || res.status >= 500;
   return new AgsFailure(`${prefix}http_${res.status}`, retryable, res.status, retryAfter(res));
 }
@@ -130,8 +131,8 @@ export async function serviceToken(platform: ILmsPlatform, scopes: string[], opt
   return token;
 }
 
-/** One AGS request with the service token; a 401 refreshes the token once. */
-async function agsFetch(platform: ILmsPlatform, scopes: string[], url: string, init: RequestInit & { headers: Record<string, string> }): Promise<Response> {
+/** One LTI service request (AGS, NRPS) with the service token; a 401 refreshes the token once. */
+export async function agsFetch(platform: ILmsPlatform, scopes: string[], url: string, init: RequestInit & { headers: Record<string, string> }): Promise<Response> {
   let token = await serviceToken(platform, scopes);
   let res = await call(url, { ...init, headers: { ...init.headers, Authorization: `Bearer ${token}` } });
   if (res.status === 401) {

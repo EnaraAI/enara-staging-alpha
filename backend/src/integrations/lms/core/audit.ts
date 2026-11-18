@@ -12,7 +12,10 @@ export function sanitizeRefIds(refIds: Record<string, unknown> = {}): Record<str
   const out: Record<string, string | number | boolean> = {};
   for (const [k, v] of Object.entries(refIds)) {
     if (Object.keys(out).length >= MAX_KEYS) break;
-    if (PII_KEY.test(k)) continue;
+    // An identifier key (contextId, lmsUserIds, ...) is kept even when its
+    // name happens to contain a word above (conTEXTId); its value is an ID.
+    const idKey = /[a-z](Id|Ids)$/.test(k) && !/(email|name|phone|token|secret|password)/i.test(k);
+    if (!idKey && PII_KEY.test(k)) continue;
     if (typeof v === 'number' && Number.isFinite(v)) out[k] = v;
     else if (typeof v === 'boolean') out[k] = v;
     else if (typeof v === 'string') out[k] = v.slice(0, MAX_VALUE);

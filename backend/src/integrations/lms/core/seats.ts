@@ -1,4 +1,6 @@
 import { emailLayout, sendEmail } from '../../../services/emailService';
+import { ClassEnrollment } from '../../../models/ClassEnrollment';
+import { CourseInstance } from '../../../models/CourseInstance';
 import { Student } from '../../../models/Student';
 import { User } from '../../../models/User';
 import { logger, serializeError } from '../../../utils/logging';
@@ -14,9 +16,73 @@ import { writeLmsAudit } from './audit';
 // last free seat; the overrun is at most the number of simultaneous launches.
 const ALERT_EVERY_MS = 24 * 60 * 60 * 1000;
 
-/** Distinct live students in the school (demo-seed students are not seats). */
+const LIVE = { origin: { $ne: 'demo_seed' }, archivedAt: null } as const;
+
+/**
+ * LMS students who left: every LMS membership they had is inactive (dropped
+ * from the LMS roster, Phase 4) and nothing else keeps them in the school (no
+ * active group or class enrollment, no group, no class list). They keep their
+ * account and history but no longer take a seat; a re-add brings them back.
+ */
+export async function droppedLmsStudentIds(institutionId: string): Promise<string[]> {
+  const ended = await ClassEnrollment.distinct('studentId', { institutionId, source: 'lms', status: 'inactive' });
+  if (!ended.length) return [];
+  const [stillActive, listed] = await Promise.all([
+    ClassEnrollment.distinct('studentId', { institutionId, studentId: { $in: ended }, status: 'active' }),
+    CourseInstance.distinct('studentIds', { institutionId, studentIds: { $in: ended } }),
+  ]);
+  const keep = new Set<string>([...stillActive, ...listed].map(String));
+  const candidates = ended.map(String).filter((id) => !keep.has(id));
+  if (!candidates.length) return [];
+  const rows = await Student.find({ id: { $in: candidates }, institutionId, ...LIVE, $or: [{ batchId: { $exists: false } }, { batchId: null }, { batchId: '' }] })
+    .select('id')
+    .lean();
+  return rows.map((r) => r.id);
+}
+
+/**
+ * Phase 4 (owner decision): students a roster sync created who have never
+ * opened ENARA ("invited / not started"). Their account exists only through
+ * the LMS link and has never been launched (lms_users.lastLaunchAt unset on
+ * every link). They take no seat until their first launch.
+ */
+export async function notStartedLmsStudentIds(institutionId: string): Promise<string[]> {
+  const pending = (await LmsUser.distinct('enaraUserId', { institutionId, enaraUserId: { $exists: true }, lastLaunchAt: { $exists: false } })).map(String);
+  if (!pending.length) return [];
+  const launched = new Set((await LmsUser.distinct('enaraUserId', { enaraUserId: { $in: pending }, lastLaunchAt: { $exists: true } })).map(String));
+  const userIds = pending.filter((id) => !launched.has(id) && /^[a-f0-9]{24}$/i.test(id));
+  if (!userIds.length) return [];
+  const studentIds = (await User.distinct('studentId', { _id: { $in: userIds }, role: 'student', institutionId })).filter(Boolean).map(String);
+  if (!studentIds.length) return [];
+  return (await Student.distinct('id', { id: { $in: studentIds }, institutionId, ...LIVE })).map(String);
+}
+
+/** Whether this ENARA account is a synced student who has never launched (no seat yet). */
+export async function isNotStartedLmsAccount(enaraUserId: string, institutionId: string): Promise<boolean> {
+  const user = await User.findById(enaraUserId).select('role studentId institutionId').lean().catch(() => null);
+  if (!user || user.role !== 'student' || !user.studentId || user.institutionId !== institutionId) return false;
+  return !(await LmsUser.exists({ enaraUserId, lastLaunchAt: { $exists: true } }));
+}
+
+async function seatParts(institutionId: string) {
+  const [all, dropped, notStarted] = await Promise.all([
+    Student.countDocuments({ institutionId, ...LIVE }),
+    droppedLmsStudentIds(institutionId),
+    notStartedLmsStudentIds(institutionId),
+  ]);
+  const notCounted = new Set([...dropped, ...notStarted]);
+  const droppedSet = new Set(dropped);
+  return { seats: Math.max(0, all - notCounted.size), notStarted: notStarted.filter((id) => !droppedSet.has(id)).length, dropped: dropped.length, notCounted };
+}
+
+/**
+ * Seats: distinct live students in the school, one per person however many
+ * classes or LMS courses they are in. Not seats: demo-seed students, archived
+ * students, LMS students whose every LMS membership ended, and synced students
+ * who have not started yet (Phase 4).
+ */
 export async function countSeats(institutionId: string): Promise<number> {
-  return Student.countDocuments({ institutionId, origin: { $ne: 'demo_seed' } });
+  return (await seatParts(institutionId)).seats;
 }
 
 export interface SeatDecision {
@@ -77,7 +143,10 @@ async function alertSchoolAdmins(institutionId: string, seatsUsed: number, seatL
 export interface SeatView {
   institutionId: string;
   seatsUsed: number;
+  /** LMS students who take a seat (launched, not dropped). */
   lmsStudents: number;
+  /** Phase 4: synced students who have not started yet; shown, not counted. */
+  notStarted: number;
   seatLimit: number | null;
   hardCap: boolean;
   overLimit: boolean;
@@ -86,18 +155,25 @@ export interface SeatView {
 }
 
 export async function seatView(institutionId: string): Promise<SeatView> {
-  const [settings, used, lmsStudents] = await Promise.all([
+  const [settings, parts, linked] = await Promise.all([
     LmsOrgSettings.findOne({ institutionId }).lean<ILmsOrgSettings | null>(),
-    countSeats(institutionId),
-    LmsUser.distinct('enaraUserId', { institutionId, enaraUserId: { $exists: true } }).then(async (ids) =>
-      ids.length ? User.countDocuments({ _id: { $in: ids }, role: 'student' }) : 0,
-    ),
+    seatParts(institutionId),
+    LmsUser.distinct('enaraUserId', { institutionId, enaraUserId: { $exists: true } }),
   ]);
+  const used = parts.seats;
+  let lmsStudents = 0;
+  const userIds = linked.map(String).filter((id) => /^[a-f0-9]{24}$/i.test(id));
+  if (userIds.length) {
+    const studentIds = (await User.distinct('studentId', { _id: { $in: userIds }, role: 'student' })).filter(Boolean).map(String);
+    const live = studentIds.length ? await Student.distinct('id', { id: { $in: studentIds }, institutionId, ...LIVE }) : [];
+    lmsStudents = live.filter((id) => !parts.notCounted.has(String(id))).length;
+  }
   const limit = settings?.seatLimit ?? null;
   return {
     institutionId,
     seatsUsed: used,
     lmsStudents,
+    notStarted: parts.notStarted,
     seatLimit: limit,
     hardCap: settings?.hardCap ?? false,
     overLimit: limit !== null && used > limit,

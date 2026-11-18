@@ -9,7 +9,7 @@ import { enroll } from '../../../services/enrollment';
 import { initialsFromName } from '../../../utils/idGenerator';
 import { LmsContext, LmsEnrollment, LmsResourceLink, LmsUser, type ILmsContext, type ILmsResourceLink, type ILmsUser } from '../models';
 import { bindResourceLink, type ValidatedBinding } from './binding';
-import { checkSeatForNewStudent } from './seats';
+import { checkSeatForNewStudent, isNotStartedLmsAccount } from './seats';
 import type { LmsEnaraRole } from './types';
 
 // The LMS domain service (plan §2.2): turns a validated, provider-neutral
@@ -71,7 +71,7 @@ export interface ProvisionResult {
 
 const ENARA_ROLE: Record<ProvisionRole, 'student' | 'teacher' | 'admin'> = { student: 'student', teacher: 'teacher', admin: 'admin' };
 
-function displayName(p: ProvisionInput['person']): string {
+export function displayName(p: ProvisionInput['person']): string {
   const full = p.name?.trim() || [p.givenName, p.familyName].filter(Boolean).join(' ').trim();
   return (full || 'LMS user').slice(0, 120);
 }
@@ -110,10 +110,22 @@ async function newStudentId(): Promise<string> {
   return `STU${Date.now()}${randomInt(100, 999)}`;
 }
 
-/** Creates the ENARA account for a first-time LMS person; returns the winner if two launches race. */
-async function createEnaraAccount(input: ProvisionInput, lmsUser: ILmsUser): Promise<{ userId: string; studentId?: string; created: boolean; seat?: ProvisionResult['seat'] }> {
+export type AccountInput = Pick<ProvisionInput, 'role' | 'institutionId' | 'person'>;
+
+/**
+ * Creates the ENARA account for a first-time LMS person; returns the winner if
+ * two launches (or a launch and a roster sync) race. The address is the
+ * reserved, never-emailed <lms user id>@lms.enara.test, never the LMS email.
+ * `noSeatYet`: a roster sync creates the student "not started"; the seat is
+ * taken (and the hard cap checked) at their first launch (checkSeatAtFirstLaunch).
+ */
+export async function createEnaraAccount(
+  input: AccountInput,
+  lmsUser: ILmsUser,
+  opts: { noSeatYet?: boolean } = {},
+): Promise<{ userId: string; studentId?: string; created: boolean; seat?: ProvisionResult['seat'] }> {
   let seat: ProvisionResult['seat'];
-  if (input.role === 'student') {
+  if (input.role === 'student' && !opts.noSeatYet) {
     const decision = await checkSeatForNewStudent(input.institutionId, lmsUser.id);
     if (!decision.allowed) throw new LmsProvisionError('seat_limit_reached');
     seat = { overLimit: decision.overLimit, seatsUsed: decision.seatsUsed, seatLimit: decision.seatLimit };
@@ -152,7 +164,7 @@ async function createEnaraAccount(input: ProvisionInput, lmsUser: ILmsUser): Pro
   return { userId, studentId, created: true, seat };
 }
 
-async function resolveAccount(input: ProvisionInput, lmsUser: ILmsUser) {
+async function resolveAccount(input: ProvisionInput, lmsUser: ILmsUser): Promise<{ userId: string; studentId?: string; created: boolean; seat?: ProvisionResult['seat'] }> {
   if (!lmsUser.enaraUserId) return createEnaraAccount(input, lmsUser);
   const user = await User.findById(lmsUser.enaraUserId).select('role status institutionId studentId').lean();
   if (!user) {
@@ -260,7 +272,8 @@ export interface PreviewResult {
   lmsUserId: string;
   enaraUserId: string;
   staffRole: 'teacher' | 'admin';
-  detectedBy: 'staff_account' | 'test_user';
+  /** staff_account: linked to an ENARA teacher/admin; test_user: LTI TestUser role; nrps: the course roster (NRPS) lists them as staff (Phase 4). */
+  detectedBy: 'staff_account' | 'test_user' | 'nrps';
   contextId?: string;
   enaraClassId?: string;
   resourceLinkId?: string;
@@ -296,17 +309,38 @@ export async function findStudentPreview(input: ProvisionInput): Promise<Preview
   };
 }
 
+// Phase 4 (owner decision): a student a roster sync created ("not started")
+// takes no seat until their first launch. Such an account can only be used
+// through an LMS launch (its address is reserved and its password random), so
+// the first launch is the earliest real activity: the seat is counted, and the
+// hard cap checked, here, before anything of the launch is written.
+async function checkSeatAtFirstLaunch(input: ProvisionInput): Promise<ProvisionResult['seat'] | undefined> {
+  if (input.role !== 'student') return undefined;
+  const existing = await LmsUser.findOne({ platformId: input.platformId, externalUserId: input.externalUserId }).select('id enaraUserId lastLaunchAt').lean();
+  if (!existing?.enaraUserId || existing.lastLaunchAt) return undefined;
+  if (!(await isNotStartedLmsAccount(existing.enaraUserId, input.institutionId))) return undefined;
+  const decision = await checkSeatForNewStudent(input.institutionId, existing.id);
+  if (!decision.allowed) throw new LmsProvisionError('seat_limit_reached');
+  return { overLimit: decision.overLimit, seatsUsed: decision.seatsUsed, seatLimit: decision.seatLimit };
+}
+
 export async function provisionLaunch(input: ProvisionInput): Promise<ProvisionResult> {
+  const firstLaunchSeat = await checkSeatAtFirstLaunch(input);
   const lmsUser = await upsertLmsUser(input);
-  const account = await resolveAccount(input, lmsUser);
+  const resolved = await resolveAccount(input, lmsUser);
+  const account = { ...resolved, seat: resolved.seat ?? firstLaunchSeat };
   const { context, created: createdContext } = await ensureContext(input);
   const enaraClassId = context.enaraClassId!;
   const enaraGroupId = context.enaraGroupId!;
 
+  // A launch makes the membership active; a member a roster sync listed as
+  // "not started" (status invited) starts here (Phase 4: firstLaunchAt).
   await LmsEnrollment.updateOne(
     { contextId: context.id, lmsUserId: lmsUser.id },
     {
       $set: { ltiRoles: input.rawRoles.slice(0, 30).map((r) => r.slice(0, 200)), enaraRole: input.role, status: 'active' },
+      $min: { firstLaunchAt: new Date() },
+      $unset: { endedAt: 1 },
       $setOnInsert: { institutionId: input.institutionId, source: 'launch' },
     },
     { upsert: true },
@@ -318,7 +352,10 @@ export async function provisionLaunch(input: ProvisionInput): Promise<ProvisionR
     await enroll({ institutionId: input.institutionId, studentId: account.studentId, scope: 'class', targetId: enaraClassId, source: 'lms', lmsContextId: context.id });
     await CourseInstance.updateOne({ id: enaraClassId, institutionId: input.institutionId }, { $addToSet: { studentIds: account.studentId } });
   } else if (input.role === 'teacher') {
-    await CourseInstance.updateOne({ id: enaraClassId, institutionId: input.institutionId }, { $addToSet: { instructorIds: account.userId } });
+    const added = await CourseInstance.updateOne({ id: enaraClassId, institutionId: input.institutionId }, { $addToSet: { instructorIds: account.userId } });
+    // Phase 4: remember that the LMS (not someone in ENARA) made them an
+    // instructor, so a roster sync removes only instructors the LMS added.
+    if (added.modifiedCount === 1) await LmsEnrollment.updateOne({ contextId: context.id, lmsUserId: lmsUser.id }, { $set: { addedInstructor: true } });
   }
 
   let resourceLink = await upsertResourceLink(input, context);
@@ -333,6 +370,6 @@ export async function provisionLaunch(input: ProvisionInput): Promise<ProvisionR
     enaraClassId,
     enaraGroupId,
     resourceLink,
-    seat: 'seat' in account ? account.seat : undefined,
+    seat: account.seat,
   };
 }
