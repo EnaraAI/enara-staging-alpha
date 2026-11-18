@@ -34,7 +34,7 @@ Status: **done** (2026-11-16), on branch `claude/lms-integration`. **Not deploye
 - **`lms_platforms.vendor`** is checked against the preset list, not a fixed enum, so a new vendor needs no schema change.
 - **OIDC state and nonce** are stored only as SHA-256 hashes. A 10-minute TTL index removes them.
 - **The first signing key** is created on the first JWKS request. A partial unique index means only one active key can ever exist, even with simultaneous requests (tested with 10 at once).
-- **Effective flags are off whenever the LMS config has a problem:** a malformed `LMS_KEK`, or LTI on without `LMS_KEK` or `LMS_TOOL_BASE_URL`. The site still starts, and the problem names the variable, never its value.
+- **Effective flags are off whenever the LMS config has a problem:** a malformed `LMS_KEK`, or LTI on without `LMS_KEK` or `LMS_TOOL_BASE_URL`, or (later) LTI on with `LMS_TOOL_BASE_URL` and `APP_URL` on different hosts (see PHASE_2_NOTES, "One host"). The site still starts, and the problem names the variable, never its value.
 - **Admin routes** will live under `/api/lms/…` (from Phase 1), because `/api/integrations` is already used for school API keys. The role-matrix and tenant-isolation sweeps cover only `/api/*`; they will be extended when those routes arrive.
 
 ## Tests

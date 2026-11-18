@@ -1345,13 +1345,15 @@ export interface LmsStatus {
   tool: { toolUrl: string; loginUrl: string; launchUrl: string; redirectUris: string[]; jwksUrl: string };
   presets: { id: string; label: string }[];
 }
+/** ENARA admins only: the LMS is switched on but its configuration has a problem (variable names only), so it is off. */
+export interface LmsStatusProblem { enabled: false; problem: string }
 export interface LmsSeats {
   institutionId: string; seatsUsed: number; lmsStudents: number; seatLimit: number | null; hardCap: boolean;
   /** Phase 4: students the LMS roster listed who have not opened ENARA yet; shown, not counted as seats. */
   notStarted?: number;
   overLimit: boolean; billingFlaggedAt: string | null; lastAlertAt: string | null;
 }
-export const fetchLmsStatus = () => request<LmsStatus>('GET', '/api/lms/status');
+export const fetchLmsStatus = () => request<LmsStatus | LmsStatusProblem>('GET', '/api/lms/status');
 export const fetchLmsPlatforms = () => request<{ platforms: LmsPlatformView[] }>('GET', '/api/lms/platforms');
 export const createLmsPlatform = (body: Record<string, unknown>) => request<{ platform: LmsPlatformView }>('POST', '/api/lms/platforms', body);
 export const approveLmsPlatform = (id: string) => request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(id)}/approve`);

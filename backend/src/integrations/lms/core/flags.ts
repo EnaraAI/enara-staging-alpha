@@ -1,4 +1,5 @@
 import { getConfig } from '../../../config/env';
+import { logger } from '../../../utils/logging';
 
 // Effective LMS switches. A flag is on only when it is set AND the LMS
 // configuration has no problem (e.g. a missing or malformed LMS_KEK).
@@ -35,4 +36,22 @@ export function anyLmsFlagSet(): boolean {
 export function lmsSettings(): { toolBaseUrl?: string; schoolConnectionsRequireApproval: boolean } {
   const lms = getConfig().lms;
   return { toolBaseUrl: lms.toolBaseUrl, schoolConnectionsRequireApproval: lms.schoolConnectionsRequireApproval };
+}
+
+let startupLogged = false;
+/**
+ * Logs the LMS configuration problem (the LMS is off) or warning once per
+ * process, at startup (createApp). Names variables only, never values.
+ */
+export function logLmsConfigOnce(): void {
+  if (startupLogged || !anyLmsFlagSet()) return;
+  startupLogged = true;
+  const { problem, warning } = getConfig().lms;
+  if (problem) logger.error('lms_config_problem', { problem, effect: 'LMS integration is off' });
+  if (warning) logger.warn('lms_config_warning', { warning });
+}
+
+/** Tests only. */
+export function resetLmsConfigLogForTests(): void {
+  startupLogged = false;
 }

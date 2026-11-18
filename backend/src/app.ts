@@ -51,9 +51,9 @@ import usageRoutes from './routes/usage.routes';
 import parentsRoutes from './parents/routes';
 import multiClassRoutes from './routes/multiClass.routes';
 import { ltiRouter, wellKnownRouter } from './integrations/lms/routes';
-import { lmsAdminRouter } from './integrations/lms/admin/routes';
+import { lmsAdminRouter, lmsConfigProblemRouter } from './integrations/lms/admin/routes';
 import { pickerRouter } from './integrations/lms/admin/pickerRoutes';
-import { lmsFlags } from './integrations/lms/core/flags';
+import { lmsFlags, logLmsConfigOnce } from './integrations/lms/core/flags';
 import { piggybackDrain } from './integrations/lms/core/drain';
 import maintenanceRoutes from './maintenance/routes';
 import { getPostgresPool } from './config/postgres';
@@ -121,6 +121,8 @@ function makeLimiter(name: string, windowMs: number, max: number, message: strin
 
 export function createApp() {
   const config = getConfig();
+  // LMS config problem or warning (e.g. the one-host rule), once per process.
+  logLmsConfigOnce();
   const app = express();
 
   app.disable('x-powered-by');
@@ -329,6 +331,8 @@ export function createApp() {
   app.use('/lti', ltiRouter);
   app.use('/.well-known', wellKnownRouter);
   app.use('/api/lms/picker', pickerRouter);
+  // LMS switched on but its config has a problem: ENARA admins still see the status, with the problem.
+  app.use('/api/lms', lmsConfigProblemRouter);
   app.use('/api/lms', lmsAdminRouter);
 
   app.use((_req, _res, next) => {

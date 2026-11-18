@@ -11,7 +11,7 @@ import { logger, serializeError } from '../../../utils/logging';
 import { ensurePlainObject, getOptionalBoolean, getOptionalId, rejectMongoOperators } from '../../../utils/validation';
 import { isAcceptableKeysetUrl } from '../adapters/lti13/jwks';
 import { writeLmsAudit } from '../core/audit';
-import { lmsSettings } from '../core/flags';
+import { anyLmsFlagSet, lmsFlags, lmsSettings } from '../core/flags';
 import { runInBackground, triggerOn } from '../core/drain';
 import { consumeLaunchToken, issueLaunchToken, LaunchTokenError } from '../core/launchToken';
 import { flaggedActivities } from '../core/activityHealth';
@@ -38,6 +38,26 @@ import { requireLti } from '../routes';
 // connection is 'pending' until an ENARA admin approves it
 // (LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL, default on). ENARA admins see and
 // manage every school, and alone set seat limits.
+
+// LMS_LTI_ENABLED is set but the LMS config has a problem (so the LMS is off),
+// for example LMS_TOOL_BASE_URL and APP_URL on different hosts: GET /status
+// answers ENARA admins with the problem (variable names only), so the LMS
+// connections page can show it. Other signed-in users get the normal 404, as
+// does every other case (the full status below answers when the LMS is on).
+export const lmsConfigProblemRouter = Router();
+lmsConfigProblemRouter.get(
+  '/status',
+  (_req: Request, _res: Response, next: NextFunction) => {
+    const f = lmsFlags();
+    if (f.lti || !f.problem || !anyLmsFlagSet()) return next('router');
+    next();
+  },
+  authMiddleware,
+  (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (req.user?.role !== 'enara-admin') return next('router');
+    res.json({ enabled: false, problem: lmsFlags().problem });
+  },
+);
 
 export const lmsAdminRouter = Router();
 lmsAdminRouter.use(requireLti);

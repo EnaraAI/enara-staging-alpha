@@ -64,9 +64,19 @@ export const LmsConnections: React.FC = () => {
   const [contexts, setContexts] = useState<LmsContextView[] | null>(null);
   const [notStarted, setNotStarted] = useState<Record<string, LmsNotStarted[]>>({});
 
+  // The LMS is switched on but its configuration has a problem (ENARA admins only; variable names only).
+  const [configProblem, setConfigProblem] = useState<string | null>(null);
+
   const load = useCallback(async () => {
     try {
-      const [s, p, seat, g, c] = await Promise.all([fetchLmsStatus(), fetchLmsPlatforms(), fetchLmsSeats(), fetchLmsGrades().catch(() => null), fetchLmsContexts().catch(() => null)]);
+      const first = await fetchLmsStatus();
+      if (first.enabled === false && 'problem' in first) {
+        setConfigProblem(first.problem);
+        return;
+      }
+      setConfigProblem(null);
+      const [p, seat, g, c] = await Promise.all([fetchLmsPlatforms(), fetchLmsSeats(), fetchLmsGrades().catch(() => null), fetchLmsContexts().catch(() => null)]);
+      const s = first as LmsStatus;
       setContexts(c ? c.contexts : null);
       setStatus(s);
       setPlatforms(p.platforms);
@@ -124,6 +134,16 @@ export const LmsConnections: React.FC = () => {
     </label>
   );
 
+  if (configProblem) {
+    return (
+      <div className="p-4 sm:p-8 max-w-5xl mx-auto space-y-8">
+        <h1 className="text-2xl font-bold text-slate-900">LMS connections</h1>
+        <div className="rounded-lg px-4 py-3 text-sm bg-red-50 text-red-700" data-testid="lms-config-problem">
+          The LMS integration is switched on but stays off because of a configuration problem: {configProblem}. Fix the server settings and redeploy.
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="p-4 sm:p-8 max-w-5xl mx-auto space-y-8">
       <div>
