@@ -17,6 +17,7 @@ import { reportSenders, type WeeklySummary } from './reportSender';
 import { parentEmailBlocked, parentEmailBlockedBody, parentEmailState } from './emailBlock';
 import { parentEmailsEnabled } from '../email/sendParentTemplate';
 import { sendWeeklySummary } from './parentEmails';
+import { suggestedEmailFor } from './csvInvites';
 import { mockPlan } from './mock';
 import { authConfig, googleParentSignIn } from './google';
 import { recordSignIn } from '../services/signInHistory';
@@ -295,6 +296,8 @@ router.get('/account', h(async (req, res) => {
       method: codeOnly ? 'code' : profile?.signIn ?? 'password', hasEmail: !codeOnly,
       // Parents P2: the account's own address and whether it was proven; whether email sign-in is on.
       ...(parentEmailSigninEnabled() ? { emailSignin: true, ...(codeOnly ? {} : { email: req.user!.email, emailVerified: !!profile?.emailVerifiedAt }) } : {}),
+      // Parents P5: the address a school invited this parent at, offered when they add an email (never a binding).
+      ...(codeOnly && parentEmailSigninEnabled() ? await (async () => { const e = await suggestedEmailFor(uid(req)); return e ? { suggestedEmail: e } : {}; })() : {}),
     },
     ...(learners.hiddenBySchool ? { hiddenBySchool: learners.hiddenBySchool } : {}),
     preferences: {

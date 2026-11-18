@@ -162,7 +162,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
           )}
           {learners.data?.hiddenBySchool ? <p className="pp-notice" role="status" data-testid="pp-hidden-by-school" style={{ display: 'block', fontSize: 13 }}>{t.hiddenBySchool}</p> : null}
           {showEmailPrompt && tab === 'home' && !showLink && learners.data && (
-            <AddEmail mode="prompt" onDone={refresh} onDismiss={() => { setEmailPromptDismissed(true); write(EMAIL_PROMPT_KEY, '1', 'session'); }} />
+            <AddEmail mode="prompt" suggested={signIn?.suggestedEmail} onDone={refresh} onDismiss={() => { setEmailPromptDismissed(true); write(EMAIL_PROMPT_KEY, '1', 'session'); }} />
           )}
           {!showLink && learner && (
             <>

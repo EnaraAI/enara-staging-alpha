@@ -3,6 +3,7 @@ import { Users } from 'lucide-react';
 import { fetchParentsAdminSchools, setSchoolParentAccess, type ParentAccess, type ParentsAdminStatus, type ParentsSchoolRow } from '../services/apiService';
 import { ParentCodeTools } from './ParentCodeTools';
 import { ParentSchoolSettings } from './ParentSchoolSettings';
+import { ParentCsvInvites } from './ParentCsvInvites';
 import { LangSwitch, initialLang, type Lang } from './LmsSchoolStatus';
 
 // Parents P1 (PARENT_SETTINGS_ENABLED): the "Parents" page.
@@ -81,6 +82,7 @@ export const ParentsAdmin: React.FC<{ status?: ParentsAdminStatus }> = ({ status
       {/* Parents P2: code settings and class code sheets. */}
       {status?.canChangeSettings && <ParentSchoolSettings lang={lang} status={status} />}
       {status?.codeTools && <ParentCodeTools lang={lang} status={status} />}
+      {status?.csvInvites && <ParentCsvInvites lang={lang} />}
       {note && <p className="text-sm text-slate-600" role="status">{note}</p>}
 
       {data && !data.canChangeAccess && data.schools.map((s) => (

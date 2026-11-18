@@ -3,7 +3,8 @@ import { authMiddleware, requireRole, type AuthRequest } from '../middleware/aut
 import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { Institution } from '../models/Institution';
 import { ensurePlainObject } from '../utils/validation';
-import { parentCodeToolsEnabled, parentGradesAfterReviewEnabled, parentSettingsEnabled } from './flags';
+import { parentCodeToolsEnabled, parentCsvInvitesEnabled, parentGradesAfterReviewEnabled, parentSettingsEnabled } from './flags';
+import { confirmCsv, listInvites, previewCsv, resendInvite, revokeInvite } from './csvInvites';
 import { parentEmailsEnabled } from '../email/sendParentTemplate';
 import { canIssueCodes, classesForCodes, issueClassSheet, listClassCodes, revokeClassCodes, schoolParentSettings, setSchoolParentSettings } from './codeTools';
 import { accessFromDoc, setParentAccess } from './schoolAccess';
@@ -23,7 +24,8 @@ const actor = (req: AuthRequest) => ({ id: req.user!.id, role: req.user!.role, i
 const settingsOnly = (_req: unknown, _res: unknown, next: (e?: unknown) => void) => (parentSettingsEnabled() ? next() : next(notFound()));
 const toolsOnly = (_req: unknown, _res: unknown, next: (e?: unknown) => void) => (parentCodeToolsEnabled() ? next() : next(notFound()));
 // The school's parent settings: code expiry and teachers (P2), when results show (P3), which emails (P4).
-const anySchoolSettings = () => parentCodeToolsEnabled() || parentGradesAfterReviewEnabled() || parentEmailsEnabled();
+const anySchoolSettings = () => parentCodeToolsEnabled() || parentGradesAfterReviewEnabled() || parentEmailsEnabled() || parentCsvInvitesEnabled();
+const csvOnly = (_req: unknown, _res: unknown, next: (e?: unknown) => void) => (parentCsvInvitesEnabled() ? next() : next(notFound()));
 const schoolSettingsOnly = (_req: unknown, _res: unknown, next: (e?: unknown) => void) => (anySchoolSettings() ? next() : next(notFound()));
 const staff = requireRole('admin', 'enara-admin');
 
@@ -41,7 +43,9 @@ router.get('/status', h(async (req, res) => {
     canChangeAccess: parentSettingsEnabled() && req.user!.role === 'enara-admin',
     codeTools,
     ...(anySchoolSettings() && req.user!.institutionId ? { settings: await schoolParentSettings(req.user!.institutionId), canChangeSettings: req.user!.role === 'admin' } : {}),
-    settingsAvailable: { codes: parentCodeToolsEnabled(), results: parentGradesAfterReviewEnabled(), emails: parentEmailsEnabled() },
+    settingsAvailable: { codes: parentCodeToolsEnabled(), results: parentGradesAfterReviewEnabled(), emails: parentEmailsEnabled(), csv: parentCsvInvitesEnabled() },
+    // Parents P5: the school admin may send CSV invitations (switch on and the school allows it).
+    csvInvites: parentCsvInvitesEnabled() && req.user!.role === 'admin' && (await schoolParentSettings(req.user!.institutionId)).csvInvites,
   });
 }));
 
@@ -64,6 +68,14 @@ router.post('/classes/:classId/code-sheet', toolsOnly, h(async (req, res) => {
 router.get('/classes/:classId/codes', toolsOnly, h(async (req, res) => { res.json(await listClassCodes(actor(req), String(req.params.classId))); }));
 router.post('/classes/:classId/codes/revoke', toolsOnly, h(async (req, res) => { res.json(await revokeClassCodes(actor(req), String(req.params.classId))); }));
 router.delete('/classes/:classId/codes/:codeId', toolsOnly, h(async (req, res) => { res.json(await revokeClassCodes(actor(req), String(req.params.classId), String(req.params.codeId))); }));
+
+// ---- P5: CSV invitations (school admin; the CSV text is in the body, never stored)
+const school = (req: AuthRequest) => (typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined);
+router.post('/csv-invites/preview', csvOnly, staff, h(async (req, res) => { res.json(await previewCsv(actor(req), ensurePlainObject(req.body).csv, school(req))); }));
+router.post('/csv-invites', csvOnly, staff, h(async (req, res) => { res.status(201).json(await confirmCsv(actor(req), ensurePlainObject(req.body).csv, school(req))); }));
+router.get('/csv-invites', csvOnly, staff, h(async (req, res) => { res.json(await listInvites(actor(req), school(req))); }));
+router.post('/csv-invites/:id/resend', csvOnly, staff, h(async (req, res) => { res.json(await resendInvite(actor(req), String(req.params.id), school(req))); }));
+router.post('/csv-invites/:id/revoke', csvOnly, staff, h(async (req, res) => { res.json(await revokeInvite(actor(req), String(req.params.id), school(req))); }));
 
 // ---- P1: access and usage
 router.get('/schools', settingsOnly, staff, h(async (req, res) => {

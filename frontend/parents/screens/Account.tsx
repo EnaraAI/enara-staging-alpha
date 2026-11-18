@@ -96,7 +96,7 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
           <p className="pp-sub">{d.signIn.emailVerified ? t.emailVerified : t.emailNotVerified}</p>
         </section>
       ) : (
-        <AddEmail mode="inline" onDone={() => { setEditEmail(false); onChanged(); q.reload(); }} />
+        <AddEmail mode="inline" suggested={d.signIn?.suggestedEmail} onDone={() => { setEditEmail(false); onChanged(); q.reload(); }} />
       ))}
 
       {d.signIn?.method === 'code' && (

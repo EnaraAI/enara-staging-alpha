@@ -277,15 +277,24 @@ export interface ParentsSchoolRow {
   id: string; name: string; status: string; access: ParentAccess; accessUpdatedAt: string | null;
   usage: { linkedParents: number; active7: number; active30: number; logins30: number; topScreens: { screen: string; views: number }[] };
 }
-export interface ParentsAdminStatus { enabled: boolean; usage: boolean; canChangeAccess: boolean; codeTools: boolean; settings?: { codeTtlDays: number; teachersMayIssueCodes: boolean; showResults?: 'immediately' | 'after_release'; emails?: { linkConfirmed: boolean; weeklySummary: boolean; newResults: boolean; linkEnded: boolean } }; canChangeSettings?: boolean; settingsAvailable?: { codes: boolean; results: boolean; emails?: boolean } }
+export interface ParentsAdminStatus { enabled: boolean; usage: boolean; canChangeAccess: boolean; codeTools: boolean; settings?: { codeTtlDays: number; teachersMayIssueCodes: boolean; showResults?: 'immediately' | 'after_release'; emails?: { linkConfirmed: boolean; weeklySummary: boolean; newResults: boolean; linkEnded: boolean }; csvInvites?: boolean }; canChangeSettings?: boolean; settingsAvailable?: { codes: boolean; results: boolean; emails?: boolean; csv?: boolean }; csvInvites?: boolean }
 export const fetchParentsAdminStatus = () => request<ParentsAdminStatus>('GET', '/api/parents-admin/status');
 // Parents P2 (PARENT_CODE_TOOLS_ENABLED): school code settings and class code sheets. A sheet's codes are
 // in the response body only and shown once (never in a URL).
 export interface ParentCodeSheet { class: { id: string; name: string }; school: string | null; batchId: string; expiresAt: string; revoked: number; rows: { studentId: string; studentName: string; code: string; codeId: string }[] }
-export const saveSchoolParentSettings = (institutionId: string, body: { codeTtlDays?: number; teachersMayIssueCodes?: boolean; showResults?: 'immediately' | 'after_release'; emails?: Record<string, boolean> }) =>
+export const saveSchoolParentSettings = (institutionId: string, body: { codeTtlDays?: number; teachersMayIssueCodes?: boolean; showResults?: 'immediately' | 'after_release'; emails?: Record<string, boolean>; csvInvites?: boolean }) =>
   request<{ institutionId: string; codeTtlDays: number; teachersMayIssueCodes: boolean; showResults: 'immediately' | 'after_release' }>('PUT', `/api/parents-admin/schools/${encodeURIComponent(institutionId)}/settings`, body);
 export const fetchCodeClasses = () => request<{ classes: { id: string; name: string; students: number; activeCodes: number }[] }>('GET', '/api/parents-admin/classes');
 export const printClassCodes = (classId: string) => request<ParentCodeSheet>('POST', `/api/parents-admin/classes/${encodeURIComponent(classId)}/code-sheet`);
+// Parents P5 (PARENT_CSV_INVITES_ENABLED): CSV invitations. The CSV text goes in the request body (never stored);
+// addresses come back masked; codes are only ever in the parents' emails.
+export type CsvRowStatus = 'ok' | 'bad_email' | 'unknown_student' | 'archived' | 'duplicate' | 'missing';
+export interface CsvRow { row: number; studentRef: string; status: CsvRowStatus; studentName?: string; email?: string }
+export const previewCsvInvites = (csv: string) => request<{ rows: CsvRow[]; counts: Record<CsvRowStatus, number>; emails: number }>('POST', '/api/parents-admin/csv-invites/preview', { csv });
+export const sendCsvInvites = (csv: string) => request<{ batchId: string; invited: number; emails: number; rows: CsvRow[] }>('POST', '/api/parents-admin/csv-invites', { csv });
+export const fetchCsvInvites = () => request<{ invites: { id: string; studentName: string | null; email: string; status: 'sent' | 'redeemed' | 'expired' | 'revoked'; createdAt: string; resentAt: string | null }[] }>('GET', '/api/parents-admin/csv-invites');
+export const resendCsvInvite = (id: string) => request<{ ok: boolean; emailStatus: string }>('POST', `/api/parents-admin/csv-invites/${encodeURIComponent(id)}/resend`);
+export const revokeCsvInvite = (id: string) => request<{ ok: boolean }>('POST', `/api/parents-admin/csv-invites/${encodeURIComponent(id)}/revoke`);
 export const revokeClassCodes = (classId: string) => request<{ revoked: number }>('POST', `/api/parents-admin/classes/${encodeURIComponent(classId)}/codes/revoke`);
 export const fetchParentsAdminSchools = () => request<{ generatedAt: string; canChangeAccess: boolean; schools: ParentsSchoolRow[] }>('GET', '/api/parents-admin/schools');
 export const setSchoolParentAccess = (institutionId: string, access: ParentAccess) =>
