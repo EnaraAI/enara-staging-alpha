@@ -24,6 +24,39 @@ const DIAGNOSTIC = 'Diagnostic check';
 const ACCEPT = { always: 1, delegate: 2 } as const;
 const setAcceptGrades = (typeid: number, value: number) => expect(moodleCli('tool-acceptgrades', { typeid, value }).acceptgrades).toBe(value);
 
+/** Waits until Moodle has stopped moving its activity frame (resize script, drawer transition): mouse clicks use page coordinates. */
+async function frameSettled(page: Page) {
+  const rect = () => page.evaluate(() => {
+    const el = document.getElementById('contentframe');
+    if (!el) return 'none';
+    const r = el.getBoundingClientRect();
+    return `${Math.round(r.x)},${Math.round(r.y)},${Math.round(r.width)},${Math.round(r.height)}@${Math.round(window.scrollY)}`;
+  });
+  const seen: string[] = [];
+  await expect.poll(async () => {
+    seen.push(await rect());
+    const last = seen.slice(-5);
+    return last.length === 5 && last.every((r) => r === last[0]);
+  }, { timeout: 15_000, intervals: [150] }).toBe(true);
+}
+
+/**
+ * Clicks a button inside ENARA's frame once the frame has settled; if nothing
+ * reacts (a click lost to a moving frame, as in scenario 7), activates it with
+ * the keyboard instead (focus + Enter is a user gesture too).
+ */
+async function press(page: Page, button: import('@playwright/test').Locator, reaction: import('@playwright/test').Locator) {
+  await button.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  await frameSettled(page);
+  await button.click();
+  const reacted = await reaction.first().waitFor({ state: 'visible', timeout: 10_000 }).then(() => true, () => false);
+  if (!reacted) {
+    test.info().annotations.push({ type: 'mouse-click-lost', description: 'keyboard activation used' });
+    await button.focus();
+    await page.keyboard.press('Enter');
+  }
+}
+
 /** Student or teacher: open the Moodle activity and return ENARA's frame on the activity page. */
 async function openActivity(page: Page, cmid: number, testId: string, label: string): Promise<Frame> {
   await page.goto(activityUrl(cmid));
@@ -113,7 +146,7 @@ test.describe.serial('9 · Phase 8: tutor, live avatar and diagnostic activities
       await expect(f.getByTestId('lms-activity-start')).toHaveCount(0);
       if (kind !== 'diagnostic') {
         // The mic check still works (fake device, permission granted inside Moodle's frame).
-        await f.getByRole('button', { name: /Test microphone/ }).click();
+        await press(page, f.getByRole('button', { name: /Test microphone/ }), f.getByTestId('lms-activity-mic-result'));
         await expect(f.getByTestId('lms-activity-mic-result')).toHaveText(/Microphone works/, { timeout: 30_000 });
         await expect(f.locator('[data-testid^="mic-problem-"]')).toHaveCount(0);
       } else {
@@ -149,7 +182,7 @@ test.describe.serial('9 · Phase 8: tutor, live avatar and diagnostic activities
     try {
       const { page, context } = await moodleSession(browser, 'student.test');
       const f = await openActivity(page, s.activities.p8Avatar, 'lms-activity-avatar', 'blocked');
-      await f.getByRole('button', { name: /Test microphone/ }).click();
+      await press(page, f.getByRole('button', { name: /Test microphone/ }), f.getByTestId('lms-activity-mic-result'));
       await expect(f.getByTestId('lms-activity-mic-result')).toHaveText(/Not working/, { timeout: 30_000 });
       const notice = f.getByTestId('mic-problem-blocked_in_frame');
       await expect(notice).toBeVisible({ timeout: 30_000 }).catch(async (e) => {
@@ -157,12 +190,11 @@ test.describe.serial('9 · Phase 8: tutor, live avatar and diagnostic activities
         throw e;
       });
       const open = notice.getByRole('button', { name: /Open in a new tab/ });
-      await open.evaluate((el) => el.scrollIntoView({ block: 'center' }));
       await expect(open).toBeEnabled();
       await shot(page, '09-phase8-mic-blocked');
       const tabPromise = context.waitForEvent('page', { timeout: 30_000 });
-      await open.click();
       const outcome = notice.getByText(/Opened in a new tab|Your browser blocked the new tab/).or(notice.getByRole('alert'));
+      await press(page, open, outcome);
       await expect(outcome.first()).toBeVisible({ timeout: 30_000 });
       const blockedLink = notice.getByRole('link', { name: /Open ENARA in a new tab/ });
       let tab;
