@@ -13,8 +13,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: MoodleCloud reachability (status code only)
-        run: curl -s -o /dev/null -w "moodlecloud login: %{http_code}\n" -m 20 https://lms-test-enara.moodlecloud.com/login/index.php || true
+        run: |
+          curl -s -o /dev/null -w "moodlecloud login page status %{http_code}\n" -m 20 https://lms-test-enara.moodlecloud.com/login/index.php || true
       - name: lms-test reachability
-        run: curl -s -m 20 https://lms-test.enara.app/ready | head -c 200; echo
+        run: |
+          curl -s -m 20 https://lms-test.enara.app/ready | head -c 200; echo
       - name: Docker
-        run: docker version --format '{{.Server.Version}}' && docker compose version
+        run: |
+          docker version --format 'docker {{.Server.Version}}'
+          docker compose version
