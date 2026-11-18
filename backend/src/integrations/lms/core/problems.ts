@@ -104,7 +104,8 @@ export async function problemsView(opts: { institutionId?: string; days: Problem
   const school = allSchools ? {} : { institutionId: opts.institutionId };
 
   const groups = await LmsAuditLog.aggregate<Agg & { _id: { code: string | null; event: string }; failCount: number; firstSeen: Date; lastSeen: Date }>([
-    { $match: { ...school, outcome: { $in: ['fail', 'warn'] }, createdAt: { $gte: since, $lte: now } } },
+    // test_ws.* rows come from the test-only Moodle Web Services tool (maintenance), never from a school's use.
+    { $match: { ...school, outcome: { $in: ['fail', 'warn'] }, event: { $not: /^test_ws\./ }, createdAt: { $gte: since, $lte: now } } },
     {
       $group: {
         _id: { code: { $ifNull: ['$code', null] }, event: '$event' },

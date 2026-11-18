@@ -273,6 +273,11 @@ export const LTI_ERROR_HELP: Record<LtiErrorCode, Entry> = {
 
 /** Grade, roster, session, seat, registration and browser-binding codes. */
 export const OTHER_HELP: Record<string, Entry> = {
+  // Events that are written without a code.
+  'event:grade.lms_changed': {
+    en: ['A grade was changed directly in the LMS gradebook, so it no longer matches what ENARA sent.', 'The teacher opens Grade history in ENARA and chooses Keep LMS value or Keep ENARA value. Nothing is overwritten until then.'],
+    ar: ['تغيّرت درجة مباشرة في سجل درجات نظام إدارة التعلم، فلم تعد تطابق ما أرسله ENARA.', 'يفتح المعلم سجل الدرجات في ENARA ويختار الإبقاء على قيمة النظام أو قيمة ENARA. لا يُستبدل شيء قبل ذلك.'],
+  },
   // How the launch was tied to the browser (warnings: the launch worked).
   cookieless: {
     en: ["The launch worked, but the browser blocked ENARA's sign-in cookie inside the LMS (common in Safari and private windows). ENARA checked it on the server and allowed it.", 'Nothing to do. These are normal and counted on the connection.'],
@@ -492,6 +497,8 @@ const toHelp = (e: Entry, status?: string): ProblemHelp => {
 
 /** The table entry for a code, or undefined. */
 function entryFor(code: string, event?: string): { entry: Entry; status?: string } | undefined {
+  // Rows with no code are described by their event (e.g. grade.lms_changed).
+  if ((!code || code === 'none') && event && Object.prototype.hasOwnProperty.call(OTHER_HELP, `event:${event}`)) return { entry: OTHER_HELP[`event:${event}`] };
   const lti = (LTI_ERROR_HELP as Record<string, Entry>)[code];
   if (lti && Object.prototype.hasOwnProperty.call(LTI_ERRORS, code)) return { entry: lti };
   if (Object.prototype.hasOwnProperty.call(OTHER_HELP, code)) return { entry: OTHER_HELP[code] };
