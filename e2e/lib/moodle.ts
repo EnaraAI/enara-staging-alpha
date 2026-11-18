@@ -21,7 +21,7 @@ export type MoodleUser = 'admin' | 'teacher.test' | 'student.test' | 'student2.t
 /** A signed-in Moodle browser context per user, reused across the run (storage state on disk). */
 export async function moodleSession(browser: Browser, user: MoodleUser, opts: { permissions?: string[] } = {}): Promise<{ context: BrowserContext; page: Page }> {
   const stateFile = path.join(RUN_DIR, `moodle-${user}.json`);
-  const context = await browser.newContext({ ignoreHTTPSErrors: true, ...(fs.existsSync(stateFile) ? { storageState: stateFile } : {}), ...(opts.permissions ? { permissions: opts.permissions } : {}) });
+  const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1366, height: 900 }, deviceScaleFactor: 1, ...(fs.existsSync(stateFile) ? { storageState: stateFile } : {}), ...(opts.permissions ? { permissions: opts.permissions } : {}) });
   const page = await context.newPage();
   // ENARA's first-visit product tour opens over the page after a moment: skip it
   // whenever it gets in the way (inside Moodle's activity frame).

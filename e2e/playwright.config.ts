@@ -40,7 +40,7 @@ export default defineConfig({
       name: 'webkit',
       testMatch: /webkit\.spec\.ts$/,
       dependencies: ['chromium'],
-      use: { ...devices['Desktop Safari'], viewport: { width: 1366, height: 900 } },
+      use: { ...devices['Desktop Safari'], viewport: { width: 1366, height: 900 }, deviceScaleFactor: 1 },
     },
   ],
 });

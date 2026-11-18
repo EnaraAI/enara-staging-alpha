@@ -31,9 +31,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The latest stable Moodle first; MOODLE_405_STABLE (LTS) is added back
-        # once this is green.
-        moodle: [MOODLE_503_STABLE]
+        # Moodle 4.5 LTS (owner's choice). MOODLE_503_STABLE (latest, 5.3) is
+        # added back as a second entry once 4.5 is green and the owner agrees.
+        moodle: [MOODLE_405_STABLE]
     env:
       MOODLE_BRANCH: ${{ matrix.moodle }}
       MOODLE_SRC: ${{ github.workspace }}/../moodle-src
@@ -153,7 +153,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-screenshots-${{ matrix.moodle }}
-          path: e2e/.run/screenshots/*.png
+          path: |
+            e2e/.run/screenshots/*.png
+            e2e/.run/summary.md
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 30
@@ -163,6 +165,49 @@ jobs:
         run: |
           echo "::error::Scenarios failed on ${{ matrix.moodle }} (see the summary and the lms-e2e-${{ matrix.moodle }} artifact)"
           exit 1
+
+  # Screenshots + summary of this run as ONE orphan commit on branch
+  # e2e-results (force-pushed each run, so the repository does not grow):
+  # <moodle branch>/<scenario>-<moment>.png and <moodle branch>/summary.md.
+  publish-screenshots:
+    name: publish-screenshots
+    needs: [e2e]
+    if: always() && needs.e2e.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+          fetch-depth: 1
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: e2e-screenshots-*
+          path: ${{ runner.temp }}/shots
+      - name: Force-push one orphan commit to e2e-results
+        env:
+          SHOTS: ${{ runner.temp }}/shots
+        run: |
+          git checkout --orphan e2e-results
+          git rm -rfq --cached . && git clean -fdxq
+          shopt -s nullglob
+          for d in "$SHOTS"/e2e-screenshots-*; do
+            name="${d##*/e2e-screenshots-}"
+            mkdir -p "$name"
+            cp -r "$d"/. "$name"/
+          done
+          {
+            echo "# ENARA LMS e2e: screenshots of the latest run"
+            echo
+            echo "Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (attempt ${{ github.run_attempt }}), commit ${{ github.event.pull_request.head.sha || github.sha }}."
+            echo "Fake data only. Replaced on every run (single orphan commit)."
+          } > README.md
+          du -sh . --exclude=.git || true
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "e2e screenshots, run ${{ github.run_id }}"
+          git push -f origin HEAD:refs/heads/e2e-results
 
   minutes:
     name: minutes
