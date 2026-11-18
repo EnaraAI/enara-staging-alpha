@@ -90,3 +90,22 @@ The web-services token cannot change tool settings. Go to **Site administration 
 - the badge (earlier picks, and hand-made activities);
 - a picked practice item launching through Phase 3 and never sending a grade;
 - the audit log (IDs and counts only).
+
+## Status: DONE, verified on MoodleCloud (18 Nov 2026)
+
+These results come from the owner's tests, with the ENARA side confirmed from the lms-test audit log, the activities and the grade jobs.
+
+**Picker:**
+- The picker opened inside Moodle in English, showing the course title.
+- **Already added in this course** showed on "Moodle grades test (fake)".
+- The owner added 1 item, and then 2 items in one go (a graded quiz and a practice item). The response reported `items: 2, graded: 1`.
+
+**First launches:** each new activity was linked on its first launch (`activity.bound`) to its own assignment in the course's class, and its Moodle title was saved.
+
+**Grades:**
+- The graded quiz sent its grade, 2/3, to **its own** grade column (line item 18), with status sent.
+- The practice item sent **no** grade (`enara_graded=0`).
+
+**Found during the test:**
+1. **Moodle creates a grade column anyway** for an activity whose content item has no `lineItem`. The launch carries that line item (here line item 17), so the column exists but stays empty. ENARA cannot stop this, and cannot remove the activity's own column through AGS. Owner decision D3 (practice graded with "best") resolves it for practice. For items that are genuinely ungraded (later: tutor sessions, the avatar), the school guide tells teachers to set **Grade › Type: None** on that Moodle activity.
+2. **A (\*) override on "ENARA graded quiz."** in the Moodle gradebook: Moodle ignores tool grades on an overridden cell. The fix is on the Moodle side: untick **Overridden** on that cell. ENARA's ledger shows a difference as "Changed in LMS".
