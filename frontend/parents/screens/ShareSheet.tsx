@@ -8,7 +8,7 @@ import { useLive } from '../useLive';
 export const ShareSheet: React.FC<{ learner: LearnerChip; onClose: () => void }> = ({ learner, onClose }) => {
   const { t, n, lang } = useP();
   const q = useLive(() => parentsApi.report(learner.studentId), [learner.studentId], 0);
-  const [result, setResult] = useState<{ kind: 'ok' | 'wa' | 'err'; text?: string } | null>(null);
+  const [result, setResult] = useState<{ kind: 'ok' | 'wa' | 'err' | 'noemail'; text?: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const canShare = learner.role !== 'view';
   // lms-test: "Send by email" is blocked until a later step (the server says so; a 409 says the same).
@@ -20,6 +20,8 @@ export const ShareSheet: React.FC<{ learner: LearnerChip; onClose: () => void }>
       setResult(channel === 'whatsapp' ? { kind: 'wa', text: r.preview } : { kind: 'ok' });
     } catch (e) {
       if ((e as { code?: string })?.code === 'PARENT_EMAIL_BLOCKED_STAGING') { setEmailBlocked(true); setResult(null); }
+      // Parents P4: a code-only account has no email to send to yet.
+      else if ((e as { status?: number })?.status === 409) setResult({ kind: 'noemail' });
       else setResult({ kind: 'err' });
     } finally { setBusy(false); }
   };
@@ -64,6 +66,7 @@ export const ShareSheet: React.FC<{ learner: LearnerChip; onClose: () => void }>
       {result?.kind === 'ok' && <p className="pp-success" role="status"><Icon name="check" />{t.shareSent}</p>}
       {result?.kind === 'wa' && <div role="status"><p className="pp-sub" style={{ marginBlockEnd: 6 }}>{t.shareWhatsappReady}</p><p className="pp-whatsapp" dir="auto">{result.text}</p></div>}
       {result?.kind === 'err' && <p className="pp-error" role="alert">{t.shareFailed}</p>}
+      {result?.kind === 'noemail' && <p className="pp-error" role="alert">{t.shareNoEmail}</p>}
     </Sheet>
   );
 };

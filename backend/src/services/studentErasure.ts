@@ -21,6 +21,7 @@ import { BudgetReservation } from '../models/OrgBudget';
 import { ParentLearnerLink } from '../models/ParentLearnerLink';
 import { ParentLinkCode } from '../models/ParentLinkCode';
 import { ParentUsageEvent } from '../models/ParentUsage';
+import { ParentEmailSend } from '../models/ParentEmailSend';
 import { PedagogicalDecision } from '../models/PedagogicalDecision';
 import { HybridAnchorSet, HybridShadowResult } from '../models/HybridShadowResult';
 import { ReminderLog } from '../models/ReminderLog';
@@ -75,6 +76,7 @@ const DELETE_BY_STUDENT_ID: [string, Model<any>][] = [ // eslint-disable-line @t
   ['parent_learner_links', ParentLearnerLink],
   ['parent_link_codes', ParentLinkCode],
   ['parent_usage_events', ParentUsageEvent],
+  ['parent_email_sends', ParentEmailSend],
   ['assessments_for_this_student_only', Assessment],
   ['attendance_records', AttendanceRecord],
   ['diagnostic_sessions', DiagnosticSession],

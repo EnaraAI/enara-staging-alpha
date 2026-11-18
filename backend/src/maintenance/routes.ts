@@ -218,6 +218,28 @@ router.post('/parent-email-code', async (req, res, next) => {
   }
 });
 
+// Parents P4 on the test database: run the weekly summary step now (force: any
+// day of the week; it is still once per parent per week), and list the parent
+// email sends (IDs, template, outcome; no address or subject).
+router.post('/parent-weekly', async (req, res, next) => {
+  try {
+    const { runWeeklySummaries } = await import('../parents/parentEmails');
+    res.json(await runWeeklySummaries({ force: (req.body as { force?: unknown } | undefined)?.force === true }));
+  } catch (e) {
+    next(e);
+  }
+});
+router.get('/parent-emails', async (req, res, next) => {
+  try {
+    const { ParentEmailSend } = await import('../models/ParentEmailSend');
+    const n = Math.min(500, Math.max(1, Number(req.query.limit) || 200));
+    const rows = await ParentEmailSend.find({}).sort({ at: -1 }).limit(n).lean();
+    res.json({ emails: rows.map((r) => ({ key: r.key, template: r.template, parentUserId: r.parentUserId ?? null, studentId: r.studentId ?? null, institutionId: r.institutionId ?? null, status: r.status, code: r.code ?? null, attempts: r.attempts, at: r.at })) });
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Grade ledger backfill on the test database (dry run by default; apply needs confirm).
 router.post('/grade-ledger-backfill', async (req, res, next) => {
   try {

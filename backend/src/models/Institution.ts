@@ -34,6 +34,10 @@ export interface IInstitution extends Document {
     // Unset = 'after_release' (D7). A result an assignment releases automatically
     // counts as released (owner decision 3).
     showResults?: 'immediately' | 'after_release';
+    // Parents P4 (PARENT_EMAILS_ENABLED): which parent emails this school sends.
+    // Unset = the D11 defaults: link confirmed on, weekly summary on (a parent
+    // can opt out), new results off, link ended on.
+    emails?: { linkConfirmed?: boolean; weeklySummary?: boolean; newResults?: boolean; linkEnded?: boolean };
   };
   // P2: documents are deleted retentionDays after pilotEndsAt (default 180).
   documentRetention?: { pilotEndsAt?: Date; retentionDays?: number };
@@ -66,7 +70,7 @@ const institutionSchema = new Schema<IInstitution>(
     country: { type: String, maxlength: 2 },
     emailLanguage: { type: String, enum: ['ar', 'en'] },
     features: { type: Map, of: Boolean, default: undefined },
-    parentPortal: { type: { access: { type: String, enum: ['off', 'free'] }, updatedAt: Date, updatedBy: String, codeTtlDays: { type: Number, min: 1, max: 60 }, teachersMayIssueCodes: Boolean, showResults: { type: String, enum: ['immediately', 'after_release'] }, _id: false }, default: undefined },
+    parentPortal: { type: { access: { type: String, enum: ['off', 'free'] }, updatedAt: Date, updatedBy: String, codeTtlDays: { type: Number, min: 1, max: 60 }, teachersMayIssueCodes: Boolean, showResults: { type: String, enum: ['immediately', 'after_release'] }, emails: { type: { linkConfirmed: Boolean, weeklySummary: Boolean, newResults: Boolean, linkEnded: Boolean, _id: false }, default: undefined }, _id: false }, default: undefined },
     documentRetention: { type: { pilotEndsAt: Date, retentionDays: { type: Number, min: 1, max: 3650 }, _id: false }, default: undefined },
     learningSettings: {
       diagnosticMaxQuestions: { type: Number, min: 3, max: 30 },

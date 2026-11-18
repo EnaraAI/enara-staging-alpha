@@ -92,6 +92,9 @@ export const T = {
     hiddenBySchool: "A child linked to you is hidden for now: their school switched parent access off. Ask the school.",
     // Parents P3
     waitingForTeacher: 'Waiting for the teacher',
+    // Parents P4
+    emailWeekly: 'Weekly summary by email', emailNewResults: 'New results by email', emailsNeedAddress: 'Add your email above to get these.',
+    shareNoEmail: 'Add your email in Account first, then try again.',
     // Parents P2: add your email (6-digit code) and the merge it may offer
     addEmailPrompt: 'Add your email to get notifications and sign in on any device.',
     addEmailLost: 'Without an email, if you lose this device or sign out, you will need a new code from the school.',
@@ -187,6 +190,9 @@ export const T = {
     hiddenBySchool: 'أحد أبنائك المرتبطين مخفي حاليًا: أوقفت مدرسته وصول أولياء الأمور. تواصل مع المدرسة.',
     // Parents P3
     waitingForTeacher: 'بانتظار المعلم',
+    // Parents P4
+    emailWeekly: 'الملخص الأسبوعي بالبريد الإلكتروني', emailNewResults: 'النتائج الجديدة بالبريد الإلكتروني', emailsNeedAddress: 'أضف بريدك الإلكتروني أعلاه لتصلك هذه الرسائل.',
+    shareNoEmail: 'أضف بريدك الإلكتروني من صفحة الحساب أولًا، ثم حاول مرة أخرى.',
     // Parents P2
     addEmailPrompt: 'أضف بريدك الإلكتروني لتصلك الإشعارات وتسجّل الدخول من أي جهاز.',
     addEmailLost: 'بدون بريد إلكتروني، إذا فقدت هذا الجهاز أو سجّلت الخروج فستحتاج إلى رمز جديد من المدرسة.',

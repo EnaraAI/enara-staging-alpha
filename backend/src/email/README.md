@@ -235,5 +235,6 @@ delivery, frequency). `render-previews.mjs` renders them too. On approval, split
 
 `sendParentTemplate` refuses a link that carries `LINK_CODE`, a 6-digit `CODE`, or anything shaped like a
 parent link code (`code_in_url`). `parent-email-verify` and `parent-sign-in-code` are sent by `parents/emailSignin.ts` (Parents P2, behind
-`PARENT_EMAIL_SIGNIN_ENABLED`, through the same safety path); the weekly summary and invites come with P4/P5.
-See `docs/parents/`.
+`PARENT_EMAIL_SIGNIN_ENABLED`, through the same safety path). The other parent emails are sent by
+`parents/parentEmails.ts` (Parents P4, `PARENT_EMAILS_ENABLED`): which event sends which, the school and parent
+switches and the never-twice log are in `docs/parents/P4_NOTES.md`.

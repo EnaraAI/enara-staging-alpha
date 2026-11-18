@@ -116,7 +116,21 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
             <button type="button" aria-pressed={lang === 'ar'} onClick={() => chooseLang('ar')} lang="ar">العربية</button>
           </div>
         </div>
-        <div className="pp-row" style={{ fontSize: 14, minBlockSize: 44 }}><span>{t.weeklySummary}</span><span className="pp-meta">{t.onDemand}</span></div>
+        {d.preferences.emails ? (
+          // Parents P4: the parent's own on/off for the two optional emails (the school's switches apply first).
+          <>
+            {(['weeklySummary', 'newResults'] as const).map((k) => (
+              <label key={k} className="pp-row" style={{ fontSize: 14, minBlockSize: 44 }}>
+                <span>{k === 'weeklySummary' ? t.emailWeekly : t.emailNewResults}</span>
+                <input type="checkbox" checked={d.preferences.emails![k]} data-testid={`pp-pref-${k}`}
+                  onChange={(e) => { void parentsApi.savePreferences({ [k === 'weeklySummary' ? 'weeklySummaryEmail' : 'newResultsEmail']: e.target.checked } as never).then(() => q.reload()); }} />
+              </label>
+            ))}
+            {!d.signIn?.hasEmail && <p className="pp-sub">{t.emailsNeedAddress}</p>}
+          </>
+        ) : (
+          <div className="pp-row" style={{ fontSize: 14, minBlockSize: 44 }}><span>{t.weeklySummary}</span><span className="pp-meta">{t.onDemand}</span></div>
+        )}
         <div className="pp-row" style={{ fontSize: 14, minBlockSize: 44 }}><span>{t.alertsVia}</span><span className="pp-meta">{d.preferences.alertChannels.map((c) => t.channels[c] ?? c).join(' + ')}</span></div>
       </section>
 

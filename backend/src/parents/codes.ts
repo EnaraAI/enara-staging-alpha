@@ -8,6 +8,7 @@ import { Institution } from '../models/Institution';
 import { User } from '../models/User';
 import { recordAudit } from '../services/auditTrail';
 import { sendTemplate } from '../email/sendTemplate';
+import { parentEmailsEnabled } from '../email/sendParentTemplate';
 import { assertParentEmailAllowed, parentEmailState } from './emailBlock';
 import { logger } from '../utils/logging';
 import { tierOf } from './policy';
@@ -88,7 +89,13 @@ export async function createCode(actor: Actor, studentId: string, opts: { sendTo
   await recordAudit('parent_code_created', actor, { institutionId: student.institutionId, type: 'student', id: student.id }, { codeId: row.id });
 
   let emailed: { ok: boolean; reason?: string } | undefined;
-  if (opts.sendToEmail) {
+  if (opts.sendToEmail && parentEmailsEnabled()) {
+    // Parents P4: the approved parent-invite (code in the body only, the secret-code
+    // warning), through the email safety path (test inbox on lms-test).
+    const { sendInviteEmail } = await import('./parentEmails');
+    const r = await sendInviteEmail({ to: opts.sendToEmail, codeId: row.id, code: code.display, studentId: student.id, institutionId: student.institutionId, ttlDays: Math.round(ttlMs / 86_400_000) });
+    emailed = r.status === 'sent' || r.status === 'captured' ? { ok: true } : { ok: false, reason: r.code ?? r.status };
+  } else if (opts.sendToEmail) {
     // P0 item 4 (owner decision D15): the code is in the email BODY only
     // (LINK_CODE), never in a URL. The button opens the plain code page
     // (/parents/link, built in code by sendTemplate); the parent types the code.
@@ -211,6 +218,8 @@ export async function confirmCode(parent: Actor & { email?: string }, input: unk
   await recordAudit('parent_code_redeemed', parent, { institutionId: student.institutionId, type: 'student', id: student.id }, { codeId: code.id, linkId: link.id, role: link.role, ...(previousStatus ? { previousStatus } : {}) });
 
   if (tier === '13plus') await notifyLearnerEmailStub(student.email, link.id);
+  // Parents P4: parent-link-confirmed (never fails the redeem).
+  await (await import('./parentEmails')).notifyLinkConfirmed({ id: link.id, parentUserId: parent.id, studentId: student.id, institutionId: student.institutionId, codeId: code.id });
   return { linkId: link.id, studentId: student.id, role: link.role, status: link.status, consent: link.consent };
 }
 

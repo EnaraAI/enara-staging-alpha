@@ -8,6 +8,8 @@ import { recordAudit } from '../services/auditTrail';
 import { classStudentIds } from '../services/learningAccess';
 import { CODE_TTL_MS, generateCode, hashCode } from './codes';
 import { parentCodeToolsEnabled, parentGradesAfterReviewEnabled } from './flags';
+import { parentEmailsEnabled } from '../email/sendParentTemplate';
+import { SCHOOL_EMAIL_DEFAULTS, type ParentEmailKind } from './parentEmails';
 import { parentAccessOf, schoolAccessOffError } from './schoolAccess';
 
 // Parents P2 (PARENT_CODE_TOOLS_ENABLED): class code sheets and the school's code settings.
@@ -27,7 +29,7 @@ type Actor = { id: string; role: string; institutionId?: string };
 const DAY = 86_400_000;
 export const DEFAULT_CODE_TTL_DAYS = 7;
 
-export interface SchoolParentSettings { codeTtlDays: number; teachersMayIssueCodes: boolean; showResults: 'immediately' | 'after_release' }
+export interface SchoolParentSettings { codeTtlDays: number; teachersMayIssueCodes: boolean; showResults: 'immediately' | 'after_release'; emails: Record<ParentEmailKind, boolean> }
 
 export async function schoolParentSettings(institutionId: string | undefined): Promise<SchoolParentSettings> {
   const s = institutionId ? await Institution.findOne({ id: institutionId }).select('parentPortal').lean() : null;
@@ -37,6 +39,8 @@ export async function schoolParentSettings(institutionId: string | undefined): P
     teachersMayIssueCodes: s?.parentPortal?.teachersMayIssueCodes === true,
     // Parents P3: unset = after release (D7); read for scores through parents/resultVisibility.ts.
     showResults: s?.parentPortal?.showResults === 'immediately' ? 'immediately' : 'after_release',
+    // Parents P4: which parent emails the school sends (D11 defaults for unset values).
+    emails: Object.fromEntries(Object.entries(SCHOOL_EMAIL_DEFAULTS).map(([k, d]) => [k, typeof s?.parentPortal?.emails?.[k as ParentEmailKind] === 'boolean' ? s!.parentPortal!.emails![k as ParentEmailKind]! : d])) as Record<ParentEmailKind, boolean>,
   };
 }
 
@@ -56,6 +60,14 @@ export async function setSchoolParentSettings(actor: Actor, institutionId: strin
     if (!grades) throw new AppError('showResults is not available', 400, 'VALIDATION_ERROR');
     if (body.showResults !== 'immediately' && body.showResults !== 'after_release') throw new AppError('showResults must be immediately or after_release', 400, 'VALIDATION_ERROR');
     set['parentPortal.showResults'] = body.showResults;
+  }
+  if (body.emails !== undefined) {
+    if (!parentEmailsEnabled()) throw new AppError('Parent email settings are not available', 400, 'VALIDATION_ERROR');
+    if (!body.emails || typeof body.emails !== 'object' || Array.isArray(body.emails)) throw new AppError('emails must be an object', 400, 'VALIDATION_ERROR');
+    for (const [k, v] of Object.entries(body.emails as Record<string, unknown>)) {
+      if (!(k in SCHOOL_EMAIL_DEFAULTS) || typeof v !== 'boolean') throw new AppError(`emails.${k} must be true or false`, 400, 'VALIDATION_ERROR');
+      set[`parentPortal.emails.${k}`] = v;
+    }
   }
   if ((body.codeTtlDays !== undefined || body.teachersMayIssueCodes !== undefined) && !tools) throw new AppError('Code settings are not available', 400, 'VALIDATION_ERROR');
   if (body.codeTtlDays !== undefined) {

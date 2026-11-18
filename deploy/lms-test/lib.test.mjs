@@ -47,11 +47,11 @@ test('the flags manifest accepts PARENT_* switches (Parents P1) and still refuse
     assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { [bad]: 'true' } }] }), /not a feature switch/, bad);
   }
   assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { PARENT_SETTINGS_ENABLED: 'a@b.c' } }] }), /short plain string/);
-  // The real manifest: the Parents P1 switches are on for lms-test; parent emails are not managed here.
+  // The real manifest: the Parents switches are on for lms-test (parent emails since P4, through the safety path).
   const real = manifestFlags(m);
   assert.equal(real.PARENT_SETTINGS_ENABLED, 'true');
   assert.equal(real.PARENT_CODE_SIGNUP_ENABLED, 'true');
-  assert.equal(real.PARENT_EMAILS_ENABLED, undefined);
+  assert.equal(real.PARENT_EMAILS_ENABLED, 'true');
 });
 
 test('the flags manifest: the current lms-test set, switches only', () => {

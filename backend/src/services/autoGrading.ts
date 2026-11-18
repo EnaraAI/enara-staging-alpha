@@ -355,6 +355,8 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
     // Grade ledger (inert unless switched on): auto_graded, or regrade_after_grader_fix after a teacher's regrade.
     await recordGradeChange(done.id, 'auto_graded', GRADER);
     await lmsResultChanged(done.id, hold ? 'finalized' : 'released');
+    // Parents P4: parent-new-results (released, or finalized for an "immediately" school; inert unless PARENT_EMAILS_ENABLED).
+    await (await import('../parents/parentEmails')).notifyResultVisible(done.id);
     await updateLearningIntelligence(done.id, questions, version.subject);
     return hold ? 'finalized' : 'released';
   } catch (error) {
