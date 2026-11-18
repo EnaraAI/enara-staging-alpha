@@ -465,7 +465,9 @@ describe('Problems view (GET /api/lms/problems)', () => {
       { institutionId: A, platformId: 'plat-a1', event: 'lti.launch', outcome: 'fail', code: 'invalid_signature', refIds: {}, createdAt: new Date(now - 240 * H) },
       // School A: a registration duplicate and an unknown code.
       { institutionId: A, platformId: 'plat-a3', event: 'registration.complete', outcome: 'warn', code: 'duplicate_lms', refIds: {}, createdAt: new Date(now - 6 * H) },
-      { institutionId: A, event: 'test_ws.call', outcome: 'fail', code: 'weird_new_code', refIds: {}, createdAt: new Date(now - 7 * H) },
+      { institutionId: A, event: 'lti.launch', outcome: 'fail', code: 'weird_new_code', refIds: {}, createdAt: new Date(now - 7 * H) },
+      // Rows of the test-only Moodle Web Services tool never show in Problems.
+      { institutionId: A, event: 'test_ws.call', outcome: 'fail', code: 'test_tool_noise', refIds: {}, createdAt: new Date(now - 7 * H) },
       // School B: its own failure (never shown to school A).
       { institutionId: B, platformId: 'plat-b1', event: 'lti.launch', outcome: 'fail', code: 'state_invalid', refIds: { contextId: 'ctx-b' }, createdAt: new Date(now - 1 * H) },
       { institutionId: B, platformId: 'plat-b1', event: 'roster.sync', outcome: 'fail', code: 'memberships_http_403', refIds: { contextId: 'ctx-b' }, createdAt: new Date(now - 1 * H) },
@@ -573,7 +575,8 @@ describe('Problems view (GET /api/lms/problems)', () => {
     expect(dup.help.known).toBe(true);
     expect(dup.help.en.what).toMatch(/already connected/i);
     expect(dup.help.ar.what).toContain('متصل بالفعل');
-    const unknown = find(week, 'weird_new_code', 'test_ws.call');
+    const unknown = find(week, 'weird_new_code', 'lti.launch');
+    expect(week.problems.some((p: { event: string }) => p.event.startsWith('test_ws.'))).toBe(false);
     expect(unknown.help.known).toBe(false);
     expect(unknown.help.en.what).toContain('weird_new_code');
     expect(unknown.help.ar.what).toContain('weird_new_code');
