@@ -15,6 +15,14 @@ export interface ILmsPlatform {
   authLoginUrl?: string;
   authTokenUrl?: string;
   keysetUrl?: string;
+  /**
+   * Step 2: the platform's public key(s), pasted by an admin (PEM, a JWK or a
+   * JWKS), stored as a JWKS JSON string of RSA public keys. An alternative to
+   * keysetUrl for launch verification, for a Moodle the internet cannot reach
+   * (launches go through the browser; ENARA never needs to fetch this key).
+   * When set, launches are verified with it instead of the keyset URL.
+   */
+  publicJwks?: string;
   tokenAudience?: string;
   status: 'pending' | 'active' | 'disabled';
   registeredVia: 'dynamic' | 'manual' | 'google_oauth';
@@ -49,6 +57,7 @@ const platformSchema = new Schema<ILmsPlatform>(
     authLoginUrl: String,
     authTokenUrl: String,
     keysetUrl: String,
+    publicJwks: { type: String, maxlength: 20_000 },
     tokenAudience: String,
     status: { type: String, enum: ['pending', 'active', 'disabled'], default: 'pending' },
     registeredVia: { type: String, enum: ['dynamic', 'manual', 'google_oauth'], required: true },

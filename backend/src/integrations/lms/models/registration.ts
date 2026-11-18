@@ -37,6 +37,16 @@ export interface ILmsRegistrationCode {
   failedAttempts: number;
   lastErrorCode?: string;
   lastErrorAt?: Date;
+  /** Step 2: the first time Moodle opened the link (any attempt, even a failed one): "link opened". */
+  firstOpenedAt?: Date;
+  /** Step 2: the onboarding ("New school") this link belongs to. */
+  onboardingId?: string;
+  /**
+   * Step 2: a school admin's link for a school ENARA onboarded: the ENARA
+   * admin who made the school, so the connection is active on registration
+   * (R1: ENARA already approved this school's connection).
+   */
+  preApprovedBy?: string;
   createdAt: Date;
 }
 
@@ -58,6 +68,9 @@ const registrationCodeSchema = new Schema<ILmsRegistrationCode>(
     failedAttempts: { type: Number, default: 0, min: 0 },
     lastErrorCode: String,
     lastErrorAt: Date,
+    firstOpenedAt: Date,
+    onboardingId: String,
+    preApprovedBy: String,
     createdAt: { type: Date, default: () => new Date() },
   },
   { collection: 'lms_registration_codes', versionKey: false },

@@ -20,7 +20,7 @@ If the window shows "ENARA could not be connected", send the **Reference** code 
 
 ## School admin: after connecting
 
-Moodle takes most settings from the link. These it **cannot** take, so set them by hand once:
+Moodle takes most settings from the link. These it **cannot** take, so set them by hand once (the full school guide, in English and Arabic, is [SCHOOL_GUIDE.md](./SCHOOL_GUIDE.md); on ENARA's **LMS connection status** page, tick each setting when it is done):
 
 1. **Activate the tool.** In **Site administration › Plugins › Activity modules › External tool › Manage tools**, find the new **ENARA** card (it says **Pending**) and click **Activate**.
 2. **Open its settings.** On the ENARA card, click the **gear icon** (Edit).

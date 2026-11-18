@@ -19,7 +19,7 @@ import { getPreset } from '../../presets';
 import { CLAIM, DEEP_LINKING_REQUEST, LTI_VERSION, SUPPORTED_MESSAGE_TYPES } from './claims';
 import { startDeepLinking } from './deepLinking';
 import { LtiError, type LtiErrorCode } from './errors';
-import { platformKeySet } from './jwks';
+import { platformVerificationKey } from './jwks';
 import { STORAGE_HOLD_TTL_MS, validStorageTarget } from './platformStorage';
 
 // LTI 1.3 OIDC third-party-initiated login and the resource-link launch
@@ -303,7 +303,7 @@ async function holdForStorageCheck(row: ILmsOidcState, state: string, idToken: s
     const bad = platformError(platform);
     if (bad) return fail(bad, 'lti.launch', { platform });
     const origin = originOf(platform.authLoginUrl);
-    if (!origin || !platform.keysetUrl) return fail('platform_misconfigured', 'lti.launch', { platform });
+    if (!origin || (!platform.keysetUrl && !platform.publicJwks)) return fail('platform_misconfigured', 'lti.launch', { platform });
     const payload = await verifyIdToken(platform, idToken, row.nonceHash);
     const handle = randomBytes(32).toString('base64url');
     const held = await LmsOidcState.findOneAndUpdate(
@@ -372,7 +372,7 @@ async function verifyIdToken(platform: ILmsPlatform, idToken: string, nonceHash:
   const { jwtVerify } = await loadJose();
   let payload: JWTPayload;
   try {
-    ({ payload } = await jwtVerify(idToken, await platformKeySet(platform.keysetUrl!), {
+    ({ payload } = await jwtVerify(idToken, await platformVerificationKey(platform), {
       algorithms: ['RS256'],
       issuer: platform.issuer,
       audience: platform.clientId,
@@ -411,7 +411,7 @@ async function completeLaunch({ platform, nonceHash, idToken, binding: via, cook
   // A storage fallback is counted as cookieless (decision 2:A applies).
   const cookieless = via === 'cookieless' || via === 'storage_unavailable';
   if (!idToken) return fail('id_token_missing', 'lti.launch', { platform });
-  if (!platform.keysetUrl) return fail('platform_misconfigured', 'lti.launch', { platform });
+  if (!platform.keysetUrl && !platform.publicJwks) return fail('platform_misconfigured', 'lti.launch', { platform });
   const payload = await verifyIdToken(platform, idToken, nonceHash);
 
   const claims = payload as Record<string, unknown>;

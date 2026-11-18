@@ -11,7 +11,7 @@ import { selectLaunchClass } from '../../../services/multiClass';
 import { MongoRateLimitStore } from '../../../services/mongoRateLimitStore';
 import { logger, serializeError } from '../../../utils/logging';
 import { ensurePlainObject, getOptionalBoolean, getOptionalId, rejectMongoOperators } from '../../../utils/validation';
-import { isAcceptableKeysetUrl } from '../adapters/lti13/jwks';
+import { isAcceptableKeysetUrl, parsePlatformPublicKey } from '../adapters/lti13/jwks';
 import { writeLmsAudit } from '../core/audit';
 import { anyLmsFlagSet, lmsFlags, lmsSettings } from '../core/flags';
 import { runInBackground, triggerOn } from '../core/drain';
@@ -27,6 +27,7 @@ import { liftSuppression, listSuppressions } from '../core/suppression';
 import { LmsContext, LmsDeployment, LmsOrgSettings, LmsPlatform, LmsRegistrationCode, LmsResourceLink, LmsUser, type ILmsContext, type ILmsDeployment, type ILmsHandoffCode, type ILmsPlatform } from '../models';
 import { isKnownVendor, listPresets } from '../presets';
 import { requireLti } from '../routes';
+import { onboardingRouter } from './onboardingRoutes';
 import { problemsRouter } from './problemsRoutes';
 import { activityRouter } from './activityRoutes';
 import { pageTargetRequest, resolvePageTarget } from '../core/pageTargets';
@@ -100,6 +101,7 @@ function platformView(p: ILmsPlatform, deployments: ILmsDeployment[]) {
     authLoginUrl: p.authLoginUrl ?? null,
     authTokenUrl: p.authTokenUrl ?? null,
     keysetUrl: p.keysetUrl ?? null,
+    hasPublicKey: !!p.publicJwks,
     status: p.status,
     registeredVia: p.registeredVia,
     createdAt: p.createdAt,
@@ -622,6 +624,10 @@ lmsAdminRouter.use(problemsRouter);
 
 lmsAdminRouter.use(authMiddleware, requireAdmin);
 
+// Step 2: self-serve school onboarding ("New school", the invite, the school
+// connection status page, the automatic connection check).
+lmsAdminRouter.use(onboardingRouter);
+
 lmsAdminRouter.get(
   '/status',
   asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -669,7 +675,17 @@ lmsAdminRouter.post(
     const issuer = url(body, 'issuer', true)!;
     const clientId = text(body, 'clientId', 200);
     const authLoginUrl = url(body, 'authLoginUrl', true);
-    const keysetUrl = url(body, 'keysetUrl', true);
+    // Step 2: a pasted platform public key (PEM, JWK or JWKS) is an alternative
+    // to the keyset URL (an LMS the internet cannot reach): launches are then
+    // verified with it, without ENARA fetching anything from the LMS.
+    const hasKey = body.publicKey !== undefined && body.publicKey !== null && body.publicKey !== '';
+    const keysetUrl = url(body, 'keysetUrl', !hasKey);
+    let publicJwks: string | undefined;
+    if (hasKey) {
+      const parsed = await parsePlatformPublicKey(body.publicKey);
+      if (!parsed.ok) throw new AppError(`publicKey is not a usable public key (${parsed.reason})`, 400, 'LMS_PUBLIC_KEY_INVALID');
+      publicJwks = parsed.jwks;
+    }
     const authTokenUrl = url(body, 'authTokenUrl', false);
     const deployments = deploymentIds(body);
 
@@ -685,6 +701,7 @@ lmsAdminRouter.post(
         authLoginUrl,
         authTokenUrl,
         keysetUrl,
+        ...(publicJwks ? { publicJwks } : {}),
         status,
         registeredVia: 'manual',
         createdBy: req.user!.id,
@@ -698,7 +715,7 @@ lmsAdminRouter.post(
     await LmsDeployment.insertMany(
       deployments.map((deploymentId) => ({ platformId: platform.id, deploymentId, institutionId, status, createdBy: req.user!.id, ...(status === 'active' ? { approvedBy: req.user!.id } : {}) })),
     );
-    await writeLmsAudit({ event: 'platform.registered', outcome: 'ok', institutionId, platformId: platform.id, actor: req.user!.id, refIds: { vendor, via: 'manual', status, deployments: deployments.length } });
+    await writeLmsAudit({ event: 'platform.registered', outcome: 'ok', institutionId, platformId: platform.id, actor: req.user!.id, refIds: { vendor, via: 'manual', status, deployments: deployments.length, publicKey: !!publicJwks } });
     res.status(201).json({ platform: await viewOne(platform) });
   }),
 );
@@ -722,6 +739,28 @@ lmsAdminRouter.post(
     const p = await ownPlatform(req, String(req.params.id));
     await LmsPlatform.updateOne({ id: p.id }, { $set: { status: 'disabled' } });
     await writeLmsAudit({ event: 'platform.disabled', outcome: 'ok', institutionId: p.institutionId, platformId: p.id, actor: req.user!.id });
+    res.json({ platform: await viewOne((await LmsPlatform.findOne({ id: p.id }).lean())!) });
+  }),
+);
+
+// Step 2: paste (or clear, with null) the platform's public key for an
+// existing connection, e.g. a Moodle the internet cannot reach. School admins:
+// their own school's connections; ENARA admins: any. Audited (IDs only).
+lmsAdminRouter.post(
+  '/platforms/:id/public-key',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const p = await ownPlatform(req, String(req.params.id));
+    const body = ensurePlainObject(req.body ?? {});
+    if (body.publicKey === null) {
+      if (!p.keysetUrl) throw new AppError('This connection has no keyset URL, so its public key cannot be removed', 409, 'LMS_PUBLIC_KEY_REQUIRED');
+      await LmsPlatform.updateOne({ id: p.id }, { $unset: { publicJwks: 1 } });
+      await writeLmsAudit({ event: 'platform.public_key', outcome: 'ok', institutionId: p.institutionId, platformId: p.id, actor: req.user!.id, refIds: { action: 'cleared' } });
+    } else {
+      const parsed = await parsePlatformPublicKey(body.publicKey);
+      if (!parsed.ok) throw new AppError(`publicKey is not a usable public key (${parsed.reason})`, 400, 'LMS_PUBLIC_KEY_INVALID');
+      await LmsPlatform.updateOne({ id: p.id }, { $set: { publicJwks: parsed.jwks } });
+      await writeLmsAudit({ event: 'platform.public_key', outcome: 'ok', institutionId: p.institutionId, platformId: p.id, actor: req.user!.id, refIds: { action: 'set', keys: parsed.keyCount } });
+    }
     res.json({ platform: await viewOne((await LmsPlatform.findOne({ id: p.id }).lean())!) });
   }),
 );

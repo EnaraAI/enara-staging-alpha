@@ -105,10 +105,16 @@ services:
       # Mirrors lms-test (Vercel staging project) as far as a container can:
       # production + staging guard, every LMS switch on, the multi-class switches.
       NODE_ENV: production
-      # Caddy serves the SPA, as Vercel does for lms-test. The image's own SPA
-      # fallback (staging single-service mode) would answer GET /lti/* and
-      # /.well-known/* with index.html, so it is switched off here.
-      SERVE_FRONTEND_DIR: ""
+      # Caddy serves the SPA, as Vercel does for lms-test. The image keeps its
+      # own SPA fallback (SERVE_FRONTEND_DIR=/app/public, staging single-service
+      # mode) on purpose: the suite then checks that it leaves /lti/* and
+      # /.well-known/* to the API (stagingSingleService.ts).
+      # Owner rule: this stack never sends a real email. No Resend key (every
+      # sender is a no-op without one; scripts/up.sh checks it), LMS emails off,
+      # and Resend's base URL points at an address that does not exist.
+      RESEND_API_KEY: ""
+      LMS_EMAILS_ENABLED: "false"
+      RESEND_BASE_URL: http://no-email.invalid
       ENARA_STAGING: "true"
       PORT: "3001"
       MONGODB_URI: mongodb://enara-lms-test.local:27017/enara_staging_alpha
@@ -167,3 +173,15 @@ volumes:
   e2e-ca:
   enara-spa:
   moodledata:
+
+# The stack's network uses TEST-NET-3 (203.0.113.0/24, RFC 5737: reserved for
+# documentation, never routed on the internet) instead of a private range.
+# ENARA's connection check reports a Moodle whose name resolves only to
+# private addresses as "unreachable from the internet" (on-premise Moodle, by
+# design, connectionCheck.ts); with this range the docker Moodle counts as an
+# internet Moodle, so the check exercises the real keyset and token calls.
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 203.0.113.0/24

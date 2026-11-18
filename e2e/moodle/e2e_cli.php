@@ -7,7 +7,7 @@
 // Commands:
 //   provision                 users, categories, courses, enrolments (idempotent)
 //   tools                     the LTI tool types (id, name, state, coursevisible, clientid)
-//   tool-settings --name=N --category=C   the 4 settings Moodle cannot take from
+//   tool-settings --name=N|--typeid=ID --category=C   the 4 settings Moodle cannot take from
 //                             dynamic registration: Activate, show in activity
 //                             chooser, Accept grades = Always, Restrict to category
 //   tool-acceptgrades --typeid=N --value=0|1|2   Privacy › Accept grades from the tool:
@@ -59,6 +59,8 @@ const USERS = [
 const COURSES = [
     ['shortname' => 'ENARATEST', 'fullname' => 'Enara Test Course', 'category' => 'School A'],
     ['shortname' => 'ENARAB', 'fullname' => 'Enara School B Course', 'category' => 'School B'],
+    // Scenario 8: the school onboarded with "New school" (Test School C).
+    ['shortname' => 'ENARAC', 'fullname' => 'Enara School C Course', 'category' => 'School C'],
 ];
 // student2.test is enrolled by the roster scenario itself.
 const ENROLMENTS = [
@@ -66,6 +68,8 @@ const ENROLMENTS = [
     ['ENARATEST', 'student.test', 'student'],
     ['ENARAB', 'teacher.test', 'editingteacher'],
     ['ENARAB', 'student.test', 'student'],
+    ['ENARAC', 'teacher.test', 'editingteacher'],
+    ['ENARAC', 'student.test', 'student'],
 ];
 
 function course_by_short(string $short) {
@@ -133,7 +137,7 @@ switch ($cmd) {
             $made['users'][$u['username']] = (int) $id;
         }
         $cats = [];
-        foreach (['School A', 'School B'] as $name) {
+        foreach (['School A', 'School B', 'School C'] as $name) {
             $cat = $DB->get_record('course_categories', ['name' => $name]);
             if (!$cat) {
                 $cat = \core_course_category::create(['name' => $name, 'idnumber' => strtoupper(str_replace(' ', '', $name))]);
@@ -177,9 +181,10 @@ switch ($cmd) {
     }
 
     case 'tool-settings': {
-        $name = opt($opts, 'name');
         $category = opt($opts, 'category');
-        $type = $DB->get_record('lti_types', ['name' => $name], '*', MUST_EXIST);
+        $type = !empty($opts['typeid'])
+            ? $DB->get_record('lti_types', ['id' => (int) $opts['typeid']], '*', MUST_EXIST)
+            : $DB->get_record('lti_types', ['name' => opt($opts, 'name')], '*', MUST_EXIST);
         $catid = (int) $DB->get_field('course_categories', 'id', ['name' => $category], MUST_EXIST);
         // 1. Activate (Manage tools › Activate).
         // 2. Tool configuration usage: Show in activity chooser and as a preconfigured tool.

@@ -20,12 +20,18 @@ export async function createRegistrationCode(input: {
   institutionId: string;
   createdBy: string;
   createdByRole: ILmsRegistrationCode['createdByRole'];
+  /** Step 2: the onboarding the link belongs to. */
+  onboardingId?: string;
+  /** Step 2: the ENARA admin whose onboarding pre-approves a school admin's link (connection active). */
+  preApprovedBy?: string;
 }): Promise<{ code: string; row: ILmsRegistrationCode }> {
   const code = randomBytes(32).toString('base64url');
   const created = await LmsRegistrationCode.create({
     institutionId: input.institutionId,
     createdBy: input.createdBy,
     createdByRole: input.createdByRole,
+    ...(input.onboardingId ? { onboardingId: input.onboardingId } : {}),
+    ...(input.preApprovedBy ? { preApprovedBy: input.preApprovedBy } : {}),
     codeHash: sha256Hex(code),
     expiresAt: new Date(Date.now() + REGISTRATION_CODE_TTL_MS),
   });
@@ -55,7 +61,19 @@ export function registrationCodeView(row: ILmsRegistrationCode) {
     failedAttempts: row.failedAttempts ?? 0,
     lastErrorCode: row.lastErrorCode ?? null,
     lastErrorAt: row.lastErrorAt ?? null,
+    firstOpenedAt: row.firstOpenedAt ?? null,
+    onboardingId: row.onboardingId ?? null,
   };
+}
+
+/** Whether a registration with this link makes an active connection (R1, plus a link pre-approved by an ENARA onboarding). */
+export function linkMakesActive(row: Pick<ILmsRegistrationCode, 'createdByRole' | 'preApprovedBy'>, requireApproval: boolean): boolean {
+  return row.createdByRole === 'enara-admin' || !!row.preApprovedBy || !requireApproval;
+}
+
+/** Step 2 ("link opened"): the first time the LMS opened this link, whatever the outcome. Never throws. */
+export async function markRegistrationCodeOpened(id: string): Promise<void> {
+  await LmsRegistrationCode.updateOne({ id, firstOpenedAt: { $exists: false } }, { $set: { firstOpenedAt: new Date() } }).catch(() => undefined);
 }
 
 export type CodeProblem = 'registration_code_invalid' | 'registration_code_used' | 'registration_code_expired' | 'registration_in_progress';

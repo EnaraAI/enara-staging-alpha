@@ -25,7 +25,7 @@ import { LessonProgress } from '../models/LessonProgress';
 import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
-import { LMS_MIC_MODELS, LMS_MODELS, LMS_P0_MODELS, LMS_PHASE1A_MODELS, LMS_PHASE1B_MODELS, LmsRegistrationCode, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsHandoffCode, LmsLaunchToken, LmsMicDaily, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsSuppressedIdentity, LmsToolKey } from '../integrations/lms/models';
+import { LMS_MIC_MODELS, LMS_MODELS, LMS_P0_MODELS, LMS_PHASE1A_MODELS, LMS_PHASE1B_MODELS, LMS_ONBOARDING_MODELS, LmsConnectionCheck, LmsOnboarding, LmsRegistrationCode, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsHandoffCode, LmsLaunchToken, LmsMicDaily, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsSuppressedIdentity, LmsToolKey } from '../integrations/lms/models';
 import { ClassEnrollment } from '../models/ClassEnrollment';
 import { ReminderLog } from '../models/ReminderLog';
 import { SignInEvent } from '../models/SignInEvent';
@@ -485,6 +485,15 @@ export const MIGRATIONS: Migration[] = [
     up: async () => {
       for (const model of LMS_PHASE1B_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
       if (!(await LmsRegistrationCode.collection.indexes()).some((i) => i.key.codeHash === 1 && i.unique)) throw new Error('lms_registration_codes codeHash unique index missing');
+    },
+  },
+  {
+    id: '2026-11-24-lms-onboarding',
+    description: 'LMS step 2 (self-serve onboarding): lms_onboardings and lms_connection_checks indexes (new collections; nothing existing touched)',
+    up: async () => {
+      for (const model of LMS_ONBOARDING_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
+      if (!(await LmsOnboarding.collection.indexes()).some((i) => i.key.institutionId === 1 && i.unique)) throw new Error('lms_onboardings institutionId unique index missing');
+      if (!(await LmsConnectionCheck.collection.indexes()).some((i) => i.key.platformId === 1 && i.unique)) throw new Error('lms_connection_checks platformId unique index missing');
     },
   },
 ];

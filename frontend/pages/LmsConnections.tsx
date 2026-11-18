@@ -44,7 +44,7 @@ import { LmsProblems } from './LmsProblems';
 // admin pastes into Moodle (LTI Dynamic Registration). The URL is shown once;
 // the list shows each link's status, and an unused link can be cancelled.
 
-const EMPTY = { vendor: 'moodle', issuer: '', clientId: '', authLoginUrl: '', authTokenUrl: '', keysetUrl: '', deploymentIds: '', institutionId: '' };
+const EMPTY = { vendor: 'moodle', issuer: '', clientId: '', authLoginUrl: '', authTokenUrl: '', keysetUrl: '', publicKey: '', deploymentIds: '', institutionId: '' };
 
 const Copy: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 py-1.5">
@@ -124,7 +124,9 @@ export const LmsConnections: React.FC = () => {
       issuer: form.issuer.trim(),
       clientId: form.clientId.trim(),
       authLoginUrl: form.authLoginUrl.trim(),
-      keysetUrl: form.keysetUrl.trim(),
+      ...(form.keysetUrl.trim() ? { keysetUrl: form.keysetUrl.trim() } : {}),
+      // Step 2: a Moodle the internet cannot reach: its public key instead of (or as well as) the keyset URL.
+      ...(form.publicKey.trim() ? { publicKey: form.publicKey.trim() } : {}),
       deploymentIds: form.deploymentIds.split(/[\s,]+/).filter(Boolean),
       ...(form.authTokenUrl.trim() ? { authTokenUrl: form.authTokenUrl.trim() } : {}),
       ...(isEnara ? { institutionId: form.institutionId.trim() } : {}),
@@ -268,7 +270,13 @@ export const LmsConnections: React.FC = () => {
           {field('clientId', 'Client ID', 'e.g. a1B2c3D4e5')}
           {field('deploymentIds', 'Deployment ID(s)', 'e.g. 1', 'Separate several with commas.')}
           {field('authLoginUrl', 'Authentication request URL', 'https://…/mod/lti/auth.php')}
-          {field('keysetUrl', 'Public keyset URL', 'https://…/mod/lti/certs.php')}
+          {field('keysetUrl', 'Public keyset URL', 'https://…/mod/lti/certs.php', 'Or leave empty and paste the public key below.')}
+          <label className="block sm:col-span-2">
+            <span className="text-sm font-semibold text-slate-700">Public key (only for a Moodle the internet cannot reach)</span>
+            <textarea rows={3} dir="ltr" className="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-mono" value={form.publicKey}
+              placeholder={'-----BEGIN PUBLIC KEY----- … or {"keys":[…]} from …/mod/lti/certs.php'} onChange={(e) => setForm({ ...form, publicKey: e.target.value })} data-testid="lms-manual-public-key" />
+            <span className="text-xs text-slate-500">ENARA then checks launches with this key and never needs to reach Moodle's key address. Grades and class lists still need ENARA to reach Moodle (your IT team allows the Moodle address by name; ENARA has no fixed IP).</span>
+          </label>
           {field('authTokenUrl', 'Access token URL (optional)', 'https://…/mod/lti/token.php')}
           <div className="sm:col-span-2">
             <button disabled={busy} className="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-sm disabled:opacity-60">Add LMS</button>
@@ -286,7 +294,7 @@ export const LmsConnections: React.FC = () => {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-semibold text-slate-900 break-all">{p.issuer}</span>
                 <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${STATUS_STYLE[p.status]}`}>{p.status}</span>
-                <span className="text-xs text-slate-500">{p.vendor} · client {p.clientId}{p.registeredVia === 'dynamic' ? ' · connected with a link' : ''}{isEnara ? ` · school ${p.institutionId}` : ''}</span>
+                <span className="text-xs text-slate-500">{p.vendor} · client {p.clientId}{p.registeredVia === 'dynamic' ? ' · connected with a link' : ''}{p.hasPublicKey ? ' · pasted public key' : ''}{isEnara ? ` · school ${p.institutionId}` : ''}</span>
               </div>
               <p className="text-sm text-slate-600 mt-1">
                 {p.launchCount} launches ({p.cookielessLaunchCount} without cookies{p.storageLaunchCount ? `, ${p.storageLaunchCount} through the LMS page storage` : ''}){p.lastLaunchAt ? ` · last ${new Date(p.lastLaunchAt).toLocaleString()}` : ''}

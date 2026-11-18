@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import { logger } from '../utils/logging';
 import {
-  EMAIL_SENDER,
+  emailSender,
   TEMPLATE_REGISTRY,
   isTemplateAlias,
   type TemplateAlias,
@@ -23,6 +23,11 @@ export type SendTemplateResult =
   | { ok: false; code: string; message: string };
 
 let client: Resend | null = null;
+
+/** The Resend client, or null without RESEND_API_KEY (also used by sendLmsTemplate). */
+export function getEmailClient(): Resend | null {
+  return getClient();
+}
 
 function getClient(): Resend | null {
   if (client) return client;
@@ -181,7 +186,7 @@ export async function sendTemplate<A extends TemplateAlias>(
 
   try {
     const { data, error } = await resend.emails.send({
-      from: EMAIL_SENDER,
+      from: emailSender(),
       to,
       subject,
       html,

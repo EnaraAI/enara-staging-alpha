@@ -19,6 +19,8 @@ import { sweepSpeakingTranscripts } from '../services/speakingExam';
 import { scheduledDrain, triggerOn } from '../integrations/lms/core/drain';
 import { rosterTriggerOn, scheduledRosterSync } from '../integrations/lms/core/roster';
 import { checkLmsResults } from '../integrations/lms/core/lmsResults';
+import { recheckFailedConnections } from '../integrations/lms/core/connectionCheck';
+import { lmsFlags } from '../integrations/lms/core/flags';
 import { gradeLedgerOn } from '../services/gradeLedger';
 
 // Meant to be called once a day by a scheduler that sends
@@ -84,6 +86,13 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     if (rosterTriggerOn('daily')) {
       const budgetMs = Math.min(20_000, 50_000 - (Date.now() - startedAt));
       await run('lmsRoster', async () => (budgetMs < 5_000 ? { skipped: 'no_time' } : scheduledRosterSync({ trigger: 'nightly', budgetMs })));
+    }
+    // LMS step 2 (S3): re-run the automatic connection check for connections
+    // whose last check failed. Inert unless LMS_LTI_ENABLED is on; it gets what
+    // is left of a 55 s window (at most 15 s).
+    if (lmsFlags().lti) {
+      const budgetMs = Math.min(15_000, 55_000 - (Date.now() - startedAt));
+      await run('lmsConnectionChecks', async () => (budgetMs < 5_000 ? { skipped: 'no_time' } : recheckFailedConnections({ budgetMs })));
     }
     await run('reminders', () => sendReminders({}));
     if (new Date().getUTCDay() === 1) await run('weekly', () => sendWeeklySummaries());

@@ -13,6 +13,11 @@ export interface IInstitution extends Document {
   // the default in services/institutionTimeZone.ts (Africa/Cairo for now).
   // LMS Phase 2b: the picker's due dates are entered and shown in this zone.
   timeZone?: string;
+  // LMS step 2 (self-serve onboarding): ISO 3166-1 alpha-2 country code, and
+  // the language of the school's LMS emails (owner decision D1: 'ar' by
+  // default for Egyptian schools). Optional: unset means English emails.
+  country?: string;
+  emailLanguage?: 'ar' | 'en';
   // Feature flags for this school (see services/featureFlags.ts). Missing = off.
   features?: Map<string, boolean>;
   // P2: documents are deleted retentionDays after pilotEndsAt (default 180).
@@ -43,6 +48,8 @@ const institutionSchema = new Schema<IInstitution>(
     status: { type: String, enum: ['active', 'suspended'], default: 'active', index: true },
     createdBy: String,
     timeZone: { type: String, maxlength: 60 },
+    country: { type: String, maxlength: 2 },
+    emailLanguage: { type: String, enum: ['ar', 'en'] },
     features: { type: Map, of: Boolean, default: undefined },
     documentRetention: { type: { pilotEndsAt: Date, retentionDays: { type: Number, min: 1, max: 3650 }, _id: false }, default: undefined },
     learningSettings: {

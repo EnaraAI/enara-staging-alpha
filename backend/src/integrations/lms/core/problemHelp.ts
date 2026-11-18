@@ -1,4 +1,5 @@
 import { LTI_ERRORS, type LtiErrorCode } from '../adapters/lti13/errors';
+import { connectionProblemEntries } from './connectionCheckText';
 
 // Phase 1b, the Problems view: a plain-language explanation and fix for every
 // LMS reference code, in English and Arabic (simple Modern Standard Arabic,
@@ -503,6 +504,12 @@ export const OTHER_HELP: Record<string, Entry> = {
     en: ['ENARA could not ask the LMS roster whether this person is a teacher (used for "preview as student").', 'Turn on "Names and Role Provisioning"; or a teacher opens the activity once as a teacher first.'],
     ar: ['تعذر على ENARA سؤال قائمة نظام إدارة التعلم عما إذا كان هذا الشخص معلمًا (يُستخدم في "المعاينة كطالب").', 'شغّل خدمة الأسماء والأدوار (Names and Role Provisioning)، أو يفتح المعلم النشاط مرة واحدة بصفته معلمًا أولًا.'],
   },
+  keyset_http: {
+    en: ["ENARA could not read the LMS's public keys (HTTP {status}).", "Check that the LMS is online and that the connection's Public keyset URL is right. If it stays, send this code to ENARA support."],
+    ar: ['لم يستطع ENARA قراءة المفاتيح العامة لنظام إدارة التعلم (HTTP {status}).', 'تحقق من أن نظام إدارة التعلم يعمل ومن صحة رابط المفاتيح العامة في الاتصال. إذا استمر ذلك فأرسل هذا الرمز إلى دعم ENARA.'],
+  },
+  // Step 2: the automatic connection check (event connection.check).
+  ...connectionProblemEntries(),
   // Registration (Phase 1b, Dynamic Registration).
   'registration.duplicate_lms': {
     en: ['Already connected: this LMS registered ENARA again for the same school (for example, a retry), so the school now has two connections from the same LMS.', 'Keep the connection you use and switch off the other one in LMS connections. Nothing is replaced automatically.'],
@@ -510,7 +517,7 @@ export const OTHER_HELP: Record<string, Entry> = {
   },
 };
 
-const HTTP_FAMILY = /^(token|lineitems|lineitem_create|score|results|memberships)_http_(\d{3})$/;
+const HTTP_FAMILY = /^(token|lineitems|lineitem_create|score|results|memberships|keyset)_http_(\d{3})$/;
 
 const toHelp = (e: Entry, status?: string): ProblemHelp => {
   const fill = (t: string) => (status ? t.replace('{status}', status) : t);
