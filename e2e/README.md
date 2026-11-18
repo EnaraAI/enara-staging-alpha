@@ -1,8 +1,10 @@
 # ENARA LMS end-to-end suite (Moodle in Docker + Playwright)
 
 Fake data only. Never points at lms-test.enara.app or test.enara.app. Never
-sends a real email (owner rule): ENARA runs without RESEND_API_KEY and with
-LMS emails off, and `scripts/up.sh` stops if either is set. Needs no
+sends a real email (owner rule): ENARA runs without RESEND_API_KEY and LMS
+emails only in capture mode (rendered and recorded in lms_email_log, never
+sent); `scripts/up.sh` stops if a key is set or LMS emails are on without
+capture. Needs no
 repository secrets: `scripts/gen-env.sh` generates every secret and test
 password per run into `e2e/.env` (git-ignored).
 

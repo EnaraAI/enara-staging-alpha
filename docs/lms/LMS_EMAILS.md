@@ -59,6 +59,11 @@ or break a request. The audit-driven ones listen to `writeLmsAudit` (`setLmsAudi
 The digests run inside `GET /api/cron/daily` (step `lmsEmails`, at most 15 s; the ops digest always runs). Weekly
 items run on Mondays, Cairo time. lms-test has no Vercel cron (by design): the daily route runs when it is called
 with `Authorization: Bearer $CRON_SECRET` (`docs/lms/PHASE_4_NOTES.md`). Running it twice a day sends nothing new.
+`.github/workflows/lms-test-daily.yml` calls it once a day (04:23 UTC) on `https://lms-test.enara.app` only, with the
+repository secret `LMSTEST_CRON_SECRET` (= the `CRON_SECRET` of the Vercel project enara-lms-test; without it the job
+does nothing). GitHub runs `schedule` only from the default branch (`main`); until the file is there, start it by
+hand (Actions › "lms-test daily job" › Run workflow). A Vercel cron is not possible: `vercel.json` is shared with the
+other staging project and must stay cron-free (test `p6VercelStaging`).
 
 ## Teacher emails: opt-in on the first launch (D2)
 
@@ -89,7 +94,9 @@ those pages; the `filter` parameter is ignored by the app for now (the class pag
 `e2e/docker-compose.yml` runs with `LMS_EMAILS_ENABLED`, the test inbox redirect, `[lms-test]` and
 `LMS_EMAIL_CAPTURE=true` and **no `RESEND_API_KEY`**: emails are rendered and recorded (`captured`), never sent.
 Scenario 1 asserts that the School A registration captured `lms-connection-active` and `lms-ops-school-connected`
-exactly once, in English, with the `[lms-test]` prefix, through `GET /api/maintenance/lms-emails`.
+exactly once, in English, with the `[lms-test]` prefix, through `GET /api/maintenance/lms-emails`; scenario 8
+(onboarding) checks that "Send email" captured `lms-invite-connect` in Arabic (an Egyptian school). `scripts/up.sh` stops
+the run if the app has a Resend key or LMS emails on without capture.
 
 ## Env (lms-test)
 

@@ -110,10 +110,10 @@ services:
       # mode) on purpose: the suite then checks that it leaves /lti/* and
       # /.well-known/* to the API (stagingSingleService.ts).
       # Owner rule: this stack never sends a real email. No Resend key (every
-      # sender is a no-op without one; scripts/up.sh checks it), LMS emails off,
-      # and Resend's base URL points at an address that does not exist.
+      # sender is a no-op without one; scripts/up.sh checks it), LMS emails only
+      # CAPTURED (LMS_EMAIL_CAPTURE, below: recorded, Resend never called), and
+      # Resend's base URL points at an address that does not exist.
       RESEND_API_KEY: ""
-      LMS_EMAILS_ENABLED: "false"
       RESEND_BASE_URL: http://no-email.invalid
       ENARA_STAGING: "true"
       PORT: "3001"
