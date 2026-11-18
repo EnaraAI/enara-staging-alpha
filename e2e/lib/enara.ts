@@ -71,3 +71,17 @@ export async function frameSession(frame: Frame): Promise<{ role: string; name?:
 export async function frameToken(frame: Frame): Promise<string> {
   return frame.evaluate(() => sessionStorage.getItem('enara_token') || '');
 }
+
+/** A frame on ENARA's host whose path matches (e.g. /lms/picker). */
+export async function enaraFrameAt(page: Page, path: RegExp, timeout = 90_000): Promise<Frame> {
+  const host = new URL(ENARA).host;
+  const deadline = Date.now() + timeout;
+  for (;;) {
+    const f = page.frames().find((fr) => {
+      try { const u = new URL(fr.url()); return u.host === host && path.test(u.pathname); } catch { return false; }
+    });
+    if (f) return f;
+    if (Date.now() > deadline) throw new Error(`no ENARA frame at ${path} on ${page.url()} (frames: ${page.frames().map((x) => x.url()).join(', ')})`);
+    await page.waitForTimeout(250);
+  }
+}

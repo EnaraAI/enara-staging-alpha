@@ -13,7 +13,7 @@
 //   enrol --user=U --course=SHORT [--role=student]
 //   unenrol --user=U --course=SHORT
 //   activities --course=SHORT the LTI activities of a course (id, cmid, name, typeid, intro)
-//   grade --course=SHORT --activity=NAME --user=U        the gradebook value
+//   grade --course=SHORT --activity=NAME|--cmid=ID --user=U   the gradebook value
 //   set-grade --course=SHORT --activity=NAME --user=U --grade=G   a teacher's edit in the gradebook (overridden)
 //   version                   Moodle release
 
@@ -93,7 +93,11 @@ function do_enrol(string $username, string $short, string $role) {
     return ['course' => (int) $course->id, 'user' => (int) $user->id, 'role' => $role];
 }
 function lti_activity($course, string $name) {
-    global $DB;
+    global $DB, $opts;
+    if (!empty($opts['cmid'])) {
+        $cm = get_coursemodule_from_id('lti', (int) $opts['cmid'], $course->id, false, MUST_EXIST);
+        return $DB->get_record('lti', ['id' => $cm->instance], '*', MUST_EXIST);
+    }
     $recs = $DB->get_records('lti', ['course' => $course->id, 'name' => $name], 'id DESC');
     if (!$recs) {
         fwrite(STDERR, "no LTI activity named '$name' in course {$course->shortname}\n");
@@ -213,7 +217,7 @@ switch ($cmd) {
 
     case 'grade': {
         $course = course_by_short(opt($opts, 'course'));
-        $lti = lti_activity($course, opt($opts, 'activity'));
+        $lti = lti_activity($course, $opts['activity'] ?? '');
         $user = user_by_name(opt($opts, 'user'));
         $gi = grade_item_for($course, $lti);
         if (!$gi) out(['gradeitem' => null]);
@@ -228,7 +232,7 @@ switch ($cmd) {
 
     case 'set-grade': {
         $course = course_by_short(opt($opts, 'course'));
-        $lti = lti_activity($course, opt($opts, 'activity'));
+        $lti = lti_activity($course, $opts['activity'] ?? '');
         $user = user_by_name(opt($opts, 'user'));
         $gi = grade_item_for($course, $lti);
         // What the grader report does when a teacher types a grade: source 'gradebook' (overridden).
