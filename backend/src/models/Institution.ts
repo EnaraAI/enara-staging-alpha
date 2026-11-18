@@ -20,6 +20,11 @@ export interface IInstitution extends Document {
   emailLanguage?: 'ar' | 'en';
   // Feature flags for this school (see services/featureFlags.ts). Missing = off.
   features?: Map<string, boolean>;
+  // Parents P1 (PARENT_SETTINGS_ENABLED): parent access for this school, set by
+  // an ENARA admin only. Unset = 'free' (D1). 'off' hides this school's
+  // children from their parents (links are kept, not ended). Read through
+  // parents/schoolAccess.ts only.
+  parentPortal?: { access?: 'off' | 'free'; updatedAt?: Date; updatedBy?: string };
   // P2: documents are deleted retentionDays after pilotEndsAt (default 180).
   documentRetention?: { pilotEndsAt?: Date; retentionDays?: number };
   // School limits for learning-intelligence activities (set by school admins).
@@ -51,6 +56,7 @@ const institutionSchema = new Schema<IInstitution>(
     country: { type: String, maxlength: 2 },
     emailLanguage: { type: String, enum: ['ar', 'en'] },
     features: { type: Map, of: Boolean, default: undefined },
+    parentPortal: { type: { access: { type: String, enum: ['off', 'free'] }, updatedAt: Date, updatedBy: String, _id: false }, default: undefined },
     documentRetention: { type: { pilotEndsAt: Date, retentionDays: { type: Number, min: 1, max: 3650 }, _id: false }, default: undefined },
     learningSettings: {
       diagnosticMaxQuestions: { type: Number, min: 3, max: 30 },

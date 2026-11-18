@@ -1,7 +1,7 @@
 {
   "id": null,
-  "name": "Enara – Parents: invitation with link code (AR)",
-  "subject": "{{{SCHOOL_NAME}}} تدعوك لمتابعة تقدّم {{{CHILD_NAME}}} في اللغة الإنجليزية على إنارة",
+  "name": "Enara – Parents: invitation with link code(s), secret-code warning (AR)",
+  "subject": "{{{SCHOOL_NAME}}} تدعوك لمتابعة {{{CHILDREN_NAMES}}} على إنارة",
   "from": "The Enara Team <noreply@test.enara.app>",
   "variables": [
     {
@@ -11,22 +11,23 @@
       "sample": "سارة"
     },
     {
-      "key": "CHILD_NAME",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "عمر"
-    },
-    {
       "key": "SCHOOL_NAME",
       "type": "string",
       "fallback_value": null,
       "sample": "مدرسة وادي النيل الدولية"
     },
     {
-      "key": "LINK_CODE",
+      "key": "CHILDREN_NAMES",
       "type": "string",
       "fallback_value": null,
-      "sample": "ENR-7K4M-Q2XD"
+      "sample": "عمر وليلى"
+    },
+    {
+      "key": "CHILD_CODES",
+      "type": "html",
+      "fallback_value": null,
+      "note": "Built by code: one row per child (first name, school, code). Codes in the email BODY only, never in a link (D15).",
+      "sample": "<table dir=\"rtl\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:16px;\"><tr><td style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;text-align:right;\" align=\"right\">عمر<br><span style=\"font-size:13px;color:#666666;\">مدرسة وادي النيل الدولية</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:left;\" align=\"left\">ENR-7K4M-Q2XD</td></tr><tr><td style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;text-align:right;\" align=\"right\">ليلى<br><span style=\"font-size:13px;color:#666666;\">مدرسة الدلتا للغات</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:left;\" align=\"left\">ENR-R9TB-3HWP</td></tr></table>"
     },
     {
       "key": "EXPIRES_IN",
@@ -51,8 +52,18 @@
   ],
   "number": "P1",
   "group": "parents",
-  "recipient": "Parent (email given by the school: single code or CSV invite)",
-  "trigger": "School sends a parent link code (single, or CSV invitations P5)",
+  "recipient": "Parent (email given by the school: single code, or CSV invite grouped by parent email)",
+  "trigger": "School sends a parent link code (single), or CSV invitations (P5: rows with the same parent email are grouped into one email)",
   "delivery": "immediate",
-  "frequency": "Immediate; once per invite / code"
+  "frequency": "Immediate; once per invite (one email per parent email per CSV upload)",
+  "preview_variants": [
+    {
+      "id": "one-child",
+      "label": "one child",
+      "samples": {
+        "CHILDREN_NAMES": "عمر",
+        "CHILD_CODES": "<table dir=\"rtl\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:16px;\"><tr><td style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;text-align:right;\" align=\"right\">عمر<br><span style=\"font-size:13px;color:#666666;\">مدرسة وادي النيل الدولية</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:left;\" align=\"left\">ENR-7K4M-Q2XD</td></tr></table>"
+      }
+    }
+  ]
 }

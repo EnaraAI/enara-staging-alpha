@@ -119,7 +119,8 @@ const alertMails = () => sent().filter((s) => s.subject.includes('Email safety c
 
 const consent = (to: string) => T.sendTemplate('enara-parent-consent', to, { NAME: 'there', CHILD_NAME: 'Omar', LINK_CODE: 'ENR-ABCD-EFGH', EXPIRES_IN: '7 days' });
 const parentInvite = (to: string) =>
-  P.sendParentTemplate('parent-invite-en', to, { NAME: 'Mona', CHILD_NAME: 'Omar', SCHOOL_NAME: 'Nile School', LINK_CODE: 'ENR-ABCD-EFGH', EXPIRES_IN: '7 days', ACTION_URL: `${TOOL}/parents/link` });
+  // The approved (18 Nov 2026) parent-invite: one row per child (CHILD_CODES, built by code), code in the body only.
+  P.sendParentTemplate('parent-invite-en', to, { NAME: 'Mona', SCHOOL_NAME: 'Nile School', CHILDREN_NAMES: 'Omar', CHILD_CODES: '<table><tr><td>Omar</td><td>ENR-ABCD-EFGH</td></tr></table>', EXPIRES_IN: '7 days', ACTION_URL: `${TOOL}/parents/link` });
 const weekly = (to: string) =>
   R.emailReportSender.send(to, { parentName: 'Mona', childName: 'Omar', lessonsDone: 3, outcomesMastered: 2, minutesDone: 40, goalMinutes: 60, practiceTip: 'Read aloud.', statusLine: 'on track' });
 const legacy = (to: string) => S.sendEmail({ to, subject: 'Your reminder', html: '<p>Hello</p>' });

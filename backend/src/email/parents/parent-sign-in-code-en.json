@@ -1,0 +1,40 @@
+{
+  "id": null,
+  "name": "Enara – Parents: sign-in code (6 digits) (EN)",
+  "subject": "Your Enara Parents sign-in code: {{{CODE}}}",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "there",
+      "sample": "Sara"
+    },
+    {
+      "key": "CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "730 256"
+    },
+    {
+      "key": "EXPIRES_IN",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "10 minutes"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "parent-sign-in-code",
+  "language": "en",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "P7",
+  "group": "parents",
+  "recipient": "Parent (verified email on their Enara Parents account)",
+  "trigger": "Parent asks to sign in with their email (passwordless)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per request (rate-limited; a new request replaces the old code)"
+}

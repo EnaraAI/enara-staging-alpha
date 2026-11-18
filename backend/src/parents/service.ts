@@ -17,6 +17,7 @@ import { addDays, cairoDay, cairoDayStart, cairoTime, isWeekend, weekDays, weekS
 import * as mock from './mock';
 import { classOfAttempts, classOfCourse, classesForLabels } from '../services/multiClass';
 import { READ_CHECK_ACTOR, endParentLink, endReasonFor } from './linkLifecycle';
+import { parentAccessOf, schoolAccessOffError, schoolsWithAccessOff } from './schoolAccess';
 
 // Parents Portal data. Everything is computed from live data on each request
 // (user decision: real-time progress, no weekly snapshot or cache). Sections
@@ -55,6 +56,8 @@ export async function requireLearner(parentUserId: string, studentId: string, ac
     throw ended();
   }
   if (!student || !visibilityFor(link).progress || !canDo(link, action)) throw denied();
+  // Parents P1: the school switched parent access Off. The link is kept (not ended).
+  if ((await parentAccessOf(link.institutionId)) === 'off') throw schoolAccessOffError();
   const t = tierOf(student);
   return { link, student: student as LearnerContext['student'], tier: t.tier, age: t.age, firstName: String(student.name || '').trim().split(/\s+/)[0] || 'Learner' };
 }
@@ -109,7 +112,10 @@ export async function listLearners(parentUserId: string) {
     await endParentLink(l, reason, READ_CHECK_ACTOR);
     endedNow.add(l.id);
   }
-  const usable = live.filter((l) => !endedNow.has(l.id));
+  // Parents P1: children at a school with parent access Off are left out (links kept).
+  const off = await schoolsWithAccessOff(live.map((l) => l.institutionId));
+  const hiddenBySchool = live.filter((l) => !endedNow.has(l.id) && l.status === 'active' && off.has(String(l.institutionId))).length;
+  const usable = live.filter((l) => !endedNow.has(l.id) && !off.has(String(l.institutionId)));
   const schools = await Institution.find({ id: { $in: students.map((s) => s.institutionId).filter(Boolean) } }).select('id name').lean();
   const learners = usable.filter((l) => l.status === 'active').flatMap((l) => {
     const s = byId.get(l.studentId);
@@ -123,7 +129,7 @@ export async function listLearners(parentUserId: string) {
   const ended = links
     .filter((l) => l.status === 'ended' || endedNow.has(l.id))
     .map((l) => ({ linkId: l.id, status: 'ended' as const, endedAt: l.endedAt ?? new Date() }));
-  return { generatedAt: new Date().toISOString(), learners, pending, ended };
+  return { generatedAt: new Date().toISOString(), learners, pending, ended, ...(hiddenBySchool ? { hiddenBySchool } : {}) };
 }
 
 // ---------------------------------------------------------------------------

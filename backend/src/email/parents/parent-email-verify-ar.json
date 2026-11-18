@@ -1,0 +1,40 @@
+{
+  "id": null,
+  "name": "Enara – Parents: verify your email (6-digit code) (AR)",
+  "subject": "رمز بوابة أولياء الأمور في إنارة: {{{CODE}}}",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "سارة"
+    },
+    {
+      "key": "CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "482 913"
+    },
+    {
+      "key": "EXPIRES_IN",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "10 دقائق"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "parent-email-verify",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "P6",
+  "group": "parents",
+  "recipient": "Parent (the address they just typed in Enara Parents)",
+  "trigger": "Parent adds or changes their email in Enara Parents (\"Add your email\")",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per request (rate-limited; a new request replaces the old code)"
+}

@@ -1,7 +1,7 @@
 {
   "id": null,
-  "name": "Enara – Parents: weekly summary (EN)",
-  "subject": "{{{CHILD_NAME}}}'s week in English: {{{STATUS_LINE}}}",
+  "name": "Enara – Parents: weekly summary (one email per parent, a section per child) (EN)",
+  "subject": "This week in English: {{{CHILDREN_NAMES}}}",
   "from": "The Enara Team <noreply@test.enara.app>",
   "variables": [
     {
@@ -11,10 +11,10 @@
       "sample": "Sara"
     },
     {
-      "key": "CHILD_NAME",
+      "key": "CHILDREN_NAMES",
       "type": "string",
       "fallback_value": null,
-      "sample": "Omar"
+      "sample": "Omar and Laila"
     },
     {
       "key": "WEEK_LABEL",
@@ -23,46 +23,11 @@
       "sample": "9–15 November 2026"
     },
     {
-      "key": "MINUTES_DONE",
-      "type": "string",
+      "key": "CHILD_SECTIONS",
+      "type": "html",
       "fallback_value": null,
-      "sample": "45"
-    },
-    {
-      "key": "GOAL_MINUTES",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "60"
-    },
-    {
-      "key": "LESSONS_DONE",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "4"
-    },
-    {
-      "key": "OUTCOMES_MASTERED",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "3"
-    },
-    {
-      "key": "CEFR_LEVEL",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "A2"
-    },
-    {
-      "key": "STATUS_LINE",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "on track"
-    },
-    {
-      "key": "PRACTICE_TIP",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "Ask them to name five things in the kitchen in English."
+      "note": "Built by code: one block per child (first name, school, status, minutes, lessons, skills, level, tip), every value HTML-escaped. Never another family's child.",
+      "sample": "<h2 style=\"font-family:Arial, Helvetica, sans-serif;font-size:19px;line-height:26px;color:#111111;margin-top:24px;margin-bottom:4px;font-weight:bold;\">Omar</h2><p style=\"font-family:Arial, Helvetica, sans-serif;font-size:14px;line-height:20px;color:#666666;margin-top:0;margin-bottom:8px;\">Nile Valley International School · <strong>on track</strong></p><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:12px;\"><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">Minutes practised</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">45 of 60</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">Lessons done</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">4</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">New skills mastered</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">3</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">Level</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">A2</td></tr></table><p style=\"font-family:Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;color:#222222;margin-top:0;margin-bottom:16px;\"><strong>Try this at home:</strong> Ask him to name five things in the kitchen in English.</p><h2 style=\"font-family:Arial, Helvetica, sans-serif;font-size:19px;line-height:26px;color:#111111;margin-top:24px;margin-bottom:4px;font-weight:bold;\">Laila</h2><p style=\"font-family:Arial, Helvetica, sans-serif;font-size:14px;line-height:20px;color:#666666;margin-top:0;margin-bottom:8px;\">Delta Language School · <strong>needs a nudge</strong></p><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:12px;\"><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">Minutes practised</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">15 of 60</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">Lessons done</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">1</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">New skills mastered</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">0</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">Level</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">A1</td></tr></table><p style=\"font-family:Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;color:#222222;margin-top:0;margin-bottom:16px;\"><strong>Try this at home:</strong> Read one short story together and ask her who it was about.</p>"
     },
     {
       "key": "ACTION_URL",
@@ -81,8 +46,18 @@
   ],
   "number": "P4",
   "group": "parents",
-  "recipient": "Parent",
+  "recipient": "Parent (verified email), one email per parent",
   "trigger": "Weekly schedule (Sunday evening, Cairo); opt-out",
   "delivery": "digest",
-  "frequency": "Weekly; one per child per parent (on by default, opt-out, D11)"
+  "frequency": "Weekly; ONE per parent with a section per linked child (on by default, opt-out, D11)",
+  "preview_variants": [
+    {
+      "id": "one-child",
+      "label": "one child",
+      "samples": {
+        "CHILDREN_NAMES": "Omar",
+        "CHILD_SECTIONS": "<h2 style=\"font-family:Arial, Helvetica, sans-serif;font-size:19px;line-height:26px;color:#111111;margin-top:24px;margin-bottom:4px;font-weight:bold;\">Omar</h2><p style=\"font-family:Arial, Helvetica, sans-serif;font-size:14px;line-height:20px;color:#666666;margin-top:0;margin-bottom:8px;\">Nile Valley International School · <strong>on track</strong></p><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:12px;\"><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">Minutes practised</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">45 of 60</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">Lessons done</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">4</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">New skills mastered</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">3</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;\">Level</td><td align=\"right\" style=\"font-family:Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;\">A2</td></tr></table><p style=\"font-family:Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;color:#222222;margin-top:0;margin-bottom:16px;\"><strong>Try this at home:</strong> Ask him to name five things in the kitchen in English.</p>"
+      }
+    }
+  ]
 }

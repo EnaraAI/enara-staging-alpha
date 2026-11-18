@@ -200,7 +200,9 @@ export const AdminSidebar: React.FC<{
   role?: 'admin' | 'enara-admin';
   /** Show "LMS connections" (only when the LMS integration is on). */
   showLms?: boolean;
-}> = ({ activeTab, onNavigate, isOpen, onClose, isEnaraAdmin, role, showLms }) => {
+  /** Parents P1: show "Parents" (only when PARENT_SETTINGS_ENABLED is on). */
+  showParents?: boolean;
+}> = ({ activeTab, onNavigate, isOpen, onClose, isEnaraAdmin, role, showLms, showParents }) => {
   const adminMenuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'live-avatars', label: 'Live Avatar Control', icon: Radio },
@@ -231,6 +233,8 @@ export const AdminSidebar: React.FC<{
     ...(showLms ? [{ id: 'lms', label: 'LMS connections', icon: Share2, workspaceAdminOnly: true }] : []),
     // LMS step 2 (S5): the school connection status page, school admins only.
     ...(showLms ? [{ id: 'lms-status', label: 'LMS connection status', icon: ListChecks, workspaceAdminOnly: true }] : []),
+    // Parents P1: the school's Parents card (school admins only).
+    ...(showParents ? [{ id: 'parents-admin', label: 'Parents', icon: Users, workspaceAdminOnly: true }] : []),
   ];
 
   const enaraMenuItems = [
@@ -251,6 +255,8 @@ export const AdminSidebar: React.FC<{
     ...(showLms ? [{ id: 'lms', label: 'LMS connections', icon: Share2 }] : []),
     // LMS step 2: "New school" (self-serve onboarding) and every school's status page.
     ...(showLms ? [{ id: 'lms-onboarding', label: 'New school (LMS)', icon: Building2 }] : []),
+    // Parents P1: parent access per school and parent usage (all schools).
+    ...(showParents ? [{ id: 'parents-admin', label: 'Parents', icon: Users }] : []),
     { id: 'credits', label: 'Credit Reports', icon: Zap },
     { id: 'credit-management', label: 'Credit Management', icon: ShieldAlert },
   ];

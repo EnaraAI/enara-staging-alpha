@@ -18,6 +18,10 @@ import { parentEmailBlocked, parentEmailBlockedBody, parentEmailState } from './
 import { mockPlan } from './mock';
 import { authConfig, googleParentSignIn } from './google';
 import { recordSignIn } from '../services/signInHistory';
+import { parentCodeSignupEnabled, parentSettingsEnabled } from './flags';
+import { isCodeOnlyEmail, previewStartCode, startWithCode } from './codeSignup';
+import { revokeDeviceSession, useDeviceSession } from './deviceSession';
+import { recordParentLogin, recordUsage, type Feature, type Screen } from './usage';
 
 // /api/parents/* — the Parents Portal API. Every learner endpoint goes through
 // svc.requireLearner (active link + role check, policy.ts). Real-time: each
@@ -52,7 +56,31 @@ router.post('/register', h(async (req, res) => {
 // ID is public by design (the browser needs it to render the button).
 router.get('/auth-config', h(async (_req, res) => {
   res.set('Cache-Control', 'no-store');
-  res.json(authConfig());
+  res.json({ ...authConfig(), ...(parentCodeSignupEnabled() ? { codeSignup: true } : {}) });
+}));
+
+// ---------------------------------------------------------------------------
+// Parents P1 (PARENT_CODE_SIGNUP_ENABLED; 404 when off): code-first entry.
+// Public, per-IP limited in app.ts. The code is only ever in the request body.
+const codeSignupOnly = (_req: unknown, _res: unknown, next: (e?: unknown) => void) => (parentCodeSignupEnabled() ? next() : next(new AppError('Route not found', 404, 'NOT_FOUND')));
+
+router.post('/start/preview', codeSignupOnly, h(async (req, res) => {
+  res.json(await previewStartCode(ensurePlainObject(req.body).code));
+}));
+// Body { code, language? }: a code-only parent account, linked, with this device remembered.
+router.post('/start', codeSignupOnly, h(async (req, res) => {
+  const body = ensurePlainObject(req.body);
+  rejectMongoOperators(body);
+  const { user, link, device } = await startWithCode(body.code, { language: body.language });
+  await recordSignIn(req, 'success', { userId: String(user._id), role: 'parent' });
+  res.status(201).json({ token: signToken(user), user: await sessionUser(user), deviceToken: device.deviceToken, link });
+}));
+// Body { deviceToken }: a fresh session token for a remembered device.
+router.post('/device/session', codeSignupOnly, h(async (req, res) => {
+  const body = ensurePlainObject(req.body);
+  const user = await useDeviceSession(body.deviceToken);
+  await recordParentLogin(String(user._id), new Date(), 'device');
+  res.json({ token: signToken(user), user: await sessionUser(user) });
 }));
 
 // Public: "Continue with Google". Body { credential: <Google ID token>, language? }.
@@ -91,7 +119,15 @@ router.post('/link/preview', h(async (req, res) => {
   res.json(await previewCode(uid(req), ensurePlainObject(req.body).code));
 }));
 router.post('/link/confirm', h(async (req, res) => {
-  res.status(201).json(await confirmCode({ id: uid(req), role: 'parent', email: req.user!.email }, ensurePlainObject(req.body).code));
+  const r = await confirmCode({ id: uid(req), role: 'parent', email: req.user!.email }, ensurePlainObject(req.body).code);
+  const link = await ParentLearnerLink.findOne({ id: r.linkId }).select('institutionId').lean();
+  await recordUsage({ parentUserId: uid(req), institutionId: link?.institutionId, studentId: r.studentId, kind: 'feature', name: 'link_child' });
+  res.status(201).json(r);
+}));
+// Sign out on this device (body { deviceToken }); the app then signs out the account too.
+router.post('/device/sign-out', h(async (req, res) => {
+  const revoked = await revokeDeviceSession(uid(req), ensurePlainObject(req.body ?? {}).deviceToken);
+  res.json({ ok: true, revoked });
 }));
 router.delete('/links/:linkId', h(async (req, res) => {
   await unlink({ id: uid(req), role: 'parent' }, String(req.params.linkId));
@@ -101,15 +137,23 @@ router.delete('/links/:linkId', h(async (req, res) => {
 router.get('/learners', h(async (req, res) => { res.json(await svc.listLearners(uid(req))); }));
 
 const learner = (action: Parameters<typeof svc.requireLearner>[2] = 'read') => (req: AuthRequest) => svc.requireLearner(uid(req), String(req.params.studentId), action);
+// Parents P1 usage events (IDs and dates only; nothing unless PARENT_SETTINGS_ENABLED).
+const track = (req: AuthRequest, ctx: svc.LearnerContext, kind: 'screen' | 'feature', name: Screen | Feature) =>
+  recordUsage({ parentUserId: uid(req), institutionId: ctx.link.institutionId, studentId: ctx.student.id, kind, name });
+const screen = (name: Screen) => async (req: AuthRequest) => {
+  const ctx = await learner()(req);
+  await track(req, ctx, 'screen', name);
+  return ctx;
+};
 
 router.get('/learners/:studentId/status', h(async (req, res) => {
   const ctx = await learner()(req);
   res.json({ generatedAt: new Date().toISOString(), status: await svc.weeklyStatus(ctx) });
 }));
-router.get('/learners/:studentId/home', h(async (req, res) => { res.json(await svc.home(await learner()(req))); }));
+router.get('/learners/:studentId/home', h(async (req, res) => { res.json(await svc.home(await screen('home')(req))); }));
 // ?classId= filters by class; only for a child in several classes (multi-class step 6, Q3).
-router.get('/learners/:studentId/progress', h(async (req, res) => { res.json(await svc.progress(await learner()(req), req.query.classId)); }));
-router.get('/learners/:studentId/activity', h(async (req, res) => { res.json(await svc.activity(await learner()(req), new Date(), req.query.classId)); }));
+router.get('/learners/:studentId/progress', h(async (req, res) => { res.json(await svc.progress(await screen('progress')(req), req.query.classId)); }));
+router.get('/learners/:studentId/activity', h(async (req, res) => { res.json(await svc.activity(await screen('activity')(req), new Date(), req.query.classId)); }));
 router.get('/learners/:studentId/sessions/:sessionId/transcript', h(async (req, res) => {
   const ctx = await learner()(req);
   try {
@@ -121,7 +165,7 @@ router.get('/learners/:studentId/sessions/:sessionId/transcript', h(async (req, 
   }
 }));
 router.get('/learners/:studentId/alerts', h(async (req, res) => { res.json(await svc.alerts(await learner()(req))); }));
-router.get('/learners/:studentId/report', h(async (req, res) => { res.json({ ...(await svc.weeklyReport(await learner()(req))), shareEmail: parentEmailState() }); }));
+router.get('/learners/:studentId/report', h(async (req, res) => { res.json({ ...(await svc.weeklyReport(await screen('report')(req))), shareEmail: parentEmailState() }); }));
 router.post('/learners/:studentId/report/share', h(async (req, res) => {
   const ctx = await learner('share_report')(req);
   const body = ensurePlainObject(req.body);
@@ -146,15 +190,19 @@ router.post('/learners/:studentId/report/share', h(async (req, res) => {
   };
   const to = channel === 'email' ? String(parent?.email ?? '') : String(body.to ?? '');
   const result = await reportSenders[channel].send(to, summary);
+  await track(req, ctx, 'feature', 'share_report');
   res.status(result.ok ? 200 : 502).json(result);
 }));
-router.get('/learners/:studentId/controls', h(async (req, res) => { res.json(svc.controlsOf(await learner()(req))); }));
+router.get('/learners/:studentId/controls', h(async (req, res) => { res.json(svc.controlsOf(await screen('controls')(req))); }));
 router.put('/learners/:studentId/controls', h(async (req, res) => {
   const ctx = await learner('change_controls')(req);
-  res.json(await svc.updateControls(ctx, ensurePlainObject(req.body)));
+  const out = await svc.updateControls(ctx, ensurePlainObject(req.body));
+  await track(req, ctx, 'feature', 'controls_changed');
+  res.json(out);
 }));
 router.put('/learners/:studentId/guardians/:linkId', h(async (req, res) => {
   await setGuardianRole({ id: uid(req), role: 'parent' }, String(req.params.studentId), String(req.params.linkId), ensurePlainObject(req.body).role);
+  await track(req, await learner()(req), 'feature', 'guardian_role');
   res.json({ ok: true });
 }));
 
@@ -173,13 +221,23 @@ router.get('/account', h(async (req, res) => {
     items: all.filter((l) => l.studentId === mine.studentId).map((l) => ({ linkId: l.id, name: users.find((u) => String(u._id) === l.parentUserId)?.name ?? 'Parent', role: l.role, isYou: l.parentUserId === uid(req) })),
   }));
   const profile = await ParentProfile.findOne({ userId: uid(req) }).lean();
+  // Parents P1: one 'account' screen event per school of the visible children.
+  for (const sid of [...new Set(myLinks.map((l) => l.institutionId).filter(Boolean))]) await recordUsage({ parentUserId: uid(req), institutionId: sid, kind: 'screen', name: 'account' });
+  // Parents P1 (PARENT_SETTINGS_ENABLED): no mock plan or price. ENARA Parents is
+  // provided free by the school (D1, D2): "Provided by <school>" per school.
+  const providedBy = [...new Set(learners.learners.map((l) => l.school).filter((x): x is string => !!x))];
+  const plan = parentSettingsEnabled() ? { mock: false as const, kind: 'school' as const, providedBy } : { mock: true as const, ...mockPlan(learners.learners.length) };
+  // Parents P1 (code-first): how this account signs in. A code-only account has no email yet.
+  const codeOnly = isCodeOnlyEmail(req.user!.email);
   res.json({
     generatedAt: new Date().toISOString(),
     learners: learners.learners,
     pending: learners.pending,
     ended: learners.ended,
     guardians: { mock: false, byLearner: guardians },
-    plan: { mock: true, ...mockPlan(learners.learners.length) },
+    plan,
+    signIn: { method: codeOnly ? 'code' : profile?.signIn ?? 'password', hasEmail: !codeOnly },
+    ...(learners.hiddenBySchool ? { hiddenBySchool: learners.hiddenBySchool } : {}),
     preferences: { mock: false, language: profile?.language ?? 'en', alertChannels: profile?.alertChannels ?? ['push', 'whatsapp'], summary: 'on_demand' },
   });
 }));

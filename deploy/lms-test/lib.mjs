@@ -70,7 +70,8 @@ export function deploymentProblems(dep) {
 
 // ------------------------------------------------------------------ flags
 
-const FLAG_NAME = /^(LMS|ENROLLMENT|GRADE_LEDGER|MAINTENANCE_ENDPOINTS|MOODLE_TEST_WS)_[A-Z0-9_]{1,60}$/;
+// PARENT_ added for Parents P1-P5 (docs/parents/P1_NOTES.md); the secret-looking names below are still refused.
+const FLAG_NAME = /^(LMS|ENROLLMENT|GRADE_LEDGER|MAINTENANCE_ENDPOINTS|MOODLE_TEST_WS|PARENT)_[A-Z0-9_]{1,60}$/;
 const FORBIDDEN_IN_NAME = /(KEY|KEK|SECRET|TOKEN|PASSWORD|URI|URL|DSN|CREDENTIAL|PRIVATE)/;
 const FLAG_VALUE = /^[A-Za-z0-9_,.:-]{0,200}$/;
 

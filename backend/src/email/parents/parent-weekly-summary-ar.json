@@ -1,7 +1,7 @@
 {
   "id": null,
-  "name": "Enara – Parents: weekly summary (AR)",
-  "subject": "أسبوع {{{CHILD_NAME}}} في الإنجليزية: {{{STATUS_LINE}}}",
+  "name": "Enara – Parents: weekly summary (one email per parent, a section per child) (AR)",
+  "subject": "هذا الأسبوع في الإنجليزية: {{{CHILDREN_NAMES}}}",
   "from": "The Enara Team <noreply@test.enara.app>",
   "variables": [
     {
@@ -11,10 +11,10 @@
       "sample": "سارة"
     },
     {
-      "key": "CHILD_NAME",
+      "key": "CHILDREN_NAMES",
       "type": "string",
       "fallback_value": null,
-      "sample": "عمر"
+      "sample": "عمر وليلى"
     },
     {
       "key": "WEEK_LABEL",
@@ -23,46 +23,11 @@
       "sample": "9–15 نوفمبر 2026"
     },
     {
-      "key": "MINUTES_DONE",
-      "type": "string",
+      "key": "CHILD_SECTIONS",
+      "type": "html",
       "fallback_value": null,
-      "sample": "45"
-    },
-    {
-      "key": "GOAL_MINUTES",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "60"
-    },
-    {
-      "key": "LESSONS_DONE",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "4"
-    },
-    {
-      "key": "OUTCOMES_MASTERED",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "3"
-    },
-    {
-      "key": "CEFR_LEVEL",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "A2"
-    },
-    {
-      "key": "STATUS_LINE",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "يسير وفق الخطة"
-    },
-    {
-      "key": "PRACTICE_TIP",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "اطلبوا منه أن يسمّي خمسة أشياء في المطبخ بالإنجليزية."
+      "note": "Built by code: one block per child (first name, school, status, minutes, lessons, skills, level, tip), every value HTML-escaped. Never another family's child.",
+      "sample": "<h2 style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:19px;line-height:30px;color:#111111;margin-top:24px;margin-bottom:4px;font-weight:bold;text-align:right;\">عمر</h2><p style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:14px;line-height:22px;color:#666666;margin-top:0;margin-bottom:8px;text-align:right;\">مدرسة وادي النيل الدولية · <strong>يسير على المسار الصحيح</strong></p><table dir=\"rtl\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:12px;\"><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">دقائق التدريب</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\">45 من 60</td></tr><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">دروس مكتملة</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\">4</td></tr><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">مهارات جديدة متقنة</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\">3</td></tr><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">المستوى</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\"><span dir=\"ltr\" style=\"unicode-bidi:embed;\">A2</span></td></tr></table><p style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:16px;line-height:26px;color:#222222;margin-top:0;margin-bottom:16px;text-align:right;\"><strong>جرّبوا في البيت:</strong> اطلب منه أن يسمّي خمسة أشياء في المطبخ بالإنجليزية.</p><h2 style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:19px;line-height:30px;color:#111111;margin-top:24px;margin-bottom:4px;font-weight:bold;text-align:right;\">ليلى</h2><p style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:14px;line-height:22px;color:#666666;margin-top:0;margin-bottom:8px;text-align:right;\">مدرسة الدلتا للغات · <strong>يحتاج إلى تشجيع</strong></p><table dir=\"rtl\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:12px;\"><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">دقائق التدريب</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\">15 من 60</td></tr><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">دروس مكتملة</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\">1</td></tr><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">مهارات جديدة متقنة</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\">0</td></tr><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">المستوى</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\"><span dir=\"ltr\" style=\"unicode-bidi:embed;\">A1</span></td></tr></table><p style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:16px;line-height:26px;color:#222222;margin-top:0;margin-bottom:16px;text-align:right;\"><strong>جرّبوا في البيت:</strong> اقرآ قصة قصيرة معًا واسألها عمّن كانت القصة.</p>"
     },
     {
       "key": "ACTION_URL",
@@ -81,8 +46,18 @@
   ],
   "number": "P4",
   "group": "parents",
-  "recipient": "Parent",
+  "recipient": "Parent (verified email), one email per parent",
   "trigger": "Weekly schedule (Sunday evening, Cairo); opt-out",
   "delivery": "digest",
-  "frequency": "Weekly; one per child per parent (on by default, opt-out, D11)"
+  "frequency": "Weekly; ONE per parent with a section per linked child (on by default, opt-out, D11)",
+  "preview_variants": [
+    {
+      "id": "one-child",
+      "label": "one child",
+      "samples": {
+        "CHILDREN_NAMES": "عمر",
+        "CHILD_SECTIONS": "<h2 style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:19px;line-height:30px;color:#111111;margin-top:24px;margin-bottom:4px;font-weight:bold;text-align:right;\">عمر</h2><p style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:14px;line-height:22px;color:#666666;margin-top:0;margin-bottom:8px;text-align:right;\">مدرسة وادي النيل الدولية · <strong>يسير على المسار الصحيح</strong></p><table dir=\"rtl\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:12px;\"><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">دقائق التدريب</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\">45 من 60</td></tr><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">دروس مكتملة</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\">4</td></tr><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">مهارات جديدة متقنة</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\">3</td></tr><tr><td align=\"right\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#666666;text-align:right;\">المستوى</td><td align=\"left\" style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;text-align:left;\"><span dir=\"ltr\" style=\"unicode-bidi:embed;\">A2</span></td></tr></table><p style=\"font-family:Tahoma, Arial, Helvetica, sans-serif;font-size:16px;line-height:26px;color:#222222;margin-top:0;margin-bottom:16px;text-align:right;\"><strong>جرّبوا في البيت:</strong> اطلب منه أن يسمّي خمسة أشياء في المطبخ بالإنجليزية.</p>"
+      }
+    }
+  ]
 }

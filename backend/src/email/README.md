@@ -223,3 +223,16 @@ path can send them): `<alias>-en.html`, `<alias>-ar.html` and one bilingual `<al
 `subject.{en,ar}`, `variables[].{key, fallback_value.{en,ar}, sample.{en,ar}}`, recipient, trigger,
 delivery, frequency). `render-previews.mjs` renders them too. On approval, split the JSON into
 `<alias>-<lang>.json`, move the pair into `lms/` or `parents/`, add `status`/`approvedOn` and re-bundle.
+
+**Parent emails for the new sign-up flow (owner: "Approve all", 18 Nov 2026; promoted from drafts):**
+
+| Template | What |
+|---|---|
+| `parent-email-verify` (new) | 6-digit code to confirm the email a parent adds in the portal (10 min, one use). No link at all |
+| `parent-sign-in-code` (new) | 6-digit passwordless sign-in code. No link at all |
+| `parent-weekly-summary` (replaced) | ONE weekly email per parent, a section per child (`CHILD_SECTIONS`, an HTML block built by code with every value escaped; `CHILDREN_NAMES` in the subject) |
+| `parent-invite` (replaced) | code-first steps, the secret-code warning, one row per child with its code (`CHILD_CODES`, built by code) so a CSV group is one email |
+
+`sendParentTemplate` refuses a link that carries `LINK_CODE`, a 6-digit `CODE`, or anything shaped like a
+parent link code (`code_in_url`). The senders and triggers come with Parents P2 (verification, sign-in) and
+P4/P5 (weekly summary, invites); see `docs/parents/`.

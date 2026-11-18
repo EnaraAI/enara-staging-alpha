@@ -10,6 +10,7 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
   const [note, setNote] = useState<string | null>(null);
   if (!q.data) return q.error ? <ErrorBox onRetry={q.reload} /> : <Loading />;
   const d = q.data;
+  const providedBy = d.plan.mock === false ? d.plan.providedBy : [];
   const chooseLang = (l: Lang) => { setLang(l); parentsApi.savePreferences({ language: l }).catch(() => undefined); };
   const unlink = async (linkId: string, name: string) => {
     if (!window.confirm(t.unlinkConfirm(name))) return;
@@ -27,7 +28,7 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
       <h1 className="pp-h1">{t.accountTitle}</h1>
 
       <section className="pp-card" aria-labelledby="pp-learners">
-        <div className="pp-row"><h2 className="pp-h2" id="pp-learners">{t.learners}</h2><button type="button" className="pp-linkbtn" onClick={onLink}><Icon name="plus" style={{ inlineSize: 16, blockSize: 16, verticalAlign: 'middle' }} /> {t.linkChild}</button></div>
+        <div className="pp-row"><h2 className="pp-h2" id="pp-learners">{t.learners}</h2><button type="button" className="pp-linkbtn" onClick={onLink}><Icon name="plus" style={{ inlineSize: 16, blockSize: 16, verticalAlign: 'middle' }} /> {d.learners.length ? t.addAnotherChild : t.linkChild}</button></div>
         {d.learners.length === 0 && <p className="pp-sub">{t.noLearnersBody}</p>}
         {d.learners.map((l, i) => (
           <div className="pp-person" key={l.studentId}>
@@ -66,15 +67,32 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
         })}
       </section>
 
-      <section className="pp-card" aria-labelledby="pp-plan">
-        <div className="pp-row"><h2 className="pp-h2" id="pp-plan">{bi(d.plan.name, lang)}</h2><span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><span style={{ fontSize: 14, fontWeight: 600 }}>{d.plan.price}</span><SampleBadge show={d.plan.mock} /></span></div>
-        <p className="pp-sub">{t.learnersCount(n(d.plan.learners))} · {t.renews(cairoDate(d.plan.renewsOn, lang, { day: 'numeric', month: 'long' }))}</p>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button type="button" className="pp-btn" onClick={() => setNote(t.comingSoon)}>{t.changePlan}</button>
-          <button type="button" className="pp-btn" onClick={() => setNote(t.comingSoon)}>{t.invoices}</button>
-        </div>
-        <div className="pp-row" style={{ fontSize: 14 }}><span>{t.payment}</span><span className="pp-meta">{bi(d.plan.payment, lang)}</span></div>
-      </section>
+      {d.plan.mock ? (
+        <section className="pp-card" aria-labelledby="pp-plan">
+          <div className="pp-row"><h2 className="pp-h2" id="pp-plan">{bi(d.plan.name, lang)}</h2><span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><span style={{ fontSize: 14, fontWeight: 600 }}>{d.plan.price}</span><SampleBadge show={d.plan.mock} /></span></div>
+          <p className="pp-sub">{t.learnersCount(n(d.plan.learners))} · {t.renews(cairoDate(d.plan.renewsOn, lang, { day: 'numeric', month: 'long' }))}</p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button type="button" className="pp-btn" onClick={() => setNote(t.comingSoon)}>{t.changePlan}</button>
+            <button type="button" className="pp-btn" onClick={() => setNote(t.comingSoon)}>{t.invoices}</button>
+          </div>
+          <div className="pp-row" style={{ fontSize: 14 }}><span>{t.payment}</span><span className="pp-meta">{bi(d.plan.payment, lang)}</span></div>
+        </section>
+      ) : (
+        // Parents P1: ENARA Parents is provided free by the school (D1); no price.
+        <section className="pp-card" aria-labelledby="pp-plan" data-testid="pp-provided-by">
+          <h2 className="pp-h2" id="pp-plan">{t.planTitle}</h2>
+          {providedBy.length ? providedBy.map((school) => <p key={school} style={{ fontSize: 14 }} dir="auto">{t.providedBy(school)}</p>) : <p className="pp-sub">{t.noLearnersBody}</p>}
+          <p className="pp-sub">{t.providedFree}</p>
+        </section>
+      )}
+
+      {d.signIn?.method === 'code' && (
+        // Parents P1 (code-first): no email on this account yet; this device remembers the parent.
+        <section className="pp-card" aria-labelledby="pp-signin" data-testid="pp-code-only">
+          <h2 className="pp-h2" id="pp-signin">{t.signInTitle}</h2>
+          <p style={{ fontSize: 14 }}>{t.codeOnlyBody}</p>
+        </section>
+      )}
 
       <section className="pp-card" aria-labelledby="pp-prefs">
         <h2 className="pp-h2" id="pp-prefs">{t.preferences}</h2>
@@ -97,7 +115,7 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
       </section>
       {note && <p className="pp-notice" role="status" style={{ display: 'block', fontSize: 13 }}>{note}</p>}
 
-      <button type="button" className="pp-btn pp-btn--block" onClick={onSignOut}><Icon name="out" flip />{t.signOut}</button>
+      <button type="button" className="pp-btn pp-btn--block" onClick={() => { if (d.signIn?.method === 'code' && !window.confirm(t.codeOnlySignOut)) return; onSignOut(); }}><Icon name="out" flip />{t.signOut}</button>
     </>
   );
 };

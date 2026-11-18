@@ -161,6 +161,10 @@ services:
       EMAIL_SUBJECT_PREFIX: "[lms-test]"
       EMAIL_DAILY_CEILING: "1000"
       LMS_OPS_EMAILS: lms-e2e-ops@enara-e2e.app
+      # Parents P1 switches, as on lms-test (deploy/lms-test.flags.json). Parent
+      # emails stay off (PARENT_EMAILS_ENABLED unset; scripts/up.sh checks it).
+      PARENT_SETTINGS_ENABLED: "true"
+      PARENT_CODE_SIGNUP_ENABLED: "true"
       ENROLLMENT_DUAL_WRITE: "true"
       ENROLLMENT_READ_FROM: student_app,teacher_rosters,assessments,analytics,profile_context,credits,attendance
       ENROLLMENT_MULTI_CLASS: "true"

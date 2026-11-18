@@ -140,7 +140,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
                 <span className="pp-chip-name"><b>{l.firstName}</b><small>{l.age !== null ? t.age(n(l.age)) : t.tierLine[l.tier].split('·')[0].trim()}</small></span>
               </button>
             ))}
-            <button type="button" className="pp-chip pp-chip--add" onClick={() => go('link')} aria-label={t.linkChild}><Icon name="plus" /></button>
+            <button type="button" className="pp-chip pp-chip--add" onClick={() => go('link')} aria-label={t.addAnotherChild} title={t.addAnotherChild}><Icon name="plus" /></button>
           </nav>
         )}
 
@@ -150,9 +150,10 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
           {showLink && learners.data && (
             <>
               {noLearners && tab !== 'link' && <section className="pp-notice"><Icon name="link" style={{ color: '#075985' }} /><div><b>{t.noLearners}</b><p>{t.noLearnersBody}</p></div></section>}
-              <LinkChild onCancel={list.length ? () => go('home') : undefined} onLinked={(id) => { setSelectedId(id); refresh(); go('home'); }} />
+              <LinkChild another={list.length > 0} onCancel={list.length ? () => go('home') : undefined} onLinked={(id) => { setSelectedId(id); refresh(); go('home'); }} />
             </>
           )}
+          {learners.data?.hiddenBySchool ? <p className="pp-notice" role="status" data-testid="pp-hidden-by-school" style={{ display: 'block', fontSize: 13 }}>{t.hiddenBySchool}</p> : null}
           {!showLink && learner && (
             <>
               {status.data && <StatusLine status={status.data} />}

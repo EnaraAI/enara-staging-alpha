@@ -20,6 +20,7 @@ import { ObjectiveRetentionState } from '../models/ObjectiveRetentionState';
 import { BudgetReservation } from '../models/OrgBudget';
 import { ParentLearnerLink } from '../models/ParentLearnerLink';
 import { ParentLinkCode } from '../models/ParentLinkCode';
+import { ParentUsageEvent } from '../models/ParentUsage';
 import { PedagogicalDecision } from '../models/PedagogicalDecision';
 import { HybridAnchorSet, HybridShadowResult } from '../models/HybridShadowResult';
 import { ReminderLog } from '../models/ReminderLog';
@@ -73,6 +74,7 @@ const DELETE_BY_STUDENT_ID: [string, Model<any>][] = [ // eslint-disable-line @t
   ['class_enrollments', ClassEnrollment],
   ['parent_learner_links', ParentLearnerLink],
   ['parent_link_codes', ParentLinkCode],
+  ['parent_usage_events', ParentUsageEvent],
   ['assessments_for_this_student_only', Assessment],
   ['attendance_records', AttendanceRecord],
   ['diagnostic_sessions', DiagnosticSession],

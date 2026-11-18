@@ -39,6 +39,21 @@ test('deployment guard: this project, production, never aliased to test.enara.ap
   assert.match(deploymentProblems({ ...dep, alias: ['lms-test.enara.app', 'test.enara.app'] }).join(), /frozen/);
 });
 
+test('the flags manifest accepts PARENT_* switches (Parents P1) and still refuses secret-looking names', () => {
+  const m = manifest();
+  const flags = manifestFlags({ ...m, features: [{ name: 'p', flags: { PARENT_SETTINGS_ENABLED: 'true', PARENT_CODE_SIGNUP_ENABLED: 'true' } }] });
+  assert.deepEqual(flags, { PARENT_SETTINGS_ENABLED: 'true', PARENT_CODE_SIGNUP_ENABLED: 'true' });
+  for (const bad of ['PARENT_TOKEN_SECRET', 'PARENT_GOOGLE_CLIENT_SECRET', 'PARENT_API_KEY', 'PARENT_PASSWORD', 'PARENT_INVITE_URL', 'PARENT_', 'PARENTS_ENABLED', 'parent_settings_enabled']) {
+    assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { [bad]: 'true' } }] }), /not a feature switch/, bad);
+  }
+  assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { PARENT_SETTINGS_ENABLED: 'a@b.c' } }] }), /short plain string/);
+  // The real manifest: the Parents P1 switches are on for lms-test; parent emails are not managed here.
+  const real = manifestFlags(m);
+  assert.equal(real.PARENT_SETTINGS_ENABLED, 'true');
+  assert.equal(real.PARENT_CODE_SIGNUP_ENABLED, 'true');
+  assert.equal(real.PARENT_EMAILS_ENABLED, undefined);
+});
+
 test('the flags manifest: the current lms-test set, switches only', () => {
   const flags = manifestFlags(manifest());
   for (const k of ['LMS_LTI_ENABLED', 'LMS_GRADE_PASSBACK_ENABLED', 'LMS_ROSTER_SYNC_ENABLED', 'LMS_DEEP_LINKING_ENABLED', 'GRADE_LEDGER_ENABLED', 'MAINTENANCE_ENDPOINTS_ENABLED']) assert.equal(flags[k], 'true', k);

@@ -104,7 +104,8 @@ export async function sendCodeTemplate(
   const mismatch = variablesMismatch(t, variables);
   if (mismatch) return fail(kind, alias, 'invalid_variables', mismatch);
   const { subject, html } = renderCodeTemplate(t, variables);
-  return deliverRendered({ kind, alias, to, subject, html, linkCode: variables.LINK_CODE });
+  // The parent link code (LINK_CODE) or a 6-digit sign-in / verification code (CODE): never in a link.
+  return deliverRendered({ kind, alias, to, subject, html, linkCode: variables.LINK_CODE ?? variables.CODE });
 }
 
 /** null when the given variables are exactly the template's (all required, no extras), else the message. */

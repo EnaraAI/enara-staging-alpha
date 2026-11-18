@@ -38,4 +38,9 @@ export async function recordSignIn(
   } catch (error) {
     logger.warn('sign_in_record_failed', { result, error: serializeError(error) });
   }
+  // Parents P1: a parent's successful sign-in is also a usage event (IDs only; off unless PARENT_SETTINGS_ENABLED).
+  if (result === 'success' && who.role === 'parent' && who.userId) {
+    const { recordParentLogin } = await import('../parents/usage');
+    await recordParentLogin(who.userId);
+  }
 }

@@ -60,7 +60,8 @@ function loadLive() {
   });
 }
 
-// Drafts awaiting approval (none at the moment): drafts/<group>/<alias>.json, bilingual format.
+// Drafts awaiting approval: drafts/<group>/<alias>.json, bilingual format (an optional "replaces" names the live
+// template a draft would replace once approved; "html" variables are blocks built by code, every value escaped).
 function loadDrafts() {
   const list = [];
   for (const group of ['lms', 'parents']) {
