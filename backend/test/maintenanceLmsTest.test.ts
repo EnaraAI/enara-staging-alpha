@@ -30,7 +30,7 @@ beforeAll(async () => {
   await mongoose.connect(mongo.getUri()); // the app's config URI below is only used for the safety check
 });
 afterAll(async () => {
-  setEnv({ MAINTENANCE_ENDPOINTS_ENABLED: undefined, MAINTENANCE_TOKEN: undefined });
+  setEnv({ MAINTENANCE_ENDPOINTS_ENABLED: undefined, MAINTENANCE_TOKEN: undefined, MAINTENANCE_CI_TOKEN: undefined });
   await mongoose.disconnect();
   await mongo.stop();
 });
@@ -70,6 +70,45 @@ describe('safety checks', () => {
     expect(Array.isArray(s.body.pendingMigrations)).toBe(true);
     expect(JSON.stringify(s.body)).not.toMatch(/mongodb/);
   });
+});
+
+describe('second token for the deploy pipeline (MAINTENANCE_CI_TOKEN)', () => {
+  const CI = 'c'.repeat(48);
+
+  it('either token works (each >= 32 chars); a short CI token is ignored; the switch and cluster checks still apply', async () => {
+    const { maintenanceAllowed, maintenanceAuthorised, maintenanceTokens } = await import('../src/maintenance/routes');
+    expect(maintenanceTokens({ MAINTENANCE_TOKEN: TOKEN, MAINTENANCE_CI_TOKEN: 'short' })).toEqual([TOKEN]);
+    expect(maintenanceTokens({ MAINTENANCE_CI_TOKEN: CI })).toEqual([CI]);
+    // The CI token alone is enough to switch the routes on (test cluster only).
+    expect(maintenanceAllowed({ MAINTENANCE_ENDPOINTS_ENABLED: 'true', MAINTENANCE_CI_TOKEN: CI }, TEST_URI)).toBe(true);
+    expect(maintenanceAllowed({ MAINTENANCE_ENDPOINTS_ENABLED: 'true', MAINTENANCE_CI_TOKEN: CI }, REAL_URI)).toBe(false);
+    expect(maintenanceAllowed({ MAINTENANCE_CI_TOKEN: CI }, TEST_URI)).toBe(false);
+    expect(maintenanceAllowed({ MAINTENANCE_ENDPOINTS_ENABLED: 'true', MAINTENANCE_CI_TOKEN: 'c'.repeat(31) }, TEST_URI)).toBe(false);
+    const env = { MAINTENANCE_TOKEN: TOKEN, MAINTENANCE_CI_TOKEN: CI };
+    expect(maintenanceAuthorised(`Bearer ${TOKEN}`, env)).toBe(true);
+    expect(maintenanceAuthorised(`Bearer ${CI}`, env)).toBe(true);
+    for (const bad of [undefined, '', CI, `Bearer ${CI}x`, `Bearer ${CI.slice(1)}`, `bearer ${CI}`, `Bearer ${TOKEN}${CI}`]) expect(maintenanceAuthorised(bad, env)).toBe(false);
+    expect(maintenanceAuthorised(`Bearer ${'c'.repeat(20)}`, { MAINTENANCE_CI_TOKEN: 'c'.repeat(20) })).toBe(false);
+  });
+
+  it('through the routes: both tokens get 200, others 401; switched off or another cluster is 404 even with the CI token', async () => {
+    setEnv({ MONGODB_URI: TEST_URI, MAINTENANCE_ENDPOINTS_ENABLED: 'true', MAINTENANCE_TOKEN: TOKEN, MAINTENANCE_CI_TOKEN: CI });
+    let a = await app();
+    expect((await request(a).get('/api/maintenance/status').set('Authorization', `Bearer ${TOKEN}`)).status).toBe(200);
+    expect((await request(a).get('/api/maintenance/status').set('Authorization', `Bearer ${CI}`)).status).toBe(200);
+    expect((await request(a).post('/api/maintenance/seed-lms-test').set('Authorization', `Bearer ${CI}`).send({})).status).toBe(400); // past the guard, body checked
+    expect((await request(a).get('/api/maintenance/status').set('Authorization', `Bearer ${'d'.repeat(48)}`)).status).toBe(401);
+    // Only the CI token configured: the operator's old token no longer works.
+    setEnv({ MONGODB_URI: TEST_URI, MAINTENANCE_ENDPOINTS_ENABLED: 'true', MAINTENANCE_TOKEN: undefined, MAINTENANCE_CI_TOKEN: CI });
+    a = await app();
+    expect((await request(a).get('/api/maintenance/status').set('Authorization', `Bearer ${CI}`)).status).toBe(200);
+    expect((await request(a).get('/api/maintenance/status').set('Authorization', `Bearer ${TOKEN}`)).status).toBe(401);
+    setEnv({ MONGODB_URI: TEST_URI, MAINTENANCE_ENDPOINTS_ENABLED: undefined, MAINTENANCE_CI_TOKEN: CI });
+    expect((await request(await app()).get('/api/maintenance/status').set('Authorization', `Bearer ${CI}`)).status).toBe(404);
+    setEnv({ MONGODB_URI: REAL_URI, MAINTENANCE_ENDPOINTS_ENABLED: 'true', MAINTENANCE_CI_TOKEN: CI });
+    expect((await request(await app()).get('/api/maintenance/status').set('Authorization', `Bearer ${CI}`)).status).toBe(404);
+    setEnv({ MAINTENANCE_CI_TOKEN: undefined });
+  }, 60_000);
 });
 
 describe('migrate and seed through the route', () => {
