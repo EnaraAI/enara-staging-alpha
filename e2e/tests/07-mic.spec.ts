@@ -80,12 +80,43 @@ test.describe.serial('7 · microphone checks (Chrome)', () => {
       // element of the (Moodle) parent page lying over a cross-origin frame.
       await open.evaluate((el) => el.scrollIntoView({ block: 'center' }));
       await expect(open).toBeEnabled();
+      // Moodle moves the activity frame after load (its resize script, the
+      // course-index drawer's transition). A mouse click is sent at page
+      // coordinates, so wait until the frame has stopped moving.
+      const frameRect = () => page.evaluate(() => {
+        const r = document.getElementById('contentframe')!.getBoundingClientRect();
+        return `${Math.round(r.x)},${Math.round(r.y)},${Math.round(r.width)},${Math.round(r.height)}@${Math.round(window.scrollY)}`;
+      });
+      const rects: string[] = [];
+      await expect.poll(async () => {
+        rects.push(await frameRect());
+        const last = rects.slice(-5);
+        return last.length === 5 && last.every((r) => r === last[0]);
+      }, { timeout: 15_000, intervals: [150] }).toBe(true);
       await shot(page, '07-mic-blocked');
+      // Evidence if the click is lost: what the frame document receives.
+      await f.evaluate(() => {
+        const w = window as any;
+        w.__e2eEvents = [];
+        for (const t of ['pointerdown', 'mousedown', 'click']) document.addEventListener(t, (e) => w.__e2eEvents.push(`${t}:${(e.target as HTMLElement)?.textContent?.trim().slice(0, 30)}`), true);
+      });
       const tabPromise = context.waitForEvent('page', { timeout: 30_000 });
+      const box = await open.boundingBox();
       await open.click();
       // The product's outcomes: a new tab ("Opened in a new tab"), or the
       // browser blocked it (a one-minute link to click), or an error.
       const outcome = notice.getByText(/Opened in a new tab|Your browser blocked the new tab/).or(notice.getByRole('alert'));
+      const reacted = await outcome.first().waitFor({ state: 'visible', timeout: 10_000 }).then(() => true, () => false);
+      if (!reacted) {
+        const hit = box ? await page.evaluate(({ x, y }) => { const el = document.elementFromPoint(x, y); return el ? `${el.tagName}#${el.id}.${String(el.className).slice(0, 60)}` : 'none'; }, { x: box.x + box.width / 2, y: box.y + box.height / 2 }) : 'no box';
+        const seen = await f.evaluate(() => (window as any).__e2eEvents);
+        console.log(`MOUSE CLICK LOST: button box ${JSON.stringify(box)}; parent hit ${hit}; frame events ${JSON.stringify(seen)}; frame rects ${rects.slice(-3).join(' ')} -> now ${await frameRect()}`);
+        await shot(page, '07-mic-blocked-click-lost');
+        test.info().annotations.push({ type: 'mouse-click-lost', description: `parent hit ${hit}; frame events ${JSON.stringify(seen)}` });
+        // Keyboard activation (focus + Enter) is a user gesture too, and does not depend on coordinates.
+        await open.focus();
+        await f.page().keyboard.press('Enter');
+      }
       await expect(outcome.first()).toBeVisible({ timeout: 30_000 }).catch(async (e) => {
         await shot(page, '07-mic-blocked-no-outcome');
         console.log('NOTICE AFTER CLICK:', await notice.innerText().catch(() => '(gone)'));

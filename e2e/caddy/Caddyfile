@@ -19,7 +19,15 @@
 	tls internal
 	@api path /api /api/* /uploads/* /ready /health /lti /lti/* /.well-known/jwks.json
 	handle @api {
-		reverse_proxy enara:3001
+		reverse_proxy enara:3001 {
+			# Node closes idle keep-alive connections after 5 s. Caddy must drop
+			# them first: a POST (e.g. /lti/login) sent on a connection Node is
+			# closing fails ("use of closed network connection") and is not
+			# retried, as POST is not idempotent.
+			transport http {
+				keepalive 2s
+			}
+		}
 	}
 	handle {
 		root * /srv/enara

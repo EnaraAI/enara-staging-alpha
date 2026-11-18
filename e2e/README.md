@@ -1,6 +1,8 @@
 # ENARA LMS end-to-end suite (Moodle in Docker + Playwright)
 
-Fake data only. Never points at lms-test.enara.app or test.enara.app. Needs no
+Fake data only. Never points at lms-test.enara.app or test.enara.app. Never
+sends a real email (owner rule): ENARA runs without RESEND_API_KEY and with
+LMS emails off, and `scripts/up.sh` stops if either is set. Needs no
 repository secrets: `scripts/gen-env.sh` generates every secret and test
 password per run into `e2e/.env` (git-ignored).
 
@@ -17,7 +19,8 @@ password per run into `e2e/.env` (git-ignored).
 Scenarios (`tests/`, run in order, one worker): 1 registration + launches + preview,
 2 picker, 3 page links + due date, 4 grades, 5 roster + "Changed in LMS",
 6 School B isolation, 7 mic checks (Chrome; `webkit.spec.ts` for Safari),
-8 onboarding (skipped until that feature is merged).
+8 step 2 onboarding, timed (Test School C: "New school" → invite → one-link
+registration → connection check → status page → first launches; under 15 minutes).
 
 ## CI
 
