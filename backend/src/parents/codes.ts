@@ -8,6 +8,7 @@ import { Institution } from '../models/Institution';
 import { User } from '../models/User';
 import { recordAudit } from '../services/auditTrail';
 import { sendTemplate } from '../email/sendTemplate';
+import { assertParentEmailAllowed, parentEmailState } from './emailBlock';
 import { logger } from '../utils/logging';
 import { tierOf } from './policy';
 import { endParentLink, endReasonFor } from './linkLifecycle';
@@ -67,6 +68,8 @@ export async function createCode(actor: Actor, studentId: string, opts: { sendTo
   if (!student.institutionId) throw new AppError('The learner has no school', 400, 'VALIDATION_ERROR');
   // P0 item 2: no new parent access to an archived student (restore first; D9).
   if (student.archivedAt) throw new AppError('This student is archived', 409, 'STUDENT_ARCHIVED');
+  // lms-test: "Send code by email" is blocked before anything is created (emailBlock.ts).
+  if (opts.sendToEmail) assertParentEmailAllowed();
   let code = generateCode();
   for (let i = 0; i < 5 && (await ParentLinkCode.exists({ codeHash: hashCode(code.normalized) })); i++) code = generateCode();
   const row = await ParentLinkCode.create({
@@ -105,6 +108,8 @@ export async function listCodes(actor: Actor, studentId: string) {
   const parents = await User.find({ _id: { $in: links.map((l) => l.parentUserId) } }).select('name email').lean();
   return {
     codes: codes.map((c) => ({ id: c.id, display: `ENR-••••-••${c.hint.slice(-2)}`, hint: c.hint, expiresAt: c.expiresAt, createdAt: c.createdAt })),
+    // lms-test: the UI disables "Send code by email" with this note.
+    parentEmail: parentEmailState(),
     links: links.map((l) => {
       const p = parents.find((u) => String(u._id) === l.parentUserId);
       return { linkId: l.id, parentName: p?.name ?? 'Parent', parentEmail: p?.email ?? null, role: l.role, status: l.status, consent: l.consent ?? 'not_required', createdAt: l.createdAt, ...(l.status === 'ended' ? { endedAt: l.endedAt ?? null, endReason: l.endReason ?? null } : {}) };

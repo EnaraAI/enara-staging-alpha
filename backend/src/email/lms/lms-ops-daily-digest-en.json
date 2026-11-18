@@ -62,7 +62,7 @@
       "key": "CAP_NOTE",
       "type": "string",
       "fallback_value": "none",
-      "sample": "cap hit: 23 held back (lms-seats-warning 9, lms-roster-sync-failed 8, lms-grade-changed-in-lms 6)"
+      "sample": "ceiling hit: 23 held (lms-seats-warning 9, lms-roster-sync-failed 8, lms-grade-changed-in-lms 6)"
     },
     {
       "key": "ACTION_URL",
@@ -84,5 +84,5 @@
   "trigger": "Daily cron: pending approvals > 24 h, billing flags, dead grade jobs (all schools), unknown-LMS launches, cookieless share, roster failures, key problems, switch-offs",
   "delivery": "digest",
   "frequency": "Daily; only if any row is non-zero",
-  "capNote": "CAP_NOTE added 2026-11-18 with the wiring (owner condition: the digest states 'cap hit: N held back' with a per-template count); 'none' when no cap applies or nothing was held"
+  "capNote": "CAP_NOTE added 2026-11-18 with the wiring. Owner update 2026-11-18: the 20-a-day test inbox cap is gone; the row is now the email safety ceiling (EMAIL_DAILY_CEILING, default 300 a Cairo day on staging, all send paths): '<used> of <ceiling> used, nothing held', or 'ceiling hit: N held (template n, ...)'; 'none' when no ceiling applies. Only the row label changed ('Test inbox daily cap (lms-test)' -> 'Email safety ceiling (all emails, per day)'); the variable keeps its name"
 }

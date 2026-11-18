@@ -11,14 +11,20 @@ export const ShareSheet: React.FC<{ learner: LearnerChip; onClose: () => void }>
   const [result, setResult] = useState<{ kind: 'ok' | 'wa' | 'err'; text?: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const canShare = learner.role !== 'view';
+  // lms-test: "Send by email" is blocked until a later step (the server says so; a 409 says the same).
+  const [emailBlocked, setEmailBlocked] = useState(false);
   const send = async (channel: 'email' | 'whatsapp') => {
     setBusy(true);
     try {
       const r = await parentsApi.share(learner.studentId, channel);
       setResult(channel === 'whatsapp' ? { kind: 'wa', text: r.preview } : { kind: 'ok' });
-    } catch { setResult({ kind: 'err' }); } finally { setBusy(false); }
+    } catch (e) {
+      if ((e as { code?: string })?.code === 'PARENT_EMAIL_BLOCKED_STAGING') { setEmailBlocked(true); setResult(null); }
+      else setResult({ kind: 'err' });
+    } finally { setBusy(false); }
   };
   const r = q.data?.report;
+  const emailOff = emailBlocked || q.data?.shareEmail?.blocked === true;
   return (
     <Sheet title={t.share} onClose={onClose}>
       {!q.data && (q.error ? <ErrorBox onRetry={q.reload} /> : <Loading />)}
@@ -50,7 +56,8 @@ export const ShareSheet: React.FC<{ learner: LearnerChip; onClose: () => void }>
       {r && canShare && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <button type="button" className="pp-btn pp-btn--primary pp-btn--block" disabled={busy} onClick={() => send('whatsapp')}><Icon name="share" />{t.shareWhatsapp}</button>
-          <button type="button" className="pp-btn pp-btn--block" disabled={busy} onClick={() => send('email')}>{t.shareEmail}</button>
+          <button type="button" className="pp-btn pp-btn--block" disabled={busy || emailOff} aria-describedby={emailOff ? 'pp-share-email-off' : undefined} data-testid="pp-share-email" onClick={() => send('email')}>{t.shareEmail}</button>
+          {emailOff && <p id="pp-share-email-off" className="pp-sub" role="note" data-testid="pp-share-email-blocked">{t.shareEmailBlocked}</p>}
         </div>
       )}
       {r && !canShare && <p className="pp-sub">{t.viewOnly}</p>}

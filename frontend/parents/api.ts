@@ -22,7 +22,9 @@ export interface SessionCard { id: string; day: string; startedAt: string; start
 export interface Activity { classes?: ClassChoice; generatedAt: string; learner: LearnerHeader; calendar: { days: { day: string; state: 'practised' | 'missed' | 'today' | 'upcoming'; isToday: boolean; minutes: number }[]; practisedCount: number; pastCount: number }; sessions: SessionCard[] }
 export interface Transcript { learner: LearnerHeader; session: { id: string; title: string; startedAt: string }; expiresAt: string; messages: { id: string; from: 'learner' | 'enara'; text: string; at: string }[]; audio: { available: boolean } }
 export interface Controls { learner: LearnerHeader; controls: { weeklyGoalMin: number; dailyLimitMin: number; focus: string; reminders: boolean; liveAvatar: boolean; microphone: boolean; camera: boolean; learnerAccepted?: boolean }; mode: 'parent_sets' | 'co_set'; enforced: boolean }
-export interface Report { learner: LearnerHeader; report: { weekStart: string; status: WeeklyStatus['status']; minutesDone: number; goalMinutes: number; streak: number; level: Level; learned: { mock: boolean; items: Bi[] }; tryAtHome: { mock: boolean; text: Bi } } }
+/** lms-test: parent emails are blocked until a later step (backend parents/emailBlock.ts). */
+export interface ParentEmailState { blocked: boolean; code?: string; message?: { en: string; ar: string } }
+export interface Report { learner: LearnerHeader; shareEmail?: ParentEmailState; report: { weekStart: string; status: WeeklyStatus['status']; minutesDone: number; goalMinutes: number; streak: number; level: Level; learned: { mock: boolean; items: Bi[] }; tryAtHome: { mock: boolean; text: Bi } } }
 export interface Account { learners: LearnerChip[]; pending: { linkId: string }[]; guardians: { byLearner: { studentId: string; canManage: boolean; items: { linkId: string; name: string; role: LinkRole; isYou: boolean }[] }[] }; plan: { mock: boolean; name: Bi; price: string; learners: number; renewsOn: string; payment: Bi }; preferences: { language: 'en' | 'ar'; alertChannels: string[] } }
 
 const L = (id: string) => `/api/parents/learners/${encodeURIComponent(id)}`;

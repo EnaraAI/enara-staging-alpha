@@ -21,7 +21,7 @@ import { LMS_VALUE_DIFFERS } from './gradeSyncLog';
 import {
   appUrl,
   cairoDay,
-  capCount,
+  ceilingCount,
   claimWindow,
   firstName,
   formatDay,
@@ -43,14 +43,15 @@ import { classUrl, notifyOpsApprovalNeeded, opsUrl, platformUrl } from './lmsEma
 import { courseLabel, gradeFailReason, KEY_PROBLEM_CODES, REMOVALS_SKIPPED_REASON, rosterFailText } from './lmsEmailText';
 import { codeState } from './registrationCode';
 import { getConfig } from '../../../config/env';
+import { emailPolicy } from '../../../email/testInbox';
 
 // The LMS email digests, run by GET /api/cron/daily (lms-test has no
 // scheduler: the daily route runs when it is called with CRON_SECRET; see
 // docs/lms/LMS_EMAILS.md). Every digest is "one email per recipient (or per
 // connection) per Cairo day" by its idempotency key, so a second run the same
 // day sends nothing new. Weekly items run on Mondays (Cairo). The ops daily
-// digest (E5) runs last and always goes (also past the test inbox's daily cap,
-// whose held emails it counts).
+// digest (E5) runs last; its CAP_NOTE row reports the daily email safety
+// ceiling (email/testInbox.ts): how much of it is used, or what it held.
 //
 //   2a / 2b invite expiring (<= 3 days) / expired, once per onboarding link
 //   8  grade-sync digest: grades that became 'dead' in 24 h, per connection
@@ -404,7 +405,7 @@ export async function opsDailyDigest(now: Date, totals: Totals) {
   const since = new Date(now.getTime() - DAY);
   const day = cairoDay(now);
   const before = new Date(now.getTime() - DAY);
-  const [pendingP, pendingD, billing, dead, roster, keys, off, unknown, platforms, held, capUsed] = await Promise.all([
+  const [pendingP, pendingD, billing, dead, roster, keys, off, unknown, platforms, held, used] = await Promise.all([
     LmsPlatform.countDocuments({ status: 'pending', createdAt: { $lte: before } }),
     LmsDeployment.countDocuments({ status: 'pending', createdAt: { $lte: before } }),
     LmsOrgSettings.countDocuments({ billingFlaggedAt: { $exists: true } }),
@@ -415,20 +416,20 @@ export async function opsDailyDigest(now: Date, totals: Totals) {
     LmsAuditLog.countDocuments({ event: { $in: ['lti.login', 'lti.launch'] }, code: 'unknown_platform', createdAt: { $gte: since } }),
     LmsPlatform.find({ launchCount: { $gte: 10 } }).select('institutionId launchCount cookielessLaunchCount').lean(),
     heldToday(day),
-    capCount(day),
+    ceilingCount(day),
   ]);
   let cookieless = 'none';
   const top = platforms.map((p) => ({ p, share: (p.cookielessLaunchCount ?? 0) / p.launchCount })).filter((x) => x.share > 0).sort((a, b) => b.share - a.share)[0];
   if (top) cookieless = `${(await schoolOf(top.p.institutionId))?.name ?? top.p.institutionId}: ${Math.round(top.share * 100)}%`;
-  const redirect = !!getConfig().email.testRecipient;
-  const cap = getConfig().lms.testDailyCap;
-  const capNote = !redirect || !cap ? 'none'
-    : held.total ? `cap hit: ${held.total} held back (${held.byTemplate.map((h) => `${h.template} ${h.n}`).join(', ')})`
-    : `${capUsed} of ${cap} used, nothing held back`;
+  // The email safety ceiling (all send paths, per Cairo day).
+  const ceiling = emailPolicy().ceiling;
+  const capNote = !ceiling ? 'none'
+    : held.total ? `ceiling hit: ${held.total} held (${held.byTemplate.map((h) => `${h.template} ${h.n}`).join(', ')})`
+    : `${used} of ${ceiling} used, nothing held`;
   const rows = { PENDING_OVER_24H: pendingP + pendingD, BILLING_FLAGS: billing, DEAD_JOBS: dead, ROSTER_FAILED: roster, KEY_PROBLEMS: keys, SWITCHED_OFF: off, UNKNOWN_LMS_LAUNCHES: unknown };
   if (!Object.values(rows).some((n) => n > 0) && cookieless === 'none' && !held.total) return { sent: false };
   add(totals, await sendLmsEmail({
-    template: 'lms-ops-daily-digest', key: `ops-digest:${day}`, lang: 'en', recipients: opsRecipients(), alwaysSend: true,
+    template: 'lms-ops-daily-digest', key: `ops-digest:${day}`, lang: 'en', recipients: opsRecipients(),
     vars: () => ({ DATE: formatDay(now, 'en'), ...Object.fromEntries(Object.entries(rows).map(([k, v]) => [k, num(v)])), COOKIELESS_TOP: cookieless, CAP_NOTE: capNote, ACTION_URL: opsUrl() }),
   }));
   return { sent: true };

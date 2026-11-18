@@ -217,6 +217,8 @@ export function apiRequest<T = any>(method: string, path: string, body?: unknown
 
 // School admin: parent link codes for a learner (Parents Portal).
 export interface ParentCodeList {
+  /** lms-test: "Send code by email" is blocked until a later step (backend parents/emailBlock.ts). */
+  parentEmail?: { blocked: boolean; code?: string; message?: { en: string; ar: string } };
   codes: { id: string; display: string; hint: string; expiresAt: string; createdAt: string }[];
   // status 'ended' (kept for history): endedAt and endReason are set.
   links: { linkId: string; parentName: string; parentEmail: string | null; role: 'owner' | 'full' | 'view'; status: string; consent: string; createdAt: string; endedAt?: string | null; endReason?: string | null }[];

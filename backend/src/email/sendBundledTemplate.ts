@@ -1,8 +1,9 @@
 import { logger } from '../utils/logging';
-import { LOGO_CONTENT_ID, LOGO_FILENAME, LOGO_PNG_BASE64, LOGO_WHITE_CONTENT_ID, LOGO_WHITE_FILENAME, LOGO_WHITE_PNG_BASE64 } from './logoInline';
+import { LOGO_CONTENT_ID, LOGO_WHITE_CONTENT_ID } from './logoInline';
+import { resendSend } from './provider';
 import { isReservedRecipient } from './reservedRecipients';
-import { fillPlaceholders, getEmailClient, HOSTED_LOGO_URL, HOSTED_LOGO_WHITE_URL, linkCarriesCode, type SendTemplateResult } from './sendTemplate';
-import { emailSender } from './templateRegistry';
+import { fillPlaceholders, HOSTED_LOGO_URL, HOSTED_LOGO_WHITE_URL, linkCarriesCode, type SendTemplateResult } from './sendTemplate';
+import { guardOutgoing } from './testInbox';
 
 // Shared renderer/sender for the code-sent email sets that are NOT Resend-hosted
 // templates: ./lms (sendLmsTemplate) and ./parents (sendParentTemplate). Each set
@@ -49,6 +50,12 @@ export interface DeliverInput {
   linkCode?: unknown;
   /** Render and check everything, but do not call Resend (LMS_EMAIL_CAPTURE, the E2E stack). */
   capture?: boolean;
+  /**
+   * Set ONLY by sendLmsEmail, which applies the test inbox rules itself (same
+   * redirect, prefix, Test copy line and shared daily cap, plus idempotency).
+   * Every other caller gets them here (email/testInbox.ts).
+   */
+  testInboxApplied?: boolean;
 }
 
 /**
@@ -66,26 +73,19 @@ export async function deliverRendered(input: DeliverInput): Promise<SendTemplate
   if (LEFTOVER.test(html) || LEFTOVER.test(subject)) return fail(kind, alias, 'unfilled_placeholder', 'Rendered template still contains a {{{...}}} placeholder');
   if (linkCarriesCode(html, input.linkCode)) return fail(kind, alias, 'code_in_url', 'A link in the email carries a parent link code');
   if (input.capture) return { ok: true, id: 'captured' };
-  const resend = getEmailClient();
-  if (!resend) return fail(kind, alias, 'missing_api_key', 'RESEND_API_KEY is not set');
-  try {
-    const { data, error } = await resend.emails.send({
-      from: emailSender(),
-      to,
-      subject,
-      html,
-      attachments: [
-        { filename: LOGO_FILENAME, content: LOGO_PNG_BASE64, contentType: 'image/png', contentId: LOGO_CONTENT_ID },
-        { filename: LOGO_WHITE_FILENAME, content: LOGO_WHITE_PNG_BASE64, contentType: 'image/png', contentId: LOGO_WHITE_CONTENT_ID },
-      ],
-    });
-    if (error || !data) return fail(kind, alias, error?.name ?? 'unknown_error', error?.message ?? 'No data returned');
-    return { ok: true, id: data.id };
-  } catch (err) {
-    const e = err as { code?: unknown; name?: unknown; message?: unknown };
-    const code = typeof e?.code === 'string' ? e.code : typeof e?.name === 'string' ? e.name : 'exception';
-    return fail(kind, alias, code, typeof e?.message === 'string' ? e.message : 'Send failed');
-  }
+  // Staging (lms-test): only the test inbox, prefixed, capped, or captured (null: not staging, unchanged).
+  const guard = input.testInboxApplied ? null : await guardOutgoing({ kind, alias, to: [to], subject, html });
+  if (guard && !guard.send) return guard.result;
+  if (!guard || !guard.redirected) return sendNow(kind, alias, to, subject, html); // not staging: exactly as before
+  const result = await sendNow(kind, alias, guard.to, guard.subject, guard.html);
+  await guard.record(result);
+  return result;
+}
+
+async function sendNow(kind: CodeTemplateKind, alias: string, to: string | string[], subject: string, html: string): Promise<SendTemplateResult> {
+  // Paced and quota-aware (email/provider.ts); never throws.
+  const r = await resendSend(kind, alias, to, subject, html);
+  return r.ok ? r : fail(kind, alias, r.code, r.message);
 }
 
 export async function sendCodeTemplate(

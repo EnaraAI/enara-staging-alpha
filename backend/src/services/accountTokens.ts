@@ -44,10 +44,15 @@ export function formatTtl(ms: number): string {
 const useTemplates = () => !!process.env.RESEND_API_KEY;
 
 // Same guards as sendEmail: never mail reserved .test addresses (demo/test
-// accounts), and honour REMINDER_TEST_RECIPIENT when set.
+// accounts), and honour REMINDER_TEST_RECIPIENT when set. On staging (lms-test)
+// the real address is passed on: sendTemplate's staging guard (email/testInbox.ts)
+// redirects it to the test inbox with the "Test copy: this email was for ..."
+// line, the subject prefix and the shared daily cap.
 function templateRecipient(to: string): string | null {
   if (/\.test$/i.test(to.trim())) return null;
-  return getConfig().email.testRecipient || to;
+  const config = getConfig();
+  if (config.stagingMode) return to;
+  return config.email.testRecipient || to;
 }
 
 async function invitationValues(institutionId: string, invitedBy: string) {
