@@ -57,6 +57,15 @@ Under **ENARA pages** you can add a direct link to one page, for example **My pr
 
 **Hide teacher-only links from students.** In Moodle, hide a teacher-only link from students, or make it **available but not shown on the course page** (in Moodle 4.x: the activity's **Availability** setting, "Make available but don't show on course page", if your site allows it). If a student opens a teacher-only link anyway, ENARA opens **their own home**; they never see a teacher page.
 
+### AI tutor, live avatar and diagnostic activities (no grade)
+
+In the picker, **AI tutor sessions**, **Live avatar sessions** and **Diagnostic checks** each add one activity, marked **No grade column**:
+- **AI tutor session:** the student talks with ENARA's AI tutor about the course (typing or voice).
+- **Live avatar session:** a live voice call with ENARA's video tutor. It needs the microphone.
+- **Diagnostic check:** a short adaptive check, objective by objective. The student gets a report, not a grade. It works when the course's ENARA class has a curriculum with approved learning objectives.
+
+When the microphone is blocked inside Moodle, the student sees **Open in a new tab**, which opens the same activity in a new tab, already signed in. If the tutor or the avatar is not set up on your ENARA site yet, students see a clear message (English and Arabic) instead of a session. When you open the activity yourself, you see whether it is ready and how many students of the class used it in the last 7 days. ENARA never sends a grade for these activities; Moodle still makes an empty grade column for each (see "Activities that are really ungraded").
+
 ### Due dates
 
 When you pick a quiz, test or assignment, you can give it a **due date** (optional). Enter the date and time in **your school's time** (for example Cairo time); the picker shows which time zone it uses. The date must be in the future and within 2 years.
@@ -92,7 +101,7 @@ Two related settings:
 
 ### Activities that are really ungraded
 
-Moodle creates a grade column for every external tool activity. For an ENARA activity that should have no grade at all (the ENARA course link, links to ENARA pages, and later tutor sessions or the avatar), remove the column in Moodle. ENARA never sends a grade for these. Open the activity, then go to **Settings** › **Grade** › **Type**, choose **None**, and click **Save and return to course**.
+Moodle creates a grade column for every external tool activity. For an ENARA activity that should have no grade at all (the ENARA course link, links to ENARA pages, AI tutor sessions, live avatar sessions and diagnostic checks), remove the column in Moodle. ENARA never sends a grade for these. Open the activity, then go to **Settings** › **Grade** › **Type**, choose **None**, and click **Save and return to course**.
 
 ### A cell marked (*) is "overridden"
 
