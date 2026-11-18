@@ -92,13 +92,22 @@ function zoneLabel(tz: string, locale: 'en' | 'ar'): string {
  * school's time zone. Western digits in both languages, 12-hour clock.
  */
 export function formatDueLine(due: Date, tz: string, locale: 'en' | 'ar'): string {
-  const w = wallClock(tz, due.getTime());
+  return locale === 'ar' ? `موعد التسليم: ${formatSchoolDateTime(due, tz, 'ar')}` : `Due: ${formatSchoolDateTime(due, tz, 'en')}`;
+}
+
+/**
+ * A date and time in the school's time zone, e.g. "25 Nov 2026, 11:59 PM
+ * (Cairo time)" / "25 نوفمبر 2026، 11:59 م (توقيت القاهرة)". Western digits,
+ * 12-hour clock (also used for the onboarding invite's link expiry).
+ */
+export function formatSchoolDateTime(at: Date, tz: string, locale: 'en' | 'ar'): string {
+  const w = wallClock(tz, at.getTime());
   const month =
     locale === 'ar'
-      ? new Intl.DateTimeFormat('ar-EG-u-ca-gregory-nu-latn', { timeZone: tz, month: 'long' }).format(due)
-      : new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'short' }).format(due);
+      ? new Intl.DateTimeFormat('ar-EG-u-ca-gregory-nu-latn', { timeZone: tz, month: 'long' }).format(at)
+      : new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'short' }).format(at);
   const h12 = w.hour % 12 === 0 ? 12 : w.hour % 12;
   const time = `${h12}:${String(w.minute).padStart(2, '0')}`;
-  if (locale === 'ar') return `موعد التسليم: ${w.day} ${month} ${w.year}، ${time} ${w.hour < 12 ? 'ص' : 'م'} (${zoneLabel(tz, 'ar')})`;
-  return `Due: ${w.day} ${month} ${w.year}, ${time} ${w.hour < 12 ? 'AM' : 'PM'} (${zoneLabel(tz, 'en')})`;
+  if (locale === 'ar') return `${w.day} ${month} ${w.year}، ${time} ${w.hour < 12 ? 'ص' : 'م'} (${zoneLabel(tz, 'ar')})`;
+  return `${w.day} ${month} ${w.year}, ${time} ${w.hour < 12 ? 'AM' : 'PM'} (${zoneLabel(tz, 'en')})`;
 }

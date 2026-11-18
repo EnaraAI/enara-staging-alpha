@@ -1406,7 +1406,7 @@ export function reportMicTelemetry(event: { event: string; browserFamily: string
 
 export interface LmsPlatformView {
   id: string; institutionId: string; vendor: string; issuer: string; clientId: string;
-  authLoginUrl: string | null; authTokenUrl: string | null; keysetUrl: string | null;
+  authLoginUrl: string | null; authTokenUrl: string | null; keysetUrl: string | null; hasPublicKey?: boolean;
   status: 'pending' | 'active' | 'disabled'; registeredVia?: 'dynamic' | 'manual' | 'google_oauth'; createdAt: string; approvedAt: string | null;
   launchCount: number; cookielessLaunchCount: number; storageLaunchCount?: number; lastLaunchAt: string | null;
   deployments: { id: string; deploymentId: string; status: 'pending' | 'active' | 'disabled' }[];
@@ -1430,6 +1430,7 @@ export interface LmsRegistrationLink {
   status: 'unused' | 'used' | 'revoked' | 'expired';
   createdAt: string; expiresAt: string; usedAt: string | null; platformId: string | null;
   failedAttempts: number; lastErrorCode: string | null; lastErrorAt: string | null;
+  firstOpenedAt?: string | null; onboardingId?: string | null;
 }
 export const createLmsRegistrationLink = (institutionId?: string) =>
   request<{ link: LmsRegistrationLink; url: string; expiresInDays: number; connectionWillBe: 'active' | 'pending' }>('POST', '/api/lms/registration-links', institutionId ? { institutionId } : {});
@@ -1495,6 +1496,67 @@ export interface LmsProblems {
 }
 export const fetchLmsProblems = (days: 1 | 7, institutionId?: string) =>
   request<LmsProblems>('GET', `/api/lms/problems?days=${days}${institutionId ? `&institutionId=${encodeURIComponent(institutionId)}` : ''}`);
+
+// LMS step 2: self-serve school onboarding ("New school", the invite, the
+// school connection status page, the automatic connection check).
+export type LmsLang = 'en' | 'ar';
+export interface LmsBi { en: string; ar: string }
+export interface LmsInviteTexts { en: string; ar: string }
+export interface LmsNewSchoolInput {
+  name: string; country: string; timeZone?: string; emailLanguage?: LmsLang; seatLimit?: number;
+  schoolAdminName: string; schoolAdminEmail: string; moodleAdminEmail?: string; features?: 'all' | 'none';
+}
+export interface LmsNewSchoolResult {
+  institution: { id: string; name: string; country: string; timeZone: string; emailLanguage: LmsLang; features: 'all' | 'none' };
+  onboarding: { id: string };
+  invitation: { id: string; expiresAt: string; expiresInDays: number };
+  /** The school admin's account invitation link: shown once. */
+  inviteLink: string;
+  registrationLink: LmsRegistrationLink;
+  /** The Moodle link: shown once. */
+  url: string;
+  connectionWillBe: 'active' | 'pending';
+  invite: LmsInviteTexts;
+  emailAvailable: boolean;
+}
+export interface LmsNewLinkResult {
+  link: LmsRegistrationLink; url: string; expiresInDays: number; connectionWillBe: 'active' | 'pending'; cancelledLinkIds: string[]; invite: LmsInviteTexts;
+}
+export type LmsCheckStatus = 'ok' | 'fail' | 'waiting';
+export interface LmsCheckStep { key: 'registered' | 'reachable' | 'services' | 'activated' | 'roster' | 'grades'; status: LmsCheckStatus; code: string; at: string | null; help: { en: { what: string; fix: string }; ar: { what: string; fix: string } } }
+export interface LmsChecklistItem { key: string; done: boolean; at: string | null; label: LmsBi; next: LmsBi | null; code?: string }
+export interface LmsManualSetting { key: 'acceptGradesAlways' | 'activityChooser' | 'restrictToCategory' | 'activated'; checked: boolean; at: string | null; by: string | null; label: LmsBi; how: LmsBi }
+export interface LmsSchoolStatus {
+  institution: { id: string; name: string; timeZone: string; emailLanguage: LmsLang | null; country: string | null };
+  onboarding: {
+    id: string; createdAt: string; inviteSentAt: string | null; inviteSentVia: 'copy' | 'email' | null; lastEmailAt: string | null; moodleAdminEmail: string | null;
+    schoolAdminInvitation: { id: string; status: string; expiresAt: string; acceptedAt?: string } | null;
+  } | null;
+  currentLink: LmsRegistrationLink | null;
+  emailAvailable: boolean;
+  checklist: LmsChecklistItem[];
+  allDone: boolean;
+  timer: { startedAt: string; startedFrom: 'invite_sent' | 'invite_created'; goalMs: number; elapsedMs: number; goalReachedAt: string | null; running: boolean; goalMet: boolean } | null;
+  platforms: {
+    id: string; issuer: string; host: string | null; status: 'pending' | 'active' | 'disabled'; registeredVia: string; createdAt: string; hasPublicKey: boolean;
+    check: { checkedAt: string | null; outcome: LmsCheckStatus | null; trigger: string | null; unreachable: boolean; host: string | null; steps: LmsCheckStep[] };
+    manualSettings: LmsManualSetting[];
+  }[];
+}
+export interface LmsOnboardingRow { id: string; institutionId: string; name: string | null; createdAt: string; inviteSentAt: string | null; connections: number; lastCheckOutcome: LmsCheckStatus | null }
+const onb = (institutionId: string, tail: string) => `/api/lms/onboarding/${encodeURIComponent(institutionId)}/${tail}`;
+export const createLmsSchool = (body: LmsNewSchoolInput) => request<LmsNewSchoolResult>('POST', '/api/lms/onboarding/schools', body);
+export const fetchLmsOnboardings = () => request<{ onboardings: LmsOnboardingRow[] }>('GET', '/api/lms/onboarding');
+export const fetchLmsSchoolStatus = (institutionId: string) => request<LmsSchoolStatus>('GET', onb(institutionId, 'status'));
+export const newLmsOnboardingLink = (institutionId: string) => request<LmsNewLinkResult>('POST', onb(institutionId, 'new-link'), {});
+export const markLmsInviteSent = (institutionId: string) => request<{ inviteSentAt: string | null }>('POST', onb(institutionId, 'invite-sent'), {});
+export const sendLmsInviteEmail = (institutionId: string) => request<{ sent: boolean; inviteSentAt: string | null }>('POST', onb(institutionId, 'send-email'), {});
+export const checkLmsConnectionAgain = (institutionId: string, platformId?: string) =>
+  request<{ checked: number; skippedRecent: number; status: LmsSchoolStatus }>('POST', onb(institutionId, 'check'), platformId ? { platformId } : {});
+export const setLmsManualSetting = (institutionId: string, platformId: string, key: LmsManualSetting['key'], checked: boolean) =>
+  request<{ setting: { key: string; checked: boolean; by: string; at: string } }>('PUT', onb(institutionId, 'manual-settings'), { platformId, key, checked });
+export const setLmsPlatformPublicKey = (platformId: string, publicKey: string | null) =>
+  request<{ platform: LmsPlatformView }>('POST', `/api/lms/platforms/${encodeURIComponent(platformId)}/public-key`, { publicKey });
 
 // MULTI-CLASS STEP 6: ARCHIVING (backend switches ENROLLMENT_GROUP_ARCHIVE /
 // ENROLLMENT_STUDENT_ARCHIVE). The settings route answers 404 while both are

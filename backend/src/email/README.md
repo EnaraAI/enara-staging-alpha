@@ -119,3 +119,22 @@ npx tsx -e "import('./src/email/sendTemplate').then(m => m.sendTemplate('enara-w
 and staff invitation (`enara-class-invitation`, expiry from `INVITATION_TTL_MS`) through `sendTemplate` when
 `RESEND_API_KEY` is set (still skipping `.test` addresses and honouring `REMINDER_TEST_RECIPIENT`). Without the key
 the previous inline-HTML `sendEmail` path runs unchanged.
+
+## LMS emails (`lms/`, not Resend-hosted)
+
+LMS emails (owner decisions D1, D5, D11) live in [`lms/`](./lms) as one file per language
+(`lms-<name>-en.html/.json`, `lms-<name>-ar.html/.json`; Arabic is `dir="rtl"`, Tahoma, Latin tokens in
+`<span dir="ltr">`). They are **not** in `TEMPLATE_REGISTRY`, not pushed or published to Resend, and are sent only by
+`sendLmsTemplate` (`sendLmsTemplate.ts`), which LMS code calls only when `LMS_EMAILS_ENABLED`, `REMINDERS_ENABLED`
+and `RESEND_API_KEY` are all set (lms-test keeps `LMS_EMAILS_ENABLED` off). Re-bundle after an edit
+(a test checks the bundle matches the files):
+
+```bash
+npx tsx scripts/email/bundle-lms-templates.ts   # writes lms/lmsTemplatesBundle.ts
+```
+
+| Alias | Variables | Used by |
+|---|---|---|
+| lms-invite-connect-en / -ar | NAME, SCHOOL_NAME, EXPIRES_ON, ACTION_URL, REFERENCE_CODE | "Send email" on the LMS onboarding invite (step 2). `ACTION_URL` is `${APP_URL}/?page=lms-status` (sign-in; never the Moodle link or its code, D5) |
+
+The From address of every email is `EMAIL_SENDER` (env) when set, else the default above (D11).
