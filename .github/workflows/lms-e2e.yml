@@ -236,7 +236,8 @@ jobs:
   # lms-test (reusable workflow from the continuous-delivery branch).
   deploy:
     needs: [e2e]
-    if: github.event_name == 'pull_request' && github.base_ref == 'lms-test-live' && success()
+    # Never from a draft PR: a person marks the PR ready for review to deploy.
+    if: github.event_name == 'pull_request' && github.base_ref == 'lms-test-live' && github.event.pull_request.draft == false && success()
     permissions:
       contents: write
       pull-requests: write
