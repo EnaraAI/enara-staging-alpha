@@ -24,7 +24,13 @@ export interface IInstitution extends Document {
   // an ENARA admin only. Unset = 'free' (D1). 'off' hides this school's
   // children from their parents (links are kept, not ended). Read through
   // parents/schoolAccess.ts only.
-  parentPortal?: { access?: 'off' | 'free'; updatedAt?: Date; updatedBy?: string };
+  parentPortal?: {
+    access?: 'off' | 'free'; updatedAt?: Date; updatedBy?: string;
+    // Parents P2 (PARENT_CODE_TOOLS_ENABLED), set by the school admin: how long
+    // link codes last (1-60 days, unset = 7) and whether teachers may issue
+    // codes for their own classes (unset = no, D3).
+    codeTtlDays?: number; teachersMayIssueCodes?: boolean;
+  };
   // P2: documents are deleted retentionDays after pilotEndsAt (default 180).
   documentRetention?: { pilotEndsAt?: Date; retentionDays?: number };
   // School limits for learning-intelligence activities (set by school admins).
@@ -56,7 +62,7 @@ const institutionSchema = new Schema<IInstitution>(
     country: { type: String, maxlength: 2 },
     emailLanguage: { type: String, enum: ['ar', 'en'] },
     features: { type: Map, of: Boolean, default: undefined },
-    parentPortal: { type: { access: { type: String, enum: ['off', 'free'] }, updatedAt: Date, updatedBy: String, _id: false }, default: undefined },
+    parentPortal: { type: { access: { type: String, enum: ['off', 'free'] }, updatedAt: Date, updatedBy: String, codeTtlDays: { type: Number, min: 1, max: 60 }, teachersMayIssueCodes: Boolean, _id: false }, default: undefined },
     documentRetention: { type: { pilotEndsAt: Date, retentionDays: { type: Number, min: 1, max: 3650 }, _id: false }, default: undefined },
     learningSettings: {
       diagnosticMaxQuestions: { type: Number, min: 3, max: 30 },

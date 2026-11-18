@@ -202,7 +202,7 @@ export async function registerParent(name: string, email: string, password: stri
 }
 
 // Parents Portal: which sign-in methods to offer. The Google client ID is public.
-export async function fetchParentAuthConfig(): Promise<{ google: boolean; clientId?: string; codeSignup?: boolean }> {
+export async function fetchParentAuthConfig(): Promise<{ google: boolean; clientId?: string; codeSignup?: boolean; emailSignin?: boolean }> {
   return request('GET', '/api/parents/auth-config');
 }
 
@@ -235,6 +235,21 @@ export async function startWithCode(code: string, language: 'en' | 'ar'): Promis
   setParentDeviceToken(data.deviceToken);
   return data.user;
 }
+// Parents P2 (PARENT_EMAIL_SIGNIN_ENABLED): passwordless sign-in with a 6-digit code by email.
+export async function parentEmailSignInStart(email: string, language: 'en' | 'ar'): Promise<{ sent: boolean }> {
+  return request('POST', '/api/parents/email/sign-in/start', { email: email.trim(), language });
+}
+export async function parentEmailSignInVerify(email: string, code: string): Promise<SessionUser> {
+  const data = await request<{ token: string; user: SessionUser; deviceToken: string }>('POST', '/api/parents/email/sign-in/verify', { email: email.trim(), code });
+  saveSession(data.token, data.user);
+  setParentDeviceToken(data.deviceToken);
+  return data.user;
+}
+/** After a merge the device continues as the account that has the email. */
+export function adoptParentSession(data: { token: string; user: SessionUser; deviceToken: string }): void {
+  saveSession(data.token, data.user);
+  setParentDeviceToken(data.deviceToken);
+}
 let resuming: Promise<SessionUser | null> | null = null;
 /** A fresh session for a remembered parent device; null (and the device forgotten) when it no longer works. */
 export function resumeParentDevice(): Promise<SessionUser | null> {
@@ -262,7 +277,16 @@ export interface ParentsSchoolRow {
   id: string; name: string; status: string; access: ParentAccess; accessUpdatedAt: string | null;
   usage: { linkedParents: number; active7: number; active30: number; logins30: number; topScreens: { screen: string; views: number }[] };
 }
-export const fetchParentsAdminStatus = () => request<{ enabled: boolean; canChangeAccess: boolean }>('GET', '/api/parents-admin/status');
+export interface ParentsAdminStatus { enabled: boolean; usage: boolean; canChangeAccess: boolean; codeTools: boolean; settings?: { codeTtlDays: number; teachersMayIssueCodes: boolean }; canChangeSettings?: boolean }
+export const fetchParentsAdminStatus = () => request<ParentsAdminStatus>('GET', '/api/parents-admin/status');
+// Parents P2 (PARENT_CODE_TOOLS_ENABLED): school code settings and class code sheets. A sheet's codes are
+// in the response body only and shown once (never in a URL).
+export interface ParentCodeSheet { class: { id: string; name: string }; school: string | null; batchId: string; expiresAt: string; revoked: number; rows: { studentId: string; studentName: string; code: string; codeId: string }[] }
+export const saveSchoolParentSettings = (institutionId: string, body: { codeTtlDays?: number; teachersMayIssueCodes?: boolean }) =>
+  request<{ institutionId: string; codeTtlDays: number; teachersMayIssueCodes: boolean }>('PUT', `/api/parents-admin/schools/${encodeURIComponent(institutionId)}/settings`, body);
+export const fetchCodeClasses = () => request<{ classes: { id: string; name: string; students: number; activeCodes: number }[] }>('GET', '/api/parents-admin/classes');
+export const printClassCodes = (classId: string) => request<ParentCodeSheet>('POST', `/api/parents-admin/classes/${encodeURIComponent(classId)}/code-sheet`);
+export const revokeClassCodes = (classId: string) => request<{ revoked: number }>('POST', `/api/parents-admin/classes/${encodeURIComponent(classId)}/codes/revoke`);
 export const fetchParentsAdminSchools = () => request<{ generatedAt: string; canChangeAccess: boolean; schools: ParentsSchoolRow[] }>('GET', '/api/parents-admin/schools');
 export const setSchoolParentAccess = (institutionId: string, access: ParentAccess) =>
   request<{ institutionId: string; access: ParentAccess }>('PUT', `/api/parents-admin/schools/${encodeURIComponent(institutionId)}/access`, { access });

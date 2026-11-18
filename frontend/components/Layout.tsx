@@ -233,8 +233,8 @@ export const AdminSidebar: React.FC<{
     ...(showLms ? [{ id: 'lms', label: 'LMS connections', icon: Share2, workspaceAdminOnly: true }] : []),
     // LMS step 2 (S5): the school connection status page, school admins only.
     ...(showLms ? [{ id: 'lms-status', label: 'LMS connection status', icon: ListChecks, workspaceAdminOnly: true }] : []),
-    // Parents P1: the school's Parents card (school admins only).
-    ...(showParents ? [{ id: 'parents-admin', label: 'Parents', icon: Users, workspaceAdminOnly: true }] : []),
+    // Parents P1/P2: the school's Parents card and code tools (school admins; teachers only when their school lets them issue codes: App decides showParents).
+    ...(showParents ? [{ id: 'parents-admin', label: 'Parents', icon: Users }] : []),
   ];
 
   const enaraMenuItems = [

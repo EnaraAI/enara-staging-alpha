@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Users } from 'lucide-react';
-import { fetchParentsAdminSchools, setSchoolParentAccess, type ParentAccess, type ParentsSchoolRow } from '../services/apiService';
+import { fetchParentsAdminSchools, setSchoolParentAccess, type ParentAccess, type ParentsAdminStatus, type ParentsSchoolRow } from '../services/apiService';
+import { ParentCodeTools } from './ParentCodeTools';
 import { LangSwitch, initialLang, type Lang } from './LmsSchoolStatus';
 
 // Parents P1 (PARENT_SETTINGS_ENABLED): the "Parents" page.
@@ -13,7 +14,7 @@ import { LangSwitch, initialLang, type Lang } from './LmsSchoolStatus';
 
 const TEXT = {
   en: {
-    title: 'Parents', subEnara: 'Parent access for each school, and how parents use ENARA Parents (all schools).', subSchool: 'How parents at your school use ENARA Parents.',
+    title: 'Parents', subTeacher: 'Parent link codes for your classes.', subEnara: 'Parent access for each school, and how parents use ENARA Parents (all schools).', subSchool: 'How parents at your school use ENARA Parents.',
     school: 'School', access: 'Parent access', linked: 'Parents linked', active7: 'Active, last 7 days', active30: 'Active, last 30 days', top: 'Most-used screens (30 days)',
     off: 'Off', free: 'Free', none: '—', loading: 'Loading…', failed: 'Could not load the parent numbers. Try again.', retry: 'Try again', saved: 'Saved.', saveFailed: 'Could not save. Try again.',
     readOnly: 'Set by the ENARA team. Contact ENARA to change it.',
@@ -22,7 +23,7 @@ const TEXT = {
     screens: { home: 'Home', progress: 'Progress', activity: 'Activity', controls: 'Controls', report: 'Weekly report', account: 'Account' } as Record<string, string>,
   },
   ar: {
-    title: 'أولياء الأمور', subEnara: 'وصول أولياء الأمور في كل مدرسة، وكيف يستخدم أولياء الأمور البوابة (كل المدارس).', subSchool: 'كيف يستخدم أولياء الأمور في مدرستك بوابة أولياء الأمور.',
+    title: 'أولياء الأمور', subTeacher: 'رموز ربط أولياء الأمور لفصولك.', subEnara: 'وصول أولياء الأمور في كل مدرسة، وكيف يستخدم أولياء الأمور البوابة (كل المدارس).', subSchool: 'كيف يستخدم أولياء الأمور في مدرستك بوابة أولياء الأمور.',
     school: 'المدرسة', access: 'وصول أولياء الأمور', linked: 'أولياء أمور مرتبطون', active7: 'نشطون آخر 7 أيام', active30: 'نشطون آخر 30 يومًا', top: 'أكثر الشاشات استخدامًا (30 يومًا)',
     off: 'متوقف', free: 'مجاني', none: '—', loading: 'جارٍ التحميل…', failed: 'تعذّر تحميل الأرقام. حاول مرة أخرى.', retry: 'حاول مرة أخرى', saved: 'تم الحفظ.', saveFailed: 'تعذّر الحفظ. حاول مرة أخرى.',
     readOnly: 'يحدده فريق إنارة. تواصل مع إنارة لتغييره.',
@@ -39,16 +40,18 @@ const Stat: React.FC<{ label: string; value: number; testId: string }> = ({ labe
   </div>
 );
 
-export const ParentsAdmin: React.FC = () => {
+export const ParentsAdmin: React.FC<{ status?: ParentsAdminStatus }> = ({ status }) => {
+  const showUsage = status?.usage !== false;
   const [lang, setLang] = useState<Lang>(initialLang);
   const t = TEXT[lang];
   const [data, setData] = useState<{ canChangeAccess: boolean; schools: ParentsSchoolRow[] } | null>(null);
   const [error, setError] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const load = useCallback(() => {
+    if (!showUsage) return;
     setError(false);
     fetchParentsAdminSchools().then(setData).catch(() => setError(true));
-  }, []);
+  }, [showUsage]);
   useEffect(load, [load]);
 
   const change = async (id: string, access: ParentAccess) => {
@@ -68,12 +71,14 @@ export const ParentsAdmin: React.FC = () => {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2"><Users size={22} />{t.title}</h1>
-          <p className="text-slate-600 mt-1">{data?.canChangeAccess ? t.subEnara : t.subSchool}</p>
+          <p className="text-slate-600 mt-1">{!showUsage ? t.subTeacher : data?.canChangeAccess ? t.subEnara : t.subSchool}</p>
         </div>
         <LangSwitch lang={lang} setLang={setLang} />
       </div>
       {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{t.failed} <button type="button" className="underline" onClick={load}>{t.retry}</button></div>}
-      {!data && !error && <p className="text-slate-500">{t.loading}</p>}
+      {showUsage && !data && !error && <p className="text-slate-500">{t.loading}</p>}
+      {/* Parents P2: code settings and class code sheets. */}
+      {status?.codeTools && <ParentCodeTools lang={lang} status={status} />}
       {note && <p className="text-sm text-slate-600" role="status">{note}</p>}
 
       {data && !data.canChangeAccess && data.schools.map((s) => (

@@ -52,7 +52,7 @@ import { LmsOnboarding } from './pages/LmsOnboarding';
 import { LmsSchoolStatus } from './pages/LmsSchoolStatus';
 import { ParentsAdmin } from './pages/ParentsAdmin';
 import { LmsEmailOptIn } from './components/LmsEmailOptIn';
-import { isLmsPreview, isLmsSession, lmsSessionClassId, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser, getParentDeviceToken, resumeParentDevice, fetchParentsAdminStatus } from './services/apiService';
+import { isLmsPreview, isLmsSession, lmsSessionClassId, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser, getParentDeviceToken, resumeParentDevice, fetchParentsAdminStatus, type ParentsAdminStatus } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
@@ -296,11 +296,13 @@ const App: React.FC = () => {
   }, [state.role]);
 
   // Parents P1: the "Parents" page, only when PARENT_SETTINGS_ENABLED is on (the API answers 404 otherwise).
-  const [parentsAdminEnabled, setParentsAdminEnabled] = useState(false);
+  // Parents P2: also for a teacher whose school lets teachers issue parent codes (class code sheets).
+  const [parentsAdmin, setParentsAdmin] = useState<ParentsAdminStatus | null>(null);
+  const parentsAdminEnabled = !!parentsAdmin;
   useEffect(() => {
     const backendRole = getSessionUser()?.role;
-    if ((state.role !== 'admin' && state.role !== 'enara-admin') || (backendRole !== 'admin' && backendRole !== 'enara-admin')) return setParentsAdminEnabled(false);
-    fetchParentsAdminStatus().then(() => setParentsAdminEnabled(true)).catch(() => setParentsAdminEnabled(false));
+    if ((state.role !== 'admin' && state.role !== 'enara-admin') || !['admin', 'enara-admin', 'teacher'].includes(String(backendRole))) return setParentsAdmin(null);
+    fetchParentsAdminStatus().then(setParentsAdmin).catch(() => setParentsAdmin(null));
   }, [state.role]);
 
   const [isTutorOpen, setIsTutorOpen] = useState(false);
@@ -604,7 +606,7 @@ const App: React.FC = () => {
             {state.page === 'integrations' && <Integrations />}
             {state.page === 'lms' && lmsEnabled && <LmsConnections />}
             {state.page === 'lms-onboarding' && lmsEnabled && <LmsOnboarding />}
-            {state.page === 'parents-admin' && parentsAdminEnabled && <ParentsAdmin />}
+            {state.page === 'parents-admin' && parentsAdmin && <ParentsAdmin status={parentsAdmin} />}
             {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
             {state.page === 'settings' && <div className="p-20 text-center text-slate-400">Platform Global Settings</div>}
           </main>
@@ -674,7 +676,7 @@ const App: React.FC = () => {
           {/* LMS step 2 (S5): the school connection status page, own school only (server-enforced; teachers never). */}
           {state.page === 'lms-status' && lmsEnabled && sessionUser()?.role === 'admin' && sessionUser()?.institutionId && <LmsSchoolStatus institutionId={sessionUser()!.institutionId!} isEnara={false} />}
           {/* Parents P1: the school's Parents card (school admins; server-enforced, off unless PARENT_SETTINGS_ENABLED). */}
-          {state.page === 'parents-admin' && parentsAdminEnabled && sessionUser()?.role === 'admin' && <ParentsAdmin />}
+          {state.page === 'parents-admin' && parentsAdmin && (sessionUser()?.role === 'admin' || sessionUser()?.role === 'teacher') && <ParentsAdmin status={parentsAdmin} />}
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments initialClassId={state.lmsTarget?.classId ?? undefined} initialAssignmentId={state.lmsTarget?.assignmentId} />}
           {state.page === 'grading' && <GradingReview />}

@@ -3,11 +3,13 @@ import { bi, type Lang } from '../i18n';
 import { cairoDate, parentsApi } from '../api';
 import { Avatar, ErrorBox, Icon, Loading, SampleBadge, useP } from '../ui';
 import { useLive } from '../useLive';
+import { AddEmail } from './AddEmail';
 
 export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void; onLink: () => void; onPick: (studentId: string) => void; onChanged: () => void; onSignOut: () => void }> = ({ refreshKey, setLang, onLink, onPick, onChanged, onSignOut }) => {
   const { t, n, lang } = useP();
   const q = useLive(() => parentsApi.account(), [], refreshKey);
   const [note, setNote] = useState<string | null>(null);
+  const [editEmail, setEditEmail] = useState(false);
   if (!q.data) return q.error ? <ErrorBox onRetry={q.reload} /> : <Loading />;
   const d = q.data;
   const providedBy = d.plan.mock === false ? d.plan.providedBy : [];
@@ -85,6 +87,17 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
           <p className="pp-sub">{t.providedFree}</p>
         </section>
       )}
+
+      {d.signIn?.emailSignin && (d.signIn.hasEmail && !editEmail ? (
+        // Parents P2: the account's email (sign-in on any device, notifications).
+        <section className="pp-card" aria-labelledby="pp-email-h" data-testid="pp-email">
+          <div className="pp-row"><h2 className="pp-h2" id="pp-email-h">{t.emailTitle}</h2><button type="button" className="pp-linkbtn" onClick={() => setEditEmail(true)}>{t.changeEmail}</button></div>
+          <p style={{ fontSize: 14 }} dir="ltr">{d.signIn.email}</p>
+          <p className="pp-sub">{d.signIn.emailVerified ? t.emailVerified : t.emailNotVerified}</p>
+        </section>
+      ) : (
+        <AddEmail mode="inline" onDone={() => { setEditEmail(false); onChanged(); q.reload(); }} />
+      ))}
 
       {d.signIn?.method === 'code' && (
         // Parents P1 (code-first): no email on this account yet; this device remembers the parent.

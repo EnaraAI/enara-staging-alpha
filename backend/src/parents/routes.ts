@@ -18,7 +18,9 @@ import { parentEmailBlocked, parentEmailBlockedBody, parentEmailState } from './
 import { mockPlan } from './mock';
 import { authConfig, googleParentSignIn } from './google';
 import { recordSignIn } from '../services/signInHistory';
-import { parentCodeSignupEnabled, parentSettingsEnabled } from './flags';
+import { parentCodeSignupEnabled, parentEmailSigninEnabled, parentSettingsEnabled } from './flags';
+import { mergeWithTicket, startEmailVerification, startSignIn, verifyEmail, verifySignIn } from './emailSignin';
+import { createDeviceSession } from './deviceSession';
 import { isCodeOnlyEmail, previewStartCode, startWithCode } from './codeSignup';
 import { revokeDeviceSession, useDeviceSession } from './deviceSession';
 import { recordParentLogin, recordUsage, type Feature, type Screen } from './usage';
@@ -56,7 +58,27 @@ router.post('/register', h(async (req, res) => {
 // ID is public by design (the browser needs it to render the button).
 router.get('/auth-config', h(async (_req, res) => {
   res.set('Cache-Control', 'no-store');
-  res.json({ ...authConfig(), ...(parentCodeSignupEnabled() ? { codeSignup: true } : {}) });
+  res.json({ ...authConfig(), ...(parentCodeSignupEnabled() ? { codeSignup: true } : {}), ...(parentEmailSigninEnabled() ? { emailSignin: true } : {}) });
+}));
+
+// ---------------------------------------------------------------------------
+// Parents P2 (PARENT_EMAIL_SIGNIN_ENABLED; 404 when off): passwordless sign-in
+// with a 6-digit code by email. Public, per-IP limited in app.ts; the answer to
+// "start" never says whether an account exists. Codes only in request bodies.
+const emailSigninOnly = (_req: unknown, _res: unknown, next: (e?: unknown) => void) => (parentEmailSigninEnabled() ? next() : next(new AppError('Route not found', 404, 'NOT_FOUND')));
+router.post('/email/sign-in/start', emailSigninOnly, h(async (req, res) => {
+  const body = ensurePlainObject(req.body);
+  rejectMongoOperators(body);
+  res.json(await startSignIn(body.email, { language: body.language }));
+}));
+// Body { email, code }: signs in and remembers this device.
+router.post('/email/sign-in/verify', emailSigninOnly, h(async (req, res) => {
+  const body = ensurePlainObject(req.body);
+  rejectMongoOperators(body);
+  const user = await verifySignIn(body.email, body.code);
+  await recordSignIn(req, 'success', { userId: String(user._id), role: 'parent' });
+  const device = await createDeviceSession(user);
+  res.json({ token: signToken(user), user: await sessionUser(user), deviceToken: device.deviceToken });
 }));
 
 // ---------------------------------------------------------------------------
@@ -123,6 +145,26 @@ router.post('/link/confirm', h(async (req, res) => {
   const link = await ParentLearnerLink.findOne({ id: r.linkId }).select('institutionId').lean();
   await recordUsage({ parentUserId: uid(req), institutionId: link?.institutionId, studentId: r.studentId, kind: 'feature', name: 'link_child' });
   res.status(201).json(r);
+}));
+// Parents P2: "Add your email" (6-digit code), and the merge it may offer.
+router.post('/email/start', emailSigninOnly, h(async (req, res) => {
+  const body = ensurePlainObject(req.body);
+  rejectMongoOperators(body);
+  res.json(await startEmailVerification({ id: uid(req) }, body.email));
+}));
+router.post('/email/verify', emailSigninOnly, h(async (req, res) => {
+  const body = ensurePlainObject(req.body);
+  rejectMongoOperators(body);
+  res.json(await verifyEmail({ id: uid(req) }, body.email, body.code));
+}));
+// Body { ticket } from a verify that offered a merge: this account moves into the one with the email.
+// Answers with a session (and a remembered device) for the merged account.
+router.post('/email/merge', emailSigninOnly, h(async (req, res) => {
+  const body = ensurePlainObject(req.body);
+  rejectMongoOperators(body);
+  const { user, linksMoved, linksDropped } = await mergeWithTicket({ id: uid(req) }, body.ticket);
+  const device = await createDeviceSession(user);
+  res.json({ token: signToken(user), user: await sessionUser(user), deviceToken: device.deviceToken, linksMoved, linksDropped });
 }));
 // Sign out on this device (body { deviceToken }); the app then signs out the account too.
 router.post('/device/sign-out', h(async (req, res) => {
@@ -236,7 +278,11 @@ router.get('/account', h(async (req, res) => {
     ended: learners.ended,
     guardians: { mock: false, byLearner: guardians },
     plan,
-    signIn: { method: codeOnly ? 'code' : profile?.signIn ?? 'password', hasEmail: !codeOnly },
+    signIn: {
+      method: codeOnly ? 'code' : profile?.signIn ?? 'password', hasEmail: !codeOnly,
+      // Parents P2: the account's own address and whether it was proven; whether email sign-in is on.
+      ...(parentEmailSigninEnabled() ? { emailSignin: true, ...(codeOnly ? {} : { email: req.user!.email, emailVerified: !!profile?.emailVerifiedAt }) } : {}),
+    },
     ...(learners.hiddenBySchool ? { hiddenBySchool: learners.hiddenBySchool } : {}),
     preferences: { mock: false, language: profile?.language ?? 'en', alertChannels: profile?.alertChannels ?? ['push', 'whatsapp'], summary: 'on_demand' },
   });

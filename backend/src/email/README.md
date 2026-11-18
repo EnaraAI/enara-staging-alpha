@@ -234,5 +234,6 @@ delivery, frequency). `render-previews.mjs` renders them too. On approval, split
 | `parent-invite` (replaced) | code-first steps, the secret-code warning, one row per child with its code (`CHILD_CODES`, built by code) so a CSV group is one email |
 
 `sendParentTemplate` refuses a link that carries `LINK_CODE`, a 6-digit `CODE`, or anything shaped like a
-parent link code (`code_in_url`). The senders and triggers come with Parents P2 (verification, sign-in) and
-P4/P5 (weekly summary, invites); see `docs/parents/`.
+parent link code (`code_in_url`). `parent-email-verify` and `parent-sign-in-code` are sent by `parents/emailSignin.ts` (Parents P2, behind
+`PARENT_EMAIL_SIGNIN_ENABLED`, through the same safety path); the weekly summary and invites come with P4/P5.
+See `docs/parents/`.

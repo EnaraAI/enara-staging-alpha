@@ -12,6 +12,7 @@ import { Controls } from './screens/Controls';
 import { Account } from './screens/Account';
 import { LinkChild } from './screens/LinkChild';
 import { ShareSheet } from './screens/ShareSheet';
+import { AddEmail } from './screens/AddEmail';
 
 // ENARA Parents Portal: a parent mode inside the ENARA app, under /parents.
 // Mobile-first; English and Arabic with full RTL; week starts Saturday;
@@ -22,6 +23,7 @@ type Tab = (typeof TABS)[number] | 'link';
 const LANG_KEY = 'enara_parents_lang';
 const LEARNER_KEY = 'enara_parents_learner';
 const LINK_INTENT_KEY = 'enara_parent_link_intent';
+const EMAIL_PROMPT_KEY = 'enara_parent_email_prompt_dismissed';
 
 const read = (k: string, store: 'local' | 'session' = 'local') => { try { return (store === 'local' ? localStorage : sessionStorage).getItem(k); } catch { return null; } };
 const write = (k: string, v: string | null, store: 'local' | 'session' = 'local') => { try { const s = store === 'local' ? localStorage : sessionStorage; if (v === null) s.removeItem(k); else s.setItem(k, v); } catch { /* storage unavailable */ } };
@@ -77,6 +79,11 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
   const [sharing, setSharing] = useState(false);
 
   const learners = useLive(() => parentsApi.learners(), [], refreshKey);
+  // Parents P2: "Add your email" until the account has one (dismissed for this visit only: it comes back).
+  const account = useLive(() => parentsApi.account(), [], refreshKey);
+  const [emailPromptDismissed, setEmailPromptDismissed] = useState(() => read(EMAIL_PROMPT_KEY, 'session') === '1');
+  const signIn = account.data?.signIn;
+  const showEmailPrompt = !!signIn?.emailSignin && !signIn.hasEmail && !emailPromptDismissed;
   const list = learners.data?.learners ?? [];
   const [selectedId, setSelectedId] = useState<string | null>(() => read(LEARNER_KEY));
   const learner: LearnerChip | undefined = list.find((l) => l.studentId === selectedId) ?? list[0];
@@ -154,6 +161,9 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
             </>
           )}
           {learners.data?.hiddenBySchool ? <p className="pp-notice" role="status" data-testid="pp-hidden-by-school" style={{ display: 'block', fontSize: 13 }}>{t.hiddenBySchool}</p> : null}
+          {showEmailPrompt && tab === 'home' && !showLink && learners.data && (
+            <AddEmail mode="prompt" onDone={refresh} onDismiss={() => { setEmailPromptDismissed(true); write(EMAIL_PROMPT_KEY, '1', 'session'); }} />
+          )}
           {!showLink && learner && (
             <>
               {status.data && <StatusLine status={status.data} />}

@@ -30,6 +30,8 @@ import { ClassEnrollment } from '../models/ClassEnrollment';
 import { ReminderLog } from '../models/ReminderLog';
 import { SignInEvent } from '../models/SignInEvent';
 import { ParentDeviceSession } from '../models/ParentDeviceSession';
+import { ParentCapturedCode, ParentEmailCode } from '../models/ParentEmailCode';
+import { ParentLinkCode } from '../models/ParentLinkCode';
 import { ParentUsageDaily, ParentUsageEvent, USAGE_RETENTION_DAYS } from '../models/ParentUsage';
 import { dataLogRetentionDays } from '../config/retention';
 import type { Migration } from './runner';
@@ -514,6 +516,14 @@ export const MIGRATIONS: Migration[] = [
       for (const model of [ParentUsageEvent, ParentUsageDaily, ParentDeviceSession]) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
       const ttl = (await ParentUsageEvent.collection.indexes()).find((i) => i.key.at === 1 && i.expireAfterSeconds !== undefined);
       if (ttl?.expireAfterSeconds !== USAGE_RETENTION_DAYS * 86400) throw new Error('parent_usage_events 13-month TTL index missing');
+    },
+  },
+  {
+    id: '2026-11-27-parents-p2',
+    description: 'Parents P2: parent_email_codes (TTL), parent_captured_codes (E2E capture only, 15-minute TTL), and a classId index on parent_link_codes (added, nothing removed)',
+    up: async () => {
+      for (const model of [ParentEmailCode, ParentCapturedCode]) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
+      await ParentLinkCode.collection.createIndex({ classId: 1 });
     },
   },
 ];
