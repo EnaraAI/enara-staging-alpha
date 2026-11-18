@@ -25,7 +25,7 @@ import { LessonProgress } from '../models/LessonProgress';
 import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
-import { LMS_MIC_MODELS, LMS_MODELS, LMS_P0_MODELS, LMS_PHASE1A_MODELS, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsHandoffCode, LmsLaunchToken, LmsMicDaily, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsSuppressedIdentity, LmsToolKey } from '../integrations/lms/models';
+import { LMS_MIC_MODELS, LMS_MODELS, LMS_P0_MODELS, LMS_PHASE1A_MODELS, LMS_PHASE1B_MODELS, LmsRegistrationCode, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsHandoffCode, LmsLaunchToken, LmsMicDaily, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsSuppressedIdentity, LmsToolKey } from '../integrations/lms/models';
 import { ClassEnrollment } from '../models/ClassEnrollment';
 import { ReminderLog } from '../models/ReminderLog';
 import { SignInEvent } from '../models/SignInEvent';
@@ -477,6 +477,14 @@ export const MIGRATIONS: Migration[] = [
       for (const model of LMS_MIC_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
       if (!(await LmsHandoffCode.collection.indexes()).some((i) => i.key.codeHash === 1 && i.unique)) throw new Error('lms_handoff_codes codeHash unique index missing');
       if (!(await LmsMicDaily.collection.indexes()).some((i) => i.name === 'one_counter' && i.unique)) throw new Error('lms_mic_daily one_counter unique index missing');
+    },
+  },
+  {
+    id: '2026-11-23-lms-phase1b-registration',
+    description: 'LMS Phase 1b (one-URL Dynamic Registration): lms_registration_codes indexes (new collection; nothing existing touched)',
+    up: async () => {
+      for (const model of LMS_PHASE1B_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
+      if (!(await LmsRegistrationCode.collection.indexes()).some((i) => i.key.codeHash === 1 && i.unique)) throw new Error('lms_registration_codes codeHash unique index missing');
     },
   },
 ];

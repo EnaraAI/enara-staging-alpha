@@ -17,13 +17,14 @@ import { anyLmsFlagSet, lmsFlags, lmsSettings } from '../core/flags';
 import { runInBackground, triggerOn } from '../core/drain';
 import { consumeHandoffCode, HANDOFF_CODE_TTL_SECONDS, HandoffCodeError, mintHandoffCode } from '../core/handoffCode';
 import { consumeLaunchToken, LaunchTokenError } from '../core/launchToken';
+import { createRegistrationCode, registrationCodeView, registrationUrl, REGISTRATION_CODE_TTL_MS, revokeRegistrationCode } from '../core/registrationCode';
 import { micCounts, parseMicTelemetry, recordMicTelemetry } from '../core/micTelemetry';
 import { flaggedActivities } from '../core/activityHealth';
 import { drainGradeJobs, gradeStats, passbackOn, resyncGrades, retryDead } from '../core/outbox';
 import { contextRosterViews, manualSyncTooSoon, notStartedStudents, rosterOn, syncContextRoster } from '../core/roster';
 import { seatView, updateSeatSettings } from '../core/seats';
 import { liftSuppression, listSuppressions } from '../core/suppression';
-import { LmsContext, LmsDeployment, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsUser, type ILmsContext, type ILmsDeployment, type ILmsHandoffCode, type ILmsPlatform } from '../models';
+import { LmsContext, LmsDeployment, LmsOrgSettings, LmsPlatform, LmsRegistrationCode, LmsResourceLink, LmsUser, type ILmsContext, type ILmsDeployment, type ILmsHandoffCode, type ILmsPlatform } from '../models';
 import { isKnownVendor, listPresets } from '../presets';
 import { requireLti } from '../routes';
 
@@ -41,6 +42,9 @@ import { requireLti } from '../routes';
 //             status, not-started students, "Sync roster now"
 //   Suppression list (Priority 0, PDPL; ENARA admins only): list per school,
 //             lift one row
+//   Registration links (Phase 1b): the one-URL "Connect Moodle" link (LTI
+//             Dynamic Registration): create (the URL is shown once), list
+//             (never the code), revoke
 // School admins see and change only their own school. A school admin's new
 // connection is 'pending' until an ENARA admin approves it
 // (LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL, default on). ENARA admins see and
@@ -732,6 +736,71 @@ lmsAdminRouter.post(
     await writeLmsAudit({ event: 'deployment.approved', outcome: 'ok', institutionId: d.institutionId, platformId: d.platformId, actor: req.user!.id, refIds: { deploymentId: d.id } });
     const p = (await LmsPlatform.findOne({ id: d.platformId }).lean())!;
     res.json({ platform: await viewOne(p) });
+  }),
+);
+
+// ------------------------------------------- registration links (Phase 1b)
+//
+// "Connect Moodle (one URL)". POST makes a link for ONE school and returns its
+// URL once (only the code's SHA-256 is stored); it works once and expires
+// after 7 days (R2). An ENARA admin's link (any school, institutionId
+// required) makes an active connection; a school admin's link (own school
+// only) a pending one, while LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL is on (R1).
+
+async function linkSchool(req: AuthRequest, body: Record<string, unknown>): Promise<string> {
+  if (isEnara(req)) {
+    const requested = getOptionalId(body, 'institutionId');
+    if (!requested) throw new AppError('institutionId is required', 400, 'VALIDATION_ERROR');
+    return requested;
+  }
+  if (!req.user!.institutionId) throw new AppError('Institution scope required', 403, 'INSTITUTION_SCOPE_REQUIRED');
+  const requested = getOptionalId(body, 'institutionId');
+  if (requested && requested !== req.user!.institutionId) throw new AppError('Cannot write outside your institution', 403, 'TENANT_SCOPE_VIOLATION');
+  return req.user!.institutionId;
+}
+
+lmsAdminRouter.post(
+  '/registration-links',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const body = ensurePlainObject(req.body ?? {});
+    rejectMongoOperators(body);
+    const institutionId = await linkSchool(req, body);
+    if (!(await Institution.exists({ id: institutionId }))) throw new AppError('School not found', 404, 'INSTITUTION_NOT_FOUND');
+    const createdByRole = isEnara(req) ? 'enara-admin' : 'admin';
+    const { code, row } = await createRegistrationCode({ institutionId, createdBy: req.user!.id, createdByRole });
+    const willBe = createdByRole === 'enara-admin' || !lmsSettings().schoolConnectionsRequireApproval ? 'active' : 'pending';
+    await writeLmsAudit({ event: 'registration.link_created', outcome: 'ok', institutionId, actor: req.user!.id, refIds: { registrationId: row.id, createdByRole, willBe } });
+    res.status(201).json({
+      link: registrationCodeView(row),
+      // Shown once: never stored or listed again.
+      url: registrationUrl(lmsSettings().toolBaseUrl!, code),
+      expiresInDays: Math.round(REGISTRATION_CODE_TTL_MS / 86_400_000),
+      connectionWillBe: willBe,
+    });
+  }),
+);
+
+lmsAdminRouter.get(
+  '/registration-links',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const requested = typeof req.query.institutionId === 'string' && req.query.institutionId ? req.query.institutionId.slice(0, 200) : undefined;
+    const filter = isEnara(req) ? (requested ? { institutionId: requested } : {}) : { institutionId: req.user!.institutionId ?? '__none__' };
+    const rows = await LmsRegistrationCode.find(filter).select('-codeHash -reservationId').sort({ createdAt: -1 }).limit(100).lean();
+    res.json({ links: rows.map(registrationCodeView) });
+  }),
+);
+
+lmsAdminRouter.post(
+  '/registration-links/:id/revoke',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const id = String(req.params.id).slice(0, 200);
+    const scope = isEnara(req) ? { id } : { id, institutionId: req.user!.institutionId ?? '__none__' };
+    const existing = await LmsRegistrationCode.findOne(scope).select('-codeHash -reservationId').lean();
+    if (!existing) throw new AppError('Link not found', 404, 'LMS_REGISTRATION_LINK_NOT_FOUND');
+    const revoked = await revokeRegistrationCode(scope, req.user!.id);
+    if (!revoked) throw new AppError('This link was already used or cancelled', 409, 'LMS_REGISTRATION_LINK_NOT_UNUSED');
+    await writeLmsAudit({ event: 'registration.link_revoked', outcome: 'ok', institutionId: revoked.institutionId, actor: req.user!.id, refIds: { registrationId: revoked.id } });
+    res.json({ link: registrationCodeView(revoked) });
   }),
 );
 

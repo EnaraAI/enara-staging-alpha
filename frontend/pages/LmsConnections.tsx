@@ -4,11 +4,13 @@ import {
   approveLmsDeployment,
   approveLmsPlatform,
   createLmsPlatform,
+  createLmsRegistrationLink,
   disableLmsPlatform,
   fetchLmsContextRoster,
   fetchLmsContexts,
   fetchLmsGrades,
   fetchLmsPlatforms,
+  fetchLmsRegistrationLinks,
   fetchLmsSeats,
   fetchLmsStatus,
   getSessionUser,
@@ -16,9 +18,11 @@ import {
   LmsGradeStats,
   LmsNotStarted,
   LmsPlatformView,
+  LmsRegistrationLink,
   LmsSeats,
   LmsStatus,
   resyncLmsGrades,
+  revokeLmsRegistrationLink,
   retryLmsDeadGrades,
   syncLmsRoster,
   updateLmsSeats,
@@ -35,6 +39,9 @@ import {
 // courses: last roster sync, counts, the last error code, "Sync roster now",
 // and the students the LMS lists who have not opened ENARA yet ("not started",
 // shown separately from seats: they take no seat until their first launch).
+// Phase 1b: "Connect Moodle (one URL)": a one-time link (7 days) the Moodle
+// admin pastes into Moodle (LTI Dynamic Registration). The URL is shown once;
+// the list shows each link's status, and an unused link can be cancelled.
 
 const EMPTY = { vendor: 'moodle', issuer: '', clientId: '', authLoginUrl: '', authTokenUrl: '', keysetUrl: '', deploymentIds: '', institutionId: '' };
 
@@ -64,6 +71,11 @@ export const LmsConnections: React.FC = () => {
   const [contexts, setContexts] = useState<LmsContextView[] | null>(null);
   const [notStarted, setNotStarted] = useState<Record<string, LmsNotStarted[]>>({});
 
+  // Phase 1b: one-URL registration links.
+  const [links, setLinks] = useState<LmsRegistrationLink[]>([]);
+  const [linkSchool, setLinkSchool] = useState('');
+  const [newLink, setNewLink] = useState<{ url: string; expiresAt: string; willBe: 'active' | 'pending' } | null>(null);
+
   // The LMS is switched on but its configuration has a problem (ENARA admins only; variable names only).
   const [configProblem, setConfigProblem] = useState<string | null>(null);
 
@@ -75,7 +87,8 @@ export const LmsConnections: React.FC = () => {
         return;
       }
       setConfigProblem(null);
-      const [p, seat, g, c] = await Promise.all([fetchLmsPlatforms(), fetchLmsSeats(), fetchLmsGrades().catch(() => null), fetchLmsContexts().catch(() => null)]);
+      const [p, seat, g, c, l] = await Promise.all([fetchLmsPlatforms(), fetchLmsSeats(), fetchLmsGrades().catch(() => null), fetchLmsContexts().catch(() => null), fetchLmsRegistrationLinks().catch(() => null)]);
+      setLinks(l ? l.links : []);
       const s = first as LmsStatus;
       setContexts(c ? c.contexts : null);
       setStatus(s);
@@ -169,8 +182,68 @@ export const LmsConnections: React.FC = () => {
       )}
 
       {status && (
+        <section className="bg-white rounded-2xl border border-slate-100 p-5" data-testid="lms-connect-moodle">
+          <h2 className="font-bold text-slate-900 mb-1">Connect Moodle (one URL)</h2>
+          <p className="text-sm text-slate-500 mb-3">
+            The easiest way: make a link, and the Moodle site administrator pastes it into Moodle. Moodle and ENARA exchange everything else.
+            Each link is for {isEnara ? 'one school' : 'your school'}, works once, and expires after 7 days.
+            {status.requireApproval && ' ENARA checks the new connection before teachers and students can use it.'}
+          </p>
+          <div className="flex flex-wrap items-end gap-3">
+            {isEnara && (
+              <label className="text-sm">School ID
+                <input className="block mt-1 border border-slate-200 rounded-lg px-3 py-2" value={linkSchool} placeholder="institution id" onChange={(e) => setLinkSchool(e.target.value)} />
+              </label>
+            )}
+            <button disabled={busy || (isEnara && !linkSchool.trim())} className="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-sm disabled:opacity-60"
+              onClick={() => act(async () => {
+                const r = await createLmsRegistrationLink(isEnara ? linkSchool.trim() : undefined);
+                setNewLink({ url: r.url, expiresAt: r.link.expiresAt, willBe: r.connectionWillBe });
+              }, 'Link created. Copy it now: it is shown only once.')}>
+              Create Moodle link
+            </button>
+          </div>
+          {newLink && (
+            <div className="mt-4 rounded-xl border border-teal-200 bg-teal-50/50 p-4" data-testid="lms-registration-link">
+              <Copy label="Moodle link" value={newLink.url} />
+              <p className="text-xs text-slate-500">Shown only once. Works once, until {new Date(newLink.expiresAt).toLocaleString()}. The connection will be {newLink.willBe === 'active' ? 'active straight away' : 'pending until ENARA approves it'}.</p>
+              <ol className="mt-3 list-decimal pl-5 text-sm text-slate-700 space-y-1">
+                <li>Send the link to the Moodle site administrator.</li>
+                <li>In Moodle: <b>Site administration › Plugins › Activity modules › External tool › Manage tools</b>.</li>
+                <li>Paste the link in <b>Tool URL</b> and click <b>Add LTI Advantage</b>.</li>
+                <li>If Moodle says there are existing tools for this address, click <b>Register as a new external tool</b> (not "Update").</li>
+                <li>When the window says <b>"ENARA is registered"</b>, it closes. On the new ENARA tool card, click <b>Activate</b>.</li>
+                <li>Then set the few settings Moodle cannot take from the link: on the ENARA tool card click the edit (gear) icon, set <b>Tool configuration usage</b> to <b>"Show in activity chooser and as a preconfigured tool"</b> and, under <b>Privacy</b>, <b>Accept grades from the tool</b> to <b>Always</b>; click <b>Save changes</b>. (See the ENARA guide for Moodle, "School admin: after connecting".)</li>
+              </ol>
+            </div>
+          )}
+          {links.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-slate-700 mb-1">Links</h3>
+              <ul className="text-sm text-slate-600 space-y-1">
+                {links.slice(0, 10).map((l) => (
+                  <li key={l.id} className="flex flex-wrap items-center gap-2">
+                    <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${l.status === 'used' ? 'bg-teal-50 text-teal-700' : l.status === 'unused' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>{l.status}</span>
+                    <span>made {new Date(l.createdAt).toLocaleString()}{isEnara ? ` · school ${l.institutionId}` : ''}</span>
+                    {l.status === 'unused' && <span className="text-xs text-slate-500">expires {new Date(l.expiresAt).toLocaleDateString()}</span>}
+                    {l.usedAt && <span className="text-xs text-slate-500">used {new Date(l.usedAt).toLocaleString()}</span>}
+                    {l.lastErrorCode && l.status === 'unused' && <span className="text-xs text-red-700">last try failed: <code>{l.lastErrorCode}</code></span>}
+                    {l.status === 'unused' && (
+                      <button disabled={busy} className="text-xs font-semibold text-red-700" onClick={() => window.confirm('Cancel this link? It will stop working.') && act(() => revokeLmsRegistrationLink(l.id), 'Link cancelled.')}>
+                        Cancel link
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+      )}
+
+      {status && (
         <section className="bg-white rounded-2xl border border-slate-100 p-5">
-          <h2 className="font-bold text-slate-900 mb-1">1. Enter these in your LMS</h2>
+          <h2 className="font-bold text-slate-900 mb-1">Or by hand — 1. Enter these in your LMS</h2>
           <p className="text-sm text-slate-500 mb-3">In Moodle: Site administration › Plugins › Activity modules › External tool › Manage tools › configure a tool manually, LTI version 1.3, public key type "Keyset URL".</p>
           <Copy label="Tool URL" value={status.tool.launchUrl} />
           <Copy label="Initiate login URL" value={status.tool.loginUrl} />
@@ -212,7 +285,7 @@ export const LmsConnections: React.FC = () => {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-semibold text-slate-900 break-all">{p.issuer}</span>
                 <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${STATUS_STYLE[p.status]}`}>{p.status}</span>
-                <span className="text-xs text-slate-500">{p.vendor} · client {p.clientId}{isEnara ? ` · school ${p.institutionId}` : ''}</span>
+                <span className="text-xs text-slate-500">{p.vendor} · client {p.clientId}{p.registeredVia === 'dynamic' ? ' · connected with a link' : ''}{isEnara ? ` · school ${p.institutionId}` : ''}</span>
               </div>
               <p className="text-sm text-slate-600 mt-1">
                 {p.launchCount} launches ({p.cookielessLaunchCount} without cookies){p.lastLaunchAt ? ` · last ${new Date(p.lastLaunchAt).toLocaleString()}` : ''}

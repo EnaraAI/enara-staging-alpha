@@ -36,6 +36,9 @@ export function captureRawBody(req: Request, _res: Response, buf: Buffer): void 
 }
 
 // File links carry a signature that works for hours: never log it.
+// LMS registration links (Phase 1b) carry the one-time code in the path and
+// the LMS's registration token in the query: never log either.
 export function logPath(url: string): string {
+  if (url.startsWith('/lti/register/')) return '/lti/register/[REDACTED]';
   return url.startsWith('/uploads/') ? url.split('?')[0] : url;
 }

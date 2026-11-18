@@ -1,7 +1,7 @@
 import { Router, type NextFunction, type Request, type Response } from 'express';
 import { lmsFlags } from './core/flags';
 import { ensureActiveKey, getPublicJwks } from './core/keys';
-import { ltiLaunch, ltiLogin } from './adapters/lti13/http';
+import { ltiLaunch, ltiLogin, ltiRegister } from './adapters/lti13/http';
 
 // Public LTI endpoints: the tool's JWKS (Phase 0), the OIDC login and the
 // resource-link launch (Phase 1a). With LMS_LTI_ENABLED
@@ -30,6 +30,8 @@ ltiRouter.get('/jwks', jwks);
 ltiRouter.get('/login', ltiLogin);
 ltiRouter.post('/login', ltiLogin);
 ltiRouter.post('/launch', ltiLaunch);
+// Phase 1b: the one-URL "Connect Moodle" link (LTI Dynamic Registration 1.0).
+ltiRouter.get('/register/:code', ltiRegister);
 
 export const wellKnownRouter = Router();
 wellKnownRouter.use(requireLti);

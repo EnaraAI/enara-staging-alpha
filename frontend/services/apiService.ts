@@ -1407,7 +1407,7 @@ export function reportMicTelemetry(event: { event: string; browserFamily: string
 export interface LmsPlatformView {
   id: string; institutionId: string; vendor: string; issuer: string; clientId: string;
   authLoginUrl: string | null; authTokenUrl: string | null; keysetUrl: string | null;
-  status: 'pending' | 'active' | 'disabled'; createdAt: string; approvedAt: string | null;
+  status: 'pending' | 'active' | 'disabled'; registeredVia?: 'dynamic' | 'manual' | 'google_oauth'; createdAt: string; approvedAt: string | null;
   launchCount: number; cookielessLaunchCount: number; lastLaunchAt: string | null;
   deployments: { id: string; deploymentId: string; status: 'pending' | 'active' | 'disabled' }[];
 }
@@ -1424,6 +1424,17 @@ export interface LmsSeats {
   notStarted?: number;
   overLimit: boolean; billingFlaggedAt: string | null; lastAlertAt: string | null;
 }
+// Phase 1b: the one-URL "Connect Moodle" link (LTI Dynamic Registration). The URL is returned once.
+export interface LmsRegistrationLink {
+  id: string; institutionId: string; createdByRole: 'enara-admin' | 'admin';
+  status: 'unused' | 'used' | 'revoked' | 'expired';
+  createdAt: string; expiresAt: string; usedAt: string | null; platformId: string | null;
+  failedAttempts: number; lastErrorCode: string | null; lastErrorAt: string | null;
+}
+export const createLmsRegistrationLink = (institutionId?: string) =>
+  request<{ link: LmsRegistrationLink; url: string; expiresInDays: number; connectionWillBe: 'active' | 'pending' }>('POST', '/api/lms/registration-links', institutionId ? { institutionId } : {});
+export const fetchLmsRegistrationLinks = () => request<{ links: LmsRegistrationLink[] }>('GET', '/api/lms/registration-links');
+export const revokeLmsRegistrationLink = (id: string) => request<{ link: LmsRegistrationLink }>('POST', `/api/lms/registration-links/${encodeURIComponent(id)}/revoke`, {});
 export const fetchLmsStatus = () => request<LmsStatus | LmsStatusProblem>('GET', '/api/lms/status');
 export const fetchLmsPlatforms = () => request<{ platforms: LmsPlatformView[] }>('GET', '/api/lms/platforms');
 export const createLmsPlatform = (body: Record<string, unknown>) => request<{ platform: LmsPlatformView }>('POST', '/api/lms/platforms', body);

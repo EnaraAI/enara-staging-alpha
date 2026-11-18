@@ -12,6 +12,12 @@ import { SignJWT, exportJWK, generateKeyPair, type JWK, type JWTPayload } from '
 // Phase 4 adds LTI NRPS: GET /memberships/<course> (membership container,
 // `limit` paging with Link rel="next", member statuses, the `role` filter),
 // with the same token check; members are set per course by the test.
+// Phase 1b adds LTI Dynamic Registration (Moodle style): GET
+// /mod/lti/openid-configuration.php (the platform's openid configuration with
+// its lti-platform-configuration) and POST /mod/lti/openid-registration.php
+// (checks the Bearer registration token, records the request, answers with a
+// new client_id and deployment_id). Use `adoptServiceBaseAsIssuer()` so the
+// issuer is this server's own origin (the configuration URL must start with it).
 
 export const LIS = 'http://purl.imsglobal.org/vocab/lis/v2/membership#';
 export const ROLE = {
@@ -104,11 +110,125 @@ export class MockPlatform {
   /** NRPS: if set, the next-page links point at this origin instead (security test). */
   nrpsNextOrigin?: string;
 
+  /** Dynamic Registration (Phase 1b). */
+  registrationRequests: { auth: string; contentType: string; body: Record<string, unknown> }[] = [];
+  /** The Bearer token the registration endpoint accepts; undefined = any (or none). */
+  expectedRegistrationToken?: string;
+  /** Status for the next registration posts (shifted per request); empty = 200. */
+  registrationStatuses: number[] = [];
+  /** Overrides in the served openid configuration (e.g. a wrong issuer). */
+  openidOverrides: Record<string, unknown> = {};
+  productFamilyCode = 'moodle';
+  openidHits = 0;
+  private registrationCount = 0;
+  /** The client_id / deployment_id the next registration gets. */
+  nextClientId?: string;
+  nextDeploymentId?: string;
+
   constructor(
-    public readonly issuer: string,
-    public readonly clientId: string,
-    public readonly deploymentId = '1',
+    public issuer: string,
+    public clientId: string,
+    public deploymentId = '1',
   ) {}
+
+  /** The issuer becomes this server's origin (for Dynamic Registration tests). */
+  adoptServiceBaseAsIssuer(): this {
+    this.issuer = this.serviceBase;
+    return this;
+  }
+
+  get openidConfigurationUrl() {
+    return `${this.serviceBase}/mod/lti/openid-configuration.php`;
+  }
+
+  get registrationEndpoint() {
+    return `${this.serviceBase}/mod/lti/openid-registration.php`;
+  }
+
+  openidConfiguration(): Record<string, unknown> {
+    return {
+      issuer: this.issuer,
+      token_endpoint: this.tokenUrl,
+      token_endpoint_auth_methods_supported: ['private_key_jwt'],
+      token_endpoint_auth_signing_alg_values_supported: ['RS256'],
+      jwks_uri: this.keysetUrl,
+      authorization_endpoint: this.authLoginUrl,
+      registration_endpoint: this.registrationEndpoint,
+      scopes_supported: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem', 'https://purl.imsglobal.org/spec/lti-ags/scope/score', 'openid'],
+      response_types_supported: ['id_token'],
+      subject_types_supported: ['public', 'pairwise'],
+      id_token_signing_alg_values_supported: ['RS256'],
+      claims_supported: ['sub', 'iss', 'name', 'given_name', 'family_name', 'email'],
+      'https://purl.imsglobal.org/spec/lti-platform-configuration': {
+        product_family_code: this.productFamilyCode,
+        version: '4.5.1 (Build: 20241007)',
+        messages_supported: [{ type: 'LtiResourceLinkRequest' }, { type: 'LtiDeepLinkingRequest', placements: ['ContentArea'] }],
+        variables: ['CourseSection.title'],
+      },
+      ...this.openidOverrides,
+    };
+  }
+
+  resetRegistration() {
+    this.registrationRequests = [];
+    this.expectedRegistrationToken = undefined;
+    this.registrationStatuses = [];
+    this.openidOverrides = {};
+    this.productFamilyCode = 'moodle';
+    this.openidHits = 0;
+    this.nextClientId = undefined;
+    this.nextDeploymentId = undefined;
+    this.registrationCount = 0;
+  }
+
+  private async registration(req: http.IncomingMessage, res: http.ServerResponse): Promise<boolean> {
+    const url = new URL(req.url ?? '/', this.serviceBase || 'http://127.0.0.1');
+    if (url.pathname === '/mod/lti/openid-configuration.php' && req.method === 'GET') {
+      this.openidHits++;
+      this.json(res, 200, this.openidConfiguration());
+      return true;
+    }
+    if (url.pathname === '/mod/lti/openid-registration.php' && req.method === 'POST') {
+      const raw = await this.body(req);
+      const auth = String(req.headers.authorization ?? '');
+      const body = JSON.parse(raw || '{}') as Record<string, unknown>;
+      this.registrationRequests.push({ auth, contentType: String(req.headers['content-type'] ?? ''), body });
+      if (!auth.startsWith('Bearer ') || (this.expectedRegistrationToken !== undefined && auth !== `Bearer ${this.expectedRegistrationToken}`)) {
+        this.json(res, 401, 'missing_registration_token');
+        return true;
+      }
+      const status = this.registrationStatuses.shift() ?? 200;
+      if (status !== 200) {
+        this.json(res, status, { error: 'invalid_client_metadata' });
+        return true;
+      }
+      const n = ++this.registrationCount;
+      const toolConf = body['https://purl.imsglobal.org/spec/lti-tool-configuration'] as Record<string, unknown>;
+      this.json(res, 200, {
+        client_id: this.nextClientId ?? `dyn-client-${n}`,
+        response_types: ['id_token'],
+        jwks_uri: body.jwks_uri,
+        initiate_login_uri: body.initiate_login_uri,
+        grant_types: ['client_credentials', 'implicit'],
+        redirect_uris: body.redirect_uris,
+        application_type: 'web',
+        token_endpoint_auth_method: 'private_key_jwt',
+        client_name: body.client_name,
+        logo_uri: body.logo_uri,
+        scope: body.scope,
+        'https://purl.imsglobal.org/spec/lti-tool-configuration': {
+          version: '1.3.0',
+          deployment_id: this.nextDeploymentId ?? String(n),
+          target_link_uri: toolConf?.target_link_uri,
+          domain: toolConf?.domain,
+          description: toolConf?.description,
+          claims: ['sub', 'iss', 'name', 'family_name', 'given_name', 'email'],
+        },
+      });
+      return true;
+    }
+    return false;
+  }
 
   get authLoginUrl() {
     return `${this.issuer}/mod/lti/auth.php`;
@@ -280,7 +400,9 @@ export class MockPlatform {
         res.end(this.jwksStatus === 200 ? JSON.stringify({ keys: this.keys.map((k) => k.publicJwk) }) : '{}');
         return;
       }
-      this.ags(req, res).catch(() => {
+      this.registration(req, res)
+        .then((handled) => (handled ? undefined : this.ags(req, res)))
+        .catch(() => {
         if (!res.headersSent) res.writeHead(500);
         res.end();
       });

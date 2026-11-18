@@ -3,6 +3,7 @@ import { LmsContext, LmsEnrollment, LmsLineItem, LmsResourceLink, LmsUser } from
 import { GoogleConnection } from './google';
 import { LmsGradeSyncJob, LmsLock } from './outbox';
 import { LmsDeployment, LmsPlatform } from './platform';
+import { LmsRegistrationCode } from './registration';
 import { LmsOrgSettings } from './seats';
 import { LmsAccessToken, LmsOidcState, LmsToolKey } from './security';
 import { LmsDeepLinkSession, LmsHandoffCode, LmsLaunchToken } from './session';
@@ -14,6 +15,7 @@ export * from './context';
 export * from './google';
 export * from './outbox';
 export * from './platform';
+export * from './registration';
 export * from './seats';
 export * from './security';
 export * from './session';
@@ -54,5 +56,9 @@ export const LMS_P0_MODELS = [LmsSuppressedIdentity] as const;
 // the one-time "Open in new tab" codes and the daily mic counters.
 export const LMS_MIC_MODELS = [LmsHandoffCode, LmsMicDaily] as const;
 
+// Added in Phase 1b (migration 2026-11-23-lms-phase1b-registration): the
+// one-URL "Connect Moodle" links (LTI Dynamic Registration).
+export const LMS_PHASE1B_MODELS = [LmsRegistrationCode] as const;
+
 /** Every LMS collection, for the cleanup script and the tests. */
-export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS, ...LMS_P0_MODELS, ...LMS_MIC_MODELS] as const;
+export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS, ...LMS_P0_MODELS, ...LMS_MIC_MODELS, ...LMS_PHASE1B_MODELS] as const;

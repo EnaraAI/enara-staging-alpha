@@ -1,6 +1,8 @@
+import { randomBytes } from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import { logger, serializeError } from '../../../../utils/logging';
 import { lmsSettings } from '../../core/flags';
+import { dynamicRegistration } from './dynamicRegistration';
 import { LtiError } from './errors';
 import { oidcLaunch, oidcLogin, platformFrameOrigins } from './oidc';
 
@@ -24,10 +26,12 @@ function escapeHtml(v: string): string {
  * (or, when the platform is unknown, by any https page: error pages carry no
  * actions and no data).
  */
-export function setFrameHeaders(res: Response, origins: string[] | 'any-https'): void {
+export function setFrameHeaders(res: Response, origins: string[] | 'any-https', opts: { scriptNonce?: string } = {}): void {
   res.removeHeader('X-Frame-Options');
   const ancestors = origins === 'any-https' ? "'self' https:" : ["'self'", ...origins].join(' ');
-  res.setHeader('Content-Security-Policy', `default-src 'none'; style-src 'unsafe-inline'; frame-ancestors ${ancestors}; base-uri 'none'; form-action 'none'`);
+  // Only the registration pages run a script (the spec's "close" message), by nonce.
+  const script = opts.scriptNonce ? `; script-src 'nonce-${opts.scriptNonce}'` : '';
+  res.setHeader('Content-Security-Policy', `default-src 'none'; style-src 'unsafe-inline'${script}; frame-ancestors ${ancestors}; base-uri 'none'; form-action 'none'`);
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Referrer-Policy', 'no-referrer');
 }
@@ -92,3 +96,72 @@ export const ltiLaunch = handle(async (req, res) => {
   if (out.cookieless) params.set('c', '1');
   res.redirect(303, `${lmsSettings().toolBaseUrl}/lms/launch#${params.toString()}`);
 });
+
+// ------------------------------------------------- Dynamic Registration (Phase 1b)
+//
+// GET /lti/register/<code>?openid_configuration=...&registration_token=...
+// Moodle opens this page inside its "Manage tools" page (any https origin may
+// frame it: the platform is not known until the code and its configuration
+// are checked). The page ends by posting {subject:'org.imsglobal.lti.close'}
+// to window.opener || window.parent (LTI DR 1.0 §3.7; target '*' as the spec
+// shows: the message carries nothing), so Moodle closes its dialog and shows
+// the new tool, which the Moodle admin then activates.
+
+const PAGE_STYLE =
+  'body{font-family:system-ui,-apple-system,Segoe UI,Tahoma,sans-serif;color:#1f2937;max-width:560px;margin:40px auto;padding:0 20px}' +
+  'h1{font-size:20px}p{line-height:1.6}code{background:#f1f5f9;padding:2px 6px;border-radius:4px}' +
+  'button{margin-top:12px;padding:8px 18px;border:0;border-radius:8px;background:#0f172a;color:#fff;font-weight:600;cursor:pointer}' +
+  '[dir=rtl]{text-align:right}hr{border:0;border-top:1px solid #e2e8f0;margin:20px 0}';
+
+function closeScript(nonce: string, autoCloseMs?: number): string {
+  const auto = autoCloseMs ? `setTimeout(c,${autoCloseMs});` : '';
+  return `<script nonce="${nonce}">(function(){function c(){var t=window.opener||window.parent;if(t&&t!==window){t.postMessage({subject:'org.imsglobal.lti.close'},'*');}}` +
+    `var b=document.getElementById('close');if(b){b.addEventListener('click',c);}${auto}})();</script>`;
+}
+
+function registrationPage(res: Response, status: number, body: string, autoCloseMs?: number): void {
+  const nonce = randomBytes(16).toString('base64');
+  setFrameHeaders(res, 'any-https', { scriptNonce: nonce });
+  res
+    .status(status)
+    .type('html')
+    .send(
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ENARA</title><style>${PAGE_STYLE}</style></head>` +
+        `<body>${body}<button id="close" type="button">Close · إغلاق</button>${closeScript(nonce, autoCloseMs)}</body></html>`,
+    );
+}
+
+function registrationErrorPage(res: Response, error: LtiError): void {
+  registrationPage(
+    res,
+    error.status,
+    `<h1>ENARA could not be connected</h1><p>${escapeHtml(error.message)}</p><p>Reference: <code>${escapeHtml(error.code)}</code></p>` +
+      `<hr><div dir="rtl" lang="ar"><h1>تعذّر ربط ENARA</h1><p>لم يكتمل ربط ENARA بنظام إدارة التعلّم. أرسل الرمز المرجعي أدناه إلى فريق ENARA أو إلى مسؤول مدرستك.</p><p>الرمز المرجعي: <code dir="ltr">${escapeHtml(error.code)}</code></p></div>`,
+  );
+}
+
+const SUCCESS_AUTO_CLOSE_MS = 5000;
+
+export const ltiRegister = (req: Request, res: Response, next: NextFunction) => {
+  const q = req.query as Record<string, unknown>;
+  dynamicRegistration({ code: req.params.code, openidConfiguration: q.openid_configuration, registrationToken: q.registration_token })
+    .then((out) => {
+      const pending = out.status === 'pending';
+      const en =
+        '<h1>ENARA is registered.</h1><p>Click <b>Activate</b> in Moodle.</p>' +
+        (pending ? '<p>ENARA will approve this connection before teachers and students can use it.</p>' : '') +
+        (out.alreadyConnected ? '<p>Note: this LMS was already connected to ENARA for this school. Both connections are kept; ask ENARA to switch off the one you do not need.</p>' : '');
+      const ar =
+        '<h1>تم تسجيل ENARA.</h1><p>اضغط على <b>Activate</b> (تفعيل) في Moodle.</p>' +
+        (pending ? '<p>سيوافق فريق ENARA على هذا الاتصال قبل أن يتمكن المعلمون والطلاب من استخدامه.</p>' : '') +
+        (out.alreadyConnected ? '<p>ملاحظة: هذا النظام متصل بالفعل بـ ENARA لهذه المدرسة. سيُحتفظ بالاتصالين؛ اطلب من ENARA إيقاف الاتصال غير المطلوب.</p>' : '');
+      registrationPage(res, 200, `${en}<hr><div dir="rtl" lang="ar">${ar}</div>`, SUCCESS_AUTO_CLOSE_MS);
+    })
+    .catch((error) => {
+      if (error instanceof LtiError) return registrationErrorPage(res, error);
+      // Never the JSON error handler (its headers forbid framing); never the query (it holds the token).
+      logger.error('lti_unexpected_error', { path: '/lti/register', error: serializeError(error) });
+      if (res.headersSent) return next(error);
+      return registrationErrorPage(res, new LtiError('internal_error'));
+    });
+};

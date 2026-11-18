@@ -6,6 +6,36 @@ This guide is for teachers and school admins who add ENARA activities to a Moodl
 
 In **Site administration › Plugins › Activity modules › External tool › Manage tools › ENARA › edit › Privacy**, keep **Accept grades from the tool = Always** (owner decision, 18 Nov 2026). Moodle then creates a grade column for every ENARA activity. For links that have no grade, set the activity's **Grade › Type** to **None**; see "Activities that are really ungraded" below.
 
+## School admin: connecting Moodle with one link
+
+ENARA gives you (or your Moodle site administrator) a **Moodle link** from **LMS connections › Connect Moodle (one URL)**. The link is for your school, works once, and expires after 7 days.
+
+1. In Moodle, go to **Site administration › Plugins › Activity modules › External tool › Manage tools**.
+2. Paste the link in **Tool URL** and click **Add LTI Advantage**.
+3. If Moodle says "There are existing tools attached to the registration's domain", click **Register as a new external tool**. Do not click **Update**: ENARA refuses it, and your other ENARA tool stays as it is.
+4. The window shows **"ENARA is registered. Click Activate in Moodle."** and then closes.
+5. Do the steps in "School admin: after connecting" below.
+
+If the window shows "ENARA could not be connected", send the **Reference** code on it to ENARA. In most cases the same link still works: try again from step 1.
+
+## School admin: after connecting
+
+Moodle takes most settings from the link. These it **cannot** take, so set them by hand once:
+
+1. **Activate the tool.** In **Site administration › Plugins › Activity modules › External tool › Manage tools**, find the new **ENARA** card (it says **Pending**) and click **Activate**.
+2. **Open its settings.** On the ENARA card, click the **gear icon** (Edit).
+3. **Show it in the activity chooser.** Under **Tool settings**, set **Tool configuration usage** to **Show in activity chooser and as a preconfigured tool**. (Moodle sets "Show as preconfigured tool when adding an external tool", so teachers would not see ENARA in **Add an activity or resource**.)
+4. **Accept grades = Always.** Under **Privacy**, set **Accept grades from the tool** to **Always**. (Moodle sets "Delegate to teacher".)
+5. Click **Save changes**.
+
+Already set by the link (no change needed; you can check them on the same page): **Default launch container** = Embed, without blocks; **Supports Deep Linking (Content-Item Message)** ticked; **IMS LTI Assignment and Grade Services** = Use this service for grade sync and column management; **IMS LTI Names and Role Provisioning** = Use this service to retrieve members' information as per privacy settings; **Share launcher's name with the tool** = Always; **Share launcher's email with the tool** = Always.
+
+If the connection was made with a school admin's link, ENARA approves it before teachers and students can open ENARA. Until then a launch shows "This LMS connection is waiting for approval by ENARA".
+
+### One Moodle site for two schools
+
+Each school connects with its own link, and Moodle shows one ENARA tool per school, for example **ENARA** and **ENARA (Test School B)**. Teachers must pick their own school's tool. On Moodle 4.3 or later, limit each tool to its school's courses: put each school's courses in its own course category, then in each ENARA tool's settings set **Restrict to category** to that school's category and click **Save changes**.
+
 ## Adding ENARA to your course
 
 In your Moodle course, turn editing on, add an **ENARA** activity (External tool), and click **Select content**. The ENARA picker opens in your language (English or Arabic). Pick one or more items and click **Add**. Moodle creates one activity per item.

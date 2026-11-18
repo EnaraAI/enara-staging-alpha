@@ -48,6 +48,18 @@ export const LTI_ERRORS = {
   seat_limit_reached: [403, 'Your school has used all of its ENARA seats. Ask your school administrator.'],
   identity_suppressed: [403, "This account was permanently deleted at your school's request. ENARA cannot recreate it. Ask your school administrator."],
   invalid_activity_binding: [400, "This activity points to ENARA work that isn't available (unknown, not published, or from another school). Ask your teacher to check the activity's ENARA setting."],
+  // Phase 1b: the one-URL "Connect Moodle" link (LTI Dynamic Registration).
+  registration_code_invalid: [404, 'This ENARA connection link is not valid (it may have been cancelled). Ask ENARA or your school administrator for a new link.'],
+  registration_code_used: [410, 'This ENARA connection link has already been used. Each link works once. Ask for a new link if you need to connect again.'],
+  registration_code_expired: [410, 'This ENARA connection link has expired (links work for 7 days). Ask ENARA or your school administrator for a new link.'],
+  registration_in_progress: [409, 'This ENARA connection link is being used right now. Wait a minute, then try again from your LMS.'],
+  registration_missing_parameters: [400, 'Your LMS did not send its registration details. In Moodle, paste this link in Site administration › Plugins › Activity modules › External tool › Manage tools › "Tool URL" and click "Add LTI Advantage".'],
+  registration_insecure_url: [400, "Your LMS's address must start with https://. ENARA only connects to an LMS over a secure connection."],
+  registration_openid_invalid: [502, 'ENARA could not read the settings of your LMS. Please try again in a minute; if it keeps happening, send this reference to ENARA support.'],
+  registration_issuer_mismatch: [400, 'Your LMS sent settings that do not match its own address, so ENARA did not connect. Send this reference to ENARA support.'],
+  registration_update_not_supported: [400, 'Moodle asked to update an existing tool. Paste the link again and choose "Register as a new external tool" instead of "Update".'],
+  registration_failed: [502, 'Your LMS did not accept the registration. Nothing was changed in ENARA, and the link still works: try again from your LMS. If it keeps happening, send this reference to ENARA support.'],
+  registration_conflict: [409, 'This LMS tool is already connected to ENARA for another school. Paste the link again and choose "Register as a new external tool".'],
   internal_error: [500, 'Something went wrong on our side while opening ENARA. Please try again in a minute; if it keeps happening, send this reference to ENARA support.'],
 } as const satisfies Record<string, readonly [number, string]>;
 

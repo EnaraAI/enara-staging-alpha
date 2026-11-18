@@ -6,7 +6,7 @@ const SENSITIVE_KEY_PATTERN =
 // Signed links are bearer credentials (P22): any signature, expiry-bound
 // token or presigned-URL credential in a logged string is replaced, wherever
 // the string appears (paths, URLs, error messages).
-const SIGNED_QUERY_PATTERN = /([?&](?:sig|exp|token|X-Amz-Signature|X-Amz-Credential|X-Amz-Security-Token)=)[^&\s"'#]*/gi;
+const SIGNED_QUERY_PATTERN = /([?&](?:sig|exp|token|registration_token|X-Amz-Signature|X-Amz-Credential|X-Amz-Security-Token)=)[^&\s"'#]*/gi;
 
 export function redactSignedLinks(text: string): string {
   return text.replace(SIGNED_QUERY_PATTERN, '$1[REDACTED]');
