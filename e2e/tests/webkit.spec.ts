@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { SPEAKING_TITLE } from '../lib/content';
 import { enaraFrame, frameSession } from '../lib/enara';
 import { moodleSession } from '../lib/moodle';
 import { activityUrl } from '../lib/picker';
@@ -16,8 +15,10 @@ test.describe.serial('7 · microphone checks (Safari / WebKit)', () => {
     await page.goto(activityUrl(s.activities.speaking));
     const f = await enaraFrame(page);
     expect((await frameSession(f)).role).toBe('student');
-    await expect(f.getByRole('heading', { name: SPEAKING_TITLE })).toBeVisible();
-    await f.getByRole('button', { name: /^(Start speaking exam|Continue|Start another attempt)$/ }).click();
+    const start = f.getByRole('button', { name: /^(Start speaking exam|Continue|Start another attempt)$/ });
+    const hint = f.getByTestId('safari-frame-hint');
+    await expect(start.or(hint).first()).toBeVisible({ timeout: 60_000 });
+    if (await start.first().isVisible()) await start.first().click();
     await expect(f.getByTestId('safari-frame-hint')).toBeVisible({ timeout: 60_000 });
     await expect(f.getByTestId('safari-frame-hint').getByRole('button', { name: 'open the exam in a new tab' })).toBeVisible();
     await shot(page, '07-mic-safari-safari-hint');

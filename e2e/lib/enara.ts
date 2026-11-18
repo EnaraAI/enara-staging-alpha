@@ -59,6 +59,13 @@ export async function enaraFrame(page: Page, timeout = 90_000): Promise<Frame> {
 /** The ENARA session the frame holds after the launch (role, preview, LMS target). */
 export async function frameSession(frame: Frame): Promise<{ id: string /* the account's (reserved) email */; role: string; name?: string; institutionId?: string; preview: boolean; lms: any; target: any }> {
   await expect.poll(async () => frame.evaluate(() => !!sessionStorage.getItem('enara_token')), { timeout: 60_000 }).toBe(true);
+  // The product tour is not under test: mark it done for this account (as
+  // "Skip tour" would), so it does not cover the page in later launches.
+  const pending = await frame.evaluate(() => JSON.parse(sessionStorage.getItem('enara_user') || '{}').tourPending === true);
+  if (pending) {
+    const token = await frameToken(frame);
+    await call('POST', '/api/auth/tour/complete', { token, ok: [200, 403] }).catch(() => undefined);
+  }
   return frame.evaluate(() => {
     const user = JSON.parse(sessionStorage.getItem('enara_user') || '{}');
     const lms = JSON.parse(sessionStorage.getItem('enara_lms') || '{}');

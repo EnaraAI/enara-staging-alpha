@@ -194,7 +194,8 @@ jobs:
           for d in "$SHOTS"/e2e-screenshots-*; do
             name="${d##*/e2e-screenshots-}"
             mkdir -p "$name"
-            cp -r "$d"/. "$name"/
+            # <moodle>/<scenario>-<moment>.png and <moodle>/summary.md (flat).
+            find "$d" -type f \( -name '*.png' -o -name 'summary.md' \) -exec cp {} "$name"/ \;
           done
           {
             echo "# ENARA LMS e2e: screenshots of the latest run"

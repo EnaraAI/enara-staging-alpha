@@ -23,6 +23,8 @@ export async function moodleSession(browser: Browser, user: MoodleUser, opts: { 
   const stateFile = path.join(RUN_DIR, `moodle-${user}.json`);
   const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1366, height: 900 }, deviceScaleFactor: 1, ...(fs.existsSync(stateFile) ? { storageState: stateFile } : {}), ...(opts.permissions ? { permissions: opts.permissions } : {}) });
   const page = await context.newPage();
+  // Script errors in Moodle or ENARA (frames included) go to the test log.
+  page.on('pageerror', (e) => console.log(`[pageerror ${user}]`, String(e).slice(0, 500)));
   // ENARA's first-visit product tour opens over the page after a moment: skip it
   // whenever it gets in the way (inside Moodle's activity frame).
   await page.addLocatorHandler(page.frameLocator('#contentframe').getByRole('button', { name: 'Skip tour' }), async (b) => { await b.click(); });

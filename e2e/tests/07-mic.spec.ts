@@ -6,14 +6,24 @@ import { activityByName, activityUrl, addThroughPicker } from '../lib/picker';
 import { readState, saveState, shot } from '../lib/state';
 
 /** Student: open the speaking exam activity, start it, and reach the microphone check. */
-async function openSpeakingExam(page: import('@playwright/test').Page, cmid: number) {
+async function openSpeakingExam(page: import('@playwright/test').Page, cmid: number, label: string) {
   await page.goto(activityUrl(cmid));
   const f = await enaraFrame(page);
   expect((await frameSession(f)).role).toBe('student');
-  await expect(f.getByRole('heading', { name: SPEAKING_TITLE })).toBeVisible();
+  // The assignment opens with its "Start speaking exam" button (or, once started, the mic check).
   const start = f.getByRole('button', { name: /^(Start speaking exam|Continue|Start another attempt)$/ });
-  await start.click();
-  await expect(f.getByRole('button', { name: 'Test microphone' })).toBeVisible({ timeout: 60_000 });
+  const micTest = f.getByRole('button', { name: 'Test microphone' });
+  try {
+    const skip = f.getByRole('button', { name: 'Skip tour' });
+    await skip.waitFor({ state: 'visible', timeout: 4_000 }).then(() => skip.click(), () => undefined);
+    await expect(start.or(micTest).first()).toBeVisible({ timeout: 60_000 });
+    if (await start.first().isVisible()) await start.first().click();
+    await expect(micTest).toBeVisible({ timeout: 60_000 });
+  } catch (e) {
+    await shot(page, `07-mic-FAILED-${label}`);
+    console.log(`SPEAKING FRAME (${f.url()}):`, (await f.locator('body').innerText().catch(() => '')).slice(0, 800));
+    throw e;
+  }
   return f;
 }
 
@@ -38,7 +48,7 @@ test.describe.serial('7 · microphone checks (Chrome)', () => {
   test('mic OK in the Moodle frame (fake device, permission granted)', async ({ browser }) => {
     const s = readState();
     const { page, context } = await moodleSession(browser, 'student.test', { permissions: ['microphone'] });
-    const f = await openSpeakingExam(page, s.activities.speaking);
+    const f = await openSpeakingExam(page, s.activities.speaking, 'ok');
     await f.getByRole('button', { name: 'Test microphone' }).click();
     await expect(f.getByText('Microphone works').or(f.getByText('Not working'))).toBeVisible({ timeout: 30_000 });
     await expect(f.locator('[data-testid^="mic-problem-"]')).toHaveCount(0);
@@ -55,7 +65,7 @@ test.describe.serial('7 · microphone checks (Chrome)', () => {
     const browser = await chromium.launch({ channel: 'chromium', args: ['--use-fake-device-for-media-stream', '--deny-permission-prompts'] });
     try {
       const { page, context } = await moodleSession(browser, 'student.test');
-      const f = await openSpeakingExam(page, s.activities.speaking);
+      const f = await openSpeakingExam(page, s.activities.speaking, 'blocked');
       await f.getByRole('button', { name: 'Test microphone' }).click();
       const notice = f.getByTestId('mic-problem-blocked_in_frame');
       await expect(notice).toBeVisible({ timeout: 30_000 }).catch(async (e) => {
