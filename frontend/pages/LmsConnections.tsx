@@ -198,6 +198,13 @@ export const LmsConnections: React.FC = () => {
                     <span className={g.dead ? 'text-red-700 font-semibold' : ''}>{g.dead} failed</span>
                     {g.lastSentAt ? ` · last sent ${new Date(g.lastSentAt).toLocaleString()}` : ''}
                     {g.lastErrorCode && <> · last error <code className="bg-white px-1 rounded">{g.lastErrorCode}</code>{g.lastErrorAt ? ` (${new Date(g.lastErrorAt).toLocaleString()})` : ''}</>}
+                    {!!g.activitiesMayBeDeleted?.length && (
+                      <div className="mt-1 text-amber-800" data-testid="lms-activities-may-be-deleted">
+                        <span className="font-semibold">LMS activity may have been deleted ({g.activitiesMayBeDeleted.length}):</span>{' '}
+                        {g.activitiesMayBeDeleted.slice(0, 5).map((a) => `${a.activityTitle || a.assignmentId} (${a.reason === 'lineitem_gone' ? 'the LMS no longer accepts its grades' : '30 days without a launch or a result'})`).join('; ')}
+                        {g.activitiesMayBeDeleted.length > 5 ? '; …' : ''}. Archive the assignment in Class assignments if the activity is gone.
+                      </div>
+                    )}
                     <div className="flex flex-wrap gap-3 mt-1">
                       <button disabled={busy} className="text-sm font-semibold text-teal-700"
                         onClick={() => act(async () => { const r = await resyncLmsGrades(p.id); return r; }, 'Grades queued again; they are sent in the background.')}>

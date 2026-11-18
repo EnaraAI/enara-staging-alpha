@@ -133,6 +133,18 @@ export interface ILmsResourceLink {
   customParams?: Record<string, string>;
   presentation: 'iframe' | 'window';
   scoringPolicy?: 'best' | 'latest';
+  /** Phase 3 follow-up: the activity's title in the LMS (launch claim resource_link.title). */
+  title?: string;
+  /** Phase 3 follow-up: the last (non-preview) launch of this activity. */
+  lastLaunchAt?: Date;
+  /**
+   * Phase 3 follow-up: the LMS answered 404/410 for this link's line item
+   * during a grade send ("LMS activity may have been deleted"). Cleared by the
+   * next launch of the activity (it exists then). While set, no grade job is
+   * queued or sent for the link.
+   */
+  lineItemGoneAt?: Date;
+  lineItemGoneStatus?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -152,6 +164,10 @@ const resourceLinkSchema = new Schema<ILmsResourceLink>(
     customParams: { type: Schema.Types.Mixed },
     presentation: { type: String, enum: ['iframe', 'window'], default: 'iframe' },
     scoringPolicy: { type: String, enum: ['best', 'latest'] },
+    title: { type: String, maxlength: 200 },
+    lastLaunchAt: Date,
+    lineItemGoneAt: Date,
+    lineItemGoneStatus: Number,
   },
   { collection: 'lms_resource_links', versionKey: false, timestamps: true },
 );

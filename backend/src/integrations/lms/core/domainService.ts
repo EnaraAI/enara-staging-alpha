@@ -221,13 +221,20 @@ async function ensureContext(input: ProvisionInput): Promise<{ context: ILmsCont
 
 async function upsertResourceLink(input: ProvisionInput, context: ILmsContext): Promise<ILmsResourceLink> {
   const key = { contextId: context.id, externalResourceLinkId: input.resourceLink.externalId };
-  const set: Record<string, unknown> = {};
+  // Phase 3 follow-up: the activity's title and last launch (shown to teachers;
+  // the 30-day "may have been deleted" check). A launch proves the activity
+  // exists, so it clears a "line item gone" flag; a line item we found or
+  // created ourselves is then looked up again (the launch's own one replaces it).
+  const set: Record<string, unknown> = { lastLaunchAt: new Date() };
+  if (input.resourceLink.title?.trim()) set.title = input.resourceLink.title.trim().slice(0, 200);
   if (input.resourceLink.customParams && Object.keys(input.resourceLink.customParams).length) set.customParams = input.resourceLink.customParams;
   if (input.resourceLink.lineItemUrl) set.lineItemUrl = input.resourceLink.lineItemUrl;
+  const gone = await LmsResourceLink.findOne({ ...key, lineItemGoneAt: { $exists: true } }).select('id').lean();
+  const unset: Record<string, 1> = gone ? { lineItemGoneAt: 1, lineItemGoneStatus: 1, ...(input.resourceLink.lineItemUrl ? {} : { lineItemUrl: 1 }) } : {};
   try {
     return (await LmsResourceLink.findOneAndUpdate(
       key,
-      { ...(Object.keys(set).length ? { $set: set } : {}), $setOnInsert: { institutionId: input.institutionId, presentation: 'iframe' } },
+      { $set: set, ...(Object.keys(unset).length ? { $unset: unset } : {}), $setOnInsert: { institutionId: input.institutionId, presentation: 'iframe' } },
       { upsert: true, new: true },
     ).lean())!;
   } catch (error) {

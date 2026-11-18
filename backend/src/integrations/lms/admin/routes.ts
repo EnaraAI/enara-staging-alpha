@@ -12,6 +12,7 @@ import { writeLmsAudit } from '../core/audit';
 import { lmsSettings } from '../core/flags';
 import { runInBackground, triggerOn } from '../core/drain';
 import { consumeLaunchToken, issueLaunchToken, LaunchTokenError } from '../core/launchToken';
+import { flaggedActivities } from '../core/activityHealth';
 import { drainGradeJobs, gradeStats, passbackOn, resyncGrades, retryDead } from '../core/outbox';
 import { seatView, updateSeatSettings } from '../core/seats';
 import { LmsDeployment, LmsOrgSettings, LmsPlatform, LmsUser, type ILmsDeployment, type ILmsPlatform } from '../models';
@@ -156,7 +157,8 @@ lmsAdminRouter.post(
         cookieless: row.cookieless,
         preview,
         // Phase 3: the ENARA work the activity is bound to (the landing page opens it).
-        target: row.targetAssignmentId ? { kind: 'assignment', assignmentId: row.targetAssignmentId } : null,
+        // An archived assignment is not opened (students cannot see it).
+        target: row.targetAssignmentId && (await Assignment.exists({ id: row.targetAssignmentId, institutionId: row.institutionId, state: { $ne: 'archived' } })) ? { kind: 'assignment', assignmentId: row.targetAssignmentId } : null,
       },
     });
   }),
@@ -212,7 +214,11 @@ gradesRouter.get(
     const requested = typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined;
     const filter = isEnara(req) ? (requested ? { institutionId: requested } : {}) : { institutionId: req.user!.institutionId ?? '__none__' };
     const platforms = await LmsPlatform.find(filter).select('id').sort({ createdAt: -1 }).limit(200).lean();
-    res.json({ enabled: true, platforms: await gradeStats(platforms.map((p) => p.id)) });
+    const stats = await gradeStats(platforms.map((p) => p.id));
+    // Phase 3 follow-up: bound activities that may have been deleted in the LMS (404/410 for the line item, or 30 days without a launch or a result).
+    const now = new Date();
+    const withActivities = await Promise.all(stats.map(async (s) => ({ ...s, activitiesMayBeDeleted: await flaggedActivities(s.platformId, now) })));
+    res.json({ enabled: true, platforms: withActivities });
   }),
 );
 

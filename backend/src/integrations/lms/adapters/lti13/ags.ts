@@ -29,6 +29,7 @@ const MEDIA = {
 } as const;
 const WANTED_SCOPES: string[] = [AGS_SCOPE.lineItem, AGS_SCOPE.resultReadOnly, AGS_SCOPE.score];
 const TOKEN_MARGIN_MS = 60_000;
+export const LINE_ITEM_GONE = 'lineitem_gone';
 let callTimeoutMs = 8_000;
 
 class AgsFailure extends Error {
@@ -238,6 +239,7 @@ export async function pushScore(job: GradeSyncJobView): Promise<PushResult> {
     ]);
     if (!platform || platform.status !== 'active') return { ok: false, retryable: true, error: 'platform_not_active' };
     if (!context || !lmsUser) return { ok: false, retryable: false, error: 'not_eligible' };
+    if (link?.lineItemGoneAt) return { ok: false, retryable: false, error: LINE_ITEM_GONE };
     lineItemRef = /^https?:\/\//.test(job.lineItemRef) ? job.lineItemRef : link ? await resolveLineItem(platform, context, link, job.scoreMaximum) : undefined;
     if (!lineItemRef) return { ok: false, retryable: false, error: 'no_line_item' };
     const res = await agsFetch(platform, tokenScopes(context.agsScopes), scoresUrl(safeUrl(lineItemRef, 'bad_line_item_url')), {
@@ -246,12 +248,15 @@ export async function pushScore(job: GradeSyncJobView): Promise<PushResult> {
       body: JSON.stringify(scorePayload(job, lmsUser.externalUserId)),
     });
     if (res.ok) return { ok: true, lineItemRef };
-    // A line item we found or created ourselves may have been deleted in the LMS:
-    // forget it so the next try finds or creates it again.
-    if (res.status === 404 && link && link.lineItemUrl === lineItemRef && (await LmsLineItem.exists({ contextId: context.id, externalLineItemUrl: lineItemRef }))) {
-      await LmsResourceLink.updateOne({ id: link.id, lineItemUrl: lineItemRef }, { $unset: { lineItemUrl: 1 } });
-      await LmsLineItem.deleteOne({ contextId: context.id, externalLineItemUrl: lineItemRef });
-      return { ok: false, retryable: true, status: 404, error: 'score_http_404', lineItemRef: `link:${link.id}` };
+    // Phase 3 follow-up: 404/410 for the line item = the LMS activity (or its
+    // gradebook column) may have been deleted. Flag the link (shown to teachers
+    // and admins), make the job dead (lineitem_gone), and send nothing more for
+    // it until the activity is launched again (domainService clears the flag).
+    // Never "find or create again" here: for a deleted activity that would add
+    // an orphan column to the gradebook.
+    if (res.status === 404 || res.status === 410) {
+      if (link) await LmsResourceLink.updateOne({ id: link.id }, { $set: { lineItemGoneAt: new Date(), lineItemGoneStatus: res.status } });
+      return { ok: false, retryable: false, status: res.status, error: LINE_ITEM_GONE, lineItemRef };
     }
     const f = httpFailure('score_', res);
     return { ok: false, retryable: f.retryable, status: f.status, retryAfterSeconds: f.retryAfterSeconds, error: f.code, lineItemRef };

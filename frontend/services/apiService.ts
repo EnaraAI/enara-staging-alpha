@@ -1028,6 +1028,11 @@ export const archiveAssessmentById = (id: string) => request<any>('POST', `/api/
 export const duplicateAssessmentById = (id: string) => request<any>('POST', `/api/assessments/${enc(id)}/duplicate`);
 export const fetchAssessmentVersions = (id: string) => request<{ versions: any[] }>('GET', `/api/assessments/${enc(id)}/versions`);
 
+/** LMS Phase 3 follow-up: the LMS activity an assignment belongs to (only when LMS launches are on). */
+export interface LinkedLmsActivity {
+  resourceLinkId: string; platformName: string; activityTitle: string | null; courseTitle: string | null; courseUrl: string | null;
+  mayBeDeleted: boolean; reason: 'lineitem_gone' | 'stale' | null; lineItemGoneAt: string | null; lastLaunchAt: string | null; lastResultAt: string | null;
+}
 export const fetchClassAssignments = (classId?: string) => request<{ assignments: any[] }>('GET', `/api/assignments${classId ? `?classId=${enc(classId)}` : ''}`);
 export const createClassAssignment = (data: any) => request<any>('POST', '/api/assignments', data);
 export const fetchClassAssignment = (id: string) => request<any>('GET', `/api/assignments/${enc(id)}`);
@@ -1347,6 +1352,8 @@ export interface LmsGradeStats {
   platformId: string; pending: number; processing: number; sent: number; dead: number;
   lastErrorCode: string | null; lastErrorAt: string | null; lastSentAt: string | null;
   recentDead: { id: string; resourceLinkId: string | null; lmsUserId: string; attemptId: string; code: string | null; tries: number; at: string }[];
+  /** Phase 3 follow-up: bound activities that may have been deleted in the LMS. */
+  activitiesMayBeDeleted?: { resourceLinkId: string; assignmentId: string; activityTitle: string | null; reason: 'lineitem_gone' | 'stale' | null; lastLaunchAt: string | null; lastResultAt: string | null }[];
 }
 export const fetchLmsGrades = () => request<{ enabled: boolean; platforms: LmsGradeStats[] }>('GET', '/api/lms/grades');
 export const resyncLmsGrades = (platformId: string) => request<{ links: number; students: number; queued: number; outcomes: Record<string, number> }>('POST', `/api/lms/platforms/${encodeURIComponent(platformId)}/grades/resync`, {});
