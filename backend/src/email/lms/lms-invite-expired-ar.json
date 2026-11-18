@@ -1,0 +1,52 @@
+{
+  "id": null,
+  "name": "Enara – LMS: connection link expired (AR)",
+  "subject": "انتهت صلاحية رابط الربط بإنارة",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "منى"
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "مدرسة وادي النيل الدولية"
+    },
+    {
+      "key": "EXPIRED_ON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "16 نوفمبر 2026"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms-status"
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "lmsi_4c81d07a"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-invite-expired",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "2b",
+  "group": "lms",
+  "recipient": "School admins (the invited admin)",
+  "trigger": "New code needed: daily cron, invite past its expiry and unused",
+  "delivery": "digest",
+  "frequency": "Daily cron; once per invite"
+}

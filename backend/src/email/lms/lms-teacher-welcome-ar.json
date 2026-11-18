@@ -1,0 +1,46 @@
+{
+  "id": null,
+  "name": "Enara – LMS: teacher welcome (AR)",
+  "subject": "مقررك في Moodle جاهز على إنارة",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "أحمد"
+    },
+    {
+      "key": "COURSE_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "اللغة الإنجليزية - الصف الثامن"
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Moodle (moodle.nilevalley.example)"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=class-assignments&class=cls_3e91a7"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-teacher-welcome",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "13",
+  "group": "lms",
+  "recipient": "That teacher (only with the opt-in address confirmed on first launch, D2)",
+  "trigger": "lti.launch with refIds.createdUser:true and role teacher",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per teacher ever (welcome:<enaraUserId>)"
+}

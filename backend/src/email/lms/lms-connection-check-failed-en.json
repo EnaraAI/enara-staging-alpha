@@ -1,0 +1,64 @@
+{
+  "id": null,
+  "name": "Enara – LMS: connection check failed (EN)",
+  "subject": "Action needed: check your Moodle connection",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "there",
+      "sample": "Mona"
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Moodle (moodle.nilevalley.example)"
+    },
+    {
+      "key": "CHECKED_AT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "18 November 2026, 09:40"
+    },
+    {
+      "key": "CAUSE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "The class list service is off for the Enara tool in Moodle."
+    },
+    {
+      "key": "FIX",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "In the tool settings, set \"IMS LTI Names and Role Provisioning\" to use the service, then have a teacher open the activity once."
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4"
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "lmsa_8d14e2 · nrps_not_allowed"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-connection-check-failed",
+  "language": "en",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "5",
+  "group": "lms",
+  "recipient": "School admins",
+  "trigger": "New code needed: 'Check connection' (on save, on demand, daily) plus a daily scan of lms_audit_log fail codes per platform",
+  "delivery": "immediate",
+  "frequency": "Immediate after a check that changed from OK to failed; from the scan max once per platform+cause per 24 h"
+}

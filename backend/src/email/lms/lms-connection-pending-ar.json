@@ -1,0 +1,56 @@
+{
+  "id": null,
+  "name": "Enara – LMS: connection pending approval (AR)",
+  "subject": "نراجع طلب ربط Moodle الخاص بكم",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "منى"
+    },
+    {
+      "key": "ITEM",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "طلب ربط <span dir=\"ltr\" style=\"unicode-bidi:embed;\">Moodle (moodle.nilevalley.example)</span>"
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4"
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "lmsp_7f3a9c21e4"
+    }
+  ],
+  "status": "approved",
+  "approvedOn": "2026-11-18",
+  "alias": "lms-connection-pending",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "4a (also E3)",
+  "group": "lms",
+  "recipient": "School admins",
+  "trigger": "platform.registered with status 'pending'; deployment.registered pending; deployment auto-created pending at launch (E3 uses ITEM)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per platform id / deployment id",
+  "preview_variants": [
+    {
+      "id": "e3-deployment",
+      "label": "E3: new deployment pending",
+      "samples": {
+        "ITEM": "تثبيتًا جديدًا في Moodle (رقم التثبيت <span dir=\"ltr\" style=\"unicode-bidi:embed;\">3</span>)",
+        "REFERENCE_CODE": "lmsd_2a90b6"
+      }
+    }
+  ]
+}

@@ -120,35 +120,100 @@ and staff invitation (`enara-class-invitation`, expiry from `INVITATION_TTL_MS`)
 `RESEND_API_KEY` is set (still skipping `.test` addresses and honouring `REMINDER_TEST_RECIPIENT`). Without the key
 the previous inline-HTML `sendEmail` path runs unchanged.
 
-## LMS emails (`lms/`, not Resend-hosted)
+## LMS and parent emails (`lms/`, `parents/`: sent from code, not Resend-hosted)
 
-LMS emails (owner decisions D1, D5, D11) live in [`lms/`](./lms) as one file per language
-(`lms-<name>-en.html/.json`, `lms-<name>-ar.html/.json`; Arabic is `dir="rtl"`, Tahoma, Latin tokens in
-`<span dir="ltr">`). They are **not** in `TEMPLATE_REGISTRY`, not pushed or published to Resend, and are sent only by
-`sendLmsTemplate` (`sendLmsTemplate.ts`), which LMS code calls only when `LMS_EMAILS_ENABLED`, `REMINDERS_ENABLED`
-and `RESEND_API_KEY` are all set (lms-test keeps `LMS_EMAILS_ENABLED` off). Re-bundle after an edit
-(a test checks the bundle matches the files):
+Two sets of emails are rendered and sent from code only. They are **not** in `templates/` or
+`TEMPLATE_REGISTRY`, and are never pushed or published to Resend:
+
+- [`lms/`](./lms): LMS emails (owner decisions D1, D4, D5, D11), sent only by `sendLmsTemplate`
+  ([`sendLmsTemplate.ts`](./sendLmsTemplate.ts)). LMS code calls it only when `LMS_EMAILS_ENABLED`,
+  `REMINDERS_ENABLED` and `RESEND_API_KEY` are all set (lms-test keeps `LMS_EMAILS_ENABLED` off).
+- [`parents/`](./parents): parent emails, sent only by `sendParentTemplate`
+  ([`sendParentTemplate.ts`](./sendParentTemplate.ts)).
+
+Each template is one file per language: `<alias>-en.html` / `<alias>-ar.html` with `<alias>-en.json` /
+`<alias>-ar.json` (Arabic is `<html lang="ar" dir="rtl">`, Tahoma, Latin tokens in `<span dir="ltr">`).
+Ops emails (`lms-ops-*`, to the ENARA team) are English only (D4). The send alias is the file name, e.g.
+`sendParentTemplate('parent-invite-ar', to, vars)`.
+
+`<alias>-<lang>.json` holds what the bundle uses, `subject` and `variables[]` (`key`, `fallback_value`),
+plus catalogue metadata the bundler ignores: `status` (`approved`) and `approvedOn`, `alias`, `language`,
+`number` (plan number), `group`, `recipient`, `trigger`, `delivery`, `frequency`, a FAKE `sample` per
+variable and optional `preview_variants`.
+
+Both senders share [`sendBundledTemplate.ts`](./sendBundledTemplate.ts) and render like `sendTemplate`:
+`{{{VAR}}}` raw, `{{VAR}}` HTML-escaped, a missing/empty value uses `fallback_value`, hosted logos become
+inline `cid:` attachments. They refuse (nothing sent) a reserved recipient (`reserved_recipient`), a variable
+mismatch (`invalid_variables`: every template variable is required, no extras), a leftover placeholder
+(`unfilled_placeholder`), a link carrying an `ENR-XXXX-XXXX` code or the given `LINK_CODE` (`code_in_url`, D15)
+and a missing key (`missing_api_key`). Logs carry the alias and code only.
+
+LMS emails never carry a student name (no `CHILD_NAME` / `STUDENT_NAME` / `LEARNER`), and no link in any of
+these emails carries a token, code or key; `ACTION_URL` is built by the caller from the app URL and opens
+a sign-in page. **No trigger is wired yet** apart from `lms-invite-connect` ("Send email" on the LMS
+onboarding invite, step 2: `ACTION_URL` is `${APP_URL}/?page=lms-status`, never the Moodle link or its code).
+
+Re-bundle after editing any of them (writes `lms/lmsTemplatesBundle.ts` and `parents/parentTemplatesBundle.ts`;
+`test/codeEmailTemplates.test.ts` checks the bundles match the files, every sample renders with no `{{`
+left, Arabic is right-to-left, ops emails are English only and links carry no codes):
 
 ```bash
-npx tsx scripts/email/bundle-lms-templates.ts   # writes lms/lmsTemplatesBundle.ts
+npx tsx scripts/email/bundle-lms-templates.ts
 ```
 
-| Alias | Variables | Used by |
-|---|---|---|
-| lms-invite-connect-en / -ar | NAME, SCHOOL_NAME, EXPIRES_ON, ACTION_URL, REFERENCE_CODE | "Send email" on the LMS onboarding invite (step 2). `ACTION_URL` is `${APP_URL}/?page=lms-status` (sign-in; never the Moodle link or its code, D5) |
+| # | Alias | Languages | Recipient | Trigger | Variables |
+|---|---|---|---|---|---|
+| 1 | lms-invite-connect | en, ar | School admins (the named admin) | ENARA admin sends the LMS onboarding invite ("Send email", onboarding step 2) | NAME, SCHOOL_NAME, EXPIRES_ON, ACTION_URL, REFERENCE_CODE |
+| 2a | lms-invite-expiring | en, ar | School admins (the invited admin) | New code needed: daily cron, invite open and expiring within 3 days, not yet reminded | NAME, SCHOOL_NAME, EXPIRES_ON, ACTION_URL, REFERENCE_CODE |
+| 2b | lms-invite-expired | en, ar | School admins (the invited admin) | New code needed: daily cron, invite past its expiry and unused | NAME, SCHOOL_NAME, EXPIRED_ON, ACTION_URL, REFERENCE_CODE |
+| 3 (also 4b) | lms-connection-active | en, ar | School admins | platform.registered with status 'active', and platform.approved (also when switched back on) | NAME, SCHOOL_NAME, LMS_NAME, ACTION_URL, REFERENCE_CODE |
+| 4a (also E3) | lms-connection-pending | en, ar | School admins | platform.registered with status 'pending'; deployment.registered pending; deployment auto-created pending at launch (E3 uses ITEM) | NAME, ITEM, ACTION_URL, REFERENCE_CODE |
+| 4c | lms-connection-rejected | en, ar | School admins | New code needed: ENARA admin 'Reject' with a reason from a fixed list; new status 'rejected' | NAME, LMS_NAME, REASON, FIX, ACTION_URL, REFERENCE_CODE |
+| 5 | lms-connection-check-failed | en, ar | School admins | New code needed: 'Check connection' (on save, on demand, daily) plus a daily scan of lms_audit_log fail codes per platform | NAME, LMS_NAME, CHECKED_AT, CAUSE, FIX, ACTION_URL, REFERENCE_CODE |
+| 6 | lms-connection-switched-off | en, ar | School admins (ops see it in the E5 digest) | platform.disabled (a "disconnect/delete" would need new code) | NAME, SCHOOL_NAME, LMS_NAME, DATE, BY_ROLE, ACTION_URL, REFERENCE_CODE |
+| 7 | lms-key-problem | en, ar | School admins (ops see it in the E5 digest) | Audit fail codes jwks_unavailable, unknown_kid, invalid_signature (lti.launch/lti.login) and token_http_400/401 on grade or roster calls | NAME, LMS_NAME, FIRST_SEEN, FAILED_COUNT, PROBLEM, FIX, ACTION_URL, REFERENCE_CODE |
+| 8 | lms-grade-sync-digest | en, ar | School admins | Daily cron after the lmsGrades drain: grade jobs that became 'dead' in the last 24 h, excluding held LMS_VALUE_DIFFERS jobs | NAME, SCHOOL_NAME, LMS_NAME, DATE, FAILED_COUNT, RETRYING_COUNT, COURSES_AFFECTED, TOP_REASON, ACTION_URL, REFERENCE_CODE |
+| 9 | lms-roster-sync-failed | en, ar | School admins | roster.sync outcome 'fail' from nightly/launch/cron (not manual, not busy/skipped) | NAME, SCHOOL_NAME, LMS_NAME, FAILED_COURSES, COURSE_NAME, REASON, FIX, ACTION_URL, REFERENCE_CODE |
+| 10a | lms-seats-warning | en, ar | School admins | New code needed: threshold check after checkSeatForNewStudent updates seatsUsed (PERCENT = 80 or 90) | NAME, SCHOOL_NAME, PERCENT, SEATS_USED, SEAT_LIMIT, SEATS_LEFT, ACTION_URL |
+| 10b | lms-seats-over-limit | en, ar | School admins (ops get E2) | markOverLimit -> alertSchoolAdmins (audit seats.over_limit); replaces the inline English email in seats.ts | NAME, SCHOOL_NAME, SEATS_USED, SEAT_LIMIT, ACTION_URL |
+| 11 | lms-adoption-weekly | en, ar | School admins | New code needed: Monday run inside /api/cron/daily (next to sendWeeklySummaries) | NAME, SCHOOL_NAME, LMS_NAME, WEEK_OF, COURSES_CONNECTED, NOT_STARTED, ACTIVE, GRADES_SENT, GRADES_FAILED, ACTION_URL |
+| 12a | lms-data-export-ready | en, ar | The requesting school admin | New code needed: PDPL data export per school or per course. Never attaches the file, never a signed download URL | NAME, SCOPE, EXPIRES_ON, ACTION_URL, REFERENCE_CODE |
+| 12b | lms-deletion-received | en, ar | The requesting school admin and the other school admins | New code needed: data deletion request intake | NAME, SCOPE, STUDENT_COUNT, RECEIVED_ON, DUE_BY, ACTION_URL, REFERENCE_CODE |
+| 12c | lms-deletion-completed | en, ar | The requester and the school admins | After permanentlyDeleteStudent for request-based or per-school / per-course deletions (new code); not for single on-screen deletes (D9) | NAME, SCOPE, COMPLETED_ON, STUDENT_COUNT, RECORDS_REMOVED, RESULTS_ANONYMISED, FILES_PENDING, ACTION_URL, REFERENCE_CODE |
+| 13 | lms-teacher-welcome | en, ar | That teacher (only with the opt-in address confirmed on first launch, D2) | lti.launch with refIds.createdUser:true and role teacher | NAME, COURSE_NAME, LMS_NAME, ACTION_URL |
+| 14 | lms-students-not-started | en, ar | Teachers (opt-in, D2) | Weekly cron over notStartedStudents(context) per teacher's courses; needs LMS_ROSTER_SYNC_ENABLED | NAME, NOT_STARTED, COURSE_LABEL, ACTION_URL |
+| 15 | lms-activity-may-be-deleted | en, ar | Teachers of the class (opt-in, D2); admins see the same list on the grades page | lineItemGoneAt set during a grade send (404/410), or stale (30 days without launch or result) | NAME, ACTIVITY_COUNT, COURSE_LABEL, LMS_NAME, ACTION_URL |
+| 16 | lms-grade-changed-in-lms | en, ar | Teachers of the class (opt-in, D2) | grade.lms_changed with result 'flagged'; needs GRADE_LEDGER_ENABLED + passback | NAME, LMS_NAME, CHANGED_COUNT, COURSE_LABEL, ACTION_URL |
+| 17 | lms-newer-attempt-waiting | en, ar | Teachers of the class (opt-in, D2) | grade.kept_released (owner decision G2) | NAME, WAITING_COUNT, COURSE_LABEL, ACTION_URL |
+| 18 | lms-ops-school-connected | en | ENARA ops (LMS_OPS_EMAILS) | platform.registered (active) / platform.approved | SCHOOL_NAME, INSTITUTION_ID, LMS_NAME, REGISTERED_VIA, DEPLOYMENTS, BY_ROLE, PLATFORM_ID, ACTION_URL |
+| 19 | lms-ops-approval-needed | en | ENARA ops (LMS_OPS_EMAILS) | platform.registered pending, deployment.registered pending, deployment auto-created at launch | SCHOOL_NAME, INSTITUTION_ID, LMS_NAME, ITEM, WAITING_SINCE, PLATFORM_ID, ACTION_URL |
+| 20 | lms-ops-error-spike | en | ENARA ops (LMS_OPS_EMAILS) | New code needed: throttled count of lms_audit_log outcome 'fail' per school on each fail write | SCHOOL_NAME, INSTITUTION_ID, LMS_NAME, WINDOW, FAIL_COUNT, TOTAL_COUNT, TOP_CODE, TOP_CODE_COUNT, FIRST_AT, ACTION_URL, REFERENCE_CODE |
+| E1 | lms-seats-hard-cap | en, ar | School admins (ops see it in the E5 digest) | seats.hard_cap (student refused with seat_limit_reached) | NAME, SCHOOL_NAME, SEATS_USED, SEAT_LIMIT, REFUSED_COUNT, ACTION_URL |
+| E2 | lms-ops-billing-flag | en | ENARA ops (LMS_OPS_EMAILS) | billingFlaggedAt first set (seats over the limit) | SCHOOL_NAME, INSTITUTION_ID, SEATS_USED, SEAT_LIMIT, HARD_CAP, FLAGGED_ON, ACTION_URL |
+| E4 | lms-ops-key-rotation-due | en | ENARA ops (LMS_OPS_EMAILS) | New code needed: daily check of lms_tool_keys (a 'next' key older than 24 h not yet promoted, or no 'active' key) | KEY_STATE, ACTIVE_SINCE, NEXT_SINCE, ACTION_URL |
+| E5 | lms-ops-daily-digest | en | ENARA ops (LMS_OPS_EMAILS) | Daily cron: pending approvals > 24 h, billing flags, dead grade jobs (all schools), unknown-LMS launches, cookieless share, roster failures, key problems, switch-offs | DATE, PENDING_OVER_24H, BILLING_FLAGS, DEAD_JOBS, ROSTER_FAILED, KEY_PROBLEMS, SWITCHED_OFF, UNKNOWN_LMS_LAUNCHES, COOKIELESS_TOP, ACTION_URL |
+| E6 | lms-roster-removals-skipped | en, ar | School admins | roster.removals_skipped warn, codes roster_truncated / empty_roster | NAME, COURSE_NAME, LMS_NAME, REASON, ACTION_URL |
+| P1 | parent-invite | en, ar | Parent (email given by the school: single code or CSV invite) | School sends a parent link code (single, or CSV invitations P5) | NAME, CHILD_NAME, SCHOOL_NAME, LINK_CODE, EXPIRES_IN, ACTION_URL |
+| P2 | parent-link-confirmed | en, ar | Parent | A parent link becomes active (any source) | NAME, CHILD_NAME, SCHOOL_NAME, ACTION_URL |
+| P3 | parent-link-ended | en, ar | Parent | The school unlinks the parent, or the student is archived / leaves (link kept as "ended", D8) | NAME, CHILD_NAME, SCHOOL_NAME |
+| P4 | parent-weekly-summary | en, ar | Parent | Weekly schedule (Sunday evening, Cairo); opt-out | NAME, CHILD_NAME, WEEK_LABEL, MINUTES_DONE, GOAL_MINUTES, LESSONS_DONE, OUTCOMES_MASTERED, CEFR_LEVEL, STATUS_LINE, PRACTICE_TIP, ACTION_URL |
+| P5 | parent-new-results | en, ar | Parent | A result becomes visible to the parent (per the school's grades setting; default after teacher review, D7) | NAME, CHILD_NAME, TEST_NAME, CLASS_NAME, SCORE, LEVEL, ACTION_URL |
 
-The From address of every email is `EMAIL_SENDER` (env) when set, else the default above (D11).
+All of them were approved by the owner on 2026-11-18 except #1 (`lms-invite-connect`, built and approved
+with the onboarding work). The From address of every email is `EMAIL_SENDER` (env) when set, else the
+default above (D11).
 
-## Drafts (`drafts/`, not approved, never sent)
+## Previews and drafts
 
-`drafts/lms/` (LMS emails, plan `LMS_EMAIL_TEMPLATES_PLAN.md`) and `drafts/parents/` (parent emails) hold the
-not-yet-approved templates: `<alias>-en.html`, `<alias>-ar.html` (ops emails `lms-ops-*` are English only, D4)
-and one `<alias>.json` per template (subjects EN/AR, recipient, trigger, delivery, variables with fallbacks and
-FAKE sample values). They are outside `templates/` and `lms/`, not in any registry or bundle, so no code path can
-send them. On approval a pair moves to `lms/` (or `templates/`) and gets bundled.
-
-Preview them (no network, no Resend; logo inlined; Tahoma mapped to an installed Arabic font):
+Render every LMS and parent email to PNG with its FAKE sample values (no network, no Resend; logo inlined;
+Tahoma mapped to an installed Arabic font; also checks placeholders, right-to-left text and links):
 
 ```bash
-node scripts/email/render-drafts.mjs --out /tmp/email-previews   # PNGs, contact sheets, INDEX.md
+node scripts/email/render-previews.mjs --out /tmp/email-previews   # PNGs, contact sheets, INDEX.md
 ```
+
+New, not-yet-approved emails go in `drafts/lms/` or `drafts/parents/` (outside every bundle, so no code
+path can send them): `<alias>-en.html`, `<alias>-ar.html` and one bilingual `<alias>.json` (`languages`,
+`subject.{en,ar}`, `variables[].{key, fallback_value.{en,ar}, sample.{en,ar}}`, recipient, trigger,
+delivery, frequency). `render-previews.mjs` renders them too. On approval, split the JSON into
+`<alias>-<lang>.json`, move the pair into `lms/` or `parents/`, add `status`/`approvedOn` and re-bundle.
