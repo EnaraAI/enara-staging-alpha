@@ -178,13 +178,13 @@ router.get('/lms-evidence', async (req, res, next) => {
 router.get('/lms-emails', async (req, res, next) => {
   try {
     const { LmsEmailLog } = await import('../integrations/lms/models');
-    const { cairoDay, capCount, heldToday } = await import('../integrations/lms/core/lmsEmail');
+    const { cairoDay, ceilingCount, heldToday, emailPolicy } = await import('../email/testInbox');
     const n = Math.min(500, Math.max(1, Number(req.query.limit) || 200));
     const template = typeof req.query.template === 'string' ? req.query.template.slice(0, 80) : undefined;
     const rows = await LmsEmailLog.find(template ? { template } : {}).sort({ createdAt: -1 }).limit(n).lean();
     const day = cairoDay();
     res.json({
-      today: { cairoDay: day, capUsed: await capCount(day), held: await heldToday(day) },
+      today: { cairoDay: day, ceiling: emailPolicy().ceiling ?? null, ceilingUsed: await ceilingCount(day), held: await heldToday(day) },
       emails: rows.map((r) => ({
         key: r.key, template: r.template, lang: r.lang, status: r.status, code: r.code ?? null, subject: r.subject ?? null, institutionId: r.institutionId ?? null,
         platformId: r.platformId ?? null, recipientCount: r.recipientCount, redirected: r.redirected, cairoDay: r.cairoDay, createdAt: r.createdAt,

@@ -8,7 +8,7 @@ import { resetConfigForTests } from '../../src/config/env';
 // LMS emails wired to events (lms-test): every trigger fires once, with the
 // right template and language; the gates (LMS_EMAILS_ENABLED, REMINDERS_ENABLED,
 // RESEND_API_KEY, the E2E capture); the test inbox redirect, the subject prefix
-// and the daily cap; the digests' grouping; the teacher opt-in (D2); no student
+// and the daily safety ceiling; the digests' grouping; the teacher opt-in (D2); no student
 // names (D3). Resend is mocked: nothing is ever sent. No network.
 const sendMock = vi.fn();
 vi.mock('resend', () => ({ Resend: vi.fn().mockImplementation(() => ({ emails: { send: sendMock } })) }));
@@ -22,7 +22,7 @@ const BASE_ENV = {
 };
 const ENV_KEYS = [
   'LMS_LTI_ENABLED', 'LMS_TOOL_BASE_URL', 'LMS_KEK', 'LMS_DRAIN_TRIGGERS', 'LMS_ROSTER_SYNC_ENABLED', 'LMS_EMAILS_ENABLED', 'REMINDERS_ENABLED', 'RESEND_API_KEY', 'APP_URL',
-  'REMINDER_TEST_RECIPIENT', 'EMAIL_SUBJECT_PREFIX', 'LMS_TEST_DAILY_CAP', 'LMS_EMAIL_CAPTURE', 'LMS_OPS_EMAILS', 'LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL',
+  'REMINDER_TEST_RECIPIENT', 'EMAIL_SUBJECT_PREFIX', 'EMAIL_DAILY_CEILING', 'LMS_EMAIL_CAPTURE', 'LMS_OPS_EMAILS', 'LMS_SCHOOL_CONNECTIONS_REQUIRE_APPROVAL',
 ];
 const OPS = 'ops@ops.enara.app';
 const ON = {
@@ -475,7 +475,8 @@ describe('admin and ops digests (daily cron)', () => {
     expect(digest.html).toMatch(/>2</); // FAILED_COUNT 2 (the held LMS_VALUE_DIFFERS job is not counted)
     expect(digest.html).toContain('Moodle refused access');
     const opsDigest = sentTo(OPS).find((s) => s.subject.startsWith('[LMS] Daily summary'))!;
-    expect(opsDigest.html).toContain('Test inbox daily cap (lms-test)');
+    expect(opsDigest.html).toContain('Email safety ceiling (all emails, per day)');
+    expect(opsDigest.html).toMatch(/per day\)<\/td><td[^>]*>none</); // no ceiling outside staging unless EMAIL_DAILY_CEILING is set
     expect(sentTo(OPS).find((s) => s.subject.includes('signing key'))!.html).toContain('kid-next');
     expect(sentTo(TEACHER_EMAIL)).toHaveLength(0); // nobody opted in here
     // Again the same day: nothing new.
@@ -489,50 +490,77 @@ describe('admin and ops digests (daily cron)', () => {
   });
 });
 
-// ------------------------------------------------------------ lms-test: redirect, prefix, daily cap
+// ------------------------------------------------------------ lms-test: redirect, prefix, safety ceiling
 
-describe('lms-test: test inbox redirect, subject prefix and the daily cap', () => {
+describe('lms-test: test inbox redirect, subject prefix and the daily safety ceiling', () => {
   const INBOX = 'owner-inbox@qa.enara.app';
-  it('one copy per event to the test inbox only, "Test copy" line, "[lms-test] " prefix; above the cap held (recorded) except the ops digest, which states it', async () => {
-    setEnv({ ...ON, REMINDER_TEST_RECIPIENT: INBOX, EMAIL_SUBJECT_PREFIX: '[lms-test]', LMS_TEST_DAILY_CAP: '2' });
+  const staging = async (vars: Record<string, string | undefined>) => {
+    setEnv(vars);
+    const { getConfig } = await import('../../src/config/env');
+    (getConfig() as { stagingMode: boolean }).stagingMode = true; // as ENARA_STAGING=true on lms-test
+  };
+
+  it('no 20-a-day cap any more: every email is sent when its event happens (25 in a day), one copy each to the test inbox, "Test copy" line, "[lms-test] " prefix', async () => {
+    await staging({ ...ON, REMINDER_TEST_RECIPIENT: INBOX, EMAIL_SUBJECT_PREFIX: '[lms-test]' });
     await mkUser(`adminB2-${seq}`, `deputy${seq}@school-b.enara.app`, 'admin', B, 'Deputy Head');
-    const p1 = await platform(B);
-    const p2 = await platform(B);
-    const p3 = await platform(B);
-    expect(await E.notifyConnectionActive(p1)).toMatchObject({ sent: 1 });
-    expect(await E.notifyConnectionActive(p2)).toMatchObject({ sent: 1 });
-    expect(await E.notifyConnectionActive(p3)).toMatchObject({ sent: 0, held: 1 });
-    expect(await E.notifyConnectionActive(p3)).toMatchObject({ sent: 0, duplicate: 1 }); // held stays held
+    const ps = [];
+    for (let i = 0; i < 25; i++) ps.push(await platform(B));
+    for (const p of ps) expect(await E.notifyConnectionActive(p)).toMatchObject({ sent: 1, held: 0 });
+    expect(sent()).toHaveLength(25);
     expect(sent().every((s) => s.to === INBOX)).toBe(true);
-    expect(sent()).toHaveLength(2);
-    expect(sent()[0].subject).toBe(`[lms-test] Moodle (${new URL(p1.issuer).host}) is now connected to Enara`);
+    expect(sent()[0].subject).toBe(`[lms-test] Moodle (${new URL(ps[0].issuer).host}) is now connected to Enara`);
     expect(sent()[0].html).toContain(`Test copy: this email was for ${ADMIN_B}, deputy`);
     const rows = await logs('lms-connection-active');
-    expect(rows.map((r) => [r.status, r.recipientRef, r.redirected, r.recipientCount])).toEqual([['sent', 'redirect', true, 2], ['sent', 'redirect', true, 2], ['held', 'redirect', true, 2]]);
-    expect(await L.capCount(L.cairoDay())).toBe(2);
-    // The ops digest always goes and says what was held back.
+    expect(rows.every((r) => r.status === 'sent' && r.recipientRef === 'redirect' && r.redirected && r.recipientCount === 2)).toBe(true);
+    expect(await L.ceilingCount(L.cairoDay())).toBe(25); // of the default 300
+    expect((await import('../../src/email/testInbox')).emailPolicy().ceiling).toBe(300);
+  });
+
+  it('the safety ceiling (EMAIL_DAILY_CEILING): above it held (recorded, not sent), ONE alert email (exempt) to the test inbox, one critical alert + audit; the ops digest reports it', async () => {
+    await staging({ ...ON, REMINDER_TEST_RECIPIENT: INBOX, EMAIL_SUBJECT_PREFIX: '[lms-test]', EMAIL_DAILY_CEILING: '2' });
+    const ps = [await platform(B), await platform(B), await platform(B), await platform(B)];
+    expect(await E.notifyConnectionActive(ps[0])).toMatchObject({ sent: 1 });
+    expect(await E.notifyConnectionActive(ps[1])).toMatchObject({ sent: 1 });
+    expect(await E.notifyConnectionActive(ps[2])).toMatchObject({ sent: 0, held: 1 });
+    expect(await E.notifyConnectionActive(ps[2])).toMatchObject({ sent: 0, duplicate: 1 }); // held stays held
+    expect(await E.notifyConnectionActive(ps[3])).toMatchObject({ sent: 0, held: 1 });
+    // 2 LMS emails + exactly one alert email, which is exempt from the ceiling.
+    expect(sent().map((s) => s.subject)).toEqual([expect.stringMatching(/^\[lms-test\] Moodle/), expect.stringMatching(/^\[lms-test\] Moodle/), '[lms-test] Email safety ceiling hit: 1 held']);
+    const alert = sent()[2];
+    expect(alert.to).toBe(INBOX);
+    expect(alert.html).toContain(`Test copy: this email was for ${OPS}`);
+    expect(alert.html).toContain('The email safety ceiling (2 emails per Cairo day, all send paths)');
+    expect(await L.ceilingCount(L.cairoDay())).toBe(2);
+    const { AlertEvent } = await import('../../src/models/AlertEvent');
+    const { AuditEvent } = await import('../../src/models/AuditEvent');
+    expect(await AlertEvent.countDocuments({ kind: 'email_daily_ceiling_hit', severity: 'critical' })).toBe(1);
+    expect(await AuditEvent.countDocuments({ action: 'email_daily_ceiling_hit' })).toBe(1);
+    const day = L.cairoDay();
+    expect(await L.heldToday(day)).toEqual({ total: 2, byTemplate: [{ template: 'lms-connection-active', n: 2 }] });
+    expect((await logs('lms-connection-active')).map((r) => [r.status, r.code ?? null])).toEqual([['sent', null], ['sent', null], ['held', 'daily_ceiling'], ['held', 'daily_ceiling']]);
+    // With room again (the ceiling raised by hand), the ops digest states what was held.
+    await staging({ ...ON, REMINDER_TEST_RECIPIENT: INBOX, EMAIL_SUBJECT_PREFIX: '[lms-test]', EMAIL_DAILY_CEILING: '10' });
     await platform(B, { status: 'pending', createdAt: new Date(Date.now() - 3 * 86_400_000) }); // a non-zero row
     await D.opsDailyDigest(new Date(), {});
     const digest = sent().find((s) => s.subject.startsWith('[lms-test] [LMS] Daily summary'))!;
     expect(digest.to).toBe(INBOX);
-    expect(digest.html).toContain('cap hit: 1 held back (lms-connection-active 1)');
-    expect(digest.html).toContain(`Test copy: this email was for ${OPS}`);
-    // The maintenance view shows the same (IDs, codes, subjects; no address).
-    const day = L.cairoDay();
-    expect(await L.heldToday(day)).toEqual({ total: 1, byTemplate: [{ template: 'lms-connection-active', n: 1 }] });
+    expect(digest.html).toContain('Email safety ceiling (all emails, per day)');
+    expect(digest.html).toContain('ceiling hit: 2 held (lms-connection-active 2)');
+    expect(sent().filter((s) => s.subject.includes('Email safety ceiling hit'))).toHaveLength(1); // still one alert
   });
 
-  it('the cap is atomic under parallel sends', async () => {
-    setEnv({ ...ON, REMINDER_TEST_RECIPIENT: INBOX, LMS_TEST_DAILY_CAP: '3' });
+  it('the ceiling is atomic under parallel sends', async () => {
+    await staging({ ...ON, REMINDER_TEST_RECIPIENT: INBOX, EMAIL_DAILY_CEILING: '3' });
     const ps = await Promise.all(Array.from({ length: 8 }, () => platform(B)));
     const results = await Promise.all(ps.map((p) => E.notifyConnectionActive(p)));
     expect(results.reduce((a, r) => a + (r?.sent ?? 0), 0)).toBe(3);
     expect(results.reduce((a, r) => a + (r?.held ?? 0), 0)).toBe(5);
-    expect(sendMock).toHaveBeenCalledTimes(3);
+    expect(sent().filter((s) => !s.subject.includes('Email safety ceiling hit'))).toHaveLength(3);
+    expect(sent().filter((s) => s.subject.includes('Email safety ceiling hit'))).toHaveLength(1);
   });
 
-  it('without a test inbox: no cap, no prefix unless EMAIL_SUBJECT_PREFIX is set, reserved addresses (.example) never emailed', async () => {
-    setEnv({ ...ON, LMS_TEST_DAILY_CAP: '1' });
+  it('not staging, no EMAIL_DAILY_CEILING: no ceiling, no prefix unless EMAIL_SUBJECT_PREFIX is set, reserved addresses (.example) never emailed', async () => {
+    setEnv(ON);
     const { User } = await import('../../src/models/User');
     await User.create({ email: `a${seq}@school.example`, password: 'x', role: 'admin', name: 'Fake', institutionId: B });
     const ps = [await platform(B), await platform(B)];
@@ -540,5 +568,6 @@ describe('lms-test: test inbox redirect, subject prefix and the daily cap', () =
     expect(sent().map((s) => s.to).sort()).toEqual([ADMIN_B, ADMIN_B, expect.stringMatching(/^deputy/), expect.stringMatching(/^deputy/)].sort());
     expect(sent().every((s) => !s.subject.startsWith('['))).toBe(true);
     expect(sent().every((s) => !s.html.includes('Test copy'))).toBe(true);
+    expect(await L.ceilingCount(L.cairoDay())).toBe(0);
   });
 });

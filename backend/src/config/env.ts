@@ -74,6 +74,13 @@ export interface AppConfig {
      * so a test copy is never mistaken for a real one. Unset in production.
      */
     subjectPrefix?: string;
+    /**
+     * EMAIL_DAILY_CEILING: a safety ceiling against bugs, across EVERY send path,
+     * per Cairo day (email/testInbox.ts). Above it emails are held (recorded, not
+     * sent) and one critical alert + one alert email go out. Default 300 on a
+     * staging deployment (ENARA_STAGING); elsewhere none unless the variable is set.
+     */
+    dailyCeiling?: number;
   };
   appUrl: string;
   // Parents Portal "Continue with Google": the OAuth 2.0 Web client ID. Public
@@ -186,12 +193,6 @@ export interface LmsConfig {
   emailsEnabled: boolean;
   /** LMS_OPS_EMAILS: ENARA ops mailboxes for the lms-ops-* emails (comma list; owner decision D4). Malformed entries are dropped. */
   opsEmails: string[];
-  /**
-   * LMS_TEST_DAILY_CAP: with REMINDER_TEST_RECIPIENT set (lms-test), at most this many LMS
-   * emails per Cairo day go to the test inbox (default 20); the rest are held (recorded,
-   * not sent), except the ops daily digest. 0 = no cap. Ignored without a test recipient.
-   */
-  testDailyCap: number;
   /**
    * LMS_EMAIL_CAPTURE (the Docker E2E stack only): LMS emails are rendered and recorded in
    * lms_email_log as 'captured' instead of being sent; Resend is never called and no
@@ -335,7 +336,6 @@ export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
     platformStorageEnabled: readBoolean(source, 'LMS_PLATFORM_STORAGE_ENABLED', true),
     emailsEnabled: readBoolean(source, 'LMS_EMAILS_ENABLED', false),
     opsEmails: (readString(source, 'LMS_OPS_EMAILS') ?? '').split(',').map((x) => x.trim().toLowerCase()).filter((x) => /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]+$/.test(x)).slice(0, 10),
-    testDailyCap: readNumber(source, 'LMS_TEST_DAILY_CAP', 20, { min: 0, max: 10_000 }),
     emailCapture: readBoolean(source, 'LMS_EMAIL_CAPTURE', false),
     google: {
       clientId: readString(source, 'GOOGLE_CLASSROOM_CLIENT_ID'),
@@ -438,6 +438,9 @@ function parseTestSpend(source: NodeJS.ProcessEnv): AppConfig["aiTestSpend"] {
   return { id, capUsd };
 }
 
+/** The email safety ceiling on a staging deployment unless EMAIL_DAILY_CEILING says otherwise. */
+export const DEFAULT_EMAIL_DAILY_CEILING = 300;
+
 export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
   // A misspelt ENARA_STAGING would silently skip the guard: refuse it.
   const flagProblem = stagingFlagProblem(source);
@@ -529,6 +532,9 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     testRecipient: readString(source, "REMINDER_TEST_RECIPIENT"),
     // "[lms-test]" -> "[lms-test] " (one space is added; env editors often trim a trailing space).
     subjectPrefix: readString(source, "EMAIL_SUBJECT_PREFIX") ? `${readString(source, "EMAIL_SUBJECT_PREFIX")!.slice(0, 40)} ` : undefined,
+    dailyCeiling: readString(source, "EMAIL_DAILY_CEILING") !== undefined || staging
+      ? readNumber(source, "EMAIL_DAILY_CEILING", DEFAULT_EMAIL_DAILY_CEILING, { min: 1, max: 100_000 })
+      : undefined,
   };
 
   const awsS3Bucket = readString(source, "AWS_S3_BUCKET");

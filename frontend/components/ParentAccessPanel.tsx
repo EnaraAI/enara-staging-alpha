@@ -28,12 +28,18 @@ export const ParentAccessPanel: React.FC<{ studentId: string; studentName: strin
   }, [studentId]);
   useEffect(() => { load(); }, [load]);
 
+  // lms-test: "Send code by email" is blocked until a later step; a code without email still works.
+  const emailBlocked = data?.parentEmail?.blocked === true;
+  const emailBlockedNote = data?.parentEmail?.message?.en || 'Parent emails are switched on in a later step.';
   const create = async () => {
     setBusy(true); setCopied(false);
     try {
-      const r = await createParentCode(studentId, email.trim() || undefined);
+      const r = await createParentCode(studentId, emailBlocked ? undefined : email.trim() || undefined);
       setFresh(r); setEmail(''); load();
-    } catch (e: any) { setError(e?.message || 'Could not create a code.'); } finally { setBusy(false); }
+    } catch (e: any) {
+      if (e?.code === 'PARENT_EMAIL_BLOCKED_STAGING') { setError(e?.message || emailBlockedNote); load(); }
+      else setError(e?.message || 'Could not create a code.');
+    } finally { setBusy(false); }
   };
   const copy = async () => {
     if (!fresh) return;
@@ -54,12 +60,14 @@ export const ParentAccessPanel: React.FC<{ studentId: string; studentName: strin
 
       <div className="flex flex-col sm:flex-row gap-2">
         <label className="sr-only" htmlFor="parent-code-email">Parent email (optional)</label>
-        <input id="parent-code-email" type="email" placeholder="Parent email (optional, sends the code)" value={email} onChange={(e) => setEmail(e.target.value)}
-          className="h-11 flex-1 min-w-0 rounded-md border border-slate-300 px-3 text-sm" />
+        <input id="parent-code-email" type="email" placeholder={emailBlocked ? 'Sending the code by email is off' : 'Parent email (optional, sends the code)'} value={emailBlocked ? '' : email} onChange={(e) => setEmail(e.target.value)}
+          disabled={emailBlocked} aria-describedby={emailBlocked ? 'parent-code-email-off' : undefined} data-testid="parent-code-email"
+          className="h-11 flex-1 min-w-0 rounded-md border border-slate-300 px-3 text-sm disabled:bg-slate-100 disabled:text-slate-400" />
         <button type="button" onClick={create} disabled={busy} className="h-11 px-4 rounded-md bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold inline-flex items-center justify-center gap-2 disabled:opacity-60">
           <KeyRound size={16} />Create parent link code
         </button>
       </div>
+      {emailBlocked && <p id="parent-code-email-off" className="text-xs text-slate-600" role="note" data-testid="parent-code-email-blocked">{emailBlockedNote} Give the code to the parent yourself.</p>}
 
       {fresh && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2" role="status">

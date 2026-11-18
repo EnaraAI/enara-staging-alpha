@@ -15,15 +15,18 @@ owner decisions D1-D14 of 18 Nov 2026.
 | Never twice | `lms_email_log.key` is unique per (event key, recipient). A failed email is retried at most 3 times; a held one never. Digests use a per-day key (one per recipient or per connection per Cairo day). Windows ("once per 24 h", "72 h", "7 days", "once per attempt") are atomic claims in `lms_email_claims`. |
 | Test inbox (lms-test) | With `REMINDER_TEST_RECIPIENT`: ONE copy per event goes to that inbox only (never to the real recipients), with a "Test copy: this email was for ..." line naming them. |
 | Subject prefix | `EMAIL_SUBJECT_PREFIX` (lms-test: `[lms-test]`, a space is added) in front of every LMS subject. Unset in production. |
-| Daily cap (lms-test) | With `REMINDER_TEST_RECIPIENT`: at most `LMS_TEST_DAILY_CAP` (default 20, 0 = no cap) emails per Cairo day to the inbox (atomic counter `cap:<day>`). Above it the email is **held** (recorded in `lms_email_log`, status `held`, code `daily_cap`, not sent), except the ops daily digest (E5), which always goes and says `cap hit: N held back (template n, ...)`. |
+| Safety ceiling | No daily cap any more (owner update 18 Nov 2026): every email is sent when its event happens. ONE safety ceiling against bugs across ALL send paths: `EMAIL_DAILY_CEILING` emails per Cairo day (default 300 on a staging deployment; none elsewhere unless set), one atomic counter (`lms_email_claims` `ceiling:<day>`). Above it the email is **held** (recorded in `lms_email_log`, status `held`, code `daily_ceiling`, not sent); the first hit of the day raises one critical alert (`email_daily_ceiling_hit`) + an audit row and sends ONE alert email "[lms-test] Email safety ceiling hit: N held" (to the test inbox on staging, `LMS_OPS_EMAILS` elsewhere), itself exempt from the ceiling. The ops digest (E5) reports it in its `CAP_NOTE` row. |
+| Provider limits | Resend free tier: 100 emails a day, 3,000 a month, 10 requests a second (`backend/src/email/provider.ts`). Every provider call is paced (at most ~9 a second per instance). A quota refusal (429, `daily_quota_exceeded`, `monthly_quota_exceeded`, `rate_limit_exceeded`) is a failure, never a throw; it raises one critical alert a day (`email_provider_quota_hit`) + audit, and after a daily/monthly quota refusal that instance stops calling Resend for the rest of the Cairo day (code `provider_quota`, the email is held), so there is no retry storm. |
+| Every other email (lms-test) | The same rules for every send path, not only LMS emails (`backend/src/email/testInbox.ts`): staff invitations, password resets, parent templates and the legacy `sendEmail`. On a staging deployment (`ENARA_STAGING=true`) each goes as ONE copy to `REMINDER_TEST_RECIPIENT` with the subject prefix and the "Test copy" line, counts against the same safety ceiling (row in `lms_email_log` with the template alias, no address and no subject), and is captured with `LMS_EMAIL_CAPTURE`. Without `REMINDER_TEST_RECIPIENT` nothing is sent (code `staging_no_test_inbox`). Not staging: unchanged (the real recipients). |
+| Parent emails (lms-test) | Blocked on staging, not just redirected (owner, 18 Nov 2026): "Send code by email" (student profile) and "Share this week -> Email" (parent portal) answer 409 `PARENT_EMAIL_BLOCKED_STAGING` ("Parent emails are switched on in a later step.", EN/AR) and the UI disables them with that note (`backend/src/parents/emailBlock.ts`). A code without email and the WhatsApp preview still work. Parents P4 brings them back through the safe path. |
 | Values | Every value is HTML-escaped; reasons/fixes are code-owned sentences (`lmsEmailText.ts`); Latin tokens in Arabic stay left-to-right. No student names or per-student values (D3). No token, code or key in a link. |
-| Records | `lms_email_log`: key, template, language, status, code, subject, ids, Cairo day. Never an address, a name or the body. `GET /api/maintenance/lms-emails` (test site only) lists them with today's cap use and held counts. |
+| Records | `lms_email_log`: key, template, language, status, code, subject, ids, Cairo day. Never an address, a name or the body. `GET /api/maintenance/lms-emails` (test site only) lists them with today's ceiling use (`ceiling`, `ceilingUsed`) and held counts. |
 
 ## Triggers
 
 | # | Template | Trigger | Where |
 |---|---|---|---|
-| 1 | `lms-invite-connect` | "Send email" on the onboarding invite (now through `sendLmsEmail`: redirect, prefix, cap; a held one answers 429 `LMS_EMAIL_HELD`) | `core/onboarding.ts` |
+| 1 | `lms-invite-connect` | "Send email" on the onboarding invite (now through `sendLmsEmail`: redirect, prefix, safety ceiling; a held one answers 429 `LMS_EMAIL_HELD`) | `core/onboarding.ts` |
 | 2a / 2b | `lms-invite-expiring` / `-expired` | Daily: the onboarding's current link, invite sent, unused and expiring within 3 days / expired unused in the last 7 days. Once per link. To the school contact (and admins) | `core/lmsEmailDaily.ts` |
 | 3, 4b | `lms-connection-active` | Audit `platform.registered` (active) or `platform.approved`. Once per activation | `core/lmsEmailEvents.ts` |
 | 4a, E3 | `lms-connection-pending` | `platform.registered` pending; `deployment.registered` pending (school admin); a launch that auto-created a pending deployment. Once per connection / deployment | events |
@@ -48,7 +51,7 @@ owner decisions D1-D14 of 18 Nov 2026.
 | E1 | `lms-seats-hard-cap` | A student refused at the hard cap. Once per school per 24 h | seats |
 | E2 | `lms-ops-billing-flag` | The billing flag set (once per flag) | seats |
 | E4 | `lms-ops-key-rotation-due` | Daily: a `next` signing key older than 24 h, or no active key while a connection is active. Once per state per day | daily |
-| E5 | `lms-ops-daily-digest` | Daily, after the others, only when a row is non-zero or something was held. Always sent (past the cap). New row "Test inbox daily cap (lms-test)" (`CAP_NOTE`) | daily |
+| E5 | `lms-ops-daily-digest` | Daily, after the others, only when a row is non-zero or something was held. Row "Email safety ceiling (all emails, per day)" (`CAP_NOTE`: "N of 300 used, nothing held" or "ceiling hit: N held (template n, ...)"; "none" without a ceiling). Counts against the ceiling like every email | daily |
 | E6 | `lms-roster-removals-skipped` | Daily: `roster.removals_skipped` (`roster_truncated`, `empty_roster`). Once per course + code per 7 days | daily |
 
 Immediate emails run in the background after the response (`runInBackground`, Vercel `waitUntil`): they never delay
@@ -107,7 +110,7 @@ the run if the app has a Resend key or LMS emails on without capture.
 | `RESEND_API_KEY` | the Resend key (Sensitive, by hand) |
 | `REMINDER_TEST_RECIPIENT` | the owner's test inbox (by hand; never in the repo) |
 | `EMAIL_SUBJECT_PREFIX` | `[lms-test]` |
-| `LMS_TEST_DAILY_CAP` | leave unset (default 20); set by hand only to change it |
+| `EMAIL_DAILY_CEILING` | leave unset (default 300 a Cairo day on staging); set by hand only to change it (`LMS_TEST_DAILY_CAP` is gone) |
 | `LMS_OPS_EMAILS` | the ops mailbox(es), comma list (by hand) |
 | `EMAIL_SENDER` | optional, the From address (D11) |
 | `APP_URL`, `CRON_SECRET` | already set |

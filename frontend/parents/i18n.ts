@@ -50,7 +50,7 @@ export const T = {
     weeklyGoal: (n: string) => `Weekly goal: ${n} min`, acceptedBy: (name: string) => `Accepted by ${name}`, waitingFor: (name: string) => `Waiting for ${name}`,
     alertCat: { personal_details: 'Shared personal details', inappropriate_content: 'Tried to push the tutor off-limits', distress: 'Signs of distress', bullying: 'Mentioned bullying' } as Record<string, string>,
     whatEnaraDid: 'What ENARA did', excerpt: 'What was said', manage: 'Manage',
-    share: 'Share this week', shareTitle: (name: string) => `${name}'s week in English`, shareEmail: 'Send by email', shareWhatsapp: 'Share on WhatsApp', shareSent: 'Sent to your email.', shareWhatsappReady: 'WhatsApp message ready (sending is not connected yet):', shareFailed: 'Could not send. Try again later.', close: 'Close',
+    share: 'Share this week', shareTitle: (name: string) => `${name}'s week in English`, shareEmail: 'Send by email', shareWhatsapp: 'Share on WhatsApp', shareSent: 'Sent to your email.', shareWhatsappReady: 'WhatsApp message ready (sending is not connected yet):', shareFailed: 'Could not send. Try again later.', shareEmailBlocked: 'Parent emails are switched on in a later step.', close: 'Close',
     heLearned: 'Learned', streakShort: 'day streak', openPortal: 'Open ENARA Parents', weekOf: (d: string) => `ENARA · week of ${d}`,
     // Progress
     progressTitle: 'Progress', cefrTitle: 'English level (CEFR)', skills: 'Skills', skillsSub: (lvl: string) => `Share of ${lvl} goals mastered · trend over 4 weeks`,
@@ -134,7 +134,7 @@ export const T = {
     weeklyGoal: (n: string) => `هدف الأسبوع: ${n} دقيقة`, acceptedBy: (name: string) => `${name} وافق`, waitingFor: (name: string) => `مستني موافقة ${name}`,
     alertCat: { personal_details: 'شارك بيانات شخصية', inappropriate_content: 'حاول يخلّي المدرّس يتكلم في حاجة مش مناسبة', distress: 'علامات ضيق', bullying: 'اتكلم عن تنمّر' } as Record<string, string>,
     whatEnaraDid: 'إنارة عملت إيه', excerpt: 'اللي اتقال', manage: 'إدارة',
-    share: 'شارك الأسبوع ده', shareTitle: (name: string) => `أسبوع ${name} في الإنجليزي`, shareEmail: 'ابعت بالإيميل', shareWhatsapp: 'شارك على واتساب', shareSent: 'اتبعت على إيميلك.', shareWhatsappReady: 'رسالة واتساب جاهزة (الإرسال لسه مش متوصّل):', shareFailed: 'مقدرناش نبعت. جرّب بعدين.', close: 'إغلاق',
+    share: 'شارك الأسبوع ده', shareTitle: (name: string) => `أسبوع ${name} في الإنجليزي`, shareEmail: 'ابعت بالإيميل', shareWhatsapp: 'شارك على واتساب', shareSent: 'اتبعت على إيميلك.', shareWhatsappReady: 'رسالة واتساب جاهزة (الإرسال لسه مش متوصّل):', shareFailed: 'مقدرناش نبعت. جرّب بعدين.', shareEmailBlocked: 'إيميلات أولياء الأمور هتتفعّل في خطوة جاية.', close: 'إغلاق',
     heLearned: 'اتعلّم', streakShort: 'أيام ورا بعض', openPortal: 'افتح إنارة لأولياء الأمور', weekOf: (d: string) => `إنارة · أسبوع ${d}`,
     progressTitle: 'التقدّم', cefrTitle: 'مستوى الإنجليزي (CEFR)', skills: 'المهارات', skillsSub: (lvl: string) => `نسبة أهداف ${lvl} اللي اتقنها · الاتجاه في ٤ أسابيع`,
     skill: { listening: 'الاستماع', speaking: 'الكلام', reading: 'القراءة', writing: 'الكتابة', vocabulary: 'الكلمات', grammar: 'القواعد' } as Record<string, string>,

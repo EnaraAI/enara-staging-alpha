@@ -151,14 +151,15 @@ services:
       # LMS emails (docs/lms/LMS_EMAILS.md) as on lms-test (test inbox redirect,
       # "[lms-test]" prefix), but CAPTURED: rendered and recorded in lms_email_log,
       # never sent. There is deliberately NO RESEND_API_KEY in this stack, so even
-      # without the capture nothing could be sent. Fake addresses only. The cap is
-      # raised so the suite's order cannot hold back the emails it asserts.
+      # without the capture nothing could be sent. Fake addresses only. The email
+      # safety ceiling (default 300 a day on staging) is raised so repeated local
+      # runs on one database cannot hold back the emails the suite asserts.
       LMS_EMAILS_ENABLED: "true"
       REMINDERS_ENABLED: "true"
       LMS_EMAIL_CAPTURE: "true"
       REMINDER_TEST_RECIPIENT: lms-e2e-inbox@enara-e2e.app
       EMAIL_SUBJECT_PREFIX: "[lms-test]"
-      LMS_TEST_DAILY_CAP: "500"
+      EMAIL_DAILY_CEILING: "1000"
       LMS_OPS_EMAILS: lms-e2e-ops@enara-e2e.app
       # Parents P1 switches, as on lms-test (deploy/lms-test.flags.json). Parent
       # emails stay off (PARENT_EMAILS_ENABLED unset; scripts/up.sh checks it).
