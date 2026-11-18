@@ -1,0 +1,119 @@
+{
+  "alias": "lms-adoption-weekly",
+  "number": "11",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS: weekly adoption summary",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "School admins",
+  "trigger": "New code needed: Monday run inside /api/cron/daily (next to sendWeeklySummaries)",
+  "delivery": "digest",
+  "frequency": "Weekly (Monday); skipped when there were no launches and nothing changed for 2 weeks",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "lms-adoption-weekly-en.html",
+    "ar": "lms-adoption-weekly-ar.html"
+  },
+  "subject": {
+    "en": "{{{SCHOOL_NAME}}}: Enara in Moodle this week",
+    "ar": "{{{SCHOOL_NAME}}}: إنارة في Moodle هذا الأسبوع"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Mona",
+        "ar": "منى"
+      }
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Nile Valley International School",
+        "ar": "مدرسة وادي النيل الدولية"
+      }
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Moodle (moodle.nilevalley.example)",
+        "ar": "Moodle (moodle.nilevalley.example)"
+      }
+    },
+    {
+      "key": "WEEK_OF",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "9 November 2026",
+        "ar": "9 نوفمبر 2026"
+      }
+    },
+    {
+      "key": "COURSES_CONNECTED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "12",
+        "ar": "12"
+      }
+    },
+    {
+      "key": "NOT_STARTED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "37",
+        "ar": "37"
+      }
+    },
+    {
+      "key": "ACTIVE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "318",
+        "ar": "318"
+      }
+    },
+    {
+      "key": "GRADES_SENT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "1,204",
+        "ar": "1,204"
+      }
+    },
+    {
+      "key": "GRADES_FAILED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "6",
+        "ar": "6"
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4",
+        "ar": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4"
+      }
+    }
+  ]
+}

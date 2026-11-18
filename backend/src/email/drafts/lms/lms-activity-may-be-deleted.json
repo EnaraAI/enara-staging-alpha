@@ -1,0 +1,74 @@
+{
+  "alias": "lms-activity-may-be-deleted",
+  "number": "15",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS: activity may have been deleted",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "Teachers of the class (opt-in, D2); admins see the same list on the grades page",
+  "trigger": "lineItemGoneAt set during a grade send (404/410), or stale (30 days without launch or result)",
+  "delivery": "digest",
+  "frequency": "lineitem_gone in the daily teacher digest; stale weekly; once per resource link per reason",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "lms-activity-may-be-deleted-en.html",
+    "ar": "lms-activity-may-be-deleted-ar.html"
+  },
+  "subject": {
+    "en": "A Moodle activity linked to Enara may have been deleted",
+    "ar": "ربما حُذف نشاط في Moodle مرتبط بإنارة"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Ahmed",
+        "ar": "أحمد"
+      }
+    },
+    {
+      "key": "ACTIVITY_COUNT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "2",
+        "ar": "2"
+      }
+    },
+    {
+      "key": "COURSE_LABEL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Grade 8 English (Term 1)",
+        "ar": "اللغة الإنجليزية - الصف الثامن"
+      }
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Moodle (moodle.nilevalley.example)",
+        "ar": "Moodle (moodle.nilevalley.example)"
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/?page=class-assignments&class=cls_3e91a7&filter=may-be-deleted",
+        "ar": "https://enara.app/?page=class-assignments&class=cls_3e91a7&filter=may-be-deleted"
+      }
+    }
+  ]
+}

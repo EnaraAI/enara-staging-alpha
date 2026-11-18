@@ -1,0 +1,55 @@
+{
+  "alias": "lms-ops-key-rotation-due",
+  "number": "E4",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS ops: signing key action due",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "ENARA ops (LMS_OPS_EMAILS)",
+  "trigger": "New code needed: daily check of lms_tool_keys (a 'next' key older than 24 h not yet promoted, or no 'active' key)",
+  "delivery": "digest",
+  "frequency": "Daily; once per key state per day",
+  "languages": [
+    "en"
+  ],
+  "files": {
+    "en": "lms-ops-key-rotation-due-en.html"
+  },
+  "subject": {
+    "en": "[LMS] Enara signing key: action due"
+  },
+  "variables": [
+    {
+      "key": "KEY_STATE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "The next signing key (kid lmsk_2026_11_b) was created more than 24 hours ago and has not been promoted yet."
+      }
+    },
+    {
+      "key": "ACTIVE_SINCE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "2 August 2026"
+      }
+    },
+    {
+      "key": "NEXT_SINCE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "16 November 2026"
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/docs/lms/key-rotation"
+      }
+    }
+  ]
+}

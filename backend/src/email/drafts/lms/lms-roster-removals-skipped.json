@@ -1,0 +1,74 @@
+{
+  "alias": "lms-roster-removals-skipped",
+  "number": "E6",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS: class list not fully updated",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "School admins",
+  "trigger": "roster.removals_skipped warn, codes roster_truncated / empty_roster",
+  "delivery": "digest",
+  "frequency": "Daily batch; once per course+code per 7 days",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "lms-roster-removals-skipped-en.html",
+    "ar": "lms-roster-removals-skipped-ar.html"
+  },
+  "subject": {
+    "en": "Class list not fully updated for {{{COURSE_NAME}}}",
+    "ar": "لم تُحدَّث قائمة الصف بالكامل في {{{COURSE_NAME}}}"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Mona",
+        "ar": "منى"
+      }
+    },
+    {
+      "key": "COURSE_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Grade 8 English (Term 1)",
+        "ar": "اللغة الإنجليزية - الصف الثامن"
+      }
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Moodle (moodle.nilevalley.example)",
+        "ar": "Moodle (moodle.nilevalley.example)"
+      }
+    },
+    {
+      "key": "REASON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Moodle returned no active students. If the course really has none, you can ignore this.",
+        "ar": "لم يُرجع Moodle أي طالب نشط. إذا كان المقرر خاليًا فعلًا، يمكنك تجاهل هذه الرسالة."
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=roster",
+        "ar": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=roster"
+      }
+    }
+  ]
+}

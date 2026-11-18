@@ -1,0 +1,81 @@
+{
+  "alias": "lms-connection-pending",
+  "number": "4a (also E3)",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS: connection pending approval",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "School admins",
+  "trigger": "platform.registered with status 'pending'; deployment.registered pending; deployment auto-created pending at launch (E3 uses ITEM)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per platform id / deployment id",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "lms-connection-pending-en.html",
+    "ar": "lms-connection-pending-ar.html"
+  },
+  "subject": {
+    "en": "We're reviewing your Moodle connection",
+    "ar": "نراجع طلب ربط Moodle الخاص بكم"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Mona",
+        "ar": "منى"
+      }
+    },
+    {
+      "key": "ITEM",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "the connection for Moodle (moodle.nilevalley.example)",
+        "ar": "طلب ربط <span dir=\"ltr\" style=\"unicode-bidi:embed;\">Moodle (moodle.nilevalley.example)</span>"
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4",
+        "ar": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4"
+      }
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "lmsp_7f3a9c21e4",
+        "ar": "lmsp_7f3a9c21e4"
+      }
+    }
+  ],
+  "preview_variants": [
+    {
+      "id": "e3-deployment",
+      "label": "E3: new deployment pending",
+      "samples": {
+        "en": {
+          "ITEM": "a new Moodle installation (Deployment ID 3)",
+          "REFERENCE_CODE": "lmsd_2a90b6"
+        },
+        "ar": {
+          "ITEM": "تثبيتًا جديدًا في Moodle (رقم التثبيت <span dir=\"ltr\" style=\"unicode-bidi:embed;\">3</span>)",
+          "REFERENCE_CODE": "lmsd_2a90b6"
+        }
+      }
+    }
+  ]
+}

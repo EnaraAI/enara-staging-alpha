@@ -138,3 +138,17 @@ npx tsx scripts/email/bundle-lms-templates.ts   # writes lms/lmsTemplatesBundle.
 | lms-invite-connect-en / -ar | NAME, SCHOOL_NAME, EXPIRES_ON, ACTION_URL, REFERENCE_CODE | "Send email" on the LMS onboarding invite (step 2). `ACTION_URL` is `${APP_URL}/?page=lms-status` (sign-in; never the Moodle link or its code, D5) |
 
 The From address of every email is `EMAIL_SENDER` (env) when set, else the default above (D11).
+
+## Drafts (`drafts/`, not approved, never sent)
+
+`drafts/lms/` (LMS emails, plan `LMS_EMAIL_TEMPLATES_PLAN.md`) and `drafts/parents/` (parent emails) hold the
+not-yet-approved templates: `<alias>-en.html`, `<alias>-ar.html` (ops emails `lms-ops-*` are English only, D4)
+and one `<alias>.json` per template (subjects EN/AR, recipient, trigger, delivery, variables with fallbacks and
+FAKE sample values). They are outside `templates/` and `lms/`, not in any registry or bundle, so no code path can
+send them. On approval a pair moves to `lms/` (or `templates/`) and gets bundled.
+
+Preview them (no network, no Resend; logo inlined; Tahoma mapped to an installed Arabic font):
+
+```bash
+node scripts/email/render-drafts.mjs --out /tmp/email-previews   # PNGs, contact sheets, INDEX.md
+```

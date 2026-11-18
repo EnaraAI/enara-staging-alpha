@@ -1,0 +1,92 @@
+{
+  "alias": "parent-new-results",
+  "number": "P5",
+  "group": "parents",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – Parents: new result",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "Parent",
+  "trigger": "A result becomes visible to the parent (per the school's grades setting; default after teacher review, D7)",
+  "delivery": "digest",
+  "frequency": "At most one email a day per child (off by default, D11)",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "parent-new-results-en.html",
+    "ar": "parent-new-results-ar.html"
+  },
+  "subject": {
+    "en": "New result for {{{CHILD_NAME}}}: {{{TEST_NAME}}}",
+    "ar": "نتيجة جديدة لـ{{{CHILD_NAME}}}: {{{TEST_NAME}}}"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Sara",
+        "ar": "سارة"
+      }
+    },
+    {
+      "key": "CHILD_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Omar",
+        "ar": "عمر"
+      }
+    },
+    {
+      "key": "TEST_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Unit 3 Reading Check",
+        "ar": "Unit 3 Reading Check"
+      }
+    },
+    {
+      "key": "CLASS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Grade 8 English (Term 1)",
+        "ar": "اللغة الإنجليزية - الصف الثامن"
+      }
+    },
+    {
+      "key": "SCORE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "17 / 20",
+        "ar": "17 / 20"
+      }
+    },
+    {
+      "key": "LEVEL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "A2",
+        "ar": "A2"
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/parents",
+        "ar": "https://enara.app/parents"
+      }
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "alias": "lms-roster-sync-failed",
+  "number": "9",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS: class list sync failed",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "School admins",
+  "trigger": "roster.sync outcome 'fail' from nightly/launch/cron (not manual, not busy/skipped)",
+  "delivery": "digest",
+  "frequency": "Daily digest after the nightly sync; same course+code not again for 72 h",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "lms-roster-sync-failed-en.html",
+    "ar": "lms-roster-sync-failed-ar.html"
+  },
+  "subject": {
+    "en": "{{{SCHOOL_NAME}}}: class lists not updated from Moodle",
+    "ar": "{{{SCHOOL_NAME}}}: لم تُحدَّث قوائم الصفوف من Moodle"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Mona",
+        "ar": "منى"
+      }
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Nile Valley International School",
+        "ar": "مدرسة وادي النيل الدولية"
+      }
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Moodle (moodle.nilevalley.example)",
+        "ar": "Moodle (moodle.nilevalley.example)"
+      }
+    },
+    {
+      "key": "FAILED_COURSES",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "3",
+        "ar": "3"
+      }
+    },
+    {
+      "key": "COURSE_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Grade 8 English (Term 1)",
+        "ar": "اللغة الإنجليزية - الصف الثامن"
+      }
+    },
+    {
+      "key": "REASON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "The class list service is off for the Enara tool in Moodle.",
+        "ar": "خدمة قوائم الأسماء والأدوار متوقفة لأداة إنارة في Moodle."
+      }
+    },
+    {
+      "key": "FIX",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "In the tool settings, set \"IMS LTI Names and Role Provisioning\" to use the service, then have a teacher open the activity once.",
+        "ar": "في إعدادات الأداة فعّل خدمة <span dir=\"ltr\" style=\"unicode-bidi:embed;\">IMS LTI Names and Role Provisioning</span>، ثم اطلب من معلم فتح النشاط مرة واحدة."
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=roster",
+        "ar": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=roster"
+      }
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "lmsa_e71b09 · nrps_not_allowed",
+        "ar": "lmsa_e71b09 · nrps_not_allowed"
+      }
+    }
+  ]
+}

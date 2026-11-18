@@ -1,0 +1,119 @@
+{
+  "alias": "lms-grade-sync-digest",
+  "number": "8",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS: grades not sent (daily)",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "School admins",
+  "trigger": "Daily cron after the lmsGrades drain: grade jobs that became 'dead' in the last 24 h, excluding held LMS_VALUE_DIFFERS jobs",
+  "delivery": "digest",
+  "frequency": "Daily digest, only if FAILED_COUNT >= 1; one per platform per day",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "lms-grade-sync-digest-en.html",
+    "ar": "lms-grade-sync-digest-ar.html"
+  },
+  "subject": {
+    "en": "{{{SCHOOL_NAME}}}: grades not sent to Moodle ({{{DATE}}})",
+    "ar": "{{{SCHOOL_NAME}}}: درجات لم تُرسَل إلى Moodle ({{{DATE}}})"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Mona",
+        "ar": "منى"
+      }
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Nile Valley International School",
+        "ar": "مدرسة وادي النيل الدولية"
+      }
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Moodle (moodle.nilevalley.example)",
+        "ar": "Moodle (moodle.nilevalley.example)"
+      }
+    },
+    {
+      "key": "DATE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "17 November 2026",
+        "ar": "17 نوفمبر 2026"
+      }
+    },
+    {
+      "key": "FAILED_COUNT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "6",
+        "ar": "6"
+      }
+    },
+    {
+      "key": "RETRYING_COUNT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "2",
+        "ar": "2"
+      }
+    },
+    {
+      "key": "COURSES_AFFECTED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "2",
+        "ar": "2"
+      }
+    },
+    {
+      "key": "TOP_REASON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Moodle refused access",
+        "ar": "رفض Moodle الوصول"
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=grades",
+        "ar": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=grades"
+      }
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "lmsp_7f3a9c21e4",
+        "ar": "lmsp_7f3a9c21e4"
+      }
+    }
+  ]
+}

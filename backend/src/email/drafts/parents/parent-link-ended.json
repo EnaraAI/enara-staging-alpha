@@ -1,0 +1,56 @@
+{
+  "alias": "parent-link-ended",
+  "number": "P3",
+  "group": "parents",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – Parents: link ended",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "Parent",
+  "trigger": "The school unlinks the parent, or the student is archived / leaves (link kept as \"ended\", D8)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per link (on by default, D11)",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "parent-link-ended-en.html",
+    "ar": "parent-link-ended-ar.html"
+  },
+  "subject": {
+    "en": "Your access to {{{CHILD_NAME}}}'s Enara progress has ended",
+    "ar": "انتهى وصولك إلى تقدّم {{{CHILD_NAME}}} على إنارة"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Sara",
+        "ar": "سارة"
+      }
+    },
+    {
+      "key": "CHILD_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Omar",
+        "ar": "عمر"
+      }
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Nile Valley International School",
+        "ar": "مدرسة وادي النيل الدولية"
+      }
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "alias": "lms-deletion-completed",
+  "number": "12c",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS: deletion completed",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "The requester and the school admins",
+  "trigger": "After permanentlyDeleteStudent for request-based or per-school / per-course deletions (new code); not for single on-screen deletes (D9)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per request",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "lms-deletion-completed-en.html",
+    "ar": "lms-deletion-completed-ar.html"
+  },
+  "subject": {
+    "en": "Data deletion completed",
+    "ar": "اكتمل حذف البيانات"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Mona",
+        "ar": "منى"
+      }
+    },
+    {
+      "key": "SCOPE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "the course \"Grade 8 English (Term 1)\"",
+        "ar": "المقرر «اللغة الإنجليزية - الصف الثامن»"
+      }
+    },
+    {
+      "key": "COMPLETED_ON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "20 November 2026",
+        "ar": "20 نوفمبر 2026"
+      }
+    },
+    {
+      "key": "STUDENT_COUNT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "28",
+        "ar": "28"
+      }
+    },
+    {
+      "key": "RECORDS_REMOVED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "4,317",
+        "ar": "4,317"
+      }
+    },
+    {
+      "key": "RESULTS_ANONYMISED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "212",
+        "ar": "212"
+      }
+    },
+    {
+      "key": "FILES_PENDING",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "0",
+        "ar": "0"
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/?page=lms&deletion=lmsr_0b7d55",
+        "ar": "https://enara.app/?page=lms&deletion=lmsr_0b7d55"
+      }
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "lmsr_0b7d55",
+        "ar": "lmsr_0b7d55"
+      }
+    }
+  ]
+}

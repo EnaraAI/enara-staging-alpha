@@ -1,0 +1,92 @@
+{
+  "alias": "lms-seats-warning",
+  "number": "10a",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS: seats 80% / 90% used",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "School admins",
+  "trigger": "New code needed: threshold check after checkSeatForNewStudent updates seatsUsed (PERCENT = 80 or 90)",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per threshold per seat limit; reset when the limit changes or usage drops under 75%",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "lms-seats-warning-en.html",
+    "ar": "lms-seats-warning-ar.html"
+  },
+  "subject": {
+    "en": "{{{SCHOOL_NAME}}} has used {{{PERCENT}}}% of its Enara seats",
+    "ar": "استخدمت {{{SCHOOL_NAME}}} ‏{{{PERCENT}}}% من مقاعد إنارة"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Mona",
+        "ar": "منى"
+      }
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Nile Valley International School",
+        "ar": "مدرسة وادي النيل الدولية"
+      }
+    },
+    {
+      "key": "PERCENT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "80",
+        "ar": "80"
+      }
+    },
+    {
+      "key": "SEATS_USED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "400",
+        "ar": "400"
+      }
+    },
+    {
+      "key": "SEAT_LIMIT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "500",
+        "ar": "500"
+      }
+    },
+    {
+      "key": "SEATS_LEFT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "100",
+        "ar": "100"
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=seats",
+        "ar": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=seats"
+      }
+    }
+  ]
+}

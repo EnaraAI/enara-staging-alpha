@@ -1,0 +1,128 @@
+{
+  "alias": "parent-weekly-summary",
+  "number": "P4",
+  "group": "parents",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – Parents: weekly summary",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "Parent",
+  "trigger": "Weekly schedule (Sunday evening, Cairo); opt-out",
+  "delivery": "digest",
+  "frequency": "Weekly; one per child per parent (on by default, opt-out, D11)",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "parent-weekly-summary-en.html",
+    "ar": "parent-weekly-summary-ar.html"
+  },
+  "subject": {
+    "en": "{{{CHILD_NAME}}}'s week in English: {{{STATUS_LINE}}}",
+    "ar": "أسبوع {{{CHILD_NAME}}} في الإنجليزية: {{{STATUS_LINE}}}"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Sara",
+        "ar": "سارة"
+      }
+    },
+    {
+      "key": "CHILD_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Omar",
+        "ar": "عمر"
+      }
+    },
+    {
+      "key": "WEEK_LABEL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "9–15 November 2026",
+        "ar": "9–15 نوفمبر 2026"
+      }
+    },
+    {
+      "key": "MINUTES_DONE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "45",
+        "ar": "45"
+      }
+    },
+    {
+      "key": "GOAL_MINUTES",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "60",
+        "ar": "60"
+      }
+    },
+    {
+      "key": "LESSONS_DONE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "4",
+        "ar": "4"
+      }
+    },
+    {
+      "key": "OUTCOMES_MASTERED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "3",
+        "ar": "3"
+      }
+    },
+    {
+      "key": "CEFR_LEVEL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "A2",
+        "ar": "A2"
+      }
+    },
+    {
+      "key": "STATUS_LINE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "on track",
+        "ar": "يسير وفق الخطة"
+      }
+    },
+    {
+      "key": "PRACTICE_TIP",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Ask them to name five things in the kitchen in English.",
+        "ar": "اطلبوا منه أن يسمّي خمسة أشياء في المطبخ بالإنجليزية."
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/parents",
+        "ar": "https://enara.app/parents"
+      }
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "alias": "lms-connection-rejected",
+  "number": "4c",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS: connection not approved",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "School admins",
+  "trigger": "New code needed: ENARA admin 'Reject' with a reason from a fixed list; new status 'rejected'",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per rejection",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "lms-connection-rejected-en.html",
+    "ar": "lms-connection-rejected-ar.html"
+  },
+  "subject": {
+    "en": "Your Moodle connection wasn't approved",
+    "ar": "لم تتم الموافقة على طلب ربط Moodle"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Mona",
+        "ar": "منى"
+      }
+    },
+    {
+      "key": "LMS_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Moodle (moodle.nilevalley.example)",
+        "ar": "Moodle (moodle.nilevalley.example)"
+      }
+    },
+    {
+      "key": "REASON",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "The Platform ID or Client ID doesn't match the Moodle site.",
+        "ar": "معرّف المنصة أو معرّف العميل لا يطابق موقع Moodle."
+      }
+    },
+    {
+      "key": "FIX",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Copy them again from the tool's configuration details in Moodle.",
+        "ar": "انسخهما مرة أخرى من تفاصيل إعداد الأداة في Moodle."
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4",
+        "ar": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4"
+      }
+    },
+    {
+      "key": "REFERENCE_CODE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "lmsp_7f3a9c21e4",
+        "ar": "lmsp_7f3a9c21e4"
+      }
+    }
+  ]
+}

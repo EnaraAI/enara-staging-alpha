@@ -1,0 +1,74 @@
+{
+  "alias": "lms-seats-over-limit",
+  "number": "10b",
+  "group": "lms",
+  "status": "draft: not approved, not in TEMPLATE_REGISTRY or any bundle, never sent",
+  "name": "Enara – LMS: over the seat limit",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "recipient": "School admins (ops get E2)",
+  "trigger": "markOverLimit -> alertSchoolAdmins (audit seats.over_limit); replaces the inline English email in seats.ts",
+  "delivery": "immediate",
+  "frequency": "Immediate; once per 24 h (existing lastAlertAt claim)",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "files": {
+    "en": "lms-seats-over-limit-en.html",
+    "ar": "lms-seats-over-limit-ar.html"
+  },
+  "subject": {
+    "en": "{{{SCHOOL_NAME}}} is over its Enara seat limit",
+    "ar": "تجاوزت {{{SCHOOL_NAME}}} حدّ مقاعد إنارة"
+  },
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": {
+        "en": "there",
+        "ar": "بك"
+      },
+      "sample": {
+        "en": "Mona",
+        "ar": "منى"
+      }
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "Nile Valley International School",
+        "ar": "مدرسة وادي النيل الدولية"
+      }
+    },
+    {
+      "key": "SEATS_USED",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "512",
+        "ar": "512"
+      }
+    },
+    {
+      "key": "SEAT_LIMIT",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "500",
+        "ar": "500"
+      }
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": {
+        "en": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=seats",
+        "ar": "https://enara.app/?page=lms&platform=lmsp_7f3a9c21e4&tab=seats"
+      }
+    }
+  ]
+}
