@@ -155,7 +155,10 @@ router.put('/learners/:studentId/guardians/:linkId', h(async (req, res) => {
 // Account: learners, guardians, plan placeholder, preferences.
 router.get('/account', h(async (req, res) => {
   const learners = await svc.listLearners(uid(req));
-  const myLinks = await ParentLearnerLink.find({ parentUserId: uid(req), status: 'active' }).lean();
+  // Only children who passed the read-time check (listLearners): an archived,
+  // deleted or departed child's other guardians are not shown either.
+  const visible = learners.learners.map((l) => l.studentId);
+  const myLinks = await ParentLearnerLink.find({ parentUserId: uid(req), status: 'active', studentId: { $in: visible } }).lean();
   const all = await ParentLearnerLink.find({ studentId: { $in: myLinks.map((l) => l.studentId) }, status: 'active' }).lean();
   const users = await User.find({ _id: { $in: [...new Set(all.map((l) => l.parentUserId))] } }).select('name').lean();
   const guardians = myLinks.map((mine) => ({
@@ -168,6 +171,7 @@ router.get('/account', h(async (req, res) => {
     generatedAt: new Date().toISOString(),
     learners: learners.learners,
     pending: learners.pending,
+    ended: learners.ended,
     guardians: { mock: false, byLearner: guardians },
     plan: { mock: true, ...mockPlan(learners.learners.length) },
     preferences: { mock: false, language: profile?.language ?? 'en', alertChannels: profile?.alertChannels ?? ['push', 'whatsapp'], summary: 'on_demand' },

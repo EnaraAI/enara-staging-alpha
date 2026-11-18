@@ -102,7 +102,7 @@ describe('sendTemplate links + account emails', () => {
     legacySend.mockClear();
     resetEmailClientForTests();
     process.env.RESEND_API_KEY = 're_test_dummy';
-    db.user = { _id: 'u1', email: 'jane@example.com', name: 'Jane' };
+    db.user = { _id: 'u1', email: 'jane@qa.enara.app', name: 'Jane' };
     db.inviter = { name: 'Ms Teacher' };
     db.school = { name: 'Alpha School' };
     errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => undefined);
@@ -114,43 +114,43 @@ describe('sendTemplate links + account emails', () => {
 
   it('fails with missing_app_url and sends nothing', async () => {
     cfg.appUrl = '';
-    const r = await sendTemplate('enara-welcome', 'jane@example.com', { NAME: 'Jane' });
+    const r = await sendTemplate('enara-welcome', 'jane@qa.enara.app', { NAME: 'Jane' });
     expect(r).toMatchObject({ ok: false, code: 'missing_app_url' });
     expect(sendMock).not.toHaveBeenCalled();
   });
 
   it('builds ACTION_URL for assessment and lesson templates', async () => {
-    await sendTemplate('enara-assessment-results', 'j@example.com', { NAME: 'J', CHILD_NAME: 'K', TEST_NAME: 'T', SCORE: 9, LEVEL: 'B1', SUMMARY: 'S', assessmentId: 'as 1' });
+    await sendTemplate('enara-assessment-results', 'j@qa.enara.app', { NAME: 'J', CHILD_NAME: 'K', TEST_NAME: 'T', SCORE: 9, LEVEL: 'B1', SUMMARY: 'S', assessmentId: 'as 1' });
     expectRendered(sendMock.mock.lastCall![0], 'enara-assessment-results', { NAME: 'J', CHILD_NAME: 'K', TEST_NAME: 'T', SCORE: 9, LEVEL: 'B1', SUMMARY: 'S', ACTION_URL: 'https://app.example.org/?assessment=as%201' });
-    await sendTemplate('enara-lesson-reminder', 'j@example.com', { NAME: 'J', LESSON_TITLE: 'L', courseId: 'c1' });
+    await sendTemplate('enara-lesson-reminder', 'j@qa.enara.app', { NAME: 'J', LESSON_TITLE: 'L', courseId: 'c1' });
     expect(sendMock.mock.lastCall![0].html).toContain('href="https://app.example.org/?course=c1"');
-    await sendTemplate('enara-verify-email', 'j@example.com', { NAME: 'J', ACTION_URL: 'https://custom/verify', EXPIRES_IN: '1 day' });
+    await sendTemplate('enara-verify-email', 'j@qa.enara.app', { NAME: 'J', ACTION_URL: 'https://custom/verify', EXPIRES_IN: '1 day' });
     expect(sendMock.mock.lastCall![0].html).toContain('href="https://custom/verify"');
   });
 
   it('password reset uses enara-password-reset with the token link and real expiry', async () => {
-    const token = await requestPasswordReset('jane@example.com');
+    const token = await requestPasswordReset('jane@qa.enara.app');
     expect(sendMock).toHaveBeenCalledTimes(1);
     const arg = sendMock.mock.calls[0][0];
-    expect(arg.to).toBe('jane@example.com');
+    expect(arg.to).toBe('jane@qa.enara.app');
     expectRendered(arg, 'enara-password-reset', { NAME: 'Jane', EXPIRES_IN: '30 minutes', ACTION_URL: `https://app.example.org/reset-password?token=${encodeURIComponent(token!)}` });
     expect(arg.attachments).toHaveLength(2);
     expect(legacySend).not.toHaveBeenCalled();
   });
 
   it('invitation uses enara-class-invitation with inviter, school and 7-day expiry', async () => {
-    const { token } = await createInvitation({ institutionId: 'instA', email: 'new@example.com', role: 'teacher', invitedBy: INVITER_ID });
+    const { token } = await createInvitation({ institutionId: 'instA', email: 'new@qa.enara.app', role: 'teacher', invitedBy: INVITER_ID });
     const arg = sendMock.mock.calls[0][0];
     expectRendered(arg, 'enara-class-invitation', { NAME: 'there', TEACHER_NAME: 'Ms Teacher', CLASS_NAME: 'Alpha School', EXPIRES_IN: '7 days', ACTION_URL: `https://app.example.org/accept-invitation?token=${encodeURIComponent(token)}` });
   });
 
   it('invitation falls back to the school name, then ENARA', async () => {
     db.inviter = null;
-    await createInvitation({ institutionId: 'instA', email: 'new@example.com', role: 'teacher', invitedBy: 'not-an-object-id' });
+    await createInvitation({ institutionId: 'instA', email: 'new@qa.enara.app', role: 'teacher', invitedBy: 'not-an-object-id' });
     expect(sendMock.mock.lastCall![0].subject).toBe("You're invited to join Alpha School on Enara");
     expect(sendMock.mock.lastCall![0].html).not.toContain('Ms Teacher');
     db.school = null;
-    await createInvitation({ institutionId: 'instA', email: 'new2@example.com', role: 'teacher', invitedBy: INVITER_ID });
+    await createInvitation({ institutionId: 'instA', email: 'new2@qa.enara.app', role: 'teacher', invitedBy: INVITER_ID });
     expect(sendMock.mock.lastCall![0].subject).toBe("You're invited to join ENARA on Enara");
     expect(sendMock.mock.lastCall![0].html).not.toContain('Alpha School');
   });
@@ -158,15 +158,15 @@ describe('sendTemplate links + account emails', () => {
   it('skips .test addresses and honours the test recipient', async () => {
     await createInvitation({ institutionId: 'instA', email: 'x@a.test', role: 'teacher', invitedBy: INVITER_ID });
     expect(sendMock).not.toHaveBeenCalled();
-    cfg.testRecipient = 'inbox@example.com';
-    await requestPasswordReset('jane@example.com');
-    expect(sendMock.mock.calls[0][0].to).toBe('inbox@example.com');
+    cfg.testRecipient = 'inbox@qa.enara.app';
+    await requestPasswordReset('jane@qa.enara.app');
+    expect(sendMock.mock.calls[0][0].to).toBe('inbox@qa.enara.app');
   });
 
   it('without RESEND_API_KEY keeps the previous sendEmail path', async () => {
     delete process.env.RESEND_API_KEY;
-    await requestPasswordReset('jane@example.com');
-    await createInvitation({ institutionId: 'instA', email: 'new@example.com', role: 'teacher', invitedBy: INVITER_ID });
+    await requestPasswordReset('jane@qa.enara.app');
+    await createInvitation({ institutionId: 'instA', email: 'new@qa.enara.app', role: 'teacher', invitedBy: INVITER_ID });
     expect(sendMock).not.toHaveBeenCalled();
     expect(legacySend).toHaveBeenCalledTimes(2);
   });

@@ -16,6 +16,7 @@ import { CEFR_ORDER, PARENT_LEVEL_LABELS, checkpointLevel, computeLevel, courseO
 import { addDays, cairoDay, cairoDayStart, cairoTime, isWeekend, weekDays, weekStartDay } from './time';
 import * as mock from './mock';
 import { classOfAttempts, classOfCourse, classesForLabels } from '../services/multiClass';
+import { READ_CHECK_ACTOR, endParentLink, endReasonFor } from './linkLifecycle';
 
 // Parents Portal data. Everything is computed from live data on each request
 // (user decision: real-time progress, no weekly snapshot or cache). Sections
@@ -33,14 +34,27 @@ export interface LearnerContext {
   firstName: string;
 }
 
-/** The one gate for every learner-scoped parent endpoint: an active link for this parent, and the action allowed by its role. */
+/**
+ * The one gate for every learner-scoped parent endpoint: an active link for
+ * this parent, the student still there (not deleted, not archived, still in
+ * the link's school: P0 item 2, checked on every read), and the action allowed
+ * by the link's role. A link that fails the student check is ended here
+ * (linkLifecycle.ts) and the parent gets 403 PARENT_LINK_ENDED, as for a link
+ * already ended. No link, or a pending one: 403 PARENT_ACCESS_DENIED.
+ */
 export async function requireLearner(parentUserId: string, studentId: string, action: ParentAction = 'read'): Promise<LearnerContext> {
+  const denied = () => new AppError('You do not have access to this learner', 403, 'PARENT_ACCESS_DENIED');
+  const ended = () => new AppError('Your access to this learner has ended', 403, 'PARENT_LINK_ENDED');
   const link = await ParentLearnerLink.findOne({ parentUserId, studentId });
-  if (!link || !visibilityFor(link).progress || !canDo(link, action)) {
-    throw new AppError('You do not have access to this learner', 403, 'PARENT_ACCESS_DENIED');
+  if (!link) throw denied();
+  if (link.status === 'ended') throw ended();
+  const student = await Student.findOne({ id: studentId }).select('+learnerAgeBand +birthDate id name institutionId adaptiveProfile archivedAt').lean();
+  const reason = endReasonFor(link, student);
+  if (reason) {
+    await endParentLink(link, reason, READ_CHECK_ACTOR);
+    throw ended();
   }
-  const student = await Student.findOne({ id: studentId }).select('+learnerAgeBand +birthDate id name institutionId adaptiveProfile').lean();
-  if (!student) throw new AppError('You do not have access to this learner', 403, 'PARENT_ACCESS_DENIED');
+  if (!student || !visibilityFor(link).progress || !canDo(link, action)) throw denied();
   const t = tierOf(student);
   return { link, student: student as LearnerContext['student'], tier: t.tier, age: t.age, firstName: String(student.name || '').trim().split(/\s+/)[0] || 'Learner' };
 }
@@ -75,13 +89,29 @@ async function classView(ctx: LearnerContext, classId: unknown) {
 // ---------------------------------------------------------------------------
 // Learners list
 
+/**
+ * The parent's children. Same student check as requireLearner: a child who is
+ * deleted, archived or no longer in the link's school is not listed (the link
+ * is ended there and then). Ended links are listed apart, in `ended`, with the
+ * link ID and end date only: no child name, ID, school or reason (the safer
+ * choice: nothing about the child after access ends, and nothing at all about
+ * a deleted one).
+ */
 export async function listLearners(parentUserId: string) {
   const links = await ParentLearnerLink.find({ parentUserId }).lean();
-  const active = links.filter((l) => l.status === 'active');
-  const students = await Student.find({ id: { $in: active.map((l) => l.studentId) } }).select('+learnerAgeBand +birthDate id name institutionId').lean();
-  const schools = await Institution.find({ id: { $in: students.map((s) => s.institutionId).filter(Boolean) } }).select('id name').lean();
+  const live = links.filter((l) => l.status === 'active' || l.status === 'pending');
+  const students = await Student.find({ id: { $in: live.map((l) => l.studentId) } }).select('+learnerAgeBand +birthDate id name institutionId archivedAt').lean();
   const byId = new Map(students.map((s) => [s.id, s]));
-  const learners = active.flatMap((l) => {
+  const endedNow = new Set<string>();
+  for (const l of live) {
+    const reason = endReasonFor(l, byId.get(l.studentId));
+    if (!reason) continue;
+    await endParentLink(l, reason, READ_CHECK_ACTOR);
+    endedNow.add(l.id);
+  }
+  const usable = live.filter((l) => !endedNow.has(l.id));
+  const schools = await Institution.find({ id: { $in: students.map((s) => s.institutionId).filter(Boolean) } }).select('id name').lean();
+  const learners = usable.filter((l) => l.status === 'active').flatMap((l) => {
     const s = byId.get(l.studentId);
     if (!s) return [];
     const t = tierOf(s);
@@ -89,8 +119,11 @@ export async function listLearners(parentUserId: string) {
     return [{ studentId: s.id, linkId: l.id, name: s.name, firstName, initial: firstName.charAt(0).toUpperCase(), age: t.age ?? null, tier: t.tier, role: l.role, consent: l.consent ?? 'not_required', school: schools.find((x) => x.id === s.institutionId)?.name ?? null }];
   });
   // Pending links show nothing of the learner.
-  const pending = links.filter((l) => l.status === 'pending').map((l) => ({ linkId: l.id, status: 'pending' as const, createdAt: l.createdAt }));
-  return { generatedAt: new Date().toISOString(), learners, pending };
+  const pending = usable.filter((l) => l.status === 'pending').map((l) => ({ linkId: l.id, status: 'pending' as const, createdAt: l.createdAt }));
+  const ended = links
+    .filter((l) => l.status === 'ended' || endedNow.has(l.id))
+    .map((l) => ({ linkId: l.id, status: 'ended' as const, endedAt: l.endedAt ?? new Date() }));
+  return { generatedAt: new Date().toISOString(), learners, pending, ended };
 }
 
 // ---------------------------------------------------------------------------

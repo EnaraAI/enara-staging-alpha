@@ -6,6 +6,7 @@ import { CourseInstance, type ClassArchiveRecord } from '../models/CourseInstanc
 import { Student, type StudentArchiveRecord } from '../models/Student';
 import { User } from '../models/User';
 import { recordAudit } from './auditTrail';
+import { endParentLinksForStudent } from '../parents/linkLifecycle';
 import { syncClassMember, syncStudentGroup } from './enrollmentSync';
 import { groupsOfStudent, refreshGroupCounts } from './groupCounts';
 
@@ -286,6 +287,9 @@ export async function archiveStudent(s: StudentLike, actor: Actor) {
   // Account closed: no sign-in, and existing sessions end (tokenVersion).
   if (record.userIds.length) await User.updateMany({ _id: { $in: record.userIds }, status: 'active' }, { $set: { status: 'disabled' }, $inc: { tokenVersion: 1 } });
   await refreshGroupCounts([s.batchId, ...(await groupsOfStudent(s.id))]); // multi-class S4 (no-op while off)
+  // P0 item 2: parent access ends (links kept as 'ended', D8; unused codes
+  // revoked). restoreStudent does not bring them back (D9).
+  await endParentLinksForStudent(s.id, 'archived', actor, { revokeCodes: true });
   await recordAudit('student.archived', actor, { institutionId: s.institutionId, type: 'student', id: s.id }, { group: record.batchId ? 1 : 0, classes: record.classIds.length, enrollmentsEnded: ended, accountsClosed: record.userIds.length });
   return { id: s.id, archivedAt: now, group: record.batchId ?? null, classesLeft: record.classIds.length, enrollmentsEnded: ended, accountsClosed: record.userIds.length };
 }
@@ -330,6 +334,7 @@ export async function restoreStudent(s: StudentLike, actor: Actor) {
   for (const classId of classesBack) await syncClassMember({ institutionId: s.institutionId, studentId: s.id, classId, action: 'add', by: actor?.id });
   await refreshGroupCounts([groupBack, ...(await groupsOfStudent(s.id))]); // multi-class S4 (no-op while off)
 
+  // Parent links stay ended (owner decision D9): the school issues new codes.
   // Reopen exactly the accounts the archive closed.
   const reopened = rec.userIds.length ? (await User.updateMany({ _id: { $in: rec.userIds }, status: 'disabled' }, { $set: { status: 'active' } })).modifiedCount : 0;
   await recordAudit('student.restored', actor, { institutionId: s.institutionId, type: 'student', id: s.id }, { group: groupBack ? 1 : 0, classes: classesBack.length, enrollmentsReactivated: reactivated, accountsReopened: reopened, skipped: skipped.length });

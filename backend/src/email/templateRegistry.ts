@@ -20,7 +20,8 @@ export const TEMPLATE_REGISTRY = {
   },
   'enara-parent-consent': {
     id: '57ebb3c9-2cb5-4ab5-aea6-1c4baba3952b',
-    variables: ['NAME', 'CHILD_NAME', 'ACTION_URL', 'EXPIRES_IN'],
+    // LINK_CODE: the parent link code, shown in the body only (never in a URL, D15).
+    variables: ['NAME', 'CHILD_NAME', 'LINK_CODE', 'ACTION_URL', 'EXPIRES_IN'],
   },
   'enara-lesson-reminder': {
     id: 'f6972409-d9e9-4bec-9c99-c6c41b573221',

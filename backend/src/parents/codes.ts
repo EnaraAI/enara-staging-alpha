@@ -8,9 +8,10 @@ import { Institution } from '../models/Institution';
 import { User } from '../models/User';
 import { recordAudit } from '../services/auditTrail';
 import { sendTemplate } from '../email/sendTemplate';
-import { getAppUrl } from '../email/links';
 import { logger } from '../utils/logging';
 import { tierOf } from './policy';
+import { endParentLink, endReasonFor } from './linkLifecycle';
+import { requireLearner } from './service';
 
 // Parent link codes (decision 16 Nov 2026): the school admin issues a code for
 // a learner (any age); a parent redeems it once; the link is ACTIVE on confirm.
@@ -52,7 +53,7 @@ type Actor = { id: string; role: string; institutionId?: string };
 
 /** The student an admin may manage: own school for admin, any for enara-admin; another school's -> 403. */
 export async function adminStudent(actor: Actor, studentId: string) {
-  const student = await Student.findOne({ id: studentId }).select('+learnerAgeBand +birthDate id name email institutionId').lean();
+  const student = await Student.findOne({ id: studentId }).select('+learnerAgeBand +birthDate id name email institutionId archivedAt').lean();
   if (!student) throw new AppError('Student not found', 404, 'NOT_FOUND');
   if (actor.role === 'enara-admin') return student;
   if (actor.role !== 'admin' || !actor.institutionId || student.institutionId !== actor.institutionId) {
@@ -64,6 +65,8 @@ export async function adminStudent(actor: Actor, studentId: string) {
 export async function createCode(actor: Actor, studentId: string, opts: { sendToEmail?: string } = {}) {
   const student = await adminStudent(actor, studentId);
   if (!student.institutionId) throw new AppError('The learner has no school', 400, 'VALIDATION_ERROR');
+  // P0 item 2: no new parent access to an archived student (restore first; D9).
+  if (student.archivedAt) throw new AppError('This student is archived', 409, 'STUDENT_ARCHIVED');
   let code = generateCode();
   for (let i = 0; i < 5 && (await ParentLinkCode.exists({ codeHash: hashCode(code.normalized) })); i++) code = generateCode();
   const row = await ParentLinkCode.create({
@@ -80,18 +83,16 @@ export async function createCode(actor: Actor, studentId: string, opts: { sendTo
 
   let emailed: { ok: boolean; reason?: string } | undefined;
   if (opts.sendToEmail) {
-    // Reuses enara-parent-consent (caller-supplied ACTION_URL) to carry the code link.
-    const app = getAppUrl();
-    if (!app) emailed = { ok: false, reason: 'missing_app_url' };
-    else {
-      const r = await sendTemplate('enara-parent-consent', opts.sendToEmail, {
-        NAME: 'there',
-        CHILD_NAME: String(student.name || '').split(/\s+/)[0] || 'your child',
-        ACTION_URL: `${app}/parents/link?code=${encodeURIComponent(code.display)}`,
-        EXPIRES_IN: '7 days',
-      });
-      emailed = r.ok ? { ok: true } : { ok: false, reason: r.code };
-    }
+    // P0 item 4 (owner decision D15): the code is in the email BODY only
+    // (LINK_CODE), never in a URL. The button opens the plain code page
+    // (/parents/link, built in code by sendTemplate); the parent types the code.
+    const r = await sendTemplate('enara-parent-consent', opts.sendToEmail, {
+      NAME: 'there',
+      CHILD_NAME: String(student.name || '').split(/\s+/)[0] || 'your child',
+      LINK_CODE: code.display,
+      EXPIRES_IN: '7 days',
+    });
+    emailed = r.ok ? { ok: true } : { ok: false, reason: r.code };
   }
   return { id: row.id, code: code.display, expiresAt: row.expiresAt, studentId: student.id, ...(emailed ? { emailed } : {}) };
 }
@@ -106,7 +107,7 @@ export async function listCodes(actor: Actor, studentId: string) {
     codes: codes.map((c) => ({ id: c.id, display: `ENR-••••-••${c.hint.slice(-2)}`, hint: c.hint, expiresAt: c.expiresAt, createdAt: c.createdAt })),
     links: links.map((l) => {
       const p = parents.find((u) => String(u._id) === l.parentUserId);
-      return { linkId: l.id, parentName: p?.name ?? 'Parent', parentEmail: p?.email ?? null, role: l.role, status: l.status, consent: l.consent ?? 'not_required', createdAt: l.createdAt };
+      return { linkId: l.id, parentName: p?.name ?? 'Parent', parentEmail: p?.email ?? null, role: l.role, status: l.status, consent: l.consent ?? 'not_required', createdAt: l.createdAt, ...(l.status === 'ended' ? { endedAt: l.endedAt ?? null, endReason: l.endReason ?? null } : {}) };
     }),
   };
 }
@@ -157,6 +158,10 @@ export async function previewCode(parentUserId: string, input: unknown) {
 
 export async function confirmCode(parent: Actor & { email?: string }, input: unknown) {
   const code = await findUsable(parent.id, input);
+  // P0 item 2: a code issued before the student was archived, deleted or left
+  // the school makes no link (the hooks also revoke such codes).
+  const current = await Student.findOne({ id: code.studentId }).select('id institutionId archivedAt').lean();
+  if (endReasonFor({ institutionId: code.institutionId }, current)) throw new AppError(INVALID_CODE_MESSAGE, 400, 'INVALID_CODE');
   // Single use: only one confirm can flip it.
   const claimed = await ParentLinkCode.findOneAndUpdate(
     { id: code.id, status: 'active', expiresAt: { $gt: new Date() } },
@@ -173,17 +178,24 @@ export async function confirmCode(parent: Actor & { email?: string }, input: unk
   const hasOwner = await ParentLearnerLink.exists({ studentId: student.id, role: 'owner', status: 'active' });
   const now = new Date();
   const link = existing ?? new ParentLearnerLink({ id: `pll_${randomUUID()}`, parentUserId: parent.id, studentId: student.id });
+  // A new code reactivates an ended link (same row, D8); its old role is not
+  // kept when another guardian became owner meanwhile.
+  const previousStatus = existing?.status;
+  const keepRole = existing && existing.status !== 'ended' ? existing.role : undefined;
   link.set({
     institutionId: student.institutionId,
     status: 'active',
-    role: existing?.role ?? (hasOwner ? 'full' : 'owner'),
+    role: keepRole ?? (hasOwner ? 'full' : 'owner'),
+    endedAt: undefined,
+    endReason: undefined,
+    endedBy: undefined,
     codeId: code.id,
     // Kids: the consent step (enara-parent-consent) is a stub; recorded as pending.
     consent: tier === 'kid' ? 'pending' : 'not_required',
     ...(tier === '13plus' ? { learnerNotifiedAt: now, learnerNoticeReadAt: undefined } : {}),
   });
   await link.save();
-  await recordAudit('parent_code_redeemed', parent, { institutionId: student.institutionId, type: 'student', id: student.id }, { codeId: code.id, linkId: link.id, role: link.role });
+  await recordAudit('parent_code_redeemed', parent, { institutionId: student.institutionId, type: 'student', id: student.id }, { codeId: code.id, linkId: link.id, role: link.role, ...(previousStatus ? { previousStatus } : {}) });
 
   if (tier === '13plus') await notifyLearnerEmailStub(student.email, link.id);
   return { linkId: link.id, studentId: student.id, role: link.role, status: link.status, consent: link.consent };
@@ -202,6 +214,8 @@ async function notifyLearnerEmailStub(to: string | undefined, linkId: string) {
 
 // ---------------------------------------------------------------------------
 // Unlink: the parent themself, or a school admin of the learner's school.
+// The link is ENDED, not deleted (D8): unlinked_by_parent / unlinked_by_school.
+// Unlinking an ended link again changes nothing.
 
 export async function unlink(actor: Actor, linkId: string, studentId?: string) {
   const link = await ParentLearnerLink.findOne({ id: linkId });
@@ -211,16 +225,15 @@ export async function unlink(actor: Actor, linkId: string, studentId?: string) {
   } else {
     await adminStudent(actor, link.studentId);
   }
-  await ParentLearnerLink.deleteOne({ _id: link._id });
-  await recordAudit('parent_link_removed', actor, { institutionId: link.institutionId, type: 'student', id: link.studentId }, { linkId: link.id, by: actor.role === 'parent' ? 'parent' : 'school_admin' });
+  await endParentLink(link, actor.role === 'parent' ? 'unlinked_by_parent' : 'unlinked_by_school', actor);
 }
 
 /** Owner changes another guardian's role (full <-> view). */
 export async function setGuardianRole(owner: Actor, studentId: string, linkId: string, role: unknown) {
   if (role !== 'full' && role !== 'view') throw new AppError('role must be full or view', 400, 'VALIDATION_ERROR');
-  const mine = await ParentLearnerLink.findOne({ parentUserId: owner.id, studentId, status: 'active' });
-  if (!mine || mine.role !== 'owner') throw new AppError('You do not have access to this learner', 403, 'PARENT_ACCESS_DENIED');
-  const other = await ParentLearnerLink.findOne({ id: linkId, studentId });
+  // The same gate as every learner endpoint (incl. the read-time student check).
+  await requireLearner(owner.id, studentId, 'manage_guardians');
+  const other = await ParentLearnerLink.findOne({ id: linkId, studentId, status: { $ne: 'ended' } });
   if (!other || other.role === 'owner') throw new AppError('Link not found', 404, 'NOT_FOUND');
   other.role = role;
   await other.save();

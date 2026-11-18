@@ -11,6 +11,7 @@ import { generateStudentId, initialsFromName } from '../utils/idGenerator';
 import { resolveWriteInstitutionId, scopedFilter } from '../auth/authorization';
 import { archivedListFilter } from './archive.controller';
 import { studentArchiveOn } from '../services/archive';
+import { endParentLinksForStudent } from '../parents/linkLifecycle';
 import {
   ensurePlainObject,
   escapeRegex,
@@ -177,5 +178,9 @@ export const deleteStudent = asyncHandler(async (req: AuthRequest, res: Response
   );
   await syncStudentDeleted({ studentId: student.id, by: req.user?.id });
   await refreshGroupCounts([student.batchId, ...extraGroups]); // multi-class S4 (no-op while off)
+  // P0 item 2: parent access ends; the link rows are kept as 'ended' (D8) and
+  // unused codes are revoked. (This legacy delete keeps other records too;
+  // PDPL erasure is services/studentErasure.ts.)
+  await endParentLinksForStudent(student.id, 'deleted', { id: req.user?.id, role: req.user?.role }, { revokeCodes: true });
   res.json({ message: 'Student deleted' });
 });

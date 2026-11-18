@@ -47,6 +47,7 @@ import { anonymiseAttempt, anonymiseProposal, keepsFinalResult, newAnonymousAtte
 import { type Actor, studentUserFilter } from './archive';
 import { groupsOfStudent, refreshGroupCounts } from './groupCounts';
 import { recordAudit } from './auditTrail';
+import { endParentLinksForStudent } from '../parents/linkLifecycle';
 import { deleteUpload } from './uploadStorage';
 
 // Multi-class step 6, decision C: "Delete permanently" (data-deletion requests,
@@ -191,6 +192,10 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
   // P1: final results kept anonymised, everything else about the attempts deleted
   // (before the per-student assessments go, which decide what is kept).
   await anonymiseResults(sid, removed, anonymised, new Set(personalAssignments));
+  // P0 item 2: parent links end first ('deleted'; audited with IDs only), so
+  // the audit trail keeps the fact; then, as before (PDPL), the link and code
+  // rows are deleted with the student's other records below.
+  await endParentLinksForStudent(sid, 'deleted', actor);
   for (const [name, model] of DELETE_BY_STUDENT_ID) removed[name] = (await model.deleteMany({ studentId: sid })).deletedCount;
   // P2: safety alerts are kept for safeguarding (admins only, retention purge).
   const keptAlerts = (await SafetyAlert.updateMany({ studentId: sid }, { $set: { subjectDeleted: true }, $unset: { sessionId: 1 } })).matchedCount;

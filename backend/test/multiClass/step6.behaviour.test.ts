@@ -67,7 +67,7 @@ beforeAll(async () => {
   await use('u3', 5);
   await use('u4', 7, 'cA3', 'visualize');
   const parent = await addUser('parent@p.test', 'parent');
-  for (const s of ['a1', 'a6']) await ParentLearnerLink.create({ id: `pl-${s}`, parentUserId: parent._id.toString(), studentId: s, role: 'owner', status: 'active' });
+  for (const s of ['a1', 'a6']) await ParentLearnerLink.create({ id: `pl-${s}`, parentUserId: parent._id.toString(), studentId: s, institutionId: 'A', role: 'owner', status: 'active' });
   // Baselines before a1 becomes multi-class (Q1).
   multi(true);
   baseline.credits = (await call(ADMIN, 'get', '/api/credits')).body.summary.studentCount;

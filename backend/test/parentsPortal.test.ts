@@ -424,7 +424,7 @@ describe('access control', () => {
     expect((await as('admin@pp-A').get('/api/parents/learners/teen1/home')).status).toBe(403);
   });
   it('a pending link sees nothing', async () => {
-    await M.ParentLearnerLink.create({ id: 'pll-pending', parentUserId: String((await M.User.findOne({ email: 'p4@parents.test' }))._id), studentId: 'teen1', role: 'owner', status: 'pending' });
+    await M.ParentLearnerLink.create({ id: 'pll-pending', parentUserId: String((await M.User.findOne({ email: 'p4@parents.test' }))._id), studentId: 'teen1', institutionId: 'pp-A', role: 'owner', status: 'pending' });
     expect((await as('p4').get('/api/parents/learners/teen1/home')).status).toBe(403);
     const list = await as('p4').get('/api/parents/learners');
     expect(list.body.learners).toEqual([]);
@@ -536,7 +536,9 @@ describe('unlink', () => {
     expect((await as('admin@pp-A').del(`/api/students/teen1/parent-links/${link.id}`)).status).toBe(200);
     expect((await as('p1').get('/api/parents/learners/teen1/home')).status).toBe(403);
     expect((await as('p1').get('/api/parents/learners/teen1/sessions/ts-recent/transcript')).status).toBe(403);
-    expect(await M.AuditEvent.exists({ action: 'parent_link_removed', targetId: 'teen1' })).toBeTruthy();
+    // P0 item 2 (D8): ended, not deleted; audited with IDs only.
+    expect(await M.ParentLearnerLink.findOne({ id: link.id }).lean()).toMatchObject({ status: 'ended', endReason: 'unlinked_by_school', endedAt: expect.any(Date) });
+    expect(await M.AuditEvent.exists({ action: 'parent_link_ended', targetId: 'teen1', 'detail.linkId': link.id, 'detail.reason': 'unlinked_by_school' })).toBeTruthy();
   });
   it('a parent can unlink themself', async () => {
     const p2 = String((await M.User.findOne({ email: 'p2@parents.test' }))._id);
@@ -544,5 +546,6 @@ describe('unlink', () => {
     expect((await as('p1').del(`/api/parents/links/${link.id}`)).status).toBe(404);
     expect((await as('p2').del(`/api/parents/links/${link.id}`)).status).toBe(200);
     expect((await as('p2').get('/api/parents/learners/kid1/home')).status).toBe(403);
+    expect(await M.ParentLearnerLink.findOne({ id: link.id }).lean()).toMatchObject({ status: 'ended', endReason: 'unlinked_by_parent' });
   });
 });
