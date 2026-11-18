@@ -168,6 +168,24 @@ router.post('/grade-ledger-backfill', async (req, res, next) => {
   }
 });
 
+// TEST-ONLY Moodle Web Services tool (maintenance/moodleTestWs.ts): fixed
+// actions on the fake MoodleCloud course. 404 unless MOODLE_TEST_WS_ENABLED,
+// the token and the URL are set (on top of this router's own guards).
+router.post('/moodle-ws', async (req, res, next) => {
+  try {
+    const { moodleWsConfigured, runMoodleWsAction, MoodleWsError } = await import('./moodleTestWs');
+    if (!moodleWsConfigured(process.env)) { res.status(404).json({ error: 'Not found' }); return; }
+    try {
+      res.json(await runMoodleWsAction(process.env, (req.body ?? {}) as Record<string, unknown>));
+    } catch (e) {
+      if (e instanceof MoodleWsError) { res.status(e.status).json({ error: e.code, message: e.message === e.code ? undefined : e.message }); return; }
+      throw e;
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Multi-class step 4 shadow report (counts only).
 router.get('/enrollment-shadow-report', async (req, res, next) => {
   try {
