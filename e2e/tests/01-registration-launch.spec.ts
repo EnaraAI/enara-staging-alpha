@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { enaraApi, enaraFrame, frameSession, login, maintenance } from '../lib/enara';
 import { ENARA, MOODLE, secrets } from '../lib/env';
 import { moodleCli, moodleProvision, moodleSession, moodleTools, sesskey } from '../lib/moodle';
-import { readState, recordTiming, saveState } from '../lib/state';
+import { readState, recordTiming, saveState, shot } from '../lib/state';
 import { createContent } from '../lib/content';
 
 // Scenario 1: boot, Phase 1b registration of School A through Moodle's own
@@ -33,8 +33,13 @@ test.describe.serial('1 · registration (School A) + launches + student preview'
     await page.locator('#tool-url').fill(link.url);
     await page.locator('#tool-create-button').click();
     const reg = page.frameLocator('iframe[src*="startltiadvregistration"]');
-    await expect(reg.getByText('ENARA is registered.')).toBeVisible({ timeout: 60_000 });
-    await page.screenshot({ path: test.info().outputPath('registered.png'), fullPage: true });
+    await expect(reg.getByText('ENARA is registered.')).toBeVisible({ timeout: 60_000 }).catch(async (e) => {
+      // Artifacts may not be downloadable: put the evidence in the job log.
+      console.log('REGISTRATION FRAME TEXT:', await reg.locator('body').innerText({ timeout: 5_000 }).catch(() => '(none)'));
+      console.log('AUDIT:', JSON.stringify((await maintenance('GET', '/lms-evidence?limit=10')).audit?.slice(0, 5)));
+      throw e;
+    });
+    await shot(page, '01-registration-registered');
     await reg.locator('#close').click();
     // Moodle closes its dialog on the close message and lists the new tool (Pending).
     await expect(page.locator('iframe[src*="startltiadvregistration"]')).toHaveCount(0, { timeout: 30_000 });
@@ -81,7 +86,7 @@ test.describe.serial('1 · registration (School A) + launches + student preview'
     expect(sess.role).toBe('teacher');
     expect(sess.preview).toBe(false);
     await expect(frame.getByText('Opened from your LMS')).toBeVisible();
-    await page.screenshot({ path: test.info().outputPath('teacher-launch.png'), fullPage: true });
+    await shot(page, '01-registration-teacher-launch');
     recordTiming('registration_to_first_launch', Date.now() - s.registrationStartedAt);
     saveState({ launchTestUrl: page.url() });
     await context.close();
@@ -95,7 +100,7 @@ test.describe.serial('1 · registration (School A) + launches + student preview'
     const sess = await frameSession(frame);
     expect(sess.role).toBe('student');
     expect(sess.preview).toBe(false);
-    await page.screenshot({ path: test.info().outputPath('student-launch.png'), fullPage: true });
+    await shot(page, '01-registration-student-launch');
     await context.close();
   });
 
@@ -112,7 +117,7 @@ test.describe.serial('1 · registration (School A) + launches + student preview'
     const sess = await frameSession(frame);
     expect(sess.preview).toBe(true);
     await expect(frame.getByTestId('lms-preview-banner')).toHaveText('Preview as student — nothing is saved');
-    await page.screenshot({ path: test.info().outputPath('student-preview.png'), fullPage: true });
+    await shot(page, '01-registration-student-preview');
     // Back to the normal role.
     await page.goto(`${MOODLE}/course/switchrole.php?id=${course}&sesskey=${await sesskey(page)}&switchrole=0&returnurl=${encodeURIComponent('/course/view.php?id=' + course)}`);
     await context.close();

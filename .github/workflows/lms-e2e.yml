@@ -117,6 +117,14 @@ jobs:
           node scripts/summary.mjs > /dev/null || true
           cat .run/summary.md >> "$GITHUB_STEP_SUMMARY" || true
 
+      - name: Diagnostics (in the job log, on failure)
+        if: steps.tests.outcome != 'success'
+        working-directory: e2e
+        run: |
+          echo "== ENARA (last 80 lines, no health checks) =="; docker compose logs --no-color enara 2>&1 | grep -v '"/health"' | tail -80 | cut -c1-600
+          echo "== Moodle (last 40 lines) =="; docker compose logs --no-color moodle 2>&1 | tail -40 | cut -c1-600
+          echo "== Caddy errors =="; docker compose logs --no-color caddy 2>&1 | grep -i error | tail -20 | cut -c1-600
+
       - name: Docker logs
         if: always()
         working-directory: e2e
@@ -139,6 +147,16 @@ jobs:
             e2e/.run/docker-logs
           retention-days: 14
           include-hidden-files: true
+
+      - name: Upload screenshots (PNG)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots-${{ matrix.moodle }}
+          path: e2e/.run/screenshots/*.png
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Result
         if: steps.tests.outcome != 'success'

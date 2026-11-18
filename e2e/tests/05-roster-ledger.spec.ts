@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { enaraApi, enaraFrame, frameSession, login } from '../lib/enara';
 import { moodleCli, moodleSession } from '../lib/moodle';
 import { activityUrl } from '../lib/picker';
-import { readState, saveState } from '../lib/state';
+import { readState, saveState, shot } from '../lib/state';
 
 // A seeded School A student (fake) placed in the LMS course's ENARA class by
 // hand: a roster sync must never touch this enrollment.
@@ -57,7 +57,7 @@ test.describe.serial('5 · roster sync + grade changed in the LMS', () => {
     await expect(row).toBeVisible({ timeout: 60_000 });
     await expect(row.getByText('Not started')).toBeVisible();
     await expect(f.locator('tr').filter({ hasText: MANUAL_STUDENT.name })).toBeVisible();
-    await page.screenshot({ path: test.info().outputPath('roster-not-started.png'), fullPage: true });
+    await shot(page, '05-roster-not-started');
     await context.close();
   });
 
@@ -74,7 +74,7 @@ test.describe.serial('5 · roster sync + grade changed in the LMS', () => {
     const { page, context, f } = await teacherClassView(browser);
     await expect(f.locator('tr').filter({ hasText: MANUAL_STUDENT.name })).toBeVisible();
     await expect(f.locator('tr').filter({ hasText: STUDENT2 })).toHaveCount(0);
-    await page.screenshot({ path: test.info().outputPath('roster-after-unenrol.png'), fullPage: true });
+    await shot(page, '05-roster-after-unenrol');
     await context.close();
   });
 
@@ -95,7 +95,7 @@ test.describe.serial('5 · roster sync + grade changed in the LMS', () => {
     await row.getByRole('button', { name: 'Grade history' }).click();
     const dialog = f.getByRole('dialog', { name: 'Grade history' });
     await expect(dialog.getByText('Changed in LMS.')).toBeVisible();
-    await t.page.screenshot({ path: test.info().outputPath('grade-history-changed-in-lms.png'), fullPage: true });
+    await shot(t.page, '05-roster-grade-history-changed-in-lms');
     // Moodle keeps the teacher's value.
     expect(moodleCli('grade', { course: 'ENARATEST', cmid: s.activities.quiz, user: 'student.test' }).finalgrade).toBe(40);
     await t.context.close();

@@ -4,7 +4,7 @@ import { PRACTICE_TITLE, QUIZ_TITLE } from '../lib/content';
 import { enaraFrame, frameSession } from '../lib/enara';
 import { moodleCli, moodleSession } from '../lib/moodle';
 import { activityUrl } from '../lib/picker';
-import { readState, recordTiming } from '../lib/state';
+import { readState, recordTiming, shot } from '../lib/state';
 import { MOODLE } from '../lib/env';
 
 // By course module: the quiz was picked twice (scenario 3 added a dated copy).
@@ -15,6 +15,15 @@ async function expectMoodleGrade(activity: number, value: number, timer?: string
   const t0 = Date.now();
   await expect.poll(() => grade(activity).finalgrade, { timeout: 120_000, intervals: [1000, 2000, 3000] }).toBe(value);
   if (timer) recordTiming(timer, Date.now() - t0);
+}
+
+/** The teacher's Moodle grader report, as evidence of the gradebook value. */
+async function gradebookShot(browser: any, name: string) {
+  const { page, context } = await moodleSession(browser, 'teacher.test');
+  await page.goto(`${MOODLE}/grade/report/grader/index.php?id=${moodleCli('activities', { course: 'ENARATEST' }).course}`);
+  await expect(page.getByText('Student Test').first()).toBeVisible();
+  await shot(page, name);
+  await context.close();
 }
 
 // Scenario 4 (Phase 3): grades go to the Moodle gradebook (AGS): a quiz sends
@@ -29,7 +38,7 @@ test.describe.serial('4 · grades in the Moodle gradebook: quiz latest, practice
     expect((await frameSession(f)).role).toBe('student');
     await expect(f.getByRole('heading', { name: title })).toBeVisible();
     await answerAndSubmit(f, correct);
-    await page.screenshot({ path: test.info().outputPath(`attempt-${correct}of4.png`), fullPage: true });
+    await shot(page, `04-grades-${title.includes('practice') ? 'practice' : 'quiz'}-attempt-${correct}of4`);
     await context.close();
   }
 
@@ -37,12 +46,14 @@ test.describe.serial('4 · grades in the Moodle gradebook: quiz latest, practice
     const s = readState();
     await attempt(browser, s.activities.quiz, 3, QUIZ_TITLE);
     await expectMoodleGrade(s.activities.quiz, 75, 'grade_submit_to_moodle_first');
+    await gradebookShot(browser, '04-grades-gradebook-75');
   });
 
   test('quiz: then 1/4 → Moodle shows 25 (latest)', async ({ browser }) => {
     const s = readState();
     await attempt(browser, s.activities.quiz, 1, QUIZ_TITLE);
     await expectMoodleGrade(s.activities.quiz, 25, 'grade_submit_to_moodle_second');
+    await gradebookShot(browser, '04-grades-gradebook-25');
   });
 
   test('practice: 3/4 → 75, then 1/4 → still 75 (best)', async ({ browser }) => {
@@ -53,6 +64,7 @@ test.describe.serial('4 · grades in the Moodle gradebook: quiz latest, practice
     // Give the second result time to be sent (it must not lower the cell).
     await new Promise((r) => setTimeout(r, 15_000));
     expect(grade(s.activities.practice).finalgrade).toBe(75);
+    await gradebookShot(browser, '04-grades-gradebook-practice-best-75');
   });
 
   test('teacher sees the grades in Moodle\'s grader report', async ({ browser }) => {
@@ -60,7 +72,7 @@ test.describe.serial('4 · grades in the Moodle gradebook: quiz latest, practice
     const id = moodleCli('activities', { course: 'ENARATEST' }).course;
     await page.goto(`${MOODLE}/grade/report/grader/index.php?id=${id}`);
     await expect(page.getByText('Student Test').first()).toBeVisible();
-    await page.screenshot({ path: test.info().outputPath('grader-report.png'), fullPage: true });
+    await shot(page, '04-grades-grader-report');
     await context.close();
   });
 });

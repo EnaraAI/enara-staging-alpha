@@ -3,7 +3,7 @@ import { enaraFrame, frameSession } from '../lib/enara';
 import { PRACTICE_TITLE, QUIZ_TITLE } from '../lib/content';
 import { moodleProvision, moodleSession } from '../lib/moodle';
 import { activityByName, activityUrl, addThroughPicker } from '../lib/picker';
-import { readState, saveState } from '../lib/state';
+import { readState, saveState, shot } from '../lib/state';
 
 const COURSE_LINK = 'ENARA home (course link)';
 
@@ -17,13 +17,13 @@ test.describe.serial('2 · picker: multi-select, practice graded, course link wi
     const { badges } = await addThroughPicker(page, {
       course: moodleProvision().courses.ENARATEST, courseShort: 'ENARATEST', typeid: s.schoolA.typeid,
       picks: [{ title: QUIZ_TITLE }, { title: PRACTICE_TITLE }, { title: COURSE_LINK }],
-      shot: test.info().outputPath('picker.png'),
+      shotName: '02-picker-picker',
     });
     expect(badges[QUIZ_TITLE]).toContain('Grade column');
     expect(badges[PRACTICE_TITLE]).toContain('Grade column');
     expect(badges[PRACTICE_TITLE]).not.toContain('No grade column');
     expect(badges[COURSE_LINK]).toContain('No grade column');
-    await page.screenshot({ path: test.info().outputPath('course-after-add.png'), fullPage: true });
+    await shot(page, '02-picker-course-after-add');
 
     const quiz = activityByName('ENARATEST', QUIZ_TITLE);
     const practice = activityByName('ENARATEST', PRACTICE_TITLE);
@@ -45,7 +45,7 @@ test.describe.serial('2 · picker: multi-select, practice graded, course link wi
     const ss = await frameSession(sf);
     expect(ss.role).toBe('student');
     expect(ss.target?.page ?? 'home').toMatch(/home|dashboard/);
-    await student.page.screenshot({ path: test.info().outputPath('course-link-student.png'), fullPage: true });
+    await shot(student.page, '02-picker-course-link-student');
     await student.context.close();
 
     const teacher = await moodleSession(browser, 'teacher.test');
@@ -53,7 +53,7 @@ test.describe.serial('2 · picker: multi-select, practice graded, course link wi
     const tf = await enaraFrame(teacher.page);
     const ts = await frameSession(tf);
     expect(ts.role).toBe('teacher');
-    await teacher.page.screenshot({ path: test.info().outputPath('course-link-teacher.png'), fullPage: true });
+    await shot(teacher.page, '02-picker-course-link-teacher');
     await teacher.context.close();
   });
 
@@ -67,7 +67,7 @@ test.describe.serial('2 · picker: multi-select, practice graded, course link wi
     // Lands on the bound assignment (Assignments, opened), ready to start.
     await expect(sf.getByRole('heading', { name: QUIZ_TITLE })).toBeVisible();
     await expect(sf.getByRole('button', { name: 'Start' })).toBeVisible();
-    await student.page.screenshot({ path: test.info().outputPath('quiz-student.png'), fullPage: true });
+    await shot(student.page, '02-picker-quiz-student');
     await student.context.close();
   });
 });

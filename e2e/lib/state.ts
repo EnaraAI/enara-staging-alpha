@@ -30,3 +30,10 @@ export function recordTiming(name: string, ms: number): void {
   fs.mkdirSync(RUN_DIR, { recursive: true });
   fs.writeFileSync(file, JSON.stringify(all, null, 2));
 }
+
+/** A full-page screenshot for the run report: .run/screenshots/<name>.png (uploaded as e2e-screenshots-<moodle>). */
+export async function shot(page: { screenshot(o: { path: string; fullPage: boolean }): Promise<unknown> }, name: string): Promise<void> {
+  const dir = path.join(RUN_DIR, 'screenshots');
+  fs.mkdirSync(dir, { recursive: true });
+  await page.screenshot({ path: path.join(dir, `${name}.png`), fullPage: true });
+}

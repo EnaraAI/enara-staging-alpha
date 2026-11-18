@@ -3,7 +3,7 @@ import { enaraFrame, frameSession } from '../lib/enara';
 import { QUIZ_TITLE } from '../lib/content';
 import { moodleProvision, moodleSession } from '../lib/moodle';
 import { activityByName, activityUrl, addThroughPicker } from '../lib/picker';
-import { readState, saveState } from '../lib/state';
+import { readState, saveState, shot } from '../lib/state';
 
 const GRADING = 'Grading';
 
@@ -27,7 +27,7 @@ test.describe.serial('3 · page links (teacher-only) + due date in the descripti
     const { badges } = await addThroughPicker(page, {
       course: moodleProvision().courses.ENARATEST, courseShort: 'ENARATEST', typeid: s.schoolA.typeid,
       picks: [{ title: GRADING }, { title: QUIZ_TITLE, due: due.local }],
-      shot: test.info().outputPath('picker-pages-due.png'),
+      shotName: '03-pages-picker-pages-due',
     });
     expect(badges[GRADING]).toContain('Teachers only');
     expect(badges[GRADING]).toContain('No grade column');
@@ -51,7 +51,7 @@ test.describe.serial('3 · page links (teacher-only) + due date in the descripti
     expect(ss.role).toBe('student');
     expect(ss.target?.page ?? 'dashboard').toBe('dashboard');
     await expect(f.getByRole('heading', { name: GRADING })).toHaveCount(0);
-    await page.screenshot({ path: test.info().outputPath('student-teacher-only-link.png'), fullPage: true });
+    await shot(page, '03-pages-student-teacher-only-link');
     await context.close();
   });
 
@@ -63,7 +63,7 @@ test.describe.serial('3 · page links (teacher-only) + due date in the descripti
     const ts = await frameSession(f);
     expect(ts.role).toBe('teacher');
     await expect(f.getByText(GRADING).first()).toBeVisible();
-    await page.screenshot({ path: test.info().outputPath('teacher-grading-link.png'), fullPage: true });
+    await shot(page, '03-pages-teacher-grading-link');
     await context.close();
   });
 
@@ -76,7 +76,7 @@ test.describe.serial('3 · page links (teacher-only) + due date in the descripti
     const d = new Date(Date.now() + 9 * 86_400_000);
     const month = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'Africa/Cairo' }).format(d);
     await expect(f.getByText(new RegExp(`Due ${month} \\d+, \\d{4}`))).toBeVisible();
-    await page.screenshot({ path: test.info().outputPath('student-dated-quiz.png'), fullPage: true });
+    await shot(page, '03-pages-student-dated-quiz');
     await context.close();
   });
 });

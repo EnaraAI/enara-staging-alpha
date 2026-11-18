@@ -4,7 +4,7 @@ import { enaraApi, enaraFrame, frameSession, frameToken, login } from '../lib/en
 import { MOODLE } from '../lib/env';
 import { moodleCli, moodleProvision, moodleSession, moodleTools } from '../lib/moodle';
 import { activityByName, activityUrl, addThroughPicker } from '../lib/picker';
-import { readState, recordTiming, saveState } from '../lib/state';
+import { readState, recordTiming, saveState, shot } from '../lib/state';
 
 const COURSE_LINK = 'ENARA home (course link)';
 
@@ -38,7 +38,7 @@ test.describe.serial('6 · School B on the same Moodle + isolation', () => {
     await expect(asNew.or(done)).toBeVisible({ timeout: 60_000 });
     if (await asNew.isVisible()) await asNew.click();
     await expect(done).toBeVisible({ timeout: 60_000 });
-    await page.screenshot({ path: test.info().outputPath('school-b-registered.png'), fullPage: true });
+    await shot(page, '06-school-b-registered');
     await reg.locator('#close').click();
     await expect(page.locator('iframe[src*="startltiadvregistration"]')).toHaveCount(0, { timeout: 30_000 });
     const tools = moodleTools();
@@ -63,7 +63,7 @@ test.describe.serial('6 · School B on the same Moodle + isolation', () => {
     const { page, context } = await moodleSession(browser, 'teacher.test');
     await addThroughPicker(page, {
       course: moodleProvision().courses.ENARAB, courseShort: 'ENARAB', typeid: s.schoolB.typeid,
-      picks: [{ title: COURSE_LINK }], shot: test.info().outputPath('school-b-picker.png'),
+      picks: [{ title: COURSE_LINK }], shotName: '06-school-b-picker',
     });
     const link = activityByName('ENARAB', COURSE_LINK);
     saveState({ activities: { ...s.activities, schoolBCourseLink: link.cmid } });
@@ -84,7 +84,7 @@ test.describe.serial('6 · School B on the same Moodle + isolation', () => {
     const list = await enaraApi.get('/api/assessments?limit=200', tB.token);
     const titles = (Array.isArray(list) ? list : list.assessments ?? list.data ?? []).map((a: any) => a.title);
     expect(titles).not.toContain(QUIZ_TITLE);
-    await tB.page.screenshot({ path: test.info().outputPath('school-b-teacher.png'), fullPage: true });
+    await shot(tB.page, '06-school-b-teacher');
     await tB.context.close();
 
     const sA = await launch(browser, 'student.test', s.activities.courseLink);
@@ -95,7 +95,7 @@ test.describe.serial('6 · School B on the same Moodle + isolation', () => {
     expect(sB.sess.id).not.toBe(sA.sess.id);
     const mine = await enaraApi.get('/api/me/assignments', sB.token).catch(() => ({}));
     expect(JSON.stringify(mine)).not.toContain(QUIZ_TITLE);
-    await sB.page.screenshot({ path: test.info().outputPath('school-b-student.png'), fullPage: true });
+    await shot(sB.page, '06-school-b-student');
     await sB.context.close();
   });
 

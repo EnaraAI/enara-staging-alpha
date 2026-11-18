@@ -2,6 +2,7 @@ import { expect, type Page } from '@playwright/test';
 import { enaraFrameAt } from './enara';
 import { MOODLE } from './env';
 import { moodleCli } from './moodle';
+import { shot } from './state';
 
 export interface Pick { title: string; due?: string; /** e.g. 'Assignments' when an assessment has the same title */ type?: string }
 
@@ -10,7 +11,7 @@ export interface Pick { title: string; due?: string; /** e.g. 'Assignments' when
  * picker (inside Moodle's dialog) › Add › Save and return to course.
  * Returns the picker frame's view of each item (badges) before adding.
  */
-export async function addThroughPicker(page: Page, opts: { course: number; courseShort: string; typeid: number; picks: Pick[]; shot?: string }): Promise<{ badges: Record<string, string> }> {
+export async function addThroughPicker(page: Page, opts: { course: number; courseShort: string; typeid: number; picks: Pick[]; shotName?: string }): Promise<{ badges: Record<string, string> }> {
   const before = new Set(moodleCli('activities', { course: opts.courseShort }).activities.map((a: any) => a.id));
   await page.goto(`${MOODLE}/course/modedit.php?add=lti&typeid=${opts.typeid}&course=${opts.course}&section=0&return=0`);
   await page.locator('#id_selectcontent').click();
@@ -26,7 +27,7 @@ export async function addThroughPicker(page: Page, opts: { course: number; cours
     await row.locator('input[name="enara-pick"]').check();
     if (p.due) await row.locator('input[type="datetime-local"]').fill(p.due);
   }
-  if (opts.shot) await page.screenshot({ path: opts.shot, fullPage: true });
+  if (opts.shotName) await shot(page, opts.shotName);
   const n = opts.picks.length;
   await picker.getByRole('button', { name: n === 1 ? 'Add 1 activity' : `Add ${n} activities` }).click();
   if (n > 1) {

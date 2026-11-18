@@ -3,7 +3,7 @@ import { SPEAKING_TITLE } from '../lib/content';
 import { enaraFrame, frameSession } from '../lib/enara';
 import { moodleProvision, moodleSession } from '../lib/moodle';
 import { activityByName, activityUrl, addThroughPicker } from '../lib/picker';
-import { readState, saveState } from '../lib/state';
+import { readState, saveState, shot } from '../lib/state';
 
 /** Student: open the speaking exam activity, start it, and reach the microphone check. */
 async function openSpeakingExam(page: import('@playwright/test').Page, cmid: number) {
@@ -28,7 +28,7 @@ test.describe.serial('7 · microphone checks (Chrome)', () => {
     const { page, context } = await moodleSession(browser, 'teacher.test');
     const { badges } = await addThroughPicker(page, {
       course: moodleProvision().courses.ENARATEST, courseShort: 'ENARATEST', typeid: s.schoolA.typeid,
-      picks: [{ title: SPEAKING_TITLE, type: 'Assignments' }], shot: test.info().outputPath('picker-speaking.png'),
+      picks: [{ title: SPEAKING_TITLE, type: 'Assignments' }], shotName: '07-mic-picker-speaking',
     });
     expect(badges[SPEAKING_TITLE]).toContain('Microphone');
     saveState({ activities: { ...s.activities, speaking: activityByName('ENARATEST', SPEAKING_TITLE).cmid } });
@@ -43,7 +43,7 @@ test.describe.serial('7 · microphone checks (Chrome)', () => {
     await expect(f.getByText('Microphone works').or(f.getByText('Not working'))).toBeVisible({ timeout: 30_000 });
     await expect(f.locator('[data-testid^="mic-problem-"]')).toHaveCount(0);
     await expect(f.getByText('Microphone works')).toBeVisible();
-    await page.screenshot({ path: test.info().outputPath('mic-ok.png'), fullPage: true });
+    await shot(page, '07-mic-ok');
     await context.close();
   });
 
@@ -59,16 +59,16 @@ test.describe.serial('7 · microphone checks (Chrome)', () => {
       await f.getByRole('button', { name: 'Test microphone' }).click();
       const notice = f.getByTestId('mic-problem-blocked_in_frame');
       await expect(notice).toBeVisible({ timeout: 30_000 }).catch(async (e) => {
-        await page.screenshot({ path: test.info().outputPath('mic-blocked-failed.png'), fullPage: true });
+        await shot(page, '07-mic-blocked-failed');
         throw e;
       });
-      await page.screenshot({ path: test.info().outputPath('mic-blocked.png'), fullPage: true });
+      await shot(page, '07-mic-blocked');
       const [tab] = await Promise.all([context.waitForEvent('page'), notice.getByRole('button', { name: 'Open in a new tab' }).click()]);
       await tab.waitForURL(/\/(assignments|lms|$)/, { timeout: 60_000 });
       await expect.poll(() => tab.evaluate(() => !!sessionStorage.getItem('enara_token')), { timeout: 60_000 }).toBe(true);
       expect(await tab.evaluate(() => window.self === window.top)).toBe(true);
       await expect(tab.getByText(SPEAKING_TITLE).first()).toBeVisible({ timeout: 60_000 });
-      await tab.screenshot({ path: test.info().outputPath('mic-new-tab.png'), fullPage: true });
+      await shot(tab, '07-mic-new-tab');
       await context.close();
     } finally {
       await browser.close();
