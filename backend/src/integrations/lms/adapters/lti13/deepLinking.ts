@@ -21,8 +21,10 @@ import { LtiError } from './errors';
 // trusts for grades) and the page auto-posts it to the LMS return URL. Each
 // item becomes one LMS activity: its title, the custom parameter the launch
 // already understands (Phase 3 binding), a grade column (max 100, owner
-// decision P2) only for graded items, and "open in a new window" for items
-// that need the microphone or camera (owner decision P3).
+// decision P2) only for graded items, and a request for a new window for
+// items that need the microphone or camera (owner decision P3: ENARA asks the
+// LMS for a new window and always offers its own new tab; Moodle 4.3+ ignores
+// the request, MDL-79442).
 
 export const PICKER_TTL_MS = 10 * 60_000;
 export const SCORE_MAXIMUM = 100;
@@ -141,7 +143,8 @@ export function contentItem(item: PickerItem, session: Pick<ILmsDeepLinkSession,
   if (item.graded && session.acceptLineItem) {
     ci.lineItem = { scoreMaximum: SCORE_MAXIMUM, label: item.title.slice(0, 255), resourceId: itemKey(item.type, item.id), tag: 'enara' };
   }
-  // Mic / camera: always a new window (decision P3). Without a hint the LMS uses its default (embedded).
+  // Mic / camera: ask the LMS for a new window (decision P3). Moodle 4.3+ ignores it; ENARA's own
+  // "Open in new tab" covers that. Without a hint the LMS uses its default (embedded).
   if (item.needsMedia && session.acceptWindow) ci.window = { targetName: `enara_${item.id}`.slice(0, 60) };
   return ci;
 }

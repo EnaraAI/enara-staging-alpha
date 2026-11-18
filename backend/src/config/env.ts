@@ -167,6 +167,8 @@ export interface LmsConfig {
   schoolConnectionsRequireApproval: boolean;
   google: { clientId?: string; clientSecret?: string; redirectUri?: string };
   problem?: string;
+  /** Something to check that does not switch the LMS off (e.g. APP_URL unset, so the one-host rule could not be checked). Names variables only. */
+  warning?: string;
 }
 
 let cachedConfig: AppConfig | undefined;
@@ -241,11 +243,13 @@ export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
   const googleClassroomEnabled = readBoolean(source, 'LMS_GOOGLE_CLASSROOM_ENABLED', false);
   if ((ltiEnabled || googleClassroomEnabled) && !kek.value && !kek.problem) problems.push('LMS_KEK is required when an LMS flag is on');
 
+  const warnings: string[] = [];
   let toolBaseUrl = readString(source, 'LMS_TOOL_BASE_URL');
   if (toolBaseUrl) {
     try {
       const u = new URL(toolBaseUrl);
-      const local = u.hostname === 'localhost' || u.hostname === '127.0.0.1';
+      // http only for a local test or development server, never in production.
+      const local = (u.hostname === 'localhost' || u.hostname === '127.0.0.1') && readString(source, 'NODE_ENV') !== 'production';
       if (u.protocol !== 'https:' && !(local && u.protocol === 'http:')) throw new Error('scheme');
       toolBaseUrl = u.origin;
     } catch {
@@ -254,6 +258,26 @@ export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
     }
   } else if (ltiEnabled) {
     problems.push('LMS_TOOL_BASE_URL is required when LMS_LTI_ENABLED is on');
+  }
+  // One host (docs/lms/PHASE_2_NOTES.md, "One host"): Moodle's iframe grants the
+  // microphone and camera only to the Tool URL's host (MDL-81637), so /lti/* and
+  // the app (the /lms/launch page and every page after it) must be on the same
+  // host. APP_URL is the app's public address (email links). Unset: warn only.
+  if (ltiEnabled && toolBaseUrl) {
+    const appUrl = readString(source, 'APP_URL');
+    if (!appUrl) {
+      warnings.push('APP_URL is not set, so LMS_TOOL_BASE_URL could not be checked against the app host');
+    } else {
+      let appHost: string | undefined;
+      try {
+        appHost = new URL(appUrl).host;
+      } catch {
+        problems.push('APP_URL must be a URL to check LMS_TOOL_BASE_URL against the app host');
+      }
+      if (appHost !== undefined && appHost !== new URL(toolBaseUrl).host) {
+        problems.push('LMS_TOOL_BASE_URL and APP_URL must be on the same host (the LMS grants the microphone only to the tool host)');
+      }
+    }
   }
 
   const triggersRaw = readString(source, 'LMS_DRAIN_TRIGGERS') ?? 'inline,piggyback,targeted,daily';
@@ -280,6 +304,7 @@ export function parseLmsConfig(source: NodeJS.ProcessEnv): LmsConfig {
       redirectUri: readString(source, 'GOOGLE_CLASSROOM_REDIRECT_URI'),
     },
     problem: problems.length ? problems.join('; ') : undefined,
+    warning: warnings.length ? warnings.join('; ') : undefined,
   };
 }
 

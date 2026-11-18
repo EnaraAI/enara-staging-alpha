@@ -155,6 +155,17 @@ export type EnqueueOutcome =
   | 'assignment_archived'
   | 'kept_released';
 
+/** The link's bound work is practice: its kind from the binding, else the assignment's (or its assessment's) kind. */
+async function boundToPractice(link: ILmsResourceLink): Promise<boolean> {
+  if (link.activityKind) return link.activityKind === 'practice';
+  if (!link.enaraActivityId) return false;
+  const assignment = await Assignment.findOne({ id: link.enaraActivityId, institutionId: link.institutionId }).select('assessmentId assessmentKind').lean();
+  if (!assignment) return false;
+  if (assignment.assessmentKind) return assignment.assessmentKind === 'practice';
+  const assessment = await Assessment.findOne({ id: assignment.assessmentId, institutionId: link.institutionId }).select('assessmentKind').lean();
+  return assessment?.assessmentKind === 'practice';
+}
+
 /** Phase 3 follow-up codes (job lastError / enqueue outcome). */
 export const LINE_ITEM_GONE = 'lineitem_gone';
 export const ASSIGNMENT_ARCHIVED = 'assignment_archived';
@@ -175,8 +186,11 @@ export async function enqueueForLink(link: ILmsResourceLink, studentId: string, 
   // Phase 3 follow-ups: nothing for an activity the LMS said is gone (until it
   // is launched again), nor for an assignment a teacher archived.
   if (link.lineItemGoneAt) return { outcome: 'lineitem_gone' };
-  // Phase 2: an item added through the picker without a grade column (practice).
-  if ((link.customParams as Record<string, string> | undefined)?.enara_graded === '0') return { outcome: 'not_graded' };
+  // Phase 2: an item added through the picker without a grade column
+  // (enara_graded=0). Owner decision D3: practice is graded (best attempt), so
+  // the flag is ignored when the bound work is practice; practice activities
+  // picked before D3 carry it and now send their best score too.
+  if ((link.customParams as Record<string, string> | undefined)?.enara_graded === '0' && !(await boundToPractice(link))) return { outcome: 'not_graded' };
   if (link.enaraActivityId && (await Assignment.exists({ id: link.enaraActivityId, institutionId: link.institutionId, state: 'archived' }))) return { outcome: 'assignment_archived' };
   const context = await LmsContext.findOne({ id: link.contextId, institutionId: link.institutionId, status: 'active' }).lean();
   if (!context) return { outcome: 'context_inactive' };

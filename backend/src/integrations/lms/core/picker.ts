@@ -24,7 +24,7 @@ export interface PickerItem {
   points?: number;
   /** Gets a grade column in the LMS (an AGS line item). */
   graded: boolean;
-  /** Needs the microphone or camera: always opens in a new window (owner decision P3). */
+  /** Needs the microphone or camera: ENARA asks the LMS for a new window and always offers its own new tab (owner decision P3). */
   needsMedia: boolean;
   /** LTI custom parameters the launch reads to open this item. */
   custom: Record<string, string>;

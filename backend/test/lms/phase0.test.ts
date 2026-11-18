@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { SignJWT, createLocalJWKSet, jwtVerify } from 'jose';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { parseLmsConfig, resetConfigForTests } from '../../src/config/env';
 
 // LMS Phase 0 (docs/lms/IMPLEMENTATION_PLAN.md): config and flags, KEK
@@ -18,7 +18,7 @@ const BASE_ENV = {
   JWT_ISSUER: 'enara-backend', JWT_AUDIENCE: 'enara-platform', INGEST_HMAC_SECRET: 'test-hmac-secret-32-characters-minimum',
   CORS_ALLOWED_ORIGINS: 'http://localhost:5173', AWS_S3_BUCKET: '', TRUST_PROXY: 'false', SERVE_LOCAL_UPLOADS: 'false',
 };
-const LMS_KEYS = ['LMS_LTI_ENABLED', 'LMS_GOOGLE_CLASSROOM_ENABLED', 'LMS_GRADE_PASSBACK_ENABLED', 'LMS_TOOL_BASE_URL', 'LMS_KEK', 'LMS_KEK_PREVIOUS', 'LMS_DRAIN_TRIGGERS'];
+const LMS_KEYS = ['LMS_LTI_ENABLED', 'LMS_GOOGLE_CLASSROOM_ENABLED', 'LMS_GRADE_PASSBACK_ENABLED', 'LMS_TOOL_BASE_URL', 'LMS_KEK', 'LMS_KEK_PREVIOUS', 'LMS_DRAIN_TRIGGERS', 'APP_URL'];
 
 function setLmsEnv(vars: Record<string, string | undefined>) {
   for (const k of LMS_KEYS) delete process.env[k];
@@ -69,6 +69,57 @@ describe('config and flags', () => {
     expect(lmsFlags()).toMatchObject({ lti: false });
     setLmsEnv({ LMS_LTI_ENABLED: 'true', LMS_TOOL_BASE_URL: 'https://test.enara.app', LMS_KEK: KEK });
     expect(lmsFlags()).toMatchObject({ lti: true, googleClassroom: false, gradePassback: false });
+    setLmsEnv({ LMS_KEK: KEK });
+  });
+});
+
+describe('one host: the tool URL and the app (the LMS frame grants the mic to the tool host only)', () => {
+  const ON = { LMS_LTI_ENABLED: 'true', LMS_KEK: KEK };
+  it('same host: no problem and no warning (path, trailing slash and case do not matter)', () => {
+    const c = parseLmsConfig({ ...ON, LMS_TOOL_BASE_URL: 'https://lms-test.enara.app', APP_URL: 'https://LMS-test.enara.app/' });
+    expect(c.problem).toBeUndefined();
+    expect(c.warning).toBeUndefined();
+    expect(parseLmsConfig({ ...ON, LMS_TOOL_BASE_URL: 'https://lms-test.enara.app/lti', APP_URL: 'https://lms-test.enara.app/home' }).problem).toBeUndefined();
+  });
+  it('another host or port is a problem that names the variables, never their values', () => {
+    for (const appUrl of ['https://app.enara.app', 'https://lms-test.enara.app:8443', 'https://enara.app']) {
+      const c = parseLmsConfig({ ...ON, LMS_TOOL_BASE_URL: 'https://lms-test.enara.app', APP_URL: appUrl });
+      expect(c.problem, appUrl).toMatch(/LMS_TOOL_BASE_URL and APP_URL must be on the same host/);
+      expect(c.problem).not.toMatch(/enara\.app/);
+    }
+    expect(parseLmsConfig({ ...ON, LMS_TOOL_BASE_URL: 'https://lms-test.enara.app', APP_URL: 'not a url' }).problem).toMatch(/APP_URL must be a URL/);
+  });
+  it('APP_URL unset: not blocked, a warning names it', () => {
+    const c = parseLmsConfig({ ...ON, LMS_TOOL_BASE_URL: 'https://lms-test.enara.app' });
+    expect(c.problem).toBeUndefined();
+    expect(c.warning).toMatch(/APP_URL is not set/);
+  });
+  it('LTI off: the hosts are not compared', () => {
+    const c = parseLmsConfig({ LMS_KEK: KEK, LMS_TOOL_BASE_URL: 'https://lms-test.enara.app', APP_URL: 'https://app.enara.app' });
+    expect(c.problem).toBeUndefined();
+    expect(c.warning).toBeUndefined();
+  });
+  it('http only for localhost outside production', () => {
+    expect(parseLmsConfig({ ...ON, NODE_ENV: 'test', LMS_TOOL_BASE_URL: 'http://localhost:3000', APP_URL: 'http://localhost:3000' }).problem).toBeUndefined();
+    expect(parseLmsConfig({ ...ON, NODE_ENV: 'production', LMS_TOOL_BASE_URL: 'http://localhost:3000', APP_URL: 'http://localhost:3000' }).problem).toMatch(/https origin/);
+    expect(parseLmsConfig({ ...ON, NODE_ENV: 'test', LMS_TOOL_BASE_URL: 'http://lms-test.enara.app' }).problem).toMatch(/https origin/);
+  });
+  it('a host mismatch switches LTI off and is logged once at startup', async () => {
+    const { lmsFlags, logLmsConfigOnce, resetLmsConfigLogForTests } = await import('../../src/integrations/lms/core/flags');
+    const { logger } = await import('../../src/utils/logging');
+    setLmsEnv({ ...ON, LMS_TOOL_BASE_URL: 'https://lms-test.enara.app', APP_URL: 'https://app.enara.app' });
+    expect(lmsFlags()).toMatchObject({ lti: false, deepLinking: false });
+    expect(lmsFlags().problem).toMatch(/same host/);
+    const spy = vi.spyOn(logger, 'error').mockImplementation(() => undefined);
+    resetLmsConfigLogForTests();
+    logLmsConfigOnce();
+    logLmsConfigOnce();
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0][0]).toBe('lms_config_problem');
+    expect(JSON.stringify(spy.mock.calls[0][1])).not.toContain('enara.app');
+    spy.mockRestore();
+    setLmsEnv({ ...ON, LMS_TOOL_BASE_URL: 'https://lms-test.enara.app', APP_URL: 'https://lms-test.enara.app' });
+    expect(lmsFlags()).toMatchObject({ lti: true });
     setLmsEnv({ LMS_KEK: KEK });
   });
 });
@@ -307,6 +358,30 @@ describe('HTTP: inert with the flags off', () => {
   it('flag on with a broken KEK: still 404', async () => {
     setLmsEnv({ LMS_LTI_ENABLED: 'true', LMS_TOOL_BASE_URL: 'https://test.enara.app', LMS_KEK: 'YnJva2Vu' });
     expect((await request(await app()).get('/lti/jwks')).status).toBe(404);
+  });
+
+  it('flag on with a host mismatch: the LMS is off; ENARA admins see the problem in the status, others get 404', async () => {
+    setLmsEnv({ LMS_LTI_ENABLED: 'true', LMS_TOOL_BASE_URL: 'https://lms-test.enara.app', APP_URL: 'https://app.enara.app', LMS_KEK: KEK });
+    const { User } = await import('../../src/models/User');
+    const { signAccessToken } = await import('../../src/auth/jwt');
+    const bearer = async (role: string, institutionId?: string) => {
+      const u = await User.create({ email: `${role}-${randomBytes(4).toString('hex')}@p0.test`, password: 'x', role, name: role, institutionId });
+      return `Bearer ${signAccessToken({ id: u._id.toString(), email: u.email, role: u.role, institutionId } as never)}`;
+    };
+    const a = await app();
+    expect((await request(a).get('/lti/jwks')).status).toBe(404);
+    const enara = await request(a).get('/api/lms/status').set('Authorization', await bearer('enara-admin'));
+    expect(enara.status).toBe(200);
+    expect(enara.body.enabled).toBe(false);
+    expect(enara.body.problem).toMatch(/LMS_TOOL_BASE_URL and APP_URL must be on the same host/);
+    expect(JSON.stringify(enara.body)).not.toContain('enara.app');
+    expect((await request(a).get('/api/lms/status').set('Authorization', await bearer('admin', 'org-p0'))).status).toBe(404);
+    expect((await request(a).get('/api/lms/platforms').set('Authorization', await bearer('enara-admin'))).status).toBe(404);
+    // No problem: the normal status.
+    setLmsEnv({ LMS_LTI_ENABLED: 'true', LMS_TOOL_BASE_URL: 'https://lms-test.enara.app', APP_URL: 'https://lms-test.enara.app', LMS_KEK: KEK });
+    const ok = await request(await app()).get('/api/lms/status').set('Authorization', await bearer('enara-admin'));
+    expect(ok.body).toMatchObject({ enabled: true, tool: { launchUrl: 'https://lms-test.enara.app/lti/launch' } });
+    setLmsEnv({ LMS_KEK: KEK });
   });
 
   it('flag on: both URLs serve the same valid public JWKS', async () => {

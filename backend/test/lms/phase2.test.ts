@@ -15,8 +15,9 @@ import { MockPlatform, ROLE } from './mockPlatform';
 // response (issuer, audience, deployment, data, nonce, content items, grade
 // column only for graded items, max 100, new window for mic items),
 // "already added in this course", one-at-a-time LMSs, school isolation, and
-// that a picked activity launches through the Phase 3 binding (practice: no
-// grade sent).
+// that a picked activity launches through the Phase 3 binding. Owner decision
+// D3: practice is graded (its own grade column, best attempt), and a practice
+// activity picked before D3 (enara_graded=0) sends its best attempt too.
 
 const KEK = randomBytes(32).toString('base64');
 const TOOL = 'https://tool.enara.test';
@@ -174,6 +175,25 @@ async function verifyResponse(p: MockPlatform, jwt: string) {
   return payload as Record<string, unknown>;
 }
 
+async function launchAndExchange(p: MockPlatform, over: Record<string, unknown>) {
+  const r = await ltiPost(p, over);
+  expect(r.status, r.text).toBe(303);
+  const token = new URLSearchParams(new URL(r.headers.location).hash.slice(1)).get('lt');
+  const ex = await request(app).post('/api/lms/launch/exchange').send({ token });
+  expect(ex.status, JSON.stringify(ex.body)).toBe(200);
+  return { session: `Bearer ${ex.body.token}`, launch: ex.body.launch, user: ex.body.user };
+}
+
+const modules = async () => ({ outbox: await import('../../src/integrations/lms/core/outbox'), drain: await import('../../src/integrations/lms/core/drain') });
+
+/** Start and submit one attempt on an assignment through the student API. */
+async function submitAttempt(session: string, assignmentId: string, answers: Record<string, string>) {
+  const s = await request(app).post(`/api/me/assignments/${assignmentId}/attempts`).set('Authorization', session).send({});
+  expect(s.status, JSON.stringify(s.body)).toBe(201);
+  const r = await request(app).post(`/api/me/assignments/${assignmentId}/attempts/${s.body.attempt.id}/submit`).set('Authorization', session).send({ answers });
+  expect(r.status, JSON.stringify(r.body)).toBe(200);
+}
+
 // -------------------------------------------------------------- tests
 
 describe('switch and access', () => {
@@ -222,7 +242,7 @@ describe('items', () => {
     expect(by('AS-ENG').language).toEqual({ level: 'A2', skills: ['reading', 'speaking'] });
     expect(by('AS-MATH').language).toBeUndefined();
     expect(by('AS-ENG')).toMatchObject({ graded: true, needsMedia: false, questions: 2, points: 4, alreadyAdded: false });
-    expect(by('AS-PRACTICE').graded).toBe(false);
+    expect(by('AS-PRACTICE').graded).toBe(true); // D3: practice is graded
     expect(by('ASG-SPEAK')).toMatchObject({ needsMedia: true, kind: 'speaking' });
     expect(by('ASG-QUIZ').meta).toContain('Class 7A');
     expect(JSON.stringify(r.body)).not.toContain('enara_assessment');
@@ -230,7 +250,7 @@ describe('items', () => {
 });
 
 describe('the signed response', () => {
-  it('several items: signed by ENARA for this LMS; grade column (max 100) only for graded items; new window for mic items', async () => {
+  it('several items: signed by ENARA for this LMS; grade column (max 100) for graded items, practice included (D3); new window for mic items', async () => {
     const secret = await openPicker(pA);
     const r = await api(secret).submit([{ type: 'assessment', id: 'AS-ENG' }, { type: 'assessment', id: 'AS-PRACTICE' }, { type: 'assignment', id: 'ASG-SPEAK' }, { type: 'assessment', id: 'AS-ENG' }]);
     expect(r.status, JSON.stringify(r.body)).toBe(200);
@@ -248,8 +268,9 @@ describe('the signed response', () => {
     const [eng, practice, speak] = items;
     expect(eng).toMatchObject({ type: 'ltiResourceLink', title: 'Quiz AS-ENG', url: `${TOOL}/lti/launch`, custom: { enara_assessment: 'AS-ENG' }, lineItem: { scoreMaximum: 100, label: 'Quiz AS-ENG', resourceId: 'assessment:AS-ENG', tag: 'enara' } });
     expect(eng.window).toBeUndefined();
-    expect(practice.lineItem).toBeUndefined();
-    expect(practice.custom).toEqual({ enara_assessment: 'AS-PRACTICE', enara_graded: '0' });
+    // D3: practice gets its own grade column and no enara_graded=0.
+    expect(practice.lineItem).toEqual({ scoreMaximum: 100, label: 'Quiz AS-PRACTICE', resourceId: 'assessment:AS-PRACTICE', tag: 'enara' });
+    expect(practice.custom).toEqual({ enara_assessment: 'AS-PRACTICE' });
     expect(speak.custom).toEqual({ enara_assignment: 'ASG-SPEAK' });
     expect(speak.window).toBeDefined();
     expect(speak.lineItem.scoreMaximum).toBe(100);
@@ -314,19 +335,54 @@ describe('"Already added in this course" (decision P4)', () => {
 });
 
 describe('a picked activity opens through the Phase 3 binding', () => {
-  it('practice picked without a grade column never sends a grade (enara_graded=0)', async () => {
+  it('practice picked before D3 (enara_graded=0) is graded anyway: it queues and sends the BEST attempt to its column', async () => {
+    pA.resetAgs();
+    const custom = { enara_assessment: 'AS-PRACTICE', enara_graded: '0' };
+    const course = { id: 'course-505', label: 'P', title: 'Practice course' };
+    const t = await launchAndExchange(pA, { sub: 'teacher-3', 'lti:roles': [ROLE.instructor], 'lti:context': course, 'lti:resource_link': { id: 'rl-practice', title: 'Quiz AS-PRACTICE' }, 'lti:custom': custom, ...pA.agsClaim() });
+    const assignmentId = t.launch.target.assignmentId as string;
+    const link = await M.LmsResourceLink.findOne({ externalResourceLinkId: 'rl-practice' }).lean();
+    expect(link).toMatchObject({ enaraActivityId: assignmentId, activityKind: 'practice', title: 'Quiz AS-PRACTICE', lineItemUrl: pA.lineItemUrl() });
+    expect(link!.customParams).toMatchObject({ enara_graded: '0' });
+
+    const s = await launchAndExchange(pA, { sub: 'student-p2', name: 'Layla Hassan', email: 'student-p2@school.example', 'lti:roles': [ROLE.learner], 'lti:context': course, 'lti:resource_link': { id: 'rl-practice', title: 'Quiz AS-PRACTICE' }, 'lti:custom': custom, ...pA.agsClaim() });
+    const { outbox, drain } = await modules();
+    const send = async (answers: Record<string, string>) => {
+      await submitAttempt(s.session, assignmentId, answers);
+      await drain.settleLmsBackgroundForTests();
+      await outbox.drainGradeJobs({ trigger: 'test', filter: { contextIds: [link!.contextId] } });
+    };
+    const scoresOf = () => pA.scores.map((x) => x.body.scoreGiven);
+
+    await send({ q1: 'a', q2: 'b' }); // 2 of 4 points
+    expect(pA.scores).toHaveLength(1);
+    expect(pA.scores[0].path).toBe('/lineitems/5/lineitem/scores');
+    expect(pA.scores[0].body).toMatchObject({ scoreGiven: 2, scoreMaximum: 4, gradingProgress: 'FullyGraded', userId: 'student-p2' });
+    await send({ q1: 'a', q2: 'a' }); // 4 of 4: the new best is sent
+    expect(scoresOf()).toEqual([2, 4]);
+    await send({ q1: 'b', q2: 'b' }); // 0 of 4: best stays 4, nothing new sent
+    expect(scoresOf()).toEqual([2, 4]);
+    const jobs = await M.LmsGradeSyncJob.find({ resourceLinkId: link!.id }).sort({ scoreTimestamp: 1 }).lean();
+    expect(jobs.every((j) => j.status === 'sent')).toBe(true);
+    expect(jobs.map((j) => j.scoreGiven)).toEqual([2, 4]);
+    // Asked again: the best result is already queued (not 'not_graded').
+    const { AssessmentAttempt } = await import('../../src/models/AssessmentAttempt');
+    const studentId = (await AssessmentAttempt.findOne({ assignmentId }).lean())!.studentId;
+    expect((await outbox.enqueueForLink(link!, studentId, 'test')).outcome).toBe('duplicate');
+  });
+
+  it('enara_graded=0 still keeps a graded quiz (not practice) out of the gradebook', async () => {
     const r = await ltiPost(pA, {
       sub: 'teacher-3', 'lti:roles': [ROLE.instructor],
       'lti:context': { id: 'course-505', label: 'P', title: 'Practice course' },
-      'lti:resource_link': { id: 'rl-practice', title: 'Quiz AS-PRACTICE' },
-      'lti:custom': { enara_assessment: 'AS-PRACTICE', enara_graded: '0' },
+      'lti:resource_link': { id: 'rl-ungraded-quiz', title: 'Quiz AS-ENG' },
+      'lti:custom': { enara_assessment: 'AS-ENG', enara_graded: '0' },
     });
     expect(r.status, r.text).toBe(303);
-    const link = await M.LmsResourceLink.findOne({ externalResourceLinkId: 'rl-practice' }).lean();
-    expect(link?.enaraActivityId).toBeTruthy();
-    expect(link?.title).toBe('Quiz AS-PRACTICE');
-    const { enqueueForLink } = await import('../../src/integrations/lms/core/outbox');
-    expect((await enqueueForLink(link!, 'any-student', 'test')).outcome).toBe('not_graded');
+    const link = await M.LmsResourceLink.findOne({ externalResourceLinkId: 'rl-ungraded-quiz' }).lean();
+    expect(link?.activityKind).toBe('assessment');
+    const { outbox } = await modules();
+    expect((await outbox.enqueueForLink(link!, 'any-student', 'test')).outcome).toBe('not_graded');
   });
 });
 
@@ -335,7 +391,7 @@ describe('audit', () => {
     const rows = await M.LmsAuditLog.find({ event: 'lti.deep_link' }).lean();
     expect(rows.some((r) => r.refIds.step === 'request')).toBe(true);
     const resp = rows.find((r) => r.refIds.step === 'response' && r.refIds.items === 3);
-    expect(resp?.refIds).toMatchObject({ graded: 2, newWindow: 1 });
+    expect(resp?.refIds).toMatchObject({ graded: 3, newWindow: 1 });
     expect(JSON.stringify(rows)).not.toMatch(/Layla|school\.example|opaque-moodle-data/);
   });
 });
