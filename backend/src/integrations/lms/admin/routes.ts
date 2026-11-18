@@ -1,4 +1,5 @@
 import { Router, type NextFunction, type Request, type Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import { sessionUser, signToken } from '../../../controllers/auth.controller';
 import { authMiddleware, isInstitutionSuspended, requireAdmin, type AuthRequest } from '../../../middleware/auth.middleware';
 import { AppError, asyncHandler } from '../../../middleware/errorHandler';
@@ -7,26 +8,32 @@ import { CourseInstance } from '../../../models/CourseInstance';
 import { Institution } from '../../../models/Institution';
 import { User } from '../../../models/User';
 import { selectLaunchClass } from '../../../services/multiClass';
+import { MongoRateLimitStore } from '../../../services/mongoRateLimitStore';
 import { logger, serializeError } from '../../../utils/logging';
 import { ensurePlainObject, getOptionalBoolean, getOptionalId, rejectMongoOperators } from '../../../utils/validation';
 import { isAcceptableKeysetUrl } from '../adapters/lti13/jwks';
 import { writeLmsAudit } from '../core/audit';
 import { anyLmsFlagSet, lmsFlags, lmsSettings } from '../core/flags';
 import { runInBackground, triggerOn } from '../core/drain';
-import { consumeLaunchToken, issueLaunchToken, LaunchTokenError } from '../core/launchToken';
+import { consumeHandoffCode, HANDOFF_CODE_TTL_SECONDS, HandoffCodeError, mintHandoffCode } from '../core/handoffCode';
+import { consumeLaunchToken, LaunchTokenError } from '../core/launchToken';
+import { micCounts, parseMicTelemetry, recordMicTelemetry } from '../core/micTelemetry';
 import { flaggedActivities } from '../core/activityHealth';
 import { drainGradeJobs, gradeStats, passbackOn, resyncGrades, retryDead } from '../core/outbox';
 import { contextRosterViews, manualSyncTooSoon, notStartedStudents, rosterOn, syncContextRoster } from '../core/roster';
 import { seatView, updateSeatSettings } from '../core/seats';
 import { liftSuppression, listSuppressions } from '../core/suppression';
-import { LmsContext, LmsDeployment, LmsOrgSettings, LmsPlatform, LmsUser, type ILmsContext, type ILmsDeployment, type ILmsPlatform } from '../models';
+import { LmsContext, LmsDeployment, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsUser, type ILmsContext, type ILmsDeployment, type ILmsHandoffCode, type ILmsPlatform } from '../models';
 import { isKnownVendor, listPresets } from '../presets';
 import { requireLti } from '../routes';
 
 // /api/lms (Phase 1a). Inert (the app's normal 404) unless LMS_LTI_ENABLED is
 // on and the LMS config is valid.
 //   Public:   POST /launch/exchange   one-time launch token -> ENARA session
-//   Signed in: POST /launch/handoff   "Open in new tab" (LMS accounts only)
+//             POST /launch/handoff/exchange   one-time "Open in new tab" code -> ENARA session
+//   Signed in: POST /launch/handoff   "Open in new tab" (LMS accounts only): a 60 s one-time code
+//             POST /telemetry/mic     mic check outcome / new tab opened (daily counts per school)
+//   Admins:   GET /telemetry/mic      those counts (ENARA admins: every school; school admins: their own)
 //   Admins:   status, platforms (manual "Add LMS"), deployments, seats
 //   Grades (Phase 3, also needs LMS_GRADE_PASSBACK_ENABLED): outbox counts and
 //             last error per platform, "Re-sync grades", "Retry dead jobs"
@@ -162,6 +169,80 @@ async function selectCurrentClassForLaunch(row: { institutionId: string; platfor
   }
 }
 
+/** What a one-time LTI launch token or "Open in new tab" code opens (the row's own fields). */
+interface SessionGrant {
+  purpose: 'launch' | 'handoff';
+  institutionId: string;
+  enaraUserId: string;
+  enaraRole: 'student' | 'teacher' | 'admin';
+  preview?: boolean;
+  platformId?: string;
+  lmsUserId?: string;
+  contextId?: string;
+  enaraClassId?: string;
+  resourceLinkId?: string;
+  targetAssignmentId?: string;
+  targetPage?: string;
+  presentation?: 'iframe' | 'window';
+  cookieless: boolean;
+}
+
+type LoadedUser = Parameters<typeof sessionUser>[0];
+
+/** The checks every LMS sign-in shares (account, school, role, preview), then a normal ENARA session. */
+async function openLmsSession(row: SessionGrant, res: Response, user: LoadedUser | null, auditRefIds: Record<string, unknown> = {}) {
+  if (!user || user.status !== 'active' || user.institutionId !== row.institutionId) {
+    await writeLmsAudit({ event: 'lms.session', outcome: 'fail', institutionId: row.institutionId, platformId: row.platformId, code: 'account_unavailable', refIds: { purpose: row.purpose, ...auditRefIds } });
+    throw new AppError('Your ENARA account is not available. Ask your school administrator.', 403, 'LMS_ACCOUNT_UNAVAILABLE');
+  }
+  if (await isInstitutionSuspended(row.institutionId)) throw new AppError("Your school's ENARA access is suspended.", 403, 'INSTITUTION_SUSPENDED');
+  // P0 item 1: only these ENARA accounts open from an LMS (student app, staff
+  // portal, Parents Portal). Any other role (ENARA admin, academic manager,
+  // an unknown one) gets no session, and never the admin portal.
+  if (!LAUNCH_ACCOUNT_ROLES.has(user.role)) {
+    await writeLmsAudit({ event: 'lms.session', outcome: 'fail', institutionId: row.institutionId, platformId: row.platformId, actor: row.lmsUserId, code: 'role_not_supported', refIds: { purpose: row.purpose, ...auditRefIds } });
+    throw new AppError('ENARA does not open this kind of account from your LMS. Ask your school administrator.', 403, 'LMS_ROLE_NOT_SUPPORTED');
+  }
+  // A student preview is only for a staff account (its role may have changed since the launch).
+  const preview = row.preview === true;
+  if (preview && user.role !== 'teacher' && user.role !== 'admin') {
+    await writeLmsAudit({ event: 'lms.session', outcome: 'fail', institutionId: row.institutionId, platformId: row.platformId, code: 'preview_not_staff', refIds: { purpose: row.purpose, ...auditRefIds } });
+    throw new AppError('Your ENARA account is not available. Ask your school administrator.', 403, 'LMS_ACCOUNT_UNAVAILABLE');
+  }
+  // P0 item 5: a student's launch from an LMS course makes that course's
+  // ENARA class their current class (multi-class only; see selectLaunchClass).
+  if (!preview && row.purpose === 'launch' && user.role === 'student' && user.studentId && row.enaraClassId) {
+    await selectCurrentClassForLaunch(row, user.studentId);
+  }
+  await writeLmsAudit({
+    event: 'lms.session',
+    outcome: 'ok',
+    institutionId: row.institutionId,
+    platformId: row.platformId,
+    actor: row.lmsUserId,
+    refIds: { purpose: row.purpose, contextId: row.contextId, enaraClassId: row.enaraClassId, cookieless: row.cookieless, preview, ...auditRefIds },
+  });
+  // Phase 3: the ENARA work the activity is bound to (the landing page opens it).
+  // An archived assignment is not opened (students cannot see it). A handoff
+  // with no assignment reopens the page the student was on.
+  const assignmentOpen = row.targetAssignmentId && (await Assignment.exists({ id: row.targetAssignmentId, institutionId: row.institutionId, state: { $ne: 'archived' } }));
+  const target = assignmentOpen ? { kind: 'assignment', assignmentId: row.targetAssignmentId } : row.targetPage ? { kind: 'page', page: row.targetPage } : null;
+  res.json({
+    token: signToken(user, { preview }),
+    user: await sessionUser(user),
+    launch: {
+      purpose: row.purpose,
+      role: row.enaraRole,
+      classId: row.enaraClassId ?? null,
+      resourceLinkId: row.resourceLinkId ?? null,
+      presentation: row.presentation ?? 'iframe',
+      cookieless: row.cookieless,
+      preview,
+      target,
+    },
+  });
+}
+
 lmsAdminRouter.post(
   '/launch/exchange',
   asyncHandler(async (req, res: Response) => {
@@ -176,90 +257,218 @@ lmsAdminRouter.post(
       }
       throw error;
     }
-    const user = await User.findById(row.enaraUserId);
-    if (!user || user.status !== 'active' || user.institutionId !== row.institutionId) {
-      await writeLmsAudit({ event: 'lms.session', outcome: 'fail', institutionId: row.institutionId, platformId: row.platformId, code: 'account_unavailable' });
-      throw new AppError('Your ENARA account is not available. Ask your school administrator.', 403, 'LMS_ACCOUNT_UNAVAILABLE');
-    }
-    if (await isInstitutionSuspended(row.institutionId)) throw new AppError("Your school's ENARA access is suspended.", 403, 'INSTITUTION_SUSPENDED');
-    // P0 item 1: only these ENARA accounts open from an LMS (student app, staff
-    // portal, Parents Portal). Any other role (ENARA admin, academic manager,
-    // an unknown one) gets no session, and never the admin portal.
-    if (!LAUNCH_ACCOUNT_ROLES.has(user.role)) {
-      await writeLmsAudit({ event: 'lms.session', outcome: 'fail', institutionId: row.institutionId, platformId: row.platformId, actor: row.lmsUserId, code: 'role_not_supported', refIds: { purpose: row.purpose } });
-      throw new AppError('ENARA does not open this kind of account from your LMS. Ask your school administrator.', 403, 'LMS_ROLE_NOT_SUPPORTED');
-    }
-    // A student preview is only for a staff account (its role may have changed since the launch).
-    const preview = row.preview === true;
-    if (preview && user.role !== 'teacher' && user.role !== 'admin') {
-      await writeLmsAudit({ event: 'lms.session', outcome: 'fail', institutionId: row.institutionId, platformId: row.platformId, code: 'preview_not_staff' });
-      throw new AppError('Your ENARA account is not available. Ask your school administrator.', 403, 'LMS_ACCOUNT_UNAVAILABLE');
-    }
-    // P0 item 5: a student's launch from an LMS course makes that course's
-    // ENARA class their current class (multi-class only; see selectLaunchClass).
-    if (!preview && row.purpose === 'launch' && user.role === 'student' && user.studentId && row.enaraClassId) {
-      await selectCurrentClassForLaunch(row, user.studentId);
-    }
-    await writeLmsAudit({
-      event: 'lms.session',
-      outcome: 'ok',
-      institutionId: row.institutionId,
-      platformId: row.platformId,
-      actor: row.lmsUserId,
-      refIds: { purpose: row.purpose, contextId: row.contextId, enaraClassId: row.enaraClassId, cookieless: row.cookieless, preview },
-    });
-    res.json({
-      token: signToken(user, { preview }),
-      user: await sessionUser(user),
-      launch: {
-        purpose: row.purpose,
-        role: row.enaraRole,
-        classId: row.enaraClassId ?? null,
-        presentation: row.presentation ?? 'iframe',
-        cookieless: row.cookieless,
-        preview,
-        // Phase 3: the ENARA work the activity is bound to (the landing page opens it).
-        // An archived assignment is not opened (students cannot see it).
-        target: row.targetAssignmentId && (await Assignment.exists({ id: row.targetAssignmentId, institutionId: row.institutionId, state: { $ne: 'archived' } })) ? { kind: 'assignment', assignmentId: row.targetAssignmentId } : null,
-      },
-    });
+    await openLmsSession(row, res, await User.findById(row.enaraUserId));
   }),
 );
+
+// ------------------------------------------------- "Open in new tab" handoff
+//
+// Mic / new tab, item 2. A signed-in LMS session (inside the LMS frame) asks
+// for a one-time code; the new tab lands on /lms/launch#hc=<code> and trades
+// it once for its own session (POST /launch/handoff/exchange). The code lives
+// 60 seconds, is stored only as a hash, and is bound to the account, the
+// school, the LMS link and activity, the target and the issuing session.
+// Minting is limited per account, the exchange per network address.
+
+export const HANDOFF_MINT_PER_MINUTE = 10;
+export const HANDOFF_EXCHANGE_PER_MINUTE = 30;
+const PAGE_KEY = /^[a-z][a-z0-9-]{0,39}$/;
+
+const limited = (text: string) => ({ error: { code: 'RATE_LIMITED', message: text }, message: text });
+const handoffMintLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: HANDOFF_MINT_PER_MINUTE,
+  store: new MongoRateLimitStore('lms-handoff-mint'),
+  passOnStoreError: true,
+  keyGenerator: (req) => `inst:${(req as AuthRequest).user?.institutionId ?? 'none'}:user:${(req as AuthRequest).user?.id}`,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: limited('Too many new tabs. Wait a moment and try again.'),
+});
+const handoffExchangeLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: HANDOFF_EXCHANGE_PER_MINUTE,
+  store: new MongoRateLimitStore('lms-handoff-exchange'),
+  passOnStoreError: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: limited('Too many sign-in attempts. Wait a moment and try again.'),
+});
+
+const targetNotFound = () => new AppError('That activity is not available. Open it again from your LMS.', 404, 'LMS_HANDOFF_TARGET_NOT_FOUND');
 
 lmsAdminRouter.post(
   '/launch/handoff',
   authMiddleware,
+  handoffMintLimiter,
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const user = req.user!;
+    // Parents never come from an LMS: only student, teacher and school admin accounts.
     const role = roleForToken(user.role);
-    const link = role && user.institutionId ? await LmsUser.findOne({ enaraUserId: user.id, institutionId: user.institutionId }).select('id platformId').lean() : null;
-    if (!role || !link) throw new AppError('Only accounts that came from an LMS can do this', 403, 'LMS_ACCOUNT_REQUIRED');
+    const account = role && user.institutionId ? await User.findById(user.id).select('tokenVersion role').lean() : null;
+    if (!role || !account) throw new AppError('Only accounts that came from an LMS can do this', 403, 'LMS_ACCOUNT_REQUIRED');
+    const institutionId = user.institutionId!;
     const body = ensurePlainObject(req.body ?? {});
-    // Informational only (the landing page): kept only when it is a class of this school.
     const requestedClass = getOptionalId(body, 'classId');
-    const classId = requestedClass && (await CourseInstance.exists({ id: requestedClass, institutionId: user.institutionId })) ? requestedClass : undefined;
-    // Phase 3: the bound activity, kept only when it is an assignment of this school.
     const requestedAssignment = getOptionalId(body, 'assignmentId');
-    const targetAssignmentId = requestedAssignment && (await Assignment.exists({ id: requestedAssignment, institutionId: user.institutionId })) ? requestedAssignment : undefined;
+    const requestedLink = getOptionalId(body, 'resourceLinkId');
+    const rawPage = body.page;
+    if (rawPage !== undefined && rawPage !== null && (typeof rawPage !== 'string' || !PAGE_KEY.test(rawPage))) throw new AppError('page is invalid', 400, 'VALIDATION_ERROR');
+    const targetPage = typeof rawPage === 'string' ? rawPage : undefined;
+
+    // The LMS activity, when given: it must be this school's, on a platform this account came from.
+    let platformId: string | undefined;
+    let contextId: string | undefined;
+    let resourceLinkId: string | undefined;
+    let targetAssignmentId: string | undefined;
+    if (requestedLink) {
+      const rl = await LmsResourceLink.findOne({ id: requestedLink, institutionId }).select('id contextId enaraActivityId').lean();
+      const ctx = rl ? await LmsContext.findOne({ id: rl.contextId, institutionId }).select('id platformId').lean() : null;
+      if (!rl || !ctx) throw targetNotFound();
+      if (requestedAssignment && rl.enaraActivityId && requestedAssignment !== rl.enaraActivityId) {
+        throw new AppError('That assignment is not the one this LMS activity opens.', 400, 'LMS_HANDOFF_TARGET_MISMATCH');
+      }
+      platformId = ctx.platformId;
+      contextId = ctx.id;
+      resourceLinkId = rl.id;
+      targetAssignmentId = rl.enaraActivityId ?? requestedAssignment;
+    } else {
+      targetAssignmentId = requestedAssignment;
+    }
+    const link = await LmsUser.findOne({ enaraUserId: user.id, institutionId, ...(platformId ? { platformId } : {}) }).select('id platformId').lean();
+    if (!link) {
+      if (platformId) throw targetNotFound();
+      throw new AppError('Only accounts that came from an LMS can do this', 403, 'LMS_ACCOUNT_REQUIRED');
+    }
+    if (targetAssignmentId && !(await Assignment.exists({ id: targetAssignmentId, institutionId }))) throw targetNotFound();
+    // Informational only (the landing page): kept only when it is a class of this school.
+    const enaraClassId = requestedClass && (await CourseInstance.exists({ id: requestedClass, institutionId })) ? requestedClass : undefined;
     // A preview stays a preview in the new tab.
     const preview = user.preview === true;
-    const token = await issueLaunchToken({
-      institutionId: user.institutionId!,
+    const minted = await mintHandoffCode({
+      institutionId,
       enaraUserId: user.id,
-      purpose: 'handoff',
       enaraRole: preview ? 'student' : role,
+      accountRole: account.role,
+      sessionVersion: account.tokenVersion ?? 0,
       ...(preview ? { preview: true } : {}),
       platformId: link.platformId,
       lmsUserId: link.id,
-      enaraClassId: classId,
+      contextId,
+      enaraClassId,
+      resourceLinkId,
       targetAssignmentId,
-      presentation: 'window',
-      cookieless: false,
+      targetPage: targetAssignmentId ? undefined : targetPage,
     });
-    await writeLmsAudit({ event: 'lms.handoff', outcome: 'ok', institutionId: user.institutionId, platformId: link.platformId, actor: link.id, refIds: { preview } });
-    res.json({ token, url: `${lmsSettings().toolBaseUrl}/lms/launch#lt=${encodeURIComponent(token)}` });
+    await writeLmsAudit({
+      event: 'lms.handoff',
+      outcome: 'ok',
+      institutionId,
+      platformId: link.platformId,
+      actor: link.id,
+      refIds: { handoffId: minted.id, enaraUserId: user.id, resourceLinkId, assignmentId: targetAssignmentId, enaraClassId, page: targetAssignmentId ? undefined : targetPage, preview },
+    });
+    res.json({ url: `${lmsSettings().toolBaseUrl}/lms/launch#hc=${minted.code}`, expiresIn: HANDOFF_CODE_TTL_SECONDS });
   }),
 );
+
+const handoffRefused = async (row: ILmsHandoffCode, code: string, status: number, errorCode: string, message: string) => {
+  await writeLmsAudit({ event: 'lms.session', outcome: 'fail', institutionId: row.institutionId, platformId: row.platformId, actor: row.lmsUserId, code, refIds: { purpose: 'handoff', handoffId: row.id } });
+  return new AppError(message, status, errorCode);
+};
+
+lmsAdminRouter.post(
+  '/launch/handoff/exchange',
+  handoffExchangeLimiter,
+  asyncHandler(async (req, res: Response) => {
+    const body = ensurePlainObject(req.body ?? {});
+    let row: ILmsHandoffCode;
+    try {
+      row = await consumeHandoffCode(body.code);
+    } catch (error) {
+      if (error instanceof HandoffCodeError) {
+        await writeLmsAudit({ event: 'lms.session', outcome: 'fail', code: error.code, refIds: { purpose: 'handoff' } });
+        throw new AppError('This link has expired. Go back to the LMS tab and choose "Open in new tab" again.', error.code === 'handoff_code_invalid' ? 400 : 410, error.code.toUpperCase());
+      }
+      throw error;
+    }
+    const user = await User.findById(row.enaraUserId);
+    // Bound to the issuing session: a sign-out (or password reset) since the code was made refuses it.
+    if (user && (user.tokenVersion ?? 0) !== row.sessionVersion) {
+      throw await handoffRefused(row, 'session_changed', 403, 'LMS_HANDOFF_SESSION_ENDED', 'You signed out since this link was made. Open the activity again from your LMS.');
+    }
+    // Bound to the account as it was: a role change since then refuses it (never a wider portal).
+    if (user && (user.role !== row.accountRole || !roleForToken(user.role))) {
+      throw await handoffRefused(row, 'role_changed', 403, 'LMS_ACCOUNT_UNAVAILABLE', 'Your ENARA account is not available. Ask your school administrator.');
+    }
+    // Bound to the LMS link it came from (same account, school and platform).
+    if (!(await LmsUser.exists({ id: row.lmsUserId, enaraUserId: row.enaraUserId, institutionId: row.institutionId, platformId: row.platformId }))) {
+      throw await handoffRefused(row, 'lms_link_changed', 403, 'LMS_ACCOUNT_UNAVAILABLE', 'Your ENARA account is not available. Ask your school administrator.');
+    }
+    // Bound to the target: the activity must still open the same assignment, in the same school.
+    if (row.resourceLinkId) {
+      const rl = await LmsResourceLink.findOne({ id: row.resourceLinkId, institutionId: row.institutionId }).select('contextId enaraActivityId').lean();
+      const ctx = rl ? await LmsContext.exists({ id: rl.contextId, institutionId: row.institutionId, platformId: row.platformId }) : null;
+      if (!rl || !ctx || (row.targetAssignmentId && rl.enaraActivityId && rl.enaraActivityId !== row.targetAssignmentId)) {
+        throw await handoffRefused(row, 'target_changed', 409, 'LMS_HANDOFF_TARGET_CHANGED', 'This activity changed since the link was made. Open it again from your LMS.');
+      }
+    }
+    if (row.targetAssignmentId && !(await Assignment.exists({ id: row.targetAssignmentId, institutionId: row.institutionId }))) {
+      throw await handoffRefused(row, 'target_changed', 409, 'LMS_HANDOFF_TARGET_CHANGED', 'This activity changed since the link was made. Open it again from your LMS.');
+    }
+    await openLmsSession(
+      { ...row, purpose: 'handoff', presentation: 'window', cookieless: false },
+      res,
+      user,
+      { handoffId: row.id, resourceLinkId: row.resourceLinkId, assignmentId: row.targetAssignmentId },
+    );
+  }),
+);
+
+// ------------------------------------------------------- mic telemetry
+//
+// Mic / new tab, item 6. Any signed-in account of a school reports one mic
+// check outcome or "new tab opened"; only daily counts per school, browser
+// family, frame and feature are kept (no user, no name, no user-agent).
+// ENARA admins read every school's counts; a school admin reads their own.
+
+export const MIC_TELEMETRY_PER_MINUTE = 30;
+const micTelemetryLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: MIC_TELEMETRY_PER_MINUTE,
+  store: new MongoRateLimitStore('lms-mic-telemetry'),
+  passOnStoreError: true,
+  keyGenerator: (req) => `inst:${(req as AuthRequest).user?.institutionId ?? 'none'}:user:${(req as AuthRequest).user?.id}`,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: limited('Too many events'),
+});
+
+lmsAdminRouter.post(
+  '/telemetry/mic',
+  authMiddleware,
+  micTelemetryLimiter,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const event = parseMicTelemetry(req.body);
+    const institutionId = req.user!.institutionId;
+    if (institutionId) await recordMicTelemetry(institutionId, event);
+    res.status(204).end();
+  }),
+);
+
+lmsAdminRouter.get(
+  '/telemetry/mic',
+  authMiddleware,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!isEnara(req) && req.user!.role !== 'admin') throw new AppError('Admin access required', 403, 'ADMIN_REQUIRED');
+    const requested = typeof req.query.institutionId === 'string' && req.query.institutionId ? req.query.institutionId.slice(0, 200) : undefined;
+    const institutionId = isEnara(req) ? requested : req.user!.institutionId ?? '__none__';
+    const rawDays = typeof req.query.days === 'string' ? Number(req.query.days) : 30;
+    const days = Number.isFinite(rawDays) && rawDays >= 1 ? rawDays : 30;
+    res.json(await micCounts({ institutionId, days }));
+  }),
+);
+
 
 // --------------------------------------------------------------- roster
 //

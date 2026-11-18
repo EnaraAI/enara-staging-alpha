@@ -1,4 +1,6 @@
-import { askDataAssistant, createTutorSession, sendTutorMessage } from '../services/apiService';
+import { askDataAssistant, createTutorSession, lmsNewTabTarget, sendTutorMessage } from '../services/apiService';
+import { MicProblemNotice, useMicGate } from './MicCheck';
+import { classifySpeechRecognitionError, isInFrame } from '../services/micCheck';
 import { toast } from '../services/toastService';
 import React, { useState, useRef, useEffect } from 'react';
 import { 
@@ -200,6 +202,12 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
   const [topicFilter, setTopicFilter] = useState('All Topics');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  // Mic / new tab: a short mic probe on the first click, before voice input
+  // starts; a mic error (the probe's or the speech service's) picks the message.
+  const mic = useMicGate('tutor_voice');
+  const micRef = useRef(mic);
+  micRef.current = mic;
+  const micTarget = () => lmsNewTabTarget();
 
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -218,6 +226,8 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
       recognitionRef.current.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
+        const problem = classifySpeechRecognitionError(String(event.error ?? ''), isInFrame());
+        if (problem) micRef.current.fail(problem);
       };
 
       recognitionRef.current.onend = () => {
@@ -226,11 +236,14 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
     }
   }, []);
 
-  const toggleListening = () => {
+  const toggleListening = async () => {
     if (isListening) {
       recognitionRef.current?.stop();
       setIsListening(false);
     } else {
+      if (!recognitionRef.current) return;
+      // The probe runs before voice input starts (once it worked, later clicks skip it).
+      if ((await mic.check()) !== 'ok') return;
       try {
         recognitionRef.current?.start();
         setIsListening(true);
@@ -381,6 +394,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
 
               {/* Input */}
               <div className="p-6 bg-white border-t border-slate-100 shrink-0">
+                {mic.problem && <div className="mb-3"><MicProblemNotice problem={mic.problem} feature="tutor_voice" target={micTarget} /></div>}
                 <div className="relative">
                   <input
                     type="text"

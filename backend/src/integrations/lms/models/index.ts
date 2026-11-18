@@ -5,7 +5,8 @@ import { LmsGradeSyncJob, LmsLock } from './outbox';
 import { LmsDeployment, LmsPlatform } from './platform';
 import { LmsOrgSettings } from './seats';
 import { LmsAccessToken, LmsOidcState, LmsToolKey } from './security';
-import { LmsDeepLinkSession, LmsLaunchToken } from './session';
+import { LmsDeepLinkSession, LmsHandoffCode, LmsLaunchToken } from './session';
+import { LmsMicDaily } from './telemetry';
 import { LmsSuppressedIdentity } from './suppression';
 
 export * from './audit';
@@ -17,6 +18,7 @@ export * from './seats';
 export * from './security';
 export * from './session';
 export * from './suppression';
+export * from './telemetry';
 
 // Every LMS model (13 from Spec §4 plus lms_locks). Used by the index
 // migration and the cleanup script.
@@ -48,5 +50,9 @@ export const LMS_PHASE2_MODELS = [LmsDeepLinkSession] as const;
 // PDPL suppression list. Kept by the drop script unless asked (see lmsDropCollections.ts).
 export const LMS_P0_MODELS = [LmsSuppressedIdentity] as const;
 
+// Added for the mic / new-tab fixes (migration 2026-11-22-lms-mic-handoff):
+// the one-time "Open in new tab" codes and the daily mic counters.
+export const LMS_MIC_MODELS = [LmsHandoffCode, LmsMicDaily] as const;
+
 /** Every LMS collection, for the cleanup script and the tests. */
-export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS, ...LMS_P0_MODELS] as const;
+export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS, ...LMS_P0_MODELS, ...LMS_MIC_MODELS] as const;

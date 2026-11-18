@@ -473,7 +473,7 @@ describe('student preview (owner decision L1): staff opening the activity as a l
     // "Open in new tab" is allowed and stays a preview.
     const h = await request(app).post('/api/lms/launch/handoff').set('Authorization', bearer).send({ classId: ex.body.launch.classId });
     expect(h.status, JSON.stringify(h.body)).toBe(200);
-    const ex2 = await request(app).post('/api/lms/launch/exchange').send({ token: h.body.token });
+    const ex2 = await request(app).post('/api/lms/launch/handoff/exchange').send({ code: new URLSearchParams(new URL(h.body.url).hash.slice(1)).get('hc') });
     expect(ex2.body.launch).toMatchObject({ purpose: 'handoff', role: 'student', preview: true });
     expect(decode(ex2.body.token).pv).toBe(true);
     // Signing out is allowed.
@@ -661,17 +661,19 @@ describe('launch token exchange and "Open in new tab"', () => {
     const forged = await new SignJWT({ purpose: 'launch' }).setProtectedHeader({ alg: 'HS256' }).setJti('j').setSubject('u').setIssuer(TOOL).setAudience('enara-lms-landing').setExpirationTime('1m').sign(new TextEncoder().encode('y'.repeat(32)));
     expect((await request(app).post('/api/lms/launch/exchange').send({ token: forged })).status).toBe(400);
   });
-  it('handoff: an LMS account gets a fresh one-time token for a new tab; other accounts cannot', async () => {
+  it('handoff: an LMS account gets a fresh one-time code for a new tab; other accounts cannot', async () => {
     const { ex } = await launchAndExchange(pA, { sub: 'student-1' });
     const h = await request(app).post('/api/lms/launch/handoff').set('Authorization', `Bearer ${ex.body.token}`).send({ classId: ex.body.launch.classId });
     expect(h.status, JSON.stringify(h.body)).toBe(200);
-    expect(h.body.url).toBe(`${TOOL}/lms/launch#lt=${encodeURIComponent(h.body.token)}`);
-    const ex2 = await request(app).post('/api/lms/launch/exchange').send({ token: h.body.token });
+    expect(h.body.url).toMatch(new RegExp(`^${TOOL}/lms/launch#hc=[A-Za-z0-9_-]{43}$`));
+    expect(h.body.token).toBeUndefined();
+    const code = (r: request.Response) => new URLSearchParams(new URL(r.body.url).hash.slice(1)).get('hc');
+    const ex2 = await request(app).post('/api/lms/launch/handoff/exchange').send({ code: code(h) });
     expect(ex2.status).toBe(200);
     expect(ex2.body.launch).toMatchObject({ purpose: 'handoff', presentation: 'window', classId: ex.body.launch.classId });
     // A class id from another school is dropped.
     const h2 = await request(app).post('/api/lms/launch/handoff').set('Authorization', `Bearer ${ex.body.token}`).send({ classId: 'inst-of-another-school' });
-    expect((await request(app).post('/api/lms/launch/exchange').send({ token: h2.body.token })).body.launch.classId).toBeNull();
+    expect((await request(app).post('/api/lms/launch/handoff/exchange').send({ code: code(h2) })).body.launch.classId).toBeNull();
     expect((await request(app).post('/api/lms/launch/handoff').set('Authorization', auth.teacherA).send({})).status).toBe(403);
     expect((await request(app).post('/api/lms/launch/handoff').send({})).status).toBe(401);
   });
@@ -837,6 +839,9 @@ describe('flags off: nothing changes', () => {
         request(off).post('/lti/launch').type('form').send({ state: 'x', id_token: 'y' }),
         request(off).post('/api/lms/launch/exchange').send({ token: 'x' }),
         request(off).post('/api/lms/launch/handoff').set('Authorization', auth.adminA),
+        request(off).post('/api/lms/launch/handoff/exchange').send({ code: 'x' }),
+        request(off).post('/api/lms/telemetry/mic').set('Authorization', auth.adminA).send({}),
+        request(off).get('/api/lms/telemetry/mic').set('Authorization', auth.enara),
         request(off).get('/api/lms/status').set('Authorization', auth.adminA),
         request(off).get('/api/lms/platforms').set('Authorization', auth.enara),
         request(off).post('/api/lms/platforms').set('Authorization', auth.enara).send({}),
