@@ -14,6 +14,7 @@ import {
   updateAssignment,
 } from '../controllers/assignments.controller';
 import { listSpeakingAttempts, removeSpeakingTranscript } from '../controllers/speakingExam.controller';
+import { decideLmsValue, getGradeHistory, requireGradeLedger } from '../controllers/gradeLedger.controller';
 
 // Teaching workflow (Phase 3): assignments for classes. Teachers for classes
 // they instruct, admins for their school.
@@ -32,5 +33,8 @@ router.post('/:id/archive', archiveAssignment);
 router.post('/:id/extensions', grantExtension);
 router.get('/:id/speaking-attempts', listSpeakingAttempts);
 router.post('/:id/attempts/:attemptId/speaking/remove-transcript', removeSpeakingTranscript);
+// Grade ledger (GRADE_LEDGER_ENABLED; otherwise the normal 404). Read-only history + the LMS decision.
+router.get('/:id/students/:studentId/grade-history', requireGradeLedger, getGradeHistory);
+router.post('/:id/students/:studentId/lms-decision', requireGradeLedger, decideLmsValue);
 
 export default router;

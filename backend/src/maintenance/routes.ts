@@ -154,6 +154,20 @@ router.get('/lms-evidence', async (req, res, next) => {
   }
 });
 
+// Grade ledger backfill on the test database (dry run by default; apply needs confirm).
+router.post('/grade-ledger-backfill', async (req, res, next) => {
+  try {
+    const body = (req.body ?? {}) as { apply?: unknown; confirm?: unknown; institutionId?: unknown };
+    if (body.apply === true && body.confirm !== true) { res.status(400).json({ error: 'apply needs "confirm": true' }); return; }
+    const { backfillGradeLedger } = await import('../services/gradeLedgerBackfill');
+    const r = await backfillGradeLedger({ apply: body.apply === true, institutionId: typeof body.institutionId === 'string' ? body.institutionId : undefined } as never);
+    logger.info('maintenance_grade_ledger_backfill', { apply: body.apply === true });
+    res.json(r);
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Multi-class step 4 shadow report (counts only).
 router.get('/enrollment-shadow-report', async (req, res, next) => {
   try {

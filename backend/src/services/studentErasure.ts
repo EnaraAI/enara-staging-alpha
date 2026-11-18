@@ -42,6 +42,7 @@ import { UsageLedger } from '../models/UsageLedger';
 import { User } from '../models/User';
 import { GoogleConnection, LmsEnrollment, LmsGradeSyncJob, LmsUser } from '../integrations/lms/models';
 import { logger, serializeError } from '../utils/logging';
+import { anonymiseGradeLedger } from './gradeLedger';
 import { anonymiseAttempt, anonymiseProposal, keepsFinalResult, newAnonymousAttemptId, newAnonymousProposalId, newAnonymousStudentId } from './anonymisedResults';
 import { type Actor, studentUserFilter } from './archive';
 import { groupsOfStudent, refreshGroupCounts } from './groupCounts';
@@ -144,6 +145,12 @@ async function anonymiseResults(sid: string, removed: Record<string, number>, an
   }
   anonymised.assessment_attempts = keep.length;
   anonymised.grading_proposals = keptProposals.length;
+  // Grade ledger and LMS sync log (P1): kept results' entries move to the same
+  // anonymous ID and new attempt IDs, without free text; the rest are deleted.
+  // Counted only when there are any (the answer is unchanged otherwise).
+  const ledger = await anonymiseGradeLedger(sid, allIds, newAttemptId, anonymousId);
+  Object.assign(anonymised, ledger.anonymised);
+  Object.assign(removed, ledger.removed);
   // What is left under the old IDs is deleted.
   removed.grading_proposals = allIds.length ? (await GradingProposal.deleteMany({ attemptId: { $in: allIds } })).deletedCount : 0;
   removed.assessment_attempts = (await AssessmentAttempt.deleteMany({ studentId: sid })).deletedCount;

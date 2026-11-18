@@ -26,6 +26,7 @@ const MEDIA = {
   score: 'application/vnd.ims.lis.v1.score+json',
   lineItem: 'application/vnd.ims.lis.v2.lineitem+json',
   lineItems: 'application/vnd.ims.lis.v2.lineitemcontainer+json',
+  results: 'application/vnd.ims.lis.v2.resultcontainer+json',
 } as const;
 const WANTED_SCOPES: string[] = [AGS_SCOPE.lineItem, AGS_SCOPE.resultReadOnly, AGS_SCOPE.score];
 const TOKEN_MARGIN_MS = 60_000;
@@ -264,6 +265,55 @@ export async function pushScore(job: GradeSyncJobView): Promise<PushResult> {
   } catch (error) {
     if (error instanceof AgsFailure) return { ok: false, retryable: error.retryable, status: error.status, retryAfterSeconds: error.retryAfterSeconds, error: error.code, lineItemRef };
     return { ok: false, retryable: true, error: 'internal_error', lineItemRef };
+  }
+}
+
+// --------------------------------------------------------------- results
+// Grade ledger (docs/lms/GRADE_LEDGER_NOTES.md): read what the LMS gradebook
+// shows for one user, to notice a grade a teacher changed in the LMS.
+
+/** {lineitem}/results, keeping the line item's query string (Moodle: ?type_id=). */
+export function resultsUrl(lineItemUrl: string, userId?: string): string {
+  const u = new URL(lineItemUrl);
+  u.pathname = `${u.pathname.replace(/\/+$/, '')}/results`;
+  if (userId) u.searchParams.set('user_id', userId);
+  return u.toString();
+}
+
+export interface LmsResultValue {
+  /** null: the LMS has no score for the user (no result, or a result without resultScore). */
+  resultScore: number | null;
+  /** AGS: absent means 1. */
+  resultMaximum: number;
+}
+
+export type ReadResult = { ok: true; result: LmsResultValue | null } | { ok: false; error: string; retryable: boolean; status?: number };
+
+/**
+ * GET {lineitem}/results?user_id=<sub> (scope result.readonly, Accept
+ * application/vnd.ims.lis.v2.resultcontainer+json) with the cached service
+ * token. Never throws for an LMS problem: returns a short code.
+ */
+export async function readLmsResult(platform: ILmsPlatform, context: ILmsContext, lineItemUrl: string, externalUserId: string): Promise<ReadResult> {
+  try {
+    if (context.agsScopes?.length && !context.agsScopes.includes(AGS_SCOPE.resultReadOnly)) return { ok: false, error: 'no_result_scope', retryable: false };
+    const url = resultsUrl(safeUrl(lineItemUrl, 'bad_line_item_url'), externalUserId);
+    const res = await agsFetch(platform, tokenScopes(context.agsScopes), url, { method: 'GET', headers: { Accept: MEDIA.results } });
+    if (!res.ok) {
+      const f = httpFailure('results_', res);
+      return { ok: false, error: f.code, retryable: f.retryable, status: f.status };
+    }
+    const body = (await res.json().catch(() => null)) as unknown;
+    if (!Array.isArray(body)) return { ok: false, error: 'results_invalid_response', retryable: true };
+    const rows = body.filter((r): r is Record<string, unknown> => !!r && typeof r === 'object');
+    const mine = rows.find((r) => r.userId === externalUserId) ?? (rows.length === 1 && rows[0].userId === undefined ? rows[0] : undefined);
+    if (!mine) return { ok: true, result: null };
+    const score = typeof mine.resultScore === 'number' && Number.isFinite(mine.resultScore) ? mine.resultScore : null;
+    const max = typeof mine.resultMaximum === 'number' && Number.isFinite(mine.resultMaximum) && mine.resultMaximum > 0 ? mine.resultMaximum : 1;
+    return { ok: true, result: { resultScore: score, resultMaximum: max } };
+  } catch (error) {
+    if (error instanceof AgsFailure) return { ok: false, error: error.code, retryable: error.retryable, status: error.status };
+    return { ok: false, error: 'internal_error', retryable: true };
   }
 }
 

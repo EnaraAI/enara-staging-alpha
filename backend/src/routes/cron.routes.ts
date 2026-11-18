@@ -18,6 +18,8 @@ import { sweepDocumentRetention } from '../services/documentRetention';
 import { sweepSpeakingTranscripts } from '../services/speakingExam';
 import { scheduledDrain, triggerOn } from '../integrations/lms/core/drain';
 import { rosterTriggerOn, scheduledRosterSync } from '../integrations/lms/core/roster';
+import { checkLmsResults } from '../integrations/lms/core/lmsResults';
+import { gradeLedgerOn } from '../services/gradeLedger';
 
 // Meant to be called once a day by a scheduler that sends
 // "Authorization: Bearer <CRON_SECRET>". Staging deliberately has no Vercel
@@ -73,6 +75,8 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     // Demo sessions left open (browser closed without saying so).
     await run('demoSessions', () => sweepDemoSessions({ limit: 200 }));
     // LMS grade outbox, last safety net (plan §5 e). Skipped unless passback is on.
+    // Grade ledger (inert unless GRADE_LEDGER_ENABLED): grades changed in the LMS are found and held first.
+    if (triggerOn('daily') && gradeLedgerOn()) await run('lmsResultsCheck', () => checkLmsResults({ all: true }, { limit: 200, budgetMs: 15_000 }));
     if (triggerOn('daily')) await run('lmsGrades', () => scheduledDrain('daily'));
     // LMS roster sync, nightly (plan §5 e, Phase 4). Skipped unless roster sync is
     // on. It gets what is left of a 50 s window (at most 20 s), so the whole run

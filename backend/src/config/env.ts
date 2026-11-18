@@ -138,6 +138,11 @@ export interface AppConfig {
   // alerts of deleted students, default 730) and DATA_LOG_RETENTION_DAYS (the
   // app's own logs with personal data, default 30). Placeholders until legal confirms.
   retention: { safetyAlertDays: number; dataLogDays: number };
+  // Grade ledger (docs/lms/GRADE_LEDGER_NOTES.md): GRADE_LEDGER_ENABLED, default
+  // off. On: every grade change is an append-only grade_ledger entry, LMS sends
+  // are logged (grade_sync_log), and grades changed directly in the LMS are
+  // detected and held for the teacher. Off: nothing is written or read.
+  gradeLedger: { enabled: boolean };
 }
 
 // LMS integration (docs/lms/IMPLEMENTATION_PLAN.md). Every flag defaults to off.
@@ -586,6 +591,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       student: readBoolean(source, 'ENROLLMENT_STUDENT_ARCHIVE', false),
     },
     retention: { safetyAlertDays: safetyAlertRetentionDays(source), dataLogDays: dataLogRetentionDays(source) },
+    gradeLedger: { enabled: readBoolean(source, 'GRADE_LEDGER_ENABLED', false) },
     // Staging starts with AI paused and invite-only registration unless set explicitly.
     aiPaused: readBoolean(source, "AI_PAUSED", staging),
     registrationInviteOnly: readBoolean(source, "REGISTRATION_INVITE_ONLY", staging),

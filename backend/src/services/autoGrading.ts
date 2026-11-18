@@ -14,6 +14,7 @@ import { evaluateRubricAnswer, evaluateShortAnswer, questionObjectiveIds, type E
 import { notifyResultsReleased } from './teachingNotifications';
 import { logger } from '../utils/logging';
 import { lmsResultChanged } from '../integrations/lms/core/gradeEvents';
+import { recordGradeChange } from './gradeLedger';
 
 // Automatic grading (autograde-v1). Every submitted assignment attempt is
 // graded, validated, finalized and released without a teacher in the way:
@@ -251,6 +252,7 @@ async function recordFailure(attempt: AttemptDoc, error: unknown, now: Date) {
   logger.warn(final ? 'grading_exception' : 'grading_failed', { attemptId: attempt.id, reason: e.reason, runs });
   if (final) void recordAlert('grading_exception', 'warning', { scope: e.reason, attemptId: attempt.id, reason: e.reason }, attempt.institutionId);
   // LMS grade passback (inert unless switched on): now waiting for a person.
+  if (final) await recordGradeChange(attempt.id, 'grading_exception', GRADER);
   if (final) await lmsResultChanged(attempt.id, 'grading_exception');
   return final ? 'exception' : 'failed';
 }
@@ -350,6 +352,8 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
     // Downstream steps: each can fail without affecting the grade.
     if (!hold) await notifyResultsReleased(assignment, done.studentId, done.id).catch((error) => logger.warn('results_notification_failed', { attemptId: done.id, error: String(error) }));
     // LMS grade passback (inert unless switched on): released -> the score; held -> pending.
+    // Grade ledger (inert unless switched on): auto_graded, or regrade_after_grader_fix after a teacher's regrade.
+    await recordGradeChange(done.id, 'auto_graded', GRADER);
     await lmsResultChanged(done.id, hold ? 'finalized' : 'released');
     await updateLearningIntelligence(done.id, questions, version.subject);
     return hold ? 'finalized' : 'released';

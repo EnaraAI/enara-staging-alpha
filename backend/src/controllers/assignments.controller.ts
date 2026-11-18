@@ -31,6 +31,7 @@ async function lmsActivities(institutionId: string | undefined, ids: string[]) {
   const { linkedActivities } = await import('../integrations/lms/core/activityHealth');
   return linkedActivities(institutionId, ids);
 }
+import { gradeLedgerOn, lmsDiffersFor } from '../services/gradeLedger';
 
 // Speaking exams (P4) need the school's speaking_exams_enabled flag; the
 // avatar-only and student-choice policies also need the avatar option, which
@@ -215,6 +216,8 @@ export const getAssignment = asyncHandler(async (req: AuthRequest, res: Response
     const sid = k.slice(k.indexOf('|') + 1);
     byStudent.set(sid, [...(byStudent.get(sid) ?? []), ...list]);
   }
+  // Grade ledger (switch off: null, the answer is unchanged): cells changed in the LMS.
+  const lmsDiffers = gradeLedgerOn() ? await lmsDiffersFor(a.institutionId, a.id) : null;
   const roster = students.map((s) => {
     const mine = byStudent.get(s.id) ?? [];
     const submitted = mine.filter((t) => t.status === 'submitted').sort((x, y) => new Date(y.submittedAt!).getTime() - new Date(x.submittedAt!).getTime());
@@ -234,6 +237,7 @@ export const getAssignment = asyncHandler(async (req: AuthRequest, res: Response
       gradingStatus: latest?.gradingStatus ?? null,
       newerAttemptWaiting: !!lastReleased,
       lastReleasedScore: lastReleased ? lastReleased.score ?? null : null,
+      ...(lmsDiffers ? { lmsValueDiffers: lmsDiffers.has(s.id) } : {}),
     };
   });
   const count = (st: string) => roster.filter((r) => r.status === st).length;
@@ -254,6 +258,7 @@ export const getAssignment = asyncHandler(async (req: AuthRequest, res: Response
     },
     roster,
     ...anonymisedResultsBlock(attempts, roster.length),
+    ...(lmsDiffers ? { gradeLedger: true } : {}),
   });
 });
 

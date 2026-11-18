@@ -18,6 +18,7 @@ import { ensurePlainObject, getOptionalString, getRequiredString, rejectMongoOpe
 import { evidenceFor, publicSettings } from '../services/speakingExam';
 import { foldForStudent } from '../services/multiClass';
 import { lmsResultChanged } from '../integrations/lms/core/gradeEvents';
+import { recordGradeChange } from '../services/gradeLedger';
 
 // Network and clock tolerance around deadlines and time limits.
 export const GRACE_MS = 2 * 60 * 1000;
@@ -254,6 +255,8 @@ async function submitAttempt(a: IAssignment, attempt: AttemptDoc, answers: Recor
     idempotencyKey: `attempt:${claimed.id}:started`,
     at: claimed.startedAt,
   });
+  // Grade ledger (inert unless switched on): the attempt's own record starts here (newer_attempt from the 2nd).
+  await recordGradeChange(claimed.id, 'submitted', by.startsWith('system') ? 'system' : 'student');
   if (status === 'grading_queued') claimed = await startGrading(claimed);
   // LMS grade passback (inert unless switched on): a hand-graded or held
   // submission shows as pending in the LMS; automatic grading reports itself.

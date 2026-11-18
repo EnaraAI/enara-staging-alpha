@@ -300,9 +300,15 @@ gradesRouter.post(
     const p = await ownPlatform(req, String(req.params.id));
     const body = ensurePlainObject(req.body ?? {});
     const resourceLinkId = getOptionalId(body, 'resourceLinkId');
+    // Grade ledger (inert unless GRADE_LEDGER_ENABLED): first look for grades changed in the LMS, so the
+    // re-sync never overwrites them (those cells are held until a teacher decides). Bounded.
+    const { gradeLedgerOn } = await import('../../../services/gradeLedger');
+    const lmsCheck = gradeLedgerOn()
+      ? await (await import('../core/lmsResults')).checkLmsResults(resourceLinkId ? { resourceLinkId, institutionId: p.institutionId } : { platformId: p.id, institutionId: p.institutionId }, { limit: 100, budgetMs: 15_000 })
+      : undefined;
     const out = await resyncGrades({ platformId: p.id, institutionId: p.institutionId, resourceLinkId }, req.user!.id);
     drainSoon(p.id);
-    res.json({ links: out.links, students: out.students, outcomes: out.outcomes, queued: out.jobIds.length });
+    res.json({ links: out.links, students: out.students, outcomes: out.outcomes, queued: out.jobIds.length, ...(lmsCheck ? { lmsCheck } : {}) });
   }),
 );
 

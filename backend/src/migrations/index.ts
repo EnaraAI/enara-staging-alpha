@@ -436,6 +436,16 @@ export const MIGRATIONS: Migration[] = [
     },
   },
   {
+    id: '2026-11-18-grade-ledger-indexes',
+    description: 'Grade ledger: grade_ledger, grade_sync_log (append-only) and grade_lms_slots collections and indexes (additive; no existing rows touched)',
+    up: async () => {
+      const { GRADE_LEDGER_MODELS } = await import('../models/GradeLedger');
+      for (const m of GRADE_LEDGER_MODELS) await (m as unknown as { createIndexes(): Promise<unknown> }).createIndexes();
+      const { GradeLmsSlot } = await import('../models/GradeLedger');
+      if (!(await GradeLmsSlot.collection.indexes()).some((i) => i.key.resourceLinkId === 1 && i.key.lmsUserId === 1 && i.unique)) throw new Error('grade_lms_slots slot index missing');
+    },
+  },
+  {
     id: '2026-11-19-lms-phase4-indexes',
     description: 'LMS Phase 4 (roster sync): lms_contexts (status, lastRosterSyncAt) for the nightly sync (additive; no existing rows touched)',
     up: async () => {

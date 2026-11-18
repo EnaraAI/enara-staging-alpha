@@ -13,6 +13,7 @@ import {
   setSubmissionFeedback,
 } from '../../services/apiService';
 import { toast } from '../../services/toastService';
+import { GradeHistory } from './GradeHistory';
 
 // Grading oversight (autograde-v1). Enara grades, checks and releases results
 // on its own; this page is where teachers look over that work: submissions
@@ -205,6 +206,7 @@ export const SubmissionReview: React.FC<{ attemptId: string; onClose: () => void
   const [data, setData] = useState<any>(null);
   const [overall, setOverall] = useState('');
   const [confirmFinal, setConfirmFinal] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const load = () =>
     fetchSubmissionForReview(attemptId)
       .then((d) => { setData(d); setOverall(d.attempt.overallFeedback ?? ''); })
@@ -236,6 +238,7 @@ export const SubmissionReview: React.FC<{ attemptId: string; onClose: () => void
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {data.gradeLedger && data.student?.id && <button onClick={() => setShowHistory(true)} className="px-3 py-1.5 rounded-lg border border-slate-300 text-sm">Grade history</button>}
           {(st === 'grading_exception' || st === 'grading_failed') && <button onClick={() => run(() => regradeSubmission(attemptId), 'Sent back to the grader')} className="px-3 py-1.5 rounded-lg border border-violet-300 text-violet-800 text-sm">Try the grader again</button>}
           {byHand && !confirmFinal && <button onClick={() => setConfirmFinal(true)} className="px-3 py-1.5 rounded-lg bg-indigo-700 text-white text-sm font-semibold">Finalize and release</button>}
           {byHand && confirmFinal && (
@@ -248,6 +251,7 @@ export const SubmissionReview: React.FC<{ attemptId: string; onClose: () => void
           {st === 'finalized' && <button onClick={() => run(() => releaseSubmission(attemptId), 'Released to the student')} className="px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-sm font-semibold">Release</button>}
         </div>
       </div>
+      {showHistory && <GradeHistory assignmentId={data.assignment.id} studentId={data.student.id} onClose={() => setShowHistory(false)} />}
       {st === 'grading_exception' && (
         <div className="flex gap-2 items-start bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-900">
           <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
