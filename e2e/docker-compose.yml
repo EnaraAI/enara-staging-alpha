@@ -105,6 +105,10 @@ services:
       # Mirrors lms-test (Vercel staging project) as far as a container can:
       # production + staging guard, every LMS switch on, the multi-class switches.
       NODE_ENV: production
+      # Caddy serves the SPA, as Vercel does for lms-test. The image's own SPA
+      # fallback (staging single-service mode) would answer GET /lti/* and
+      # /.well-known/* with index.html, so it is switched off here.
+      SERVE_FRONTEND_DIR: ""
       ENARA_STAGING: "true"
       PORT: "3001"
       MONGODB_URI: mongodb://enara-lms-test.local:27017/enara_staging_alpha

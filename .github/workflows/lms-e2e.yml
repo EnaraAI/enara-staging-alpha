@@ -178,10 +178,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: .github
-          fetch-depth: 1
       - uses: actions/download-artifact@v4
         with:
           pattern: e2e-screenshots-*
@@ -189,9 +185,11 @@ jobs:
       - name: Force-push one orphan commit to e2e-results
         env:
           SHOTS: ${{ runner.temp }}/shots
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git checkout --orphan e2e-results
-          git rm -rfq --cached . && git clean -fdxq
+          out="$RUNNER_TEMP/e2e-results"
+          mkdir -p "$out" && cd "$out"
+          git init -q && git checkout -q --orphan e2e-results
           shopt -s nullglob
           for d in "$SHOTS"/e2e-screenshots-*; do
             name="${d##*/e2e-screenshots-}"
@@ -204,10 +202,10 @@ jobs:
             echo "Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (attempt ${{ github.run_attempt }}), commit ${{ github.event.pull_request.head.sha || github.sha }}."
             echo "Fake data only. Replaced on every run (single orphan commit)."
           } > README.md
-          du -sh . --exclude=.git || true
+          du -sh --exclude=.git . || true
           git add -A
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "e2e screenshots, run ${{ github.run_id }}"
-          git push -f origin HEAD:refs/heads/e2e-results
+          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:refs/heads/e2e-results
 
   minutes:
     name: minutes
