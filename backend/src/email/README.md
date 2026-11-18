@@ -224,15 +224,15 @@ path can send them): `<alias>-en.html`, `<alias>-ar.html` and one bilingual `<al
 delivery, frequency). `render-previews.mjs` renders them too. On approval, split the JSON into
 `<alias>-<lang>.json`, move the pair into `lms/` or `parents/`, add `status`/`approvedOn` and re-bundle.
 
-**Parent drafts awaiting the owner's approval (Parents sign-up flow, 18 Nov 2026):**
+**Parent emails for the new sign-up flow (owner: "Approve all", 18 Nov 2026; promoted from drafts):**
 
-| Draft | What | Replaces |
-|---|---|---|
-| `parent-email-verify` | 6-digit code to confirm the email a parent adds in the portal (10 min, one use) | (new) |
-| `parent-sign-in-code` | 6-digit passwordless sign-in code | (new) |
-| `parent-weekly-summary-v2` | ONE weekly email per parent, a section per child (`CHILD_SECTIONS`, built by code) | `parent-weekly-summary` |
-| `parent-invite-v2` | code-first steps, the secret-code warning, one email listing every child of a CSV group (`CHILD_CODES`, built by code) | `parent-invite` |
+| Template | What |
+|---|---|
+| `parent-email-verify` (new) | 6-digit code to confirm the email a parent adds in the portal (10 min, one use). No link at all |
+| `parent-sign-in-code` (new) | 6-digit passwordless sign-in code. No link at all |
+| `parent-weekly-summary` (replaced) | ONE weekly email per parent, a section per child (`CHILD_SECTIONS`, an HTML block built by code with every value escaped; `CHILDREN_NAMES` in the subject) |
+| `parent-invite` (replaced) | code-first steps, the secret-code warning, one row per child with its code (`CHILD_CODES`, built by code) so a CSV group is one email |
 
-The codes are in the email body only; none of these emails has a link that carries a code (the two code
-emails have no link at all). Until approved, the code that sends them is built but the drafts stay here and
-nothing sends them (docs/parents/SIGN_UP_FLOW.md).
+`sendParentTemplate` refuses a link that carries `LINK_CODE`, a 6-digit `CODE`, or anything shaped like a
+parent link code (`code_in_url`). The senders and triggers come with Parents P2 (verification, sign-in) and
+P4/P5 (weekly summary, invites); see `docs/parents/`.

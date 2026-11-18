@@ -1,7 +1,7 @@
 {
   "id": null,
-  "name": "Enara – Parents: invitation with link code (EN)",
-  "subject": "{{{SCHOOL_NAME}}} invites you to follow {{{CHILD_NAME}}}'s English on Enara",
+  "name": "Enara – Parents: invitation with link code(s), secret-code warning (EN)",
+  "subject": "{{{SCHOOL_NAME}}} invites you to follow {{{CHILDREN_NAMES}}} on Enara",
   "from": "The Enara Team <noreply@test.enara.app>",
   "variables": [
     {
@@ -11,22 +11,23 @@
       "sample": "Sara"
     },
     {
-      "key": "CHILD_NAME",
-      "type": "string",
-      "fallback_value": null,
-      "sample": "Omar"
-    },
-    {
       "key": "SCHOOL_NAME",
       "type": "string",
       "fallback_value": null,
       "sample": "Nile Valley International School"
     },
     {
-      "key": "LINK_CODE",
+      "key": "CHILDREN_NAMES",
       "type": "string",
       "fallback_value": null,
-      "sample": "ENR-7K4M-Q2XD"
+      "sample": "Omar and Laila"
+    },
+    {
+      "key": "CHILD_CODES",
+      "type": "html",
+      "fallback_value": null,
+      "note": "Built by code: one row per child (first name, school, code). Codes in the email BODY only, never in a link (D15).",
+      "sample": "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:16px;\"><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;\">Omar<br><span style=\"font-size:13px;color:#666666;\">Nile Valley International School</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:right;\" align=\"right\">ENR-7K4M-Q2XD</td></tr><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;\">Laila<br><span style=\"font-size:13px;color:#666666;\">Delta Language School</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:right;\" align=\"right\">ENR-R9TB-3HWP</td></tr></table>"
     },
     {
       "key": "EXPIRES_IN",
@@ -51,8 +52,18 @@
   ],
   "number": "P1",
   "group": "parents",
-  "recipient": "Parent (email given by the school: single code or CSV invite)",
-  "trigger": "School sends a parent link code (single, or CSV invitations P5)",
+  "recipient": "Parent (email given by the school: single code, or CSV invite grouped by parent email)",
+  "trigger": "School sends a parent link code (single), or CSV invitations (P5: rows with the same parent email are grouped into one email)",
   "delivery": "immediate",
-  "frequency": "Immediate; once per invite / code"
+  "frequency": "Immediate; once per invite (one email per parent email per CSV upload)",
+  "preview_variants": [
+    {
+      "id": "one-child",
+      "label": "one child",
+      "samples": {
+        "CHILDREN_NAMES": "Omar",
+        "CHILD_CODES": "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin-bottom:16px;\"><tr><td style=\"font-family:Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#222222;\">Omar<br><span style=\"font-size:13px;color:#666666;\">Nile Valley International School</span></td><td dir=\"ltr\" style=\"font-family:'Courier New', Courier, monospace;font-size:20px;line-height:28px;padding-top:10px;padding-bottom:10px;border-bottom:1px solid #eeeeee;color:#111111;font-weight:bold;letter-spacing:2px;text-align:right;\" align=\"right\">ENR-7K4M-Q2XD</td></tr></table>"
+      }
+    }
+  ]
 }

@@ -8,7 +8,7 @@ vi.mock('resend', () => ({
 import fs from 'fs';
 import path from 'path';
 import { logger } from '../src/utils/logging';
-import { resetEmailClientForTests, HOSTED_LOGO_URL, HOSTED_LOGO_WHITE_URL } from '../src/email/sendTemplate';
+import { resetEmailClientForTests, HOSTED_LOGO_URL, HOSTED_LOGO_WHITE_URL, linkCarriesCode } from '../src/email/sendTemplate';
 import { LMS_TEMPLATES_BUNDLE } from '../src/email/lms/lmsTemplatesBundle';
 import { PARENT_TEMPLATES_BUNDLE } from '../src/email/parents/parentTemplatesBundle';
 import { renderCodeTemplate, type CodeTemplate } from '../src/email/sendBundledTemplate';
@@ -38,7 +38,9 @@ const LMS_OPS = [
   'lms-ops-approval-needed', 'lms-ops-billing-flag', 'lms-ops-daily-digest', 'lms-ops-error-spike',
   'lms-ops-key-rotation-due', 'lms-ops-school-connected',
 ];
-const PARENT_PROMOTED = ['parent-invite', 'parent-link-confirmed', 'parent-link-ended', 'parent-new-results', 'parent-weekly-summary'];
+// parent-invite and parent-weekly-summary were replaced (one email per parent; code-first invite with the
+// secret-code warning), and parent-email-verify / parent-sign-in-code added: owner "Approve all", 18 Nov 2026.
+const PARENT_PROMOTED = ['parent-email-verify', 'parent-invite', 'parent-link-confirmed', 'parent-link-ended', 'parent-new-results', 'parent-sign-in-code', 'parent-weekly-summary'];
 
 interface TemplateJson {
   subject: string;
@@ -197,8 +199,10 @@ describe('sendParentTemplate / sendLmsTemplate', () => {
     expect(r).toEqual({ ok: true, id: 'em_1' });
     const sent = sendMock.mock.calls[0][0] as { to: string; subject: string; html: string; attachments: { contentId: string }[] };
     expect(sent.to).toBe(TO);
-    expect(sent.subject).toContain(vars.CHILD_NAME);
-    expect(sent.html).toContain(vars.LINK_CODE);
+    expect(sent.subject).toContain(vars.CHILDREN_NAMES);
+    // Grouped invite: every child's code is in the body (CHILD_CODES), with the secret-code warning.
+    for (const code of vars.CHILD_CODES.match(/ENR-[A-Z0-9]{4}-[A-Z0-9]{4}/g)!) expect(sent.html).toContain(code);
+    expect(sent.html).toContain('هذا الرمز سري');
     expect(sent.html).toContain('cid:enara-logo');
     expect(sent.html).not.toMatch(/\{\{/);
     expect(sent.attachments.map((a) => a.contentId).sort()).toEqual(['enara-logo', 'enara-logo-white']);
@@ -223,10 +227,16 @@ describe('sendParentTemplate / sendLmsTemplate', () => {
     const vars = samples(PARENTS_DIR, 'parent-invite-en');
     expect(await sendParentTemplate('parent-invite-en', 'parent@school.example', vars)).toMatchObject({ ok: false, code: 'reserved_recipient' });
     expect(await sendParentTemplate('parent-invite-en', TO, { ...vars, EXTRA: 'x' })).toMatchObject({ ok: false, code: 'invalid_variables' });
-    const { LINK_CODE: _code, ...noCode } = vars;
+    const { CHILD_CODES: _codes, ...noCode } = vars;
     expect(await sendParentTemplate('parent-invite-en', TO, noCode)).toMatchObject({ ok: false, code: 'invalid_variables' });
-    expect(await sendParentTemplate('parent-invite-en', TO, { ...vars, LINK_CODE: '' })).toMatchObject({ ok: false, code: 'unfilled_placeholder' });
-    expect(await sendParentTemplate('parent-invite-en', TO, { ...vars, ACTION_URL: `https://enara.app/parents/link?c=${vars.LINK_CODE}` })).toMatchObject({ ok: false, code: 'code_in_url' });
+    expect(await sendParentTemplate('parent-invite-en', TO, { ...vars, CHILD_CODES: '' })).toMatchObject({ ok: false, code: 'unfilled_placeholder' });
+    expect(await sendParentTemplate('parent-invite-en', TO, { ...vars, ACTION_URL: 'https://enara.app/parents/link?c=ENR-7K4M-Q2XD' })).toMatchObject({ ok: false, code: 'code_in_url' });
+    // A 6-digit sign-in code is never in a link either (these emails have none; a link carrying it is refused).
+    const sign = samples(PARENTS_DIR, 'parent-sign-in-code-en');
+    expect(await sendParentTemplate('parent-sign-in-code-en', TO, sign)).toMatchObject({ ok: true });
+    const withLink = { ...PARENT_TEMPLATES_BUNDLE['parent-sign-in-code-en'], html: PARENT_TEMPLATES_BUNDLE['parent-sign-in-code-en'].html.replace('</h1>', `</h1><a href="https://enara.app/parents?c=${sign.CODE}">x</a>`) };
+    expect(linkCarriesCode(renderCodeTemplate(withLink, sign).html, sign.CODE)).toBe(true);
+    sendMock.mockClear();
     expect(await sendLmsTemplate('lms-teacher-welcome-en', TO, { ...samples(LMS_DIR, 'lms-teacher-welcome-en'), COURSE_NAME: '' })).toMatchObject({ ok: false, code: 'unfilled_placeholder' });
     expect(await sendParentTemplate('nope' as never, TO, vars)).toMatchObject({ ok: false, code: 'unknown_template' });
     delete process.env.RESEND_API_KEY;
