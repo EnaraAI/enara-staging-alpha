@@ -9,6 +9,7 @@ import * as api from '../services/apiService';
 import { toast } from '../services/toastService';
 import { SpeakingExam } from '../components/SpeakingExam';
 import * as D from './kidsData';
+import { showOldAssessmentsTab } from '../services/roleRouting';
 
 type Tab = 'home' | 'learning' | 'progress' | 'assignments' | 'plan' | 'quizzes' | 'results';
 type Route =
@@ -27,6 +28,8 @@ type Ctx = {
   askTutor: (t?: Omit<Tutor, 'open'>) => void;
   speak: (text: string) => void;
   T: (en: string, ar: string) => string;
+  /** P0 item 6: an LMS student (no older quiz list). */
+  lmsStudent: boolean;
 };
 
 const LANG_KEY = 'enara_kids_lang';
@@ -58,10 +61,14 @@ export interface KidsAppProps {
   tourPending?: boolean;
   sharedAssessmentId?: string | null;
   sharedCourseId?: string | null;
+  /** Opened from an LMS activity bound to ENARA work: the assignment to open first (as the standard student app does). */
+  lmsAssignmentId?: string | null;
+  /** P0 item 6: an LMS student; the older quiz list (attempts without an assignment) is not offered. */
+  lmsStudent?: boolean;
   onSignOut: () => void;
 }
 
-export default function KidsApp({ tourPending, sharedAssessmentId, sharedCourseId, onSignOut }: KidsAppProps) {
+export default function KidsApp({ tourPending, sharedAssessmentId, sharedCourseId, lmsAssignmentId, lmsStudent = false, onSignOut }: KidsAppProps) {
   const [lang, setLang] = useState<Lang>(() => {
     try {
       const saved = localStorage.getItem(LANG_KEY) as Lang | null;
@@ -70,11 +77,14 @@ export default function KidsApp({ tourPending, sharedAssessmentId, sharedCourseI
     return navigator.language?.startsWith('ar') ? 'ar' : 'en';
   });
   const [route, setRoute] = useState<Route>(() =>
-    sharedAssessmentId ? { tab: 'quizzes', id: sharedAssessmentId } : sharedCourseId ? { tab: 'learning', courseId: sharedCourseId } : { tab: 'home' });
+    lmsAssignmentId ? { tab: 'assignments', id: lmsAssignmentId }
+      : sharedAssessmentId ? { tab: 'quizzes', id: sharedAssessmentId } : sharedCourseId ? { tab: 'learning', courseId: sharedCourseId } : { tab: 'home' });
+  // A later launch in the same tab (a new LMS activity) opens its assignment too.
+  useEffect(() => { if (lmsAssignmentId) setRoute({ tab: 'assignments', id: lmsAssignmentId }); }, [lmsAssignmentId]);
   const [tutor, setTutor] = useState<Tutor>({ open: false });
   const [tourStep, setTourStep] = useState(tourPending ? 1 : 0);
   const [night, setNight] = useState(() => window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false);
-  const [flags, setFlags] = useState({ progress: false, assignments: false, plan: false, quizzes: true });
+  const [flags, setFlags] = useState({ progress: false, assignments: false, plan: false, quizzes: !lmsStudent });
   const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,10 +98,13 @@ export default function KidsApp({ tourPending, sharedAssessmentId, sharedCourseI
   // The same tab rules as the standard student portal.
   useEffect(() => {
     const ok = (p: Promise<unknown>) => p.then(() => true, () => false);
-    Promise.all([ok(api.fetchKnowledgeMap()), api.fetchMyAssignments().then(() => true, () => false), ok(api.fetchMyStudyPlan()), api.fetchMyAssessments().catch(() => [])])
+    Promise.all([ok(api.fetchKnowledgeMap()), api.fetchMyAssignments().then(() => true, () => false), ok(api.fetchMyStudyPlan()), lmsStudent ? Promise.resolve([]) : api.fetchMyAssessments().catch(() => [])])
       .then(([progress, assignments, plan, assessments]) =>
-        setFlags({ progress: progress as boolean, assignments: assignments as boolean, plan: plan as boolean, quizzes: !assignments || (assessments as unknown[]).length > 0 }));
-  }, []);
+        setFlags({
+          progress: progress as boolean, assignments: assignments as boolean, plan: plan as boolean,
+          quizzes: showOldAssessmentsTab({ assignmentsEnabled: assignments as boolean, oldAssessmentCount: (assessments as unknown[]).length, lmsStudent }),
+        }));
+  }, [lmsStudent]);
 
   const go = useCallback((r: Route) => { setRoute(r); mainRef.current?.scrollIntoView({ block: 'start' }); window.scrollTo?.(0, 0); }, []);
   const T = useCallback((en: string, ar: string) => (D.isArabic(lang) ? ar : en), [lang]);
@@ -106,7 +119,7 @@ export default function KidsApp({ tourPending, sharedAssessmentId, sharedCourseI
       synth.speak(u);
     } catch { /* speech not available */ }
   }, [lang]);
-  const ctx: Ctx = useMemo(() => ({ lang, go, T, speak, askTutor: t => setTutor({ open: true, ...(t || {}) }) }), [lang, go, T, speak]);
+  const ctx: Ctx = useMemo(() => ({ lang, go, T, speak, lmsStudent, askTutor: t => setTutor({ open: true, ...(t || {}) }) }), [lang, go, T, speak, lmsStudent]);
 
   const changeLang = () => {
     const next = LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length];
@@ -185,7 +198,7 @@ function Home({ ctx }: { ctx: Ctx }) {
       soft(api.fetchMyResults(), [] as any[]),
       soft(api.fetchMyAchievements() as Promise<any[]>, [] as any[]),
       soft(api.fetchMyAssignments().then(r => r.assignments), [] as any[]),
-      soft(api.fetchMyAssessments(), [] as any[]),
+      ctx.lmsStudent ? Promise.resolve([] as any[]) : soft(api.fetchMyAssessments(), [] as any[]),
       soft(api.fetchNextSteps().then(r => r.steps), [] as any[]),
     ]);
     const courseId = dashboard?.continueLearning?.courseId || courses.find((c: any) => c.progressPct < 100)?.id || courses[0]?.id;

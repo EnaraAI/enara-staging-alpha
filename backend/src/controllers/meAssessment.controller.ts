@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { queueQuizMistakes } from '../services/reviewService';
 import { forgetLearnerSnapshot } from '../services/learnerSnapshot';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { isLmsStudentAccount } from '../integrations/lms/core/lmsStudent';
 import { asyncHandler, AppError, creditReservationError } from '../middleware/errorHandler';
 import { toPlainObject } from '../utils/serialize';
 import { Assessment, AssessmentVersion, type IQuestion } from '../models/Assessment';
@@ -154,6 +155,11 @@ export const getMyAssessment = asyncHandler(async (req: AuthRequest, res: Respon
 });
 
 export const startAssessmentAttempt = asyncHandler(async (req: AuthRequest, res: Response) => {
+  // P0 item 6: an LMS student's work goes through class assignments (which
+  // reach the LMS gradebook), never an attempt without an assignment.
+  if (await isLmsStudentAccount(req.user)) {
+    throw new AppError('Open this work from Assignments: your school uses it with your LMS.', 403, 'LMS_USE_CLASS_ASSIGNMENT');
+  }
   const studentId = req.user!.studentId!;
   const assessmentId = String(req.params.id);
   const assessments = await getAssignedAssessments(studentId);
