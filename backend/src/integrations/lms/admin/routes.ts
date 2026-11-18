@@ -26,6 +26,7 @@ import { liftSuppression, listSuppressions } from '../core/suppression';
 import { LmsContext, LmsDeployment, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsUser, type ILmsContext, type ILmsDeployment, type ILmsHandoffCode, type ILmsPlatform } from '../models';
 import { isKnownVendor, listPresets } from '../presets';
 import { requireLti } from '../routes';
+import { problemsRouter } from './problemsRoutes';
 
 // /api/lms (Phase 1a). Inert (the app's normal 404) unless LMS_LTI_ENABLED is
 // on and the LMS config is valid.
@@ -99,6 +100,7 @@ function platformView(p: ILmsPlatform, deployments: ILmsDeployment[]) {
     approvedAt: p.approvedAt ?? null,
     launchCount: p.launchCount ?? 0,
     cookielessLaunchCount: p.cookielessLaunchCount ?? 0,
+    storageLaunchCount: p.storageLaunchCount ?? 0,
     lastLaunchAt: p.lastLaunchAt ?? null,
     deployments: deployments.filter((d) => d.platformId === p.id).map((d) => ({ id: d.id, deploymentId: d.deploymentId, status: d.status })),
   };
@@ -591,6 +593,9 @@ gradesRouter.post(
 );
 
 lmsAdminRouter.use(gradesRouter);
+
+// Phase 1b: the Problems view (failures and warnings by reference code; admins).
+lmsAdminRouter.use(problemsRouter);
 
 
 // ---------------------------------------------------------------- admin

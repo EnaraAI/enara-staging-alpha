@@ -17,6 +17,8 @@ export const lti13Provider: LmsProvider = {
     const out = await oidcLaunch(body ?? {}, cookieHeader);
     // The provider interface signs people in; an activity-picker request is handled by /lti/launch only.
     if ('pickerSecret' in out) throw new Error('deep_linking_request_not_a_launch');
+    // A platform-storage check needs the browser page (/lti/launch only).
+    if ('kind' in out && out.kind === 'storage_check') throw new Error('platform_storage_check_needs_browser');
     return out.result;
   },
   pushScore,

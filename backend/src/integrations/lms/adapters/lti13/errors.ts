@@ -13,6 +13,7 @@ export const LTI_ERRORS = {
   state_missing: [400, 'The sign-in request is incomplete. Please open the activity again from your LMS.'],
   state_invalid: [400, 'This sign-in link has already been used or has expired. Please open the activity again from your LMS.'],
   state_cookie_mismatch: [400, 'This sign-in did not start in this browser. Please open the activity again from your LMS.'],
+  storage_mismatch: [400, 'This sign-in did not start in this browser. Please open the activity again from your LMS.'],
   id_token_missing: [400, 'The LMS did not send a sign-in token.'],
   invalid_token: [401, 'The sign-in token from your LMS could not be read.'],
   invalid_signature: [401, 'The sign-in token from your LMS could not be verified.'],

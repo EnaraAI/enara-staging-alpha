@@ -23,6 +23,7 @@ import {
   syncLmsRoster,
   updateLmsSeats,
 } from '../services/apiService';
+import { LmsProblems } from './LmsProblems';
 
 // "LMS connections" (Phase 1a): register an LMS by hand (LTI 1.3), see its
 // status, deployments and launches, and the school's seats. A school admin's
@@ -215,7 +216,7 @@ export const LmsConnections: React.FC = () => {
                 <span className="text-xs text-slate-500">{p.vendor} · client {p.clientId}{isEnara ? ` · school ${p.institutionId}` : ''}</span>
               </div>
               <p className="text-sm text-slate-600 mt-1">
-                {p.launchCount} launches ({p.cookielessLaunchCount} without cookies){p.lastLaunchAt ? ` · last ${new Date(p.lastLaunchAt).toLocaleString()}` : ''}
+                {p.launchCount} launches ({p.cookielessLaunchCount} without cookies{p.storageLaunchCount ? `, ${p.storageLaunchCount} through the LMS page storage` : ''}){p.lastLaunchAt ? ` · last ${new Date(p.lastLaunchAt).toLocaleString()}` : ''}
               </p>
               <p className="text-sm text-slate-600">
                 Deployments:{' '}
@@ -324,6 +325,9 @@ export const LmsConnections: React.FC = () => {
           ))}
         </div>
       </section>
+
+      {/* Phase 1b: failures and warnings by Reference code, with explanations in English and Arabic. */}
+      {status && <LmsProblems isEnara={isEnara} />}
 
       {isEnara && (
         <section className="bg-white rounded-2xl border border-slate-100 p-5">

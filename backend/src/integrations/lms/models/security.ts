@@ -34,6 +34,12 @@ toolKeySchema.index({ status: 1 }, { unique: true, partialFilterExpression: { st
 
 // lms_oidc_state: OIDC login state and nonce, single use, 10-minute TTL.
 // Only SHA-256 hashes are stored; the nonce row is deleted when used.
+// Phase 1b (platform storage): a login that asked for LTI platform storage
+// records the platform's storage frame (`storageTarget`). A launch that has to
+// check the storage (no state cookie came back) parks the platform's id_token
+// on the same row, encrypted with LMS_KEK, for at most 2 minutes, behind a
+// one-time handle (only its SHA-256 is kept): `heldAt`, `holdHash`,
+// `idTokenEnc`. POST /lti/launch/verify deletes the row as it uses it.
 export interface ILmsOidcState {
   stateHash: string;
   nonceHash: string;
@@ -41,6 +47,10 @@ export interface ILmsOidcState {
   institutionId: string;
   targetLinkUri: string;
   expiresAt: Date;
+  storageTarget?: string;
+  heldAt?: Date;
+  holdHash?: string;
+  idTokenEnc?: string;
 }
 
 const oidcStateSchema = new Schema<ILmsOidcState>(
@@ -51,6 +61,10 @@ const oidcStateSchema = new Schema<ILmsOidcState>(
     institutionId: requiredOrg,
     targetLinkUri: { type: String, required: true },
     expiresAt: { type: Date, required: true },
+    storageTarget: { type: String, maxlength: 100 },
+    heldAt: Date,
+    holdHash: String,
+    idTokenEnc: { type: String, select: false },
   },
   { collection: 'lms_oidc_state', versionKey: false },
 );

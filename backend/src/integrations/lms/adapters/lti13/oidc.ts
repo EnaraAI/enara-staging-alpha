@@ -4,7 +4,7 @@ import { isInstitutionSuspended } from '../../../../middleware/auth.middleware';
 import { writeLmsAudit } from '../../core/audit';
 import { BindingError, bindingRequest, validateBinding, type ValidatedBinding } from '../../core/binding';
 import { pageTargetRequest, resolvePageTarget, type ResolvedPageTarget } from '../../core/pageTargets';
-import { sha256Hex } from '../../core/crypto';
+import { decryptSecret, encryptSecret, sha256Hex } from '../../core/crypto';
 import { findStudentPreview, LmsProvisionError, provisionLaunch, type ProvisionInput, type ProvisionRole } from '../../core/domainService';
 import { lmsFlags, lmsSettings } from '../../core/flags';
 import { loadJose } from '../../core/jose';
@@ -14,12 +14,13 @@ import { nrpsStudentPreview, scheduleRosterSyncOnLaunch } from '../../core/roste
 import { isTestUser, mapLtiRoles } from '../../core/roleMap';
 import { findSuppression } from '../../core/suppression';
 import type { LaunchResult } from '../../core/types';
-import { LmsDeployment, LmsOidcState, LmsPlatform, type ILmsPlatform } from '../../models';
+import { LmsDeployment, LmsOidcState, LmsPlatform, type ILmsOidcState, type ILmsPlatform } from '../../models';
 import { getPreset } from '../../presets';
 import { CLAIM, DEEP_LINKING_REQUEST, LTI_VERSION, SUPPORTED_MESSAGE_TYPES } from './claims';
 import { startDeepLinking } from './deepLinking';
 import { LtiError, type LtiErrorCode } from './errors';
 import { platformKeySet } from './jwks';
+import { STORAGE_HOLD_TTL_MS, validStorageTarget } from './platformStorage';
 
 // LTI 1.3 OIDC third-party-initiated login and the resource-link launch
 // (1EdTech Security Framework 1.0 §5.1, LTI Core 1.3 §5). All signature and
@@ -31,6 +32,15 @@ import { platformKeySet } from './jwks';
 // launch is allowed on the server-side single-use state alone, and is logged
 // and counted as "cookieless". A browser that sends other state cookies but
 // not this one is refused (state_cookie_mismatch: a login started elsewhere).
+//
+// Phase 1b, LTI platform storage (platformStorage.ts): when the login asked for
+// it (lti_storage_target) and no state cookie comes back, the launch checks the
+// platform's page storage first (POST /lti/launch/verify). A storage that
+// answers with the right values binds the launch to this browser (not
+// cookieless); one that answers with other values or "key_not_found" is
+// refused (storage_mismatch, the login-CSRF signature); one that does not
+// answer in time falls back to the cookieless path (counted, audit code
+// storage_unavailable).
 
 const STATE_TTL_MS = 10 * 60_000;
 const CLOCK_SKEW_S = 60;
@@ -88,6 +98,8 @@ export interface LoginOutcome {
   redirectUrl: string;
   cookieName: string;
   platform: ILmsPlatform;
+  /** Phase 1b: the login page puts state and nonce into the platform's storage frame first. */
+  storage?: { target: string; origin: string; state: string; nonce: string };
 }
 
 export async function oidcLogin(params: Record<string, unknown>): Promise<LoginOutcome> {
@@ -108,6 +120,13 @@ export async function oidcLogin(params: Record<string, unknown>): Promise<LoginO
   if (bad) return fail(bad, 'lti.login', { platform });
   if (!platform.authLoginUrl || !/^https?:\/\//.test(platform.authLoginUrl)) return fail('platform_misconfigured', 'lti.login', { platform });
 
+  // Phase 1b: the platform offers its page storage (lti_storage_target). The
+  // messages go to the origin of its OIDC auth URL (the spec's targetOrigin).
+  const storageRequested = params.lti_storage_target !== undefined;
+  const storageTarget = lmsSettings().platformStorageEnabled ? validStorageTarget(params.lti_storage_target) : undefined;
+  const storageOrigin = storageTarget ? originOf(platform.authLoginUrl) : undefined;
+  const useStorage = !!(storageTarget && storageOrigin);
+
   const state = randomBytes(32).toString('base64url');
   const nonce = randomBytes(32).toString('base64url');
   const stateHash = sha256Hex(state);
@@ -118,6 +137,7 @@ export async function oidcLogin(params: Record<string, unknown>): Promise<LoginO
     institutionId: platform.institutionId,
     targetLinkUri,
     expiresAt: new Date(Date.now() + STATE_TTL_MS),
+    ...(useStorage ? { storageTarget } : {}),
   });
 
   const url = new URL(platform.authLoginUrl);
@@ -132,18 +152,45 @@ export async function oidcLogin(params: Record<string, unknown>): Promise<LoginO
   q.set('state', state);
   q.set('nonce', nonce);
   if (messageHint) q.set('lti_message_hint', messageHint);
-  await writeLmsAudit({ event: 'lti.login', outcome: 'ok', institutionId: platform.institutionId, platformId: platform.id });
-  return { redirectUrl: url.toString(), cookieName: stateCookieName(stateHash), platform };
+  await writeLmsAudit({
+    event: 'lti.login',
+    outcome: 'ok',
+    institutionId: platform.institutionId,
+    platformId: platform.id,
+    ...(storageRequested ? { refIds: { storage: useStorage } } : {}),
+  });
+  return {
+    redirectUrl: url.toString(),
+    cookieName: stateCookieName(stateHash),
+    platform,
+    ...(useStorage ? { storage: { target: storageTarget!, origin: storageOrigin!, state, nonce } } : {}),
+  };
 }
 
 // --------------------------------------------------------------- launch
 
+/** How the launch was tied to the browser that started the login. */
+export type LaunchBinding = 'cookie' | 'cookieless' | 'storage' | 'storage_unavailable';
+
 export interface LaunchOutcome {
   token: string;
   cookieless: boolean;
+  binding: LaunchBinding;
   result: LaunchResult;
   platform: ILmsPlatform;
   stateCookieName: string;
+}
+
+/** Phase 1b: the launch waits for the platform-storage check (the page asks the storage frame). */
+export interface StorageCheckOutcome {
+  kind: 'storage_check';
+  platform: ILmsPlatform;
+  stateCookieName: string;
+  target: string;
+  origin: string;
+  state: string;
+  nonce: string;
+  handle: string;
 }
 
 /** Phase 2: a validated LtiDeepLinkingRequest opens the activity picker instead of signing in. */
@@ -151,6 +198,7 @@ export interface PickerOutcome {
   kind: 'picker';
   pickerSecret: string;
   cookieless: boolean;
+  binding: LaunchBinding;
   platform: ILmsPlatform;
   stateCookieName: string;
 }
@@ -204,35 +252,127 @@ function stringMap(v: unknown): Record<string, string> | undefined {
 
 const obj = (v: unknown): Record<string, unknown> | undefined => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : undefined);
 
-export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: string | undefined): Promise<LaunchOutcome | PickerOutcome> {
+export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: string | undefined): Promise<LaunchOutcome | PickerOutcome | StorageCheckOutcome> {
   const state = str(body.state, 512);
   if (!state) return fail('state_missing', 'lti.launch');
   const idToken = str(body.id_token, MAX.idToken);
   const stateHash = sha256Hex(state);
   const cookieName = stateCookieName(stateHash);
+  const cookies = parseCookies(cookieHeader);
+  const hasOwnCookie = cookies.has(cookieName);
+  const otherStateCookies = [...cookies.keys()].some((k) => k.startsWith(STATE_COOKIE_PREFIX) && k !== cookieName);
+
+  // Phase 1b: the login used platform storage and no state cookie came back.
+  if (!hasOwnCookie && !otherStateCookies && idToken) {
+    const stored = await LmsOidcState.findOne({ stateHash, storageTarget: { $exists: true }, heldAt: { $exists: false } }).lean();
+    if (stored) return holdForStorageCheck(stored, state, idToken, cookieName);
+  }
 
   // Single use: the state row is removed by the first launch that presents it.
-  const stateRow = await LmsOidcState.findOneAndDelete({ stateHash }).lean();
+  const stateRow = await LmsOidcState.findOneAndDelete({ stateHash, heldAt: { $exists: false } }).lean();
   if (!stateRow || stateRow.expiresAt.getTime() < Date.now()) return fail('state_invalid', 'lti.launch');
   const platform = await LmsPlatform.findOne({ id: stateRow.platformId }).lean();
   if (!platform) return fail('unknown_platform', 'lti.launch');
   const bad = platformError(platform);
   if (bad) return fail(bad, 'lti.launch', { platform });
 
-  const cookies = parseCookies(cookieHeader);
-  const stateCookies = [...cookies.keys()].filter((k) => k.startsWith(STATE_COOKIE_PREFIX));
-  let cookieless = false;
-  if (!cookies.has(cookieName)) {
-    if (stateCookies.length) return fail('state_cookie_mismatch', 'lti.launch', { platform });
-    cookieless = true;
+  let binding: LaunchBinding = 'cookie';
+  if (!hasOwnCookie) {
+    if (otherStateCookies) return fail('state_cookie_mismatch', 'lti.launch', { platform });
+    binding = 'cookieless';
   }
-  if (!idToken) return fail('id_token_missing', 'lti.launch', { platform });
-  if (!platform.keysetUrl) return fail('platform_misconfigured', 'lti.launch', { platform });
+  return completeLaunch({ platform, nonceHash: stateRow.nonceHash, idToken, binding, cookieName });
+}
 
+const holdAad = (stateHash: string) => `lms_oidc_state:${stateHash}`;
+
+/**
+ * Phase 1b: checks the id_token, parks it on the state row (encrypted, one-time
+ * handle, 2 minutes) and asks the browser to read the platform storage. A token
+ * that fails its checks is refused now and its state is used up.
+ */
+async function holdForStorageCheck(row: ILmsOidcState, state: string, idToken: string, cookieName: string): Promise<StorageCheckOutcome> {
+  const now = Date.now();
+  if (row.expiresAt.getTime() < now) {
+    await LmsOidcState.deleteOne({ stateHash: row.stateHash });
+    return fail('state_invalid', 'lti.launch');
+  }
+  try {
+    const platform = await LmsPlatform.findOne({ id: row.platformId }).lean();
+    if (!platform) return fail('unknown_platform', 'lti.launch');
+    const bad = platformError(platform);
+    if (bad) return fail(bad, 'lti.launch', { platform });
+    const origin = originOf(platform.authLoginUrl);
+    if (!origin || !platform.keysetUrl) return fail('platform_misconfigured', 'lti.launch', { platform });
+    const payload = await verifyIdToken(platform, idToken, row.nonceHash);
+    const handle = randomBytes(32).toString('base64url');
+    const held = await LmsOidcState.findOneAndUpdate(
+      { stateHash: row.stateHash, heldAt: { $exists: false } },
+      {
+        $set: {
+          heldAt: new Date(now),
+          holdHash: sha256Hex(handle),
+          idTokenEnc: encryptSecret(idToken, holdAad(row.stateHash)),
+          expiresAt: new Date(Math.min(row.expiresAt.getTime(), now + STORAGE_HOLD_TTL_MS)),
+        },
+      },
+    ).lean();
+    if (!held) return fail('state_invalid', 'lti.launch', { platform });
+    await writeLmsAudit({ event: 'lti.storage_check', outcome: 'ok', institutionId: platform.institutionId, platformId: platform.id });
+    return { kind: 'storage_check', platform, stateCookieName: cookieName, target: row.storageTarget!, origin, state, nonce: payload.nonce as string, handle };
+  } catch (error) {
+    // Refused before the storage check: the state is used up, as on the normal path.
+    await LmsOidcState.deleteOne({ stateHash: row.stateHash, heldAt: { $exists: false } }).catch(() => undefined);
+    throw error;
+  }
+}
+
+/**
+ * Phase 1b: POST /lti/launch/verify. The launch page sends back the state, the
+ * one-time handle and what the platform storage returned (r = ok | missing |
+ * unavailable, s, n). The parked id_token is used once.
+ */
+export async function oidcLaunchVerify(body: Record<string, unknown>): Promise<LaunchOutcome | PickerOutcome> {
+  const state = str(body.state, 512);
+  const handle = str(body.h, 100);
+  if (!state || !handle) return fail('state_missing', 'lti.launch');
+  const stateHash = sha256Hex(state);
+  const row = await LmsOidcState.findOneAndDelete({ stateHash, holdHash: sha256Hex(handle), heldAt: { $exists: true } }).select('+idTokenEnc').lean();
+  if (!row || !row.idTokenEnc || row.expiresAt.getTime() < Date.now()) return fail('state_invalid', 'lti.launch', { refIds: { storage: true } });
+  const platform = await LmsPlatform.findOne({ id: row.platformId }).lean();
+  if (!platform) return fail('unknown_platform', 'lti.launch');
+  const bad = platformError(platform);
+  if (bad) return fail(bad, 'lti.launch', { platform });
+  let idToken: string;
+  try {
+    idToken = decryptSecret(row.idTokenEnc, holdAad(stateHash));
+  } catch {
+    return fail('state_invalid', 'lti.launch', { platform, refIds: { storage: true } });
+  }
+
+  const result = body.r;
+  let binding: LaunchBinding;
+  if (result === 'ok') {
+    const s = str(body.s, 512);
+    const n = str(body.n, 512);
+    if (!s || !n || sha256Hex(s) !== row.stateHash || sha256Hex(n) !== row.nonceHash) {
+      return fail('storage_mismatch', 'lti.launch', { platform, refIds: { reason: 'value' } });
+    }
+    binding = 'storage';
+  } else if (result === 'missing') {
+    return fail('storage_mismatch', 'lti.launch', { platform, refIds: { reason: 'key_not_found' } });
+  } else {
+    binding = 'storage_unavailable';
+  }
+  return completeLaunch({ platform, nonceHash: row.nonceHash, idToken, binding, cookieName: stateCookieName(stateHash) });
+}
+
+/** Signature, issuer, audience, times, azp and nonce. Refuses (audited) on any failure. */
+async function verifyIdToken(platform: ILmsPlatform, idToken: string, nonceHash: string): Promise<JWTPayload> {
   const { jwtVerify } = await loadJose();
   let payload: JWTPayload;
   try {
-    ({ payload } = await jwtVerify(idToken, await platformKeySet(platform.keysetUrl), {
+    ({ payload } = await jwtVerify(idToken, await platformKeySet(platform.keysetUrl!), {
       algorithms: ['RS256'],
       issuer: platform.issuer,
       audience: platform.clientId,
@@ -251,7 +391,28 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
   const aud = payload.aud;
   if (Array.isArray(aud) && aud.length > 1 && payload.azp === undefined) return fail('invalid_azp', 'lti.launch', { platform });
   if (payload.azp !== undefined && payload.azp !== platform.clientId) return fail('invalid_azp', 'lti.launch', { platform });
-  if (typeof payload.nonce !== 'string' || sha256Hex(payload.nonce) !== stateRow.nonceHash) return fail('nonce_invalid', 'lti.launch', { platform });
+  if (typeof payload.nonce !== 'string' || sha256Hex(payload.nonce) !== nonceHash) return fail('nonce_invalid', 'lti.launch', { platform });
+  return payload;
+}
+
+interface CompleteInput {
+  platform: ILmsPlatform;
+  nonceHash: string;
+  idToken?: string;
+  binding: LaunchBinding;
+  cookieName: string;
+}
+
+/** Audit code for how the launch was bound (cookie and storage need none). */
+const bindingCode = (b: LaunchBinding) => (b === 'cookieless' || b === 'storage_unavailable' ? b : undefined);
+
+/** Everything after the browser binding: the id_token, its claims, then sign-in or the picker. */
+async function completeLaunch({ platform, nonceHash, idToken, binding: via, cookieName }: CompleteInput): Promise<LaunchOutcome | PickerOutcome> {
+  // A storage fallback is counted as cookieless (decision 2:A applies).
+  const cookieless = via === 'cookieless' || via === 'storage_unavailable';
+  if (!idToken) return fail('id_token_missing', 'lti.launch', { platform });
+  if (!platform.keysetUrl) return fail('platform_misconfigured', 'lti.launch', { platform });
+  const payload = await verifyIdToken(platform, idToken, nonceHash);
 
   const claims = payload as Record<string, unknown>;
   if (claims[CLAIM.version] !== LTI_VERSION) return fail('invalid_version', 'lti.launch', { platform });
@@ -315,7 +476,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
       role: mapped.role,
       claims,
     });
-    return { kind: 'picker', pickerSecret, cookieless, platform, stateCookieName: cookieName };
+    return { kind: 'picker', pickerSecret, cookieless, binding: via, platform, stateCookieName: cookieName };
   }
 
   const ags = obj(claims[CLAIM.ags]);
@@ -387,7 +548,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
       institutionId: platform.institutionId,
       platformId: platform.id,
       actor: preview.lmsUserId,
-      code: cookieless ? 'cookieless' : undefined,
+      code: bindingCode(via),
       refIds: {
         deploymentId: deployment.id,
         lmsUserId: preview.lmsUserId,
@@ -398,11 +559,13 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
         resourceLinkId: preview.resourceLinkId,
         enaraClassId: preview.enaraClassId,
         cookieless,
+        ...(via.startsWith('storage') ? { binding: via } : {}),
       },
     });
     return {
       token,
       cookieless,
+      binding: via,
       platform,
       stateCookieName: cookieName,
       result: {
@@ -427,7 +590,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
 
   await LmsPlatform.updateOne(
     { id: platform.id },
-    { $inc: { launchCount: 1, ...(cookieless ? { cookielessLaunchCount: 1 } : {}) }, $set: { lastLaunchAt: new Date() } },
+    { $inc: { launchCount: 1, ...(cookieless ? { cookielessLaunchCount: 1 } : {}), ...(via === 'storage' ? { storageLaunchCount: 1 } : {}) }, $set: { lastLaunchAt: new Date() } },
   );
   const tokenRole = mapped.role as ProvisionRole;
   const page = pageFor(tokenRole);
@@ -458,7 +621,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
     institutionId: platform.institutionId,
     platformId: platform.id,
     actor: provisioned.lmsUser.id,
-    code: cookieless ? 'cookieless' : undefined,
+    code: bindingCode(via),
     refIds: {
       deploymentId: deployment.id,
       contextId: provisioned.context.id,
@@ -468,6 +631,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
       role: mapped.role,
       warnings: mapped.warnings.join(','),
       cookieless,
+      ...(via.startsWith('storage') ? { binding: via } : {}),
       createdUser: provisioned.createdUser,
       createdContext: provisioned.createdContext,
       overSeatLimit: !!provisioned.seat?.overLimit,
@@ -478,6 +642,7 @@ export async function oidcLaunch(body: Record<string, unknown>, cookieHeader: st
   return {
     token,
     cookieless,
+    binding: via,
     platform,
     stateCookieName: cookieName,
     result: {

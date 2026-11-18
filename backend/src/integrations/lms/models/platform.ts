@@ -31,6 +31,8 @@ export interface ILmsPlatform {
   /** Launch counters (Phase 1a). Cookieless = the browser sent no state cookie (decision 2:A). */
   launchCount: number;
   cookielessLaunchCount: number;
+  /** Phase 1b: launches bound to the browser through LTI platform storage (no cookie needed, not cookieless). */
+  storageLaunchCount?: number;
   lastLaunchAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -59,6 +61,7 @@ const platformSchema = new Schema<ILmsPlatform>(
     approvedAt: Date,
     launchCount: { type: Number, default: 0, min: 0 },
     cookielessLaunchCount: { type: Number, default: 0, min: 0 },
+    storageLaunchCount: { type: Number, default: 0, min: 0 },
     lastLaunchAt: Date,
   },
   { collection: 'lms_platforms', versionKey: false, timestamps: true },
