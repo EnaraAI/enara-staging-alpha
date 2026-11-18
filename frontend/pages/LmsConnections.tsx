@@ -14,6 +14,7 @@ import {
   fetchLmsSeats,
   fetchLmsStatus,
   getSessionUser,
+  LMS_REJECT_REASONS,
   LmsContextView,
   LmsGradeStats,
   LmsNotStarted,
@@ -21,6 +22,7 @@ import {
   LmsRegistrationLink,
   LmsSeats,
   LmsStatus,
+  rejectLmsPlatform,
   resyncLmsGrades,
   revokeLmsRegistrationLink,
   retryLmsDeadGrades,
@@ -60,6 +62,7 @@ export const LmsConnections: React.FC = () => {
   const isEnara = getSessionUser()?.role === 'enara-admin';
   const [status, setStatus] = useState<LmsStatus | null>(null);
   const [platforms, setPlatforms] = useState<LmsPlatformView[]>([]);
+  const [rejectReason, setRejectReason] = useState<Record<string, string>>({});
   const [seats, setSeats] = useState<LmsSeats | null>(null);
   const [flagged, setFlagged] = useState<LmsSeats[]>([]);
   const [form, setForm] = useState(EMPTY);
@@ -391,12 +394,24 @@ export const LmsConnections: React.FC = () => {
                     {p.status === 'pending' ? 'Approve' : 'Switch on again'}
                   </button>
                 )}
-                {p.status !== 'disabled' && (
+                {isEnara && p.status === 'pending' && (
+                  <span className="inline-flex items-center gap-1">
+                    <select aria-label="Reason for rejecting" className="text-xs border rounded px-1 py-0.5" value={rejectReason[p.id] ?? ''} onChange={(e) => setRejectReason((m) => ({ ...m, [p.id]: e.target.value }))}>
+                      <option value="">Reject: choose a reason</option>
+                      {LMS_REJECT_REASONS.map((r) => <option key={r.code} value={r.code}>{r.label}</option>)}
+                    </select>
+                    <button disabled={busy || !rejectReason[p.id]} className="text-sm font-semibold text-red-700" onClick={() => window.confirm('Reject this connection? The school admins are told why.') && act(() => rejectLmsPlatform(p.id, rejectReason[p.id]), 'Connection rejected.')}>
+                      Reject
+                    </button>
+                  </span>
+                )}
+                {p.status === 'rejected' && <span className="text-xs text-slate-500">Rejected{p.rejectedReason ? ` (${LMS_REJECT_REASONS.find((r) => r.code === p.rejectedReason)?.label ?? p.rejectedReason})` : ''}</span>}
+                {p.status !== 'disabled' && p.status !== 'rejected' && (
                   <button disabled={busy} className="text-sm font-semibold text-red-700" onClick={() => window.confirm('Switch off this LMS connection? Launches from it will stop.') && act(() => disableLmsPlatform(p.id), 'Connection switched off.')}>
                     Switch off
                   </button>
                 )}
-                {p.status !== 'disabled' && (
+                {p.status !== 'disabled' && p.status !== 'rejected' && (
                   <button disabled={busy} className="text-sm font-semibold text-slate-700" onClick={() => { const d = window.prompt('New deployment ID'); if (d) void act(() => addLmsDeployment(p.id, d), 'Deployment added.'); }}>
                     Add deployment
                   </button>

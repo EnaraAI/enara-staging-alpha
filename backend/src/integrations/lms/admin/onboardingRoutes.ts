@@ -132,7 +132,7 @@ onboardingRouter.post(
     const institutionId = schoolParam(req);
     const body = ensurePlainObject(req.body ?? {});
     const platformId = getOptionalId(body, 'platformId');
-    const platforms = await LmsPlatform.find({ institutionId, status: { $ne: 'disabled' }, ...(platformId ? { id: platformId } : {}) }).select('id').sort({ createdAt: -1 }).limit(3).lean();
+    const platforms = await LmsPlatform.find({ institutionId, status: { $nin: ['disabled', 'rejected'] }, ...(platformId ? { id: platformId } : {}) }).select('id').sort({ createdAt: -1 }).limit(3).lean();
     if (platformId && !platforms.length) throw new AppError('LMS connection not found', 404, 'LMS_PLATFORM_NOT_FOUND');
     const recent = await LmsConnectionCheck.find({ platformId: { $in: platforms.map((p) => p.id) }, checkedAt: { $gt: new Date(Date.now() - CHECK_MIN_INTERVAL_MS) } }).select('platformId').lean();
     let ran = 0;

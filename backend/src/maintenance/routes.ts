@@ -160,6 +160,30 @@ router.get('/lms-evidence', async (req, res, next) => {
   }
 });
 
+// LMS emails on the test database (and the E2E stack's captured emails,
+// LMS_EMAIL_CAPTURE): lms_email_log rows, newest first. IDs, codes, the
+// template, the language and the subject only (the log keeps no address, name
+// or body). ?template= filters one base alias.
+router.get('/lms-emails', async (req, res, next) => {
+  try {
+    const { LmsEmailLog } = await import('../integrations/lms/models');
+    const { cairoDay, capCount, heldToday } = await import('../integrations/lms/core/lmsEmail');
+    const n = Math.min(500, Math.max(1, Number(req.query.limit) || 200));
+    const template = typeof req.query.template === 'string' ? req.query.template.slice(0, 80) : undefined;
+    const rows = await LmsEmailLog.find(template ? { template } : {}).sort({ createdAt: -1 }).limit(n).lean();
+    const day = cairoDay();
+    res.json({
+      today: { cairoDay: day, capUsed: await capCount(day), held: await heldToday(day) },
+      emails: rows.map((r) => ({
+        key: r.key, template: r.template, lang: r.lang, status: r.status, code: r.code ?? null, subject: r.subject ?? null, institutionId: r.institutionId ?? null,
+        platformId: r.platformId ?? null, recipientCount: r.recipientCount, redirected: r.redirected, cairoDay: r.cairoDay, createdAt: r.createdAt,
+      })),
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Grade ledger backfill on the test database (dry run by default; apply needs confirm).
 router.post('/grade-ledger-backfill', async (req, res, next) => {
   try {

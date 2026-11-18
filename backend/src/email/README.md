@@ -125,11 +125,17 @@ the previous inline-HTML `sendEmail` path runs unchanged.
 Two sets of emails are rendered and sent from code only. They are **not** in `templates/` or
 `TEMPLATE_REGISTRY`, and are never pushed or published to Resend:
 
-- [`lms/`](./lms): LMS emails (owner decisions D1, D4, D5, D11), sent only by `sendLmsTemplate`
-  ([`sendLmsTemplate.ts`](./sendLmsTemplate.ts)). LMS code calls it only when `LMS_EMAILS_ENABLED`,
-  `REMINDERS_ENABLED` and `RESEND_API_KEY` are all set (lms-test keeps `LMS_EMAILS_ENABLED` off).
+- [`lms/`](./lms): LMS emails (owner decisions D1, D4, D5, D11), rendered with the bundle and sent by the
+  LMS email service `sendLmsEmail` (below; `sendLmsTemplate.ts` is the plain renderer/sender it shares code
+  with), only when `LMS_EMAILS_ENABLED`, `REMINDERS_ENABLED` and `RESEND_API_KEY` are all set.
 - [`parents/`](./parents): parent emails, sent only by `sendParentTemplate`
-  ([`sendParentTemplate.ts`](./sendParentTemplate.ts)).
+  ([`sendParentTemplate.ts`](./sendParentTemplate.ts)), and only with `PARENT_EMAILS_ENABLED=true`.
+
+**Sending LMS emails:** LMS code never calls `sendLmsTemplate` directly any more: every LMS email goes through
+`sendLmsEmail` (`integrations/lms/core/lmsEmail.ts`: gates, idempotency, recipients, the lms-test inbox redirect,
+`EMAIL_SUBJECT_PREFIX` and the daily cap, the E2E capture). Which event sends which template:
+[`docs/lms/LMS_EMAILS.md`](../../../docs/lms/LMS_EMAILS.md). Parent emails send nothing unless
+`PARENT_EMAILS_ENABLED=true` (default off; no caller yet).
 
 Each template is one file per language: `<alias>-en.html` / `<alias>-ar.html` with `<alias>-en.json` /
 `<alias>-ar.json` (Arabic is `<html lang="ar" dir="rtl">`, Tahoma, Latin tokens in `<span dir="ltr">`).
@@ -150,8 +156,8 @@ and a missing key (`missing_api_key`). Logs carry the alias and code only.
 
 LMS emails never carry a student name (no `CHILD_NAME` / `STUDENT_NAME` / `LEARNER`), and no link in any of
 these emails carries a token, code or key; `ACTION_URL` is built by the caller from the app URL and opens
-a sign-in page. **No trigger is wired yet** apart from `lms-invite-connect` ("Send email" on the LMS
-onboarding invite, step 2: `ACTION_URL` is `${APP_URL}/?page=lms-status`, never the Moodle link or its code).
+a sign-in page. Every LMS template except 12a/12b/12c is wired to its event (docs/lms/LMS_EMAILS.md); `lms-invite-connect`
+("Send email" on the onboarding invite) links to `${APP_URL}/?page=lms-status`, never the Moodle link or its code.
 
 Re-bundle after editing any of them (writes `lms/lmsTemplatesBundle.ts` and `parents/parentTemplatesBundle.ts`;
 `test/codeEmailTemplates.test.ts` checks the bundles match the files, every sample renders with no `{{`
