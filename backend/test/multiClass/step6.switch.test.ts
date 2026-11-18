@@ -39,7 +39,7 @@ beforeAll(async () => {
   await TutorSession.create({ id: 'ts-a3', studentId: 'a3', institutionId: 'A', courseId: 'cA', title: 'Chat', lastMessageAt: new Date(NOW.getTime() - DAY), messages: [{ id: 'm1', role: 'user', text: 'hello', timestamp: new Date(NOW.getTime() - DAY) }] });
   await UsageEvent.create({ id: 'ue1', userId: 'u', studentId: 'a3', institutionId: 'A', feature: 'chat', requestId: 'r1', sessionId: 'ts-a3', creditsUsed: 5, status: 'settled', timestamp: new Date(NOW.getTime() - DAY) });
   const parent = await addUser('parent@p.test', 'parent');
-  await ParentLearnerLink.create({ id: 'pl-a3', parentUserId: parent._id.toString(), studentId: 'a3', role: 'owner', status: 'active' });
+  await ParentLearnerLink.create({ id: 'pl-a3', parentUserId: parent._id.toString(), studentId: 'a3', institutionId: 'A', role: 'owner', status: 'active' });
 }, 120_000);
 
 afterAll(stopFixture);

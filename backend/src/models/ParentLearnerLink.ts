@@ -5,13 +5,21 @@ import { Schema, model, Document } from 'mongoose';
 //          full: reads everything, changes controls, shares the summary.
 //          view: reads everything, changes nothing.
 //   status pending: exists but grants nothing; active: the parent sees
-//          everything for every age (user decision, 16 Nov 2026).
+//          everything for every age (user decision, 16 Nov 2026);
+//          ended: access is over and grants nothing. The row is kept for
+//          history (owner decision D8, 18 Nov 2026), with endedAt/endReason.
+//          Rows are never deleted, except by PDPL permanent deletion of the
+//          student (services/studentErasure.ts). Existing rows keep their
+//          status (no migration needed: a row without endedAt is not ended).
 // Links are created by redeeming a code a school admin issued
 // (ParentLinkCode), so they are active on confirm for every age.
 export const PARENT_LINK_ROLES = ['owner', 'full', 'view'] as const;
 export type ParentLinkRole = (typeof PARENT_LINK_ROLES)[number];
-export const PARENT_LINK_STATUSES = ['pending', 'active'] as const;
+export const PARENT_LINK_STATUSES = ['pending', 'active', 'ended'] as const;
 export type ParentLinkStatus = (typeof PARENT_LINK_STATUSES)[number];
+// Why a link ended (P0 item 2). See parents/linkLifecycle.ts for who sets each.
+export const PARENT_LINK_END_REASONS = ['archived', 'deleted', 'left_school', 'lms_left_all_classes', 'unlinked_by_school', 'unlinked_by_parent'] as const;
+export type ParentLinkEndReason = (typeof PARENT_LINK_END_REASONS)[number];
 
 export interface ParentControls {
   weeklyGoalMin: number;
@@ -40,6 +48,10 @@ export interface IParentLearnerLink extends Document {
   learnerNotifiedAt?: Date;
   learnerNoticeReadAt?: Date;
   controls?: ParentControls;
+  // status 'ended' only: when, why and by whom (an ID, or 'system:...').
+  endedAt?: Date;
+  endReason?: ParentLinkEndReason;
+  endedBy?: string;
   createdAt?: Date;
 }
 
@@ -56,6 +68,9 @@ const linkSchema = new Schema<IParentLearnerLink>(
     learnerNotifiedAt: Date,
     learnerNoticeReadAt: Date,
     controls: { type: Schema.Types.Mixed },
+    endedAt: Date,
+    endReason: { type: String, enum: PARENT_LINK_END_REASONS },
+    endedBy: String,
   },
   { collection: 'parent_learner_links', versionKey: false, timestamps: true },
 );

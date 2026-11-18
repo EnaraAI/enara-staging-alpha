@@ -18,7 +18,9 @@ import { TEMPLATES_BUNDLE } from '../src/email/templatesBundle';
 import { buildBundleSource } from '../../scripts/email/bundle-templates';
 import { EMAIL_SENDER, TEMPLATE_REGISTRY } from '../src/email/templateRegistry';
 
-const EMAIL = 'jane.doe@example.com';
+// Not a reserved domain (sendTemplate refuses example.com, .test etc.: P0 item 4).
+// Resend is mocked: nothing is sent.
+const EMAIL = 'jane.doe@qa.enara.app';
 const NAME = 'Jane Doe';
 const TEMPLATES_DIR = path.join(__dirname, '../src/email/templates');
 
@@ -62,7 +64,11 @@ describe('sendTemplate', () => {
       void sendTemplate('enara-assessment-results', EMAIL, { NAME, CHILD_NAME: 'c', TEST_NAME: 't', SCORE: 1, LEVEL: 'l', SUMMARY: 's', assessmentId: 'a' });
       void sendTemplate('enara-lesson-reminder', EMAIL, { NAME, LESSON_TITLE: 'L', courseId: 'c' });
       void sendTemplate('enara-verify-email', EMAIL, { NAME, ACTION_URL: 'https://x', EXPIRES_IN: '1 day' });
-      void sendTemplate('enara-parent-consent', EMAIL, { NAME, CHILD_NAME: 'c', ACTION_URL: 'https://x', EXPIRES_IN: '1 day' });
+      // @ts-expect-error parent-consent: ACTION_URL is built in code (never carries the code)
+      void sendTemplate('enara-parent-consent', EMAIL, { NAME, CHILD_NAME: 'c', LINK_CODE: 'ENR-ABCD-EFGH', ACTION_URL: 'https://x', EXPIRES_IN: '1 day' });
+      // @ts-expect-error parent-consent: LINK_CODE is required
+      void sendTemplate('enara-parent-consent', EMAIL, { NAME, CHILD_NAME: 'c', EXPIRES_IN: '1 day' });
+      void sendTemplate('enara-parent-consent', EMAIL, { NAME, CHILD_NAME: 'c', LINK_CODE: 'ENR-ABCD-EFGH', EXPIRES_IN: '1 day' });
     };
     expect(typeof typeOnly).toBe('function');
   });

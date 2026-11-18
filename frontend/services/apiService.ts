@@ -218,7 +218,8 @@ export function apiRequest<T = any>(method: string, path: string, body?: unknown
 // School admin: parent link codes for a learner (Parents Portal).
 export interface ParentCodeList {
   codes: { id: string; display: string; hint: string; expiresAt: string; createdAt: string }[];
-  links: { linkId: string; parentName: string; parentEmail: string | null; role: 'owner' | 'full' | 'view'; status: string; consent: string; createdAt: string }[];
+  // status 'ended' (kept for history): endedAt and endReason are set.
+  links: { linkId: string; parentName: string; parentEmail: string | null; role: 'owner' | 'full' | 'view'; status: string; consent: string; createdAt: string; endedAt?: string | null; endReason?: string | null }[];
 }
 export const fetchParentCodes = (studentId: string) => request<ParentCodeList>('GET', `/api/students/${encodeURIComponent(studentId)}/parent-codes`);
 export const createParentCode = (studentId: string, sendToEmail?: string) =>

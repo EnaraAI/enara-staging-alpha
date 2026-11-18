@@ -16,6 +16,7 @@ import {
 } from './logoInline';
 import { TEMPLATES_BUNDLE } from './templatesBundle';
 import { MissingAppUrlError, TEMPLATE_LINKS, buildActionUrl, isLinkedAlias, type TemplateSendVariables } from './links';
+import { isReservedRecipient } from './reservedRecipients';
 
 export type SendTemplateResult =
   | { ok: true; id: string }
@@ -83,6 +84,23 @@ export function fillPlaceholders(
 
 const LEFTOVER_PLACEHOLDER = /\{\{\{?\s*[A-Za-z0-9_]+\s*\}?\}\}/;
 
+// A parent link code (ENR-XXXX-XXXX, any separators) must never be in a URL
+// (P0 item 4, D15): the email is refused if any link in it carries one.
+// Code alphabet as in parents/codes.ts (no 0/O/1/I/L).
+const LINK_CODE_IN_TEXT = /(?<![A-Z0-9])ENR[\s\-_.+]*[A-HJKMNP-Z2-9]{4}[\s\-_.+]*[A-HJKMNP-Z2-9]{4}(?![A-Z0-9])/;
+function linkCarriesCode(html: string, code: unknown): boolean {
+  const raw = typeof code === 'string' ? code.trim().toUpperCase() : '';
+  const bare = raw.replace(/[^A-Z0-9]/g, '');
+  for (const m of html.matchAll(/\b(?:href|src|action)\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)) {
+    let url = m[1] ?? m[2] ?? '';
+    try { url = decodeURIComponent(url); } catch { /* keep as is */ }
+    const upper = url.toUpperCase();
+    if (LINK_CODE_IN_TEXT.test(upper)) return true;
+    if (bare && upper.replace(/[^A-Z0-9]/g, '').includes(bare)) return true;
+  }
+  return false;
+}
+
 /** Render a bundled template: fill variables, then point the hosted logos at the inline CID attachments. */
 export function renderTemplate(
   alias: TemplateAlias,
@@ -105,6 +123,14 @@ export async function sendTemplate<A extends TemplateAlias>(
   variables: TemplateSendVariables<A>,
 ): Promise<SendTemplateResult> {
   if (!isTemplateAlias(alias)) return fail(String(alias), 'unknown_template', 'Unknown template alias');
+  // P0 item 4: never email a reserved domain (.test, .example, .invalid,
+  // .localhost, example.com/.net/.org, lms.enara.test, and subdomains). Nothing
+  // is sent; only the code is logged (never the address).
+  const recipients = Array.isArray(to) ? to : [to];
+  if (!recipients.length || recipients.some((r) => isReservedRecipient(r))) {
+    logger.warn('email.send_template_refused', { alias, code: 'reserved_recipient' });
+    return { ok: false, code: 'reserved_recipient', message: 'Recipient is on a reserved domain; nothing was sent' };
+  }
   const entry = TEMPLATE_REGISTRY[alias];
   const linked = isLinkedAlias(alias);
   // Linked aliases take link params instead of ACTION_URL; the URL is built here.
@@ -145,6 +171,9 @@ export async function sendTemplate<A extends TemplateAlias>(
   const { subject, html } = renderTemplate(alias, templateVariables);
   if (LEFTOVER_PLACEHOLDER.test(html) || LEFTOVER_PLACEHOLDER.test(subject)) {
     return fail(alias, 'unfilled_placeholder', 'Rendered template still contains a {{{...}}} placeholder');
+  }
+  if (linkCarriesCode(html, input.LINK_CODE)) {
+    return fail(alias, 'code_in_url', 'A link in the email carries a parent link code');
   }
 
   const resend = getClient();

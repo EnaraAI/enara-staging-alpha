@@ -4,9 +4,10 @@ import { Icon, useP } from '../ui';
 import { formatCodeInput } from '../codeFormat';
 
 // Enter a school-issued parent link code -> minimal preview -> confirm.
-export const LinkChild: React.FC<{ initialCode?: string; onLinked: (studentId: string) => void; onCancel?: () => void }> = ({ initialCode = '', onLinked, onCancel }) => {
+// The parent types the code (it is never read from a URL: P0 item 4, D15).
+export const LinkChild: React.FC<{ onLinked: (studentId: string) => void; onCancel?: () => void }> = ({ onLinked, onCancel }) => {
   const { t } = useP();
-  const [code, setCode] = useState(() => formatCodeInput(initialCode));
+  const [code, setCode] = useState('');
   const [preview, setPreview] = useState<{ learner: string; school: string | null } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

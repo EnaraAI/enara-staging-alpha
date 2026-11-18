@@ -16,6 +16,7 @@ import { lmsFlags } from './flags';
 import { isTestUser, mapLtiRoles } from './roleMap';
 import { afterRosterSync } from './rosterHooks';
 import { suppressedExternalIds } from './suppression';
+import { endParentLinksForStudent, hasAnyActiveEnrollment } from '../../../parents/linkLifecycle';
 
 // LMS Phase 4: roster sync through LTI NRPS (docs/lms/PHASE_4_NOTES.md).
 //
@@ -274,7 +275,15 @@ async function applyRoster(
     await LmsEnrollment.updateOne({ id: row.id, status: { $in: ['active', 'invited'] } }, { $set: { status: 'inactive', endedAt: new Date(), ...(instructorRemoved ? { addedInstructor: false } : {}) } });
     if (row.enaraRole === 'student') counts.removed++;
     else if (instructorRemoved) counts.instructorsRemoved++;
-    await audit('roster.member_removed', 'ok', { lmsUserId: lu.id, enaraUserId: lu.enaraUserId, role: row.enaraRole, reason, classEnrollmentEnded: classEnded, instructorRemoved });
+    // P0 item 2: a student this sync left in no class at all (no active class
+    // enrollment of any kind, no LMS course) loses parent access: links
+    // 'ended' (lms_left_all_classes), unused codes revoked. Still in another
+    // class: nothing changes.
+    let parentLinksEnded = 0;
+    if (row.enaraRole === 'student' && acc?.studentId && !(await hasAnyActiveEnrollment(acc.studentId, String(acc._id)))) {
+      parentLinksEnded = (await endParentLinksForStudent(acc.studentId, 'lms_left_all_classes', { id: SYSTEM_ACTOR, role: 'system' }, { revokeCodes: true })).linksEnded;
+    }
+    await audit('roster.member_removed', 'ok', { lmsUserId: lu.id, enaraUserId: lu.enaraUserId, role: row.enaraRole, reason, classEnrollmentEnded: classEnded, instructorRemoved, ...(parentLinksEnded ? { parentLinksEnded } : {}) });
   }
 
   // ---- additions and updates: people with an account first (cheap), new people last (bounded).

@@ -12,7 +12,7 @@ Sender: `The Enara Team <noreply@test.enara.app>` (`EMAIL_SENDER`).
 | enara-welcome | 4f7c1ade-5991-4ebe-a300-aa5a5b4db313 | NAME, ACTION_URL |
 | enara-verify-email | ef72353a-9930-4670-b68a-42c30986e8ad | NAME, ACTION_URL, EXPIRES_IN |
 | enara-password-reset | 15397fc6-acaa-453d-a103-b80d9e0f6394 | NAME, ACTION_URL, EXPIRES_IN |
-| enara-parent-consent | 57ebb3c9-2cb5-4ab5-aea6-1c4baba3952b | NAME, CHILD_NAME, ACTION_URL, EXPIRES_IN |
+| enara-parent-consent | 57ebb3c9-2cb5-4ab5-aea6-1c4baba3952b | NAME, CHILD_NAME, LINK_CODE, ACTION_URL, EXPIRES_IN |
 | enara-lesson-reminder | f6972409-d9e9-4bec-9c99-c6c41b573221 | NAME, LESSON_TITLE, ACTION_URL |
 | enara-weekly-progress | 879509b9-d69b-4c01-8b7f-26d01be2e15e | NAME, CHILD_NAME, LESSONS_DONE, OUTCOMES_MASTERED, TIME_SPENT, PRACTICE_TIP, ACTION_URL |
 | enara-assessment-results | 732d6b7a-77cb-4c51-be8f-22278fb4e70f | NAME, CHILD_NAME, TEST_NAME, SCORE, LEVEL, SUMMARY, ACTION_URL |
@@ -72,9 +72,21 @@ params URL-encoded). Without an app URL `sendTemplate` returns `{ ok: false, cod
 | enara-assessment-results | `assessmentId` | `${APP_URL}/?assessment=…` |
 | enara-lesson-reminder | `courseId` | `${APP_URL}/?course=…` |
 | enara-verify-email | `ACTION_URL` (caller-supplied) | no page in the app yet |
-| enara-parent-consent | `ACTION_URL` (caller-supplied) | no page in the app yet |
+| enara-parent-consent | `LINK_CODE` (shown in the body only) | `${APP_URL}/parents/link` (never carries the code) |
 
-When pages for email verification and parent consent exist, add them to `TEMPLATE_LINKS` in `links.ts`.
+When a page for email verification exists, add it to `TEMPLATE_LINKS` in `links.ts`.
+
+**Parent link codes are never in a URL** (P0 item 4, owner decision D15): `enara-parent-consent` shows the
+code in the body (`LINK_CODE`, no fallback, so an empty code fails as `unfilled_placeholder`), and its
+button opens `/parents/link` with no parameters. As a second check, `sendTemplate` refuses
+(`code_in_url`) any email whose links carry an `ENR-XXXX-XXXX` code or the given `LINK_CODE`.
+The `LINK_CODE` change is in the repo copy of the template only; the copy hosted in Resend is not
+updated until the owner approves a push (sending renders the repo copy, so this does not affect sends).
+
+**Reserved recipients** (P0 item 4): `sendTemplate` refuses any recipient on `.test`, `.example`,
+`.invalid`, `.localhost`, `example.com`/`.net`/`.org` or `lms.enara.test` (and their subdomains), and an
+address without a domain: `{ ok: false, code: 'reserved_recipient' }`, nothing sent, and only the code is
+logged (`email.send_template_refused`, never the address). See [`reservedRecipients.ts`](./reservedRecipients.ts).
 
 ## Sending
 

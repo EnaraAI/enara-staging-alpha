@@ -59,8 +59,18 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
   const { t, n } = ctx;
   usePwaHead(lang);
 
-  const initialCode = useMemo(() => new URLSearchParams(window.location.search).get('code') ?? '', []);
-  const [tab, setTab] = useState<Tab>(() => (read(LINK_INTENT_KEY, 'session') === '1' || initialCode ? 'link' : tabFromPath()));
+  // P0 item 4 (D15): a link code is never taken from the URL; the parent types
+  // it. An old link that still carries ?code= opens the code screen, and the
+  // code is dropped from the address bar (and so from history) unread.
+  const codeInUrl = useMemo(() => new URLSearchParams(window.location.search).has('code'), []);
+  useEffect(() => {
+    if (!codeInUrl) return;
+    const params = new URLSearchParams(window.location.search);
+    params.delete('code');
+    const q = params.toString();
+    window.history.replaceState(window.history.state, '', `${window.location.pathname}${q ? `?${q}` : ''}${window.location.hash}`);
+  }, [codeInUrl]);
+  const [tab, setTab] = useState<Tab>(() => (read(LINK_INTENT_KEY, 'session') === '1' || codeInUrl ? 'link' : tabFromPath()));
   useEffect(() => { write(LINK_INTENT_KEY, null, 'session'); }, []);
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
@@ -140,7 +150,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
           {showLink && learners.data && (
             <>
               {noLearners && tab !== 'link' && <section className="pp-notice"><Icon name="link" style={{ color: '#075985' }} /><div><b>{t.noLearners}</b><p>{t.noLearnersBody}</p></div></section>}
-              <LinkChild initialCode={initialCode} onCancel={list.length ? () => go('home') : undefined} onLinked={(id) => { setSelectedId(id); refresh(); go('home'); }} />
+              <LinkChild onCancel={list.length ? () => go('home') : undefined} onLinked={(id) => { setSelectedId(id); refresh(); go('home'); }} />
             </>
           )}
           {!showLink && learner && (

@@ -5,13 +5,18 @@ import type { TemplateAlias, TemplateVariables } from './templateRegistry';
  * Builds the ACTION_URL of each template from the configured app URL
  * (getConfig().appUrl, i.e. APP_URL). Callers pass link params, never the URL.
  *
- * enara-verify-email and enara-parent-consent have no page in the app yet, so
- * their ACTION_URL stays caller-supplied (see README).
+ * enara-verify-email has no page in the app yet, so its ACTION_URL stays
+ * caller-supplied (see README).
+ *
+ * enara-parent-consent opens the Parents Portal code page with NO parameters:
+ * the parent link code is in the email body only (LINK_CODE) and never in a
+ * URL (P0 item 4, owner decision D15). The parent types it on the page.
  */
 export const TEMPLATE_LINKS = {
   'enara-welcome': { path: '/', params: [] },
   'enara-weekly-progress': { path: '/', params: [] },
   'enara-password-reset': { path: '/reset-password', params: ['token'] },
+  'enara-parent-consent': { path: '/parents/link', params: [] },
   'enara-class-invitation': { path: '/accept-invitation', params: ['token'] },
   'enara-assessment-results': { path: '/', params: ['assessmentId'], query: { assessmentId: 'assessment' } },
   'enara-lesson-reminder': { path: '/', params: ['courseId'], query: { courseId: 'course' } },
