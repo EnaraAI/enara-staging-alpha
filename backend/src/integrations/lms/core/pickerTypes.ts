@@ -9,13 +9,19 @@ import { registerPickerType, type PickerItem } from './picker';
 // The two item types of Phase 2 (owner decision P1): published assessments and
 // existing assignments. Both open through the Phase 3 binding (the same custom
 // parameters a teacher used to type by hand), so grades (Phase 3), the roster
-// (Phase 4) and the ledger work unchanged. Practice gets no grade column
-// (custom parameter enara_graded=0 keeps the grade outbox away from it).
+// (Phase 4) and the ledger work unchanged.
+//
+// Owner decision D3: practice is graded too. It gets its own grade column (max
+// 100) and sends the student's BEST attempt (scoring.ts, default policy for
+// practice). Moodle creates a column for every activity anyway, so this fills
+// it. Both Phase 2 item types are therefore graded; NOT_GRADED_PARAM
+// (enara_graded=0, no grade column) stays for item types that are truly
+// ungraded (none yet). The grade outbox ignores enara_graded=0 on practice,
+// because practice activities picked before D3 still carry it.
 
 export const NOT_GRADED_PARAM = 'enara_graded';
 
 const ID = /^[A-Za-z0-9][\w.:-]{0,127}$/;
-const graded = (kind?: string) => kind !== 'practice';
 const pointsOf = (qs: { points?: number }[] = []) => qs.reduce((n, q) => n + (typeof q.points === 'number' ? q.points : 1), 0);
 
 type LangInfo = Map<string, { level?: string; skills?: string[] }>;
@@ -36,8 +42,8 @@ const ASSESSMENT_FIELDS = 'id title subject assessmentKind difficulty curriculum
 type AssessmentRow = { id: string; title: string; subject?: string; assessmentKind?: string; difficulty?: string; curriculumId?: string; questions?: { points?: number }[]; instructions?: string };
 
 function assessmentItem(a: AssessmentRow, lang: LangInfo): PickerItem {
+  // Every kind is graded, practice included (D3): no NOT_GRADED_PARAM.
   const custom: Record<string, string> = { [BINDING_PARAM.assessment]: a.id };
-  if (!graded(a.assessmentKind)) custom[NOT_GRADED_PARAM] = '0';
   return {
     type: 'assessment',
     id: a.id,
@@ -49,7 +55,7 @@ function assessmentItem(a: AssessmentRow, lang: LangInfo): PickerItem {
     language: a.curriculumId ? lang.get(a.curriculumId) : undefined,
     questions: a.questions?.length ?? 0,
     points: pointsOf(a.questions),
-    graded: graded(a.assessmentKind),
+    graded: true,
     needsMedia: false,
     custom,
   };
@@ -86,7 +92,6 @@ async function assignmentItems(institutionId: string, rows: AssignmentRow[]): Pr
     const kind = s.assessmentKind ?? a?.assessmentKind;
     const media = !!s.speaking || s.format === 'conversation' || s.format === 'english_conversation';
     const custom: Record<string, string> = { [BINDING_PARAM.assignment]: s.id };
-    if (!graded(kind)) custom[NOT_GRADED_PARAM] = '0';
     return {
       type: 'assignment',
       id: s.id,
@@ -98,7 +103,7 @@ async function assignmentItems(institutionId: string, rows: AssignmentRow[]): Pr
       language: a?.curriculumId ? lang.get(a.curriculumId) : undefined,
       questions: a?.questions?.length,
       points: a ? pointsOf(a.questions) : undefined,
-      graded: graded(kind),
+      graded: true,
       needsMedia: media,
       custom,
       meta: [classes.get(s.classId), s.dueAt ? new Date(s.dueAt).toISOString().slice(0, 10) : undefined].filter(Boolean).join(' · ') || undefined,

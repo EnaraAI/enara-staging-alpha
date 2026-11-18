@@ -37,7 +37,9 @@ const T = {
     points: (n: number) => `${n} pts`,
     graded: 'Grade column',
     notGraded: 'No grade column',
-    newWindow: 'Opens in a new window (microphone)',
+    // P3: ENARA asks the LMS for a new window and always offers its own new tab.
+    newWindow: 'Microphone: new window or tab',
+    newWindowHint: 'Uses the microphone. ENARA asks your LMS for a new window and always offers its own "Open in new tab". Moodle 4.3 and later ignore the request.',
     already: 'Already added in this course',
     add: (n: number) => (n ? `Add ${n} activit${n === 1 ? 'y' : 'ies'}` : 'Add'),
     cancel: 'Cancel',
@@ -67,7 +69,8 @@ const T = {
     points: (n: number) => `${n} درجة`,
     graded: 'عمود درجة',
     notGraded: 'بدون عمود درجة',
-    newWindow: 'يفتح في نافذة جديدة (الميكروفون)',
+    newWindow: 'الميكروفون: نافذة أو علامة تبويب جديدة',
+    newWindowHint: 'يستخدم الميكروفون. تطلب إنارة من نظام إدارة التعلم فتحه في نافذة جديدة، وتعرض دائماً خيار الفتح في علامة تبويب جديدة. يتجاهل Moodle 4.3 وما بعده هذا الطلب.',
     already: 'أُضيف سابقاً في هذا المقرر',
     add: (n: number) => (n ? `إضافة ${arCount(n, 'نشاط واحد', 'نشاطين', 'أنشطة', 'نشاطاً')}` : 'إضافة'),
     cancel: 'إلغاء',
@@ -258,7 +261,7 @@ export const LmsPicker: React.FC = () => {
                         </span>
                         <span className="flex flex-wrap gap-2 mt-2 text-xs">
                           <span className={`rounded-full px-2 py-0.5 border ${i.graded ? 'bg-green-50 text-green-800 border-green-200' : 'bg-slate-50 text-slate-600 border-slate-200'}`}>{i.graded ? t.graded : t.notGraded}</span>
-                          {i.needsMedia && <span className="rounded-full px-2 py-0.5 border bg-blue-50 text-blue-800 border-blue-200">{t.newWindow}</span>}
+                          {i.needsMedia && <span className="rounded-full px-2 py-0.5 border bg-blue-50 text-blue-800 border-blue-200" title={t.newWindowHint}>{t.newWindow}</span>}
                         </span>
                       </span>
                     </label>

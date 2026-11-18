@@ -26,8 +26,9 @@ Switch: `LMS_DEEP_LINKING_ENABLED`, default off. It also needs `LMS_LTI_ENABLED`
   - `type: ltiResourceLink`, with the title, the description as `text`, and `url` = `/lti/launch`.
   - `custom` is the **same binding parameter as Phase 3** (`enara_assessment=…` or `enara_assignment=…`). Grades (Phase 3), the roster (Phase 4) and the ledger therefore work unchanged.
   - `lineItem {scoreMaximum: 100, label, resourceId: "<type>:<id>", tag: "enara"}`, **only for graded items** and only if the LMS accepts line items (decision P2).
-  - Practice gets **no** grade column, plus `enara_graded=0`. The grade outbox then skips it (`enqueueForLink` returns `not_graded`), so no column is ever created later through the line-items service.
-  - Items that need the mic or camera get `window` (decision P3), if the LMS accepts window targets. **Moodle 4.3+ ignores this hint** (MDL-79442), so ENARA's own in-frame check and "Open in new tab" handle it. See `LMS_MEDIA_IN_FRAME` in the "everything in Moodle" plan.
+  - **Practice is graded** (owner decision D3, "practice graded, best attempt"). It gets a grade column (max 100) like any graded item and sends the student's **best** attempt (`scoring.ts`: the default policy for practice is `best`). Moodle creates a column for every activity anyway, so this fills it. Both Phase 2 item types are now graded, so the picker shows the "No grade column" badge for none of them; the badge stays for item types that are truly ungraded (none in Phase 2).
+  - `enara_graded=0` (no grade column) is kept for truly ungraded item types. The grade outbox skips such a link (`enqueueForLink` returns `not_graded`), **except when the bound work is practice**: practice activities picked before D3 carry `enara_graded=0`, and they now send their best attempt to the column Moodle made.
+  - Items that need the mic or camera get `window` (decision P3), if the LMS accepts window targets. **Decision P3: ENARA asks the LMS for a new window and always offers its own new tab; Moodle 4.3+ ignores the request** (MDL-79442), so ENARA's own in-frame check and "Open in new tab" handle it there. The picker badge reads "Microphone: new window or tab". See `LMS_MEDIA_IN_FRAME` in the "everything in Moodle" plan.
 
 ## "Already added in this course" (decision P4)
 
@@ -67,6 +68,14 @@ Phase 2 registers `assessment` and `assignment` in `core/pickerTypes.ts`.
 
 **Skipped.** Moodle's LTI activity has **no due-date field**, and Moodle doesn't use the date fields of a deep-linking response. A date set in the picker would therefore not show in Moodle. As before, the ENARA assignment keeps its own due date, which comes from the assignment or defaults to one year. If wanted later, the picker could set the ENARA due date, but it would show only in ENARA.
 
+## One host (startup check)
+
+Moodle's frame grants the microphone and camera only to the **Tool URL's host** (MDL-81637). So `/lti/*` and the app (the `/lms/launch` page and every page after it) must be on the same host. When `LMS_LTI_ENABLED` is on, the LMS config checks (`config/env.ts › parseLmsConfig`):
+- `LMS_TOOL_BASE_URL` is an https origin (http only for `localhost` outside production);
+- its host (with port) equals the host of `APP_URL`, the app's public address (also used by email links).
+
+If the hosts differ (or `APP_URL` is not a URL), the config gets a `problem` that names the variables, never their values. The LMS is then off (`lmsFlags()`), the problem is logged once at startup (`lms_config_problem`), and `GET /api/lms/status` answers ENARA admins with `{enabled: false, problem}`, which the LMS connections page shows. If `APP_URL` is unset, nothing is blocked: a warning is logged once (`lms_config_warning`). **Before switching LTI on anywhere, set `APP_URL` to the same host as `LMS_TOOL_BASE_URL`** (for lms-test: `https://lms-test.enara.app` for both).
+
 ## Moodle settings (owner, by hand)
 
 The web-services token cannot change tool settings. Go to **Site administration › Plugins › Activity modules › External tool › Manage tools › ENARA (test) › edit (cog)**:
@@ -76,19 +85,20 @@ The web-services token cannot change tool settings. Go to **Site administration 
 
 ## Tests
 
-`test/lms/phase2.test.ts` has 13 tests against the mock LMS, covering:
+`test/lms/phase2.test.ts` has 14 tests against the mock LMS, covering:
 - the switch;
 - who may open the picker;
 - the return URL and accepted types;
 - the session (IDs only, language, single use, expiry);
 - the items (this school, published only, language facts only for language courses, no custom parameters leaked);
-- the signed response (verified with ENARA's JWKS, deployment, `data`, nonce, items, grade column only for graded items, new window for mic items, duplicates removed);
+- the signed response (verified with ENARA's JWKS, deployment, `data`, nonce, items, grade column for graded items, practice included, new window for mic items, duplicates removed);
 - Cancel;
 - draft, unknown and other-school items refused;
 - one item at a time;
 - an LMS that accepts neither line items nor windows;
 - the badge (earlier picks, and hand-made activities);
-- a picked practice item launching through Phase 3 and never sending a grade;
+- a practice activity picked before D3 (`enara_graded=0`) queuing and sending its **best** attempt (2/4, then 4/4 sent; a later 0/4 sends nothing);
+- `enara_graded=0` still keeping a non-practice quiz out of the gradebook;
 - the audit log (IDs and counts only).
 
 ## Status: DONE, verified on MoodleCloud (18 Nov 2026)
@@ -107,5 +117,5 @@ These results come from the owner's tests, with the ENARA side confirmed from th
 - The practice item sent **no** grade (`enara_graded=0`).
 
 **Found during the test:**
-1. **Moodle creates a grade column anyway** for an activity whose content item has no `lineItem`. The launch carries that line item (here line item 17), so the column exists but stays empty. ENARA cannot stop this, and cannot remove the activity's own column through AGS. Owner decision D3 (practice graded with "best") resolves it for practice. For items that are genuinely ungraded (later: tutor sessions, the avatar), the school guide tells teachers to set **Grade › Type: None** on that Moodle activity.
+1. **Moodle creates a grade column anyway** for an activity whose content item has no `lineItem`. The launch carries that line item (here line item 17), so the column exists but stays empty. ENARA cannot stop this, and cannot remove the activity's own column through AGS. Owner decision D3 (practice graded with "best") resolves it for practice: **done** (see "The signed response"); once deployed, the practice activity above sends its best attempt to line item 17 (not yet verified on MoodleCloud). For items that are genuinely ungraded (later: tutor sessions, the avatar), the teacher guide (`TEACHER_GUIDE.md`) tells teachers to set **Grade › Type: None** on that Moodle activity, and how to give practice weight 0 in the course total.
 2. **A (\*) override on "ENARA graded quiz."** in the Moodle gradebook: Moodle ignores tool grades on an overridden cell. The fix is on the Moodle side: untick **Overridden** on that cell. ENARA's ledger shows a difference as "Changed in LMS".
