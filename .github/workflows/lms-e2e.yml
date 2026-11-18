@@ -231,3 +231,17 @@ jobs:
           done < jobs.tsv
           mins=$(( (total + 59) / 60 ))
           echo "lms-e2e minutes: ${mins} (sum of finished e2e job durations, run ${{ github.run_id }})" | tee -a "$GITHUB_STEP_SUMMARY"
+
+  # After a green run on a PR into lms-test-live: merge it and deploy to
+  # lms-test (reusable workflow from the continuous-delivery branch).
+  deploy:
+    needs: [e2e]
+    if: github.event_name == 'pull_request' && github.base_ref == 'lms-test-live' && success()
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/lms-deploy.yml
+    with:
+      pr_number: ${{ github.event.pull_request.number }}
+      pr_title: ${{ github.event.pull_request.title }}
+    secrets: inherit
