@@ -78,15 +78,35 @@ jobs:
         working-directory: e2e
         run: ./scripts/up.sh
 
-      - name: Playwright
+      - name: Playwright (npm)
         working-directory: e2e
-        run: |
-          npm ci --no-audit --no-fund
-          npx playwright install --with-deps chromium webkit
+        timeout-minutes: 5
+        run: npm ci --no-audit --no-fund
+
+      - name: Playwright browsers (cache)
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('e2e/package-lock.json') }}
+
+      - name: Playwright browsers (Chromium, WebKit)
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        working-directory: e2e
+        timeout-minutes: 10
+        run: npx playwright install chromium webkit
+
+      - name: Playwright system libraries
+        working-directory: e2e
+        timeout-minutes: 15
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: sudo -E env "PATH=$PATH" npx playwright install-deps chromium webkit
 
       - name: Run the scenarios
         id: tests
         working-directory: e2e
+        timeout-minutes: 30
         run: npx playwright test
         continue-on-error: true
 

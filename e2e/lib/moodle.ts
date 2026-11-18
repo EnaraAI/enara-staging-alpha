@@ -23,6 +23,9 @@ export async function moodleSession(browser: Browser, user: MoodleUser, opts: { 
   const stateFile = path.join(RUN_DIR, `moodle-${user}.json`);
   const context = await browser.newContext({ ignoreHTTPSErrors: true, ...(fs.existsSync(stateFile) ? { storageState: stateFile } : {}), ...(opts.permissions ? { permissions: opts.permissions } : {}) });
   const page = await context.newPage();
+  // ENARA's first-visit product tour opens over the page after a moment: skip it
+  // whenever it gets in the way (inside Moodle's activity frame).
+  await page.addLocatorHandler(page.frameLocator('#contentframe').getByRole('button', { name: 'Skip tour' }), async (b) => { await b.click(); });
   await page.goto(`${MOODLE}/my/`);
   if (/login\/index\.php/.test(page.url())) {
     // Signs in with the context's own HTTP client (same cookie jar as the

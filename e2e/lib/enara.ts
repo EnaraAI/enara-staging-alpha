@@ -57,13 +57,13 @@ export async function enaraFrame(page: Page, timeout = 90_000): Promise<Frame> {
 }
 
 /** The ENARA session the frame holds after the launch (role, preview, LMS target). */
-export async function frameSession(frame: Frame): Promise<{ role: string; name?: string; preview: boolean; lms: any; target: any }> {
+export async function frameSession(frame: Frame): Promise<{ id: string /* the account's (reserved) email */; role: string; name?: string; institutionId?: string; preview: boolean; lms: any; target: any }> {
   await expect.poll(async () => frame.evaluate(() => !!sessionStorage.getItem('enara_token')), { timeout: 60_000 }).toBe(true);
   return frame.evaluate(() => {
     const user = JSON.parse(sessionStorage.getItem('enara_user') || '{}');
     const lms = JSON.parse(sessionStorage.getItem('enara_lms') || '{}');
     const target = JSON.parse(sessionStorage.getItem('enara_lms_target') || 'null');
-    return { role: user.role, name: user.name, preview: lms.preview === true, lms, target };
+    return { id: user.email, role: user.role, name: user.name, institutionId: user.institutionId, preview: lms.preview === true, lms, target };
   });
 }
 

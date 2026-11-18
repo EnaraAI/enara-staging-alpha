@@ -3,7 +3,7 @@ import { enaraFrameAt } from './enara';
 import { MOODLE } from './env';
 import { moodleCli } from './moodle';
 
-export interface Pick { title: string; due?: string }
+export interface Pick { title: string; due?: string; /** e.g. 'Assignments' when an assessment has the same title */ type?: string }
 
 /**
  * Teacher: Add an ENARA activity › Select content › pick items in the ENARA
@@ -18,7 +18,9 @@ export async function addThroughPicker(page: Page, opts: { course: number; cours
   await expect(picker.getByRole('heading', { name: 'Add ENARA activities' })).toBeVisible({ timeout: 60_000 });
   const badges: Record<string, string> = {};
   for (const p of opts.picks) {
-    const row = picker.locator('li').filter({ has: picker.getByText(p.title, { exact: true }) }).first();
+    let row = picker.locator('li').filter({ has: picker.getByText(p.title, { exact: true }) });
+    if (p.type) row = row.filter({ hasText: `${p.type} ·` });
+    row = row.first();
     await expect(row).toBeVisible();
     badges[p.title] = (await row.innerText()).replace(/\s+/g, ' ');
     await row.locator('input[name="enara-pick"]').check();
@@ -32,7 +34,8 @@ export async function addThroughPicker(page: Page, opts: { course: number; cours
     await expect(page.locator('#id_submitbutton2')).toBeVisible({ timeout: 60_000 });
     await page.locator('#id_submitbutton2').click();
   } else {
-    await expect(page.locator('#id_selectcontentindicator')).not.toBeEmpty({ timeout: 60_000 });
+    // One item: Moodle fills the form from it (name, custom parameters) and closes its dialog.
+    await expect(page.locator('#id_name')).toHaveValue(opts.picks[0].title, { timeout: 60_000 });
     await page.locator('#id_submitbutton2').click();
   }
   await page.waitForURL(/course\/view\.php/, { timeout: 60_000 });

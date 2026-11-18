@@ -1,0 +1,26 @@
+import { test, expect } from '@playwright/test';
+import { SPEAKING_TITLE } from '../lib/content';
+import { enaraFrame, frameSession } from '../lib/enara';
+import { moodleSession } from '../lib/moodle';
+import { activityUrl } from '../lib/picker';
+import { readState } from '../lib/state';
+
+// Scenario 7, Safari (WebKit): Safari has no frame-policy API, so before the
+// speaking exam ENARA shows "open the exam in a new tab" inside the frame. The
+// launch itself runs without third-party cookies (WebKit blocks them).
+test.describe.serial('7 · microphone checks (Safari / WebKit)', () => {
+  test('student in Safari: launch works in the frame and the "open in a new tab" hint is shown', async ({ browser }) => {
+    const s = readState();
+    test.skip(!s.activities?.speaking, 'needs the speaking exam activity from 07-mic.spec.ts');
+    const { page, context } = await moodleSession(browser, 'student.test');
+    await page.goto(activityUrl(s.activities.speaking));
+    const f = await enaraFrame(page);
+    expect((await frameSession(f)).role).toBe('student');
+    await expect(f.getByRole('heading', { name: SPEAKING_TITLE })).toBeVisible();
+    await f.getByRole('button', { name: /^(Start speaking exam|Continue|Start another attempt)$/ }).click();
+    await expect(f.getByTestId('safari-frame-hint')).toBeVisible({ timeout: 60_000 });
+    await expect(f.getByTestId('safari-frame-hint').getByRole('button', { name: 'open the exam in a new tab' })).toBeVisible();
+    await page.screenshot({ path: test.info().outputPath('safari-hint.png'), fullPage: true });
+    await context.close();
+  });
+});
