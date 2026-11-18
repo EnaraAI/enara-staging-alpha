@@ -11,6 +11,7 @@ import {
   grantAssignmentExtension,
   isFeatureDisabled,
   releaseAllResults,
+  type LinkedLmsActivity,
 } from '../../services/apiService';
 import { toast } from '../../services/toastService';
 import { SubmissionReview } from './GradingReview';
@@ -26,6 +27,33 @@ const STATUS: Record<string, string> = {
 };
 const A_STATUS: Record<string, string> = { draft: 'Draft', scheduled: 'Scheduled', active: 'Open', closed: 'Closed', archived: 'Archived' };
 const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+
+// LMS Phase 3 follow-up: which LMS activity an assignment belongs to, and a
+// warning when that activity may have been deleted in the LMS.
+const MAY_BE_DELETED: Record<string, string> = {
+  lineitem_gone: 'The LMS no longer accepts grades for this activity.',
+  stale: 'Not opened from the LMS and no results for 30 days.',
+};
+function LmsActivityLine({ activities, archived, compact }: { activities?: LinkedLmsActivity[]; archived?: boolean; compact?: boolean }) {
+  if (!activities?.length) return null;
+  return (
+    <>
+      {activities.map((l) => (
+        <span key={l.resourceLinkId} className="block text-xs text-slate-600" data-testid="lms-activity">
+          LMS activity: <span className="font-medium text-slate-800">{l.activityTitle || 'Untitled activity'}</span> · {l.platformName}
+          {!compact && l.courseTitle && <> · course {l.courseUrl ? <a href={l.courseUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-700 underline">{l.courseTitle}</a> : l.courseTitle}</>}
+          {!compact && !l.courseTitle && l.courseUrl && <> · <a href={l.courseUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-700 underline">open the LMS course</a></>}
+          {l.mayBeDeleted && !archived && (
+            <span className="block text-amber-800 font-semibold">
+              LMS activity may have been deleted{!compact && l.reason ? `: ${MAY_BE_DELETED[l.reason]} If it was, archive this assignment.` : ''}
+            </span>
+          )}
+        </span>
+      ))}
+      {archived && !compact && <span className="block text-xs text-slate-600">Archived: hidden from students; grades are no longer sent to the LMS.</span>}
+    </>
+  );
+}
 const toLocalInput = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
@@ -181,6 +209,7 @@ export const ClassAssignments: React.FC<{ initialClassId?: string; initialAssign
                 <button onClick={() => openDetail(a.id)} className={`w-full text-left bg-white border rounded-xl p-3 ${detail?.assignment.id === a.id ? 'border-indigo-500' : 'border-slate-200'}`}>
                   <span className="block font-semibold text-slate-900">{a.title}</span>
                   <span className="text-xs text-slate-600">{A_STATUS[a.status]} · due {new Date(a.dueAt).toLocaleString()}</span>
+                  <LmsActivityLine activities={a.lmsActivities} archived={a.state === 'archived'} compact />
                 </button>
               </li>
             ))}
@@ -190,6 +219,7 @@ export const ClassAssignments: React.FC<{ initialClassId?: string; initialAssign
               <div className="flex flex-wrap justify-between gap-2">
                 <div>
                   <h2 className="text-lg font-bold text-slate-900">{detail.assignment.title}</h2>
+                  <LmsActivityLine activities={detail.assignment.lmsActivities} archived={detail.assignment.state === 'archived'} />
                   <p className="text-sm text-slate-600">{A_STATUS[detail.assignment.status]} · version {detail.assignment.assessmentVersion} · due {new Date(detail.assignment.dueAt).toLocaleString()} ({detail.assignment.timeZone}) · {detail.assignment.releasePolicy === 'manual' ? 'results held until you release them' : 'results released automatically'}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -211,7 +241,10 @@ export const ClassAssignments: React.FC<{ initialClassId?: string; initialAssign
                     {detail.roster.map((r: any) => (
                       <tr key={r.studentId} className="border-t border-slate-100">
                         <td className="py-1.5 pr-3 font-medium">{r.name}</td>
-                        <td className="py-1.5 pr-3">{STATUS[r.status] ?? r.status}{r.late ? ' · late' : ''}</td>
+                        <td className="py-1.5 pr-3">
+                          {STATUS[r.status] ?? r.status}{r.late ? ' · late' : ''}
+                          {r.newerAttemptWaiting && <span className="block text-xs text-amber-800" data-testid="newer-attempt-waiting">Newer attempt waiting for review{r.lastReleasedScore != null ? ` (released result: ${r.lastReleasedScore})` : ''}</span>}
+                        </td>
                         <td className="py-1.5 pr-3">{new Date(r.dueAt).toLocaleDateString()}</td>
                         <td className="py-1.5 pr-3 tabular-nums">{r.score ?? '—'}</td>
                         <td className="py-1.5 space-x-3 whitespace-nowrap">

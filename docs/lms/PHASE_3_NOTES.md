@@ -66,7 +66,7 @@ enara_assignment=<ASSIGNMENT_ID>
   - then `Details in ENARA.`
   The job also stores `levelScheme: cefr` / `levelLabel` only for a language course with a level.
 - **Scoring policy** per resource link: `best` for practice, `latest` for assessments (default from `activityKind`), `lms_resource_links.scoringPolicy` overrides it (data only; no UI yet).
-  - `latest`: the most recent submitted attempt. While its automatic grading runs nothing new is sent; if it waits for a teacher it is sent as `PendingManual` (Moodle then shows no grade for it until it is released: the latest attempt really has none yet).
+  - `latest`: the most recent submitted attempt. While its automatic grading runs nothing new is sent; if it waits for a teacher and **nothing was ever released** for that student it is sent as `PendingManual`; if a released grade was already sent, the **last released grade is sent again with the line "A newer attempt is waiting for teacher review."** (owner decision G2, see Follow-ups).
   - `best`: the highest released result (ratio; ties: most recent). A newer pending attempt never hides a released best; `PendingManual` only when nothing is released yet.
 
 ### Who gets a job (owner decisions)
@@ -83,7 +83,7 @@ A **student preview** has no student record and every write is refused (Phase 1a
 ### AGS client (`adapters/lti13/ags.ts`)
 
 - **Token**: `POST <Access token URL>` with `grant_type=client_credentials`, `client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer`, `client_assertion` = RS256 JWT signed with ENARA's active tool key (its `kid` is in `/.well-known/jwks.json`), `iss` = `sub` = client ID, `aud` = the platform's token URL (or `tokenAudience` if set), 5-minute life, random `jti`; `scope` = `lineitem result.readonly score`, narrowed to what the launch's AGS claim granted. Cached in `lms_access_tokens` **encrypted with LMS_KEK** (record-bound) until 60 s before expiry; a 401 from an AGS call refreshes it once.
-- **Line item**: the launch's `endpoint.lineitem` (Moodle sends it for an activity that accepts grades); else `GET endpoint.lineitems?resource_link_id=<link>` and use the matching one; else **create** it (`POST`, label = assignment title, `resourceLinkId`, `resourceId` = assignment, `tag: enara`, `scoreMaximum`) only when the course granted the `lineitem` scope (capability `lineItemCreate`), otherwise the job is dead with `line_item_create_not_allowed`. A found or created line item is remembered (`lms_resource_links.lineItemUrl`, `lms_line_items`); if the LMS later answers 404 for it, it is forgotten and found/created again on the next try.
+- **Line item**: the launch's `endpoint.lineitem` (Moodle sends it for an activity that accepts grades); else `GET endpoint.lineitems?resource_link_id=<link>` and use the matching one; else **create** it (`POST`, label = assignment title, `resourceLinkId`, `resourceId` = assignment, `tag: enara`, `scoreMaximum`) only when the course granted the `lineitem` scope (capability `lineItemCreate`), otherwise the job is dead with `line_item_create_not_allowed`. A found or created line item is remembered (`lms_resource_links.lineItemUrl`, `lms_line_items`); if the LMS later answers **404 or 410** for a line item during a grade send, the activity **may have been deleted**: the resource link is flagged, the job is dead with `lineitem_gone`, and nothing more is sent for it until the activity is launched again (see Follow-ups; this replaces "forget and find/create again", which could add an orphan column for a deleted activity).
 - **Score**: `POST {lineitem}/scores` (the line item's query string, e.g. Moodle's `?type_id=`, is kept), `Content-Type: application/vnd.ims.lis.v1.score+json`, body `userId` (LMS `sub`), `scoreGiven`/`scoreMaximum` (omitted for PendingManual), `comment`, `activityProgress`, `gradingProgress`, `timestamp` (strictly increasing per resource link + LMS user).
 - Every LMS call has an **8 s timeout**; only `https` URLs are called (plain `http` only to localhost outside production, for tests). Errors are kept as short codes only (`score_http_503`, `token_http_401`, `lineitems_http_403`, `timeout`, `network`, `not_eligible`, ...), never response bodies.
 
@@ -92,7 +92,7 @@ A **student preview** has no student record and every write is refused (Phase 1a
 - **Idempotency key**: SHA-256 of (resource link — which stands for its line item, LMS user, attempt, grading progress, score, maximum, comment). The same result queued twice is one job.
 - **Supersede**: a newer result for the same slot (resource link + LMS user) deletes older jobs of that slot that are still `pending`; an older job is never sent after a newer one (it is dropped at claim time: `grade.superseded`), and its AGS timestamp is older anyway.
 - **Claim**: atomic `pending → processing` with a **2-minute lease** (`findOneAndUpdate`); expired leases go back to `pending` at the start of every drain; two drains never send the same job (tested with three in parallel).
-- **Retries**: the long schedule **1 m, 5 m, 30 m, 2 h, 12 h**, ±10 % jitter (a `Retry-After` can only lengthen it). The **5th** failed try, or a refusal a retry cannot fix (400, 403, 404 on the launch's line item, 409, 422, `not_eligible`, `line_item_create_not_allowed`), makes the job **`dead`**: visible to admins, who can retry it.
+- **Retries**: the long schedule **1 m, 5 m, 30 m, 2 h, 12 h**, ±10 % jitter (a `Retry-After` can only lengthen it). The **5th** failed try, or a refusal a retry cannot fix (400, 403, 404/410 for the line item = `lineitem_gone`, 409, 422, `not_eligible`, `line_item_create_not_allowed`, `assignment_archived`), makes the job **`dead`**: visible to admins, who can retry it.
 - **Bounded**: a drain takes at most 20 jobs and 25 s (daily: 200 jobs, 40 s; per-minute route: 50, 25 s); the inline push at most 5 jobs.
 
 ### Delivery layers (`LMS_DRAIN_TRIGGERS`, default `inline,piggyback,targeted,daily`)
@@ -220,7 +220,7 @@ If you see "We couldn't open ENARA" with Reference **`invalid_activity_binding`*
 | 12 | Student preview: as teacher.test use **Switch role to › Student**, open the activity | ENARA opens the quiz read-only with the yellow "Preview as student — nothing is saved" banner; starting it is refused; **no** grade appears for teacher.test in Moodle | the banner |
 
 Notes:
-- Moodle shows a grade only for a **released** result. If the assignment holds results for manual release, the cell stays empty (ENARA sends "pending") until the teacher releases them in ENARA.
+- Moodle shows a grade only for a **released** result. If the assignment holds results for manual release, the cell stays empty (ENARA sends "pending") until the teacher releases the first one in ENARA. After that, a newer held attempt does not clear the cell: Moodle keeps the last released grade, its feedback ending "A newer attempt is waiting for teacher review.", until the teacher releases the newer one.
 - If a Moodle teacher **overrides** a grade in the gradebook, Moodle ignores later tool scores for that cell (Moodle's rule).
 
 ### What I (ENARA side) will check after the run
@@ -241,3 +241,43 @@ On the lms-test database (IDs only):
 - `result.readonly` is requested but the results service is not read.
 - `/api/lms/*` grade routes are not yet in the `p7RoleMatrix` / `p14_9TenantIsolation` sweeps (those run with flags off and see 404s); `phase3.test.ts` has its own role and tenant sweep.
 - Not tested live: MoodleCloud (runbook above), Moodle 4.5 LTS / latest (Phase 7).
+
+## Follow-ups (2026-11-18, branch `claude/lms-phase3-followups`)
+
+Owner decisions after the Phase 3 review. Not deployed; no migration needed (new optional fields only). Every flag still off by default.
+
+### G1: one ENARA assignment per Moodle activity (kept)
+
+No change. Two Moodle activities that name the same assessment are two ENARA assignments (own attempts, own gradebook column). An `enara_assignment=` id that is already in the course's class is used as it is (then two activities would share it; the teacher views list both activities).
+
+### G2: a newer attempt waiting for the teacher keeps the released grade in the LMS (`latest`)
+
+- Under `latest`, when the most recent attempt waits for a teacher (needs review, graded draft, grading exception, or finalized but held for release) **and a released (`FullyGraded`) grade was already queued or sent for that slot** (resource link + LMS user), `PendingManual` is **not** sent. Instead the **most recent released result is sent again** (same score, new timestamp) with its normal feedback plus the line **`A newer attempt is waiting for teacher review.`**, so a teacher who works only in Moodle sees it. The comment stays within 1000 characters (the feedback is shortened, the line is never cut). Repeated events for the same waiting attempt send nothing new (same idempotency key); a correction of the released attempt while the newer one waits is sent with the line.
+- When the newer result is released it is sent as usual, with its normal comment (no line).
+- If nothing was ever released for the student, `PendingManual` is sent as before. `best` is unchanged (it never picks a pending attempt over a released one).
+- Audit `grade.kept_released` (`resourceLinkId`, `lmsUserId`, `attemptId` = the waiting attempt, `reason`). Where: `core/outbox.ts` (`enqueueForLink`, `linkResult().lastReleased`), `core/scoring.ts` (`withNewerAttemptWaiting`, `NEWER_ATTEMPT_WAITING_LINE`, `waitsForTeacher`).
+- In ENARA, `GET /api/assignments/:id` roster rows have `newerAttemptWaiting` and `lastReleasedScore`; Class assignments shows **"Newer attempt waiting for review (released result: 75)"** under the student's status. Shown for any assignment (LMS or not) whose latest attempt waits while an earlier one is released.
+
+### Deleted Moodle activities
+
+**(a) Which LMS activity an assignment belongs to.** The launch now stores the activity's **title** (`lms_resource_links.title`, from the LTI `resource_link.title`) and **`lastLaunchAt`** (every non-preview launch). `GET /api/assignments?classId=` items and `GET /api/assignments/:id` (`assignment`) carry `lmsActivities: [{ resourceLinkId, platformName, activityTitle, courseTitle, courseUrl, mayBeDeleted, reason, lineItemGoneAt, lastLaunchAt, lastResultAt }]` for assignments bound to an LMS activity (absent otherwise, and no LMS query at all while `LMS_LTI_ENABLED` is off). `platformName` = preset label + issuer host (`Moodle (lms-test-enara.moodlecloud.com)`); `courseUrl` = `<issuer>/course/view.php?id=<course id>` for Moodle (https, numeric course id), else `null`. Class assignments shows "LMS activity: <title> · <platform> · course <link>" on the list and the detail. Links created before this change get their title on their next launch ("Untitled activity" until then).
+
+**(b) Archive.** The existing assignment **Archive** (`POST /api/assignments/:id/archive`, state `archived`, kept in history) is used; nothing new was needed for permissions: the **teacher of that class** (an LMS teacher is an instructor of the course's class after a launch), the **school admin** (own school) and the **ENARA admin** may archive; another teacher and another school's admin get 404. An archived assignment is hidden from students (list and open: 404, as before), a launch of its activity no longer opens it (`launch.target` is `null`), and it is **never grade-synced**: no job is queued (`assignment_archived` outcome, also for Re-sync), and a job queued before the archive is dead with `assignment_archived` at send time. Archiving is one-way (no restore route exists).
+
+**(c) "LMS activity may have been deleted".** Two signs (`core/activityHealth.ts`):
+- `lineitem_gone`: the LMS answers **404 or 410** for the line item during a grade send. The resource link gets `lineItemGoneAt` / `lineItemGoneStatus`, the job is **dead** with `lineitem_gone`; no further job is queued for that link (`lineitem_gone` outcome) and Retry failed does not call the LMS again. The next **launch** of the activity clears the flag (it exists then; a line item we had found or created ourselves is looked up again; Moodle's own one comes with the launch). After that, Re-sync grades sends the current results.
+- `stale` (computed): the activity has **not been launched for 30 days** (`lastLaunchAt`; for older links `boundAt`/`createdAt`) **and** its assignment has **no submitted result in 30 days**.
+Shown in Class assignments ("LMS activity may have been deleted: … If it was, archive this assignment."), in `lmsActivities[].mayBeDeleted/reason`, and in **`GET /api/lms/grades`** per platform as `activitiesMayBeDeleted: [{ resourceLinkId, assignmentId, activityTitle, mayBeDeleted, reason, lineItemGoneAt, lastLaunchAt, lastResultAt }]` (max 50; archived assignments are left out), which LMS connections lists under "Grades to the LMS". Nothing is archived automatically.
+
+**(d) Archiving the extra test assignment on lms-test.** No maintenance route is needed: archive goes through the normal API (or the **Archive** button in Class assignments). To find it: Class assignments → the Moodle course's class → the item whose "LMS activity" is **ENARA launch test** (the Phase 1a activity) if it has one; otherwise the assignment the owner names (check that its roster shows no submissions). Then, as the LT-SCHOOL-A admin, teacher.test, or an ENARA admin:
+
+```
+curl -X POST https://lms-test.enara.app/api/assignments/<ASSIGNMENT_ID>/archive \
+  -H "Authorization: Bearer <ENARA session token>"
+```
+
+(`200` with `"state": "archived"`, also when it already was; `404` = not your school or not your class.) The teaching workflow feature must be on for the school (it is, the Class assignments page uses it). To see archived ones again: `GET /api/assignments?classId=<class>&includeArchived=true`.
+
+### Tests
+
+New `backend/test/lms/phase3Followups.test.ts` (12 tests, mock platform): G2 (released 75 → newer held attempt → 75 re-sent with the line, newer timestamp, no PendingManual → same event again sends nothing → teacher's roster row says "newer attempt waiting", released 75 → teacher releases 25 → 25 sent with the normal comment; a `needs_review` attempt the same way; never released → PendingManual; `best` unaffected; comment cap); the linked activity in the teacher views (platform, title, Moodle course URL; none for plain assignments or with LTI off); 404 and 410 for the line item (dead `lineitem_gone`, link flagged, teacher and admin views, nothing queued or posted while flagged, Retry does not call the LMS, a relaunch clears it and the next result is sent); 30-day staleness with a fixed clock (pure and through the data) and through `GET /api/lms/grades`, cleared by a launch or a recent result; archive permissions (class teacher yes, other teacher no, school admin yes, other school's admin no, ENARA admin yes); archived hidden from students, not opened by a launch, a queued job dead `assignment_archived`, no new job, Re-sync queues nothing; tenant isolation of the flags and LMS blocks.

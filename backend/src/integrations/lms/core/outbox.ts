@@ -9,7 +9,7 @@ import { LmsContext, LmsEnrollment, LmsGradeSyncJob, LmsPlatform, LmsResourceLin
 import { writeLmsAudit } from './audit';
 import { AGS_SCOPE } from './capabilities';
 import { lmsFlags } from './flags';
-import { effectivePolicy, pickForPolicy, toLmsScore, type LmsScore, type ScoreAttempt, type ScoreCourse, type ScoreQuestion } from './scoring';
+import { effectivePolicy, pickForPolicy, toLmsScore, withNewerAttemptWaiting, type LmsScore, type ScoreAttempt, type ScoreCourse, type ScoreQuestion } from './scoring';
 
 // The grade outbox (plan §5, Phase 3): lms_grade_sync_jobs.
 //
@@ -77,8 +77,10 @@ async function linkedStudent(studentId: string, institutionId: string, context: 
 async function sendTimeProblem(job: ILmsGradeSyncJob): Promise<string | null> {
   const attempt = await AssessmentAttempt.findOne({ id: job.enaraAttemptId }).select('studentId institutionId assignmentId status anonymised').lean();
   if (!attempt || attempt.institutionId !== job.institutionId || attempt.anonymised || attempt.status !== 'submitted') return 'not_eligible';
-  const link = job.resourceLinkId ? await LmsResourceLink.findOne({ id: job.resourceLinkId, institutionId: job.institutionId }).select('enaraActivityId contextId').lean() : null;
+  const link = job.resourceLinkId ? await LmsResourceLink.findOne({ id: job.resourceLinkId, institutionId: job.institutionId }).select('enaraActivityId contextId lineItemGoneAt').lean() : null;
   if (!link || link.enaraActivityId !== attempt.assignmentId || link.contextId !== job.contextId) return 'not_eligible';
+  if (link.lineItemGoneAt) return LINE_ITEM_GONE;
+  if (await Assignment.exists({ id: link.enaraActivityId, institutionId: job.institutionId, state: 'archived' })) return ASSIGNMENT_ARCHIVED;
   const context = await LmsContext.findOne({ id: job.contextId, institutionId: job.institutionId }).lean();
   if (!context || context.platformId !== job.platformId) return 'not_eligible';
   const who = await linkedStudent(attempt.studentId, job.institutionId, context);
@@ -102,8 +104,15 @@ async function courseInfo(assignment: Pick<IAssignment, 'assessmentId' | 'instit
 
 type AttemptRow = ScoreAttempt & { assessmentId: string; assessmentVersion?: number };
 
+export interface LinkResult {
+  attemptId: string;
+  score: LmsScore;
+  /** latest policy, when the picked result waits for a teacher: the most recent RELEASED result, if any (owner decision G2). */
+  lastReleased?: { attemptId: string; score: LmsScore };
+}
+
 /** The result this LMS user's gradebook cell should show for the link (scoring policy), or null. */
-export async function linkResult(link: ILmsResourceLink, studentId: string): Promise<{ attemptId: string; score: LmsScore } | null> {
+export async function linkResult(link: ILmsResourceLink, studentId: string): Promise<LinkResult | null> {
   if (!link.enaraActivityId) return null;
   const assignment = await Assignment.findOne({ id: link.enaraActivityId, institutionId: link.institutionId }).select('assessmentId institutionId format speaking').lean();
   if (!assignment) return null;
@@ -117,16 +126,34 @@ export async function linkResult(link: ILmsResourceLink, studentId: string): Pro
   const rows = versions.length ? await AssessmentVersion.find({ assessmentId: assignment.assessmentId, version: { $in: versions } }).select('version questions.id questions.type questions.topic questions.rubric').lean() : [];
   const questionsByVersion = new Map(rows.map((r) => [r.version, r.questions as unknown as ScoreQuestion[]]));
   const course = await courseInfo(assignment);
-  const picked = pickForPolicy(
-    attempts.map((attempt) => ({ attempt, score: toLmsScore(attempt, { questions: questionsByVersion.get(attempt.assessmentVersion ?? -1) ?? [], course }) })),
-    effectivePolicy(link),
-  );
-  return picked?.score ? { attemptId: picked.attempt.id, score: picked.score } : null;
+  const scored = attempts.map((attempt) => ({ attempt, score: toLmsScore(attempt, { questions: questionsByVersion.get(attempt.assessmentVersion ?? -1) ?? [], course }) }));
+  const policy = effectivePolicy(link);
+  const picked = pickForPolicy(scored, policy);
+  if (!picked?.score) return null;
+  // Newest first (the query's order).
+  const released = policy === 'latest' && picked.score.gradingProgress === 'PendingManual' ? scored.find((c) => c.score?.gradingProgress === 'FullyGraded') : undefined;
+  return { attemptId: picked.attempt.id, score: picked.score, ...(released?.score ? { lastReleased: { attemptId: released.attempt.id, score: released.score } } : {}) };
 }
 
 // --------------------------------------------------------------- enqueue
 
-export type EnqueueOutcome = 'queued' | 'requeued' | 'duplicate' | 'context_inactive' | 'platform_not_active' | 'no_ags' | 'no_score_scope' | 'not_linked' | 'nothing_to_send';
+export type EnqueueOutcome =
+  | 'queued'
+  | 'requeued'
+  | 'duplicate'
+  | 'context_inactive'
+  | 'platform_not_active'
+  | 'no_ags'
+  | 'no_score_scope'
+  | 'not_linked'
+  | 'nothing_to_send'
+  | 'lineitem_gone'
+  | 'assignment_archived'
+  | 'kept_released';
+
+/** Phase 3 follow-up codes (job lastError / enqueue outcome). */
+export const LINE_ITEM_GONE = 'lineitem_gone';
+export const ASSIGNMENT_ARCHIVED = 'assignment_archived';
 
 const lineItemRefOf = (link: ILmsResourceLink) => link.lineItemUrl ?? `link:${link.id}`;
 
@@ -141,6 +168,10 @@ async function nextTimestamp(resourceLinkId: string, lmsUserId: string): Promise
  * `force` (Re-sync): a result already sent is queued again with a new timestamp.
  */
 export async function enqueueForLink(link: ILmsResourceLink, studentId: string, reason: string, opts: { force?: boolean } = {}): Promise<{ outcome: EnqueueOutcome; jobId?: string }> {
+  // Phase 3 follow-ups: nothing for an activity the LMS said is gone (until it
+  // is launched again), nor for an assignment a teacher archived.
+  if (link.lineItemGoneAt) return { outcome: 'lineitem_gone' };
+  if (link.enaraActivityId && (await Assignment.exists({ id: link.enaraActivityId, institutionId: link.institutionId, state: 'archived' }))) return { outcome: 'assignment_archived' };
   const context = await LmsContext.findOne({ id: link.contextId, institutionId: link.institutionId, status: 'active' }).lean();
   if (!context) return { outcome: 'context_inactive' };
   const platform = await LmsPlatform.findOne({ id: context.platformId, institutionId: link.institutionId }).select('id status provider').lean();
@@ -151,7 +182,21 @@ export async function enqueueForLink(link: ILmsResourceLink, studentId: string, 
   if (!who) return { outcome: 'not_linked' };
   const result = await linkResult(link, studentId);
   if (!result) return { outcome: 'nothing_to_send' };
-  const { score, attemptId } = result;
+  let { score, attemptId } = result;
+  // Owner decision G2 (latest policy): a newer attempt that waits for a teacher
+  // (needs review, held for release) does not clear the gradebook cell. Once a
+  // released score was queued or sent for this slot, PendingManual is not sent;
+  // the most recent RELEASED result is sent again instead, its comment ending
+  // "A newer attempt is waiting for teacher review." (so a teacher working only
+  // in the LMS sees it). When the newer result is released it is sent as usual,
+  // with its normal comment. With nothing ever released, PendingManual is sent
+  // as before. (best never picks a pending attempt over a released one.)
+  if (score.gradingProgress === 'PendingManual' && effectivePolicy(link) === 'latest' && (await LmsGradeSyncJob.exists({ resourceLinkId: link.id, lmsUserId: who.lmsUserId, gradingProgress: 'FullyGraded' }))) {
+    await writeLmsAudit({ event: 'grade.kept_released', outcome: 'ok', institutionId: link.institutionId, platformId: context.platformId, refIds: { resourceLinkId: link.id, lmsUserId: who.lmsUserId, attemptId, reason } });
+    if (!result.lastReleased) return { outcome: 'kept_released' };
+    attemptId = result.lastReleased.attemptId;
+    score = { ...result.lastReleased.score, comment: withNewerAttemptWaiting(result.lastReleased.score.comment) };
+  }
   const lineItemRef = lineItemRefOf(link);
   // The resource link stands for its line item here: one link has one line item,
   // which may only be found or created at send time (lineItemRef changes then).

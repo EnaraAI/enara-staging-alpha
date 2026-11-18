@@ -21,6 +21,16 @@ import { isFeatureEnabled } from '../services/featureFlags';
 import { checkSpeakingQuestions, parseSpeakingSettings } from '../services/speakingExam';
 import { sharedAttempts } from '../services/multiClass';
 import { scheduleTargetedFlush } from '../integrations/lms/core/drain';
+import { lmsFlags } from '../integrations/lms/core/flags';
+import { waitsForTeacher } from '../integrations/lms/core/scoring';
+
+// LMS Phase 3 follow-up: the LMS activity (or activities) an assignment
+// belongs to, for the teacher's views. Nothing (and no query) while LTI is off.
+async function lmsActivities(institutionId: string | undefined, ids: string[]) {
+  if (!lmsFlags().lti || !ids.length) return new Map<string, unknown[]>();
+  const { linkedActivities } = await import('../integrations/lms/core/activityHealth');
+  return linkedActivities(institutionId, ids);
+}
 
 // Speaking exams (P4) need the school's speaking_exams_enabled flag; the
 // avatar-only and student-choice policies also need the avatar option, which
@@ -183,7 +193,8 @@ export const listAssignments = asyncHandler(async (req: AuthRequest, res: Respon
   const items = await Assignment.find(filter).sort({ dueAt: -1 }).limit(200);
   const status = typeof req.query.status === 'string' ? req.query.status : undefined;
   const views = items.map(view).filter((a) => !status || a.status === status);
-  res.json({ assignments: views });
+  const lms = await lmsActivities(typeof filter.institutionId === 'string' ? filter.institutionId : undefined, views.map((a) => a.id));
+  res.json({ assignments: lms.size ? views.map((a) => (lms.has(a.id) ? { ...a, lmsActivities: lms.get(a.id) } : a)) : views });
 });
 
 // GET /api/assignments/:id — with each student's real status.
@@ -206,7 +217,11 @@ export const getAssignment = asyncHandler(async (req: AuthRequest, res: Response
   }
   const roster = students.map((s) => {
     const mine = byStudent.get(s.id) ?? [];
-    const latest = mine.filter((t) => t.status === 'submitted').sort((x, y) => new Date(y.submittedAt!).getTime() - new Date(x.submittedAt!).getTime())[0];
+    const submitted = mine.filter((t) => t.status === 'submitted').sort((x, y) => new Date(y.submittedAt!).getTime() - new Date(x.submittedAt!).getTime());
+    const latest = submitted[0];
+    // Owner decision G2: the latest attempt waits for the teacher while an earlier
+    // one is released (the LMS gradebook keeps that released result meanwhile).
+    const lastReleased = latest && waitsForTeacher(latest.gradingStatus) ? submitted.find((t) => t.gradingStatus === 'released') : undefined;
     return {
       studentId: s.id,
       name: s.name,
@@ -217,11 +232,14 @@ export const getAssignment = asyncHandler(async (req: AuthRequest, res: Response
       // Scores are shown to staff once finalized; drafts are marked as such.
       score: latest?.gradingStatus === 'finalized' || latest?.gradingStatus === 'released' ? latest.score ?? null : null,
       gradingStatus: latest?.gradingStatus ?? null,
+      newerAttemptWaiting: !!lastReleased,
+      lastReleasedScore: lastReleased ? lastReleased.score ?? null : null,
     };
   });
   const count = (st: string) => roster.filter((r) => r.status === st).length;
+  const lms = (await lmsActivities(a.institutionId, [a.id])).get(a.id);
   res.json({
-    assignment: view(a),
+    assignment: lms ? { ...view(a), lmsActivities: lms } : view(a),
     summary: {
       students: roster.length,
       notStarted: count('not_started'),

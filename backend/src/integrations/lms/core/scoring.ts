@@ -78,6 +78,11 @@ export function effectivePolicy(link: { scoringPolicy?: ScoringPolicy; activityK
 
 const PENDING_MANUAL = new Set(['needs_review', 'graded_draft', 'grading_exception', 'grading_pending', 'finalized']);
 
+/** An assignment attempt whose result waits for a person (needs review, draft, exception, finalized but not released). */
+export function waitsForTeacher(gradingStatus: string | undefined | null): boolean {
+  return !!gradingStatus && PENDING_MANUAL.has(gradingStatus);
+}
+
 /**
  * Where an attempt's result is. Assignment attempts are final only when
  * RELEASED (gradingStatus 'released'; autoGrading.ts and grading.ts set it with
@@ -213,6 +218,15 @@ export function toLmsScore(attempt: ScoreAttempt, opts: { questions?: ScoreQuest
   };
 }
 
+/** Owner decision G2: the line added to a re-sent released result while a newer attempt waits for the teacher. */
+export const NEWER_ATTEMPT_WAITING_LINE = 'A newer attempt is waiting for teacher review.';
+
+/** The released result's comment plus the "newer attempt waiting" line, within the comment limit (the line is never cut). */
+export function withNewerAttemptWaiting(comment: string, max = COMMENT_MAX): string {
+  const base = clampComment(comment, max - NEWER_ATTEMPT_WAITING_LINE.length - 1);
+  return base ? `${base} ${NEWER_ATTEMPT_WAITING_LINE}` : NEWER_ATTEMPT_WAITING_LINE;
+}
+
 export interface Candidate<T extends ScoreAttempt = ScoreAttempt> {
   attempt: T;
   score: LmsScore | null;
@@ -225,7 +239,9 @@ const when = (a: ScoreAttempt) => (a.submittedAt ? new Date(a.submittedAt).getTi
  * link, by scoring policy:
  * - latest: the most recent submitted attempt. While its automatic grading
  *   runs, nothing is sent (the cell keeps what it had); a pending human grade
- *   is sent as PendingManual.
+ *   is picked as PendingManual (once a released grade was sent, the outbox
+ *   re-sends that released grade with a "newer attempt waiting" line instead:
+ *   owner decision G2, outbox.enqueueForLink).
  * - best: the highest released result (ties: the most recent). Only when no
  *   result is released yet is a pending one sent (PendingManual), so a newer
  *   pending attempt never hides a released best.
