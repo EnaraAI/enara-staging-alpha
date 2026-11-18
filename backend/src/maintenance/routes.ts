@@ -136,6 +136,24 @@ router.post('/dangling-class-members', async (req, res, next) => {
   }
 });
 
+// LMS evidence for the owner's MoodleCloud checks (test database only):
+// grade jobs and the LMS audit log, IDs and codes only (no names or emails
+// are stored in these collections; this route returns them as stored).
+router.get('/lms-evidence', async (req, res, next) => {
+  try {
+    const { LmsAuditLog, LmsGradeSyncJob } = await import('../integrations/lms/models');
+    const n = Math.min(500, Math.max(1, Number(req.query.limit) || 200));
+    const jobs = await LmsGradeSyncJob.find({}).sort({ createdAt: -1 }).limit(n).lean();
+    const audit = await LmsAuditLog.find({}).sort({ createdAt: -1 }).limit(n).lean();
+    res.json({
+      jobs: jobs.map((j) => { const { _id, ...rest } = j as Record<string, unknown>; void _id; return rest; }),
+      audit: audit.map((a) => { const { _id, ...rest } = a as Record<string, unknown>; void _id; return rest; }),
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Multi-class step 4 shadow report (counts only).
 router.get('/enrollment-shadow-report', async (req, res, next) => {
   try {
