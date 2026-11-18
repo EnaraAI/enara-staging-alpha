@@ -165,6 +165,10 @@ services:
       # emails stay off (PARENT_EMAILS_ENABLED unset; scripts/up.sh checks it).
       PARENT_SETTINGS_ENABLED: "true"
       PARENT_CODE_SIGNUP_ENABLED: "true"
+      # Parents P2: the 6-digit code emails are captured like every email here;
+      # the suite reads the code from POST /api/maintenance/parent-email-code.
+      PARENT_CODE_TOOLS_ENABLED: "true"
+      PARENT_EMAIL_SIGNIN_ENABLED: "true"
       ENROLLMENT_DUAL_WRITE: "true"
       ENROLLMENT_READ_FROM: student_app,teacher_rosters,assessments,analytics,profile_context,credits,attendance
       ENROLLMENT_MULTI_CLASS: "true"

@@ -159,6 +159,8 @@ export function createApp() {
   // Parents P1 code-first entry (public: no account, so no per-account lockout) and device sessions.
   app.use('/api/parents/start', makeLimiter('parent-start', 15 * 60 * 1000, 30, 'Too many code attempts'));
   app.use('/api/parents/device/session', makeLimiter('parent-device', 15 * 60 * 1000, 60, 'Too many sign-in attempts'));
+  // Parents P2: 6-digit email codes (sign-in, add your email, merge); per address limits are in parents/emailSignin.ts.
+  app.use('/api/parents/email', makeLimiter('parent-email', 15 * 60 * 1000, 60, 'Too many code requests'));
   app.use(['/lti', '/.well-known'], makeLimiter('lti', 60 * 1000, 600, 'Too many requests', false, () => !lmsFlags().lti));
   app.use('/api/workspace/invitations/accept', makeLimiter('invitation-accept', 15 * 60 * 1000, 20, 'Too many invitation attempts'));
   app.use('/api/upload', makeLimiter('upload', 60 * 60 * 1000, 30, 'Too many upload requests'));

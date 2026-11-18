@@ -31,5 +31,6 @@ never twice; capture mode in the E2E stack). P1 sends no email.
 
 `e2e/tests/10-parents-p1.spec.ts`: one parent, two children in two schools (code-first, then "Add another
 child"), the remembered device (reload, expired session, no session), a second device without the device
-token, the ENARA admin switching one school Off and back, the school admin's Parents card. The email merge and
-signing in on a second device with an email are added to the scenario in P2.
+token, the ENARA admin switching one school Off and back, the school admin's Parents card. `e2e/tests/11-parents-p2.spec.ts` (P2):
+the class code sheet, "Add your email", a second device signing in by email, and the email merge (every device
+then shows both children).

@@ -18,6 +18,10 @@ export interface IParentLinkCode extends Document {
   revokedAt?: Date;
   revokedBy?: string;
   createdAt: Date;
+  // Parents P2: issued on a class code sheet (one batch per print). A reprint
+  // revokes the class's unused codes from earlier prints (owner decision 4).
+  classId?: string;
+  batchId?: string;
 }
 
 const codeSchema = new Schema<IParentLinkCode>(
@@ -35,6 +39,8 @@ const codeSchema = new Schema<IParentLinkCode>(
     revokedAt: Date,
     revokedBy: String,
     createdAt: { type: Date, default: () => new Date() },
+    classId: { type: String, index: true },
+    batchId: String,
   },
   { collection: 'parent_link_codes', versionKey: false },
 );

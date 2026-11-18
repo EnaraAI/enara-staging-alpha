@@ -6,6 +6,7 @@ import './Login.css';
 import { EnaraLogo } from '../components/brand/EnaraLogo';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { CodeStart } from '../parents/CodeStart';
+import { EmailSignIn } from '../parents/EmailSignIn';
 
 // Sign-in "Floating Classroom" (redesign concept B). The sign-in flow is the
 // same as before: the backend checks the email and password, and
@@ -125,7 +126,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
   const [portal, setPortal] = useState<LoginChoice>(initialPortal ?? 'student');
   // Parents tab: sign in, or create a parent account; linkIntent opens the code screen next.
   // Parents P1 (codeSignup from the server): 'code' is the code-first entry, the default for the Parents tab.
-  const [parentMode, setParentMode] = useState<'signin' | 'signup' | 'code'>('signin');
+  const [parentMode, setParentMode] = useState<'signin' | 'signup' | 'code' | 'email'>('signin');
   const [linkIntent, setLinkIntent] = useState(() => { try { return sessionStorage.getItem(PARENT_LINK_INTENT_KEY) === '1'; } catch { return false; } });
   const [name, setName] = useState('');
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -139,10 +140,13 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
   // Parents tab: "Continue with Google", shown only when the server has a Google client ID.
   const [googleCfg, setGoogleCfg] = useState<{ google: boolean; clientId?: string }>({ google: false });
   const [codeSignup, setCodeSignup] = useState(false);
+  // Parents P2: passwordless email sign-in ("Already have an account? Sign in with your email first").
+  const [emailSignin, setEmailSignin] = useState(false);
   useEffect(() => {
     if (isSharedCourse || isSharedAssessment) return;
     fetchParentAuthConfig().then((c) => {
       setGoogleCfg(c?.google && c.clientId ? c : { google: false });
+      if (c?.emailSignin) setEmailSignin(true);
       if (c?.codeSignup) {
         setCodeSignup(true);
         setParentMode((m) => (m === 'signin' ? 'code' : m));
@@ -210,6 +214,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
   const isParent = portal === 'parent';
   const signingUp = isParent && parentMode === 'signup';
   const codeMode = isParent && codeSignup && parentMode === 'code';
+  const emailMode = isParent && emailSignin && parentMode === 'email';
   const rememberLinkIntent = (on: boolean) => {
     setLinkIntent(on);
     try { if (on) sessionStorage.setItem(PARENT_LINK_INTENT_KEY, '1'); else sessionStorage.removeItem(PARENT_LINK_INTENT_KEY); } catch { /* storage unavailable */ }
@@ -217,7 +222,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (codeMode) return; // the code entry has its own buttons
+    if (codeMode || emailMode) return; // the code entry and the email sign-in have their own buttons
     setAuthError(null); setInfo(null); setFieldError(null);
     if (!EMAIL_RE.test(email.trim())) { setFieldError({ field: 'email', text: t.badEmail }); return; }
     if (!password) { setFieldError({ field: 'password', text: t.noPassword }); return; }
@@ -338,10 +343,13 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isSharedCourse, isSharedA
         )}
 
         {codeMode && (
-          <CodeStart lang={lang} onLogin={(user) => onLogin('parent', user)} onSignIn={() => { setParentMode('signin'); setAuthError(null); setInfo(null); }} />
+          <CodeStart lang={lang} onLogin={(user) => onLogin('parent', user)} onSignIn={() => { setParentMode(emailSignin ? 'email' : 'signin'); setAuthError(null); setInfo(null); }} />
+        )}
+        {emailMode && (
+          <EmailSignIn lang={lang} onLogin={(user) => onLogin('parent', user)} onPassword={() => { setParentMode('signin'); setAuthError(null); setInfo(null); }} onCode={codeSignup ? () => setParentMode('code') : undefined} />
         )}
 
-        {!codeMode && <>
+        {!codeMode && !emailMode && <>
         {isParent && googleCfg.google && googleCfg.clientId && (
           <GoogleSignInButton clientId={googleCfg.clientId} lang={lang} context={signingUp ? 'signup' : 'signin'} disabled={isLoading} onCredential={handleGoogle} orLabel={t.or} />
         )}

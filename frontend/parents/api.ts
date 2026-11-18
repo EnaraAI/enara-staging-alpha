@@ -25,7 +25,7 @@ export interface Controls { learner: LearnerHeader; controls: { weeklyGoalMin: n
 /** lms-test: parent emails are blocked until a later step (backend parents/emailBlock.ts). */
 export interface ParentEmailState { blocked: boolean; code?: string; message?: { en: string; ar: string } }
 export interface Report { learner: LearnerHeader; shareEmail?: ParentEmailState; report: { weekStart: string; status: WeeklyStatus['status']; minutesDone: number; goalMinutes: number; streak: number; level: Level; learned: { mock: boolean; items: Bi[] }; tryAtHome: { mock: boolean; text: Bi } } }
-export interface Account { learners: LearnerChip[]; pending: { linkId: string }[]; guardians: { byLearner: { studentId: string; canManage: boolean; items: { linkId: string; name: string; role: LinkRole; isYou: boolean }[] }[] }; plan: AccountPlan; preferences: { language: 'en' | 'ar'; alertChannels: string[] }; signIn?: { method: 'code' | 'password' | 'google'; hasEmail: boolean }; hiddenBySchool?: number }
+export interface Account { learners: LearnerChip[]; pending: { linkId: string }[]; guardians: { byLearner: { studentId: string; canManage: boolean; items: { linkId: string; name: string; role: LinkRole; isYou: boolean }[] }[] }; plan: AccountPlan; preferences: { language: 'en' | 'ar'; alertChannels: string[] }; signIn?: { method: 'code' | 'password' | 'google'; hasEmail: boolean; emailSignin?: boolean; email?: string; emailVerified?: boolean }; hiddenBySchool?: number }
 // Parents P1: with PARENT_SETTINGS_ENABLED the plan is "Provided by <school>" (no price); otherwise the mock plan.
 export type AccountPlan = { mock: true; name: Bi; price: string; learners: number; renewsOn: string; payment: Bi } | { mock: false; kind: 'school'; providedBy: string[] };
 
@@ -48,6 +48,10 @@ export const parentsApi = {
   previewCode: (code: string) => apiRequest<{ learner: string; school: string | null }>('POST', '/api/parents/link/preview', { code }),
   confirmCode: (code: string) => apiRequest<{ studentId: string; role: LinkRole }>('POST', '/api/parents/link/confirm', { code }),
   unlink: (linkId: string) => apiRequest('DELETE', `/api/parents/links/${encodeURIComponent(linkId)}`),
+  // Parents P2: add your email (6-digit code) and the merge it may offer.
+  emailStart: (email: string) => apiRequest<{ sent?: boolean; alreadyVerified?: boolean }>('POST', '/api/parents/email/start', { email }),
+  emailVerify: (email: string, code: string) => apiRequest<{ verified: boolean; email?: string; merge?: { ticket: string; otherChildren: string[]; yourChildren: string[] } }>('POST', '/api/parents/email/verify', { email, code }),
+  emailMerge: (ticket: string) => apiRequest<{ token: string; user: any; deviceToken: string; linksMoved: number }>('POST', '/api/parents/email/merge', { ticket }),
 };
 
 // --- Africa/Cairo formatting --------------------------------------------------

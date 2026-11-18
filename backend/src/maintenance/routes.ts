@@ -195,6 +195,29 @@ router.get('/lms-emails', async (req, res, next) => {
   }
 });
 
+// Parents P2, the Docker E2E stack only: the last 6-digit parent email code
+// captured for a (fake) address. Emails there are captured, never sent
+// (LMS_EMAIL_CAPTURE), so the suite reads the code here. 404 unless capture is
+// on (never on lms-test); behind the maintenance token and the test cluster
+// check like every route here. The address is in the POST body (request logs
+// keep the path and query only), never logged.
+router.post('/parent-email-code', async (req, res, next) => {
+  try {
+    const { capturedCodeFor } = await import('../parents/emailSignin');
+    const body = (req.body ?? {}) as { email?: unknown; purpose?: unknown };
+    const purpose = body.purpose === 'signin' ? 'signin' : 'verify';
+    const code = typeof body.email === 'string' ? await capturedCodeFor(body.email.slice(0, 254), purpose) : null;
+    if (!code) {
+      res.status(404).json({ error: 'No captured code' });
+      return;
+    }
+    res.set('Cache-Control', 'no-store');
+    res.json({ code });
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Grade ledger backfill on the test database (dry run by default; apply needs confirm).
 router.post('/grade-ledger-backfill', async (req, res, next) => {
   try {

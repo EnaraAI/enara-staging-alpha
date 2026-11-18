@@ -73,6 +73,8 @@ export async function createCode(actor: Actor, studentId: string, opts: { sendTo
   if (opts.sendToEmail) assertParentEmailAllowed();
   let code = generateCode();
   for (let i = 0; i < 5 && (await ParentLinkCode.exists({ codeHash: hashCode(code.normalized) })); i++) code = generateCode();
+  // Parents P2 (PARENT_CODE_TOOLS_ENABLED): the school's code expiry (1-60 days); 7 days otherwise.
+  const ttlMs = await (await import('./codeTools')).codeTtlMsFor(student.institutionId);
   const row = await ParentLinkCode.create({
     id: `plc_${randomUUID()}`,
     codeHash: hashCode(code.normalized),
@@ -81,7 +83,7 @@ export async function createCode(actor: Actor, studentId: string, opts: { sendTo
     institutionId: student.institutionId,
     createdBy: actor.id,
     status: 'active',
-    expiresAt: new Date(Date.now() + CODE_TTL_MS),
+    expiresAt: new Date(Date.now() + ttlMs),
   });
   await recordAudit('parent_code_created', actor, { institutionId: student.institutionId, type: 'student', id: student.id }, { codeId: row.id });
 
@@ -94,7 +96,7 @@ export async function createCode(actor: Actor, studentId: string, opts: { sendTo
       NAME: 'there',
       CHILD_NAME: String(student.name || '').split(/\s+/)[0] || 'your child',
       LINK_CODE: code.display,
-      EXPIRES_IN: '7 days',
+      EXPIRES_IN: ((d) => `${d} day${d === 1 ? '' : 's'}`)(Math.round(ttlMs / 86_400_000)),
     });
     emailed = r.ok ? { ok: true } : { ok: false, reason: r.code };
   }
