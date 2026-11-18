@@ -17,6 +17,21 @@
 > Where this document says `https://test.enara.app` (for example `LMS_TOOL_BASE_URL` below), read `https://lms-test.enara.app` for all current work. The production values are frozen until Mohamed reopens.
 >
 > Every session working on this repository must follow this rule.
+>
+> ## STANDING RULE: done means the E2E suite passed (owner, 18 Nov 2026)
+>
+> **Manual runbooks:** none. Changes are checked by the automated end-to-end suite (`.github/workflows/lms-e2e.yml`: Moodle in Docker plus ENARA plus Playwright). It always runs the full matrix: Moodle 4.5 LTS and the latest Moodle release.
+>
+> **When it runs:**
+> - when a feature's pull request is opened or updated;
+> - again before merging;
+> - manually, on demand.
+>
+> There are no nightly runs and no runs on every push.
+>
+> **A feature is not "done"**, and is not reported as done, until this run passes. Only the summary goes to Mohamed. A one-line minutes report is sent monthly.
+>
+> **Only for things automation can't do** (a real iPhone, the Moodle mobile app) is Mohamed asked, batched into one short session before the first real school.
 
 Status: **approved with changes (2026-11-16)**. This version includes Mohamed's answers to the 15 questions, plus his note that **not every student is a language student**. Spec: `ENARA_LMS_Integration_Spec.md` v1.2.
 Release 1 ships and is tested on **Moodle + Google Classroom (Mode A) only**. The design must let any other LMS be added without changing core code or the data model.
