@@ -56,9 +56,12 @@ jobs:
     outputs:
       reason: ${{ steps.guard.outputs.reason }}
     steps:
+      # The guard runs the scripts of the commit E2E tested (the PR head), so the
+      # very first pipeline PR, which brings these scripts, can run it too. The
+      # deploy and report jobs run lms-test-live after the merge.
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.LIVE_BRANCH }}
+          ref: ${{ github.event.pull_request.head.sha || env.LIVE_BRANCH }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
