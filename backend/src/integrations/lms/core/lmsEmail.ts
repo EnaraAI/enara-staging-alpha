@@ -76,9 +76,15 @@ export function appUrl(): string {
   return ((getConfig() as { appUrl?: string }).appUrl || '').trim().replace(/\/+$/, '');
 }
 
-/** LMS emails go out (or, in the E2E stack, are captured) only with every switch set. */
+/**
+ * LMS emails go out (or, in the E2E stack, are captured) only with every switch set.
+ * Interlock: a staging deployment (ENARA_STAGING=true, e.g. lms-test) sends LMS
+ * emails only to a test inbox: without REMINDER_TEST_RECIPIENT they stay off, so
+ * switching LMS_EMAILS_ENABLED on there can never email a real school.
+ */
 export function lmsEmailsActive(): boolean {
   const c = getConfig();
+  if (c.stagingMode && !c.email.testRecipient) return false;
   return c.lms.emailsEnabled === true && c.email.enabled && (!!c.email.resendApiKey || c.lms.emailCapture === true) && !!appUrl();
 }
 

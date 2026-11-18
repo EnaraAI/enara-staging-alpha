@@ -155,6 +155,18 @@ describe('gates', () => {
     expect(await D.runLmsEmailDaily()).toMatchObject({ skipped: 'lms_emails_off' });
   });
 
+  it('staging interlock: on a staging deployment (ENARA_STAGING, e.g. lms-test) LMS emails stay off without a test inbox', async () => {
+    const { getConfig } = await import('../../src/config/env');
+    (getConfig() as { stagingMode: boolean }).stagingMode = true;
+    expect(L.lmsEmailsActive()).toBe(false);
+    expect(await E.notifyConnectionActive(await platform(A))).toMatchObject({ sent: 0, codes: ['lms_emails_off'] });
+    setEnv({ ...ON, REMINDER_TEST_RECIPIENT: 'owner-inbox@qa.enara.app' });
+    (getConfig() as { stagingMode: boolean }).stagingMode = true;
+    expect(L.lmsEmailsActive()).toBe(true);
+    resetConfigForTests();
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
   it('LMS_EMAIL_CAPTURE (E2E stack): rendered and recorded as captured without any RESEND_API_KEY; Resend is never called', async () => {
     setEnv({ ...ON, RESEND_API_KEY: undefined, LMS_EMAIL_CAPTURE: 'true' });
     const p = await platform(A);
