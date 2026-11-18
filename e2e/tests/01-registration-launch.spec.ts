@@ -63,6 +63,24 @@ test.describe.serial('1 · registration (School A) + launches + student preview'
     recordTiming('registration_school_a_ui', Date.now() - t0);
   });
 
+  test('School A: LMS emails for the new connection captured once (English, [lms-test], test inbox; never sent)', async () => {
+    // docs/lms/LMS_EMAILS.md: the stack captures LMS emails (LMS_EMAIL_CAPTURE, no
+    // RESEND_API_KEY). The registration's audit row schedules them in the background.
+    const s = readState();
+    const rows = async (template: string) =>
+      ((await maintenance('GET', `/lms-emails?template=${template}`)).emails as any[]).filter((e) => e.platformId === s.schoolA.platformId);
+    await expect.poll(async () => (await rows('lms-connection-active')).length, { timeout: 30_000 }).toBe(1);
+    await expect.poll(async () => (await rows('lms-ops-school-connected')).length, { timeout: 30_000 }).toBe(1);
+    const [active] = await rows('lms-connection-active');
+    expect(active).toMatchObject({ status: 'captured', lang: 'en', redirected: true });
+    expect(active.subject).toMatch(/^\[lms-test\] Moodle \(.+\) is now connected to Enara$/);
+    const [ops] = await rows('lms-ops-school-connected');
+    expect(ops).toMatchObject({ status: 'captured', lang: 'en', redirected: true });
+    expect(ops.subject).toMatch(/^\[lms-test\] \[LMS\] New school connected: Test School A \(fake\)/);
+    // The log never holds an address.
+    expect(JSON.stringify([active, ops])).not.toContain('@');
+  });
+
   test('School A: the 4 manual Moodle settings, by script (Activate, chooser, Accept grades = Always, category)', async () => {
     const r = moodleCli('tool-settings', { name: 'ENARA', category: 'School A' });
     const tool = moodleTools().find((t) => t.id === r.typeid)!;

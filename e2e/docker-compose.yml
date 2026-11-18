@@ -141,6 +141,18 @@ services:
       LMS_ROSTER_SYNC_ENABLED: "true"
       GRADE_LEDGER_ENABLED: "true"
       MAINTENANCE_ENDPOINTS_ENABLED: "true"
+      # LMS emails (docs/lms/LMS_EMAILS.md) as on lms-test (test inbox redirect,
+      # "[lms-test]" prefix), but CAPTURED: rendered and recorded in lms_email_log,
+      # never sent. There is deliberately NO RESEND_API_KEY in this stack, so even
+      # without the capture nothing could be sent. Fake addresses only. The cap is
+      # raised so the suite's order cannot hold back the emails it asserts.
+      LMS_EMAILS_ENABLED: "true"
+      REMINDERS_ENABLED: "true"
+      LMS_EMAIL_CAPTURE: "true"
+      REMINDER_TEST_RECIPIENT: lms-e2e-inbox@enara-e2e.app
+      EMAIL_SUBJECT_PREFIX: "[lms-test]"
+      LMS_TEST_DAILY_CAP: "500"
+      LMS_OPS_EMAILS: lms-e2e-ops@enara-e2e.app
       ENROLLMENT_DUAL_WRITE: "true"
       ENROLLMENT_READ_FROM: student_app,teacher_rosters,assessments,analytics,profile_context,credits,attendance
       ENROLLMENT_MULTI_CLASS: "true"

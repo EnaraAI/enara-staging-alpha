@@ -84,16 +84,23 @@ those pages; the `filter` parameter is ignored by the app for now (the class pag
   12b on create, 12a / 12c on done (the hooks exist as templates; ACTION_URL `?page=lms&export=<id>` /
   `&deletion=<id>`, sign-in required, never a signed URL or the file).
 
+## E2E (Docker stack)
+
+`e2e/docker-compose.yml` runs with `LMS_EMAILS_ENABLED`, the test inbox redirect, `[lms-test]` and
+`LMS_EMAIL_CAPTURE=true` and **no `RESEND_API_KEY`**: emails are rendered and recorded (`captured`), never sent.
+Scenario 1 asserts that the School A registration captured `lms-connection-active` and `lms-ops-school-connected`
+exactly once, in English, with the `[lms-test]` prefix, through `GET /api/maintenance/lms-emails`.
+
 ## Env (lms-test)
 
 | Variable | Value |
 |---|---|
-| `LMS_EMAILS_ENABLED` | `true` (flags manifest) |
+| `LMS_EMAILS_ENABLED` | `true` (flags manifest `deploy/lms-test.flags.json`). Interlock: on a staging deployment (`ENARA_STAGING=true`) LMS emails stay off without `REMINDER_TEST_RECIPIENT` |
 | `REMINDERS_ENABLED` | `true`. It is also the switch of the older reminder and weekly-summary emails (`services/emailService.ts`), which send only when `REMINDER_FROM` is set too: **leave `REMINDER_FROM` unset on lms-test** so only LMS emails (capped) reach the test inbox |
 | `RESEND_API_KEY` | the Resend key (Sensitive, by hand) |
 | `REMINDER_TEST_RECIPIENT` | the owner's test inbox (by hand; never in the repo) |
 | `EMAIL_SUBJECT_PREFIX` | `[lms-test]` |
-| `LMS_TEST_DAILY_CAP` | `20` (default when unset) |
+| `LMS_TEST_DAILY_CAP` | leave unset (default 20); set by hand only to change it |
 | `LMS_OPS_EMAILS` | the ops mailbox(es), comma list (by hand) |
 | `EMAIL_SENDER` | optional, the From address (D11) |
 | `APP_URL`, `CRON_SECRET` | already set |
