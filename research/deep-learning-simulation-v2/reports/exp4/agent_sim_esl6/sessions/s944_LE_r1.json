@@ -65,7 +65,10 @@
  "rec": {
   "entries": [],
   "liveErrors": {},
-  "knownPoints": {}
+  "knownPoints": {
+   "lsn:2": 1,
+   "lsn:3": 1
+  }
  },
  "turns": [
   {
@@ -446,7 +449,55 @@
     "probes": [
      "W1"
     ]
-   }
+   },
+   "lang": {
+    "assessment": {
+     "verdict": "CORRECT",
+     "relevance": "ACTIVE_ITEM",
+     "criteria": [
+      2,
+      3
+     ],
+     "next": "NEW_ITEM",
+     "source": "tutor_assessment"
+    },
+    "activeItem": {
+     "id": "msg:s944_LE_r1_t4",
+     "source": "tutor"
+    },
+    "hintLevel": 0,
+    "rulesIntroduced": [
+     2
+    ]
+   },
+   "markerStatus": "ok",
+   "qualityFlags": [],
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": true,
+   "rulesIntroduced": [
+    2
+   ],
+   "profileLines": 0,
+   "ev5": {
+    "ownSentence": "asked"
+   },
+   "engineVerdict": "CORRECT",
+   "recordLive": [],
+   "tutor": "Yes, your question is correct and complete.\nExample: \"Do you have these shoes in blue?\" Rule: ask for another size or colour with \"Do you have this ... in ...?\"\nRight: Do you have this bag in black? Wrong: Have you this bag black?\nNow write one sentence about a person you know using this point.",
+   "raw": "[[assess verdict=CORRECT relevance=ACTIVE_ITEM criteria=2,3 next=NEW_ITEM]]\nYes, your question is correct and complete.\nExample: \"Do you have these shoes in blue?\" Rule: ask for another size or colour with \"Do you have this ... in ...?\"\nRight: Do you have this bag in black? Wrong: Have you this bag black?\nNow write one sentence about a person you know using this point.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false
   }
  ],
  "assess": {
