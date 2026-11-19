@@ -81,4 +81,12 @@ describe('kidsPack', () => {
     for (const w of ['cat', 'children', 'feet', 'ice', 'cream', 'colour', 'twenty', 'point', 'clap']) expect(t.has(w), w).toBe(true);
     for (const w of ['extraordinary', 'mischievous', 'airport']) expect(t.has(w), w).toBe(false);
   });
+  it('the 20 reviewed lessons pass the lesson checker and cover 9 of the 10 can-dos (copying needs the Kids app screen)', () => {
+    const out = execFileSync('npx', ['tsx', path.resolve(__dirname, '../src/scripts/kidsLessonCheck.ts'), path.resolve(__dirname, '../../data/kids/prea1/LESSONS.json')], { encoding: 'utf8' });
+    expect(out).toMatch(/OK: 20 lessons/);
+    const d = loadKidsPack()!;
+    const covered = new Set(d.lessons.flatMap((l) => l.outcomeIds));
+    // PREA1-10 (copy words, phrases and short sentences) needs the written word on screen: a Kids app task, not a spoken lesson.
+    expect(d.outcomes.filter((o) => !covered.has(o.id)).map((o) => o.id)).toEqual(['PREA1-10']);
+  }, 60000);
 });
