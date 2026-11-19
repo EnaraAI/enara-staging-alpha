@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -821,7 +821,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 3: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My brother is tall but he is not strong.\" is correct: \"but\" joins two ideas that contrast.\n\nHere is one last task, in a new situation. Join the two sentences into one with a linking word that fits them:\n\n\"I take an umbrella. It is cloudy.\"\n\nWrite the whole sentence on your own.\n\nLEARNER'S LAST MESSAGE:\nI take an umbrella because it is cloudy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I take an umbrella because it is cloudy.\" is correct. \"because\" gives the reason in one sentence.\n\nNow a new task. Write the full sentence.\n\nJoin with and: \"I have a cat. I have a dog.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 3: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My brother is tall but he is not strong.\" is correct: \"but\" joins two ideas that contrast.\n\nHere is one last task, in a new situation. Join the two sentences into one with a linking word that fits them:\n\n\"I take an umbrella. It is cloudy.\"\n\nWrite the whole sentence on your own.\n\nLEARNER'S LAST MESSAGE:\nI take an umbrella because it is cloudy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I take an umbrella because it is cloudy.\" is correct. \"because\" gives the reason in one sentence.\n\nNow a new task. Write the full sentence.\n\nJoin with and: \"I have a cat. I have a dog.\"",
+   "stateBefore": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"I take an umbrella because it is cloudy.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"I take an umbrella because it is cloudy.\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"because\" gives the reason in one sentence."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "I have a cat and I have a dog.",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I have a cat and I have a dog.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I have a cat and I have a dog.",
+    "probes": []
+   }
   }
  ],
  "assess": {

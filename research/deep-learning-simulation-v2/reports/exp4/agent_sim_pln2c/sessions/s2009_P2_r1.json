@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -983,7 +983,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 3: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Yesterday my sister cleaned her room.\" is correct: \"cleaned\" shows a finished action with the -ed ending.\n\nRecap: a time word helps, but the regular verb itself also changes for the past. Now a new situation, on your own.\n\nYou are telling a friend about your office. Write the correct past form of the verb:\n\"Last week our manager ___ (plan) a small party.\"\n\nAnswer with only the verb.\n\nLEARNER'S LAST MESSAGE:\nplanned\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"planned\" is correct. The action is finished, and the regular verb takes -ed. The final letter is doubled before -ed, which you wrote correctly.\n\nNow a freer task.\n\nWrite two sentences about what you or a colleague did at work last week. Use at least one regular verb in the past simple."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 3: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Yesterday my sister cleaned her room.\" is correct: \"cleaned\" shows a finished action with the -ed ending.\n\nRecap: a time word helps, but the regular verb itself also changes for the past. Now a new situation, on your own.\n\nYou are telling a friend about your office. Write the correct past form of the verb:\n\"Last week our manager ___ (plan) a small party.\"\n\nAnswer with only the verb.\n\nLEARNER'S LAST MESSAGE:\nplanned\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"planned\" is correct. The action is finished, and the regular verb takes -ed. The final letter is doubled before -ed, which you wrote correctly.\n\nNow a freer task.\n\nWrite two sentences about what you or a colleague did at work last week. Use at least one regular verb in the past simple.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"planned\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"planned\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The action is finished, and the regular verb takes -ed."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Last week I called a customer.",
+    "errors": {
+     "W1": "Last week I call a customer."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Last week I called a customer.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Last week I called a customer.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

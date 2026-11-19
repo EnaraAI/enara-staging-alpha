@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 3,
+   "C1": 4,
    "C2": 0
   },
   "start": {
@@ -845,7 +845,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 3: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Yesterday my brother played football.\" is correct: \"played\" has the -ed ending for a finished action.\n\nHere is one last task, in a new situation. Write only the verb in the past.\n\n\"Two days ago I ___ (wait) at the bus stop for an hour.\"\n\nTry it on your own.\n\nLEARNER'S LAST MESSAGE:\nwaited\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"waited\" is correct for \"Two days ago I ___ (wait) at the bus stop for an hour.\" The regular verb takes -ed.\n\nNow a short, freer task. Think about last weekend. Write two sentences of your own about what you or someone you know did. Use a different regular verb in each sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 3: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Yesterday my brother played football.\" is correct: \"played\" has the -ed ending for a finished action.\n\nHere is one last task, in a new situation. Write only the verb in the past.\n\n\"Two days ago I ___ (wait) at the bus stop for an hour.\"\n\nTry it on your own.\n\nLEARNER'S LAST MESSAGE:\nwaited\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"waited\" is correct for \"Two days ago I ___ (wait) at the bus stop for an hour.\" The regular verb takes -ed.\n\nNow a short, freer task. Think about last weekend. Write two sentences of your own about what you or someone you know did. Use a different regular verb in each sentence.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"waited\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"waited\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The regular verb takes -ed."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Last weekend I visited my aunt.",
+    "errors": {
+     "W1": "Last weekend I visit my aunt."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Last weekend I visited my aunt.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Last weekend I visited my aunt.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
