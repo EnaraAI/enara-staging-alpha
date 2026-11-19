@@ -160,6 +160,46 @@ function gapWithContext(item: KeyItem, a: string, nkeys: string[], sens: Sensiti
   return false;
 }
 
+// Round-12 rules E and F: gap-fill items only (one gap, not choice, not error correction), and never on spelling- or
+// capital-sensitive items (spellingIsTarget), so a misspelt or wrongly capitalised word is never accepted by them.
+const gapCount = (p: string) => (p.match(/_{2,}/g) ?? []).length;
+function gapRuleItem(item: KeyItem, sens: Sensitivity): boolean {
+  const p = String(item.prompt ?? item.text ?? '');
+  return sens === 'none' && gapCount(p) === 1 && !isChoice(item) && !isErrorCorrection(item) && !spellingIsTarget(item);
+}
+// The item's sentence: instruction before the first colon dropped, the hint in brackets right after the gap dropped.
+function gapSentence(item: KeyItem): [string, string] | null {
+  const p = String(item.prompt ?? item.text ?? '').replace(/^[^:]*:\s*/, '').replace(/^['"‘“]|['"’”]$/g, '');
+  const m = /^(.*?)_{2,}\s*(?:\([^()]*\))?(.*)$/s.exec(p);
+  return m ? [m[1], m[2]] : null;
+}
+/** Rule E: the whole sentence written in the gap, word for word, with an accepted answer in the gap. */
+function wholeSentenceInGap(item: KeyItem, a: string, keys: string[], sens: Sensitivity): boolean {
+  const parts = gapSentence(item);
+  if (!parts) return false;
+  const [before, after] = parts;
+  return keys.some((k) => {
+    const kk = k.trim();
+    // a contracted key ("'m") joins the word before the gap: "I'm tired" = "I am tired"
+    const filled = /^'/.test(kk) ? `${before.trimEnd()}${kk} ${after}` : `${before} ${kk} ${after}`;
+    return normaliseV2(filled, sens) === a;
+  });
+}
+// Rule F: the standard contractions of an accepted answer: 'd, 'll, 'm, 're, 's, 've and n't.
+const CONTRACTED: [RegExp, string[]][] = [
+  [/'d\b/g, [' would', ' had']], [/'ll\b/g, [' will']], [/'m\b/g, [' am']], [/'re\b/g, [' are']],
+  [/'s\b/g, [' is', ' has']], [/'ve\b/g, [' have']], [/n't\b/g, [' not']],
+];
+/** The answer with each standard contraction written out in full (every reading of 'd and 's). */
+function contractionReadings(raw: string): string[] {
+  let out = [straightQuotes(raw)];
+  for (const [re, fulls] of CONTRACTED) {
+    out = out.flatMap((t) => (t.search(re) < 0 ? [t] : fulls.map((f) => t.replace(re, f))));
+    if (out.length > 16) break;
+  }
+  return out.filter((t) => t !== straightQuotes(raw));
+}
+
 // Round-8 fix (pattern B): prepositions a rater treats as a harmless change OUTSIDE the corrected target.
 const PREP = new Set(['in', 'on', 'at', 'for', 'to', 'from', 'with', 'by', 'into']);
 // Time prepositions are rule-bound (on Monday, in May, at 7): a swap in front of a time word is a real error.
@@ -167,7 +207,6 @@ const TIME_WORD = /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|ja
 
 const isErrorCorrection = (item: KeyItem) => /error.?correction/i.test(String(item.type ?? '')) || /\b(correct|fix) the (mistake|error)|find and correct/i.test(String(item.prompt ?? item.text ?? ''));
 const FUNC = new Set(['a', 'an', 'the', 'to', 'of', 'in', 'on', 'at', 'is', 'are', 'am', 'and', 'for', 'very', 'my', 'it']);
-const slipOf = (x: string, k: string) => x !== k && Math.min(x.length, k.length) >= 3 && (lev(x, k) <= (k.length >= 7 ? 2 : 1) || (x.length >= 4 && k.length >= 4 && x.slice(0, 3) === k.slice(0, 3) && Math.abs(x.length - k.length) <= 2));
 /** Token edit script from a to b: ['=',i,j] | ['s',i,j] | ['d',i,-1] (a[i] dropped) | ['i',-1,j] (b[j] added). */
 function align(a: string[], b: string[]) {
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)] as number[]);
@@ -186,8 +225,11 @@ function align(a: string[], b: string[]) {
  * Round-4 fix (rubric §2.2): error correction is scored on the target only. The target is the part of the key that
  * differs from the prompt's wrong sentence (for a deletion, the key words on both sides of it), plus nearby key
  * words named in the item's targetForm ("than" in a comparative). Credit when every target word is right, none of the
- * removed wrong words is still there, and the rest differs from the key by at most two slips (a misspelt or
- * mis-inflected word, or a dropped/added small word).
+ * removed wrong words is still there, and the rest of the sentence is the key's.
+ * Round-12 change (rubric §2.2, decision 1A: the whole sentence is scored, no new mistake): the round-4 allowance of
+ * up to two "slips" outside the target (a misspelt or mis-inflected word, a dropped or added small word) is removed,
+ * because under 1A each of them is a new mistake. Only the round-8 pattern-B change stays: one or two harmless
+ * preposition swaps outside the target and not in front of a time word.
  */
 function errorCorrectionTarget(item: KeyItem & { targetForm?: string }, a: string, sens: Sensitivity): boolean {
   if (!isErrorCorrection(item)) return false;
@@ -220,19 +262,17 @@ function errorCorrectionTarget(item: KeyItem & { targetForm?: string }, a: strin
     if (A.some((x) => removed.has(x))) continue;
     let slips = 0, ok = true;
     const ops = align(A, K);
-    ops.forEach(([op, i, j], n) => {
+    ops.forEach(([op, i, j]) => {
       if (op === '=') return;
       if (j >= 0 && target.has(j)) { ok = false; return; }
-      if (op === 'd') { // an added word next to the target changes the target
-        const prev = ops.slice(0, n).reverse().find((o) => o[2] >= 0), next = ops.slice(n + 1).find((o) => o[2] >= 0);
-        if ((prev && target.has(prev[2]) && next && target.has(next[2])) || !FUNC.has(A[i])) { ok = false; return; }
-      }
-      if (op === 'i' && !FUNC.has(K[j])) { ok = false; return; }
+      // Round-12 change: an added or dropped word is a new mistake under rubric 1A (no slip allowance).
+      if (op !== 's') { ok = false; return; }
       // Round-8 fix (pattern B): one preposition swapped for another outside the target ("in the market" for
-      // "at the market") is a slip; a preposition inside the target is still checked above and stays wrong.
+      // "at the market") is harmless; a preposition inside the target is still checked above and stays wrong.
       const nextWord = K[j + 1] === 'the' ? K[j + 2] : K[j + 1]; // look past "the" (at the weekend)
       const harmlessPrep = sens === 'none' && PREP.has(A[i]) && PREP.has(K[j]) && !TIME_WORD.test(nextWord ?? '');
-      if (op === 's' && !slipOf(A[i], K[j]) && !harmlessPrep) { ok = false; return; }
+      // Round-12 change: a misspelt or mis-inflected word is a new mistake under rubric 1A (slipOf no longer forgiven).
+      if (!harmlessPrep) { ok = false; return; }
       slips++;
     });
     // At least 70% of the key's words must be unchanged, so a rewrite never passes as "slips".
@@ -275,7 +315,16 @@ export function matchKeyV2(item: KeyItem, answer: string | number | undefined | 
   if (sens !== 'case_punct' && /\bits\b/.test(a) && !nkeys.some((k) => /\bits\b/.test(k)) && nkeys.includes(a.replace(/\bits\b/g, 'it is'))) return true;
   if (!isChoice(item)) {
     if (sens === 'case_punct') return false;
-    return gapWithSubject(item, a, nkeys, sens) || gapWithContext(item, a, nkeys, sens) || errorCorrectionTarget(item, a, sens);
+    if (gapWithSubject(item, a, nkeys, sens) || gapWithContext(item, a, nkeys, sens) || errorCorrectionTarget(item, a, sens)) return true;
+    if (!gapRuleItem(item, sens)) return false;
+    // Rule E (round 12): the whole sentence written in the gap.
+    if (wholeSentenceInGap(item, a, keys, sens)) return true;
+    // Rule F (round 12): a standard contraction of an accepted answer ("'d" for "would"), alone or with the words around
+    // the gap; the written-out answer must then match exactly as above.
+    return contractionReadings(String(answer)).some((r) => {
+      const ra = normaliseV2(r, sens);
+      return Boolean(ra) && (nkeys.includes(ra) || gapWithSubject(item, ra, nkeys, sens) || gapWithContext(item, ra, nkeys, sens) || wholeSentenceInGap(item, ra, keys, sens));
+    });
   }
   const options = choiceOptions(item);
   if (!options.length) return false;
