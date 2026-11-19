@@ -11,7 +11,7 @@
 import { planWithTrace, type MethodPick, type MethodRule, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { STRATEGY_BY_ID, validateComposition } from './strategyRegistry';
 
-export const PLANNER_VERSION = 'planner2-v2';
+export const PLANNER_VERSION = 'planner2-v3';
 
 export type LessonShape = 'PPP' | 'TTT' | 'TASK' | 'LAD';
 export type Stage =
@@ -322,6 +322,8 @@ export const QUICK_CHECK_ITEMS = 1;
 export const QUICK_CHECK_MAX_TURNS = 1;
 /** TASK: the learner's opening message plus 2 role-play answers, then the language focus. */
 export const TASK_TURNS = 3;
+/** TASK: this many wrong learner messages in a row inside the task end it early and go to the language focus (planner2c). */
+export const TASK_BAD_RUN = 2;
 type HistoryLike = { role: string; languageTurn?: unknown };
 /** Progress in this lesson from the stored language-turn evidence (code-graded verdicts; never the model's own claim). */
 export function progressFromHistory(history: HistoryLike[], current?: { verdict?: string | null }): StageProgress {
@@ -405,13 +407,15 @@ export function stageMachine(shape: LessonShape, ev: Ev[]): Stage {
     return st;
   }
   if (shape === 'TASK') {
-    let st: Stage = 'pretask'; let taskTurns = 0; let errs = false; let repeated = false;
+    let st: Stage = 'pretask'; let taskTurns = 0; let errs = false; let repeated = false; let badRun = 0;
     for (let k = 1; k < ev.length; k++) {
       const e = ev[k];
       if (st === 'pretask') st = 'task';
       if (st === 'task') {
         taskTurns++; if (e === 'bad') errs = true;
-        if (taskTurns >= TASK_TURNS) st = errs ? 'focus' : 'done';
+        badRun = e === 'bad' ? badRun + 1 : 0;
+        // planner2c: the same learner wrong twice in a row inside the task -> stop the task and teach now (PLN2b stuck learner s2001).
+        if (badRun >= TASK_BAD_RUN || taskTurns >= TASK_TURNS) st = errs ? 'focus' : 'done';
         continue;
       }
       if (st === 'focus') { if (e === 'ok') st = repeated ? 'done' : 'repeat'; continue; }

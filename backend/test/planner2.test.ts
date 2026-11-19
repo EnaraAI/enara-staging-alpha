@@ -507,6 +507,16 @@ describe('planner2b: move on only on evidence; on errors go back to teaching', (
     expect(stageMachine('TASK', [...task('none', 'bad', 'none'), 'ok', 'bad'])).toBe('focus');
     expect(stageMachine('TASK', [...task('none', 'bad', 'none'), 'ok', 'bad', 'ok'])).toBe('done'); // no second repeat
   });
+  it('TASK (planner2c): two wrong answers in a row inside the task end it early -> focus (PLN2b stuck learner s2001)', () => {
+    // s2001: "I get up always at seven." three times; the task held the learner for 3 messages before teaching.
+    expect(stageMachine('TASK', [o, 'bad'])).toBe('task'); // one error: the task goes on
+    expect(stageMachine('TASK', [o, 'bad', 'bad'])).toBe('focus'); // second error in a row: teach now, not on turn 3
+    expect(stageMachine('TASK', [o, 'bad', 'bad', 'bad'])).toBe('focus'); // stays in focus until the fix is right
+    expect(stageMachine('TASK', [o, 'bad', 'bad', 'ok'])).toBe('repeat');
+    expect(stageMachine('TASK', [o, 'bad', 'ok'])).toBe('task'); // not in a row: the task goes on
+    expect(stageMachine('TASK', [o, 'bad', 'ok', 'bad'])).toBe('focus'); // ends at 3 messages with errors, as before
+    expect(stageMachine('TASK', [o, 'ok', 'none', 'none'])).toBe('done');
+  });
   it('a diagnosed error counts as an error even without a wrong verdict', () => {
     const h = [{ role: 'user' }, { role: 'assistant', languageTurn: { diagnosis: 'copula_omitted' } }];
     expect(progressFromHistory(h).events).toEqual(['bad', 'none']);
