@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -436,7 +436,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 1: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe time word \"Yesterday\" and the rest of your sentence work well. The word to check is \"goed\" in \"Yesterday I goed to the market.\" Look at that verb again and think about whether it is a regular verb or one that changes in a special way.\n\nTry the sentence again with a new form of that verb.\n\nLEARNER'S LAST MESSAGE:\nYesterday I goed to the market.\nFACT: the last learner message contained the error of W1 (adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\")).\n\nTUTOR TURN TO JUDGE:\nThe sentence \"Yesterday I goed to the market.\" is the same as before, so let us look at the idea in a different way. English has two groups of past verbs.\n\nGroup 1 adds -ed: \"She walked home.\"\nGroup 2 changes into a different word: \"She ate lunch.\"\n\nDecide which group your verb belongs to. Then write the sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 1: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe time word \"Yesterday\" and the rest of your sentence work well. The word to check is \"goed\" in \"Yesterday I goed to the market.\" Look at that verb again and think about whether it is a regular verb or one that changes in a special way.\n\nTry the sentence again with a new form of that verb.\n\nLEARNER'S LAST MESSAGE:\nYesterday I goed to the market.\nFACT: the last learner message contained the error of W1 (adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\")).\n\nTUTOR TURN TO JUDGE:\nThe sentence \"Yesterday I goed to the market.\" is the same as before, so let us look at the idea in a different way. English has two groups of past verbs.\n\nGroup 1 adds -ed: \"She walked home.\"\nGroup 2 changes into a different word: \"She ate lunch.\"\n\nDecide which group your verb belongs to. Then write the sentence again.",
+   "stateBefore": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "English has two groups of past verbs. Group 1 adds -ed ... Group 2 changes into a different word: \"She ate lunch.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Yesterday I went to the market.",
+    "errors": {
+     "W1": "Yesterday I goed to the market."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Yesterday I went to the market.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Yesterday I went to the market.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -443,7 +443,94 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 2: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My cat drinks milk.\" has the right order.\nNext one.\nPut in order: \"plays / Sam / chess / on Mondays\"\n\nLEARNER'S LAST MESSAGE:\nPlays Sam chess on Mondays.\nFACT: the last learner message contained the error of W1 (puts the verb before the subject (\"Plays Ahmed football.\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote the same words in the same order, so something still needs to change.\nExample: Lina reads a book at home. Rule: put the place or time at the end.\nRight: Ben cooks rice at night. Wrong: Ben at night cooks rice.\nLook at the first word of your sentence. Put the words in order again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 2: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My cat drinks milk.\" has the right order.\nNext one.\nPut in order: \"plays / Sam / chess / on Mondays\"\n\nLEARNER'S LAST MESSAGE:\nPlays Sam chess on Mondays.\nFACT: the last learner message contained the error of W1 (puts the verb before the subject (\"Plays Ahmed football.\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote the same words in the same order, so something still needs to change.\nExample: Lina reads a book at home. Rule: put the place or time at the end.\nRight: Ben cooks rice at night. Wrong: Ben at night cooks rice.\nLook at the first word of your sentence. Put the words in order again.",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Sam plays chess on Mondays.",
+    "errors": {
+     "W1": "Plays Sam chess on Mondays."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Plays Sam chess on Mondays.",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "Plays Sam chess on Mondays.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

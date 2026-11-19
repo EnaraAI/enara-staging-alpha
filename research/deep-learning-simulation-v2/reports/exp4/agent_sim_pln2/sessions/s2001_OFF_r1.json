@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -389,7 +389,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you for the sentence. Your idea about your morning is clear.\nLook at the word \"always\" in \"I drink always water before breakfast.\" Check where you put it.\nTry the sentence again.\n\nLEARNER'S LAST MESSAGE:\nI drink always water before breakfast.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nThe sentence is still not right, so here is the answer: \"I always drink water before breakfast.\" In English, always goes before the main verb, here drink.\nRight: She never eats meat. Wrong: She eats never meat.\nNow try one on your own, without help. Write one sentence about what you usually do on Sunday morning, and use the word usually."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you for the sentence. Your idea about your morning is clear.\nLook at the word \"always\" in \"I drink always water before breakfast.\" Check where you put it.\nTry the sentence again.\n\nLEARNER'S LAST MESSAGE:\nI drink always water before breakfast.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nThe sentence is still not right, so here is the answer: \"I always drink water before breakfast.\" In English, always goes before the main verb, here drink.\nRight: She never eats meat. Wrong: She eats never meat.\nNow try one on your own, without help. Write one sentence about what you usually do on Sunday morning, and use the word usually.",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "here is the answer: \"I always drink water before breakfast.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English, always goes before the main verb, here drink."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: She never eats meat. Wrong: She eats never meat."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I usually sleep late on Sunday morning.",
+    "errors": {
+     "W1": "I sleep usually late on Sunday morning."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I usually sleep late on Sunday morning.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I usually sleep late on Sunday morning.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

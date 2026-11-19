@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -389,7 +389,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 1: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou chose a clear thing to ask for, and the glass of water is fine.\nLook at the first two words of your sentence, \"Give me\". Think about how they sound when you say them to a waiter.\nTry the sentence again.\n\nLEARNER'S LAST MESSAGE:\nGive me a glass of water.\nFACT: the last learner message contained the error of W1 (makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\")).\n\nTUTOR TURN TO JUDGE:\nThe polite sentence is: \"Can I have a glass of water, please?\" \"Give me\" is a command, so it sounds rude to a waiter. \"Can I have ... please?\" is a polite request.\nRight: Can I have an orange juice, please? Wrong: Give me an orange juice.\nNow try one on your own, without help. You are hungry in a café. Ask the waiter politely for a sandwich."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 1: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou chose a clear thing to ask for, and the glass of water is fine.\nLook at the first two words of your sentence, \"Give me\". Think about how they sound when you say them to a waiter.\nTry the sentence again.\n\nLEARNER'S LAST MESSAGE:\nGive me a glass of water.\nFACT: the last learner message contained the error of W1 (makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\")).\n\nTUTOR TURN TO JUDGE:\nThe polite sentence is: \"Can I have a glass of water, please?\" \"Give me\" is a command, so it sounds rude to a waiter. \"Can I have ... please?\" is a polite request.\nRight: Can I have an orange juice, please? Wrong: Give me an orange juice.\nNow try one on your own, without help. You are hungry in a café. Ask the waiter politely for a sandwich.",
+   "stateBefore": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The polite sentence is: \"Can I have a glass of water, please?\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"Give me\" is a command, so it sounds rude to a waiter. \"Can I have ... please?\" is a polite request."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Can I have an orange juice, please? Wrong: Give me an orange juice."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Can I have a sandwich, please?",
+    "errors": {
+     "W1": "Give me a sandwich."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Can I have a sandwich, please?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Can I have a sandwich, please?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -17,11 +17,11 @@
    "W1": 0,
    "W2": 0,
    "C1": 3,
-   "C2": 2
+   "C2": 3
   },
   "indep": {
-   "C1": 1,
-   "C2": 1
+   "C1": 2,
+   "C2": 2
   },
   "start": {
    "W1": 2,
@@ -508,7 +508,122 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 1.\nC2 (correct) strength 2: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"I am sitting at my desk.\" uses am + -ing correctly to say what is happening now. The next step is a short writing task.\n\nImagine a park. Write two sentences about what people are doing now.\n\nLEARNER'S LAST MESSAGE:\nA boy is playing football.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThe sentence \"A boy is playing football.\" is correct. It uses is + playing to say what is happening now, and it names a person and an activity.\n\nNow a new task. Write one sentence about a person you know. Say what that person is doing right now."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 1.\nC2 (correct) strength 2: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"I am sitting at my desk.\" uses am + -ing correctly to say what is happening now. The next step is a short writing task.\n\nImagine a park. Write two sentences about what people are doing now.\n\nLEARNER'S LAST MESSAGE:\nA boy is playing football.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThe sentence \"A boy is playing football.\" is correct. It uses is + playing to say what is happening now, and it names a person and an activity.\n\nNow a new task. Write one sentence about a person you know. Say what that person is doing right now.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "The sentence \"A boy is playing football.\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "The sentence \"A boy is playing football.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "A boy is playing football."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "A boy is playing football."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My sister is cooking dinner now.",
+    "errors": {
+     "W1": "My sister cooking dinner now.",
+     "W2": "My sister cooks dinner now."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister is cooking dinner now.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister is cooking dinner now.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

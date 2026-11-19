@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -441,7 +441,100 @@
    "twoAsks": false,
    "twoAsksRaw": true,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe goal today is to put a frequency word in the right place in a routine sentence. Your meaning is clear, and \"at seven\" is a good time phrase.\n\nThe error is in this part: \"have usually breakfast\". Check where \"usually\" sits next to the verb \"have\". Look at that position again, then write the whole sentence once more.\n\nLEARNER'S LAST MESSAGE:\nI have usually breakfast at seven.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence is the same as before, so let's try a different angle. Here are two sentences about another routine:\n\nRight: \"We always walk to school.\"\nWrong: \"We walk always to school.\"\n\nThe words are the same. Only the place of \"always\" changes, and that changes whether the sentence is correct in English.\n\nNow look at your own sentence again. Where does the frequency word belong next to the main verb?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe goal today is to put a frequency word in the right place in a routine sentence. Your meaning is clear, and \"at seven\" is a good time phrase.\n\nThe error is in this part: \"have usually breakfast\". Check where \"usually\" sits next to the verb \"have\". Look at that position again, then write the whole sentence once more.\n\nLEARNER'S LAST MESSAGE:\nI have usually breakfast at seven.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence is the same as before, so let's try a different angle. Here are two sentences about another routine:\n\nRight: \"We always walk to school.\"\nWrong: \"We walk always to school.\"\n\nThe words are the same. Only the place of \"always\" changes, and that changes whether the sentence is correct in English.\n\nNow look at your own sentence again. Where does the frequency word belong next to the main verb?",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"We always walk to school.\" Wrong: \"We walk always to school.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I usually have breakfast at seven.",
+    "errors": {
+     "W1": "I have usually breakfast at seven."
+    }
+   },
+   "applied": [
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I have usually breakfast at seven.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "I have usually breakfast at seven.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
