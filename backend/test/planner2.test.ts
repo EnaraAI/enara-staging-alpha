@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { planWithTrace, selectTeachingPlan, METHOD_RULES, type PlanInput } from '../src/services/pedagogyPolicy';
 import { STRATEGIES, validateComposition } from '../src/services/strategyRegistry';
 import {
-  METHOD_TABLE, SHAPE_RULES, SHAPE_STAGES, allowedMain, chooseShape, currentStage, levelRank, methodGateOk, planLesson, reviewOpener, shapeLines,
+  METHOD_TABLE, SHAPE_RULES, SHAPE_STAGES, allowedMain, chooseShape, currentStage, levelRank, methodGateOk, planLesson, progressFromHistory, reviewOpener, shapeLines,
   type LessonShape, type PlannerSignals,
 } from '../src/services/lessonPlanner';
 import { engineV2 } from '../src/services/engineV2';
@@ -269,6 +269,22 @@ describe('stages', () => {
     expect(currentStage('LAD', { tries: 1, right: 1 })).toBe('do');
     expect(currentStage('LAD', { tries: 2, right: 2 })).toBe('chant');
     expect(currentStage('LAD', { tries: 3, right: 2, ownSentenceDone: true })).toBe('check');
+  });
+  it('progress comes from stored, code-graded verdicts; the stage follows it', () => {
+    const t = (verdict?: string, ownSentence?: string) => ({ role: 'assistant', languageTurn: { ...(verdict ? { assessment: { verdict } } : {}), ...(ownSentence ? { ownSentence } : {}) } });
+    const h = [{ role: 'user' }, t(), { role: 'user' }, t('INCORRECT'), { role: 'user' }, t('CORRECT'), { role: 'user' }, t('NOT_EVALUATED'), { role: 'user' }, t('CORRECT_WITH_EQUIVALENT_FORMULATION')];
+    const p = progressFromHistory(h);
+    expect([p.tries, p.right, p.ownSentenceDone]).toEqual([3, 2, false]);
+    expect(currentStage('PPP', p)).toBe('produce');
+    expect(currentStage('PPP', progressFromHistory([...h, t(undefined, 'feedback')]))).toBe('check');
+    expect(currentStage('PPP', progressFromHistory([]))).toBe('present');
+    expect(progressFromHistory([{ role: 'user', languageTurn: { assessment: { verdict: 'CORRECT' } } }]).tries).toBe(0); // a learner turn never counts
+  });
+  it('without history (voice) no stage is claimed: start at the first stage', () => {
+    const lp = planLesson(base({ masteryStatus: 'emerging' }), adult());
+    const lines = shapeLines(lp).join('\n');
+    expect(lines).toMatch(/Start with: Present/);
+    expect(lines).not.toMatch(/This turn's stage/);
   });
   it('prompt lines name the shape and only the current stage', () => {
     const lp = planLesson(base({ masteryStatus: 'emerging' }), adult());

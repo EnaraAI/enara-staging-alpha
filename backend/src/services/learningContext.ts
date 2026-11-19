@@ -8,7 +8,7 @@ import { PedagogicalDecision } from '../models/PedagogicalDecision';
 import { Student } from '../models/Student';
 import { Institution } from '../models/Institution';
 import { ageFromBirthDate, loadTrustedAgeBand } from './languageTeachingContext';
-import { planLesson, shapeLines, type LessonPlan } from './lessonPlanner';
+import { currentStage, planLesson, progressFromHistory, shapeLines, type LessonPlan } from './lessonPlanner';
 import { StudentMisconception } from '../models/StudentMisconception';
 import { StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import type { TeachingMeta } from '../models/TutorMessage';
@@ -75,6 +75,8 @@ export async function buildObjectiveContext(params: {
   objectiveResolution?: string;
   // Voice: spoken replies need a shorter plan.
   compact?: boolean;
+  // planner2: this session's turns with their language-turn evidence, so code (not the model) sets the lesson stage.
+  history?: { role: string; languageTurn?: unknown }[];
 }): Promise<ObjectiveContext | null> {
   try {
     if (!(await isFeatureEnabled(params.institutionId, 'adaptive_pedagogy_enabled'))) return null;
@@ -253,7 +255,7 @@ export async function buildObjectiveContext(params: {
       ...weak.map((w) => `- Prerequisite not secure yet: ${w.code} "${w.title}".`),
       ...misconceptions.map((m) => `- Possible misconception (${m.status === 'confirmed' ? 'confirmed by a teacher' : 'not confirmed'}): ${m.description}`),
       ...planLines(plan, target && target.id !== objective.id ? `${target.code} "${target.title}"` : undefined, status, params.compact),
-      ...(lesson ? shapeLines(lesson) : []),
+      ...(lesson ? shapeLines(lesson, params.history ? currentStage(lesson.shape, progressFromHistory(params.history)) : undefined) : []),
       '- Assessment integrity: never give the answers to the student\'s assessment or quick-check questions. If they paste one, teach the method with a different example.',
       plan.requiresReassessment
         ? '- When they seem ready, suggest a quick check to confirm (practice with you does not count as proof of understanding).'
@@ -342,6 +344,8 @@ export async function buildTeachingContext(params: {
   // false: use the plan without logging a new decision (e.g. a voice nudge,
   // which continues the turn it follows). Defaults to true.
   record?: boolean;
+  // planner2: the session's turns (language-turn evidence) for the lesson stage.
+  history?: { role: string; languageTurn?: unknown }[];
 }): Promise<ObjectiveContext | null> {
   try {
     if (!(await isFeatureEnabled(params.institutionId, 'adaptive_pedagogy_enabled'))) return null;
@@ -358,6 +362,7 @@ export async function buildTeachingContext(params: {
       channel: params.channel,
       objectiveResolution: resolved.resolution,
       compact: params.compact,
+      history: params.history,
     });
   } catch (error) {
     logger.warn('teaching_context_failed', { error: serializeError(error) });

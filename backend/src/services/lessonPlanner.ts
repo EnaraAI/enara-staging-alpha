@@ -330,11 +330,39 @@ export function currentStage(shape: LessonShape, p: { tries: number; right: numb
   }
 }
 
-/** Prompt lines for the chosen shape and stage (the model writes the reply inside them). */
-export function shapeLines(lp: LessonPlan, stage: Stage = lp.startStage): string[] {
+export interface StageProgress { tries: number; right: number; ownSentenceDone?: boolean; taskDone?: boolean; triesAfterTest?: number; rightAfterTest?: number; opened?: boolean }
+type HistoryLike = { role: string; languageTurn?: unknown };
+/** Progress in this lesson from the stored language-turn evidence (code-graded verdicts; never the model's own claim). */
+export function progressFromHistory(history: HistoryLike[]): StageProgress {
+  let tries = 0;
+  let right = 0;
+  let rightAfterTest = 0;
+  let triesAfterTest = 0;
+  let ownSentenceDone = false;
+  for (const t of history) {
+    if (t.role !== 'assistant' || !t.languageTurn || typeof t.languageTurn !== 'object') continue;
+    const lt = t.languageTurn as { assessment?: { verdict?: string }; ownSentence?: string };
+    const v = lt.assessment?.verdict;
+    const ok = v === 'CORRECT' || v === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
+    const bad = v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
+    if (ok || bad) {
+      if (tries >= 3) { triesAfterTest++; if (ok) rightAfterTest++; }
+      tries++;
+      if (ok) right++;
+    }
+    if (lt.ownSentence === 'feedback') ownSentenceDone = true;
+  }
+  return { tries, right, ownSentenceDone, triesAfterTest, rightAfterTest, opened: history.some((t) => t.role === 'assistant') };
+}
+
+/** Prompt lines for the chosen shape and stage (the model writes the reply inside them). Without a stage (no turn history,
+ *  e.g. a voice call), the lesson starts at the first stage and the model is told the order only. */
+export function shapeLines(lp: LessonPlan, stage?: Stage): string[] {
   return [
     `- Lesson shape: ${SHAPE_NAMES[lp.shape]} (${lp.stages.map((x) => STAGE_WORDS[x].split(':')[0]).join(' → ')}).${lp.opener ? ' First a short review from memory of earlier points.' : ''}`,
-    `- This turn's stage: ${STAGE_WORDS[stage]}. Stay in this stage; the system moves the stage on.`,
+    stage
+      ? `- This turn's stage: ${STAGE_WORDS[stage]}. Stay in this stage; the system moves the stage on.`
+      : `- Start with: ${STAGE_WORDS[lp.startStage]}; go on to the next stage only after the learner succeeds.`,
     ...(lp.childSupports ? ['- Child learner: very short sentences, one instruction at a time, praise effort, a small game or story frame.'] : []),
     ...(lp.plan.supporting.includes('elaborative_interrogation') ? ['- If you ask "why", the learner may answer in Arabic.'] : []),
     ...(lp.methodRule === 'P1_L1_CONTRAST' ? ['- Contrast the English form with how Arabic says it, in one short line.'] : []),
