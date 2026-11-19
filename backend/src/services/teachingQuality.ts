@@ -99,7 +99,7 @@ function filledClauses(item: PoolItem): string[][] {
   return out;
 }
 export interface GuardHit { itemId: string; source: PoolItem['source']; sentence: string; why: 'completes_item' | 'scores_open_item' }
-const LABEL = /^\s*(?:[-*•>]\s*)?(?:\*\*)?\s*(right|wrong|example|model|result|watch|correct|for example|e\.g\.|step \d+|answer)\s*[:)]\s*/i;
+const LABEL = /^\s*(?:[-*•>]\s*)?(?:\*\*)?\s*(right|wrong|not right|example|model|result|watch|correct|for example|e\.g\.|step \d+|answer|clue|meaning|spelling)\s*[:)]\s*/i;
 /** Sentences of a reply that model language (not the task line, not quotes of the learner, not a labelled wrong example). */
 export function modelledSentences(reply: string, learnerText = '', pool: PoolItem[] = [], confirmed: string[] = []): string[] {
   const learner = ` ${plain(learnerText)} `;
@@ -108,9 +108,10 @@ export function modelledSentences(reply: string, learnerText = '', pool: PoolIte
   const out: string[] = [];
   for (const line of reply.split('\n')) {
     if (GAP.test(line)) continue; // the task line (a gap) is never a model
-    for (let s of line.split(/(?<=[.!?])\s+(?=\S)/)) {
+    // sentences end at . ! ? (also before a closing quote), and a Right:/Wrong: label always starts a new part
+    for (let s of line.split(/(?<=[.!?]["”’']?)\s+(?=\S)|\s+(?=(?:right|wrong|not right)\s*:)/i)) {
       const label = LABEL.exec(s);
-      if (label && /wrong/i.test(label[1])) continue;
+      if (label && /wrong|clue|meaning|spelling/i.test(label[1])) continue;
       s = s.replace(LABEL, '').replace(/\*\*/g, '').trim();
       if (!s) continue;
       const p = plain(s);
@@ -251,7 +252,8 @@ const FRIGHT = /\b(kill|killed|blood|die|died|dead|gun|knife|war|drunk|beer|wine
 const CHILDISH = /\b(yummy|teeny|itsy|bitsy|boo-boo|tummy|doggy|kitty|sweetie|little one)\b/i;
 const GRAMMAR_LABELS = /\b(subject|object|verb|noun|adjective|adverb|preposition|article|pronoun|plural|singular|infinitive|participle|auxiliary|tense|clause|conjunction|uncountable|countable|consonant|vowel|comparative|superlative|possessive)\b/gi;
 const IMPERATIVE = /^(?:now |then |next |please |so )?(write|complete|fill|choose|pick|circle|try|tell|make|correct|fix|rewrite|change|put|answer|use|say|describe|order|match|add|draw|send|give|count|copy|spell|ask)\b/i;
-const splitSentences = (t: string) => t.split('\n').flatMap((l) => l.split(/(?<=[.!?])\s+(?=\S)/)).map((s) => s.replace(/^[-*•>\d.)\s]+/, '').trim()).filter((s) => /\p{L}/u.test(s));
+// a sentence ends at . ! or ?, also when a closing quote follows it ('Right: "It is stormy." Wrong: ...')
+const splitSentences = (t: string) => t.split('\n').flatMap((l) => l.split(/(?<=[.!?]["”’']?)\s+(?=\S)/)).map((s) => s.replace(/^[-*•>\d.)\s]+/, '').trim()).filter((s) => /\p{L}/u.test(s));
 const wordList = (t: string) => (t.match(/[A-Za-z][A-Za-z'-]*/g) ?? []);
 /** Base forms tried for a word not in the list: plural, -ed, -ing, -er/-est, 's, contractions. */
 function known(w: string, list: Set<string>): boolean {

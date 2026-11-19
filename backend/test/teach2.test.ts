@@ -61,6 +61,12 @@ describe('example guard: a worked example never uses an item the learner will so
     expect(exampleGuardHits('Rule: some verbs have their own past form: go - went, buy - bought, see - saw.', pool)).toEqual([]);
     expect(exampleGuardHits('go → went, see → saw', pool)).toEqual([]);
   });
+  it('a right/wrong pair on one line is split, and the wrong member and a vocabulary clue are never models', () => {
+    const pool = poolFromBankItems(bankItems('EN-F-A2-VO-clothes-shopping'));
+    expect(exampleGuardHits('Right: "a red dress" Wrong: "a dress red" The colour comes first.', pool)).toEqual([]);
+    const cls = poolFromBankItems(bankItems('EN-F-A1-VO-classroom-objects'));
+    expect(exampleGuardHits('Clue: "you cut paper with it." I think of school things that cut.', cls)).toEqual([]);
+  });
   it('a gapped transfer item is checked by its frame, not as an open item', () => {
     const pool = poolFromBankItems(bankItems('EN-F-A1-VO-numbers-time'));
     expect(pool.filter((p) => /____/.test(p.prompt)).every((p) => !p.open)).toBe(true);
