@@ -269,6 +269,8 @@ export interface TurnSignals {
   liveTarget?: string;
   // releaseAfterTwo (ESL5): genuine failed attempts on the open item, this message included (empty, "I don't know" and copies of the prompt don't count).
   genuineFailedAttempts?: number;
+  // planner2c (PLN2c): the learner sent again a free answer (no course key, e.g. a task sentence) that was already graded wrong; it counts as a failed try.
+  repeatWrong?: number;
   // reviewOpen (ESL5): the recall error types the previous reply opened with (read back from its stored evidence).
   prevReview?: string[];
   // fadeKnown (ESL5): criteria of this turn's item that the record shows as known (faded: no rule line, quick check), or whose quick check is being answered now.
@@ -959,6 +961,10 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
     else if (turnNo >= OWN_SENTENCE_FROM && !tags.includes('asked') && (sig.answeringCheck || sig.unpromptedSentence)) sig.ownSentence = 'ask';
   }
   if ((engineV2('releaseAfterTwo') || engineV2('feedbackLadder')) && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope);
+  if (engineV2('planner2') && !sig.keyVerdict) {
+    const r = repeatedWrongAnswers(text, history, scope);
+    if (r >= 2) { sig.repeatWrong = r; sig.genuineFailedAttempts = Math.max(sig.genuineFailedAttempts ?? 0, r); }
+  }
   return sig;
 }
 
@@ -999,6 +1005,20 @@ export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<Tur
   const ok = s.keyVerdict === 'CORRECT' || s.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
   if (!ok && genuineAttempt(text, prevTutor, s.activeLessonItem, s.learnerResponse ?? 'no_pending_task')) n += 1;
   return n;
+}
+/** planner2c: how many times in a row the learner has sent this same message, each earlier copy graded wrong by the reply after it (this one
+ *  included). A free answer (no course key) is graded only after the reply, so a repeat is the code's evidence of a failed try now. 0: not a repeat. */
+export function repeatedWrongAnswers(text: string, history: Turn[], scope?: string): number {
+  const same = (a: string) => norm(a) !== '' && norm(a) === norm(text);
+  let n = 1;
+  for (let i = history.length - 1; i >= 0; i -= 1) {
+    if (history[i].role !== 'user') continue;
+    const next = history.slice(i + 1).find((x) => x.role === 'assistant');
+    const lt = next && inScope(next.languageTurn, scope) ? next.languageTurn : undefined;
+    if (!same(history[i].content) || !isFailure(lt?.assessment?.verdict)) break;
+    n += 1;
+  }
+  return n >= 2 ? n : 0;
 }
 /** releaseAfterTwo: the reply after two genuine failed attempts gives the answer (never earlier). */
 export const RELEASE_AFTER = 2;
@@ -1179,7 +1199,7 @@ export function selectLanguageMoves(input: {
   // open item the answer is given with its reason and a right/wrong pair, then a new item on the same point. Never earlier: any other answer move
   // becomes a hint until then (the leak guards keep hiding the open item's answer, see guardedItems). A hints-only policy never releases.
   if (engineV2('releaseAfterTwo') && !input.hintsOnly) {
-    const engaged = s.answeringCheck || s.dontKnow || s.answerRequest || s.hintRequest || s.whyAfterAttempt;
+    const engaged = s.answeringCheck || s.dontKnow || s.answerRequest || s.hintRequest || s.whyAfterAttempt || (s.repeatWrong ?? 0) >= 2;
     if ((s.genuineFailedAttempts ?? 0) >= releaseAfter() && engaged) {
       for (let k = moves.length - 1; k >= 0; k -= 1) if (['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning'].includes(moves[k].id)) moves.splice(k, 1);
       moves.unshift({ id: 'answer_with_reasoning', reasons: ['release_after_two_genuine_attempts'], ledger: ['LTC-D6'] });
@@ -1361,7 +1381,23 @@ export const askedNewExample = (t: string) => /\bone (?:new |more )?example (?:o
 export const SHORT_RECAP = 'This is the point to close the lesson unit. This overrides the "next task" instructions above: (1) answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) state the rule in ONE plain line of 20 words or fewer; (3) end by asking: "Now write one new example of your own." Do not set a new exercise this turn and never write a completed answer to an open exercise.';
 export const EXAMPLE_CHECK = 'They have just written their own example. If it follows the rule, confirm it in one line starting "Remember:" and then give the next task. If it is wrong or incomplete, correct only the wrong part in one short sentence and ask for one more example (no new exercise yet).';
 // v2 (ruleFirst): which rules (success criteria) the focus item needs that this session has not introduced yet.
-export function rulesToIntroduce(history: { role: string; languageTurn?: unknown }[], s: { presentLessonItem?: { criteria?: number[] }; activeLessonItem?: { criteria?: number[] }; answeringCheck?: boolean; hintRequest?: boolean; dontKnow?: boolean; whyAfterAttempt?: boolean; learning?: { criteria?: Record<string, unknown> } }, spec: { successCriteria?: string[] } | undefined, opts: { beforeFirstTry?: boolean } = {}): { criteria: number[]; texts: string[] } | undefined {
+type GradedTurn = { role: string; languageTurn?: unknown };
+const verdictOf = (t: GradedTurn) => (t.role === 'assistant' ? ((t.languageTurn as { assessment?: { verdict?: string } } | null | undefined)?.assessment?.verdict) : undefined);
+const isOk = (v?: string | null) => v === 'CORRECT' || v === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
+const isBad = (v?: string | null) => v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
+/** planner2b: right answers in a row at the end of this session (stored verdicts, then this turn's code grade). */
+export function sessionRightStreak(history: GradedTurn[], current?: string | null): number {
+  const vs = [...history.map(verdictOf), current].filter((v) => isOk(v) || isBad(v));
+  let n = 0;
+  for (let k = vs.length - 1; k >= 0 && isOk(vs[k]); k--) n++;
+  return n;
+}
+/** planner2b: the latest graded answer of this session was wrong. */
+export function lastGradedWrong(history: GradedTurn[], current?: string | null): boolean {
+  const vs = [...history.map(verdictOf), current].filter((v) => isOk(v) || isBad(v));
+  return vs.length > 0 && isBad(vs[vs.length - 1]);
+}
+export function rulesToIntroduce(history: { role: string; languageTurn?: unknown }[], s: { keyVerdict?: string | null; presentLessonItem?: { criteria?: number[] }; activeLessonItem?: { criteria?: number[] }; answeringCheck?: boolean; hintRequest?: boolean; dontKnow?: boolean; whyAfterAttempt?: boolean; learning?: { criteria?: Record<string, unknown> } }, spec: { successCriteria?: string[] } | undefined, opts: { beforeFirstTry?: boolean } = {}): { criteria: number[]; texts: string[] } | undefined {
   // First exposure = the reply to the learner's first attempt, request for a hint, "I don't know" or "why" on an item (never the turn that only presents the exercise: their first try stays unassisted).
   // levelExplicit (explicit-first learners) also counts the reply that presents the exercise: the rule comes before the first try.
   const presenting = Boolean(opts.beforeFirstTry && s.presentLessonItem && !s.answeringCheck);
@@ -1369,6 +1405,8 @@ export function rulesToIntroduce(history: { role: string; languageTurn?: unknown
   const item = s.activeLessonItem ?? s.presentLessonItem; const crit = spec?.successCriteria ?? [];
   if (!item?.criteria?.length || !crit.length) return undefined;
   const done = new Set<number>(); for (const h of history) for (const c of ((h.languageTurn as { rulesIntroduced?: number[] } | null | undefined)?.rulesIntroduced ?? [])) done.add(c);
+  // planner2b: after an error the rule is stated again (an error sends the lesson back to teaching); it is not "done" once said.
+  if (engineV2('planner2') && lastGradedWrong(history, s.keyVerdict)) done.clear();
   // levelExplicit decides per form: a criterion the learner has already shown in this session needs no rule statement.
   const shown = opts.beforeFirstTry ? new Set(Object.keys(s.learning?.criteria ?? {}).map(Number)) : new Set<number>();
   const todo = item.criteria.filter((c) => c >= 1 && c <= crit.length && !done.has(c) && !shown.has(c)).slice(0, 2);
@@ -1572,7 +1610,12 @@ export function esl5Adjust(i: { signals: TurnSignals; moves: SelectedMove[]; rec
     const { presentLessonItem: _skip, ...rest } = signals;
     signals = rest; moves = moves.filter((m) => m.id !== 'present_lesson_item');
   }
-  if (engineV2('fadeKnown')) { const fade = fadeDecision(signals, i.record, i.history ?? [], i.lessonId, i.scope); if (fade) signals = { ...signals, fade }; }
+  if (engineV2('fadeKnown')) {
+    const fade = fadeDecision(signals, i.record, i.history ?? [], i.lessonId, i.scope);
+    // planner2b: support fades only after the form is right twice in a row in THIS session (never on the record or a count alone).
+    const ok = !engineV2('planner2') || sessionRightStreak(i.history ?? [], signals.keyVerdict) >= 2;
+    if (fade && ok) signals = { ...signals, fade };
+  }
   return { signals, moves };
 }
 // fadeKnown (ESL5, framework §2: explicit instruction for novices, faded for learners who already know the point).
@@ -2090,9 +2133,25 @@ export function languageStateScope(p: { institutionId?: string; studentId?: stri
   return createHash('sha256').update(key).digest('hex').slice(0, 24);
 }
 
-/** planner2 quick check: moves that teach or correct, removed during the 3 test items. */
+/** planner2 (amendment C): the code grade of the learner's message in THIS turn (the same keyVerdict the language engine computes),
+ *  so the planner can decide the lesson shape on the quick-check answer now instead of one reply later. Null when not gradable. */
+export async function currentKeyVerdict(params: { institutionId?: string; curriculumId?: string; lessonId?: string; message: string; history: Turn[] }): Promise<string | null> {
+  try {
+    if (!params.curriculumId) return null;
+    const curriculum = await Curriculum.findOne({ id: params.curriculumId, ...(params.institutionId ? { institutionId: params.institutionId } : {}) }).select('type courseName name chapters').lean();
+    if (!curriculum || !isLanguageCourse(curriculum.type)) return null;
+    const chapter = (curriculum.chapters ?? []).find((c) => c.id === params.lessonId);
+    const lesson = deriveLessonContext(chapter as never, curriculum.courseName || curriculum.name);
+    if (lesson.status === 'none') return null;
+    return detectTurnSignals(params.message, params.history, { title: lesson.title, spec: lesson.spec }).keyVerdict ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** planner2 quick check: moves that teach or correct, removed in the quick-check reply. */
 export const QUICK_CHECK_DROPPED = new Set<MoveId>(['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'l1_support', 'activate_prior_knowledge']);
-export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this lesson opens with three short exercises, one at a time, to see what the learner already knows. Do not teach, explain, hint, correct or give any answer during them. After each answer say only a short neutral thanks (for example "Thanks, noted.") and give the next exercise. After the third, say the lesson starts now.';
+export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this opening reply gives ONE short exercise from the lesson to see what the learner already knows. Do not teach, explain, hint or give any answer in this reply: a short greeting, then the exercise. The teaching starts in your next reply. This overrides any instruction above to explain, model or give an answer.';
 
 export async function buildLanguageTeachingContext(params: {
   institutionId?: string;

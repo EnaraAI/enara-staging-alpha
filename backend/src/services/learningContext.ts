@@ -8,7 +8,7 @@ import { PedagogicalDecision } from '../models/PedagogicalDecision';
 import { Student } from '../models/Student';
 import { Institution } from '../models/Institution';
 import { ageFromBirthDate, loadTrustedAgeBand } from './languageTeachingContext';
-import { planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow, type LessonPlan, type PlannerSignals, type StageProgress } from './lessonPlanner';
+import { QUICK_CHECK_PLAN_LINE, quickCheckActive, planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow, type LessonPlan, type PlannerSignals, type StageProgress } from './lessonPlanner';
 import { L1_TRANSFER_CODES } from './languageLearningState';
 import { recordL1Transfer } from './misconceptionRules';
 import { kidsPackOn, ladLines, lessonFor, loadKidsPack } from './kidsPack';
@@ -82,6 +82,10 @@ export async function buildObjectiveContext(params: {
   compact?: boolean;
   // planner2: this session's turns with their language-turn evidence, so code (not the model) sets the lesson stage.
   history?: { role: string; languageTurn?: unknown }[];
+  // planner2 (amendment C): the code grade of the learner's message in this turn.
+  currentVerdict?: string | null;
+  /** planner2c: the learner's message in this turn (a repeat of an answer already graded wrong counts as wrong now). */
+  currentMessage?: string;
 }): Promise<ObjectiveContext | null> {
   try {
     if (!(await isFeatureEnabled(params.institutionId, 'adaptive_pedagogy_enabled'))) return null;
@@ -204,7 +208,7 @@ export async function buildObjectiveContext(params: {
         if (!input.misconceptions.some((m) => m.category === 'l1_transfer')) input.misconceptions = [{ id: `l1-session-${objective.id}`, category: 'l1_transfer', status: 'suspected' }, ...input.misconceptions];
         if (params.record) await recordL1Transfer({ institutionId: params.institutionId, studentId: params.studentId, objectiveId: objective.id, codes: l1 });
       }
-      progress = params.history ? progressFromHistory(params.history) : undefined;
+      progress = params.history ? progressFromHistory(params.history, { verdict: params.currentVerdict, message: params.currentMessage }) : undefined;
       const opener = reviewOpener(signals, input);
       lesson = planLesson(input, { ...signals, ...quickCheckSignals(signals, progress, opener) });
     }
@@ -273,7 +277,7 @@ export async function buildObjectiveContext(params: {
         : '- No assessed answers on it yet.',
       ...weak.map((w) => `- Prerequisite not secure yet: ${w.code} "${w.title}".`),
       ...misconceptions.map((m) => `- Possible misconception (${m.status === 'confirmed' ? 'confirmed by a teacher' : 'not confirmed'}): ${m.description}`),
-      ...planLines(plan, target && target.id !== objective.id ? `${target.code} "${target.title}"` : undefined, status, params.compact),
+      ...(quickCheckActive(lesson) ? [QUICK_CHECK_PLAN_LINE] : planLines(plan, target && target.id !== objective.id ? `${target.code} "${target.title}"` : undefined, status, params.compact)),
       ...(lesson ? shapeLines(lesson, progress ? stageNow(lesson, progress) : undefined) : []),
       // kidsPack: the listen-and-do content for this stage (code picks it; the model says it).
       ...(lesson?.shape === 'LAD' && kidsPackOn() ? ladLines((() => { const d = loadKidsPack(); return d ? lessonFor(d, objective.code ? String(objective.code) : undefined, objective.title) : undefined; })(), progress ? stageNow(lesson, progress) : lesson.startStage, progress?.tries ?? 0) : []),
@@ -368,6 +372,9 @@ export async function buildTeachingContext(params: {
   record?: boolean;
   // planner2: the session's turns (language-turn evidence) for the lesson stage.
   history?: { role: string; languageTurn?: unknown }[];
+  currentVerdict?: string | null;
+  /** planner2c: the learner's message in this turn (a repeat of an answer already graded wrong counts as wrong now). */
+  currentMessage?: string;
 }): Promise<ObjectiveContext | null> {
   try {
     if (!(await isFeatureEnabled(params.institutionId, 'adaptive_pedagogy_enabled'))) return null;
@@ -385,6 +392,8 @@ export async function buildTeachingContext(params: {
       objectiveResolution: resolved.resolution,
       compact: params.compact,
       history: params.history,
+      currentVerdict: params.currentVerdict,
+      currentMessage: params.currentMessage,
     });
   } catch (error) {
     logger.warn('teaching_context_failed', { error: serializeError(error) });

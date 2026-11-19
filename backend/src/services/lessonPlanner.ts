@@ -11,22 +11,23 @@
 import { planWithTrace, type MethodPick, type MethodRule, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { STRATEGY_BY_ID, validateComposition } from './strategyRegistry';
 
-export const PLANNER_VERSION = 'planner2-v1';
+export const PLANNER_VERSION = 'planner2-v3';
 
 export type LessonShape = 'PPP' | 'TTT' | 'TASK' | 'LAD';
 export type Stage =
   | 'present' | 'practise' | 'produce' | 'check' // PPP
   | 'test' | 'teach' | 'retest' // TTT
   | 'pretask' | 'task' | 'focus' | 'repeat' // TASK
-  | 'listen' | 'do' | 'chant'; // LAD (+ check)
+  | 'listen' | 'do' | 'chant' // LAD (+ check)
+  | 'done'; // planner2b: goal reached on evidence (any shape)
 export type Goal = 'work' | 'exam' | 'daily' | 'school';
 export type PlannerAgeBand = 'child' | 'teen' | 'adult' | 'unknown';
 
 export const SHAPE_STAGES: Record<LessonShape, Stage[]> = {
-  PPP: ['present', 'practise', 'produce', 'check'],
-  TTT: ['test', 'teach', 'retest'],
-  TASK: ['pretask', 'task', 'focus', 'repeat'],
-  LAD: ['listen', 'do', 'chant', 'check'],
+  PPP: ['present', 'practise', 'produce', 'check', 'done'],
+  TTT: ['test', 'teach', 'retest', 'done'],
+  TASK: ['pretask', 'task', 'focus', 'repeat', 'done'],
+  LAD: ['listen', 'do', 'chant', 'check', 'done'],
 };
 export const SHAPE_NAMES: Record<LessonShape, string> = {
   PPP: 'present, practise, produce',
@@ -49,6 +50,7 @@ export const STAGE_WORDS: Record<Stage, string> = {
   listen: 'Listen: a short story or chant with the words',
   do: 'Do: tap, point or say after a spoken instruction',
   chant: 'Chant again together',
+  done: 'Goal reached: one-line recap, then one new, slightly harder situation to use the same point (no new rule)',
 };
 
 /** Learner signals for the planner. All come from code (records, settings); none from the model. Missing = unknown. */
@@ -65,6 +67,8 @@ export interface PlannerSignals {
   sessionNumber?: number;
   earlierErrors?: boolean;
   reviewDue?: boolean;
+  /** planner2b: listen-and-do content (kids pack lesson) exists for this objective; LAD runs only then. */
+  ladContent?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -91,9 +95,9 @@ export interface ShapeRow {
 
 const teenOrAdult = (s: PlannerSignals) => s.ageBand === 'teen' || s.ageBand === 'adult';
 export const SHAPE_RULES: ShapeRow[] = [
-  { id: 'S2a', shape: 'LAD', when: 'level Pre-A1', test: (s) => levelRank(s.level) === 0 },
-  { id: 'S2b', shape: 'LAD', childSupports: true, when: 'a child under 9', test: (s) => s.ageBand === 'child' && s.ageYears !== undefined && s.ageYears < 9 },
-  { id: 'S2c', shape: 'PPP', childSupports: true, when: 'a child aged 9-12 (or of unknown exact age) at A1 or above', test: (s) => s.ageBand === 'child' },
+  { id: 'S2a', shape: 'LAD', when: 'level Pre-A1, with listen-and-do content', test: (s) => levelRank(s.level) === 0 && Boolean(s.ladContent) },
+  { id: 'S2b', shape: 'LAD', childSupports: true, when: 'a child under 9, with listen-and-do content', test: (s) => s.ageBand === 'child' && s.ageYears !== undefined && s.ageYears < 9 && Boolean(s.ladContent) },
+  { id: 'S2c', shape: 'PPP', childSupports: true, when: 'a child (9-12, unknown exact age, or under 9 without listen-and-do content)', test: (s) => s.ageBand === 'child' },
   {
     id: 'S3', shape: 'TASK', when: 'B1 or above, partly secure or better, with a real-life goal',
     test: (s, m) => teenOrAdult(s) && (levelRank(s.level) ?? -1) >= 3 && RANK[m] >= 2 && (s.goal === 'work' || s.goal === 'exam' || s.goal === 'daily'),
@@ -231,6 +235,8 @@ export interface LessonPlan {
   opener: boolean;
   startStage: Stage;
   methodStage: Stage;
+  /** A quick check opened this lesson (teen/adult eligible); only then do the test answers not count as practice. */
+  quickCheckUsed: boolean;
   childSupports: boolean;
   methodRule: string;
   skipped: string[];
@@ -285,7 +291,7 @@ export function planLesson(input: PlanInput, s: PlannerSignals): LessonPlan {
   plan.reasonCodes.push(`SHAPE:${shape}:${row.id}`, `RULE:${traced.ruleId}`);
   if (opener) plan.reasonCodes.push('OPENER:S1');
 
-  // Every lesson starts at the shape's first stage; code moves it on (currentStage). methodStage = where the main method acts.
+  // Every lesson starts at the shape's first stage; code moves it on (stageMachine). methodStage = where the main method acts.
   const startStage = SHAPE_STAGES[shape][0];
   const methodStage = stageFor(plan.primary, shape);
   const method = STRATEGY_BY_ID.get(plan.primary)?.name ?? plan.primary;
@@ -298,6 +304,7 @@ export function planLesson(input: PlanInput, s: PlannerSignals): LessonPlan {
     opener,
     startStage,
     methodStage,
+    quickCheckUsed: Boolean(s.quickCheck || s.quickCheckPending),
     childSupports,
     methodRule: traced.ruleId,
     skipped: traced.skipped,
@@ -306,76 +313,151 @@ export function planLesson(input: PlanInput, s: PlannerSignals): LessonPlan {
   };
 }
 
-/**
- * The current stage, from what happened in this lesson so far (code, not the model). Moves forward only:
- * PPP: present until the first try; practise until 2 right; produce until an own sentence is done; then check.
- * TTT: test until 3 tried; teach until a right answer after the test; then test again.
- * TASK: pre-task, task until the role-play is done, language focus until a fix is right, then repeat.
- * LAD: listen, do until 2 right, chant, check.
- */
-export function currentStage(shape: LessonShape, p: { tries: number; right: number; ownSentenceDone?: boolean; taskDone?: boolean; triesAfterTest?: number; rightAfterTest?: number; opened?: boolean }): Stage {
-  switch (shape) {
-    case 'PPP':
-      if (p.tries === 0) return 'present';
-      if (p.right < 2) return 'practise';
-      return p.ownSentenceDone ? 'check' : 'produce';
-    case 'TTT':
-      if (p.tries < 3) return 'test';
-      return (p.rightAfterTest ?? 0) >= 1 ? 'retest' : 'teach';
-    case 'TASK':
-      if (!p.opened) return 'pretask';
-      if (!p.taskDone) return 'task';
-      return (p.rightAfterTest ?? 0) >= 1 ? 'repeat' : 'focus';
-    case 'LAD':
-      if (p.tries === 0) return 'listen';
-      if (p.right < 2) return 'do';
-      return p.ownSentenceDone ? 'check' : 'chant';
-  }
-}
-
-export interface StageProgress { quickCheck?: { right: number; of: number }; tries: number; right: number; ownSentenceDone?: boolean; taskDone?: boolean; triesAfterTest?: number; rightAfterTest?: number; opened?: boolean }
-type HistoryLike = { role: string; languageTurn?: unknown };
+/** One learner message, as graded by code: right, wrong (wrong verdict or a diagnosed error), or not gradable. */
+export type Ev = 'ok' | 'bad' | 'none';
+export interface StageProgress { events?: Ev[]; quickCheck?: { right: number; of: number }; tries: number; right: number; ownSentenceDone?: boolean; taskDone?: boolean; triesAfterTest?: number; rightAfterTest?: number; rightAfterTask?: number; learnerTurns?: number; opened?: boolean }
+/** pln2 amendment C: the quick check is ONE item, decided on the learner's answer in the very next turn (graded by code then). */
+export const QUICK_CHECK_ITEMS = 1;
+/** It closes once the learner has answered it, even if that answer could not be graded (then: PPP). */
+export const QUICK_CHECK_MAX_TURNS = 1;
+/** TASK: the learner's opening message plus 2 role-play answers, then the language focus. */
+export const TASK_TURNS = 3;
+/** TASK: this many wrong learner messages in a row inside the task end it early and go to the language focus (planner2c). */
+export const TASK_BAD_RUN = 2;
+type HistoryLike = { role: string; content?: string; languageTurn?: unknown };
+const sameText = (a?: string, b?: string) => { const n = (x?: string) => (x ?? '').toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim(); return Boolean(n(a)) && n(a) === n(b); };
 /** Progress in this lesson from the stored language-turn evidence (code-graded verdicts; never the model's own claim). */
-export function progressFromHistory(history: HistoryLike[]): StageProgress {
+export function progressFromHistory(history: HistoryLike[], current?: { verdict?: string | null; message?: string }): StageProgress {
   let tries = 0;
   let right = 0;
   let rightAfterTest = 0;
   let triesAfterTest = 0;
   let ownSentenceDone = false;
   let firstThreeRight = 0;
+  let learnerTurns = 0;
+  let rightAfterTask = 0;
+  const events: Ev[] = [];
   for (const t of history) {
+    if (t.role === 'user') { learnerTurns++; events.push('none'); continue; }
     if (t.role !== 'assistant' || !t.languageTurn || typeof t.languageTurn !== 'object') continue;
-    const lt = t.languageTurn as { assessment?: { verdict?: string }; ownSentence?: string };
+    const lt = t.languageTurn as { assessment?: { verdict?: string }; ownSentence?: string; diagnosis?: string };
+    {
+      const v0 = lt.assessment?.verdict;
+      const e: Ev = v0 === 'CORRECT' || v0 === 'CORRECT_WITH_EQUIVALENT_FORMULATION' ? 'ok' : v0 === 'INCORRECT' || v0 === 'PARTIALLY_CORRECT' || lt.diagnosis ? 'bad' : 'none';
+      if (events.length) events[events.length - 1] = e; // the reply grades the learner message before it
+    }
     const v = lt.assessment?.verdict;
     const ok = v === 'CORRECT' || v === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
     const bad = v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
     if (ok || bad) {
-      if (tries < 3 && ok) firstThreeRight++;
-      if (tries >= 3) { triesAfterTest++; if (ok) rightAfterTest++; }
+      if (tries < QUICK_CHECK_ITEMS && ok) firstThreeRight++;
+      if (tries >= QUICK_CHECK_ITEMS) { triesAfterTest++; if (ok) rightAfterTest++; }
       tries++;
       if (ok) right++;
+      if (ok && learnerTurns > TASK_TURNS) rightAfterTask++;
     }
     if (lt.ownSentence === 'feedback') ownSentenceDone = true;
   }
-  return { ...(tries >= 3 ? { quickCheck: { right: firstThreeRight, of: 3 } } : {}), tries, right, ownSentenceDone, triesAfterTest, rightAfterTest, opened: history.some((t) => t.role === 'assistant') };
+  // The quick check ends at 3 graded answers, or at QUICK_CHECK_MAX_TURNS learner answers with whatever was graded (an answer the
+  // engine cannot grade must not keep the learner in the no-teaching check). 0 graded -> PPP (S5).
+  // The answer just given, graded by code in this turn (keyVerdict): counted now, not one reply later (pln2 amendment C).
+  const cv = current?.verdict;
+  // planner2c: a free answer (no course key, e.g. a task sentence) is graded only after the reply. If the learner sends again the very
+  // message that was already graded wrong, that is evidence now: count it as wrong in this turn (PLN2c: the repeat came one reply late).
+  const lastUser = [...history].reverse().find((t) => t.role === 'user');
+  const repeatWrong = !cv && events.length > 0 && events[events.length - 1] === 'bad' && sameText(current?.message, lastUser?.content);
+  events.push(cv === 'CORRECT' || cv === 'CORRECT_WITH_EQUIVALENT_FORMULATION' ? 'ok' : cv === 'INCORRECT' || cv === 'PARTIALLY_CORRECT' || repeatWrong ? 'bad' : 'none');
+  if (cv === 'CORRECT' || cv === 'CORRECT_WITH_EQUIVALENT_FORMULATION' || cv === 'INCORRECT' || cv === 'PARTIALLY_CORRECT') {
+    const ok = cv === 'CORRECT' || cv === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
+    if (tries < QUICK_CHECK_ITEMS && ok) firstThreeRight++;
+    if (tries >= QUICK_CHECK_ITEMS) { triesAfterTest++; if (ok) rightAfterTest++; }
+    tries++;
+    if (ok) right++;
+  }
+  const qcDone2 = tries >= QUICK_CHECK_ITEMS || learnerTurns >= QUICK_CHECK_MAX_TURNS;
+  return {
+    ...(qcDone2 ? { quickCheck: { right: firstThreeRight, of: Math.min(tries, QUICK_CHECK_ITEMS) } } : {}),
+    events, tries, right, ownSentenceDone, triesAfterTest, rightAfterTest, learnerTurns,
+    taskDone: learnerTurns > TASK_TURNS, rightAfterTask,
+    opened: history.some((t) => t.role === 'assistant'),
+  };
 }
 
-/** Quick-check signals (planner2): a teen or adult lesson (not Pre-A1, no review opener) opens with 3 graded items. Until 3 are
- *  graded the check is pending; then its result decides TTT (2 or 3 right) or PPP. Without turn history there is no check. */
+/** Quick-check signals (planner2): a teen or adult lesson (not Pre-A1, no review opener) opens with ONE check item (amendment C).
+ *  Until the learner answers it the check is pending; then its result decides TTT (right) or PPP (wrong or ungraded). Without turn history there is no check. */
 export function quickCheckSignals(s: PlannerSignals, progress: StageProgress | undefined, opener: boolean): Pick<PlannerSignals, 'quickCheck' | 'quickCheckPending'> {
   if (!progress || opener || !(s.ageBand === 'teen' || s.ageBand === 'adult') || levelRank(s.level) === 0) return {};
   return progress.quickCheck ? { quickCheck: progress.quickCheck } : { quickCheckPending: true };
 }
 
-/** The stage for this turn: the quick check while pending; after it, PPP and LAD count only what came after the 3 test items
- *  (TTT's own test stage is the quick check). */
+/**
+ * planner2b: the stage for this reply, from the graded learner messages (ev[0] = the learner's opening message). The core rule:
+ * a lesson moves on only on evidence, and an error sends it back to teaching that gap. Never on turn count.
+ *  PPP: present (opening) -> practise until 2 right in a row -> produce (one own sentence) -> check (ONE item):
+ *       right -> done; wrong -> practise that gap until 1 right -> check again.
+ *  LAD: listen -> do until 2 right in a row -> chant (one reply) -> check, as PPP (wrong -> do).
+ *  TTT: test (the quick check) -> teach until 1 right -> retest: right -> done; wrong -> teach.
+ *  TASK: pretask -> task (the opening plus 2 role-play answers) -> errors in the task ? focus : done;
+ *        focus until the fix is right -> repeat (at most once) -> an error -> focus -> done; no error -> done.
+ */
+export function stageMachine(shape: LessonShape, ev: Ev[]): Stage {
+  if (shape === 'TTT') {
+    let st: Stage = 'test';
+    for (let k = 1; k < ev.length; k++) {
+      const e = ev[k];
+      if (st === 'test') { st = 'teach'; continue; } // the check answer decided the shape; teaching starts now
+      if (st === 'teach' && e === 'ok') st = 'retest';
+      else if (st === 'retest') st = e === 'ok' ? 'done' : e === 'bad' ? 'teach' : 'retest';
+    }
+    return st;
+  }
+  if (shape === 'TASK') {
+    let st: Stage = 'pretask'; let taskTurns = 0; let errs = false; let repeated = false; let badRun = 0;
+    for (let k = 1; k < ev.length; k++) {
+      const e = ev[k];
+      if (st === 'pretask') st = 'task';
+      if (st === 'task') {
+        taskTurns++; if (e === 'bad') errs = true;
+        badRun = e === 'bad' ? badRun + 1 : 0;
+        // planner2c: the same learner wrong twice in a row inside the task -> stop the task and teach now (PLN2b stuck learner s2001).
+        if (badRun >= TASK_BAD_RUN || taskTurns >= TASK_TURNS) st = errs ? 'focus' : 'done';
+        continue;
+      }
+      if (st === 'focus') { if (e === 'ok') st = repeated ? 'done' : 'repeat'; continue; }
+      if (st === 'repeat') { repeated = true; st = e === 'bad' ? 'focus' : 'done'; continue; }
+    }
+    return st;
+  }
+  const L = shape === 'LAD';
+  let st: Stage = L ? 'listen' : 'present'; let streak = 0; let need = 2;
+  for (let k = 1; k < ev.length; k++) {
+    const e = ev[k];
+    if (st === 'done') continue;
+    if (st === 'present' || st === 'listen') st = L ? 'do' : 'practise';
+    else if (st === 'produce' || st === 'chant') { st = 'check'; continue; }
+    else if (st === 'check') {
+      if (e === 'ok') st = 'done';
+      else if (e === 'bad') { st = L ? 'do' : 'practise'; need = 1; streak = 0; }
+      continue;
+    }
+    if (e === 'ok') streak++; else if (e === 'bad') streak = 0;
+    if (streak >= need) { st = need === 1 ? 'check' : L ? 'chant' : 'produce'; streak = 0; }
+  }
+  return st;
+}
+
+/** The stage for this turn: the quick check while pending; after it, TTT continues from the check answer and PPP starts its own
+ *  opening on the reply to the check answer (the check's item is not practice). */
 export function stageNow(lp: LessonPlan, progress: StageProgress): Stage {
   if (lp.shapeRule === 'S4q') return 'test';
-  if (progress.quickCheck && (lp.shape === 'PPP' || lp.shape === 'LAD')) {
-    return currentStage(lp.shape, { ...progress, tries: progress.tries - 3, right: progress.right - progress.quickCheck.right });
-  }
-  return currentStage(lp.shape, progress);
+  const ev = progress.events ?? ['none'];
+  if (lp.shape === 'PPP' && lp.quickCheckUsed && progress.quickCheck) return stageMachine('PPP', ev.slice(1));
+  return stageMachine(lp.shape, ev);
 }
+
+/** During the quick check the teaching method is not used: this line replaces the method's instructions. */
+export const QUICK_CHECK_PLAN_LINE = '- Teaching method: none in this opening reply (a one-item quick check); the method for this lesson starts in the next reply.';
+export const quickCheckActive = (lp: LessonPlan | undefined): boolean => lp?.shapeRule === 'S4q';
 
 /** Prompt lines for the chosen shape and stage (the model writes the reply inside them). Without a stage (no turn history,
  *  e.g. a voice call), the lesson starts at the first stage and the model is told the order only. */
@@ -383,7 +465,7 @@ export function shapeLines(lp: LessonPlan, stage?: Stage): string[] {
   return [
     `- Lesson shape: ${SHAPE_NAMES[lp.shape]} (${lp.stages.map((x) => STAGE_WORDS[x].split(':')[0]).join(' → ')}).${lp.opener ? ' First a short review from memory of earlier points.' : ''}`,
     lp.shapeRule === 'S4q'
-      ? '- This turn\'s stage: Quick check (3 short exercises before any teaching; the system grades them and then picks the lesson shape).'
+      ? '- This turn\'s stage: Quick check (one short exercise before any teaching; the system grades the answer and then picks the lesson shape).'
       : stage
       ? `- This turn's stage: ${STAGE_WORDS[stage]}. Stay in this stage; the system moves the stage on.`
       : `- Start with: ${STAGE_WORDS[lp.startStage]}; go on to the next stage only after the learner succeeds.`,

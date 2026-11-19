@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { planWithTrace, selectTeachingPlan, METHOD_RULES, type PlanInput } from '../src/services/pedagogyPolicy';
 import { STRATEGIES, validateComposition } from '../src/services/strategyRegistry';
 import {
-  METHOD_TABLE, SHAPE_RULES, SHAPE_STAGES, allowedMain, chooseShape, currentStage, levelRank, methodGateOk, planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow,
+  METHOD_TABLE, SHAPE_RULES, SHAPE_STAGES, allowedMain, chooseShape, stageMachine, levelRank, methodGateOk, planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow,
   type LessonShape, type PlannerSignals,
 } from '../src/services/lessonPlanner';
 import { engineV2 } from '../src/services/engineV2';
@@ -51,10 +51,12 @@ describe('off-parity', () => {
 
 describe('shape rows', () => {
   const cases: [string, PlannerSignals, string, LessonShape, string][] = [
-    ['Pre-A1 adult', { ageBand: 'adult', level: 'Pre-A1 Starters' }, 'not_assessed', 'LAD', 'S2a'],
-    ['Pre-A1 child age 11', { ageBand: 'child', ageYears: 11, level: 'pre-a1' }, 'not_assessed', 'LAD', 'S2a'],
-    ['child 7 at A1', { ageBand: 'child', ageYears: 7, level: 'A1' }, 'not_assessed', 'LAD', 'S2b'],
-    ['child 8 at A2', { ageBand: 'child', ageYears: 8, level: 'A2' }, 'developing', 'LAD', 'S2b'],
+    ['Pre-A1 adult', { ageBand: 'adult', level: 'Pre-A1 Starters', ladContent: true }, 'not_assessed', 'LAD', 'S2a'],
+    ['Pre-A1 adult, no listen-and-do content', { ageBand: 'adult', level: 'Pre-A1 Starters' }, 'not_assessed', 'PPP', 'S5'],
+    ['Pre-A1 child age 11', { ageBand: 'child', ageYears: 11, level: 'pre-a1', ladContent: true }, 'not_assessed', 'LAD', 'S2a'],
+    ['child 7 at A1', { ageBand: 'child', ageYears: 7, level: 'A1', ladContent: true }, 'not_assessed', 'LAD', 'S2b'],
+    ['child 7 at A1, no listen-and-do content -> PPP + child supports', { ageBand: 'child', ageYears: 7, level: 'A1' }, 'not_assessed', 'PPP', 'S2c'],
+    ['child 8 at A2', { ageBand: 'child', ageYears: 8, level: 'A2', ladContent: true }, 'developing', 'LAD', 'S2b'],
     ['child 9 at A1', { ageBand: 'child', ageYears: 9, level: 'A1' }, 'not_assessed', 'PPP', 'S2c'],
     ['child 12 at B1 with goal', { ageBand: 'child', ageYears: 12, level: 'B1', goal: 'exam' }, 'proficient', 'PPP', 'S2c'],
     ['child, age unknown, A1', { ageBand: 'child', level: 'A1' }, 'not_assessed', 'PPP', 'S2c'],
@@ -148,7 +150,7 @@ describe('★ gates', () => {
     expect(methodGateOk('interleaving', { ageBand: 'child', ageYears: 10 })).toBe(true);
   });
   it('children get scaffolding and a story or game frame; LAD gets a story', () => {
-    const lad = withEnv(ESL, () => planLesson(base({ masteryStatus: 'not_assessed', belowB1: true, ageBand: 'child' }), { ageBand: 'child', ageYears: 7, level: 'A1' }));
+    const lad = withEnv(ESL, () => planLesson(base({ masteryStatus: 'not_assessed', belowB1: true, ageBand: 'child' }), { ageBand: 'child', ageYears: 7, level: 'A1', ladContent: true }));
     expect(lad.shape).toBe('LAD');
     expect(lad.plan.supporting).toEqual(expect.arrayContaining(['narrative_contextual']));
     expect(lad.childSupports).toBe(true);
@@ -170,7 +172,7 @@ const GOALS: PlannerSignals['goal'][] = [undefined, 'work', 'exam', 'daily', 'sc
 const CHECKS: PlannerSignals['quickCheck'][] = [undefined, { right: 0, of: 3 }, { right: 1, of: 3 }, { right: 2, of: 3 }, { right: 3, of: 3 }];
 const MASTERY = ['not_assessed', 'emerging', 'developing', 'proficient', 'mastered'];
 function* signalGrid(): Generator<[PlannerSignals, string]> {
-  for (const [ageBand, ageYears] of AGES) for (const level of LEVELS) for (const goal of GOALS) for (const quickCheck of CHECKS) for (const m of MASTERY) for (const quickCheckPending of [false, true]) yield [{ ageBand, ageYears, level, goal, quickCheck, quickCheckPending }, m];
+  for (const [ageBand, ageYears] of AGES) for (const level of LEVELS) for (const goal of GOALS) for (const quickCheck of CHECKS) for (const m of MASTERY) for (const quickCheckPending of [false, true]) for (const ladContent of [false, true]) yield [{ ageBand, ageYears, level, goal, quickCheck, quickCheckPending, ladContent }, m];
 }
 
 describe('coverage', () => {
@@ -186,13 +188,13 @@ describe('coverage', () => {
       reached.add(r.id);
       const lr = levelRank(s.level);
       // LAD exactly for Pre-A1, or a child known to be under 9
-      expect(r.shape === 'LAD').toBe(lr === 0 || (s.ageBand === 'child' && s.ageYears !== undefined && s.ageYears < 9));
+      expect(r.shape === 'LAD').toBe(Boolean(s.ladContent) && (lr === 0 || (s.ageBand === 'child' && s.ageYears !== undefined && s.ageYears < 9)));
       if (s.ageBand === 'child') expect(['LAD', 'PPP']).toContain(r.shape);
       if (r.shape === 'TTT') expect(r.id === 'S4q' ? s.quickCheckPending : s.quickCheck!.right * 3 >= s.quickCheck!.of * 2).toBe(true);
       if (r.shape === 'TASK') expect((lr ?? -1) >= 3 && ['work', 'exam', 'daily'].includes(s.goal ?? '')).toBe(true);
-      if (s.ageBand === 'unknown') expect(r.shape).toBe(lr === 0 ? 'LAD' : 'PPP');
+      if (s.ageBand === 'unknown') expect(r.shape).toBe(lr === 0 && s.ladContent ? 'LAD' : 'PPP');
     }
-    expect(n).toBe(AGES.length * LEVELS.length * GOALS.length * CHECKS.length * MASTERY.length * 2);
+    expect(n).toBe(AGES.length * LEVELS.length * GOALS.length * CHECKS.length * MASTERY.length * 4);
     expect([...reached].sort()).toEqual(SHAPE_RULES.map((r) => r.id).sort());
   });
 
@@ -205,7 +207,7 @@ describe('coverage', () => {
     const inputs = planGrid(1500);
     const sigs: PlannerSignals[] = [
       { ageBand: 'adult', level: 'A1' }, { ageBand: 'adult', level: 'B2', goal: 'work' }, { ageBand: 'teen', level: 'A2', quickCheck: { right: 2, of: 3 } },
-      { ageBand: 'child', ageYears: 7, level: 'A1' }, { ageBand: 'child', ageYears: 10, level: 'A2' }, { ageBand: 'unknown' }, { ageBand: 'adult', level: 'Pre-A1' },
+      { ageBand: 'child', ageYears: 7, level: 'A1', ladContent: true }, { ageBand: 'child', ageYears: 7, level: 'A1' }, { ageBand: 'child', ageYears: 10, level: 'A2' }, { ageBand: 'unknown' }, { ageBand: 'adult', level: 'Pre-A1' },
       { ageBand: 'adult', level: 'B1', goal: 'daily' }, { ageBand: 'adult', level: 'C1', goal: 'exam' },
     ];
     for (const env of ['', ESL]) withEnv(env, () => {
@@ -253,31 +255,25 @@ describe('coverage', () => {
 // 4. Stages: code moves the stage on, forward only.
 
 describe('stages', () => {
-  it('PPP, TTT, TASK and LAD move forward from progress', () => {
-    expect(currentStage('PPP', { tries: 0, right: 0 })).toBe('present');
-    expect(currentStage('PPP', { tries: 2, right: 1 })).toBe('practise');
-    expect(currentStage('PPP', { tries: 3, right: 2 })).toBe('produce');
-    expect(currentStage('PPP', { tries: 4, right: 3, ownSentenceDone: true })).toBe('check');
-    expect(currentStage('TTT', { tries: 2, right: 2 })).toBe('test');
-    expect(currentStage('TTT', { tries: 3, right: 2, rightAfterTest: 0 })).toBe('teach');
-    expect(currentStage('TTT', { tries: 5, right: 3, rightAfterTest: 1 })).toBe('retest');
-    expect(currentStage('TASK', { tries: 0, right: 0 })).toBe('pretask');
-    expect(currentStage('TASK', { tries: 0, right: 0, opened: true })).toBe('task');
-    expect(currentStage('TASK', { tries: 1, right: 0, opened: true, taskDone: true })).toBe('focus');
-    expect(currentStage('TASK', { tries: 2, right: 1, opened: true, taskDone: true, rightAfterTest: 1 })).toBe('repeat');
-    expect(currentStage('LAD', { tries: 0, right: 0 })).toBe('listen');
-    expect(currentStage('LAD', { tries: 1, right: 1 })).toBe('do');
-    expect(currentStage('LAD', { tries: 2, right: 2 })).toBe('chant');
-    expect(currentStage('LAD', { tries: 3, right: 2, ownSentenceDone: true })).toBe('check');
+  it('planner2b: each shape moves only on graded evidence (ev[0] = the opening message)', () => {
+    const o = 'none' as const;
+    expect(stageMachine('PPP', [o])).toBe('present');
+    expect(stageMachine('PPP', [o, 'bad'])).toBe('practise');
+    expect(stageMachine('PPP', [o, 'ok', 'bad', 'ok'])).toBe('practise'); // not 2 in a row
+    expect(stageMachine('PPP', [o, 'ok', 'ok'])).toBe('produce');
+    expect(stageMachine('PPP', [o, 'ok', 'ok', 'none'])).toBe('check');
+    expect(stageMachine('TTT', [o])).toBe('test');
+    expect(stageMachine('TASK', [o])).toBe('pretask');
+    expect(stageMachine('LAD', [o])).toBe('listen');
+    expect(stageMachine('LAD', [o, 'ok', 'ok'])).toBe('chant');
   });
   it('progress comes from stored, code-graded verdicts; the stage follows it', () => {
     const t = (verdict?: string, ownSentence?: string) => ({ role: 'assistant', languageTurn: { ...(verdict ? { assessment: { verdict } } : {}), ...(ownSentence ? { ownSentence } : {}) } });
     const h = [{ role: 'user' }, t(), { role: 'user' }, t('INCORRECT'), { role: 'user' }, t('CORRECT'), { role: 'user' }, t('NOT_EVALUATED'), { role: 'user' }, t('CORRECT_WITH_EQUIVALENT_FORMULATION')];
     const p = progressFromHistory(h);
     expect([p.tries, p.right, p.ownSentenceDone]).toEqual([3, 2, false]);
-    expect(currentStage('PPP', p)).toBe('produce');
-    expect(currentStage('PPP', progressFromHistory([...h, t(undefined, 'feedback')]))).toBe('check');
-    expect(currentStage('PPP', progressFromHistory([]))).toBe('present');
+    expect(p.events).toEqual(['none', 'bad', 'ok', 'none', 'ok', 'none']); // one per learner message (last = this turn, ungraded)
+    expect(stageMachine('PPP', progressFromHistory([]).events!)).toBe('present');
     expect(progressFromHistory([{ role: 'user', languageTurn: { assessment: { verdict: 'CORRECT' } } }]).tries).toBe(0); // a learner turn never counts
   });
   it('without history (voice) no stage is claimed: start at the first stage', () => {
@@ -348,28 +344,6 @@ describe('quick check', () => {
     expect(quickCheckSignals(adult(), p0, true)).toEqual({});
     expect(quickCheckSignals(adult(), undefined, false)).toEqual({}); // voice: no history
   });
-  it('2 of 3 right -> TTT at teach; 1 of 3 -> PPP from present (the 3 test items do not count as practice)', () => {
-    const h2 = [g('CORRECT'), g('INCORRECT'), g('CORRECT')];
-    const p2 = progressFromHistory(h2);
-    expect(p2.quickCheck).toEqual({ right: 2, of: 3 });
-    const lp2 = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p2, false) });
-    expect([lp2.shape, lp2.shapeRule, stageNow(lp2, p2)]).toEqual(['TTT', 'S4', 'teach']);
-    const h1 = [g('INCORRECT'), g('INCORRECT'), g('CORRECT')];
-    const p1 = progressFromHistory(h1);
-    const lp1 = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p1, false) });
-    expect([lp1.shape, lp1.shapeRule, stageNow(lp1, p1)]).toEqual(['PPP', 'S5', 'present']);
-    const p1b = progressFromHistory([...h1, g('CORRECT'), g('CORRECT')]);
-    expect(stageNow(lp1, p1b)).toBe('produce');
-  });
-  it('while pending: TTT test stage, the prompt says quick check; the language engine drops teaching moves', () => {
-    const p = progressFromHistory([g('CORRECT')]);
-    const lp = planLesson(base({ masteryStatus: 'not_assessed', belowB1: true }), { ...adult(), ...quickCheckSignals(adult(), p, false) });
-    expect([lp.shape, lp.shapeRule, stageNow(lp, p)]).toEqual(['TTT', 'S4q', 'test']);
-    expect(shapeLines(lp, 'test').join('\n')).toMatch(/Quick check/);
-    for (const m of ['corrective_feedback_retry', 'scaffold_hint', 'answer_with_reasoning', 'short_explanation']) expect(QUICK_CHECK_DROPPED.has(m as never)).toBe(true);
-    expect(QUICK_CHECK_DROPPED.has('present_lesson_item' as never)).toBe(false);
-    expect(QUICK_CHECK_LINE).toMatch(/Do not teach, explain, hint, correct or give any answer/);
-  });
   it('a TASK learner skips the quick check (S3 comes first)', () => {
     const s = adult({ level: 'B1', goal: 'work' });
     const lp = planLesson(base({ masteryStatus: 'developing' }), { ...s, ...quickCheckSignals(s, progressFromHistory([]), false) });
@@ -417,5 +391,176 @@ describe('Arabic-transfer errors (l1_transfer)', () => {
     const lp = withEnv(ESL, () => planLesson(base({ masteryStatus: 'emerging', belowB1: true, misconceptions: [{ id: 'l1', category: 'l1_transfer', status: 'suspected' }] }), adult()));
     expect([lp.plan.primary, lp.methodRule]).toEqual(['analogy', 'P1_L1_CONTRAST']);
     expect(shapeLines(lp).join('\n')).toMatch(/Contrast the English form with how Arabic says it/);
+  });
+});
+
+describe('fixes from the harness build', () => {
+  const g = (verdict?: string) => ({ role: 'assistant', languageTurn: verdict ? { assessment: { verdict } } : {} });
+  const u = { role: 'user' };
+  it('children and other no-check lessons are not reset at the 4th graded answer', () => {
+    const h = [u, g('CORRECT'), u, g('CORRECT'), u, g('CORRECT'), u, g('INCORRECT')];
+    const p = progressFromHistory(h);
+    const kid = planLesson(base({ masteryStatus: 'emerging' }), { ageBand: 'child', ageYears: 10, level: 'A1' });
+    expect(kid.quickCheckUsed).toBe(false);
+    expect(stageNow(kid, p)).toBe('check'); // 2 right in a row -> produce -> check (no reset to present)
+    const lad = planLesson(base({ masteryStatus: 'emerging' }), { ageBand: 'child', ageYears: 7, level: 'A1', ladContent: true });
+    expect(stageNow(lad, p)).toBe('check');
+  });
+  it('TASK moves on: pre-task, task (2 role-play answers), focus on an error, then one repeat', () => {
+    const s = adult({ level: 'B1', goal: 'work' });
+    const lp = planLesson(base({ masteryStatus: 'developing' }), s);
+    expect(stageNow(lp, progressFromHistory([]))).toBe('pretask');
+    expect(stageNow(lp, progressFromHistory([u, g()]))).toBe('task');
+    expect(stageNow(lp, progressFromHistory([u, g(), u, g()]))).toBe('task');
+    expect(stageNow(lp, progressFromHistory([u, g(), u, g(), u, g('INCORRECT')]))).toBe('focus');
+    expect(stageNow(lp, progressFromHistory([u, g(), u, g(), u, g('INCORRECT'), u, g()]))).toBe('focus');
+    // this turn's answer (the fix) is right -> this reply repeats the task
+    expect(stageNow(lp, progressFromHistory([u, g(), u, g(), u, g('INCORRECT'), u, g()], { verdict: 'CORRECT' }))).toBe('repeat');
+  });
+  it('the quick check closes after 4 learner answers even if fewer than 3 could be graded', () => {
+    const p = progressFromHistory([u, g('CORRECT'), u, g(), u, g(), u, g()]);
+    expect(p.quickCheck).toEqual({ right: 1, of: 1 });
+    const lp = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p, false) });
+    expect([lp.shape, lp.shapeRule, stageNow(lp, p)]).toEqual(['TTT', 'S4', 'teach']);
+    const p0 = progressFromHistory([u, g(), u, g(), u, g(), u, g()]);
+    const lp0 = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p0, false) });
+    expect([lp0.shape, lp0.shapeRule]).toEqual(['PPP', 'S5']);
+  });
+});
+
+describe('pln2 deviation 1: present/listen last for the opening reply only', () => {
+  const u = { role: 'user' }; const a = { role: 'assistant', languageTurn: {} };
+  it('no graded answer yet: present, then practise; listen, then do', () => {
+    expect(stageMachine('PPP', progressFromHistory([]).events!)).toBe('present');
+    expect(stageMachine('PPP', progressFromHistory([u, a]).events!)).toBe('practise');
+    expect(stageMachine('LAD', progressFromHistory([]).events!)).toBe('listen');
+    expect(stageMachine('LAD', progressFromHistory([u, a]).events!)).toBe('do');
+  });
+});
+
+describe('pln2 amendment C: the quick check is one step', () => {
+  const u = { role: 'user' }; const a = (verdict?: string) => ({ role: 'assistant', languageTurn: verdict ? { assessment: { verdict } } : {} });
+  const qc = (hist: { role: string }[], current?: string) => {
+    const p = progressFromHistory(hist, { verdict: current ?? null });
+    const lp = planLesson(base({ masteryStatus: 'emerging', belowB1: true }), { ...adult(), ...quickCheckSignals(adult(), p, false) });
+    return { p, lp, stage: stageNow(lp, p) };
+  };
+  it('reply 1 is the check (no teaching); reply 2 already teaches, decided on the answer graded in that same turn', () => {
+    const r1 = qc([]);
+    expect([r1.lp.shapeRule, r1.stage]).toEqual(['S4q', 'test']);
+    const right = qc([u, a()], 'CORRECT');
+    expect([right.lp.shape, right.lp.shapeRule, right.stage]).toEqual(['TTT', 'S4', 'teach']);
+    const wrong = qc([u, a()], 'INCORRECT');
+    expect([wrong.lp.shape, wrong.lp.shapeRule, wrong.stage]).toEqual(['PPP', 'S5', 'present']);
+    const ungraded = qc([u, a()], null as never);
+    expect([ungraded.lp.shape, ungraded.lp.shapeRule]).toEqual(['PPP', 'S5']);
+  });
+  it('the run bug: a teen is never still in the check on reply 3 or 4', () => {
+    for (const v of ['CORRECT', 'INCORRECT', undefined]) {
+      expect(qc([u, a(), u, a(v)], 'INCORRECT').lp.shapeRule).not.toBe('S4q');
+      expect(qc([u, a(), u, a(v), u, a('CORRECT')]).lp.shapeRule).not.toBe('S4q');
+    }
+  });
+  it('TTT moves on to the re-test after a right answer following the check', () => {
+    const r = qc([u, a(), u, a('CORRECT')], 'CORRECT');
+    expect([r.lp.shape, r.stage]).toEqual(['TTT', 'retest']);
+  });
+  it('check prompts: one exercise, no teaching in that reply, method replaced, overrides the rest', async () => {
+    const m = await import('../src/services/lessonPlanner');
+    const lp = qc([]).lp;
+    expect(m.quickCheckActive(lp)).toBe(true);
+    expect(shapeLines(lp, 'test').join('\n')).toMatch(/one short exercise/);
+    expect(m.QUICK_CHECK_PLAN_LINE).toMatch(/one-item quick check/);
+    expect(QUICK_CHECK_LINE).toMatch(/ONE short exercise/);
+    expect(QUICK_CHECK_LINE).toMatch(/overrides any instruction above/);
+    for (const mv of ['corrective_feedback_retry', 'scaffold_hint', 'answer_with_reasoning', 'short_explanation']) expect(QUICK_CHECK_DROPPED.has(mv as never)).toBe(true);
+  });
+});
+
+describe('planner2b: move on only on evidence; on errors go back to teaching', () => {
+  const o = 'none' as const;
+  it('PPP/LAD check is ONE step: right -> done; wrong -> targeted practice (1 right) -> check again', () => {
+    const toCheck = [o, 'ok', 'ok', 'none'] as const;
+    expect(stageMachine('PPP', [...toCheck, 'ok'])).toBe('done');
+    expect(stageMachine('PPP', [...toCheck, 'bad'])).toBe('practise');
+    expect(stageMachine('PPP', [...toCheck, 'bad', 'ok'])).toBe('check');
+    expect(stageMachine('PPP', [...toCheck, 'bad', 'ok', 'ok'])).toBe('done');
+    expect(stageMachine('PPP', [...toCheck, 'none', 'none'])).toBe('check'); // ungraded: stays, never moves on a count
+    expect(stageMachine('PPP', [...toCheck, 'ok', 'bad'])).toBe('done'); // done is the end of this lesson's point
+    expect(stageMachine('LAD', [...toCheck, 'bad'])).toBe('do');
+    expect(stageMachine('LAD', [...toCheck, 'ok'])).toBe('done');
+  });
+  it('TTT: teach until right, retest; a wrong retest goes back to teach', () => {
+    expect(stageMachine('TTT', [o, 'bad'])).toBe('teach');
+    expect(stageMachine('TTT', [o, 'ok', 'none'])).toBe('teach');
+    expect(stageMachine('TTT', [o, 'ok', 'ok'])).toBe('retest');
+    expect(stageMachine('TTT', [o, 'ok', 'ok', 'bad'])).toBe('teach');
+    expect(stageMachine('TTT', [o, 'ok', 'ok', 'ok'])).toBe('done');
+  });
+  it('TASK: errors -> focus before any repeat; at most one repeat; no errors -> done', () => {
+    const task = (a: 'ok' | 'bad' | 'none', b: 'ok' | 'bad' | 'none', c: 'ok' | 'bad' | 'none') => [o, a, b, c] as ('ok' | 'bad' | 'none')[];
+    expect(stageMachine('TASK', task('none', 'none', 'none'))).toBe('done');
+    expect(stageMachine('TASK', task('none', 'bad', 'none'))).toBe('focus');
+    expect(stageMachine('TASK', [...task('none', 'bad', 'none'), 'none'])).toBe('focus'); // stays until the fix is right
+    expect(stageMachine('TASK', [...task('none', 'bad', 'none'), 'ok'])).toBe('repeat');
+    expect(stageMachine('TASK', [...task('none', 'bad', 'none'), 'ok', 'ok'])).toBe('done');
+    expect(stageMachine('TASK', [...task('none', 'bad', 'none'), 'ok', 'bad'])).toBe('focus');
+    expect(stageMachine('TASK', [...task('none', 'bad', 'none'), 'ok', 'bad', 'ok'])).toBe('done'); // no second repeat
+  });
+  it('TASK (planner2c): two wrong answers in a row inside the task end it early -> focus (PLN2b stuck learner s2001)', () => {
+    // s2001: "I get up always at seven." three times; the task held the learner for 3 messages before teaching.
+    expect(stageMachine('TASK', [o, 'bad'])).toBe('task'); // one error: the task goes on
+    expect(stageMachine('TASK', [o, 'bad', 'bad'])).toBe('focus'); // second error in a row: teach now, not on turn 3
+    expect(stageMachine('TASK', [o, 'bad', 'bad', 'bad'])).toBe('focus'); // stays in focus until the fix is right
+    expect(stageMachine('TASK', [o, 'bad', 'bad', 'ok'])).toBe('repeat');
+    expect(stageMachine('TASK', [o, 'bad', 'ok'])).toBe('task'); // not in a row: the task goes on
+    expect(stageMachine('TASK', [o, 'bad', 'ok', 'bad'])).toBe('focus'); // ends at 3 messages with errors, as before
+    expect(stageMachine('TASK', [o, 'ok', 'none', 'none'])).toBe('done');
+  });
+  it('planner2c: a task sentence is graded only after the reply, so the same wrong sentence sent again counts as wrong now', () => {
+    const wrong = { assessment: { verdict: 'INCORRECT' } };
+    const hist = [
+      { role: 'user', content: 'Hello! I have an exam. Can we practise always and usually?' },
+      { role: 'assistant', content: 'Tell me about your morning.', languageTurn: { assessment: { verdict: 'NOT_EVALUATED' } } },
+      { role: 'user', content: 'I get up always at seven.' },
+      { role: 'assistant', content: 'Nice. And after that?', languageTurn: wrong },
+    ];
+    const rep = progressFromHistory(hist, { verdict: null, message: 'I get up always at seven.' });
+    expect(rep.events).toEqual(['none', 'bad', 'bad']);
+    expect(stageMachine('TASK', rep.events!)).toBe('focus'); // teach now, one reply earlier than before
+    const other = progressFromHistory(hist, { verdict: null, message: 'Then I drink coffee.' });
+    expect(other.events).toEqual(['none', 'bad', 'none']); // a new sentence is not graded yet
+    expect(stageMachine('TASK', other.events!)).toBe('task');
+    const afterRight = progressFromHistory([...hist.slice(0, 3), { role: 'assistant', content: 'Good.', languageTurn: { assessment: { verdict: 'CORRECT' } } }], { verdict: null, message: 'I get up always at seven.' });
+    expect(afterRight.events).toEqual(['none', 'ok', 'none']); // only a repeat of a WRONG answer counts
+  });
+  it('a diagnosed error counts as an error even without a wrong verdict', () => {
+    const h = [{ role: 'user' }, { role: 'assistant', languageTurn: { diagnosis: 'copula_omitted' } }];
+    expect(progressFromHistory(h).events).toEqual(['bad', 'none']);
+  });
+  it('without listen-and-do content an under-9 gets PPP with child supports', () => {
+    const lp = planLesson(base({ masteryStatus: 'emerging' }), { ageBand: 'child', ageYears: 7, level: 'A1' });
+    expect([lp.shape, lp.shapeRule, lp.childSupports]).toEqual(['PPP', 'S2c', true]);
+  });
+});
+
+describe('planner2b: rule statements fade only on evidence', () => {
+  it('right-in-a-row streak and last-wrong come from this session (stored verdicts + this turn)', async () => {
+    const m = await import('../src/services/languageTeachingContext');
+    const a = (verdict: string) => ({ role: 'assistant', languageTurn: { assessment: { verdict } } });
+    const h = [{ role: 'user' }, a('CORRECT'), { role: 'user' }, a('INCORRECT'), { role: 'user' }, a('CORRECT')];
+    expect(m.sessionRightStreak(h)).toBe(1);
+    expect(m.sessionRightStreak(h, 'CORRECT')).toBe(2);
+    expect(m.lastGradedWrong(h, 'INCORRECT')).toBe(true);
+    expect(m.lastGradedWrong(h)).toBe(false);
+  });
+  it('after an error the rule is stated again (planner2 on); off: once per session as before', async () => {
+    const m = await import('../src/services/languageTeachingContext');
+    const spec = { successCriteria: ['Adds -s after he/she/it'] };
+    const hist = [{ role: 'user' }, { role: 'assistant', languageTurn: { rulesIntroduced: [1], assessment: { verdict: 'INCORRECT' } } }];
+    const sig = { answeringCheck: true, activeLessonItem: { criteria: [1] }, keyVerdict: 'INCORRECT' };
+    expect(withEnv('', () => m.rulesToIntroduce(hist, sig, spec))).toBeUndefined();
+    expect(withEnv('planner2', () => m.rulesToIntroduce(hist, sig, spec))?.criteria).toEqual([1]);
+    expect(withEnv('planner2', () => m.rulesToIntroduce(hist, { ...sig, keyVerdict: 'CORRECT' }, spec))).toBeUndefined();
   });
 });
