@@ -89,3 +89,5 @@ The run paused mid round 2 (commit 950ae1db) is **discarded**. Its round-1 data,
     - **Change made:** the runner sets this through `JUDGE_PER(round)`; its hash is re-synced in PROTOCOL §3. PROTOCOL §6 notes the change.
     - **Effect:** none intended on the data. A possible effect on judge quality from longer batches is watched by the round-3 and round-5 agreement checks (≥ 85% guard).
     - Not adopted: a proposal to judge only 10% of process events. Judge events are what update the simulated learner's state and set the next task, so the primary outcome depends on every case being judged.
+15. **Concurrency lowered to 2 (user request, 2026-11-19, during round 4) because the usage limit was near.** Agents already running were allowed to finish. **Effect: none** on the data.
+16. **Round 3, LE10: one shared reply.** `s792_LE_r1` and `s984_LE_r1` are on the same family lesson and both answered "She"; they got the same confirmation. Kept, as in deviation 10. **Effect:** negligible.
