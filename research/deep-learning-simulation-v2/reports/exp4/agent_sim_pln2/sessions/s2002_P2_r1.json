@@ -20,8 +20,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 4,
-   "C2": 4
+   "C1": 5,
+   "C2": 5
   },
   "start": {
    "W1": 2,
@@ -1221,7 +1221,109 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 4.\nC2 (correct) strength 3: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"A man is waiting for the bus.\" is correct. \"is\" and \"waiting\" work together to show what is happening now.\n\nThe task asked for more: two sentences, and one detail about where the people are. So far you have written one sentence.\n\nWrite one more sentence, about a different person at the bus station, and include a detail about where that person is.\n\nLEARNER'S LAST MESSAGE:\nA woman is sitting on the bench.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour sentence \"A woman is sitting on the bench.\" is correct. \"is sitting\" shows what is happening now, and \"on the bench\" gives a detail about where she is. With your first sentence, the bus station task is complete.\n\nHere is a fresh task to do on your own. Imagine a cafe at lunchtime. Write two sentences about what people are doing now, and add details such as where they are or what they have."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 4.\nC2 (correct) strength 3: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 4.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"A man is waiting for the bus.\" is correct. \"is\" and \"waiting\" work together to show what is happening now.\n\nThe task asked for more: two sentences, and one detail about where the people are. So far you have written one sentence.\n\nWrite one more sentence, about a different person at the bus station, and include a detail about where that person is.\n\nLEARNER'S LAST MESSAGE:\nA woman is sitting on the bench.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour sentence \"A woman is sitting on the bench.\" is correct. \"is sitting\" shows what is happening now, and \"on the bench\" gives a detail about where she is. With your first sentence, the bus station task is complete.\n\nHere is a fresh task to do on your own. Imagine a cafe at lunchtime. Write two sentences about what people are doing now, and add details such as where they are or what they have.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 4
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Your sentence \"A woman is sitting on the bench.\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"is sitting\" shows what is happening now"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "A woman is sitting on the bench."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "A woman is sitting on the bench."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "A man is eating a sandwich at the table.",
+    "errors": {
+     "W1": "A man eating a sandwich at the table.",
+     "W2": "A man eats a sandwich at the table."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 5
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1238,5 +1340,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "prescont",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 5,
+   "C2": 5
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

@@ -15,7 +15,7 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 2,
    "C2": 1
   },
@@ -981,7 +981,109 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 1: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 2: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 1: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are using the -ing word on its own here: \"My mother cooking rice.\"\n\nThe rule: to say what is happening now, we put am, is or are before the -ing word. Every sentence needs that small word.\n\nExample: \"My brother is washing the car.\"\n\nNow try the task again. Write two sentences about what people in a kitchen are doing now.\n\nLEARNER'S LAST MESSAGE:\nMy mother cooks rice.\nFACT: the last learner message contained the error of W2 (uses the plain present for now (\"Look! It rains.\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"My mother cooks rice.\" again. It is a clear sentence, but \"cooks\" tells us about a habit, not about this moment.\n\nThe answer is \"My mother is cooking rice.\" We use is + -ing for an action happening now, and \"cooks\" has no helping verb or -ing.\n\nRight: The children are playing in the garden. Wrong: The children play in the garden now.\n\nNow try a new one on your own. Imagine a bus stop. Write one sentence about what a person there is doing now."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 1: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 2: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 1: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are using the -ing word on its own here: \"My mother cooking rice.\"\n\nThe rule: to say what is happening now, we put am, is or are before the -ing word. Every sentence needs that small word.\n\nExample: \"My brother is washing the car.\"\n\nNow try the task again. Write two sentences about what people in a kitchen are doing now.\n\nLEARNER'S LAST MESSAGE:\nMy mother cooks rice.\nFACT: the last learner message contained the error of W2 (uses the plain present for now (\"Look! It rains.\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"My mother cooks rice.\" again. It is a clear sentence, but \"cooks\" tells us about a habit, not about this moment.\n\nThe answer is \"My mother is cooking rice.\" We use is + -ing for an action happening now, and \"cooks\" has no helping verb or -ing.\n\nRight: The children are playing in the garden. Wrong: The children play in the garden now.\n\nNow try a new one on your own. Imagine a bus stop. Write one sentence about what a person there is doing now.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 2,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is \"My mother is cooking rice.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "We use is + -ing for an action happening now"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "We use is + -ing for an action happening now"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: The children are playing in the garden. Wrong: The children play in the garden now."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "A man is waiting for the bus.",
+    "errors": {
+     "W1": "A man waiting for the bus.",
+     "W2": "A man waits for the bus."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W2",
+    "R1:W1",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -998,5 +1100,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "prescont",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 2,
+   "C2": 1
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -1109,7 +1109,87 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 3: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"I took an umbrella and it was raining.\" joins the two ideas, and it keeps the same two parts: the umbrella and the rain.\n\nLook at the joining word \"and\". This task needs a word that tells us the reason for taking the umbrella. Check whether \"and\" does that job.\n\nTry the sentence again with a different joining word.\n\nLEARNER'S LAST MESSAGE:\nI took an umbrella and it was raining.\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\")).\n\nTUTOR TURN TO JUDGE:\nYou are using \"and\" here. The word \"and\" adds one more fact, so the umbrella and the rain are just two facts side by side. The word \"because\" gives the reason, and the reason comes after it.\n\nExample with different words:\nI stayed home because I was ill.\nThe reason (I was ill) is after the joining word.\n\nNow try this item again. Join with because: \"I took an umbrella. It was raining.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 3: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"I took an umbrella and it was raining.\" joins the two ideas, and it keeps the same two parts: the umbrella and the rain.\n\nLook at the joining word \"and\". This task needs a word that tells us the reason for taking the umbrella. Check whether \"and\" does that job.\n\nTry the sentence again with a different joining word.\n\nLEARNER'S LAST MESSAGE:\nI took an umbrella and it was raining.\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\")).\n\nTUTOR TURN TO JUDGE:\nYou are using \"and\" here. The word \"and\" adds one more fact, so the umbrella and the rain are just two facts side by side. The word \"because\" gives the reason, and the reason comes after it.\n\nExample with different words:\nI stayed home because I was ill.\nThe reason (I was ill) is after the joining word.\n\nNow try this item again. Join with because: \"I took an umbrella. It was raining.\"",
+   "stateBefore": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The word \"and\" adds one more fact ... The word \"because\" gives the reason, and the reason comes after it."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I took an umbrella because it was raining.",
+    "errors": {
+     "W1": "I took an umbrella and it was raining."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1126,5 +1206,34 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "conj",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }
