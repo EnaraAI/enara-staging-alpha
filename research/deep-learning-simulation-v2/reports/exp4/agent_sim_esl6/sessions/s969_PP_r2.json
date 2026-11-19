@@ -621,6 +621,32 @@
    "primaryMax": 4,
    "ecRewrite": 1,
    "ecRewriteMax": 2
+  },
+  "imm": {
+   "form": "A",
+   "points": 8,
+   "max": 12,
+   "pct": 0.6666666666666666,
+   "free": 3,
+   "items1to4": 3,
+   "nulls": 0,
+   "primary": 3,
+   "primaryMax": 4,
+   "ecRewrite": 2,
+   "ecRewriteMax": 2
+  },
+  "del": {
+   "form": "B",
+   "points": 4,
+   "max": 12,
+   "pct": 0.3333333333333333,
+   "free": 3,
+   "items1to4": 0,
+   "nulls": 0,
+   "primary": 0,
+   "primaryMax": 4,
+   "ecRewrite": 1,
+   "ecRewriteMax": 2
   }
  },
  "stateEndS2": {
@@ -687,5 +713,35 @@
   "entries": [],
   "liveErrors": {},
   "knownPoints": {}
+ },
+ "stateDelayed": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

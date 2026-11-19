@@ -794,6 +794,32 @@
    "primaryMax": 4,
    "ecRewrite": 1,
    "ecRewriteMax": 2
+  },
+  "imm": {
+   "form": "C",
+   "points": 11,
+   "max": 12,
+   "pct": 0.9166666666666666,
+   "free": 6,
+   "items1to4": 3,
+   "nulls": 0,
+   "primary": 3,
+   "primaryMax": 4,
+   "ecRewrite": 2,
+   "ecRewriteMax": 2
+  },
+  "del": {
+   "form": "A",
+   "points": 7,
+   "max": 12,
+   "pct": 0.5833333333333334,
+   "free": 3,
+   "items1to4": 3,
+   "nulls": 0,
+   "primary": 3,
+   "primaryMax": 4,
+   "ecRewrite": 1,
+   "ecRewriteMax": 2
   }
  },
  "stateEndS2": {
@@ -864,5 +890,36 @@
   "knownPoints": {
    "lsn:1": 2
   }
+ },
+ "stateDelayed": {
+  "form": "s3",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1.5,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true,
+  "sec1": "thirdS"
  }
 }

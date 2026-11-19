@@ -735,6 +735,32 @@
    "primaryMax": 4,
    "ecRewrite": 1,
    "ecRewriteMax": 2
+  },
+  "imm": {
+   "form": "B",
+   "points": 9,
+   "max": 12,
+   "pct": 0.75,
+   "free": 5,
+   "items1to4": 3,
+   "nulls": 0,
+   "primary": 3,
+   "primaryMax": 4,
+   "ecRewrite": 1,
+   "ecRewriteMax": 2
+  },
+  "del": {
+   "form": "C",
+   "points": 6,
+   "max": 12,
+   "pct": 0.5,
+   "free": 3,
+   "items1to4": 3,
+   "nulls": 0,
+   "primary": 3,
+   "primaryMax": 4,
+   "ecRewrite": 0,
+   "ecRewriteMax": 2
   }
  },
  "stateEndS2": {
@@ -799,5 +825,34 @@
   "entries": [],
   "liveErrors": {},
   "knownPoints": {}
+ },
+ "stateDelayed": {
+  "form": "jobs",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1.5,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }
