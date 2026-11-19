@@ -8,12 +8,13 @@
 #   1 two asks <= 2% of LE turns; 2 early leaks LE <= PP (ESL5 definition: completed answer of a lesson item the learner has not solved with < 2 genuine
 #   failed attempts this session; the genuine-attempt count is rebuilt from the transcript and production facts by esl6Study.ts tags, the esl5_leak_recount
 #   method, not from the engine counter; releases and answers after >= 2 attempts counted separately); 3 blind answer_protection LE >= PP;
-#   4 judge agreement >= 85% overall AND >= 85% in session 2, no missing cases; 5 grader recheck >= 95% exact agreement on the PRIMARY item types
+#   4 judge agreement >= 85% overall AND >= 85% in the later agreement round (5; amendment A1), no missing cases; 5 grader recheck >= 95% exact agreement on the PRIMARY item types
 #   (DECISIONS 9 and 11; all-exact agreement and free-item QWK reported, not guards) (GRADER_RECHECK.json from esl6Study.ts recheckscore).
 # Decision (section 11): CONFIRMED only if p < 0.05 AND CI lower bound > 0 AND all five guards pass AND data complete (270 + 12 learners, both arms, both
-#   replications, 10 judged rounds, 3 forms scored each); otherwise NOT CONFIRMED. B2 no-harm is reported next to the decision.
+#   replications, 5 judged rounds (amendment A1), 3 forms scored each); otherwise NOT CONFIRMED. B2 no-harm is reported next to the decision.
 # The analysis refuses to decide on incomplete data (decision NOT CONFIRMED with complete = false, and the missing parts listed).
 # Usage: python3 src/offline/esl6_analyze.py reports/exp4/agent_sim_esl6
+ROUNDS = 5  # amendment A1 (2026-11-19, before round 1): one session of 5 turns, PROTOCOL §6; session-2 outputs are empty by design
 import json, os, random, sys
 from collections import defaultdict
 
@@ -57,7 +58,7 @@ for l in by:
         for k in (1, 2):
             r = by[l][a].get(k)
             if not r: problems.append(f'L{l} {a} rep{k} missing'); continue
-            if r.get('rounds') != 10: problems.append(f'L{l} {a} rep{k} judged rounds {r.get("rounds")}')
+            if r.get('rounds') != ROUNDS: problems.append(f'L{l} {a} rep{k} judged rounds {r.get("rounds")}')
             for t in TIMES:
                 if t not in (r.get('assess') or {}): problems.append(f'L{l} {a} rep{k} no {t} form')
 complete = not problems
@@ -122,7 +123,7 @@ sec['byOutcome'] = {o: diff_block(ls, 'del')[0] for o, ls in sorted(outs.items()
 for rep in (1, 2):
     dd = [score(by[l]['LE'][rep], 'del') - score(by[l]['PP'][rep], 'del') for l in EF if rep in by[l]['LE'] and rep in by[l]['PP'] and None not in (score(by[l]['LE'][rep], 'del'), score(by[l]['PP'][rep], 'del'))]
     sec[f'delayed_rep{rep}'] = {'n': len(dd), 'diff': r4(mean(dd)), 'ci95': boot(dd)}
-traj = defaultdict(lambda: [[] for _ in range(10)])
+traj = defaultdict(lambda: [[] for _ in range(ROUNDS)])
 for t in tags:
     if t.get('stateAfter') and t['band'] != 'B2': traj[t['arm']][t['turn'] - 1].append(sum(t['stateAfter']['s'][w] for w in t['stateAfter']['ws']))
 sec['trajectoryW1W2'] = {a: [round(mean(v), 3) if v else None for v in traj[a]] for a in traj}
@@ -191,12 +192,12 @@ res['ratingsMissingBatches'] = rateMissing
 le, pp = g['LE'], g['PP']
 ap = res['ratings'].get('LE', {}).get('answer_protection'); app = res['ratings'].get('PP', {}).get('answer_protection')
 agree = J('JUDGE_AGREEMENT.json'); rc = J('GRADER_RECHECK.json')
-a_all = agree.get('agreement') if agree else None; a_s2 = (agree.get('sessions', {}).get('2') or agree.get('sessions', {}).get(2) or {}).get('agreement') if agree else None
+a_all = agree.get('agreement') if agree else None; a_s2 = agree.get('late') if agree else None  # amendment A1: later agreement round (5) replaces session 2
 res['guards'] = {
     'twoAsks': {'LE': le['twoAsks'], 'turns': le['turns'], 'rate': round(le['twoAsks'] / max(le['turns'], 1), 4), 'rawBeforeGuard': le['twoAsksRaw'], 'pass': le['turns'] > 0 and le['twoAsks'] <= 0.02 * le['turns']},
     'earlyLeaks': {'LE': le['earlyLeakFinal'], 'PP': pp['earlyLeakFinal'], 'releasesLE_notLeaks': le['answerReleased'], 'answersAfterTwoFails': {'LE': le['answerAfterTwoFails'], 'PP': pp['answerAfterTwoFails']}, 'pass': le['turns'] > 0 and le['earlyLeakFinal'] <= pp['earlyLeakFinal']},
     'answerProtection': {'LE': ap, 'PP': app, 'pass': ap is not None and app is not None and ap >= app and not rateMissing},
-    'judgeAgreement': {'overall': a_all, 'session2': a_s2, 'pass': a_all is not None and a_s2 is not None and a_all >= 0.85 and a_s2 >= 0.85 and (agree or {}).get('missing', 1) == 0},
+    'judgeAgreement': {'overall': a_all, 'lateRound5': a_s2, 'pass': a_all is not None and a_s2 is not None and a_all >= 0.85 and a_s2 >= 0.85 and (agree or {}).get('missing', 1) == 0},
     'graderRecheck': {'primaryAgreement': (rc or {}).get('primaryAgreement'), 'exactAgreement': (rc or {}).get('exactAgreement'), 'qwk': (rc or {}).get('qwk'), 'sampled': (rc or {}).get('sampled'), 'pass': bool(rc and rc.get('pass'))},
 }
 res['validityFailure'] = not res['guards']['judgeAgreement']['pass']

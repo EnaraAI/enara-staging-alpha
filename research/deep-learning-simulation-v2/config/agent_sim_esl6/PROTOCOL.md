@@ -1,12 +1,20 @@
 # SIMULATION ONLY
 
-# ESL stage 6: confirmatory protocol (pre-registration, committed 2026-11-17, DECISIONS 16)
+# ESL stage 6: confirmatory protocol (pre-registration, committed 2026-11-17, DECISIONS 16; amended 2026-11-19 before round 1)
+
+> **Amendment A (2026-11-19, user decision, made and committed before any tutor reply of the restarted run; DEVIATIONS 4–7).** The run paused in round 2 is discarded and ESL6 restarts from `init`. Changes:
+> - **A1, one session:** 5 rounds, a single session of 5 turns, then the 7-day delayed test. It was 2 sessions × 5 turns. The reason is usage: about 410 agent runs instead of about 890, with power 0.77 instead of 0.65 (`POWER_A1.json`).
+> - **A2, grader recheck:** each distinct item-and-answer pair is scored once per scorer. The guard is unchanged.
+> - **A3, grader:** the round-12 grader fix (`graderV2.ts` `f4df7ca8…`) replaces the round-8 grader. `answercheck` was re-run: 0 failures, 15 grader-blind.
+> - **A4, models:** tutor agents run on Sonnet. Judges, agreement judges, recheck scorers, raters and fidelity checkers run on Opus.
+>
+> **Not tested by this study:** recall at the start of a second session (`reviewOpen`), and whether LE's lead holds through a second session. A follow-up study is proposed in section 14.
 
 This file must be committed before any ESL6 tutor reply is written. Nothing below may change after the first tutor reply is applied; any departure goes in `config/agent_sim_esl6/DEVIATIONS.md`. No real learners take part, and no API is called. Tutors, judges, raters, scorers and fidelity checkers are agents, with at most 3 running at a time. The binding user decisions 1–7 of `DECISIONS_FOR_PROTOCOL.md` (SHA-256 `6bba106b…b932e7`) are copied into the sections named in brackets: scoring (1, section 7), grader guard (2, section 10), ENARA arm with graderV2 (3, section 2), model path not used (4, section 7), 30 outcomes (5, section 5), forgetting check failed (6, section 12), sample size n = 180 at ~65% power (7, section 4).
 
 ## 1. The one claim
 
-On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outcomes, ENARA with `levelExplicit` plus the ESL5 bundle after the ESL5 instruction fixes, with graderV2 ON (arm **LE**), beats the strong plain baseline of ESL4/ESL5 (**P+**, arm **PP**) on the **delayed** outcome assessment (form given 7 simulated days after session 2), in percent of points.
+On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outcomes, ENARA with `levelExplicit` plus the ESL5 bundle after the ESL5 instruction fixes, with graderV2 ON (arm **LE**), beats the strong plain baseline of ESL4/ESL5 (**P+**, arm **PP**) on the **delayed** outcome assessment (form given 7 simulated days after the session; amendment A1), in percent of points.
 
 ## 2. Arms (exact configuration)
 
@@ -35,7 +43,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 | `backend/src/services/pedagogyPolicy.ts` | `fd0cad88cd51aa5ff5f80432d93ae1187221a4f106011a20803de0744ba7efbf` |
 | `backend/src/services/learningContext.ts` | `556c1ad4fa083732b41dc633d4c0363e971c29f19c15a51220235e9e1e87ca6c` |
 | `backend/src/models/LearnerLanguageProfile.ts` | `fbab9ad58f4d4a76d04bea2320dbf2a87c67f5f08c309519866045d7704dd01a` |
-| `backend/src/services/graderV2.ts` (round-8 fix, DECISIONS 12; inert B2 code, DECISIONS 15) | `80746e02f3c5b895f9d632d4d31f0ba56ec160187ff137115815d273b19915f4` |
+| `backend/src/services/graderV2.ts` (round-12 fix, amendment A3; was round-8 `80746e02…`) | `f4df7ca84ce482e237ab37a4c7057d8b0cd9c5a1c234bcbb609f8a5afc7150ef` |
 | `backend/src/services/grading.ts` | `dc0080001018d3cf7fae39b0a3919fa4e1ddd4a115136543ca1f586d234e601c` |
 | `backend/src/services/assessmentSecurity.ts` | `56c79bda5764d5e4b9aa201c38ec723cf6780bbd2a4add7c246007a4cfd2f477` |
 | `data/assessments/outcomes/*.json` (33 files, concatenated in name order) | `bf78f551a5292cd88632794618922bebf4f02efe372ece6d945a78a3be4383e4` |
@@ -47,13 +55,15 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 | `config/agent_sim_esl6/DECISIONS_FOR_PROTOCOL.md` | `9fb39ad04beaf6b4f1e64654dd23f7c1c6fc0e2d50edcc0d7b52665d7a960df0` |
 | `config/agent_sim_esl6/POWER.json` | `c55f59ce922b82a61d3439f0081d3e6fe2696ffda910ebc620f62b0050496b57` |
 | `src/offline/esl6_power.py` | `0ec99a73e53f1c8d515dddc919d3309b028e6536b62f690abc5e5f9d776fd78f` |
+| `config/agent_sim_esl6/POWER_A1.json` (amendment A1) | `aa14a1b8b08a8303a49c6e55c5c6e057b4ebf4e66154c6403a0f4fc3c04a739a` |
+| `src/offline/esl6_rounds_power.py` (amendment A1) | `e53c0e39d00284eb8c8e7202fb6ff89263134ab7698989f1cdd7e187d62edfed` |
 | `reports/exp4/agent_sim_esl6/validation/JUDGE_TASK_ESL6.md` (validated judge task) | `b081773d1538b35b13b88a3ca4c8020998cc967bb007af7e1a1cfbb634cd604a` |
 | `config/agent_sim_esl2/JUDGE_INSTRUCTIONS.md` | `cebaa834dd5522bb142f3d69e53254e298a6365bc1e41076c1c598b623a93a59` |
 | `config/agent_sim_esl4/PPLUS_PROMPT.txt` | `e373018e76243b1c6817dc1bdcbd8f60d3aff0cbf54d90312bbdd13cb7655472` |
 | `config/agent_sim_esl4/RATER_INSTRUCTIONS.md` (reused unchanged) | `77b8c0e6040b4bf5d8b3fb60ed23ea4e1d1ffc4f127f1cb52bf4346e9b1c69a8` |
 | `config/agent_sim_esl4/FIDELITY_INSTRUCTIONS.md` (reused unchanged) | `f4c0b7aa1e98e96ceb1ab16d00c381b50ae1e06215e457b6f3b6784b7fdd53e3` |
-| `src/offline/esl6Study.ts` (runner) | `b81667fb15e099253c163291195bc34dbb10185d558e9f35b7cce2dbe6d1b11d` |
-| `src/offline/esl6_analyze.py` (analysis and decision rule, sections 8–11) | `75f7fba473ba2d9e5b03c9ce236c28aa0537eea511871eae18d3d1ffb78544f3` |
+| `src/offline/esl6Study.ts` (runner) | `6a201f9c389cab76bdaf114ceeddd4f54e2e71fe36c41d652d82bcc275f603ac` |
+| `src/offline/esl6_analyze.py` (analysis and decision rule, sections 8–11) | `4715b01d358a356292a442701c7c9438f50a8670cfe4919232f0136e1df4ff3f` |
 | `src/offline/esl6Fixtures.ts` (lessons of the 30 outcomes) | `bda973481e314b0532557296e78dbd0679a0688f42ff8aa7b70a6f7189fa1cb7` |
 | `src/offline/esl6_forget.py` (F1 v2 and event rules, called by the runner) | `8cf37577da5cdb5d574a63cb2e8db6e0504a4814b039134292335072a2a960c1` |
 | `src/offline/esl6_outcomes.py` (belief texts of the 30 outcomes, called by the runner) | `3a39d975457fc30c83f4b7e57c8816b06a0868648f9c72faade83da6fc92d34d` |
@@ -88,6 +98,17 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 - **DECISIONS 14 (user, 2026-11-17: "n = 270"), after the primary outcome was narrowed to 4 gap-fill/choice items (DECISIONS 11):** conservative power (`POWER_C.json`, `src/offline/esl6_power_c.py`, SD scaled by √(6/4) to 0.4213) at +0.06: n = 180: 0.478; 240: 0.6125; **270: 0.653 (chosen)**; 300: 0.717. The table below is the original 6-item analysis, kept for the record.
 - **Result (original 6-item analysis): 80% power at +0.06 is NOT reachable inside 120–200.** The normal approximation needs n = 259 (270 as a multiple of 30) with the inflated SD, about 205 without inflation.
 - **Decision (DECISIONS 7, user: "n = 180, ~65% power"):** **n = 180** explicit-first learners (6 per outcome), the largest permitted multiple of 30, target effect +0.06 unchanged. **Power ≈ 0.65 with the inflated SD 0.344 (simulated 0.653, normal approximation 0.648); ≈ 0.77 with the uninflated ESL5 SD 0.307 (simulated 0.767).** The report must state the low power. (`POWER.json` is frozen as computed; its `status` field still reads "PENDING USER DECISION" and is superseded by DECISIONS 7.)
+
+- **Amendment A1 power (`config/agent_sim_esl6/POWER_A1.json`, `src/offline/esl6_rounds_power.py`):**
+  - **Method:**
+    - The effect and spread after round k come from ESL5's own sessions: expected controlled accuracy, explicit-first, both arms, 2 replications.
+    - The registered target (+0.06 at round 10) and the conservative SD (0.4213) are scaled by the ESL5 effect and spread at round k.
+    - n = 270, normal approximation.
+  - **Results:**
+    - 10 rounds: 0.648 (matches the registered 0.653);
+    - **5 rounds (chosen): 0.765** (target +0.064, SD 0.391);
+    - 3 rounds: 0.14–0.39.
+  - **Caveat:** ESL5 had 3 outcomes and an immediate test, so the figures are rough.
 
 ## 5. Learners
 
@@ -153,17 +174,17 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 
 ## 6. Design
 
-- **2 sessions × 5 turns = 10 rounds.** Session 2 is a **new chat 2 simulated days** after session 1 (LEARNING_RULES §7). Knowledge state and ENARA's record carry over; the tutor conversation does not (new chat for both arms; P+ gets only the lesson data and the new conversation).
-- **F1 v2** (`F1_PARAMS.json`, LEARNING_RULES §6) runs for 2 days between sessions and for **7 days** after session 2 before the delayed test; never inside a session. Retrieval counts come from the judge's `retrieval` field (§5b).
-- **2 replications;** every learner gets both arms in both replications: 282 × 2 × 2 = **1,128 sessions per round**, 11,280 tutor turns.
+- **1 session × 5 turns = 5 rounds (amendment A1).** The registered design was 2 sessions × 5 turns, with session 2 as a new chat 2 days later. The runner (`SESSIONS = 1`) stores the end-of-teaching state as `stateEndS2` (field name kept) and refuses `f1 <dir> 2`.
+- **F1 v2** (`F1_PARAMS.json`, LEARNING_RULES §6) runs for **7 days** after the session, before the delayed test; never inside a session. Retrieval counts come from the judge's `retrieval` field (§5b); with one session there are no session-2 retrieval rulings.
+- **2 replications;** every learner gets both arms in both replications: 282 × 2 × 2 = **1,128 sessions per round**, 5,640 tutor turns.
 - **Cells:** `<arm><rep><k>`, k = learner id mod 6 → 24 cells per round of 32 sessions, one tutor agent per cell writing every reply itself (scripted/templated/grouped replies kept as `PARTIAL_*` and redone).
-- **Judges:** blind, the ESL6 judge task (section 3) with ESL2 `JUDGE_INSTRUCTIONS.md` and ESL6 `LEARNING_RULES.md`; input = knowledge state, previous tutor turn, learner message, production fact, tutor turn (no arm). Batches of 36 (about 22 per round). Reading only, no scripts or helper files.
+- **Judges:** blind, the ESL6 judge task (section 3) with ESL2 `JUDGE_INSTRUCTIONS.md` and ESL6 `LEARNING_RULES.md`; input = knowledge state, previous tutor turn, learner message, production fact, tutor turn (no arm). Batches of 36 (32 per round) in rounds 1–2; **72 per batch (16 per round) from round 3 on** (DEVIATIONS 14, recorded before any round-3 judging; same task, same cases, every case judged). Reading only, no scripts or helper files.
 - **No session is dropped;** failed work is kept as `PARTIAL_*` and rerun. The analysis refuses to decide on incomplete data.
 
 ## 7. Measurement: the outcome assessment bank
 
 - **Forms:** each outcome's bank file has forms A, B, C (9 items, same types and sub-rules per position; 6 exact items × 1 point + 3 free/transfer items × 0/1/2 = **12 points per form**, checked for all 99 forms).
-- **Times:** pre-test before session 1 (starting state); immediate post-test at the end of session 2 (no F1); delayed post-test after 7 days of F1. Assessments never update the state and are not retrieval attempts.
+- **Times:** pre-test before session 1 (starting state); immediate post-test at the end of the session (no F1); delayed post-test after 7 days of F1. Assessments never update the state and are not retrieval attempts.
 - **Rotation (Latin square over A/B/C):** three sequences pre/immediate/delayed = **A/B/C, B/C/A, C/A/B**, assigned by position in the learner's block (position mod 3; tables in section 5). Each outcome: each sequence twice; A1 outcomes: each sequence once per band; each form appears equally often at each time. A learner keeps the same sequence in both arms and both replications, so the paired arm difference compares the same form.
 - **Which belief an item probes:** `ITEM_BELIEF_MAP.json` lists, for every item of the 30 outcomes × 3 forms, the wrong beliefs Wk (and their Ck) that could change its answer, by LEARNING_RULES §4a (ESL6 scope line): an item probes Wk if Wk's error (§1b row) could occur in it. Error-correction items probe the Wk whose error the prompt shows (from the item's `l1ErrorType`, matched to the §1b error type of the row) and any other Wk that could occur in the corrected sentence; free/transfer items probe every Wk of the row whose error can show in an answer to the prompt (where the prompt fixes a frame that cannot show it, e.g. an I-subject for "-s after can", or a key with no attributive adjective for adj–noun order, that Wk is not probed). Options that exclude Wk's error exclude Wk, as in §4a ("a or an" and "am, is or are" options exclude omission; choosing among given spellings excludes a spelling belief); a choice item answered by letter gets Wk's option letter. Every item has a one-line reason in the map (`note`). Items with an error type outside the row (e.g. copula item 6 `be_agreement_plural` → W2 "is with every subject"; a type with no §1b counterpart) are mapped by meaning; an item that probes no seeded Wk is listed as `none` and is answered from the key (it cannot differ between arms; count reported). The map is written by one agent from the bank and the rules only, before `init`, with no access to any session (authoring record `src/offline/esl6_answers_build.py`). **Counts:** 810 items; 173 probe `none`; 753 wrong strings.
 - **How the answer string is produced (deterministic, no agent):** for each item, each probed Wk fires independently with the LEARNING_RULES §2 probability for its rounded strength, raised to the §2a graded Ck floor (0.4 × max(0, 1 − Ck/2)) for answers after at least one F1 interval (immediate and delayed; not the pre-test). Dice: `sha256(seed | 'assess-' + <pre|imm|del> | item id | Wk)` → uniform [0,1); the first firing belief in W1, W2 order decides the error.
@@ -190,23 +211,23 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 - free-production score (items 7–9 only, delayed and immediate);
 - forgetting immediate → delayed (per arm and difference);
 - pre-test score (balance check) and gains;
-- per-round W1+W2 trajectory; stuck runs (ESL5 definition); answer releases (genuine / premature / already solved / not lesson items, ESL5 recount method), answers given after ≥ 2 failed attempts; session-2 turn types (ESL5 list);
+- per-round W1+W2 trajectory; stuck runs (ESL5 definition); answer releases (genuine / premature / already solved / not lesson items, ESL5 recount method), answers given after ≥ 2 failed attempts; session-2 turn types (ESL5 list; empty under amendment A1, reported as not applicable);
 - grader `null` count; items with probe `none`;
 - one blind rating pass (replication 1, ESL4 `RATER_INSTRUCTIONS.md` unchanged);
 - each replication separately;
-- **B2 no-harm:** every B2 learner ends session 2 with W1 = W2 = 0, and delayed score ≥ pre-test score, in both arms and replications.
+- **B2 no-harm:** every B2 learner ends the session with W1 = W2 = 0, and delayed score ≥ pre-test score, in both arms and replications.
 
 ## 10. Guards (all must pass)
 
 1. **Two asks:** final LE replies with two asks (`hasTwoAsks`, folded closings excepted) ≤ **2%** of LE turns (raw count also reported).
 2. **Early leaks:** LE ≤ PP, ESL5 definition (completed answer of a lesson item the learner has not solved with < 2 genuine failed attempts this session; releases and answers after ≥ 2 attempts counted separately). The genuine-attempt count is reconstructed from transcripts as in `esl5_leak_recount.py`, not from the engine counter.
 3. **Answer protection:** mean blind `answer_protection` LE ≥ PP.
-4. **Judge agreement:** in-study blind second judging of a stable 20% (`rand('esl6-agree', caseId) < 0.2`) in rounds 3 (session 1) and 8 (session 2); agreement ≥ **85% overall AND ≥ 85% in session 2**, no missing cases.
-5. **Grader recheck (DECISIONS 2):** a 10% sample of all scored assessment answers (all times, arms, learners, items), drawn with `rand('esl6-recheck', answerId) < 0.1` (fixed seed string). **3 independent agent scorers**, rubric (`docs/SCORING_RUBRIC.md`) and item only, blind to arm, learner, time and grader score; reference = majority (median for 0/1/2 if all differ). Target (DECISIONS 9 and 11): **≥ 95% exact agreement** grader vs reference on the **primary item types** (gap-fill and choice). Exact agreement on all exact items and QWK on free/transfer items are **reported, not guards**. Batches: `esl6Study.ts recheckprep` (40 answers per batch, own order per scorer, item + rubric fields + answer only); scored by `recheckscore` → `GRADER_RECHECK.json` (reference: majority, median if all three differ; exact agreement on exact items; quadratic-weighted kappa on 0/1/2 items); task `tasks/RECHECK_TASK.md`.
+4. **Judge agreement:** in-study blind second judging of a stable 20% (`rand('esl6-agree', caseId) < 0.2`) in rounds **3 and 5** (amendment A1; was 3 and 8); agreement ≥ **85% overall AND ≥ 85% in round 5** (the last round, with the closing turn; it replaces the session-2 condition), no missing cases.
+5. **Grader recheck (DECISIONS 2):** a 10% sample of all scored assessment answers (all times, arms, learners, items), drawn with `rand('esl6-recheck', answerId) < 0.1` (fixed seed string). **3 independent agent scorers**, rubric (`docs/SCORING_RUBRIC.md`) and item only, blind to arm, learner, time and grader score; reference = majority (median for 0/1/2 if all differ). Target (DECISIONS 9 and 11): **≥ 95% exact agreement** grader vs reference on the **primary item types** (gap-fill and choice). Exact agreement on all exact items and QWK on free/transfer items are **reported, not guards**. **Amendment A2:** answers and the grader are both deterministic, so sampled answers with the same item and answer string are scored **once per scorer**, under a pair id `u<hash>`. Every sampled answer takes its pair's scores, and the guard is computed over all sampled answers as before. Agreement over distinct pairs is also reported. Batches: `esl6Study.ts recheckprep` (40 distinct pairs per batch, own order per scorer, item + rubric fields + answer only); scored by `recheckscore` → `GRADER_RECHECK.json` (reference: majority, median if all three differ; exact agreement on exact items; quadratic-weighted kappa on 0/1/2 items); task `tasks/RECHECK_TASK.md`.
 
 ## 11. Decision rule (fixed now)
 
-**CONFIRMED** only if all hold: p < 0.05; 95% CI lower bound > 0; all five guards pass; data complete (270 + 12 learners, both arms, both replications, 10 judged rounds, 3 forms scored each). Otherwise **NOT CONFIRMED**. No secondary outcome, subgroup, outcome, replication or other analysis will be presented as confirming the claim. B2 no-harm is reported next to the decision.
+**CONFIRMED** only if all hold: p < 0.05; 95% CI lower bound > 0; all five guards pass; data complete (270 + 12 learners, both arms, both replications, 5 judged rounds (amendment A1), 3 forms scored each). Otherwise **NOT CONFIRMED**. No secondary outcome, subgroup, outcome, replication or other analysis will be presented as confirming the claim. B2 no-harm is reported next to the decision.
 
 ## 12. Limits and known issues (stated before any session)
 
@@ -223,6 +244,11 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 11. Assessment answers are deterministic strings per belief (`WRONG_ANSWERS.json`), agent-written; 15 of them are grader-blind (section 7) (section 7).
 12. Lessons are research fixtures of uneven fit: 3 outcomes have no practice items, several lessons are only loosely about the outcome (e.g. family: "This is my … He/She is …"; days-months shares the in/on/at lesson); 2 lesson items equal bank items (section 5).
 13. B2 no-harm uses "delayed ≥ pre-test"; with W = 0 an item still errs with probability 0.05 per probed belief on different forms, so a B2 learner can fail it by chance (seen in the dry run with scripted replies).
+14. **Amendment A1 limits:**
+    - With one session, the study does not test `reviewOpen` (recall at the start of a later session), the 2-day forgetting step between sessions, or whether LE's lead holds through a second session. That was ESL5's main improvement over ESL4.
+    - The closing turn, `releaseAfterTwo`, `ownSentence` and `fadeKnown` can still fire within 5 turns.
+    - Shorter teaching may ease the ceiling behind limit 1.
+15. **Amendment A4:** tutors run on a smaller model (Sonnet) than in ESL5. Both arms use the same tutor model, so the comparison stays paired, but absolute scores may differ from ESL5.
 
 ## 13. Run plan
 
@@ -230,9 +256,25 @@ All commands from `backend/`, `S=../research/deep-learning-simulation-v2/src/off
 
 0. DECISIONS 7 made (n = 180), superseded by DECISIONS 14 (n = 270). Files of section 3 written and hashed; `answercheck` must pass (passes: 0 failures, section 7); commit this protocol with all hashes. No session before that commit. A dry run with scripted replies and scripted judges (no agents) was run in a scratch folder (`DRY_RUN` marker) through every step below; re-run on 2026-11-17 with n = 270 and the 4-item primary: 1,128 sessions, 24 cells, 10,152 answers per assessment, grader null 0, 0 rejected events, analysis complete (n = 270).
 1. `npx tsx $S init $D` (hash checks, overlap check, 1,128 sessions); `assess $D pre` (pre-test, scored).
-2. Rounds 1–5 (session 1): per round `promptcheck` → 24 tutor cells (`tprompts` → answers → `tapply`, "applied 47 of 47") → `status` → `jprep r` → judges → `japply r`; round 3 also `agreeprep 3` + second judges.
-3. `f1 $D 2` (2 days). Rounds 6–10 (session 2, new chat), same steps; round 8 `agreeprep 8`.
+2. Rounds 1–5 (the only session, amendment A1): per round `promptcheck` → 24 tutor cells (`tprompts` → answers → `tapply`, "applied 47 of 47") → `status` → `jprep r` → judges → `japply r`; rounds 3 and 5 also `agreeprep r` + second judges. Agents run in batches of at most 2.
+3. (Amendment A1: no session 2, no `f1 $D 2`.)
 4. `assess $D imm`; `f1 $D 7`; `assess $D del`.
 5. `recheckprep $D` → 3 scorer agents (`tasks/RECHECK_TASK.md`) → `recheckscore $D`; `agreescore`; `tags $D` (TAGS.json, STUCK.json, leak recount); `post $D` (POST.json); `rateprep $D` → raters (`tasks/RATE_TASK.md`); `fidprep $D` → fidelity checkers (`tasks/FID_TASK.md`).
 6. `python3 src/offline/esl6_analyze.py reports/exp4/agent_sim_esl6` → `ANALYSIS.json`; report `reports/exp4/AGENT_SIM_ESL6.md`.
 7. **Usage limit:** stop cleanly at the end of the current cell or batch; write `reports/exp4/agent_sim_esl6/RESUME.md` (rounds complete, partial files and how to check them against the batch .md, exact next steps, deviations so far) and commit; resume from RESUME.md, never from memory.
+
+## 14. Follow-up study (proposal only; not part of ESL6, needs its own go and protocol)
+
+**ESL6b: second session.** It covers what amendment A1 leaves out.
+- **Design:**
+  - same arms, P+ against the frozen ESL5 setting;
+  - 2 sessions (5 + 3 turns), with a 2-day gap and F1 between them, then the 7-day delayed test.
+- **Learners:** about 90 new explicit-first learners on 6–9 outcomes. Use the outcomes where ESL6 shows the largest LE − PP gap; if it shows none, use the 3 ESL5 forms.
+- **Primary outcome:** the delayed score.
+- **Secondary outcomes:**
+  - the round-by-round gap through session 2 (does the lead hold?);
+  - `reviewOpen` recall success;
+  - session-2 turn types.
+- **Cost:** about 8 rounds × (8 tutor + 10 judge runs) + checks ≈ **180 agent runs**.
+- **Power:** to be computed from ESL6 data before it is registered.
+
