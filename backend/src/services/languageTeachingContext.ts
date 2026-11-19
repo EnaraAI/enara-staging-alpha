@@ -2085,9 +2085,25 @@ export function languageStateScope(p: { institutionId?: string; studentId?: stri
   return createHash('sha256').update(key).digest('hex').slice(0, 24);
 }
 
-/** planner2 quick check: moves that teach or correct, removed during the 3 test items. */
+/** planner2 (amendment C): the code grade of the learner's message in THIS turn (the same keyVerdict the language engine computes),
+ *  so the planner can decide the lesson shape on the quick-check answer now instead of one reply later. Null when not gradable. */
+export async function currentKeyVerdict(params: { institutionId?: string; curriculumId?: string; lessonId?: string; message: string; history: Turn[] }): Promise<string | null> {
+  try {
+    if (!params.curriculumId) return null;
+    const curriculum = await Curriculum.findOne({ id: params.curriculumId, ...(params.institutionId ? { institutionId: params.institutionId } : {}) }).select('type courseName name chapters').lean();
+    if (!curriculum || !isLanguageCourse(curriculum.type)) return null;
+    const chapter = (curriculum.chapters ?? []).find((c) => c.id === params.lessonId);
+    const lesson = deriveLessonContext(chapter as never, curriculum.courseName || curriculum.name);
+    if (lesson.status === 'none') return null;
+    return detectTurnSignals(params.message, params.history, { title: lesson.title, spec: lesson.spec }).keyVerdict ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** planner2 quick check: moves that teach or correct, removed in the quick-check reply. */
 export const QUICK_CHECK_DROPPED = new Set<MoveId>(['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'l1_support', 'activate_prior_knowledge']);
-export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this lesson opens with three short exercises, one at a time, to see what the learner already knows. Do not teach, explain, hint, correct or give any answer during them. After each answer say only a short neutral thanks (for example "Thanks, noted.") and give the next exercise. After the third, say the lesson starts now. This overrides any instruction above to confirm, correct, explain or model an answer.';
+export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this opening reply gives ONE short exercise from the lesson to see what the learner already knows. Do not teach, explain, hint or give any answer in this reply: a short greeting, then the exercise. The teaching starts in your next reply. This overrides any instruction above to explain, model or give an answer.';
 
 export async function buildLanguageTeachingContext(params: {
   institutionId?: string;

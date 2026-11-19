@@ -81,6 +81,8 @@ export async function buildObjectiveContext(params: {
   compact?: boolean;
   // planner2: this session's turns with their language-turn evidence, so code (not the model) sets the lesson stage.
   history?: { role: string; languageTurn?: unknown }[];
+  // planner2 (amendment C): the code grade of the learner's message in this turn.
+  currentVerdict?: string | null;
 }): Promise<ObjectiveContext | null> {
   try {
     if (!(await isFeatureEnabled(params.institutionId, 'adaptive_pedagogy_enabled'))) return null;
@@ -203,7 +205,7 @@ export async function buildObjectiveContext(params: {
         if (!input.misconceptions.some((m) => m.category === 'l1_transfer')) input.misconceptions = [{ id: `l1-session-${objective.id}`, category: 'l1_transfer', status: 'suspected' }, ...input.misconceptions];
         if (params.record) await recordL1Transfer({ institutionId: params.institutionId, studentId: params.studentId, objectiveId: objective.id, codes: l1 });
       }
-      progress = params.history ? progressFromHistory(params.history) : undefined;
+      progress = params.history ? progressFromHistory(params.history, { verdict: params.currentVerdict }) : undefined;
       const opener = reviewOpener(signals, input);
       lesson = planLesson(input, { ...signals, ...quickCheckSignals(signals, progress, opener) });
     }
@@ -365,6 +367,7 @@ export async function buildTeachingContext(params: {
   record?: boolean;
   // planner2: the session's turns (language-turn evidence) for the lesson stage.
   history?: { role: string; languageTurn?: unknown }[];
+  currentVerdict?: string | null;
 }): Promise<ObjectiveContext | null> {
   try {
     if (!(await isFeatureEnabled(params.institutionId, 'adaptive_pedagogy_enabled'))) return null;
@@ -382,6 +385,7 @@ export async function buildTeachingContext(params: {
       objectiveResolution: resolved.resolution,
       compact: params.compact,
       history: params.history,
+      currentVerdict: params.currentVerdict,
     });
   } catch (error) {
     logger.warn('teaching_context_failed', { error: serializeError(error) });

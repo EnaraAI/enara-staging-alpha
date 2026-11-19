@@ -43,10 +43,13 @@ for r in post: by[r['learner']][r['arm']] = r
 group_of = {r['learner']: r['group'] for r in post}
 
 
+USE_MAX = 6
+
 def pct(r, time, what):
     a = (r.get('assess') or {}).get(time)
     if not a: return None
     if what == 'primary': return a['primary'] / a['primaryMax'] if a['primaryMax'] else None
+    if what == 'use': return a['free'] / USE_MAX  # amendment C: own-sentence use (free-production items 7-9, 0-2 each)
     return a['pct']
 
 
@@ -62,6 +65,8 @@ def diff_block(time, what):
     return out
 
 
+use_del = diff_block('del', 'use'); use_imm = diff_block('imm', 'use')
+use_check = {g: {'diff': use_del[g]['diff'], 'ok': use_del[g]['diff'] is not None and use_del[g]['diff'] >= -0.05} for g in ('TASK', 'LAD')}
 delayed = diff_block('del', 'primary'); immediate = diff_block('imm', 'primary'); delayed_whole = diff_block('del', 'whole'); pre = diff_block('pre', 'primary')
 
 # ---------------------------------------------------------------------------------------------- turn tags: stuck, two asks, leaks
@@ -163,7 +168,7 @@ verdict = 'PASS' if complete and no_harm['pass'] and fit_rule['pass'] and judges
 
 res = {'_label': 'SIMULATION ONLY', 'complete': complete, 'missing': missing[:50], 'verdict': verdict,
        'passRules': {'noHarm': no_harm, 'fit': fit_rule, 'judges': judges},
-       'delayedPrimary': delayed, 'immediatePrimary': immediate, 'delayedWholeForm': delayed_whole, 'pretestPrimary_balance': pre,
+       'useDelayed': use_del, 'useImmediate': use_imm, 'useCheck_TASK_LAD': use_check, 'delayedPrimary': delayed, 'immediatePrimary': immediate, 'delayedWholeForm': delayed_whole, 'pretestPrimary_balance': pre,
        'turnStats': turn_stats, 'quickCheck': qc, 'tttSplit': ttt_split, 'fit': fit_table,
        'plannerP2': {'shapeStage': shape_dist, 'shapeByTurn': shape_by_turn, 'methodRule': method_dist, 'shapeMatch': shape_match, 'l1': l1}, 'offPrimaryMethod': off_method,
        'graderRecheck': recheck and {k: recheck.get(k) for k in ('primaryAgreement', 'exactAgreement', 'freeExactAgreement', 'sampled', 'pass')}}
@@ -188,6 +193,8 @@ def score_table(title, blk):
 
 score_table('Delayed test, primary items (no-harm measure)', delayed)
 score_table('Immediate test, primary items', immediate)
+score_table('Use (amendment C): own-sentence items 7-9 on the delayed test, share of 6 points', use_del)
+L.extend([f"Use check (reported, not part of the verdict): P2 - OFF >= -0.05 for TASK and LAD: {use_check}", ''])
 score_table('Delayed test, whole form', delayed_whole)
 score_table('Pre-test, primary items (balance check)', pre)
 L.extend([f"No-harm rule: overall CI lower bound {f(no_harm['overallCiLower'])} > -0.05 and no group mean below -0.05 -> {'pass' if no_harm['pass'] else 'FAIL'}", ''])

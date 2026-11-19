@@ -38,11 +38,11 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | File | SHA-256 |
 |---|---|
 | `backend/src/services/engineV2.ts` | `2f2a68665796c1322ccbc56f9893c936505830037422a50172785b91a018e9a7` |
-| `backend/src/services/lessonPlanner.ts` | `57e530a350fbec9420059f0d2f4b25495762fc3cc8ce5908447658b4600a3856` |
+| `backend/src/services/lessonPlanner.ts` | `062e8a361dad7c43e6925f5f0fd7b0d84e88b81bfd9f3dd51d0565f58c0a163c` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
-| `backend/src/services/learningContext.ts` | `e04770f8982c8e77a54e7f66fa3cc92090df6554460acd6cbc9053767a55ec83` |
+| `backend/src/services/learningContext.ts` | `5ed9c73478d66a178e569dac761415938e8125d8e78fc9a704ead49004bb1000` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
-| `backend/src/services/languageTeachingContext.ts` | `a137619242368092113f07ec1c17137dc2c5beaa6e7e892de05d48a13ed2fe5e` |
+| `backend/src/services/languageTeachingContext.ts` | `94e88887538d98537742502894937a638deb58ca5b16791e1e76200e4c7c645c` |
 | `backend/src/services/languageTurnPipeline.ts` | `2673ec40c37eec5a66ee364b5d0d65054d809bd2f38ff13f48b6843f93dfd9b1` |
 | `backend/src/services/languageLearningState.ts` | `d6ad94373485734fe2cd8b52a849a4af1c7b0055c3566d4bb72425b4837a2927` |
 | `backend/src/services/learnerLanguageProfile.ts` | `78e783f1d129339aa84e45fc6d49a3a2090ff09fe4f103793fb21ad936f56ec4` |
@@ -65,8 +65,8 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `b861336ad365ce456c070b666cc87f9fba1753decc8c2fbfb13b01d501cc93e0` |
-| `src/offline/pln2_analyze.py` (this analysis) | `553542d7ab2f471dab9c7b249db3f9760077e6b4f3ac7d17411a3bcd6284d6ff` |
+| `src/offline/pln2Study.ts` (this runner) | `f9f93eefe25e90278f2bb2844e007684e6b00928b6b59427fe83e1dfd2926e0e` |
+| `src/offline/pln2_analyze.py` (this analysis) | `a9aa17d509f5b3bd0919ca5dff920220b33bb76babea60edbfc2f37f135dd63f` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
 
@@ -157,5 +157,9 @@ The harness build found 4 planner bugs; fixed in `lessonPlanner.ts` (tests in `p
 4. The quick check had no cap. It now closes after 4 learner answers with whatever was graded (0 graded: PPP); a TTT lesson then goes to "teach", not back to "test".
 Hashes in §3 refreshed after these changes.
 
-## Deviations during the run
-See `reports/exp4/agent_sim_pln2/DEVIATIONS.md` (1: present/listen stage fix after round 2).
+## Amendment C (19 Nov 2026, owner decision; the run restarts from round 1)
+The first run was stopped before round 4 was judged (data kept in git history, last commit 024ead39) because two planner stage bugs made it unfit:
+1. **Teens stayed in the quick check for rounds 1–3 and were never taught.** Cause: the check asked 3 items one per reply, and each answer was graded only in the reply after it, so the check needed about 5 replies. Fix: the quick check is **one item in the opening reply**; the learner's answer is graded by code **in the same turn** as the next reply (`currentKeyVerdict` → `progressFromHistory(history, current)`), so reply 2 already teaches: right → TTT at "teach" (S4), wrong or ungraded → PPP at "present" (S5). This replaces the approved "2 of 3" threshold with "the one check item right" (owner: "the quick check should be one step, then teach the gaps").
+2. **Children's lessons stayed at "present"/"listen".** These stages set no exercise, so nothing was graded and the stage never moved. Fix: present/listen last for the opening reply only (was deviation 1 of the stopped run).
+3. **New measure: use.** Wrong-belief strength does not measure what TASK and LAD aim at. Added: the share of the 6 points on the delayed test's own-sentence items (positions 7–9, 0–2 each for using the target form in the learner's own sentence), per group, P2 − OFF with a bootstrap CI; reported check P2 − OFF ≥ −0.05 for TASK and LAD (not part of the verdict; n = 12 per group). **Fluency is not measured:** the simulated learners' answers come from rules, with no speed or automaticity, so fluency needs real learners (pilot: response time and words per turn).
+All other design and pass rules unchanged (7 rounds, 1 recheck scorer). Hashes in §3 refreshed.

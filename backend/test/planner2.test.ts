@@ -348,28 +348,6 @@ describe('quick check', () => {
     expect(quickCheckSignals(adult(), p0, true)).toEqual({});
     expect(quickCheckSignals(adult(), undefined, false)).toEqual({}); // voice: no history
   });
-  it('2 of 3 right -> TTT at teach; 1 of 3 -> PPP from present (the 3 test items do not count as practice)', () => {
-    const h2 = [g('CORRECT'), g('INCORRECT'), g('CORRECT')];
-    const p2 = progressFromHistory(h2);
-    expect(p2.quickCheck).toEqual({ right: 2, of: 3 });
-    const lp2 = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p2, false) });
-    expect([lp2.shape, lp2.shapeRule, stageNow(lp2, p2)]).toEqual(['TTT', 'S4', 'teach']);
-    const h1 = [g('INCORRECT'), g('INCORRECT'), g('CORRECT')];
-    const p1 = progressFromHistory(h1);
-    const lp1 = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p1, false) });
-    expect([lp1.shape, lp1.shapeRule, stageNow(lp1, p1)]).toEqual(['PPP', 'S5', 'present']);
-    const p1b = progressFromHistory([...h1, g('CORRECT'), g('CORRECT')]);
-    expect(stageNow(lp1, p1b)).toBe('produce');
-  });
-  it('while pending: TTT test stage, the prompt says quick check; the language engine drops teaching moves', () => {
-    const p = progressFromHistory([g('CORRECT')]);
-    const lp = planLesson(base({ masteryStatus: 'not_assessed', belowB1: true }), { ...adult(), ...quickCheckSignals(adult(), p, false) });
-    expect([lp.shape, lp.shapeRule, stageNow(lp, p)]).toEqual(['TTT', 'S4q', 'test']);
-    expect(shapeLines(lp, 'test').join('\n')).toMatch(/Quick check/);
-    for (const m of ['corrective_feedback_retry', 'scaffold_hint', 'answer_with_reasoning', 'short_explanation']) expect(QUICK_CHECK_DROPPED.has(m as never)).toBe(true);
-    expect(QUICK_CHECK_DROPPED.has('present_lesson_item' as never)).toBe(false);
-    expect(QUICK_CHECK_LINE).toMatch(/Do not teach, explain, hint, correct or give any answer/);
-  });
   it('a TASK learner skips the quick check (S3 comes first)', () => {
     const s = adult({ level: 'B1', goal: 'work' });
     const lp = planLesson(base({ masteryStatus: 'developing' }), { ...s, ...quickCheckSignals(s, progressFromHistory([]), false) });
@@ -450,13 +428,6 @@ describe('fixes from the harness build', () => {
     const lp0 = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p0, false) });
     expect([lp0.shape, lp0.shapeRule]).toEqual(['PPP', 'S5']);
   });
-  it('during the quick check the method instructions are replaced and the no-teaching line overrides the rest', async () => {
-    const m = await import('../src/services/lessonPlanner');
-    const lp = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), quickCheckPending: true });
-    expect(m.quickCheckActive(lp)).toBe(true);
-    expect(m.QUICK_CHECK_PLAN_LINE).toMatch(/none during the opening quick check/);
-    expect(QUICK_CHECK_LINE).toMatch(/overrides any instruction above/);
-  });
 });
 
 describe('pln2 deviation 1: present/listen last for the opening reply only', () => {
@@ -466,5 +437,44 @@ describe('pln2 deviation 1: present/listen last for the opening reply only', () 
     expect(currentStage('PPP', progressFromHistory([u, a]))).toBe('practise');
     expect(currentStage('LAD', progressFromHistory([]))).toBe('listen');
     expect(currentStage('LAD', progressFromHistory([u, a]))).toBe('do');
+  });
+});
+
+describe('pln2 amendment C: the quick check is one step', () => {
+  const u = { role: 'user' }; const a = (verdict?: string) => ({ role: 'assistant', languageTurn: verdict ? { assessment: { verdict } } : {} });
+  const qc = (hist: { role: string }[], current?: string) => {
+    const p = progressFromHistory(hist, { verdict: current ?? null });
+    const lp = planLesson(base({ masteryStatus: 'emerging', belowB1: true }), { ...adult(), ...quickCheckSignals(adult(), p, false) });
+    return { p, lp, stage: stageNow(lp, p) };
+  };
+  it('reply 1 is the check (no teaching); reply 2 already teaches, decided on the answer graded in that same turn', () => {
+    const r1 = qc([]);
+    expect([r1.lp.shapeRule, r1.stage]).toEqual(['S4q', 'test']);
+    const right = qc([u, a()], 'CORRECT');
+    expect([right.lp.shape, right.lp.shapeRule, right.stage]).toEqual(['TTT', 'S4', 'teach']);
+    const wrong = qc([u, a()], 'INCORRECT');
+    expect([wrong.lp.shape, wrong.lp.shapeRule, wrong.stage]).toEqual(['PPP', 'S5', 'present']);
+    const ungraded = qc([u, a()], null as never);
+    expect([ungraded.lp.shape, ungraded.lp.shapeRule]).toEqual(['PPP', 'S5']);
+  });
+  it('the run bug: a teen is never still in the check on reply 3 or 4', () => {
+    for (const v of ['CORRECT', 'INCORRECT', undefined]) {
+      expect(qc([u, a(), u, a(v)], 'INCORRECT').lp.shapeRule).not.toBe('S4q');
+      expect(qc([u, a(), u, a(v), u, a('CORRECT')]).lp.shapeRule).not.toBe('S4q');
+    }
+  });
+  it('TTT moves on to the re-test after a right answer following the check', () => {
+    const r = qc([u, a(), u, a('CORRECT')], 'CORRECT');
+    expect([r.lp.shape, r.stage]).toEqual(['TTT', 'retest']);
+  });
+  it('check prompts: one exercise, no teaching in that reply, method replaced, overrides the rest', async () => {
+    const m = await import('../src/services/lessonPlanner');
+    const lp = qc([]).lp;
+    expect(m.quickCheckActive(lp)).toBe(true);
+    expect(shapeLines(lp, 'test').join('\n')).toMatch(/one short exercise/);
+    expect(m.QUICK_CHECK_PLAN_LINE).toMatch(/one-item quick check/);
+    expect(QUICK_CHECK_LINE).toMatch(/ONE short exercise/);
+    expect(QUICK_CHECK_LINE).toMatch(/overrides any instruction above/);
+    for (const mv of ['corrective_feedback_retry', 'scaffold_hint', 'answer_with_reasoning', 'short_explanation']) expect(QUICK_CHECK_DROPPED.has(mv as never)).toBe(true);
   });
 });

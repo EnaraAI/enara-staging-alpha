@@ -244,7 +244,10 @@ function planOf(s: Sess): PlanOut {
   const l1 = hist.flatMap((t) => { const code = t.role === 'assistant' ? (t.languageTurn as { diagnosis?: string } | null)?.diagnosis : undefined; return code && (L1_TRANSFER_CODES as string[]).includes(code) ? [code] : []; });
   let l1Added = false;
   if (l1.length >= 2 && !input.misconceptions.some((m) => m.category === 'l1_transfer')) { input.misconceptions = [{ id: `l1-session-${l.outcome}`, category: 'l1_transfer', status: 'suspected' }, ...input.misconceptions]; l1Added = true; }
-  const progress = progressFromHistory(hist);
+  // amendment C: the code grade of the learner's message in this turn (tutor.controller -> currentKeyVerdict), as live.
+  const stAll = sessionTurns(s); const lz = lessonOf(l.outcome);
+  const currentVerdict = detectTurnSignals(stAll[stAll.length - 1].learner, hist, { title: lz.title, spec: lz.spec } as never).keyVerdict ?? null;
+  const progress = progressFromHistory(hist, { verdict: currentVerdict });
   const op = reviewOpener(signals, input);
   const lesson = planLesson(input, { ...signals, ...quickCheckSignals(signals, progress, op) });
   const stage = stageNow(lesson, progress);
