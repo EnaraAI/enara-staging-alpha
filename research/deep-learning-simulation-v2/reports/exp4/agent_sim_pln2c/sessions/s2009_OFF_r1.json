@@ -13,9 +13,9 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -378,7 +378,106 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you for your idea: \"a time word shows the past, so the verb need not change\". Let's test it.\n\nLook at the sentence: \"Yesterday I ___ (call) a customer.\" You are right that \"yesterday\" shows the time. Now look at the verb itself: does the verb \"call\" alone tell us the action is finished? Step 2 mentions an ending.\n\nTry again: write the complete sentence. Then write one more sentence about something you did yesterday, using a regular verb.\n\nLEARNER'S LAST MESSAGE:\ncalled\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"called\" is the correct form: \"call\" is a regular verb, so the ending -ed shows a finished action. You had a hint on that one, so let's check it again on your own.\n\nWrite one sentence about something your colleague did last week. Use a regular verb of your choice."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you for your idea: \"a time word shows the past, so the verb need not change\". Let's test it.\n\nLook at the sentence: \"Yesterday I ___ (call) a customer.\" You are right that \"yesterday\" shows the time. Now look at the verb itself: does the verb \"call\" alone tell us the action is finished? Step 2 mentions an ending.\n\nTry again: write the complete sentence. Then write one more sentence about something you did yesterday, using a regular verb.\n\nLEARNER'S LAST MESSAGE:\ncalled\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"called\" is the correct form: \"call\" is a regular verb, so the ending -ed shows a finished action. You had a hint on that one, so let's check it again on your own.\n\nWrite one sentence about something your colleague did last week. Use a regular verb of your choice.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"called\" is the correct form"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"call\" is a regular verb, so the ending -ed shows a finished action"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My colleague visited a client last week.",
+    "errors": {
+     "W1": "My colleague visit a client last week."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My colleague visit a client last week.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My colleague visit a client last week.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

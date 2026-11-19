@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -456,7 +456,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour idea is clear: \"I drink usually coffee after I wake up.\" The part to check is the position of \"usually\".\n\nLook at the words around it: \"I\", \"usually\", \"drink\", \"coffee\". Think about where a word like usually goes in relation to the verb \"drink\". Read your sentence again and write it again with the word in a better place.\n\nLEARNER'S LAST MESSAGE:\nI drink usually coffee after I wake up.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"I drink usually coffee after I wake up.\" is the same as before, so let's look at a different example.\n\nHere are two sentences of mine. The first is natural English, the second is not:\nWe always cook on Sunday.\nWe cook always on Sunday.\n\nIn English, a word like always, usually, sometimes or never goes before the main verb. Compare the two examples with your sentence, and write your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour idea is clear: \"I drink usually coffee after I wake up.\" The part to check is the position of \"usually\".\n\nLook at the words around it: \"I\", \"usually\", \"drink\", \"coffee\". Think about where a word like usually goes in relation to the verb \"drink\". Read your sentence again and write it again with the word in a better place.\n\nLEARNER'S LAST MESSAGE:\nI drink usually coffee after I wake up.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"I drink usually coffee after I wake up.\" is the same as before, so let's look at a different example.\n\nHere are two sentences of mine. The first is natural English, the second is not:\nWe always cook on Sunday.\nWe cook always on Sunday.\n\nIn English, a word like always, usually, sometimes or never goes before the main verb. Compare the two examples with your sentence, and write your sentence again.",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "We always cook on Sunday. / We cook always on Sunday."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a word like always, usually, sometimes or never goes before the main verb"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I usually drink coffee after I wake up.",
+    "errors": {
+     "W1": "I drink usually coffee after I wake up."
+    }
+   },
+   "applied": [
+    "R2:W1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I usually drink coffee after I wake up.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I usually drink coffee after I wake up.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

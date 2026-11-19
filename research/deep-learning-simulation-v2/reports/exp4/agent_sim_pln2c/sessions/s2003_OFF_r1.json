@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 2,
    "C1": 1,
    "C2": 0
@@ -386,7 +386,117 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you for sharing your idea: \"the main verb keeps the past form after did\". Let's check it.\n\nLook at the word \"did\" in the question. Think about which word in the question already shows the past, and what that means for the verb that comes after it.\n\nTry again: write a full question to ask a colleague about yesterday, using \"did\" and the verb \"finish\".\n\nLEARNER'S LAST MESSAGE:\nYou finished the report yesterday?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"You finished the report yesterday?\" is a clear question about a finished action, and \"the report\" and \"yesterday\" fit the situation. The question form itself needs one change.\n\nThe answer is: \"Did you finish the report yesterday?\" After \"did\", the main verb stays in its base form, because \"did\" already shows the past.\n\nRight: Did she call the client on Monday?\nWrong: Did she called the client on Monday?\n\nNow try one on your own: write a question to ask a friend about last Sunday, using \"did\" and the verb \"visit\". Then tell me in a few words why you chose that form of the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you for sharing your idea: \"the main verb keeps the past form after did\". Let's check it.\n\nLook at the word \"did\" in the question. Think about which word in the question already shows the past, and what that means for the verb that comes after it.\n\nTry again: write a full question to ask a colleague about yesterday, using \"did\" and the verb \"finish\".\n\nLEARNER'S LAST MESSAGE:\nYou finished the report yesterday?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"You finished the report yesterday?\" is a clear question about a finished action, and \"the report\" and \"yesterday\" fit the situation. The question form itself needs one change.\n\nThe answer is: \"Did you finish the report yesterday?\" After \"did\", the main verb stays in its base form, because \"did\" already shows the past.\n\nRight: Did she call the client on Monday?\nWrong: Did she called the client on Monday?\n\nNow try one on your own: write a question to ask a friend about last Sunday, using \"did\" and the verb \"visit\". Then tell me in a few words why you chose that form of the verb.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is: \"Did you finish the report yesterday?\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After \"did\", the main verb stays in its base form, because \"did\" already shows the past."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Did she call the client on Monday? Wrong: Did she called the client on Monday?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you visit your grandmother last Sunday?",
+    "errors": {
+     "W1": "Did you visited your grandmother last Sunday?",
+     "W2": "You visited your grandmother last Sunday?"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "You visited your grandmother last Sunday?",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "You visited your grandmother last Sunday?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
