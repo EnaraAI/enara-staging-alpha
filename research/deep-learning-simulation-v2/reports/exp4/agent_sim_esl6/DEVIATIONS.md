@@ -53,3 +53,16 @@ The run paused mid round 2 (commit 950ae1db) is **discarded**. Its round-1 data,
 - immediate test, `f1 7`, delayed test (grader null 0);
 - recheck (deduplicated), `agreescore`, `tags`, `post`, `rateprep` (29 batches), `fidprep` (8 batches);
 - analysis: complete = true with 5 rounds.
+
+## During the run (restarted study)
+
+9. **Round 1, LE23: tutor agent scratch files.**
+   - The tutor agent wrote two scratch files outside the repository (`/tmp/claude-0/f.txt`, `f2.txt`) to condense the `tprompts` output, then deleted them.
+   - It wrote all 47 replies itself: 47 distinct replies, 47 of 47 with the hidden assessment line.
+   - No study file was affected. This is the same kind of event as ESL5 deviation 2.
+   - **Effect: none.**
+10. **Round 1, LE22: one reply used for two sessions.**
+    - `s746_LE_r2` (prepositions-time) and `s782_LE_r2` (days-months) got the same first reply, an in/on/at rule and exercise.
+    - Both outcomes use the same lesson (PROTOCOL §5a and §12, limit 12), so the same first item fits both.
+    - The other 45 replies in the cell are distinct. Kept as written: it is not a scripted or grouped cell.
+    - **Effect:** negligible (1 of 1,128 round-1 replies).
