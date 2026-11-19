@@ -65,7 +65,11 @@
  "rec": {
   "entries": [],
   "liveErrors": {},
-  "knownPoints": {}
+  "knownPoints": {
+   "lsn:1": 1,
+   "lsn:2": 1,
+   "lsn:3": 1
+  }
  },
  "turns": [
   {
@@ -222,7 +226,58 @@
     "probes": [
      "W1"
     ]
-   }
+   },
+   "lang": {
+    "assessment": {
+     "verdict": "CORRECT",
+     "relevance": "ACTIVE_ITEM",
+     "criteria": [
+      1,
+      2,
+      3
+     ],
+     "next": "NEW_ITEM",
+     "item": "p2",
+     "source": "answer_key"
+    },
+    "activeItem": {
+     "id": "lesson:p2",
+     "source": "lesson",
+     "lessonItemId": "p2"
+    },
+    "hintLevel": 0,
+    "rulesIntroduced": [
+     3
+    ]
+   },
+   "markerStatus": "ok",
+   "qualityFlags": [
+    "possible_answer_leak_new_item"
+   ],
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": true,
+   "rulesIntroduced": [
+    3
+   ],
+   "profileLines": 0,
+   "ev5": {},
+   "engineVerdict": "CORRECT",
+   "recordLive": [],
+   "tutor": "Yes, \"Can I have a coffee, please?\" is polite and correct.\n\nExample: \"Give me a pencil.\" becomes \"Can I have a pencil, please?\" Rule: ask with \"Can I have\" and add \"please\".\n\nRight: \"Can I have an apple, please?\" Wrong: \"Give me an apple.\"\n\nNow you try:\nYou are thirsty in a cafe. Ask for a tea politely.",
+   "raw": "[[assess verdict=CORRECT relevance=ACTIVE_ITEM criteria=1,2,3 next=NEW_ITEM item=p2]]\nYes, \"Can I have a coffee, please?\" is polite and correct.\n\nExample: \"Give me a pencil.\" becomes \"Can I have a pencil, please?\" Rule: ask with \"Can I have\" and add \"please\".\n\nRight: \"Can I have an apple, please?\" Wrong: \"Give me an apple.\"\n\nNow you try:\nYou are thirsty in a cafe. Ask for a tea politely.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false
   }
  ],
  "assess": {
