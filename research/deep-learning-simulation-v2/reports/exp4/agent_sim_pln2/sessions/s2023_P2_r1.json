@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -314,7 +314,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 1: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Sure, here is one short exercise.\n\nMake this polite: \"Give me a coffee.\"\n\nLEARNER'S LAST MESSAGE:\nGive me a coffee.\nFACT: the last learner message contained the error of W1 (makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\")).\n\nTUTOR TURN TO JUDGE:\nYour answer \"Give me a coffee.\" is the same as the sentence in the task, so nothing has changed yet. A polite request needs a different start and one extra word.\nLook at one example together.\nStep 1: \"Give me water.\" is a blunt order. Step 2: I change the start and add a polite word at the end. Step 3: \"Can I have water, please?\"\nRule: start with Can I have, then the thing, then please.\nRight: Can I have an apple, please? Wrong: Give me an apple.\n\nNow try this one. Make it polite: \"Give me a pen.\" Tell me which words you change."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 1: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Sure, here is one short exercise.\n\nMake this polite: \"Give me a coffee.\"\n\nLEARNER'S LAST MESSAGE:\nGive me a coffee.\nFACT: the last learner message contained the error of W1 (makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\")).\n\nTUTOR TURN TO JUDGE:\nYour answer \"Give me a coffee.\" is the same as the sentence in the task, so nothing has changed yet. A polite request needs a different start and one extra word.\nLook at one example together.\nStep 1: \"Give me water.\" is a blunt order. Step 2: I change the start and add a polite word at the end. Step 3: \"Can I have water, please?\"\nRule: start with Can I have, then the thing, then please.\nRight: Can I have an apple, please? Wrong: Give me an apple.\n\nNow try this one. Make it polite: \"Give me a pen.\" Tell me which words you change.",
+   "stateBefore": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: start with Can I have, then the thing, then please."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Can I have an apple, please? Wrong: Give me an apple."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Can I have a pen, please?",
+    "errors": {
+     "W1": "Give me a pen."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Can I have a pen, please?",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "Can I have a pen, please?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -314,7 +314,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 1: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Let's match jobs to places.\n\nA baker makes bread in a bakery. So: a baker works in a bakery.\n\nRule: each job works in its own place.\n\nRight: A baker works in a bakery. Wrong: A baker works in a school.\n\nYour turn. Complete: \"A doctor works in a ___.\"\n\nLEARNER'S LAST MESSAGE:\nhospitl\nFACT: the last learner message contained the error of W1 (leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\")).\n\nTUTOR TURN TO JUDGE:\nYes! A doctor works in a hospital. You chose the right place. Check the spelling of your word once: \"hospitl\" is missing a letter.\n\nNext one. Complete: \"A chef works in a ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 1: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Let's match jobs to places.\n\nA baker makes bread in a bakery. So: a baker works in a bakery.\n\nRule: each job works in its own place.\n\nRight: A baker works in a bakery. Wrong: A baker works in a school.\n\nYour turn. Complete: \"A doctor works in a ___.\"\n\nLEARNER'S LAST MESSAGE:\nhospitl\nFACT: the last learner message contained the error of W1 (leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\")).\n\nTUTOR TURN TO JUDGE:\nYes! A doctor works in a hospital. You chose the right place. Check the spelling of your word once: \"hospitl\" is missing a letter.\n\nNext one. Complete: \"A chef works in a ___.\"",
+   "stateBefore": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "A doctor works in a hospital. ... \"hospitl\" is missing a letter."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "A doctor works in a hospital."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "kitchen",
+    "errors": {
+     "W1": "kitchn"
+    }
+   },
+   "applied": [
+    "R2:W1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "kitchen",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "kitchen",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
