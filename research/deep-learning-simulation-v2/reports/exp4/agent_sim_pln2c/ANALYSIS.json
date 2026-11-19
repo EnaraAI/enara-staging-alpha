@@ -1,0 +1,406 @@
+{
+ "_label": "SIMULATION ONLY",
+ "complete": true,
+ "missing": [],
+ "verdict": "NOT PASSED",
+ "passRules": {
+  "noHarm": {
+   "overallCiLower": -0.1458,
+   "groupDiffs": {
+    "TASK": -0.0208
+   },
+   "pass": false
+  },
+  "fit": {
+   "ownRubric": {
+    "TASK": {
+     "OFF": 0.3889,
+     "P2": 0.5833,
+     "diff": 0.1944,
+     "ci95": [
+      0.0278,
+      0.3889
+     ],
+     "n": 12
+    }
+   },
+   "quickCheckCompliance": null,
+   "pass": true
+  },
+  "judges": {
+   "event": 0.9286,
+   "eventMissing": 0,
+   "fit": 0.8529,
+   "fitWithin1": 1,
+   "pass": true
+  },
+  "guards": {
+   "values": {
+    "OFF": {
+     "stuck": 0,
+     "indepCorrect": 2,
+     "earlyLeaks": 1
+    },
+    "P2": {
+     "stuck": 0,
+     "indepCorrect": 0,
+     "earlyLeaks": 0
+    }
+   },
+   "stuckOk": true,
+   "indepOk": false,
+   "leaksOk": true,
+   "pass": false
+  }
+ },
+ "useDelayed": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.7778,
+   "P2": 0.8333,
+   "diff": 0.0556,
+   "ci95": [
+    -0.0556,
+    0.1944
+   ],
+   "P2_better": 2,
+   "same": 9,
+   "OFF_better": 1
+  },
+  "ALL": {
+   "n": 12,
+   "OFF": 0.7778,
+   "P2": 0.8333,
+   "diff": 0.0556,
+   "ci95": [
+    -0.0556,
+    0.1944
+   ],
+   "P2_better": 2,
+   "same": 9,
+   "OFF_better": 1
+  }
+ },
+ "useImmediate": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.8889,
+   "P2": 0.8333,
+   "diff": -0.0556,
+   "ci95": [
+    -0.1667,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 11,
+   "OFF_better": 1
+  },
+  "ALL": {
+   "n": 12,
+   "OFF": 0.8889,
+   "P2": 0.8333,
+   "diff": -0.0556,
+   "ci95": [
+    -0.1667,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 11,
+   "OFF_better": 1
+  }
+ },
+ "useCheck_TASK_LAD": {
+  "TASK": {
+   "diff": 0.0556,
+   "ok": true
+  }
+ },
+ "delayedPrimary": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.7917,
+   "P2": 0.7708,
+   "diff": -0.0208,
+   "ci95": [
+    -0.1458,
+    0.1042
+   ],
+   "P2_better": 1,
+   "same": 9,
+   "OFF_better": 2
+  },
+  "ALL": {
+   "n": 12,
+   "OFF": 0.7917,
+   "P2": 0.7708,
+   "diff": -0.0208,
+   "ci95": [
+    -0.1458,
+    0.1042
+   ],
+   "P2_better": 1,
+   "same": 9,
+   "OFF_better": 2
+  }
+ },
+ "immediatePrimary": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.9167,
+   "P2": 0.8958,
+   "diff": -0.0208,
+   "ci95": [
+    -0.0625,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 11,
+   "OFF_better": 1
+  },
+  "ALL": {
+   "n": 12,
+   "OFF": 0.9167,
+   "P2": 0.8958,
+   "diff": -0.0208,
+   "ci95": [
+    -0.0625,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 11,
+   "OFF_better": 1
+  }
+ },
+ "delayedWholeForm": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.7847,
+   "P2": 0.7986,
+   "diff": 0.0139,
+   "ci95": [
+    -0.0903,
+    0.125
+   ],
+   "P2_better": 2,
+   "same": 8,
+   "OFF_better": 2
+  },
+  "ALL": {
+   "n": 12,
+   "OFF": 0.7847,
+   "P2": 0.7986,
+   "diff": 0.0139,
+   "ci95": [
+    -0.0903,
+    0.125
+   ],
+   "P2_better": 2,
+   "same": 8,
+   "OFF_better": 2
+  }
+ },
+ "pretestPrimary_balance": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.2708,
+   "P2": 0.2708,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  },
+  "ALL": {
+   "n": 12,
+   "OFF": 0.2708,
+   "P2": 0.2708,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  }
+ },
+ "turnStats": {
+  "TASK": {
+   "OFF": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 0,
+    "earlyLeakTurns": 1,
+    "earlyLeaks": 1,
+    "answersAfterTwoFails": 0,
+    "answerReleased": 13,
+    "meanWords": 60.8333,
+    "stuckRuns": 0
+   },
+   "P2": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 2,
+    "earlyLeakTurns": 0,
+    "earlyLeaks": 0,
+    "answersAfterTwoFails": 0,
+    "answerReleased": 11,
+    "meanWords": 64.2381,
+    "stuckRuns": 0
+   }
+  },
+  "ALL": {
+   "OFF": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 0,
+    "earlyLeakTurns": 1,
+    "earlyLeaks": 1,
+    "answersAfterTwoFails": 0,
+    "answerReleased": 13,
+    "meanWords": 60.8333,
+    "stuckRuns": 0
+   },
+   "P2": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 2,
+    "earlyLeakTurns": 0,
+    "earlyLeaks": 0,
+    "answersAfterTwoFails": 0,
+    "answerReleased": 11,
+    "meanWords": 64.2381,
+    "stuckRuns": 0
+   }
+  }
+ },
+ "quickCheck": {
+  "sessions": 0,
+  "compliant": 0,
+  "violations": [],
+  "qcTurns": 0,
+  "qcTurnsWithAnswer": 0,
+  "qcTurnsWithTeachWords": 0,
+  "rate": null,
+  "offTTT_test_first_clean": null
+ },
+ "tttSplit": {
+  "sessions": 0,
+  "resolved": 0,
+  "twoOrMore_TTT": 0,
+  "underTwo_PPP": 0,
+  "stillPending_at_turn5": 0,
+  "learners": {},
+  "predicted": 0
+ },
+ "fit": {
+  "TASK": {
+   "task_goal": {
+    "OFF": 0.4167,
+    "P2": 1.0,
+    "diff": 0.5833
+   },
+   "feedback_after_task": {
+    "OFF": 0.4167,
+    "P2": 0.4167,
+    "diff": 0.0
+   },
+   "task_repeat": {
+    "OFF": 0.3333,
+    "P2": 0.3333,
+    "diff": 0.0
+   },
+   "age_fit": {
+    "OFF": 2.0,
+    "P2": 2.0,
+    "diff": 0.0
+   },
+   "teacher_accept": {
+    "OFF": 1.5833,
+    "P2": 1.6667,
+    "diff": 0.0833
+   },
+   "_ownRubric": {
+    "OFF": 0.3889,
+    "P2": 0.5833,
+    "diff": 0.1944,
+    "ci95": [
+     0.0278,
+     0.3889
+    ],
+    "n": 12
+   }
+  }
+ },
+ "plannerP2": {
+  "shapeStage": {
+   "TASK": {
+    "TASK/pretask": 12,
+    "TASK/task": 17,
+    "TASK/focus": 24,
+    "TASK/done": 31
+   }
+  },
+  "shapeByTurn": {
+   "TASK": {
+    "1": {
+     "TASK:S3:pretask": 12
+    },
+    "2": {
+     "TASK:S3:task": 12
+    },
+    "3": {
+     "TASK:S3:focus": 7,
+     "TASK:S3:task": 5
+    },
+    "4": {
+     "TASK:S3:focus": 12
+    },
+    "5": {
+     "TASK:S3:done": 9,
+     "TASK:S3:focus": 3
+    },
+    "6": {
+     "TASK:S3:done": 11,
+     "TASK:S3:focus": 1
+    },
+    "7": {
+     "TASK:S3:done": 11,
+     "TASK:S3:focus": 1
+    }
+   }
+  },
+  "methodRule": {
+   "TASK": {
+    "FALLBACK:formative_feedback": 84
+   }
+  },
+  "shapeMatch": {
+   "TASK": {
+    "turns": 84,
+    "match": 84,
+    "rate": 1.0
+   }
+  },
+  "l1": {
+   "turnsWithL1Misconception": 0,
+   "turnsWithP1Contrast": 0,
+   "arabicTransferDiagnoses": {}
+  }
+ },
+ "offPrimaryMethod": {
+  "TASK": {
+   "worked_example": 84
+  }
+ },
+ "graderRecheck": {
+  "primaryAgreement": 1,
+  "exactAgreement": 1,
+  "freeExactAgreement": 0.9231,
+  "sampled": 67,
+  "pass": true
+ }
+}
