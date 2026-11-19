@@ -21,6 +21,10 @@ for (const file of process.argv.slice(2)) {
     if (!l.outcomeIds.includes('PREA1-04')) p.push('every listen-and-do lesson must include PREA1-04 (follow simple instructions)');
     for (const w of l.words) if (!w.split(/\s+/).every((t) => inList(t, tokens))) p.push(`lesson word "${w}" is not a Starters word`);
     if (l.words.length < 4 || l.words.length > 8) p.push(`${l.words.length} lesson words (4-8)`);
+    // review round 1: every lesson word is practised (in the story or chant), and at least half of them in the story
+    const has = (lines: string[], w: string) => lines.some((x) => x.toLowerCase().split(/[^a-z'-]+/).some((t) => t && inList(t, new Set(w.toLowerCase().split('/').flatMap((f) => [f, f.split(/\s+/).pop()!])))));
+    for (const w of l.words) if (!has([...l.story, ...l.chant], w)) p.push(`lesson word "${w}" is not in the story or chant`);
+    if (l.words.filter((w) => has(l.story, w)).length * 2 < l.words.length) p.push('fewer than half of the lesson words are in the story');
     for (const c of l.cards ?? []) if (!nouns.has(c.replace(/^card:/, ''))) p.push(`card "${c}" is not a Starters noun`);
     if (p.length) { bad += p.length; console.log(`${file} ${l.id}:\n  ${p.join('\n  ')}`); }
   }
