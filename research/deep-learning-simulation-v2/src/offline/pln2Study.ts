@@ -457,6 +457,16 @@ export const RUBRICS: Record<Group, { key: string; text: string }[]> = {
     { key: 'ppp_order', text: 'A clear present -> practise -> produce order (the form is shown first, then controlled practice, then the learner makes their own sentence).' },
   ],
 };
+/** Amendment E (PLN2b, after the run): the 9-12 (KIDPPP) items with explicit 0/1/2 anchors. Used ONLY for the fit-agreement re-run (fitE/);
+ *  the main fit table keeps the RUBRICS wording above. PLN2b fit splits were mostly on short_sentences (3 of 7). */
+export const KIDPPP_E: { key: string; text: string }[] = [
+  { key: 'short_sentences', text: 'Count the tutor sentences longer than 12 words, over all tutor turns. 2 = none or one; 1 = two to four; 0 = five or more.' },
+  { key: 'one_instruction', text: 'Count the tutor messages that ask the child to do two or more things (for example "look at X, then write Y"). 2 = none; 1 = one message; 0 = two or more messages.' },
+  { key: 'praise_effort', text: 'Count the times the tutor praises trying, effort or a self-correction (not just "right" or "correct"). 2 = two or more; 1 = once; 0 = never.' },
+  { key: 'game_story', text: 'A game, challenge or story frame (characters, points, a mission, a picture scene). 2 = it runs through two or more tutor turns; 1 = it appears in one turn only; 0 = none.' },
+  { key: 'ppp_order', text: 'The order: (a) the form is shown with an example, (b) then short controlled items, (c) then the child writes their own sentence. 2 = all three, in this order; 1 = two of the three, in order; 0 = otherwise.' },
+];
+const fitItemsE = (g: Group) => [...(g === 'KIDPPP' ? KIDPPP_E : RUBRICS[g]), ...COMMON_ITEMS];
 export const COMMON_ITEMS = [
   { key: 'age_fit', text: 'Age fit: the language, length, topics and tone suit the learner\'s age.' },
   { key: 'teacher_accept', text: 'Would a qualified ESL teacher accept this lesson as a reasonable lesson for this learner?' },
@@ -468,9 +478,9 @@ function learnerLine(l: Learner): string {
   return `${who} in Egypt (first language Arabic); course level ${l.level}${goal}.`;
 }
 const fitCaseId = (key: string) => `f${sha(`${NS}|fit|${key}`).slice(0, 10)}`;
-function fitCaseText(s: Sess): string {
+function fitCaseText(s: Sess, items: (g: Group) => { key: string; text: string }[] = fitItems): string {
   const l = L_OF(s.learnerIdx); const L = lessonOf(l.outcome);
-  const rubric = fitItems(l.group).map((x) => `- ${x.key}: ${x.text}`).join('\n');
+  const rubric = items(l.group).map((x) => `- ${x.key}: ${x.text}`).join('\n');
   const conv = s.turns.map((t) => `STUDENT: ${t.learner}${t.tutor !== undefined ? `\nTUTOR: ${stripArm(t.tutor)}` : ''}`).join('\n');
   return `LEARNER: ${learnerLine(l)}\nLESSON: ${L.title}. ${L.objective}\n\nRUBRIC (score each item 0, 1 or 2, with a one-line reason):\n${rubric}\n\nTRANSCRIPT (one short lesson, ${s.turns.filter((t) => t.tutor !== undefined).length} tutor turns; the lesson is cut after the last tutor turn):\n${conv}`;
 }
@@ -668,6 +678,23 @@ async function main() {
     write(path.join(dir, 'FIT.json'), rows);
     const res = { _label: 'SIMULATION ONLY', cases: Object.keys(ag.out).length, itemScores: n, exact: same, agreement: n ? +(same / n).toFixed(4) : null, within1: n ? +(within1 / n).toFixed(4) : null, perGroup, rule: 'exact agreement on rubric item scores >= 0.85', pass: n > 0 && same / n >= 0.85 };
     write(path.join(dir, 'FIT_AGREEMENT.json'), res); console.log('fit rows', rows.length, JSON.stringify(res));
+  } else if (cmd === 'fitEprep') {
+    // Amendment E: the 12 fit-agreement sessions, judged blind twice (two different Opus agents) with the anchored 9-12 items; new ids per side.
+    const dir = dirArg(a1); const akey = JSON.parse(readFileSync(path.join(dir, 'fitagree', 'KEY.json'), 'utf8')) as Record<string, any>; const sub = path.join(dir, 'fitE'); mkdirSync(sub, { recursive: true });
+    const key: Record<string, any> = {}; const files: { batch: string; ids: string[] }[] = [];
+    for (const side of ['a', 'b']) {
+      const cs = Object.values(akey).map((k: any) => { const id = `e${side}${sha(`${NS}|fitE|${side}|${k.session}`).slice(0, 10)}`; key[id] = { ...k, side }; return { id, text: fitCaseText(load(dir, k.session), fitItemsE) }; });
+      files.push(...writeBatches(sub, `fitE_${side}`, cs, FIT_PER, `${NS}-fitE-${side}`, fitHead));
+    }
+    write(path.join(sub, 'FILES.json'), files); write(path.join(sub, 'KEY.json'), key); console.log('fitE cases', Object.keys(key).length, files.map((f) => f.batch).join(' '));
+  } else if (cmd === 'fitEscore') {
+    const dir = dirArg(a1); const sub = path.join(dir, 'fitE'); const key = JSON.parse(readFileSync(path.join(sub, 'KEY.json'), 'utf8')) as Record<string, any>;
+    const r = readFit(sub, JSON.parse(readFileSync(path.join(sub, 'FILES.json'), 'utf8')), (id) => key[id].group); if (r.missing.length || r.bad.length) { console.log('MISSING', r.missing.join(' '), 'BAD', r.bad.join(' ')); process.exit(1); }
+    const bySess: Record<string, Record<string, FitCase>> = {}; for (const [id, c] of Object.entries(r.out)) (bySess[key[id].session] ??= {})[key[id].side] = c;
+    let n = 0; let same = 0; let within1 = 0; const perGroup: Record<string, { n: number; same: number }> = {}; const perItem: Record<string, { n: number; same: number }> = {};
+    for (const [sess, sides] of Object.entries(bySess)) { const g = Object.values(key).find((k: any) => k.session === sess).group as Group; for (const x of fitItemsE(g)) { const d = Math.abs(sides.a.items[x.key].score - sides.b.items[x.key].score); n++; if (!d) same++; if (d <= 1) within1++; const pg = (perGroup[g] ??= { n: 0, same: 0 }); pg.n++; if (!d) pg.same++; const pi = (perItem[`${g}:${x.key}`] ??= { n: 0, same: 0 }); pi.n++; if (!d) pi.same++; } }
+    const res = { _label: 'SIMULATION ONLY', amendment: 'E', cases: Object.keys(bySess).length, itemScores: n, exact: same, agreement: +(same / n).toFixed(4), within1: +(within1 / n).toFixed(4), perGroup, perItem, rule: 'exact agreement on rubric item scores >= 0.85', pass: same / n >= 0.85 };
+    write(path.join(dir, 'FIT_AGREEMENT_E.json'), res); console.log(JSON.stringify({ ...res, perItem: undefined }));
   } else if (cmd === 'status') {
     const dir = dirArg(a1); const c: Record<string, number> = {};
     for (const s of allSessions(dir)) { const k = `${s.turns.filter((t) => t.tutor !== undefined).length} replies / ${s.turns.filter((t) => t.events).length} judged${s.stateDelayed ? ' / f1-7' : ''}`; c[k] = (c[k] ?? 0) + 1; }

@@ -173,3 +173,10 @@ Run folder `reports/exp4/agent_sim_pln2b` (PLN2 results stay unchanged). Same 48
 5. **Fit items fixed:** `test_first_clean` judges only the first reply (the one-step check); `task_goal` and `teach_targets_gaps` worded more precisely (PLN2 fit agreement was 77.9%).
 6. **Overlap check:** PLN2's run folder is exempt for PLN2b only (same learners by design).
 Task files for this run: `tasks_b/`. Hashes in §3 refreshed.
+
+## Amendment E (19 Nov 2026, after the PLN2b run, owner decision "go for the two fixes")
+Recorded before any new agent run. The PLN2b results, transcripts and main fit table stay as they are. The §3 hashes describe the PLN2b run; the two files below changed after it.
+1. **planner2c task rule** (`lessonPlanner.ts`, PLANNER_VERSION planner2-v3): two wrong learner messages in a row inside the task end the task early → language focus (TASK_BAD_RUN = 2). Cause: PLN2b stuck learner s2001 (the same wrong sentence three times while the task ran for 3 messages). Test in `planner2.test.ts`. Not re-simulated in this amendment.
+2. **9–12 fit items with 0/1/2 anchors** (`KIDPPP_E` in `pln2Study.ts`): counts for long sentences (> 12 words), messages with two or more instructions, effort praise; game/story across turns; the present → practise → produce steps. Other groups' items unchanged.
+3. **Fit-agreement re-run only:** the same 12 sessions as `fitagree/`, judged blind twice with the anchored items by two new Opus agents (`fitE/`, batches `fitE_a_j01`, `fitE_b_j01`; new case ids per side). Agreement = identical item scores between the two (`FIT_AGREEMENT_E.json`); the rule stays ≥ 85%. Two agent runs.
+4. Hashes after this amendment: `lessonPlanner.ts` `c8ecf382a0190189f4b96ac480d10bfde1694b6a46eb6f94a8e8d70895f77edd`; `pln2Study.ts` `aa59f5d29b8ddc893023c64862461b62e8784fdd0716bf1208f37de42174b65d`.
