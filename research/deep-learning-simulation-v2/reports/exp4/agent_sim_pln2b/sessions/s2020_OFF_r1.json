@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -841,7 +841,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 3: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My friend has big brown eyes.\" is correct. You used \"has\" for one person, and the adjectives come before the noun.\n\nNow a new one, on your own. Write one sentence about a cat. Say what it has: use two adjectives for its fur.\n\nLEARNER'S LAST MESSAGE:\nThe cat has soft white fur.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The cat has soft white fur.\" is correct. \"Has\" fits one cat, and both adjectives come before \"fur\".\n\nNow write one sentence about a person you know. Use has or has got with hair, eyes or another feature."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 3: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My friend has big brown eyes.\" is correct. You used \"has\" for one person, and the adjectives come before the noun.\n\nNow a new one, on your own. Write one sentence about a cat. Say what it has: use two adjectives for its fur.\n\nLEARNER'S LAST MESSAGE:\nThe cat has soft white fur.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The cat has soft white fur.\" is correct. \"Has\" fits one cat, and both adjectives come before \"fur\".\n\nNow write one sentence about a person you know. Use has or has got with hair, eyes or another feature.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"The cat has soft white fur.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "both adjectives come before \"fur\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister has long black hair.",
+    "errors": {
+     "W1": "My sister has hair long black."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister has long black hair.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister has long black hair.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

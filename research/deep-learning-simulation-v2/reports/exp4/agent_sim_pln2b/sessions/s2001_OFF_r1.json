@@ -816,7 +816,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 2: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe correct sentence is \"My colleague always eats a sandwich at lunchtime.\" The word \"always\" goes before the main verb \"eats\", not after it. Your verb ending in \"eats\" is right.\n\nRight: \"Tom never drinks coffee at night.\"\nWrong: \"Tom drinks never coffee at night.\"\n\nNow try one on your own, without help. Write one sentence about what your neighbour does in the morning. Use \"usually\".\n\nLEARNER'S LAST MESSAGE:\nMy neighbour drinks usually coffee in the morning.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nYour verb ending in \"drinks\" is right. But the place of \"usually\" is the same as before, so here is the correct sentence:\n\n\"My neighbour usually drinks coffee in the morning.\"\n\nThe reason: \"usually\" goes before the main verb, here \"drinks\", not after it.\n\nNow try a fresh one on your own. Write one sentence about what your sister does after work. Use \"sometimes\" or \"never\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 2: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe correct sentence is \"My colleague always eats a sandwich at lunchtime.\" The word \"always\" goes before the main verb \"eats\", not after it. Your verb ending in \"eats\" is right.\n\nRight: \"Tom never drinks coffee at night.\"\nWrong: \"Tom drinks never coffee at night.\"\n\nNow try one on your own, without help. Write one sentence about what your neighbour does in the morning. Use \"usually\".\n\nLEARNER'S LAST MESSAGE:\nMy neighbour drinks usually coffee in the morning.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nYour verb ending in \"drinks\" is right. But the place of \"usually\" is the same as before, so here is the correct sentence:\n\n\"My neighbour usually drinks coffee in the morning.\"\n\nThe reason: \"usually\" goes before the main verb, here \"drinks\", not after it.\n\nNow try a fresh one on your own. Write one sentence about what your sister does after work. Use \"sometimes\" or \"never\".",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "here is the correct sentence: \"My neighbour usually drinks coffee in the morning.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The reason: \"usually\" goes before the main verb, here \"drinks\", not after it."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister sometimes reads a book after work.",
+    "errors": {
+     "W1": "My sister reads sometimes a book after work."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister sometimes reads a book after work.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister sometimes reads a book after work.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

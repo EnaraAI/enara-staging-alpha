@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 2,
    "C2": 0
@@ -961,7 +961,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 2: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLet us look at one part of your answer: the ending of \"telled\".\n\nWhat were you thinking when you chose that ending? Tell me in a few words. Then write a new answer for: Last night he ___ me a story.\n\nLEARNER'S LAST MESSAGE:\nI think: common verbs have their own past forms (went, had, saw, bought).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour idea is right: common verbs have their own past forms. That also means \"telled\" does not fit, because these verbs do not take -ed.\n\nRule: some common verbs change into a different word in the past, with no -ed.\n\nExample with another verb: Yesterday she wrote a letter. We do not say \"writed\".\n\nNow use the same idea for 'tell'. Write the past form: Last night he ___ me a story."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 2: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLet us look at one part of your answer: the ending of \"telled\".\n\nWhat were you thinking when you chose that ending? Tell me in a few words. Then write a new answer for: Last night he ___ me a story.\n\nLEARNER'S LAST MESSAGE:\nI think: common verbs have their own past forms (went, had, saw, bought).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour idea is right: common verbs have their own past forms. That also means \"telled\" does not fit, because these verbs do not take -ed.\n\nRule: some common verbs change into a different word in the past, with no -ed.\n\nExample with another verb: Yesterday she wrote a letter. We do not say \"writed\".\n\nNow use the same idea for 'tell'. Write the past form: Last night he ___ me a story.",
+   "stateBefore": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: some common verbs change into a different word in the past, with no -ed."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Yesterday she wrote a letter. We do not say \"writed\"."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "told",
+    "errors": {
+     "W1": "telled"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "told",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "told",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

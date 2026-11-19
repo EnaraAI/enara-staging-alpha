@@ -979,7 +979,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 3: some in positive statements, any in negatives and questions. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe polite frame works: \"Can we have ... please?\" is a good way to order for two people.\n\nYou wrote \"Can we have any coffee, please?\" What were you thinking when you chose \"any\"? Tell me in one short sentence.\n\nLEARNER'S LAST MESSAGE:\nI think: some in positive statements, any in negatives and questions.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour rule is true for many sentences, but orders and polite requests are a special case. The answer here is \"Can we have some coffee, please?\" because in orders and requests we use \"some\", even in a question.\n\nRight: Can we have some bread, please?\nWrong: Can we have any bread, please?\n\nNow a new one, on your own. You are at a bakery with a friend. Write one sentence to ask politely for tea and a biscuit."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 3: some in positive statements, any in negatives and questions. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe polite frame works: \"Can we have ... please?\" is a good way to order for two people.\n\nYou wrote \"Can we have any coffee, please?\" What were you thinking when you chose \"any\"? Tell me in one short sentence.\n\nLEARNER'S LAST MESSAGE:\nI think: some in positive statements, any in negatives and questions.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour rule is true for many sentences, but orders and polite requests are a special case. The answer here is \"Can we have some coffee, please?\" because in orders and requests we use \"some\", even in a question.\n\nRight: Can we have some bread, please?\nWrong: Can we have any bread, please?\n\nNow a new one, on your own. You are at a bakery with a friend. Write one sentence to ask politely for tea and a biscuit.",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer here is \"Can we have some coffee, please?\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "in orders and requests we use \"some\", even in a question."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Can we have some bread, please? Wrong: Can we have any bread, please?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Can we have some tea and a biscuit, please?",
+    "errors": {
+     "W1": "Can we have any tea and a biscuit, please?"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Can we have some tea and a biscuit, please?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Can we have some tea and a biscuit, please?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

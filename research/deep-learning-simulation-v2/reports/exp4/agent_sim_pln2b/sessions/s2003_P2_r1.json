@@ -17,11 +17,11 @@
    "W1": 0,
    "W2": 0,
    "C1": 3,
-   "C2": 2
+   "C2": 3
   },
   "indep": {
-   "C1": 1,
-   "C2": 1
+   "C1": 2,
+   "C2": 2
   },
   "start": {
    "W1": 1,
@@ -1027,7 +1027,125 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 2: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Did your colleague play football on Saturday?\" is correct: \"Did\" starts the question and \"play\" stays in its base form.\nOne last task, in a new situation. Your neighbour bought a new car yesterday. Write one question to ask about it. Use \"did\".\n\nLEARNER'S LAST MESSAGE:\nDid your neighbour buy a new car yesterday?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Did your neighbour buy a new car yesterday?\" is correct. \"Did\" starts the question, and \"buy\" stays in its base form.\n\nRecap: for a question about a finished action, we start with \"did\" and keep the main verb simple.\n\nNow a different task. Write one sentence about a person you know. Tell me about something this person did, and use a regular verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 2: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Did your colleague play football on Saturday?\" is correct: \"Did\" starts the question and \"play\" stays in its base form.\nOne last task, in a new situation. Your neighbour bought a new car yesterday. Write one question to ask about it. Use \"did\".\n\nLEARNER'S LAST MESSAGE:\nDid your neighbour buy a new car yesterday?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Did your neighbour buy a new car yesterday?\" is correct. \"Did\" starts the question, and \"buy\" stays in its base form.\n\nRecap: for a question about a finished action, we start with \"did\" and keep the main verb simple.\n\nNow a different task. Write one sentence about a person you know. Tell me about something this person did, and use a regular verb.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Did your neighbour buy a new car yesterday?\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Did your neighbour buy a new car yesterday?\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"Did your neighbour buy a new car yesterday?\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"Did your neighbour buy a new car yesterday?\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Recap: for a question about a finished action, we start with \"did\" and keep the main verb simple."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Recap: for a question about a finished action, we start with \"did\" and keep the main verb simple."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "My brother visited our aunt last week.",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother visited our aunt last week.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother visited our aunt last week.",
+    "probes": []
+   }
   }
  ],
  "assess": {

@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 3,
+   "W1": 2,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -942,7 +942,100 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 1: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote only \"but\". Look at what the exercise asks for: the two short sentences \"The bus is cheap. It is slow.\" must become one sentence, not one word.\n\nWhat were you thinking when you wrote only \"but\"? Tell me in a few words. Then write your sentence.\n\nLEARNER'S LAST MESSAGE:\nI think clauses are chained with \"and\" whatever the meaning, with no full stop.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYou are using \"and\" to chain the ideas, whatever the meaning. That does not fit this item.\n\nRule: \"and\" adds a similar idea. \"but\" shows a contrast, when the second idea goes against the first.\n\nExample with different words:\nRight: The film is long but I like it.\nWrong: The film is long because I like it.\n\nNow try the item again. Join these two short sentences into one full sentence: \"The bus is cheap. It is slow.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 1: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote only \"but\". Look at what the exercise asks for: the two short sentences \"The bus is cheap. It is slow.\" must become one sentence, not one word.\n\nWhat were you thinking when you wrote only \"but\"? Tell me in a few words. Then write your sentence.\n\nLEARNER'S LAST MESSAGE:\nI think clauses are chained with \"and\" whatever the meaning, with no full stop.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYou are using \"and\" to chain the ideas, whatever the meaning. That does not fit this item.\n\nRule: \"and\" adds a similar idea. \"but\" shows a contrast, when the second idea goes against the first.\n\nExample with different words:\nRight: The film is long but I like it.\nWrong: The film is long because I like it.\n\nNow try the item again. Join these two short sentences into one full sentence: \"The bus is cheap. It is slow.\"",
+   "stateBefore": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: \"and\" adds a similar idea. \"but\" shows a contrast, when the second idea goes against the first."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The bus is cheap but it is slow.",
+    "errors": {
+     "W1": "The bus is cheap and it is slow."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "The bus is cheap and it is slow.",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "The bus is cheap and it is slow.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

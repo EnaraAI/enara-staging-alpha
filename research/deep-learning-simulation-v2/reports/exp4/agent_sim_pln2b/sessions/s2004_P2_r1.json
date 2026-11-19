@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -974,7 +974,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat is correct: \"I am going to study tonight.\" The word \"am\" now comes before \"going to\", and the verb \"study\" follows.\n\nTell me the rule in your own words. One short sentence is enough.\n\nLEARNER'S LAST MESSAGE:\nI think: a plan is am/is/are + going to + base verb.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nRemember: a plan is am/is/are + going to + base verb.\n\nNow write one sentence about a person you know, using am/is/are going to + a verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat is correct: \"I am going to study tonight.\" The word \"am\" now comes before \"going to\", and the verb \"study\" follows.\n\nTell me the rule in your own words. One short sentence is enough.\n\nLEARNER'S LAST MESSAGE:\nI think: a plan is am/is/are + going to + base verb.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nRemember: a plan is am/is/are + going to + base verb.\n\nNow write one sentence about a person you know, using am/is/are going to + a verb.",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Remember: a plan is am/is/are + going to + base verb."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother is going to play football tomorrow.",
+    "errors": {
+     "W1": "My brother going to play football tomorrow."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother is going to play football tomorrow.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother is going to play football tomorrow.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

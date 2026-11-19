@@ -927,7 +927,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 3.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"It is sny today.\" starts well: \"It is\" is the right way to talk about the weather.\n\nA weather word needs all its letters. Look at \"sny\" and say the word slowly, sound by sound.\n\nNow write your two short sentences again, with two different weather words, and check each word.\n\nLEARNER'S LAST MESSAGE:\nIt is sunny today.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"It is sunny today.\" is correct now. The spelling of \"sunny\" is right, and \"It is\" is right.\n\nThe task asked for two sentences with two different weather words. Write one more sentence about the weather in your town today. Use a different weather word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 3.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"It is sny today.\" starts well: \"It is\" is the right way to talk about the weather.\n\nA weather word needs all its letters. Look at \"sny\" and say the word slowly, sound by sound.\n\nNow write your two short sentences again, with two different weather words, and check each word.\n\nLEARNER'S LAST MESSAGE:\nIt is sunny today.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"It is sunny today.\" is correct now. The spelling of \"sunny\" is right, and \"It is\" is right.\n\nThe task asked for two sentences with two different weather words. Write one more sentence about the weather in your town today. Use a different weather word.",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 1
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"It is sunny today.\" is correct now."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "The spelling of \"sunny\" is right"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "It is cloudy today.",
+    "errors": {
+     "W1": "It is cloud today.",
+     "W2": "It is cldy today."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 1
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "It is cldy today.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "It is cldy today.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
