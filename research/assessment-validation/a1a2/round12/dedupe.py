@@ -13,13 +13,17 @@ for f in glob.glob(f"{A1}/**/answers.json",recursive=True)+glob.glob(f"{A1}/answ
     for a in rows if isinstance(rows,list) else []:
         if isinstance(a,dict) and a.get("itemId") and "answer" in a: seen.add((a["itemId"],norm(a["answer"])))
 raw=json.load(open(f"{H}/answers_raw.json")); spares=json.load(open(f"{H}/spares.json"))
+import collections
 used=set(); out=[]; log=[]; inset=set()
+cov=collections.Counter(a["outcomeId"] for a in raw)  # outcome coverage, kept as even as possible
 for a in raw:
     k=(a["itemId"],norm(a["answer"]))
     if k not in seen and k not in inset: out.append(a); inset.add(k); continue
     pool=[s for s in spares if s["answerId"] not in used and s["scoring"]==a["scoring"] and (s["itemId"],norm(s["answer"])) not in seen|inset]
-    pick=next((s for s in pool if s["outcomeId"]==a["outcomeId"]),pool[0] if pool else None)
+    # same outcome first; otherwise the spare whose outcome has the fewest answers (keeps every outcome covered)
+    pick=next((s for s in pool if s["outcomeId"]==a["outcomeId"]),min(pool,key=lambda s:(cov[s["outcomeId"]],s["answerId"])) if pool else None)
     if not pick: raise SystemExit(f"no spare for {a['answerId']}")
+    cov[a["outcomeId"]]-=1; cov[pick["outcomeId"]]+=1
     used.add(pick["answerId"]); inset.add((pick["itemId"],norm(pick["answer"])))
     new={**pick,"answerId":a["answerId"]}; out.append(new)
     log.append({"answerId":a["answerId"],"removed":a["answer"],"itemId":a["itemId"],"repeat_of_earlier_round":k in seen,"spare":pick["answerId"],"replacement":pick["answer"],"replacementItem":pick["itemId"]})
