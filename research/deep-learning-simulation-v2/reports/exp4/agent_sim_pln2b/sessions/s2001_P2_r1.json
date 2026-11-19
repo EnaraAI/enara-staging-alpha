@@ -15,7 +15,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -1148,7 +1148,87 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are putting \"usually\" after the verb in \"I visit usually my grandmother on Sundays.\" That order is common in some languages, but English uses a different one.\n\nRule: in English, the frequency word goes before the main verb.\n\nWorked example with a different word: \"My cousin sometimes plays tennis on Saturdays.\" Here \"sometimes\" stands before the verb \"plays\".\n\nNow use the same pattern. Write your sentence about your grandmother on Sundays again, with \"usually\".\n\nLEARNER'S LAST MESSAGE:\nI usually visit my grandmother on Sundays.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"I usually visit my grandmother on Sundays.\" is correct. \"Usually\" now comes before the main verb \"visit\".\n\nThat sentence came after my example, so let us check it on your own. Write one sentence about what your brother or sister does on Saturdays. Use \"never\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are putting \"usually\" after the verb in \"I visit usually my grandmother on Sundays.\" That order is common in some languages, but English uses a different one.\n\nRule: in English, the frequency word goes before the main verb.\n\nWorked example with a different word: \"My cousin sometimes plays tennis on Saturdays.\" Here \"sometimes\" stands before the verb \"plays\".\n\nNow use the same pattern. Write your sentence about your grandmother on Sundays again, with \"usually\".\n\nLEARNER'S LAST MESSAGE:\nI usually visit my grandmother on Sundays.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"I usually visit my grandmother on Sundays.\" is correct. \"Usually\" now comes before the main verb \"visit\".\n\nThat sentence came after my example, so let us check it on your own. Write one sentence about what your brother or sister does on Saturdays. Use \"never\".",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"I usually visit my grandmother on Sundays.\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother never plays football on Saturdays.",
+    "errors": {
+     "W1": "My brother plays never football on Saturdays."
+    }
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1165,5 +1245,34 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "freq",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

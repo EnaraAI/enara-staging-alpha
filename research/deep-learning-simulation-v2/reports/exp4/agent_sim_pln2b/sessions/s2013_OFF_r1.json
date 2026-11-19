@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -950,7 +950,93 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 3: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My friend usually plays football on Saturday.\" is correct. \"Usually\" is before the verb, and \"plays\" has -s.\n\nNow a freer task, on your own. Write two sentences about what your mother or father does in a week. Use \"always\", \"sometimes\" or \"never\" in each sentence.\n\nLEARNER'S LAST MESSAGE:\nMy mother always cooks dinner.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My mother always cooks dinner.\" is correct. \"Always\" is before the verb, and \"cooks\" has -s.\n\nI asked for two sentences, and I see one. Write one more sentence about your mother or your father. Use \"sometimes\" or \"never\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 3: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My friend usually plays football on Saturday.\" is correct. \"Usually\" is before the verb, and \"plays\" has -s.\n\nNow a freer task, on your own. Write two sentences about what your mother or father does in a week. Use \"always\", \"sometimes\" or \"never\" in each sentence.\n\nLEARNER'S LAST MESSAGE:\nMy mother always cooks dinner.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My mother always cooks dinner.\" is correct. \"Always\" is before the verb, and \"cooks\" has -s.\n\nI asked for two sentences, and I see one. Write one more sentence about your mother or your father. Use \"sometimes\" or \"never\".",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My mother always cooks dinner.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My mother always cooks dinner."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My father sometimes reads the newspaper.",
+    "errors": {
+     "W1": "My father reads sometimes the newspaper."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -967,5 +1053,34 @@
    "ecRewrite": 2,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "freq",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 0
+  },
+  "start": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

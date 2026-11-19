@@ -14,13 +14,13 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 2,
    "C1": 3,
-   "C2": 2
+   "C2": 3
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 1
   },
   "start": {
@@ -960,7 +960,97 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 2: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I ate rice for dinner yesterday.\" is correct. \"ate\" is the right past form.\n\nNow a new situation. Write one question to ask a friend about yesterday at school. Start your question with \"Did\".\n\nLEARNER'S LAST MESSAGE:\nDid you play football at school yesterday?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Did you play football at school yesterday?\" is a correct question. You started with \"Did\" and kept \"play\" in its simple form.\n\nNow write one sentence about yesterday at school. Use went, had, saw or ate."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 2: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I ate rice for dinner yesterday.\" is correct. \"ate\" is the right past form.\n\nNow a new situation. Write one question to ask a friend about yesterday at school. Start your question with \"Did\".\n\nLEARNER'S LAST MESSAGE:\nDid you play football at school yesterday?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Did you play football at school yesterday?\" is a correct question. You started with \"Did\" and kept \"play\" in its simple form.\n\nNow write one sentence about yesterday at school. Use went, had, saw or ate.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Did you play football at school yesterday?\" is a correct question."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "You started with \"Did\" and kept \"play\" in its simple form."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Did you play football at school yesterday?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "Yesterday I had lunch with my friends.",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -977,5 +1067,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 2,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 1
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

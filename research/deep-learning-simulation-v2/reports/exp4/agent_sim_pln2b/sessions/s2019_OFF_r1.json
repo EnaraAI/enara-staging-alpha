@@ -1020,7 +1020,87 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My friend is going to watch a film tomorrow evening.\" is correct. You used \"is going to\" with a verb, and \"tomorrow evening\" says when.\n\nNow a freer task. Write two sentences about your own plans for next month. Use \"going to\" and say when in each sentence.\n\nLEARNER'S LAST MESSAGE:\nI going to visit my uncle next month.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before going to (\"I going to visit my aunt.\")).\n\nTUTOR TURN TO JUDGE:\nThe end of your sentence is good: \"next month\" says when.\n\nNow check the start of \"I going to visit my uncle next month.\" A \"going to\" sentence needs a form of the verb \"be\" before \"going to\". That form must match the subject.\n\nLook at your subject and write the sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My friend is going to watch a film tomorrow evening.\" is correct. You used \"is going to\" with a verb, and \"tomorrow evening\" says when.\n\nNow a freer task. Write two sentences about your own plans for next month. Use \"going to\" and say when in each sentence.\n\nLEARNER'S LAST MESSAGE:\nI going to visit my uncle next month.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before going to (\"I going to visit my aunt.\")).\n\nTUTOR TURN TO JUDGE:\nThe end of your sentence is good: \"next month\" says when.\n\nNow check the start of \"I going to visit my uncle next month.\" A \"going to\" sentence needs a form of the verb \"be\" before \"going to\". That form must match the subject.\n\nLook at your subject and write the sentence again.",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A \"going to\" sentence needs a form of the verb \"be\" before \"going to\"."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I am going to visit my uncle next month.",
+    "errors": {
+     "W1": "I going to visit my uncle next month."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1037,5 +1117,34 @@
    "ecRewrite": 2,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "goingto",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 4,
+   "C2": 0
+  },
+  "start": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

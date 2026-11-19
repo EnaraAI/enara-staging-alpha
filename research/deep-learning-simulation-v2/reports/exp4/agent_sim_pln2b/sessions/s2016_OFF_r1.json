@@ -917,7 +917,93 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-clothes-shopping (clothes, colours and sizes). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adjective goes after the noun. Its error: puts the colour or size after the noun (\"I want a shirt blue, size big.\").\nC1 (correct) strength 2: colour and size adjectives go before the noun. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nPart of your answer is good: \"Do you have a blue jacket?\" is a full question, and it starts with \"Do you have\".\n\nI want to understand your idea. Why did you choose \"a blue jacket\" for this question?\n\nLEARNER'S LAST MESSAGE:\nI think: colour and size adjectives go before the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour idea about adjectives is true for many sentences. But this question has a different pattern.\n\nThe answer is \"Do you have this jacket in blue?\" We say \"this jacket\" for the same thing, then \"in\" and the colour.\n\nRight: \"Do you have this bag in red?\"\nWrong: \"Do you have a red bag?\"\n\nNow try on your own, without help. You want the same hat in green. Ask the shop assistant."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-clothes-shopping (clothes, colours and sizes). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adjective goes after the noun. Its error: puts the colour or size after the noun (\"I want a shirt blue, size big.\").\nC1 (correct) strength 2: colour and size adjectives go before the noun. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nPart of your answer is good: \"Do you have a blue jacket?\" is a full question, and it starts with \"Do you have\".\n\nI want to understand your idea. Why did you choose \"a blue jacket\" for this question?\n\nLEARNER'S LAST MESSAGE:\nI think: colour and size adjectives go before the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour idea about adjectives is true for many sentences. But this question has a different pattern.\n\nThe answer is \"Do you have this jacket in blue?\" We say \"this jacket\" for the same thing, then \"in\" and the colour.\n\nRight: \"Do you have this bag in red?\"\nWrong: \"Do you have a red bag?\"\n\nNow try on your own, without help. You want the same hat in green. Ask the shop assistant.",
+   "stateBefore": {
+    "form": "clothes",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"Do you have this jacket in blue?\""
+    },
+    {
+     "rule": "R6",
+     "belief": "W1",
+     "quote": "Wrong: \"Do you have a red bag?\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Do you have this hat in green?",
+    "errors": {
+     "W1": "Do you have this hat green?"
+    }
+   },
+   "applied": [
+    "R5",
+    "R6"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "clothes",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -934,5 +1020,34 @@
    "ecRewrite": 2,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "clothes",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

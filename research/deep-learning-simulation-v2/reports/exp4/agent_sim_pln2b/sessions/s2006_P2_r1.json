@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -1142,7 +1142,87 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 3: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"bigger\" is correct now. You looked at the word again and fixed the spelling, and the comparative is in the right place before \"than\".\n\nIn one short sentence, what do you do with a short word like \"big\" when you compare two things?\n\nLEARNER'S LAST MESSAGE:\nI think: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour rule is right: a short adjective takes -er (with the spelling changes you named), a long adjective takes \"more\", and \"than\" comes before the second thing.\n\nNow write one sentence about a person you know. Compare that person with someone else."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 3: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"bigger\" is correct now. You looked at the word again and fixed the spelling, and the comparative is in the right place before \"than\".\n\nIn one short sentence, what do you do with a short word like \"big\" when you compare two things?\n\nLEARNER'S LAST MESSAGE:\nI think: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour rule is right: a short adjective takes -er (with the spelling changes you named), a long adjective takes \"more\", and \"than\" comes before the second thing.\n\nNow write one sentence about a person you know. Compare that person with someone else.",
+   "stateBefore": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a short adjective takes -er (with the spelling changes you named), a long adjective takes \"more\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My father is taller than my uncle.",
+    "errors": {
+     "W1": "My father is taler than my uncle."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1159,5 +1239,34 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "comp",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

@@ -14,8 +14,8 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
-   "W2": 2,
+   "W1": 0,
+   "W2": 1,
    "C1": 3,
    "C2": 2
   },
@@ -1173,7 +1173,103 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 2: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"ate\" is the right past form in \"You ate pizza yesterday?\"\nThe task asked for a question with \"did\". Why did you write your question this way? Tell me in one short line.\n\nLEARNER'S LAST MESSAGE:\nI think: after did the main verb is in the base form.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour rule is right: after \"did\", the main verb stays in its base form. For this task the question is \"Did you eat pizza yesterday?\" It starts with \"did\".\nRight: Did you play football yesterday?\nWrong: You played football yesterday?\n\nNew task. Your friend watched a film yesterday. Write one question. Use \"did\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 2: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"ate\" is the right past form in \"You ate pizza yesterday?\"\nThe task asked for a question with \"did\". Why did you write your question this way? Tell me in one short line.\n\nLEARNER'S LAST MESSAGE:\nI think: after did the main verb is in the base form.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour rule is right: after \"did\", the main verb stays in its base form. For this task the question is \"Did you eat pizza yesterday?\" It starts with \"did\".\nRight: Did you play football yesterday?\nWrong: You played football yesterday?\n\nNew task. Your friend watched a film yesterday. Write one question. Use \"did\".",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after \"did\", the main verb stays in its base form"
+    },
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "For this task the question is \"Did you eat pizza yesterday?\""
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: Did you play football yesterday? Wrong: You played football yesterday?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you watch a film yesterday?",
+    "errors": {
+     "W1": "Did you watched a film yesterday?",
+     "W2": "You watched a film yesterday?"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1190,5 +1286,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 3,
+   "C2": 2
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 1
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

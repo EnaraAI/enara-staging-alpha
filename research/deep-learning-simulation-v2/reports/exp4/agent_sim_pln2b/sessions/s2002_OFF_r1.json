@@ -20,8 +20,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 4,
-   "C2": 5
+   "C1": 5,
+   "C2": 6
   },
   "start": {
    "W1": 2,
@@ -1104,7 +1104,109 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 4.\nC2 (correct) strength 3: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe form in \"People are waiting for the bus now.\" is right. You used \"are\" with \"waiting\" for something happening now, and \"for the bus\" is a clear detail.\n\nYour task asked for two sentences, and I can see one so far. Please write the second sentence about the busy bus station. Say what other people are doing there now, and add one detail in it.\n\nLEARNER'S LAST MESSAGE:\nA man is selling tickets at the window.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"A man is selling tickets at the window.\" is correct. You used \"is\" with a verb ending in -ing, and \"at the window\" is a clear detail. Together with your first sentence, the bus station task is complete.\n\nNow a freer task. Imagine a street market on a busy Saturday. Write three sentences about what different people are doing there now. Add one detail to each sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 4.\nC2 (correct) strength 3: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 5.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe form in \"People are waiting for the bus now.\" is right. You used \"are\" with \"waiting\" for something happening now, and \"for the bus\" is a clear detail.\n\nYour task asked for two sentences, and I can see one so far. Please write the second sentence about the busy bus station. Say what other people are doing there now, and add one detail in it.\n\nLEARNER'S LAST MESSAGE:\nA man is selling tickets at the window.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"A man is selling tickets at the window.\" is correct. You used \"is\" with a verb ending in -ing, and \"at the window\" is a clear detail. Together with your first sentence, the bus station task is complete.\n\nNow a freer task. Imagine a street market on a busy Saturday. Write three sentences about what different people are doing there now. Add one detail to each sentence.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 5
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"A man is selling tickets at the window.\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "You used \"is\" with a verb ending in -ing"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "A man is selling tickets at the window."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "A man is selling tickets at the window."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "A woman is selling fruit at a stall.",
+    "errors": {
+     "W1": "A woman selling fruit at a stall.",
+     "W2": "A woman sells fruit at a stall."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 6
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1121,5 +1223,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "prescont",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 5,
+   "C2": 6
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

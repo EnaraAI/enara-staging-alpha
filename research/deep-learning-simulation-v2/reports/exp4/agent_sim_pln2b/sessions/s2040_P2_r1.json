@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 1,
    "C1": 0,
    "C2": 0
@@ -1176,7 +1176,95 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 0: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 0.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try! You know the thing we read in class, and your idea is right. But the first letter of \"pook\" needs a check.\n\nSay the word slowly. Listen to the first sound. Some sounds are close, so look at your first letter again.\n\nTry again: I read a ___ in class.\n\nLEARNER'S LAST MESSAGE:\npook\nFACT: the last learner message contained the error of W1 (writes b for p or f for v (\"bencil\", \"bage\")).\n\nTUTOR TURN TO JUDGE:\nGood try! The answer is \"book\". It starts with b. We read a book in class.\n\nRight: This is a bag. Wrong: This is a pag.\n\nNew one, on your own:\n\nComplete: \"The teacher writes on the ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 0: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 0.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try! You know the thing we read in class, and your idea is right. But the first letter of \"pook\" needs a check.\n\nSay the word slowly. Listen to the first sound. Some sounds are close, so look at your first letter again.\n\nTry again: I read a ___ in class.\n\nLEARNER'S LAST MESSAGE:\npook\nFACT: the last learner message contained the error of W1 (writes b for p or f for v (\"bencil\", \"bage\")).\n\nTUTOR TURN TO JUDGE:\nGood try! The answer is \"book\". It starts with b. We read a book in class.\n\nRight: This is a bag. Wrong: This is a pag.\n\nNew one, on your own:\n\nComplete: \"The teacher writes on the ___.\"",
+   "stateBefore": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"book\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: This is a bag. Wrong: This is a pag."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "board",
+    "errors": {
+     "W1": "poard"
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1193,5 +1281,35 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "class",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

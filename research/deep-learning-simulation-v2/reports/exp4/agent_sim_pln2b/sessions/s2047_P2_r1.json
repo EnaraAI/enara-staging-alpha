@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 4,
+   "C1": 5,
    "C2": 0
   },
   "start": {
@@ -1251,7 +1251,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 3: many + countable plural, much + uncountable. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"How much milk is in the fridge?\" is correct. Milk cannot be counted, so much fits.\n\nRecap: many goes with things you can count, and much goes with things you cannot count.\n\nNew situation: you are at a market. Write two questions, one about something you can count and one about something you cannot count. Use much or many.\n\nLEARNER'S LAST MESSAGE:\nHow many apples do you have?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"How many apples do you have?\" is correct. Apples can be counted, so many fits.\n\nThe task asked for two questions, so one is missing. Use much with things you cannot count, like glue: \"How much glue is on the desk?\"\n\nNow write your second question about something you cannot count at the market. Use much."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 3: many + countable plural, much + uncountable. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"How much milk is in the fridge?\" is correct. Milk cannot be counted, so much fits.\n\nRecap: many goes with things you can count, and much goes with things you cannot count.\n\nNew situation: you are at a market. Write two questions, one about something you can count and one about something you cannot count. Use much or many.\n\nLEARNER'S LAST MESSAGE:\nHow many apples do you have?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"How many apples do you have?\" is correct. Apples can be counted, so many fits.\n\nThe task asked for two questions, so one is missing. Use much with things you cannot count, like glue: \"How much glue is on the desk?\"\n\nNow write your second question about something you cannot count at the market. Use much.",
+   "stateBefore": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"How many apples do you have?\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "How many apples do you have?"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Apples can be counted, so many fits. ... Use much with things you cannot count"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "How much rice do you have?",
+    "errors": {
+     "W1": "How many rice do you have?"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1268,5 +1360,34 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "muchmany",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 5,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

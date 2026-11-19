@@ -1003,7 +1003,87 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 3: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"What did you eat for lunch yesterday?\" is a good question with \"did\". After \"did\", the verb stays in its basic form.\n\nNow answer your own question. Write one sentence about your lunch yesterday.\n\nLEARNER'S LAST MESSAGE:\nYesterday I cook rice for lunch.\nFACT: the last learner message contained the error of W1 (leaves the verb in the present form with a past time word (\"Yesterday I play football.\")).\n\nTUTOR TURN TO JUDGE:\nYour question \"What did you eat for lunch yesterday?\" is good. Now look at your answer, \"Yesterday I cook rice for lunch.\" The word \"yesterday\" tells us the action is finished. A finished action in the past needs a past verb form.\n\nLook at the verb \"cook\" in your sentence. Then write your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 3: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"What did you eat for lunch yesterday?\" is a good question with \"did\". After \"did\", the verb stays in its basic form.\n\nNow answer your own question. Write one sentence about your lunch yesterday.\n\nLEARNER'S LAST MESSAGE:\nYesterday I cook rice for lunch.\nFACT: the last learner message contained the error of W1 (leaves the verb in the present form with a past time word (\"Yesterday I play football.\")).\n\nTUTOR TURN TO JUDGE:\nYour question \"What did you eat for lunch yesterday?\" is good. Now look at your answer, \"Yesterday I cook rice for lunch.\" The word \"yesterday\" tells us the action is finished. A finished action in the past needs a past verb form.\n\nLook at the verb \"cook\" in your sentence. Then write your sentence again.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The word \"yesterday\" tells us the action is finished. A finished action in the past needs a past verb form."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Yesterday I cooked rice for lunch.",
+    "errors": {
+     "W1": "Yesterday I cook rice for lunch."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1020,5 +1100,34 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "pastreg",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 4,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 5,
+   "C1": 6,
    "C2": 0
   },
   "start": {
@@ -1026,7 +1026,93 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 3: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 5.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"A mechanic works in a garage.\" is correct. The place fits the job, and you used \"works in\" well.\n\nNow one fresh item, with no help from me. Write the missing word:\n\n\"A nurse works in a ___.\"\n\nLEARNER'S LAST MESSAGE:\nhospital\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"hospital\" is correct. A nurse does work in a hospital, so the place fits the job.\n\nHere is one more, with a new job. Write the missing word:\n\n\"A waiter works in a ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 3: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 5.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"A mechanic works in a garage.\" is correct. The place fits the job, and you used \"works in\" well.\n\nNow one fresh item, with no help from me. Write the missing word:\n\n\"A nurse works in a ___.\"\n\nLEARNER'S LAST MESSAGE:\nhospital\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"hospital\" is correct. A nurse does work in a hospital, so the place fits the job.\n\nHere is one more, with a new job. Write the missing word:\n\n\"A waiter works in a ___.\"",
+   "stateBefore": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"hospital\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "hospital"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "restaurant",
+    "errors": {
+     "W1": "restrant"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1043,5 +1129,34 @@
    "ecRewrite": 2,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "jobs",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 6,
+   "C2": 0
+  },
+  "start": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

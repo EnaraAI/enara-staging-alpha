@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 3,
+   "W1": 1,
    "W2": 0,
    "C1": 0,
    "C2": 3
@@ -1036,7 +1036,103 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 0: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 3: there is / there are needs is or are after \"there\". Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"There are\" is right with \"three\". Good.\n\nNow look at the word \"book\" after \"three\". Does it show more than one? Write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nThere are three book in my room.\nFACT: the last learner message contained the error of W1 (keeps the noun singular after a number (\"There are three book.\")).\n\nTUTOR TURN TO JUDGE:\nThe sentence should be \"There are three books in my room\", because three means more than one, so the noun ends in -s.\n\nRight: There are two tables.\nWrong: There are two table.\n\nNow a new one, on your own. Write one sentence about the chairs in your kitchen. Use a number."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 0: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 3: there is / there are needs is or are after \"there\". Independent correct productions so far: 3.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"There are\" is right with \"three\". Good.\n\nNow look at the word \"book\" after \"three\". Does it show more than one? Write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nThere are three book in my room.\nFACT: the last learner message contained the error of W1 (keeps the noun singular after a number (\"There are three book.\")).\n\nTUTOR TURN TO JUDGE:\nThe sentence should be \"There are three books in my room\", because three means more than one, so the noun ends in -s.\n\nRight: There are two tables.\nWrong: There are two table.\n\nNow a new one, on your own. Write one sentence about the chairs in your kitchen. Use a number.",
+   "stateBefore": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The sentence should be \"There are three books in my room\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "three means more than one, so the noun ends in -s"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: There are two tables. Wrong: There are two table."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "There are four chairs in my kitchen.",
+    "errors": {
+     "W1": "There are four chair in my kitchen.",
+     "W2": "There four chairs in my kitchen."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1053,5 +1149,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "thereis",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 0,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 3
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

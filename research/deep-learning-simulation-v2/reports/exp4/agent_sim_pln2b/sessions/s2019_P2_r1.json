@@ -1231,7 +1231,87 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 5.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My friend is going to visit Rome next month.\" is correct. It has \"is going to\" with a verb, and \"next month\" says when.\n\nNow a bigger situation. Your class is planning a party next week. Write three sentences about what three different people are going to do, and when.\n\nLEARNER'S LAST MESSAGE:\nAli going to bring the cake on Monday.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before going to (\"I going to visit my aunt.\")).\n\nTUTOR TURN TO JUDGE:\nThe time part, \"on Monday\", is clear. The problem is in the words before \"going to\" in \"Ali going to bring the cake on Monday.\"\n\nThe words \"going to\" need a form of the verb \"be\" in front of them.\n\nWrite the sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 5.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My friend is going to visit Rome next month.\" is correct. It has \"is going to\" with a verb, and \"next month\" says when.\n\nNow a bigger situation. Your class is planning a party next week. Write three sentences about what three different people are going to do, and when.\n\nLEARNER'S LAST MESSAGE:\nAli going to bring the cake on Monday.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before going to (\"I going to visit my aunt.\")).\n\nTUTOR TURN TO JUDGE:\nThe time part, \"on Monday\", is clear. The problem is in the words before \"going to\" in \"Ali going to bring the cake on Monday.\"\n\nThe words \"going to\" need a form of the verb \"be\" in front of them.\n\nWrite the sentence again.",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The words \"going to\" need a form of the verb \"be\" in front of them."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Ali is going to bring the cake on Monday.",
+    "errors": {
+     "W1": "Ali going to bring the cake on Monday."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1248,5 +1328,34 @@
    "ecRewrite": 2,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "goingto",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 5,
+   "C2": 0
+  },
+  "start": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

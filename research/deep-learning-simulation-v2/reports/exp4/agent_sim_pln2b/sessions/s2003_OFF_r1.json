@@ -15,7 +15,7 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 3,
    "C2": 2
   },
@@ -1001,7 +1001,97 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 2: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are asked to change \"Yusuf watched a film last night.\" into a question. Your answer, \"Yusuf watched a film last night?\", still looks like the statement.\n\nThink about how you wrote your question about Omar. Look at the first word and at the verb in your new question. Then write the question again.\n\nLEARNER'S LAST MESSAGE:\nYusuf watched a film last night?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nYou are writing the statement again with a question mark: \"Yusuf watched a film last night?\"\n\nRule: a question about a finished action starts with Did. Then come the person and the simple form of the verb.\n\nWorked example with a different sentence:\nStatement: \"Nina painted the door.\"\nStep 1: I start with Did.\nStep 2: I add the person: Did Nina.\nStep 3: I change \"painted\" to its simple form: paint.\nQuestion: \"Did Nina paint the door?\"\n\nNow try again with \"Yusuf watched a film last night.\" Write the question and tell me your steps."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 2: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are asked to change \"Yusuf watched a film last night.\" into a question. Your answer, \"Yusuf watched a film last night?\", still looks like the statement.\n\nThink about how you wrote your question about Omar. Look at the first word and at the verb in your new question. Then write the question again.\n\nLEARNER'S LAST MESSAGE:\nYusuf watched a film last night?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nYou are writing the statement again with a question mark: \"Yusuf watched a film last night?\"\n\nRule: a question about a finished action starts with Did. Then come the person and the simple form of the verb.\n\nWorked example with a different sentence:\nStatement: \"Nina painted the door.\"\nStep 1: I start with Did.\nStep 2: I add the person: Did Nina.\nStep 3: I change \"painted\" to its simple form: paint.\nQuestion: \"Did Nina paint the door?\"\n\nNow try again with \"Yusuf watched a film last night.\" Write the question and tell me your steps.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Rule: a question about a finished action starts with Did."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Then come the person and the simple form of the verb."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did Yusuf watch a film last night?",
+    "errors": {
+     "W1": "Did Yusuf watched a film last night?",
+     "W2": "Yusuf watched a film last night?"
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1018,5 +1108,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 2
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 1
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }
