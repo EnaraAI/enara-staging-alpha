@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -797,7 +797,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 2: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"We are going to leave soon.\" is the correct sentence. The word \"are\" makes the difference: \"going to\" needs a form of be in front of it.\n\nNow use this in your own sentence.\n\nWrite one sentence about a person you know and a plan they have. Use am, is or are going to plus a verb, and add a time word.\n\nLEARNER'S LAST MESSAGE:\nMy sister is going to visit Cairo next week.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My sister is going to visit Cairo next week.\" is correct. You used \"is going to\" plus a verb, and \"next week\" shows the future.\n\nRecap: for a plan, use am, is or are in front of \"going to\", then the base verb. Now a new situation, on your own.\n\nYour team has a plan to move to a new office next month. Write one sentence about this plan with \"going to\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 2: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"We are going to leave soon.\" is the correct sentence. The word \"are\" makes the difference: \"going to\" needs a form of be in front of it.\n\nNow use this in your own sentence.\n\nWrite one sentence about a person you know and a plan they have. Use am, is or are going to plus a verb, and add a time word.\n\nLEARNER'S LAST MESSAGE:\nMy sister is going to visit Cairo next week.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My sister is going to visit Cairo next week.\" is correct. You used \"is going to\" plus a verb, and \"next week\" shows the future.\n\nRecap: for a plan, use am, is or are in front of \"going to\", then the base verb. Now a new situation, on your own.\n\nYour team has a plan to move to a new office next month. Write one sentence about this plan with \"going to\".",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My sister is going to visit Cairo next week.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "You used \"is going to\" plus a verb"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "for a plan, use am, is or are in front of \"going to\", then the base verb"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Our team is going to move to a new office next month.",
+    "errors": {
+     "W1": "Our team going to move to a new office next month."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Our team is going to move to a new office next month.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Our team is going to move to a new office next month.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -17,11 +17,11 @@
    "W1": 0,
    "W2": 2,
    "C1": 3,
-   "C2": 0
+   "C2": 2
   },
   "indep": {
-   "C1": 2,
-   "C2": 0
+   "C1": 3,
+   "C2": 1
   },
   "start": {
    "W1": 1,
@@ -722,7 +722,123 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 2.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Did your manager call the customer yesterday?\" is correct. It starts with \"Did\", it has the right subject, and the main verb stays in its base form.\n\nYou had some help with that one, so here is a new question to write on your own. Ask a friend about last weekend. Use these words:\n\nvisit / grandparents\n\nWrite the whole question.\n\nLEARNER'S LAST MESSAGE:\nDid you visit your grandparents last weekend?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Did you visit your grandparents last weekend?\" is correct, and you wrote it on your own this time.\n\nHere is one more question, in a new situation. Ask a friend about a film. Use these words:\n\nyour sister / watch / the film / last night\n\nWrite the whole question on your own."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 2.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Did your manager call the customer yesterday?\" is correct. It starts with \"Did\", it has the right subject, and the main verb stays in its base form.\n\nYou had some help with that one, so here is a new question to write on your own. Ask a friend about last weekend. Use these words:\n\nvisit / grandparents\n\nWrite the whole question.\n\nLEARNER'S LAST MESSAGE:\nDid you visit your grandparents last weekend?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Did you visit your grandparents last weekend?\" is correct, and you wrote it on your own this time.\n\nHere is one more question, in a new situation. Ask a friend about a film. Use these words:\n\nyour sister / watch / the film / last night\n\nWrite the whole question on your own.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Did you visit your grandparents last weekend?\" is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Did you visit your grandparents last weekend?\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "you wrote it on your own this time"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "you wrote it on your own this time"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did your sister watch the film last night?",
+    "errors": {
+     "W1": "Did your sister watched the film last night?",
+     "W2": "Your sister watched the film last night?"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Your sister watched the film last night?",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "Your sister watched the film last night?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
