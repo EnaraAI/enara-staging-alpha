@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'fs';
 import os from 'os';
 import path from 'path';
 import { lengthTarget, KIDS_PACK_CHILD_LENGTH } from '../src/services/languageTeachingContext';
-import { checkLesson, inList, ladLines, loadKidsPack, type LadLesson, type StartersWord } from '../src/services/kidsPack';
+import { checkLesson, inList, ladLines, loadKidsPack, starterTokens, type LadLesson, type StartersWord } from '../src/services/kidsPack';
 import { engineV2 } from '../src/services/engineV2';
 
 const saved = process.env.ENARA_ENGINE_V2;
@@ -57,15 +57,28 @@ describe('kidsPack', () => {
   it('without imported data the pack is inactive (no invented list)', () => {
     expect(loadKidsPack(mkdtempSync(path.join(os.tmpdir(), 'kp-')))).toBeNull();
   });
-  it('importer parses the A-Z layout and the Can Do section (format fixture, not Cambridge content)', () => {
+  it('importer: reading-order format, wrapped entries, two entries on one line, nested notes, headings skipped (format fixture, not Cambridge content)', () => {
     const dir = mkdtempSync(path.join(os.tmpdir(), 'kpi-'));
-    writeFileSync(path.join(dir, 'w.txt'), 'A\na det         cat n          jump v\nabout prep    colour n, v    red adj\nAlphabetical list\n');
-    writeFileSync(path.join(dir, 'c.txt'), 'Pre A1 Starters\nListening\n• Can understand fixture sentence one about pictures\nSpeaking\n• Can say fixture sentence two about themselves\nA1 Movers\nListening\n• Can understand something else entirely\n');
-    execFileSync('python3', ['-I', path.resolve(__dirname, '../../scripts/kids/import_starters.py'), path.join(dir, 'w.txt'), path.join(dir, 'c.txt'), path.join(dir, 'out')]);
-    const words = JSON.parse(readFileSync(path.join(dir, 'out', 'WORDS.json'), 'utf8'));
-    expect(words.map((w: StartersWord) => w.word)).toEqual(['a', 'cat', 'jump', 'about', 'colour', 'red']);
-    expect(words.find((w: StartersWord) => w.word === 'colour').pos).toEqual(['n', 'v']);
-    const out = JSON.parse(readFileSync(path.join(dir, 'out', 'OUTCOMES.json'), 'utf8'));
-    expect(out.map((o: { id: string }) => o.id)).toEqual(['PREA1-LI-01', 'PREA1-SP-01']);
+    writeFileSync(path.join(dir, 'w.txt'), ['A', 'a det', 'ask v at prep of place', 'B', 'candy (UK', 'sweet(s)) n', 'cool adj + excl', '25', 'her poss adj + pron', 'in prep of place', '+ time', 'Mr title', 'zebra n zoo n', 'Names', 'Candidates will be expected to recognise and write the following names:', 'Alex', 'May (as in girl’s', 'name)', '29'].join('\n'));
+    execFileSync('python3', ['-I', path.resolve(__dirname, '../../scripts/kids/import_starters.py'), path.join(dir, 'w.txt'), path.join(dir, 'out')]);
+    const words = JSON.parse(readFileSync(path.join(dir, 'out', 'WORDS.json'), 'utf8')) as StartersWord[];
+    expect(words.map((w) => w.word)).toEqual(['a', 'ask', 'at', 'candy', 'cool', 'her', 'in', 'Mr', 'zebra', 'zoo']);
+    expect(words.find((w) => w.word === 'candy')).toMatchObject({ note: 'UK sweet(s)', pos: ['n'] });
+    expect(words.find((w) => w.word === 'her')!.pos).toEqual(['adj', 'poss', 'pron']);
+    expect(words.find((w) => w.word === 'in')).toMatchObject({ use: 'of place + time' });
+    expect(words.find((w) => w.word === 'Mr')).toMatchObject({ use: 'title', pos: ['n'] });
+    expect(JSON.parse(readFileSync(path.join(dir, 'out', 'NAMES.json'), 'utf8'))).toEqual(['Alex', 'May (as in girl’s name)']);
+  });
+  it('the imported official data: 495 Starters entries, 10 Pre A1 can-dos, numbers 1-20, names', () => {
+    const d = loadKidsPack()!;
+    expect(d).not.toBeNull();
+    expect(d.words.length).toBe(495);
+    expect(d.outcomes.map((o) => o.id)).toEqual(Array.from({ length: 10 }, (_, i) => `PREA1-${String(i + 1).padStart(2, '0')}`));
+    expect(d.outcomes[3].canDo).toBe('The learner can understand and follow simple instructions.');
+    expect(d.numbers).toHaveLength(20);
+    expect(d.names).toContain('Lucy');
+    const t = starterTokens(d.words, d.numbers);
+    for (const w of ['cat', 'children', 'feet', 'ice', 'cream', 'colour', 'twenty', 'point', 'clap']) expect(t.has(w), w).toBe(true);
+    for (const w of ['extraordinary', 'mischievous', 'airport']) expect(t.has(w), w).toBe(false);
   });
 });

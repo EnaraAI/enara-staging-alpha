@@ -7,7 +7,7 @@ import path from 'path';
 import { engineV2 } from './engineV2';
 import type { Stage } from './lessonPlanner';
 
-export interface StartersWord { word: string; pos: string[]; topic?: string }
+export interface StartersWord { word: string; pos: string[]; forms?: string[]; note?: string; use?: string; name?: boolean; topic?: string }
 export interface PreA1Outcome { id: string; skill: 'listening' | 'reading' | 'writing' | 'speaking'; canDo: string; source: string }
 export interface LadLesson {
   id: string;
@@ -23,7 +23,8 @@ export interface LadLesson {
   /** Picture-card ids for tap/drag tasks in the Kids app. */
   cards?: string[];
 }
-export interface KidsPackData { words: StartersWord[]; outcomes: PreA1Outcome[]; lessons: LadLesson[]; source: { wordList: string; canDo: string; importedAt: string } }
+export interface PreA1Outcome2 { id: string; canDo: string; skill: string; examples: string[]; source: string }
+export interface KidsPackData { words: StartersWord[]; outcomes: PreA1Outcome2[]; lessons: LadLesson[]; numbers: string[]; names: string[]; source: Record<string, unknown> }
 
 const DATA_DIR = path.resolve(__dirname, '../../../data/kids/prea1');
 let cache: KidsPackData | null | undefined;
@@ -31,9 +32,10 @@ let cache: KidsPackData | null | undefined;
 export function loadKidsPack(dir = DATA_DIR): KidsPackData | null {
   if (cache !== undefined && dir === DATA_DIR) return cache;
   const f = (n: string) => path.join(dir, n);
-  const ok = ['WORDS.json', 'OUTCOMES.json', 'LESSONS.json', 'SOURCE.json'].every((n) => existsSync(f(n)));
-  const data = ok
-    ? { words: JSON.parse(readFileSync(f('WORDS.json'), 'utf8')), outcomes: JSON.parse(readFileSync(f('OUTCOMES.json'), 'utf8')), lessons: JSON.parse(readFileSync(f('LESSONS.json'), 'utf8')), source: JSON.parse(readFileSync(f('SOURCE.json'), 'utf8')) }
+  const ok = ['WORDS.json', 'OUTCOMES.json', 'SOURCE.json'].every((n) => existsSync(f(n)));
+  const j = (n: string, d: unknown) => (existsSync(f(n)) ? JSON.parse(readFileSync(f(n), 'utf8')) : d);
+  const data: KidsPackData | null = ok
+    ? { words: j('WORDS.json', []), outcomes: j('OUTCOMES.json', []), lessons: j('LESSONS.json', []), numbers: j('NUMBERS.json', { numbers: [] }).numbers, names: j('NAMES.json', []), source: j('SOURCE.json', {}) }
     : null;
   if (dir === DATA_DIR) cache = data;
   return data;
@@ -49,9 +51,13 @@ export function inList(word: string, list: Set<string>): boolean {
   return cands.some((c) => c.length > 1 && list.has(c));
 }
 
+/** Every single word the Starters list allows: headwords, their forms, the words of multi-word entries, numbers 1-20, names. */
+export function starterTokens(words: StartersWord[], extra: string[] = []): Set<string> {
+  return new Set([...words.flatMap((w) => [w.word, ...(w.forms ?? [])]), ...extra].flatMap((x) => x.split(/[\s/]+/)).map(norm).filter(Boolean));
+}
 /** Check a lesson's content: every story/chant/command word is a Starters word or a lesson word; lines short; one action per command. */
-export function checkLesson(lesson: LadLesson, words: StartersWord[]): string[] {
-  const list = new Set([...words.map((w) => norm(w.word)), ...lesson.words.map(norm)]);
+export function checkLesson(lesson: LadLesson, words: StartersWord[], extra: string[] = []): string[] {
+  const list = new Set([...starterTokens(words, extra), ...lesson.words.map(norm)]);
   const problems: string[] = [];
   const lines = [...lesson.story.map((l) => ['story', l]), ...lesson.chant.map((l) => ['chant', l]), ...lesson.commands.map((l) => ['command', l])] as [string, string][];
   for (const [kind, line] of lines) {
