@@ -48,3 +48,10 @@ Two of the six rules failed: a guard and fit-judge agreement. Learning itself pa
 - 672 tutor replies, 0 rejected judge events, and no reply with two questions.
 - 2 tutor flags in round 5 are logged in `agent_sim_pln2b/RUN_NOTES.md`. One was checked and found not to be a bug.
 - Agent runs: 42 Sonnet tutors and 31 Opus runs (14 round judges, 1 event-agreement judge, 9 fit judges and 7 recheck batches).
+
+## Addendum (amendment E, after the run)
+
+- **Task-stage fix (planner2c):** two wrong answers in a row inside the task now go straight to language focus. A test is added, and all 119 planner tests pass. It has not been re-simulated yet.
+- **Correction to point 4 above:** the 9–12 fit splits were mostly on `short_sentences` (3 of 7), not on game/story or praise.
+- **Fit-agreement re-run** used anchored 9–12 items: the same 12 sessions, judged blind by 2 new Opus agents. The result was **85.3% (58 of 68), a pass by one item score**, with all scores within 1 point. 9–12 agreement went from 75% to 86% (24 of 28). Listen-and-do went from 9 of 10 to 7 of 10; those items were unchanged, so this is judge noise.
+- **Still open:** the stuck-learner guard failed in the PLN2b run. Only a new run with planner2c can clear it.
