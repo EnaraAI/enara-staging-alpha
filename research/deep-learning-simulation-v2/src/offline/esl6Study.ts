@@ -79,6 +79,8 @@ const GRADER_ENV = 'graderV2';                          // assessment scoring (D
 // Amendment A1 (2026-11-19, before round 1; PROTOCOL §6, DEVIATIONS 4): ONE session of 5 turns. Session-2 code paths are kept but never reached;
 // the state at the end of teaching is stored in stateEndS2 (field name kept) and in stateAfterS1.
 const SESSIONS = 1; const AGREE_ROUNDS = [3, 5];
+// Deviation 14 (2026-11-19, user decision, before any round-3 judging): judge and agreement batches hold 72 cases from round 3 on (36 in rounds 1-2, as run).
+const JUDGE_PER = (round: number) => (round >= 3 ? 72 : 36);
 const TURNS_PER_SESSION = 5; const ROUNDS = SESSIONS * TURNS_PER_SESSION; const DAY = 86_400_000; const T0 = Date.parse('2027-03-01T09:00:00Z');
 const GAP_DAYS = 2; const DELAY_DAYS = 7;
 const LESSON_ID = 'lsn';                                // ESL5 stand-in (b), kept
@@ -453,7 +455,7 @@ async function main() {
       cases.push({ id: caseId(f, round), text: cur.judgeInput }); km[caseId(f, round)] = f.replace(/\.json$/, '');
     }
     write(keymap, km);
-    const files = writeJudgeBatches(path.join(dir, 'judge'), `r${round}`, cases, 36, NS); write(path.join(dir, 'judge', `r${round}_FILES.json`), files);
+    const files = writeJudgeBatches(path.join(dir, 'judge'), `r${round}`, cases, JUDGE_PER(round), NS); write(path.join(dir, 'judge', `r${round}_FILES.json`), files);
     console.log('judge cases', cases.length, files.map((x) => x.batch).join(' '));
   } else if (cmd === 'japply') {
     const dir = dirArg(a1); const round = Number(a2); const files = JSON.parse(readFileSync(path.join(dir, 'judge', `r${round}_FILES.json`), 'utf8')); const km = JSON.parse(readFileSync(path.join(dir, 'judge', `r${round}_KEY.json`), 'utf8'));
@@ -527,7 +529,7 @@ async function main() {
     const dir = dirArg(a1); const round = Number(a2); if (!AGREE_ROUNDS.includes(round)) throw new Error(`agreement rounds are ${AGREE_ROUNDS.join(' and ')}`); const km = JSON.parse(readFileSync(path.join(dir, 'judge', `r${round}_KEY.json`), 'utf8')); const cases: { id: string; text: string }[] = []; const key: Record<string, string> = {};
     for (const [cid, sk] of Object.entries(km) as [string, string][]) { if (rand(`${NS}-agree`, cid) >= 0.2) continue; const s = load(dir, sk); const t = s.turns[round - 1]; if (!t.judgeInput) continue; const aid = `a${cid.slice(1)}`; cases.push({ id: aid, text: t.judgeInput }); key[aid] = `${sk}|${round}|${cid}`; }
     mkdirSync(path.join(dir, 'agree'), { recursive: true });
-    const files = writeJudgeBatches(path.join(dir, 'agree'), `ag${round}`, cases, 36, `${NS}-agree`); write(path.join(dir, 'agree', `ag${round}_FILES.json`), files); write(path.join(dir, 'agree', `ag${round}_KEY.json`), key);
+    const files = writeJudgeBatches(path.join(dir, 'agree'), `ag${round}`, cases, JUDGE_PER(round), `${NS}-agree`); write(path.join(dir, 'agree', `ag${round}_FILES.json`), files); write(path.join(dir, 'agree', `ag${round}_KEY.json`), key);
     console.log('agreement cases', cases.length, files.map((x) => x.batch).join(' '));
   } else if (cmd === 'agreescore') {
     const dir = dirArg(a1); const res: any = { _label: 'SIMULATION ONLY', rounds: {}, sessions: { 1: { cases: 0, same: 0 }, 2: { cases: 0, same: 0 } }, cases: 0, same: 0, missing: 0, comparedOn: 'strengths, independent counts and counted retrievals after applying each judge\'s events (esl6_forget.comparable)' };

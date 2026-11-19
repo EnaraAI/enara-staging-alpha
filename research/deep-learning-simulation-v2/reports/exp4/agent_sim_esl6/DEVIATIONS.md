@@ -81,3 +81,11 @@ The run paused mid round 2 (commit 950ae1db) is **discarded**. Its round-1 data,
     - Every batch is still independent and blind. Each judge reads only its own batch, and outputs go only to its own file.
     - The number of agent runs and the models are unchanged.
     - **Effect:** none on the data; only wall-clock time changes.
+14. **Judge batch size 72 from round 3 (user decision, 2026-11-19, before any round-3 judging).**
+    - Judge and agreement batches hold 72 cases from round 3 on: 16 judge batches per round instead of 32. Rounds 1–2 stay at 36, as run.
+    - Same judge task, same models (Opus), same blind inputs. Every case is still judged.
+    - **Why:** usage. Each judge spends about 69k tokens reading the instructions and rules, plus about 0.8k tokens per case. Doubling the batch size cuts about 35% of judge tokens: roughly 54 fewer judge runs over rounds 3–5.
+    - **Rule:** any batch that comes back short is completed by its judge, or re-run, before `japply`.
+    - **Change made:** the runner sets this through `JUDGE_PER(round)`; its hash is re-synced in PROTOCOL §3. PROTOCOL §6 notes the change.
+    - **Effect:** none intended on the data. A possible effect on judge quality from longer batches is watched by the round-3 and round-5 agreement checks (≥ 85% guard).
+    - Not adopted: a proposal to judge only 10% of process events. Judge events are what update the simulated learner's state and set the next task, so the primary outcome depends on every case being judged.

@@ -62,7 +62,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 | `config/agent_sim_esl4/PPLUS_PROMPT.txt` | `e373018e76243b1c6817dc1bdcbd8f60d3aff0cbf54d90312bbdd13cb7655472` |
 | `config/agent_sim_esl4/RATER_INSTRUCTIONS.md` (reused unchanged) | `77b8c0e6040b4bf5d8b3fb60ed23ea4e1d1ffc4f127f1cb52bf4346e9b1c69a8` |
 | `config/agent_sim_esl4/FIDELITY_INSTRUCTIONS.md` (reused unchanged) | `f4c0b7aa1e98e96ceb1ab16d00c381b50ae1e06215e457b6f3b6784b7fdd53e3` |
-| `src/offline/esl6Study.ts` (runner) | `2ab0616c187ae865766af602b805a34b98a5a26f46cd3b8738b2c7a250b7d4b9` |
+| `src/offline/esl6Study.ts` (runner) | `6a201f9c389cab76bdaf114ceeddd4f54e2e71fe36c41d652d82bcc275f603ac` |
 | `src/offline/esl6_analyze.py` (analysis and decision rule, sections 8–11) | `4715b01d358a356292a442701c7c9438f50a8670cfe4919232f0136e1df4ff3f` |
 | `src/offline/esl6Fixtures.ts` (lessons of the 30 outcomes) | `bda973481e314b0532557296e78dbd0679a0688f42ff8aa7b70a6f7189fa1cb7` |
 | `src/offline/esl6_forget.py` (F1 v2 and event rules, called by the runner) | `8cf37577da5cdb5d574a63cb2e8db6e0504a4814b039134292335072a2a960c1` |
@@ -178,7 +178,7 @@ On new explicit-first (A1/A2) learners, each taught one of 30 A1–A2 form outco
 - **F1 v2** (`F1_PARAMS.json`, LEARNING_RULES §6) runs for **7 days** after the session, before the delayed test; never inside a session. Retrieval counts come from the judge's `retrieval` field (§5b); with one session there are no session-2 retrieval rulings.
 - **2 replications;** every learner gets both arms in both replications: 282 × 2 × 2 = **1,128 sessions per round**, 5,640 tutor turns.
 - **Cells:** `<arm><rep><k>`, k = learner id mod 6 → 24 cells per round of 32 sessions, one tutor agent per cell writing every reply itself (scripted/templated/grouped replies kept as `PARTIAL_*` and redone).
-- **Judges:** blind, the ESL6 judge task (section 3) with ESL2 `JUDGE_INSTRUCTIONS.md` and ESL6 `LEARNING_RULES.md`; input = knowledge state, previous tutor turn, learner message, production fact, tutor turn (no arm). Batches of 36 (32 per round). Reading only, no scripts or helper files.
+- **Judges:** blind, the ESL6 judge task (section 3) with ESL2 `JUDGE_INSTRUCTIONS.md` and ESL6 `LEARNING_RULES.md`; input = knowledge state, previous tutor turn, learner message, production fact, tutor turn (no arm). Batches of 36 (32 per round) in rounds 1–2; **72 per batch (16 per round) from round 3 on** (DEVIATIONS 14, recorded before any round-3 judging; same task, same cases, every case judged). Reading only, no scripts or helper files.
 - **No session is dropped;** failed work is kept as `PARTIAL_*` and rerun. The analysis refuses to decide on incomplete data.
 
 ## 7. Measurement: the outcome assessment bank
