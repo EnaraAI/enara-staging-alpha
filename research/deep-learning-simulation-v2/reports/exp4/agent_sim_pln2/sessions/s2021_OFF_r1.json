@@ -66,7 +66,9 @@
  "rec": {
   "entries": [],
   "liveErrors": {},
-  "knownPoints": {}
+  "knownPoints": {
+   "lsn:1": 1
+  }
  },
  "turns": [
   {
@@ -209,7 +211,59 @@
     "correct": true,
     "text": "I have a cat and I have a dog.",
     "probes": []
-   }
+   },
+   "lang": {
+    "assessment": {
+     "verdict": "CORRECT",
+     "relevance": "ACTIVE_ITEM",
+     "criteria": [
+      1
+     ],
+     "next": "NEW_ITEM",
+     "item": "p2",
+     "source": "answer_key"
+    },
+    "activeItem": {
+     "id": "lesson:p2",
+     "source": "lesson",
+     "lessonItemId": "p2"
+    },
+    "hintLevel": 0
+   },
+   "planner": {
+    "arm": "OFF",
+    "primary": "worked_example",
+    "supporting": [
+     "think_aloud"
+    ]
+   },
+   "diagnosis": null,
+   "markerStatus": "ok",
+   "qualityFlags": [],
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "profileLines": 0,
+   "ev5": {},
+   "engineVerdict": "CORRECT",
+   "recordLive": [],
+   "promptQuickCheck": false,
+   "tutor": "'I have a cat and I have a dog.' is correct. You used 'and' to add one more idea.\n\nNow a different joining word:\n\nJoin with but: \"The bus is cheap. It is slow.\"",
+   "raw": "[[assess verdict=CORRECT relevance=ACTIVE_ITEM criteria=1 next=NEW_ITEM item=p2]]\n'I have a cat and I have a dog.' is correct. You used 'and' to add one more idea.\n\nNow a different joining word:\n\nJoin with but: \"The bus is cheap. It is slow.\"",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "qcTeachWords": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 1: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExample: 'I like pizza.' 'I like juice.' Together: 'I like pizza and I like juice.'\nRule: use 'and' to add one more idea.\n\nRight: 'I like pizza and I like juice.'\nWrong: 'I like pizza but I like juice.'\n\nNow you try. Write one new sentence with 'and':\nJoin with and: \"I have a cat. I have a dog.\"\n\nLEARNER'S LAST MESSAGE:\nI have a cat and I have a dog.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n'I have a cat and I have a dog.' is correct. You used 'and' to add one more idea.\n\nNow a different joining word:\n\nJoin with but: \"The bus is cheap. It is slow.\""
   }
  ],
  "assess": {
