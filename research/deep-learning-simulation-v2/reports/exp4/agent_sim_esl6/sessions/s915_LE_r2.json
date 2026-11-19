@@ -430,7 +430,122 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 1.\nC2 (correct) strength 2: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"A boy is playing football.\" is a good sentence for what is happening now.\nThe task asks for two sentences. Add one more sentence about another person in the park, and tell me what that person is doing.\n\nLEARNER'S LAST MESSAGE:\nA girl reads a book.\nFACT: the last learner message contained the error of W2 (uses the plain present for now (\"Look! It rains.\")).\n\nTUTOR TURN TO JUDGE:\nThe second sentence should be \"A girl is reading a book.\" For what is happening now, use is or are and a verb with -ing.\nRight: A man is walking. Wrong: A man walks.\nNow try on your own. Imagine a school. Write two sentences about what people are doing now."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 1.\nC2 (correct) strength 2: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"A boy is playing football.\" is a good sentence for what is happening now.\nThe task asks for two sentences. Add one more sentence about another person in the park, and tell me what that person is doing.\n\nLEARNER'S LAST MESSAGE:\nA girl reads a book.\nFACT: the last learner message contained the error of W2 (uses the plain present for now (\"Look! It rains.\")).\n\nTUTOR TURN TO JUDGE:\nThe second sentence should be \"A girl is reading a book.\" For what is happening now, use is or are and a verb with -ing.\nRight: A man is walking. Wrong: A man walks.\nNow try on your own. Imagine a school. Write two sentences about what people are doing now.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The second sentence should be 'A girl is reading a book.'"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "For what is happening now, use is or are and a verb with -ing."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "For what is happening now, use is or are and a verb with -ing."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: A man is walking. Wrong: A man walks."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "A teacher is writing on the board.",
+    "errors": {
+     "W1": "A teacher writing on the board.",
+     "W2": "A teacher writes on the board."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W2",
+    "R1:W1",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "A teacher is writing on the board.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "A teacher is writing on the board.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

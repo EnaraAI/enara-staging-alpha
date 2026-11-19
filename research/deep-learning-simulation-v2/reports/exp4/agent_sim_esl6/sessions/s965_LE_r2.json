@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 2,
    "C1": 1,
    "C2": 0
@@ -371,7 +371,117 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 2: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"rny\". Think about the umbrella. What weather is that?\nTell me what you were thinking, then write the whole word again.\n\nLEARNER'S LAST MESSAGE:\nI think the noun works as the description.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"rainy\". You need an umbrella when it rains. After \"It is\", we need a describing word, not a noun.\nRight: It is sunny today. Wrong: It is sun today.\nNow try: Complete: \"The wind is strong. It is ___ today.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 2: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"rny\". Think about the umbrella. What weather is that?\nTell me what you were thinking, then write the whole word again.\n\nLEARNER'S LAST MESSAGE:\nI think the noun works as the description.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"rainy\". You need an umbrella when it rains. After \"It is\", we need a describing word, not a noun.\nRight: It is sunny today. Wrong: It is sun today.\nNow try: Complete: \"The wind is strong. It is ___ today.\"",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"rainy\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After \"It is\", we need a describing word, not a noun."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: It is sunny today. Wrong: It is sun today."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "windy",
+    "errors": {
+     "W1": "wind",
+     "W2": "wndy"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "wndy",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W2",
+    "text": "wndy",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

@@ -282,7 +282,100 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 1: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, a pilot works at an airport, and \"an\" fits because \"airport\" starts with a vowel sound. Good answer! Just check your spelling: it is a-i-r-p-o-r-t. Please write the whole sentence again with the correct spelling: A pilot works at an ___.\n\nLEARNER'S LAST MESSAGE:\nairprt\nFACT: the last learner message contained the error of W1 (leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\")).\n\nTUTOR TURN TO JUDGE:\nYou chose the right word, but the spelling is still not right. Let me help: a-i-r-p-o-r-t. Notice the letters \"o\" and \"r\" before the \"t\". So the sentence is: A pilot works at an airport. Please write it once more."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 1: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, a pilot works at an airport, and \"an\" fits because \"airport\" starts with a vowel sound. Good answer! Just check your spelling: it is a-i-r-p-o-r-t. Please write the whole sentence again with the correct spelling: A pilot works at an ___.\n\nLEARNER'S LAST MESSAGE:\nairprt\nFACT: the last learner message contained the error of W1 (leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\")).\n\nTUTOR TURN TO JUDGE:\nYou chose the right word, but the spelling is still not right. Let me help: a-i-r-p-o-r-t. Notice the letters \"o\" and \"r\" before the \"t\". So the sentence is: A pilot works at an airport. Please write it once more.",
+   "stateBefore": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "So the sentence is: A pilot works at an airport."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "A pilot works at an airport.",
+    "errors": {
+     "W1": "A pilot works at an airprt."
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "A pilot works at an airprt.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "A pilot works at an airprt.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

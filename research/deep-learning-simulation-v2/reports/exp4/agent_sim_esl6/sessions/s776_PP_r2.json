@@ -276,7 +276,101 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 2: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 1: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 0.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, chair is correct! We sit on a chair, and it is a classroom object. Great. Now a new one. Complete: \"The teacher writes on the ___.\"\n\nLEARNER'S LAST MESSAGE:\npoard\nFACT: the last learner message contained the error of W1 (writes b for p or f for v (\"bencil\", \"bage\")).\n\nTUTOR TURN TO JUDGE:\nYou have the right idea, the teacher writes on the board! But the spelling is not quite right. Hint: board starts with b, not p, and it has the letters b-o-a-r-d. Try again: The teacher writes on the ___."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 2: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 1: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 0.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, chair is correct! We sit on a chair, and it is a classroom object. Great. Now a new one. Complete: \"The teacher writes on the ___.\"\n\nLEARNER'S LAST MESSAGE:\npoard\nFACT: the last learner message contained the error of W1 (writes b for p or f for v (\"bencil\", \"bage\")).\n\nTUTOR TURN TO JUDGE:\nYou have the right idea, the teacher writes on the board! But the spelling is not quite right. Hint: board starts with b, not p, and it has the letters b-o-a-r-d. Try again: The teacher writes on the ___.",
+   "stateBefore": {
+    "form": "class",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "board starts with b, not p, and it has the letters b-o-a-r-d"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "board",
+    "errors": {
+     "W1": "poard"
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "class",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "board",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "board",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

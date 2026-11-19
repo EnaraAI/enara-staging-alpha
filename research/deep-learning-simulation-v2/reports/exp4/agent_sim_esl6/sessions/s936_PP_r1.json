@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -267,7 +267,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, correct! \"My cousin\" is one person (he or she), so we use \"has\": My cousin has brown eyes. Well done.\n\nExercise 2. Write two sentences about a famous actor: one about hair or eyes and one about personality.\nTry it first, and I will give you feedback.\n\nLEARNER'S LAST MESSAGE:\nHe has hair short black.\nFACT: the last learner message contained the error of W1 (puts appearance adjectives after the noun (\"She has hair long black.\")).\n\nTUTOR TURN TO JUDGE:\nGood try! \"He has ... hair\" is right, but the word order is not. In English the adjectives come before the noun. Hint: short black hair. Try again: write the sentence with the words in the right order. Then add one sentence about his personality."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, correct! \"My cousin\" is one person (he or she), so we use \"has\": My cousin has brown eyes. Well done.\n\nExercise 2. Write two sentences about a famous actor: one about hair or eyes and one about personality.\nTry it first, and I will give you feedback.\n\nLEARNER'S LAST MESSAGE:\nHe has hair short black.\nFACT: the last learner message contained the error of W1 (puts appearance adjectives after the noun (\"She has hair long black.\")).\n\nTUTOR TURN TO JUDGE:\nGood try! \"He has ... hair\" is right, but the word order is not. In English the adjectives come before the noun. Hint: short black hair. Try again: write the sentence with the words in the right order. Then add one sentence about his personality.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English the adjectives come before the noun."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "Hint: short black hair."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "He has short black hair.",
+    "errors": {
+     "W1": "He has hair short black."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "He has short black hair.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "He has short black hair.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

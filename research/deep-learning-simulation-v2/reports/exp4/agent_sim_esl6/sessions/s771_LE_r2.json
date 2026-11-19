@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -420,7 +420,108 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 3: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes. \"Sam plays chess on Mondays.\" has the subject first, then the verb, then the object, then the time.\nHere is the next one:\nPut in order: \"usually / we / lunch / have\"\n\nLEARNER'S LAST MESSAGE:\nWe usually have lunch.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"We usually have lunch.\" is correct.\nLook: \"My friend always eats rice.\" The word always comes before the verb.\nRule: Put always, usually or never before the main verb.\nRight: Tom never drinks milk. Wrong: Tom drinks never milk.\nNow write one sentence about a person you know. Put the subject first, then the verb, then the object."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 3: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes. \"Sam plays chess on Mondays.\" has the subject first, then the verb, then the object, then the time.\nHere is the next one:\nPut in order: \"usually / we / lunch / have\"\n\nLEARNER'S LAST MESSAGE:\nWe usually have lunch.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"We usually have lunch.\" is correct.\nLook: \"My friend always eats rice.\" The word always comes before the verb.\nRule: Put always, usually or never before the main verb.\nRight: Tom never drinks milk. Wrong: Tom drinks never milk.\nNow write one sentence about a person you know. Put the subject first, then the verb, then the object.",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"We usually have lunch.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "We usually have lunch."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister reads books.",
+    "errors": {
+     "W1": "Reads my sister books."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Reads my sister books.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "Reads my sister books.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

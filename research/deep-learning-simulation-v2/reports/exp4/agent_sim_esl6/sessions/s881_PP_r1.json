@@ -13,14 +13,14 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
-   "C2": 1
+   "C2": 3
   },
   "indep": {
    "C1": 0,
-   "C2": 0
+   "C2": 1
   },
   "start": {
    "W1": 2,
@@ -300,7 +300,113 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 1: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! After 'What', we use did: What did you do yesterday? Good job!\n\nNext one: Complete the question: '___ she go to the beach last weekend?'\n\nLEARNER'S LAST MESSAGE:\nDid\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! 'Did she go to the beach last weekend?' After did, the main verb stays in the base form: go, not went. Well done!\n\nNew exercise: Write the past form of 'go': Last weekend I ___ to the beach."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 1: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! After 'What', we use did: What did you do yesterday? Good job!\n\nNext one: Complete the question: '___ she go to the beach last weekend?'\n\nLEARNER'S LAST MESSAGE:\nDid\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! 'Did she go to the beach last weekend?' After did, the main verb stays in the base form: go, not went. Well done!\n\nNew exercise: Write the past form of 'go': Last weekend I ___ to the beach.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! 'Did she go to the beach last weekend?'"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Did"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After did, the main verb stays in the base form"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "go, not went"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "went",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "went",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "went",
+    "probes": []
+   }
   }
  ],
  "assess": {

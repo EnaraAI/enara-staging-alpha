@@ -16,11 +16,11 @@
    "W1": 0,
    "W2": 0,
    "C1": 3,
-   "C2": 2
+   "C2": 3
   },
   "indep": {
-   "C1": 1,
-   "C2": 1
+   "C1": 2,
+   "C2": 2
   },
   "start": {
    "W1": 2,
@@ -433,7 +433,122 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 1.\nC2 (correct) strength 2: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"A man is running in the park.\" is correct. It uses \"is\" and \"running\" well.\n\nThe task needs two sentences. Write one more sentence about a different person in the park.\n\nLEARNER'S LAST MESSAGE:\nA girl is reading a book.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"A girl is reading a book.\" is correct. Now you have two good sentences about the park, and both use is and -ing.\nNext task:\nAdd one sentence about the weather in the picture."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 1.\nC2 (correct) strength 2: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"A man is running in the park.\" is correct. It uses \"is\" and \"running\" well.\n\nThe task needs two sentences. Write one more sentence about a different person in the park.\n\nLEARNER'S LAST MESSAGE:\nA girl is reading a book.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"A girl is reading a book.\" is correct. Now you have two good sentences about the park, and both use is and -ing.\nNext task:\nAdd one sentence about the weather in the picture.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"A girl is reading a book.\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"A girl is reading a book.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "A girl is reading a book."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "A girl is reading a book."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "It is raining.",
+    "errors": {
+     "W1": "It raining.",
+     "W2": "It rains."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "It is raining.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "It is raining.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

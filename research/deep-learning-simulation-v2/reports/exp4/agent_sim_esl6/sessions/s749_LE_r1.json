@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -406,7 +406,117 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-prepositions-time (at, on and in for time). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: one preposition (in, like Arabic fi) works for every time. Its error: uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\").\nC1 (correct) strength 3: at + clock time, on + day/date, in + month/year. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"at\" is correct for 5 o'clock. Now try a different time word.\nWrite in, on or at: They get married ___ April.\n\nLEARNER'S LAST MESSAGE:\nin\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"in\" is correct for April.\nLook: \"The party is on Friday.\" Friday is a day.\nRule: use on before a day of the week.\nRight: Lisa runs on Monday. Wrong: Lisa runs in Monday.\nNow write one sentence about a person you know. Use on and a day."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-prepositions-time (at, on and in for time). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: one preposition (in, like Arabic fi) works for every time. Its error: uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\").\nC1 (correct) strength 3: at + clock time, on + day/date, in + month/year. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"at\" is correct for 5 o'clock. Now try a different time word.\nWrite in, on or at: They get married ___ April.\n\nLEARNER'S LAST MESSAGE:\nin\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"in\" is correct for April.\nLook: \"The party is on Friday.\" Friday is a day.\nRule: use on before a day of the week.\nRight: Lisa runs on Monday. Wrong: Lisa runs in Monday.\nNow write one sentence about a person you know. Use on and a day.",
+   "stateBefore": {
+    "form": "preptime",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"in\" is correct for April."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"in\" is correct for April."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: use on before a day of the week."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Lisa runs on Monday. Wrong: Lisa runs in Monday."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother plays football on Monday.",
+    "errors": {
+     "W1": "My brother plays football in Monday."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "preptime",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother plays football on Monday.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother plays football on Monday.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

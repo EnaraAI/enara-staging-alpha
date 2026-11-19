@@ -295,7 +295,95 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 3: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 1: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 0.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! Subject (Sam), verb (plays), object (chess), then time (on Mondays). Great work.\n\nExercise 2. Put in order: \"usually / we / lunch / have\"\n\nLEARNER'S LAST MESSAGE:\nHave we usually lunch.\nFACT: the last learner message contained the error of W1 (puts the verb before the subject (\"Plays Ahmed football.\")).\n\nTUTOR TURN TO JUDGE:\nGood try, but the word order is not right yet. In English the subject comes first, and always, usually and never go before the main verb. Who is the subject here, and what is the main verb? Hint: We ___ have lunch. Which word goes in the gap? Try again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 3: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 1: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 0.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! Subject (Sam), verb (plays), object (chess), then time (on Mondays). Great work.\n\nExercise 2. Put in order: \"usually / we / lunch / have\"\n\nLEARNER'S LAST MESSAGE:\nHave we usually lunch.\nFACT: the last learner message contained the error of W1 (puts the verb before the subject (\"Plays Ahmed football.\")).\n\nTUTOR TURN TO JUDGE:\nGood try, but the word order is not right yet. In English the subject comes first, and always, usually and never go before the main verb. Who is the subject here, and what is the main verb? Hint: We ___ have lunch. Which word goes in the gap? Try again.",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 3,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English the subject comes first"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "usually",
+    "errors": {}
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 3,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "usually",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "usually",
+    "probes": []
+   }
   }
  ],
  "assess": {

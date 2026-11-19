@@ -14,7 +14,7 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 3,
    "C2": 2
   },
@@ -325,7 +325,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 1: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 1.\nC2 (correct) strength 2: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood sentence! \"A boy is running in the park\" uses is + running correctly. But the exercise needs two sentences. Please write one more sentence about what another person is doing now.\n\nLEARNER'S LAST MESSAGE:\nA girl reads a book.\nFACT: the last learner message contained the error of W2 (uses the plain present for now (\"Look! It rains.\")).\n\nTUTOR TURN TO JUDGE:\nGood, you wrote a second sentence about a girl! But there is a small mistake. For something happening now, we need is + verb-ing. Hint: \"A girl reads a book\" is missing \"is\" and the verb needs -ing. Try again: write the sentence about the girl for now."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 1: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 1.\nC2 (correct) strength 2: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood sentence! \"A boy is running in the park\" uses is + running correctly. But the exercise needs two sentences. Please write one more sentence about what another person is doing now.\n\nLEARNER'S LAST MESSAGE:\nA girl reads a book.\nFACT: the last learner message contained the error of W2 (uses the plain present for now (\"Look! It rains.\")).\n\nTUTOR TURN TO JUDGE:\nGood, you wrote a second sentence about a girl! But there is a small mistake. For something happening now, we need is + verb-ing. Hint: \"A girl reads a book\" is missing \"is\" and the verb needs -ing. Try again: write the sentence about the girl for now.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "For something happening now, we need is + verb-ing."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "For something happening now, we need is + verb-ing."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "A girl is reading a book.",
+    "errors": {
+     "W1": "A girl reading a book.",
+     "W2": "A girl reads a book."
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "A girl is reading a book.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "A girl is reading a book.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

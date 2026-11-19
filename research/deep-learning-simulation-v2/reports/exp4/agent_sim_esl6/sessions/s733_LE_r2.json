@@ -419,7 +419,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 3: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect. You wrote \"My brother likes tea.\" The first word is big and the sentence ends with a dot.\nHere is the next sentence.\nRewrite correctly: \"i am ten years old\"\n\nLEARNER'S LAST MESSAGE:\ni am ten years old\nFACT: the last learner message contained the error of W1 (writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\")).\n\nTUTOR TURN TO JUDGE:\nThe words in \"i am ten years old\" are right. Check the big letters and the end of the sentence.\nLook: \"ben and i run\" becomes \"Ben and I run.\"\nRule: always write I as a capital letter.\nRight: Sara and I sing. Wrong: Sara and i sing.\nTry again: Rewrite correctly: \"i am ten years old\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 3: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect. You wrote \"My brother likes tea.\" The first word is big and the sentence ends with a dot.\nHere is the next sentence.\nRewrite correctly: \"i am ten years old\"\n\nLEARNER'S LAST MESSAGE:\ni am ten years old\nFACT: the last learner message contained the error of W1 (writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\")).\n\nTUTOR TURN TO JUDGE:\nThe words in \"i am ten years old\" are right. Check the big letters and the end of the sentence.\nLook: \"ben and i run\" becomes \"Ben and I run.\"\nRule: always write I as a capital letter.\nRight: Sara and I sing. Wrong: Sara and i sing.\nTry again: Rewrite correctly: \"i am ten years old\"",
+   "stateBefore": {
+    "form": "caps",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: always write I as a capital letter."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Sara and I sing. Wrong: Sara and i sing."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I am ten years old.",
+    "errors": {
+     "W1": "i am ten years old"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "caps",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I am ten years old.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I am ten years old.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

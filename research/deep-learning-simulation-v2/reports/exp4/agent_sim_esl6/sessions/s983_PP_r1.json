@@ -19,7 +19,7 @@
    "C2": 3
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -306,7 +306,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 0: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 3: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 3: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExcellent! 'My aunt often makes tea.' The subject comes first, the frequency word often goes before the main verb, and the object comes last. Perfect!\n\nNext one: Put in order: 'usually / we / lunch / have'\n\nLEARNER'S LAST MESSAGE:\nWe usually have lunch.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! 'We usually have lunch.' The frequency word usually goes before the main verb have. Nice work!\n\nHere is a harder one: Put in order: 'never / my brother / tea / drinks / in the evening'"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 0: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 3: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 3: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExcellent! 'My aunt often makes tea.' The subject comes first, the frequency word often goes before the main verb, and the object comes last. Perfect!\n\nNext one: Put in order: 'usually / we / lunch / have'\n\nLEARNER'S LAST MESSAGE:\nWe usually have lunch.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! 'We usually have lunch.' The frequency word usually goes before the main verb have. Nice work!\n\nHere is a harder one: Put in order: 'never / my brother / tea / drinks / in the evening'",
+   "stateBefore": {
+    "form": "svo",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! 'We usually have lunch.'"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "We usually have lunch."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother never drinks tea in the evening.",
+    "errors": {
+     "W1": "Drinks my brother never tea in the evening."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother never drinks tea in the evening.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "My brother never drinks tea in the evening.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

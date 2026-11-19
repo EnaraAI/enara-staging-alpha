@@ -14,7 +14,7 @@
   ],
   "s": {
    "W1": 1,
-   "W2": 2,
+   "W2": 1,
    "C1": 1,
    "C2": 0
   },
@@ -394,7 +394,110 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 2: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour word \"rany\" fits the umbrella clue. The spelling needs a check.\nSay the word slowly, part by part, and think about each sound you hear.\nThen write it again.\n\nLEARNER'S LAST MESSAGE:\nrany\nFACT: the last learner message contained the error of W2 (leaves out vowels in a weather word (\"sny\", \"windi\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"rainy\". Take the word rain and add y at the end.\nRight: The sky is cloudy. Wrong: The sky is cloudi.\nNow try on your own. Complete: \"Snow is falling. It is ___ today.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 2: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour word \"rany\" fits the umbrella clue. The spelling needs a check.\nSay the word slowly, part by part, and think about each sound you hear.\nThen write it again.\n\nLEARNER'S LAST MESSAGE:\nrany\nFACT: the last learner message contained the error of W2 (leaves out vowels in a weather word (\"sny\", \"windi\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"rainy\". Take the word rain and add y at the end.\nRight: The sky is cloudy. Wrong: The sky is cloudi.\nNow try on your own. Complete: \"Snow is falling. It is ___ today.\"",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is \"rainy\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: The sky is cloudy. Wrong: The sky is cloudi."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "snowy",
+    "errors": {
+     "W1": "snow",
+     "W2": "snwy"
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "snowy",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "snowy",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
