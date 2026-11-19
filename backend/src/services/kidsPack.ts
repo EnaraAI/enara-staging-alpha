@@ -51,9 +51,11 @@ export function inList(word: string, list: Set<string>): boolean {
   return cands.some((c) => c.length > 1 && list.has(c));
 }
 
+/** The word list gives base forms only (be, have, do, can); Pre A1 Starters grammar uses their present/past forms and short forms. */
+export const STARTERS_GRAMMAR_FORMS = ['am', 'is', 'are', "i'm", "you're", "he's", "she's", "it's", "we're", "they're", "isn't", "aren't", "'m", "'s", "'re", 'has', "hasn't", "haven't", "i've", 'does', "doesn't", "don't", "can't", "let's", "what's", "where's", "who's", "that's", "there's"];
 /** Every single word the Starters list allows: headwords, their forms, the words of multi-word entries, numbers 1-20, names. */
 export function starterTokens(words: StartersWord[], extra: string[] = []): Set<string> {
-  return new Set([...words.flatMap((w) => [w.word, ...(w.forms ?? [])]), ...extra].flatMap((x) => x.split(/[\s/]+/)).map(norm).filter(Boolean));
+  return new Set([...words.flatMap((w) => [w.word, ...(w.forms ?? [])]), ...STARTERS_GRAMMAR_FORMS, ...extra].flatMap((x) => x.split(/[\s/]+/)).map(norm).filter(Boolean));
 }
 /** Check a lesson's content: every story/chant/command word is a Starters word or a lesson word; lines short; one action per command. */
 export function checkLesson(lesson: LadLesson, words: StartersWord[], extra: string[] = []): string[] {
