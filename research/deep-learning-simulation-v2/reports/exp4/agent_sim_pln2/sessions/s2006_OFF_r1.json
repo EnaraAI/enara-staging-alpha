@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -389,7 +389,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 1: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou chose an -er ending for a short adjective, and that is the right kind of step for this sentence.\n\nNow look carefully at your answer \"taler\". Compare the first part of it with the word \"tall\" in the brackets. Check every letter.\n\nTry again: write the full answer for \"Our new manager is ___ (tall) than the old manager.\"\n\nLEARNER'S LAST MESSAGE:\ntaler\nFACT: the last learner message contained the error of W1 (spells the comparative by sound (\"biger\", \"hapier\", \"nicr\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"taller\". The word \"tall\" keeps both l letters, and then we add -er.\nRight: The room is darker than the hall.\nWrong: The room is darkr than the hall.\nNow try a new one on your own. Write the full answer and tell me your thinking:\n\"This road is ___ (long) than that road.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 1: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou chose an -er ending for a short adjective, and that is the right kind of step for this sentence.\n\nNow look carefully at your answer \"taler\". Compare the first part of it with the word \"tall\" in the brackets. Check every letter.\n\nTry again: write the full answer for \"Our new manager is ___ (tall) than the old manager.\"\n\nLEARNER'S LAST MESSAGE:\ntaler\nFACT: the last learner message contained the error of W1 (spells the comparative by sound (\"biger\", \"hapier\", \"nicr\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"taller\". The word \"tall\" keeps both l letters, and then we add -er.\nRight: The room is darker than the hall.\nWrong: The room is darkr than the hall.\nNow try a new one on your own. Write the full answer and tell me your thinking:\n\"This road is ___ (long) than that road.\"",
+   "stateBefore": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"taller\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: The room is darker than the hall. Wrong: The room is darkr than the hall."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "longer",
+    "errors": {
+     "W1": "longr"
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "longer",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "longer",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

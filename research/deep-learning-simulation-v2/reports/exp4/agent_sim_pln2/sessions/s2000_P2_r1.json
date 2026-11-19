@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 1,
    "C1": 1,
    "C2": 0
@@ -463,7 +463,115 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"She answer emails every day.\" is clear, and \"every day\" fits a routine well.\n\nThe error is in one word: the verb \"answer\". Look at it again and check whether it fits with \"She\".\n\nPlease write the sentence again after that check. Then add a second sentence about the same colleague, also beginning with \"He\" or \"She\".\n\nLEARNER'S LAST MESSAGE:\nShe answer emails every day.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe correct sentence is \"She answers emails every day.\" After he, she or it, the verb needs -s, and \"answer\" has no -s.\n\nRight: He writes reports every day.\nWrong: He write reports every day.\n\nNow one new sentence for you, without help. Write the correct form: \"My manager ___ (start) work at eight.\" Answer with only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"She answer emails every day.\" is clear, and \"every day\" fits a routine well.\n\nThe error is in one word: the verb \"answer\". Look at it again and check whether it fits with \"She\".\n\nPlease write the sentence again after that check. Then add a second sentence about the same colleague, also beginning with \"He\" or \"She\".\n\nLEARNER'S LAST MESSAGE:\nShe answer emails every day.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe correct sentence is \"She answers emails every day.\" After he, she or it, the verb needs -s, and \"answer\" has no -s.\n\nRight: He writes reports every day.\nWrong: He write reports every day.\n\nNow one new sentence for you, without help. Write the correct form: \"My manager ___ (start) work at eight.\" Answer with only the verb.",
+   "stateBefore": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The correct sentence is \"She answers emails every day.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, the verb needs -s"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: He writes reports every day. Wrong: He write reports every day."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "starts",
+    "errors": {
+     "W1": "start"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "starts",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "starts",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

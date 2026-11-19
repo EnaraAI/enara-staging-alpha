@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -390,7 +390,111 @@
    "twoAsksRaw": false,
    "qcTeachWords": true,
    "guardRemoved": 1,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThanks for writing about your morning. Your idea is clear, and \"I drink always tea in the morning.\" is almost there.\n\nLook at the word \"always\" and the words around it: \"drink\" is on one side and \"tea\" is on the other. Check where \"always\" sits in the sentence.\n\nTake another look and write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nI drink always tea in the morning.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at the answer now. The correct sentence is \"I always drink tea in the morning.\" The word \"always\" goes before the main verb, and here the main verb is \"drink\".\n\nHere is one pair on the same point:\nright: We sometimes eat lunch at home.\nwrong: We eat sometimes lunch at home.\n\nNow try one on your own, without help."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThanks for writing about your morning. Your idea is clear, and \"I drink always tea in the morning.\" is almost there.\n\nLook at the word \"always\" and the words around it: \"drink\" is on one side and \"tea\" is on the other. Check where \"always\" sits in the sentence.\n\nTake another look and write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nI drink always tea in the morning.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at the answer now. The correct sentence is \"I always drink tea in the morning.\" The word \"always\" goes before the main verb, and here the main verb is \"drink\".\n\nHere is one pair on the same point:\nright: We sometimes eat lunch at home.\nwrong: We eat sometimes lunch at home.\n\nNow try one on your own, without help.",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The correct sentence is \"I always drink tea in the morning.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The word \"always\" goes before the main verb"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "right: We sometimes eat lunch at home. wrong: We eat sometimes lunch at home."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I usually walk to school.",
+    "errors": {
+     "W1": "I walk usually to school."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I usually walk to school.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I usually walk to school.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
