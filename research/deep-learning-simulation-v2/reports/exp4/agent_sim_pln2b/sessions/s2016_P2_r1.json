@@ -67,8 +67,8 @@
   "entries": [],
   "liveErrors": {},
   "knownPoints": {
-   "lsn:2": 1,
-   "lsn:3": 1
+   "lsn:2": 2,
+   "lsn:3": 2
   }
  },
  "turns": [
@@ -724,7 +724,94 @@
     "correct": true,
     "text": "My sister asks, \"Do you have this dress in blue?\"",
     "probes": []
-   }
+   },
+   "lang": {
+    "assessment": {
+     "verdict": "CORRECT",
+     "relevance": "ACTIVE_ITEM",
+     "criteria": [
+      2,
+      3
+     ],
+     "next": "NEW_ITEM",
+     "source": "tutor_assessment"
+    },
+    "activeItem": {
+     "id": "msg:s2016_P2_r1_t5",
+     "source": "tutor"
+    },
+    "hintLevel": 0,
+    "closingAsk": "added",
+    "diagnosis": "unknown"
+   },
+   "planner": {
+    "arm": "P2",
+    "primary": "worked_example",
+    "supporting": [
+     "think_aloud"
+    ],
+    "shape": "TTT",
+    "shapeRule": "S4",
+    "methodRule": "M7b_PROCEDURAL",
+    "stage": "retest",
+    "quickCheck": false,
+    "childSupports": false,
+    "l1Diagnoses": 0,
+    "l1Misconception": false,
+    "progress": {
+     "quickCheck": {
+      "right": 1,
+      "of": 1
+     },
+     "events": [
+      "none",
+      "none",
+      "none",
+      "ok",
+      "none"
+     ],
+     "tries": 1,
+     "right": 1,
+     "ownSentenceDone": false,
+     "triesAfterTest": 0,
+     "rightAfterTest": 0,
+     "learnerTurns": 4,
+     "taskDone": true,
+     "rightAfterTask": 1,
+     "opened": true
+    },
+    "explanation": "Test, teach, test because the quick check showed at least 2 of 3 known; main method Worked Examples because: Procedural or calculation errors."
+   },
+   "diagnosis": "unknown",
+   "markerStatus": "ok",
+   "qualityFlags": [],
+   "moves": [
+    "corrective_feedback_retry",
+    "comprehensible_model"
+   ],
+   "strand": "language_focused",
+   "explicitFirst": true,
+   "ruleLine": false,
+   "closingAsk": "added",
+   "profileLines": 0,
+   "ev5": {
+    "ownSentence": "feedback"
+   },
+   "engineVerdict": "CORRECT",
+   "recordLive": [],
+   "promptQuickCheck": false,
+   "tutor": "The form is right: \"Do you have this dress in blue?\" is a full question, and \"in\" comes before the colour.\n\nNow a new place, on your own. You are in a school shop. You want the price of two notebooks. Write your question to the shop assistant.",
+   "raw": "[[assess verdict=CORRECT relevance=ACTIVE_ITEM criteria=2,3 next=NEW_ITEM]]\nThe form is right: \"Do you have this dress in blue?\" is a full question, and \"in\" comes before the colour.\n\nNow a new place, on your own. You are in a school shop. You want the price of two notebooks. Write your question to the shop assistant.",
+   "leakRaw": 0,
+   "leakFinal": 0,
+   "earlyLeakRaw": 0,
+   "earlyLeakFinal": 0,
+   "lateAnswerFinal": 0,
+   "answerReleased": false,
+   "twoAsks": false,
+   "twoAsksRaw": false,
+   "qcTeachWords": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-clothes-shopping (clothes, colours and sizes). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adjective goes after the noun. Its error: puts the colour or size after the noun (\"I want a shirt blue, size big.\").\nC1 (correct) strength 1: colour and size adjectives go before the noun. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Do you have this jacket in small?\" is correct. It is a full question, and \"in\" comes before the size.\n\nExample: I want a bag in black, so I ask \"Do you have this bag in black?\"\nRule: to ask for another size or colour, ask a full question with \"in\" before it.\n\nRight: Do you have this cap in red? Wrong: You have this cap in red.\n\nNow write one sentence about a person you know who asks for something in a size or colour.\n\nLEARNER'S LAST MESSAGE:\nMy sister asks, \"Do you have this dress in blue?\"\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThe form is right: \"Do you have this dress in blue?\" is a full question, and \"in\" comes before the colour.\n\nNow a new place, on your own. You are in a school shop. You want the price of two notebooks. Write your question to the shop assistant."
   }
  ],
  "assess": {
