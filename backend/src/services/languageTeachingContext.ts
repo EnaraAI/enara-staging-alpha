@@ -1356,7 +1356,23 @@ export const askedNewExample = (t: string) => /\bone (?:new |more )?example (?:o
 export const SHORT_RECAP = 'This is the point to close the lesson unit. This overrides the "next task" instructions above: (1) answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) state the rule in ONE plain line of 20 words or fewer; (3) end by asking: "Now write one new example of your own." Do not set a new exercise this turn and never write a completed answer to an open exercise.';
 export const EXAMPLE_CHECK = 'They have just written their own example. If it follows the rule, confirm it in one line starting "Remember:" and then give the next task. If it is wrong or incomplete, correct only the wrong part in one short sentence and ask for one more example (no new exercise yet).';
 // v2 (ruleFirst): which rules (success criteria) the focus item needs that this session has not introduced yet.
-export function rulesToIntroduce(history: { role: string; languageTurn?: unknown }[], s: { presentLessonItem?: { criteria?: number[] }; activeLessonItem?: { criteria?: number[] }; answeringCheck?: boolean; hintRequest?: boolean; dontKnow?: boolean; whyAfterAttempt?: boolean; learning?: { criteria?: Record<string, unknown> } }, spec: { successCriteria?: string[] } | undefined, opts: { beforeFirstTry?: boolean } = {}): { criteria: number[]; texts: string[] } | undefined {
+type GradedTurn = { role: string; languageTurn?: unknown };
+const verdictOf = (t: GradedTurn) => (t.role === 'assistant' ? ((t.languageTurn as { assessment?: { verdict?: string } } | null | undefined)?.assessment?.verdict) : undefined);
+const isOk = (v?: string | null) => v === 'CORRECT' || v === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
+const isBad = (v?: string | null) => v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
+/** planner2b: right answers in a row at the end of this session (stored verdicts, then this turn's code grade). */
+export function sessionRightStreak(history: GradedTurn[], current?: string | null): number {
+  const vs = [...history.map(verdictOf), current].filter((v) => isOk(v) || isBad(v));
+  let n = 0;
+  for (let k = vs.length - 1; k >= 0 && isOk(vs[k]); k--) n++;
+  return n;
+}
+/** planner2b: the latest graded answer of this session was wrong. */
+export function lastGradedWrong(history: GradedTurn[], current?: string | null): boolean {
+  const vs = [...history.map(verdictOf), current].filter((v) => isOk(v) || isBad(v));
+  return vs.length > 0 && isBad(vs[vs.length - 1]);
+}
+export function rulesToIntroduce(history: { role: string; languageTurn?: unknown }[], s: { keyVerdict?: string | null; presentLessonItem?: { criteria?: number[] }; activeLessonItem?: { criteria?: number[] }; answeringCheck?: boolean; hintRequest?: boolean; dontKnow?: boolean; whyAfterAttempt?: boolean; learning?: { criteria?: Record<string, unknown> } }, spec: { successCriteria?: string[] } | undefined, opts: { beforeFirstTry?: boolean } = {}): { criteria: number[]; texts: string[] } | undefined {
   // First exposure = the reply to the learner's first attempt, request for a hint, "I don't know" or "why" on an item (never the turn that only presents the exercise: their first try stays unassisted).
   // levelExplicit (explicit-first learners) also counts the reply that presents the exercise: the rule comes before the first try.
   const presenting = Boolean(opts.beforeFirstTry && s.presentLessonItem && !s.answeringCheck);
@@ -1364,6 +1380,8 @@ export function rulesToIntroduce(history: { role: string; languageTurn?: unknown
   const item = s.activeLessonItem ?? s.presentLessonItem; const crit = spec?.successCriteria ?? [];
   if (!item?.criteria?.length || !crit.length) return undefined;
   const done = new Set<number>(); for (const h of history) for (const c of ((h.languageTurn as { rulesIntroduced?: number[] } | null | undefined)?.rulesIntroduced ?? [])) done.add(c);
+  // planner2b: after an error the rule is stated again (an error sends the lesson back to teaching); it is not "done" once said.
+  if (engineV2('planner2') && lastGradedWrong(history, s.keyVerdict)) done.clear();
   // levelExplicit decides per form: a criterion the learner has already shown in this session needs no rule statement.
   const shown = opts.beforeFirstTry ? new Set(Object.keys(s.learning?.criteria ?? {}).map(Number)) : new Set<number>();
   const todo = item.criteria.filter((c) => c >= 1 && c <= crit.length && !done.has(c) && !shown.has(c)).slice(0, 2);
@@ -1567,7 +1585,12 @@ export function esl5Adjust(i: { signals: TurnSignals; moves: SelectedMove[]; rec
     const { presentLessonItem: _skip, ...rest } = signals;
     signals = rest; moves = moves.filter((m) => m.id !== 'present_lesson_item');
   }
-  if (engineV2('fadeKnown')) { const fade = fadeDecision(signals, i.record, i.history ?? [], i.lessonId, i.scope); if (fade) signals = { ...signals, fade }; }
+  if (engineV2('fadeKnown')) {
+    const fade = fadeDecision(signals, i.record, i.history ?? [], i.lessonId, i.scope);
+    // planner2b: support fades only after the form is right twice in a row in THIS session (never on the record or a count alone).
+    const ok = !engineV2('planner2') || sessionRightStreak(i.history ?? [], signals.keyVerdict) >= 2;
+    if (fade && ok) signals = { ...signals, fade };
+  }
   return { signals, moves };
 }
 // fadeKnown (ESL5, framework §2: explicit instruction for novices, faded for learners who already know the point).

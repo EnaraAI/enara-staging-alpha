@@ -38,11 +38,11 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | File | SHA-256 |
 |---|---|
 | `backend/src/services/engineV2.ts` | `2f2a68665796c1322ccbc56f9893c936505830037422a50172785b91a018e9a7` |
-| `backend/src/services/lessonPlanner.ts` | `062e8a361dad7c43e6925f5f0fd7b0d84e88b81bfd9f3dd51d0565f58c0a163c` |
+| `backend/src/services/lessonPlanner.ts` | `23579e070f058681e6fa615db59d680be848731075e0fad658f9ea0266681b30` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
 | `backend/src/services/learningContext.ts` | `5ed9c73478d66a178e569dac761415938e8125d8e78fc9a704ead49004bb1000` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
-| `backend/src/services/languageTeachingContext.ts` | `94e88887538d98537742502894937a638deb58ca5b16791e1e76200e4c7c645c` |
+| `backend/src/services/languageTeachingContext.ts` | `9f577d4edf3fb8f4469fb8928ed94fd57072eb1ecaa16a8f567fe33f8bbed5bf` |
 | `backend/src/services/languageTurnPipeline.ts` | `2673ec40c37eec5a66ee364b5d0d65054d809bd2f38ff13f48b6843f93dfd9b1` |
 | `backend/src/services/languageLearningState.ts` | `d6ad94373485734fe2cd8b52a849a4af1c7b0055c3566d4bb72425b4837a2927` |
 | `backend/src/services/learnerLanguageProfile.ts` | `78e783f1d129339aa84e45fc6d49a3a2090ff09fe4f103793fb21ad936f56ec4` |
@@ -65,8 +65,8 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `f9f93eefe25e90278f2bb2844e007684e6b00928b6b59427fe83e1dfd2926e0e` |
-| `src/offline/pln2_analyze.py` (this analysis) | `a9aa17d509f5b3bd0919ca5dff920220b33bb76babea60edbfc2f37f135dd63f` |
+| `src/offline/pln2Study.ts` (this runner) | `391876d36e7d06dbe3777bf99a8730899cf1a34c8bfd16ca5f47d02f5af9dec5` |
+| `src/offline/pln2_analyze.py` (this analysis) | `2df8f1d4e110a56297c26d43a265282208e20cf4e377f4d6126ae048a53d23b4` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
 
@@ -163,3 +163,13 @@ The first run was stopped before round 4 was judged (data kept in git history, l
 2. **Children's lessons stayed at "present"/"listen".** These stages set no exercise, so nothing was graded and the stage never moved. Fix: present/listen last for the opening reply only (was deviation 1 of the stopped run).
 3. **New measure: use.** Wrong-belief strength does not measure what TASK and LAD aim at. Added: the share of the 6 points on the delayed test's own-sentence items (positions 7–9, 0–2 each for using the target form in the learner's own sentence), per group, P2 − OFF with a bootstrap CI; reported check P2 − OFF ≥ −0.05 for TASK and LAD (not part of the verdict; n = 12 per group). **Fluency is not measured:** the simulated learners' answers come from rules, with no speed or automaticity, so fluency needs real learners (pilot: response time and words per turn).
 All other design and pass rules unchanged (7 rounds, 1 recheck scorer). Hashes in §3 refreshed.
+
+## Amendment D (19 Nov 2026, owner decision "approved"): PLN2b re-check of planner2b
+Run folder `reports/exp4/agent_sim_pln2b` (PLN2 results stay unchanged). Same 48 learners, seeds, arms, 7 rounds, tests, measures and pass rules as PLN2 (amendments B and C), with these changes, all made before round 1:
+1. **planner2b stages** (`lessonPlanner.ts` `stageMachine`): a lesson moves on only on graded evidence; an error sends it back to teaching. TASK: errors in the task → language focus → at most one repeat. PPP/LAD: one check item; wrong → targeted practice → one new check; right → done. TTT: teach until right → retest; wrong → teach.
+2. **Listen-and-do only with content** (`ladContent` signal): without kids-pack content (this branch) children under 9 get PPP with child supports (S2c).
+3. **Rule statements** (planner2 on only): restated after any error; support fades only after the form is right twice in a row in this session.
+4. **Guards added to the verdict:** stuck runs P2 ≤ OFF; independent correct answers (code-graded right answers after a tutor reply with no hint, correction or answer) P2 ≥ OFF; early answer leaks P2 ≤ OFF.
+5. **Fit items fixed:** `test_first_clean` judges only the first reply (the one-step check); `task_goal` and `teach_targets_gaps` worded more precisely (PLN2 fit agreement was 77.9%).
+6. **Overlap check:** PLN2's run folder is exempt for PLN2b only (same learners by design).
+Task files for this run: `tasks_b/`. Hashes in §3 refreshed.

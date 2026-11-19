@@ -21,7 +21,7 @@ RUBRIC = {
     'KIDPPP': ['short_sentences', 'one_instruction', 'praise_effort', 'game_story', 'ppp_order'],
 }
 COMMON = ['age_fit', 'teacher_accept']
-EXPECTED_SHAPES = {'TASK': {'TASK'}, 'TTT': {'TTT', 'PPP'}, 'LAD': {'LAD'}, 'KIDPPP': {'PPP'}}
+EXPECTED_SHAPES = {'TASK': {'TASK'}, 'TTT': {'TTT', 'PPP'}, 'LAD': {'LAD', 'PPP'}, 'KIDPPP': {'PPP'}}  # amendment D: under-9s get PPP without kids-pack content
 L1_CODES = ('article_omitted', 'copula_omitted', 'progressive_no_be', 'be_with_base_verb', 'subject_doubled', 'resumptive_pronoun', 'age_with_have')
 J = lambda f: json.load(open(os.path.join(D, f))) if os.path.exists(os.path.join(D, f)) else None
 post = J('POST.json') or []; tags = J('TAGS.json') or []; stuck = J('STUCK.json') or []; fit = J('FIT.json') or []
@@ -162,12 +162,26 @@ no_harm = {'overallCiLower': delayed['ALL']['ci95'][0], 'groupDiffs': {g: delaye
 no_harm['pass'] = no_harm['overallCiLower'] is not None and no_harm['overallCiLower'] > -0.05 and all(v is not None and v >= -0.05 for v in no_harm['groupDiffs'].values())
 fit_rule = {'ownRubric': {g: fit_table[g]['_ownRubric'] for g in GROUPS}, 'quickCheckCompliance': qc['rate']}
 fit_rule['pass'] = all(fit_table[g]['_ownRubric']['P2'] is not None and fit_table[g]['_ownRubric']['OFF'] is not None and fit_table[g]['_ownRubric']['P2'] >= fit_table[g]['_ownRubric']['OFF'] for g in GROUPS) and qc['rate'] is not None and qc['rate'] >= 0.95
+# amendment D guards (ENARA's strengths): stuck runs P2 <= OFF; independent correct answers P2 >= OFF; early answer leaks P2 <= OFF
+HELP_MOVES = {'scaffold_hint', 'corrective_feedback_retry', 'answer_with_reasoning', 'reteach_simpler', 'short_explanation', 'comprehensible_model'}
+def indep_correct(arm):
+    n = 0; by = {}
+    for t in tags:
+        if t['arm'] == arm: by.setdefault((t['learner'], t['rep']), []).append(t)
+    for ts in by.values():
+        ts.sort(key=lambda x: x['turn'])
+        for k in range(1, len(ts)):
+            if ts[k].get('verdict') in ('CORRECT', 'CORRECT_WITH_EQUIVALENT_FORMULATION') and not (set(ts[k - 1].get('moves') or []) & HELP_MOVES): n += 1
+    return n
+gv = {a: {'stuck': sum(1 for s in stuck if s['arm'] == a), 'indepCorrect': indep_correct(a), 'earlyLeaks': sum(1 for t in tags if t['arm'] == a and (t.get('earlyLeakFinal') or 0) > 0)} for a in ARMS}
+guards = {'values': gv, 'stuckOk': gv['P2']['stuck'] <= gv['OFF']['stuck'], 'indepOk': gv['P2']['indepCorrect'] >= gv['OFF']['indepCorrect'], 'leaksOk': gv['P2']['earlyLeaks'] <= gv['OFF']['earlyLeaks']}
+guards['pass'] = guards['stuckOk'] and guards['indepOk'] and guards['leaksOk']
 judges = {'event': (ev_ag or {}).get('agreement'), 'eventMissing': (ev_ag or {}).get('missing'), 'fit': (fit_ag or {}).get('agreement'), 'fitWithin1': (fit_ag or {}).get('within1')}
 judges['pass'] = bool(ev_ag and fit_ag and ev_ag.get('missing') == 0 and (ev_ag.get('agreement') or 0) >= 0.85 and (fit_ag.get('agreement') or 0) >= 0.85)
-verdict = 'PASS' if complete and no_harm['pass'] and fit_rule['pass'] and judges['pass'] else 'NOT PASSED'
+verdict = 'PASS' if complete and no_harm['pass'] and fit_rule['pass'] and judges['pass'] and guards['pass'] else 'NOT PASSED'
 
 res = {'_label': 'SIMULATION ONLY', 'complete': complete, 'missing': missing[:50], 'verdict': verdict,
-       'passRules': {'noHarm': no_harm, 'fit': fit_rule, 'judges': judges},
+       'passRules': {'noHarm': no_harm, 'fit': fit_rule, 'judges': judges, 'guards': guards},
        'useDelayed': use_del, 'useImmediate': use_imm, 'useCheck_TASK_LAD': use_check, 'delayedPrimary': delayed, 'immediatePrimary': immediate, 'delayedWholeForm': delayed_whole, 'pretestPrimary_balance': pre,
        'turnStats': turn_stats, 'quickCheck': qc, 'tttSplit': ttt_split, 'fit': fit_table,
        'plannerP2': {'shapeStage': shape_dist, 'shapeByTurn': shape_by_turn, 'methodRule': method_dist, 'shapeMatch': shape_match, 'l1': l1}, 'offPrimaryMethod': off_method,
@@ -192,6 +206,7 @@ def score_table(title, blk):
 
 
 score_table('Delayed test, primary items (no-harm measure)', delayed)
+L.extend([f"Guards (amendment D): stuck runs OFF {gv['OFF']['stuck']} / P2 {gv['P2']['stuck']} -> {'ok' if guards['stuckOk'] else 'FAIL'}; independent correct answers OFF {gv['OFF']['indepCorrect']} / P2 {gv['P2']['indepCorrect']} -> {'ok' if guards['indepOk'] else 'FAIL'}; early answer leaks OFF {gv['OFF']['earlyLeaks']} / P2 {gv['P2']['earlyLeaks']} -> {'ok' if guards['leaksOk'] else 'FAIL'}", ''])
 score_table('Immediate test, primary items', immediate)
 score_table('Use (amendment C): own-sentence items 7-9 on the delayed test, share of 6 points', use_del)
 L.extend([f"Use check (reported, not part of the verdict): P2 - OFF >= -0.05 for TASK and LAD: {use_check}", ''])

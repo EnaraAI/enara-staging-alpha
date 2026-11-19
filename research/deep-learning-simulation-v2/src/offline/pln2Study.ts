@@ -413,7 +413,9 @@ function hashCheck() {
 function walk(dir: string, out: string[] = []) { if (!existsSync(dir) || existsSync(path.join(dir, 'DRY_RUN'))) return out; for (const f of readdirSync(dir)) { const p = path.join(dir, f); const st = statSync(p); if (st.isDirectory()) walk(p, out); else if (/\.(json|md|txt|ts|py)$/.test(f)) out.push(p); } return out; }
 function overlapCheck(studyDir: string) {
   const own = path.resolve(studyDir);
-  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep));
+  // amendment D: PLN2b re-checks the SAME 48 learners and seeds as PLN2 by design, so PLN2's own run folder is not a clash for it (nothing else is exempt).
+  const reuse = path.basename(own).startsWith('agent_sim_pln2b') ? path.resolve(ROOT, 'reports/exp4/agent_sim_pln2') : null;
+  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && path.resolve(f).startsWith(reuse + path.sep)));
   const ids = new Set<number>(); const seeds = new Set<string>();
   for (const f of files) { const t = readFileSync(f, 'utf8'); for (const m of t.matchAll(/"learnerIdx":\s*(\d+)/g)) ids.add(Number(m[1])); for (const m of t.matchAll(/"seed":\s*"([^"]+)"/g)) seeds.add(m[1]); }
   // ids defined in code (ESL1 0-17, ESL2 0-35, ESL3 100-159, ESL3 validation 200-211, ESL4 300-407, ESL5 500-619, ESL6 700-991, teach2 1100-1799 reserved)
@@ -433,13 +435,13 @@ function forbidden(): RegExp[] {
 // ---------------------------------------------------------------------------------------------------------- fit judging (PROTOCOL §7)
 export const RUBRICS: Record<Group, { key: string; text: string }[]> = {
   TASK: [
-    { key: 'task_goal', text: 'A real-life task tied to the learner\'s stated goal happens (for example a short role-play at work, an exam-style task, or a daily-life situation), not only isolated exercises.' },
+    { key: 'task_goal', text: 'The tutor sets up and runs a role-play or real-life task in which the learner acts toward their stated goal (work, exam or daily life) for at least two turns. 2 = clearly yes; 1 = a task is mentioned or lasts one turn only; 0 = only isolated grammar exercises.' },
     { key: 'feedback_after_task', text: 'Language feedback comes AFTER the learner has done the task, and it is on one or two errors only (not a list of everything).' },
     { key: 'task_repeat', text: 'The task is repeated or extended so that the learner uses the fix.' },
   ],
   TTT: [
-    { key: 'test_first_clean', text: 'The first three exercises are given with no teaching, hints, corrections or answers (only a neutral acknowledgement between them).' },
-    { key: 'teach_targets_gaps', text: 'After those three, the teaching targets only what the learner got wrong (not a full lesson on what they already knew).' },
+    { key: 'test_first_clean', text: 'The tutor\'s FIRST reply gives one short exercise with no rule, explanation, hint, model or answer (a greeting is fine). Only the first reply is judged here; teaching from the second reply on is expected. 2 = clean; 1 = a hint or partial explanation; 0 = the rule or the answer is given.' },
+    { key: 'teach_targets_gaps', text: 'From the second reply on, the teaching is about the point the learner got wrong or did not show (not a full lesson on what they already got right). 2 = clearly targeted; 1 = partly; 0 = generic or unrelated.' },
     { key: 'retest_end', text: 'The lesson ends with a re-test item (a new item on the same form, after the teaching).' },
   ],
   LAD: [

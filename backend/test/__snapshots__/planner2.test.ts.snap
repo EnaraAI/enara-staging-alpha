@@ -282,25 +282,23 @@ exports[`golden traces > adult Pre-A1 (LAD at any age) 1`] = `
 [
   {
     "childSupports": false,
-    "explanation": "Listen and do because level Pre-A1; main method Formative Assessment & Feedback Loops because: No assessed evidence yet: find the starting point first.",
-    "methodRule": "M10_BY_MASTERY",
-    "methodStage": "check",
+    "explanation": "Present, practise, produce because new to the form, or no quick check yet; main method Direct Instruction because: A1-A2 novice with no diagnosed error: explicit instruction first.",
+    "methodRule": "M8_NOVICE_EXPLICIT",
+    "methodStage": "present",
     "opener": false,
-    "primary": "formative_feedback",
+    "primary": "direct_instruction",
     "reasons": [
-      "NO_EVIDENCE",
-      "SHAPE:LAD:S2a",
-      "RULE:M10_BY_MASTERY",
+      "NOVICE_EXPLICIT",
+      "SHAPE:PPP:S5",
+      "RULE:M8_NOVICE_EXPLICIT",
     ],
     "reinforcement": null,
-    "shape": "LAD",
-    "shapeRule": "S2a",
-    "skipped": [
-      "M8_NOVICE_EXPLICIT:direct_instruction",
-    ],
-    "startStage": "listen",
+    "shape": "PPP",
+    "shapeRule": "S5",
+    "skipped": [],
+    "startStage": "present",
     "supporting": [
-      "retrieval_practice",
+      "worked_example",
     ],
   },
 ]
@@ -355,119 +353,7 @@ exports[`golden traces > child 6 Pre-A1 1`] = `
 [
   {
     "childSupports": true,
-    "explanation": "Listen and do because level Pre-A1; main method Formative Assessment & Feedback Loops because: No assessed evidence yet: find the starting point first.",
-    "methodRule": "M10_BY_MASTERY",
-    "methodStage": "check",
-    "opener": false,
-    "primary": "formative_feedback",
-    "reasons": [
-      "NO_EVIDENCE",
-      "UNDER_13_FRAME",
-      "CHILD_SUPPORTS",
-      "SHAPE:LAD:S2a",
-      "RULE:M10_BY_MASTERY",
-    ],
-    "reinforcement": null,
-    "shape": "LAD",
-    "shapeRule": "S2a",
-    "skipped": [
-      "M8_NOVICE_EXPLICIT:direct_instruction",
-    ],
-    "startStage": "listen",
-    "supporting": [
-      "scaffolding",
-      "narrative_contextual",
-    ],
-  },
-  {
-    "childSupports": true,
-    "explanation": "Listen and do because level Pre-A1; main method Scaffolded Instruction because: Listen and do, with step-by-step support.",
-    "methodRule": "FALLBACK",
-    "methodStage": "do",
-    "opener": false,
-    "primary": "scaffolding",
-    "reasons": [
-      "SHAPE_DEFAULT",
-      "UNDER_13_FRAME",
-      "CHILD_SUPPORTS",
-      "SHAPE:LAD:S2a",
-      "RULE:FALLBACK",
-    ],
-    "reinforcement": null,
-    "shape": "LAD",
-    "shapeRule": "S2a",
-    "skipped": [
-      "M8_NOVICE_EXPLICIT:direct_instruction",
-      "M10_BY_MASTERY:direct_instruction",
-    ],
-    "startStage": "listen",
-    "supporting": [
-      "narrative_contextual",
-    ],
-  },
-]
-`;
-
-exports[`golden traces > child 8 A1 1`] = `
-[
-  {
-    "childSupports": true,
-    "explanation": "Listen and do because a child under 9; main method Formative Assessment & Feedback Loops because: No assessed evidence yet: find the starting point first.",
-    "methodRule": "M10_BY_MASTERY",
-    "methodStage": "check",
-    "opener": false,
-    "primary": "formative_feedback",
-    "reasons": [
-      "NO_EVIDENCE",
-      "UNDER_13_FRAME",
-      "CHILD_SUPPORTS",
-      "SHAPE:LAD:S2b",
-      "RULE:M10_BY_MASTERY",
-    ],
-    "reinforcement": null,
-    "shape": "LAD",
-    "shapeRule": "S2b",
-    "skipped": [
-      "M8_NOVICE_EXPLICIT:direct_instruction",
-    ],
-    "startStage": "listen",
-    "supporting": [
-      "scaffolding",
-      "narrative_contextual",
-    ],
-  },
-  {
-    "childSupports": true,
-    "explanation": "Listen and do because a child under 9; main method Scaffolded Instruction because: Partly understood.",
-    "methodRule": "M10_BY_MASTERY",
-    "methodStage": "do",
-    "opener": false,
-    "primary": "scaffolding",
-    "reasons": [
-      "DEVELOPING",
-      "UNDER_13_FRAME",
-      "GATED:metacognitive",
-      "CHILD_SUPPORTS",
-      "SHAPE:LAD:S2b",
-      "RULE:M10_BY_MASTERY",
-    ],
-    "reinforcement": "guided_practice",
-    "shape": "LAD",
-    "shapeRule": "S2b",
-    "skipped": [],
-    "startStage": "listen",
-    "supporting": [
-      "narrative_contextual",
-    ],
-  },
-]
-`;
-
-exports[`golden traces > child 9 A1 1`] = `
-[
-  {
-    "childSupports": true,
-    "explanation": "Present, practise, produce because a child aged 9-12 (or of unknown exact age) at A1 or above; main method Direct Instruction because: A1-A2 novice with no diagnosed error: explicit instruction first.",
+    "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Direct Instruction because: A1-A2 novice with no diagnosed error: explicit instruction first.",
     "methodRule": "M8_NOVICE_EXPLICIT",
     "methodStage": "present",
     "opener": false,
@@ -491,7 +377,113 @@ exports[`golden traces > child 9 A1 1`] = `
   },
   {
     "childSupports": true,
-    "explanation": "Present, practise, produce because a child aged 9-12 (or of unknown exact age) at A1 or above; main method Mastery Learning because: Mostly secure; needs consistent independent success.",
+    "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Direct Instruction because: A1-A2 novice with no diagnosed error: explicit instruction first.",
+    "methodRule": "M8_NOVICE_EXPLICIT",
+    "methodStage": "present",
+    "opener": false,
+    "primary": "direct_instruction",
+    "reasons": [
+      "NOVICE_EXPLICIT",
+      "UNDER_13_FRAME",
+      "CHILD_SUPPORTS",
+      "SHAPE:PPP:S2c",
+      "RULE:M8_NOVICE_EXPLICIT",
+    ],
+    "reinforcement": null,
+    "shape": "PPP",
+    "shapeRule": "S2c",
+    "skipped": [],
+    "startStage": "present",
+    "supporting": [
+      "scaffolding",
+      "narrative_contextual",
+    ],
+  },
+]
+`;
+
+exports[`golden traces > child 8 A1 1`] = `
+[
+  {
+    "childSupports": true,
+    "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Direct Instruction because: A1-A2 novice with no diagnosed error: explicit instruction first.",
+    "methodRule": "M8_NOVICE_EXPLICIT",
+    "methodStage": "present",
+    "opener": false,
+    "primary": "direct_instruction",
+    "reasons": [
+      "NOVICE_EXPLICIT",
+      "UNDER_13_FRAME",
+      "CHILD_SUPPORTS",
+      "SHAPE:PPP:S2c",
+      "RULE:M8_NOVICE_EXPLICIT",
+    ],
+    "reinforcement": null,
+    "shape": "PPP",
+    "shapeRule": "S2c",
+    "skipped": [],
+    "startStage": "present",
+    "supporting": [
+      "scaffolding",
+      "narrative_contextual",
+    ],
+  },
+  {
+    "childSupports": true,
+    "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Scaffolded Instruction because: Partly understood.",
+    "methodRule": "M10_BY_MASTERY",
+    "methodStage": "practise",
+    "opener": false,
+    "primary": "scaffolding",
+    "reasons": [
+      "DEVELOPING",
+      "UNDER_13_FRAME",
+      "GATED:metacognitive",
+      "CHILD_SUPPORTS",
+      "SHAPE:PPP:S2c",
+      "RULE:M10_BY_MASTERY",
+    ],
+    "reinforcement": "guided_practice",
+    "shape": "PPP",
+    "shapeRule": "S2c",
+    "skipped": [],
+    "startStage": "present",
+    "supporting": [
+      "narrative_contextual",
+    ],
+  },
+]
+`;
+
+exports[`golden traces > child 9 A1 1`] = `
+[
+  {
+    "childSupports": true,
+    "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Direct Instruction because: A1-A2 novice with no diagnosed error: explicit instruction first.",
+    "methodRule": "M8_NOVICE_EXPLICIT",
+    "methodStage": "present",
+    "opener": false,
+    "primary": "direct_instruction",
+    "reasons": [
+      "NOVICE_EXPLICIT",
+      "UNDER_13_FRAME",
+      "CHILD_SUPPORTS",
+      "SHAPE:PPP:S2c",
+      "RULE:M8_NOVICE_EXPLICIT",
+    ],
+    "reinforcement": null,
+    "shape": "PPP",
+    "shapeRule": "S2c",
+    "skipped": [],
+    "startStage": "present",
+    "supporting": [
+      "scaffolding",
+      "narrative_contextual",
+    ],
+  },
+  {
+    "childSupports": true,
+    "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Mastery Learning because: Mostly secure; needs consistent independent success.",
     "methodRule": "M10_BY_MASTERY",
     "methodStage": "check",
     "opener": false,
@@ -522,7 +514,7 @@ exports[`golden traces > child 12 A2 1`] = `
 [
   {
     "childSupports": true,
-    "explanation": "Present, practise, produce because a child aged 9-12 (or of unknown exact age) at A1 or above; main method Analogical Reasoning because: Possible conceptual misunderstanding.",
+    "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Analogical Reasoning because: Possible conceptual misunderstanding.",
     "methodRule": "M7a_CONCEPTUAL",
     "methodStage": "present",
     "opener": false,
@@ -552,7 +544,7 @@ exports[`golden traces > child, kids mode, age unknown 1`] = `
 [
   {
     "childSupports": true,
-    "explanation": "Present, practise, produce because a child aged 9-12 (or of unknown exact age) at A1 or above; main method Direct Instruction because: A1-A2 novice with no diagnosed error: explicit instruction first.",
+    "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Direct Instruction because: A1-A2 novice with no diagnosed error: explicit instruction first.",
     "methodRule": "M8_NOVICE_EXPLICIT",
     "methodStage": "present",
     "opener": false,
