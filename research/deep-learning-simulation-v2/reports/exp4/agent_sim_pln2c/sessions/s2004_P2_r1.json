@@ -13,9 +13,9 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -615,7 +615,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote that there is no word before \"going to\". Let us try a smaller step with a different example. Here are two sentences about plans:\n\n\"We are going to leave soon.\"\n\"We going to leave soon.\"\n\nOne of them follows the English rule for \"going to\" and one does not. The rule is that \"going to\" needs a form of the verb be in front of it.\n\nLook at both sentences. Which one is correct English, and which word makes the difference?\n\nLEARNER'S LAST MESSAGE:\nWe are going to leave soon.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"We are going to leave soon.\" is the correct sentence. The word \"are\" makes the difference: \"going to\" needs a form of be in front of it.\n\nNow use this in your own sentence.\n\nWrite one sentence about a person you know and a plan they have. Use am, is or are going to plus a verb, and add a time word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote that there is no word before \"going to\". Let us try a smaller step with a different example. Here are two sentences about plans:\n\n\"We are going to leave soon.\"\n\"We going to leave soon.\"\n\nOne of them follows the English rule for \"going to\" and one does not. The rule is that \"going to\" needs a form of the verb be in front of it.\n\nLook at both sentences. Which one is correct English, and which word makes the difference?\n\nLEARNER'S LAST MESSAGE:\nWe are going to leave soon.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"We are going to leave soon.\" is the correct sentence. The word \"are\" makes the difference: \"going to\" needs a form of be in front of it.\n\nNow use this in your own sentence.\n\nWrite one sentence about a person you know and a plan they have. Use am, is or are going to plus a verb, and add a time word.",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"We are going to leave soon.\" is the correct sentence."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"going to\" needs a form of be in front of it."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister is going to visit Cairo next week.",
+    "errors": {
+     "W1": "My sister going to visit Cairo next week."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister is going to visit Cairo next week.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister is going to visit Cairo next week.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
