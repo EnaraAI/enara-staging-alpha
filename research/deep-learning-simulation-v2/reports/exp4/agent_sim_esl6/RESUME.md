@@ -1,31 +1,34 @@
 SIMULATION ONLY
 
-# ESL6: restarted under amendment A (2026-11-19)
+# ESL6: paused after round 2 (2026-11-19, user request)
 
-The earlier run, paused mid round 2 at 950ae1db, is discarded; see DEVIATIONS 4–8.
-- **Design now:** one session of 5 rounds, then the 7-day delayed test.
-- **Grader:** round-12 fix.
-- **Models:** tutors on Sonnet, everything else on Opus.
-- **Concurrency:** at most 2 agents at a time.
+Amendment A design: one session of 5 rounds, then the 7-day delayed test (PROTOCOL header and §6; DEVIATIONS 4–13).
 
-## Where it is
-- See the latest commit on `claude/tutor-esl6`. Each round is committed when it is applied.
+## Where it stopped
+- Rounds 1 and 2: all 24 tutor cells applied and all 32 judge batches applied, for 1,128 sessions. 0 rejected events.
+- `status` reads `{"2 replies / 2 judged":1128}`. No round-3 work has started.
+- Judge agreement re-judging (rounds 3 and 5) has not run yet.
 
-## Each round
+## On resume (round 3)
 1. Run `promptcheck`.
-2. Run 24 tutor cells, 2 at a time. Each must end with "applied 47 of 47".
-3. Run `status`, then `jprep r`.
-4. Run 32 judge batches, 2 at a time. Check every batch's case count before `japply r`.
-5. In rounds 3 and 5 only, also run `agreeprep r` and its 7 batches.
-6. Commit.
+2. Run 24 tutor cells on Sonnet.
+   - Each prompt says the cell has 47 sessions.
+   - Each prompt says not to save the `tprompts` output to a file.
+3. Run `jprep 3`, then the 32 judge batches on Opus.
+   - Each prompt states the case count.
+   - Check every batch's count before `japply`.
+4. Run `agreeprep 3` and its 7 agreement batches.
+5. Commit.
 
-## After round 5
-1. Run `assess imm`, then `f1 7`, then `assess del`.
-2. Run `recheckprep`, then 3 scorers × 32 batches, then `recheckscore`.
-3. Run `agreescore`, `tags`, and `post`.
-4. Run `rateprep` (29 batches) and `fidprep` (8 batches).
-5. Run the analysis, then write the report.
+Up to 8 agents run at a time (DEVIATIONS 13).
 
-## On a usage-limit stop
-- Stop at the end of the current cell or batch.
-- Update this file and commit.
+## Early signal (descriptive only, not a result)
+Mean W1+W2 for explicit-first learners, lower is better:
+
+| | Start | After round 1 | After round 2 |
+|---|---|---|---|
+| LE | 2.59 | 1.78 | 1.76 |
+| PP | 2.59 | 1.86 | 1.57 |
+
+- After round 2, PP − LE = −0.198, 95% CI [−0.287, −0.111].
+- In round 2, LE stated far fewer rules (R1: 45 against PP's 196).
