@@ -38,7 +38,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | File | SHA-256 |
 |---|---|
 | `backend/src/services/engineV2.ts` | `2f2a68665796c1322ccbc56f9893c936505830037422a50172785b91a018e9a7` |
-| `backend/src/services/lessonPlanner.ts` | `70398801a067399709636eb3b8110f8baa50013f10297719fe5966bcd453af90` |
+| `backend/src/services/lessonPlanner.ts` | `57e530a350fbec9420059f0d2f4b25495762fc3cc8ce5908447658b4600a3856` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
 | `backend/src/services/learningContext.ts` | `e04770f8982c8e77a54e7f66fa3cc92090df6554460acd6cbc9053767a55ec83` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
@@ -156,3 +156,6 @@ The harness build found 4 planner bugs; fixed in `lessonPlanner.ts` (tests in `p
 3. During the quick check the main method's instructions were still in the prompt next to the no-teaching line. Now they are replaced (`QUICK_CHECK_PLAN_LINE`), and the quick-check line says it overrides any instruction to confirm, correct, explain or model.
 4. The quick check had no cap. It now closes after 4 learner answers with whatever was graded (0 graded: PPP); a TTT lesson then goes to "teach", not back to "test".
 Hashes in §3 refreshed after these changes.
+
+## Deviations during the run
+See `reports/exp4/agent_sim_pln2/DEVIATIONS.md` (1: present/listen stage fix after round 2).

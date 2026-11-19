@@ -458,3 +458,13 @@ describe('fixes from the harness build', () => {
     expect(QUICK_CHECK_LINE).toMatch(/overrides any instruction above/);
   });
 });
+
+describe('pln2 deviation 1: present/listen last for the opening reply only', () => {
+  const u = { role: 'user' }; const a = { role: 'assistant', languageTurn: {} };
+  it('no graded answer yet: present, then practise; listen, then do', () => {
+    expect(currentStage('PPP', progressFromHistory([]))).toBe('present');
+    expect(currentStage('PPP', progressFromHistory([u, a]))).toBe('practise');
+    expect(currentStage('LAD', progressFromHistory([]))).toBe('listen');
+    expect(currentStage('LAD', progressFromHistory([u, a]))).toBe('do');
+  });
+});

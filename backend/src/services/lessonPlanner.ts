@@ -316,10 +316,12 @@ export function planLesson(input: PlanInput, s: PlannerSignals): LessonPlan {
  * TASK: pre-task, task until the role-play is done, language focus until a fix is right, then repeat.
  * LAD: listen, do until 2 right, chant, check.
  */
-export function currentStage(shape: LessonShape, p: { tries: number; right: number; ownSentenceDone?: boolean; taskDone?: boolean; triesAfterTest?: number; rightAfterTest?: number; rightAfterTask?: number; opened?: boolean }): Stage {
+export function currentStage(shape: LessonShape, p: { tries: number; right: number; ownSentenceDone?: boolean; taskDone?: boolean; triesAfterTest?: number; rightAfterTest?: number; rightAfterTask?: number; opened?: boolean; learnerTurns?: number }): Stage {
+  // Present / Listen set no exercise, so no answer can be graded there: they last for the opening reply only (pln2 deviation 1).
+  const opening = (p.learnerTurns ?? 0) < 1;
   switch (shape) {
     case 'PPP':
-      if (p.tries === 0) return 'present';
+      if (p.tries === 0 && opening) return 'present';
       if (p.right < 2) return 'practise';
       return p.ownSentenceDone ? 'check' : 'produce';
     case 'TTT':
@@ -330,7 +332,7 @@ export function currentStage(shape: LessonShape, p: { tries: number; right: numb
       if (!p.taskDone) return 'task';
       return (p.rightAfterTask ?? 0) >= 1 ? 'repeat' : 'focus';
     case 'LAD':
-      if (p.tries === 0) return 'listen';
+      if (p.tries === 0 && opening) return 'listen';
       if (p.right < 2) return 'do';
       return p.ownSentenceDone ? 'check' : 'chant';
   }
