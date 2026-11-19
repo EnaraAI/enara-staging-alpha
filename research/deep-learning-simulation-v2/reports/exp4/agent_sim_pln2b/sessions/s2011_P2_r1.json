@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -459,7 +459,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 1: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence tells a finished event in the past, and \"the market\" and \"I\" are fine. Look again at one word only: \"goed\". Check whether that is the right past form for that verb. Then write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nI goed to the market.\nFACT: the last learner message contained the error of W1 (adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"I goed to the market.\" is the same as before, so let us try a different way.\n\nMany English verbs add -ed for the past. Some very common verbs do not. They change into a different word instead.\n\nHere is a pair with other verbs:\nYesterday I walked to the shop.\nYesterday I ate at the shop.\n\nIn the first line, the verb gets -ed. In the second line, the verb becomes a different word, with no -ed.\n\nThink about which kind of verb you need for your sentence. Then write it again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 1: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence tells a finished event in the past, and \"the market\" and \"I\" are fine. Look again at one word only: \"goed\". Check whether that is the right past form for that verb. Then write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nI goed to the market.\nFACT: the last learner message contained the error of W1 (adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"I goed to the market.\" is the same as before, so let us try a different way.\n\nMany English verbs add -ed for the past. Some very common verbs do not. They change into a different word instead.\n\nHere is a pair with other verbs:\nYesterday I walked to the shop.\nYesterday I ate at the shop.\n\nIn the first line, the verb gets -ed. In the second line, the verb becomes a different word, with no -ed.\n\nThink about which kind of verb you need for your sentence. Then write it again.",
+   "stateBefore": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Many English verbs add -ed for the past. Some very common verbs do not. They change into a different word instead."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I went to the market.",
+    "errors": {
+     "W1": "I goed to the market."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I went to the market.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I went to the market.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
