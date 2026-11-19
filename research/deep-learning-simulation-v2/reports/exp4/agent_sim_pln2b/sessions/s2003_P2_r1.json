@@ -16,12 +16,12 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
-   "C2": 0
+   "C1": 3,
+   "C2": 2
   },
   "indep": {
-   "C1": 0,
-   "C2": 0
+   "C1": 1,
+   "C2": 1
   },
   "start": {
    "W1": 1,
@@ -831,7 +831,122 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe question needs \"did\" at the start, and the main verb stays in its base form: \"Did you visit your family last weekend?\"\nRight: Did she watch TV yesterday?\nWrong: She watched TV yesterday?\nNow a new one on your own. Imagine a colleague played football on Saturday. Write a question to ask about it. Use \"did\".\n\nLEARNER'S LAST MESSAGE:\nDid your colleague play football on Saturday?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Did your colleague play football on Saturday?\" is correct: \"Did\" starts the question and \"play\" stays in its base form.\nOne last task, in a new situation. Your neighbour bought a new car yesterday. Write one question to ask about it. Use \"did\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe question needs \"did\" at the start, and the main verb stays in its base form: \"Did you visit your family last weekend?\"\nRight: Did she watch TV yesterday?\nWrong: She watched TV yesterday?\nNow a new one on your own. Imagine a colleague played football on Saturday. Write a question to ask about it. Use \"did\".\n\nLEARNER'S LAST MESSAGE:\nDid your colleague play football on Saturday?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Did your colleague play football on Saturday?\" is correct: \"Did\" starts the question and \"play\" stays in its base form.\nOne last task, in a new situation. Your neighbour bought a new car yesterday. Write one question to ask about it. Use \"did\".",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Did your colleague play football on Saturday?\" is correct"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"Did your colleague play football on Saturday?\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Did your colleague play football on Saturday?"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Did your colleague play football on Saturday?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did your neighbour buy a new car yesterday?",
+    "errors": {
+     "W1": "Did your neighbour bought a new car yesterday?",
+     "W2": "Your neighbour bought a new car yesterday?"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Did your neighbour buy a new car yesterday?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Did your neighbour buy a new car yesterday?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
