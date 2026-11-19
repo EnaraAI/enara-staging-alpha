@@ -10,7 +10,7 @@ Verdict (pre-registered pass rules): **NOT PASSED**
 | TASK | 12 | 0.792 | 0.771 | -0.021 | [-0.146, 0.104] | 1 / 9 / 2 |
 | ALL | 12 | 0.792 | 0.771 | -0.021 | [-0.146, 0.104] | 1 / 9 / 2 |
 
-Guards (amendment D): stuck runs OFF 0 / P2 0 -> ok; independent correct answers OFF 2 / P2 0 -> FAIL; early answer leaks OFF 1 / P2 0 -> ok
+Guards (amendment D): stuck runs OFF 0 / P2 0 -> ok; independent correct answers (fix A: first try, new item, answer not shown) OFF 39 / P2 41 of 50 / 49 first tries -> ok (old measure OFF 2 / P2 0); early answer leaks OFF 1 / P2 0 -> ok
 
 ### Immediate test, primary items
 

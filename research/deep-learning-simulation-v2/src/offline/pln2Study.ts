@@ -594,7 +594,7 @@ async function main() {
     for (const s of allSessions(dir)) { const l = L_OF(s.learnerIdx); rows.push({ learner: l.idx, rep: s.rep, arm: s.arm, group: l.group, level: l.level, ageBand: l.ageBand, ageYears: l.ageYears ?? null, goal: l.goal ?? null, status: l.status, outcome: l.outcome, type: l.outcome.split('-')[3], seq: l.seq, rounds: s.turns.filter((t) => t.events).length, assess: s.assess ?? {}, start: s.start.s, end: s.stateEnd?.s ?? null, delayed: s.stateDelayed?.s ?? null }); }
     write(path.join(dir, 'POST.json'), rows); console.log('post rows', rows.length);
   } else if (cmd === 'tags') {
-    const dir = dirArg(a1); const rows: any[] = []; const stuck: any[] = [];
+    const dir = dirArg(a1); const rows: any[] = []; const stuck: any[] = []; const indep: any[] = [];
     for (const s of allSessions(dir)) {
       const l = L_OF(s.learnerIdx);
       s.turns.forEach((t, k) => { if (t.tutor === undefined) return; rows.push({ learner: s.learnerIdx, rep: s.rep, arm: s.arm, group: l.group, level: l.level, outcome: l.outcome, turn: k + 1, planner: t.planner ?? null, promptQuickCheck: t.promptQuickCheck ?? false, diagnosis: t.diagnosis ?? null, verdict: t.engineVerdict ?? null, moves: t.moves ?? [], strand: t.strand ?? null, ruleLine: t.ruleLine ?? null, closingAsk: t.closingAsk ?? null, markerStatus: t.markerStatus ?? null, leakRaw: t.leakRaw ?? 0, leakFinal: t.leakFinal ?? 0, earlyLeakRaw: t.earlyLeakRaw ?? 0, earlyLeakFinal: t.earlyLeakFinal ?? 0, lateAnswerFinal: t.lateAnswerFinal ?? 0, answerReleased: t.answerReleased ?? false, qcTeachWords: t.qcTeachWords ?? false, ev5: t.ev5 ?? {}, twoAsks: t.twoAsks ?? false, twoAsksRaw: t.twoAsksRaw ?? false, words: (t.tutor ?? '').split(/\s+/).filter(Boolean).length, production: t.production, events: t.events ?? null, applied: t.applied ?? [], rejected: t.rejected ?? [] }); });
@@ -607,8 +607,21 @@ async function main() {
         if (answer && key && !p.correct) { if (key === runKey) run++; else { flush(); runKey = key; run = 1; startTurn = k + 1; } } else { flush(); runKey = undefined; run = 0; }
       }
       flush();
+      // Plan §4 fix A: an independent correct answer = a right answer on the FIRST try at a new item/task, when the reply before it did not show
+      // that item's answer (no leak of a lesson item's accepted answer, and not the task's target sentence). Feedback on earlier items does not count against it.
+      const seen = new Set<string>(); let indepNew = 0; let firstTries = 0;
+      for (let k = 1; k < st.length; k++) {
+        const prevT = st[k - 1]; const p = st[k].production; if (prevT.tutor === undefined) break;
+        const sh = shownItem(prevT.tutor, l.outcome); const nt = prevT.next_task as NextTask | undefined; const key = sh ? `item:${sh.id}` : nt && nt.kind !== 'none' ? `task:${nt.kind}:${norm(String(nt.correct ?? ''))}` : undefined;
+        if (!key || !(p.kind === 'blank' || p.kind === 'sentence') || seen.has(key)) { if (key) seen.add(key); continue; }
+        seen.add(key); firstTries++;
+        const target = nt && nt.correct ? norm(String(nt.correct)) : '';
+        const shown = ((prevT.leakFinal as number | undefined) ?? 0) > 0 || (!sh && target.split(' ').length >= 3 && ` ${norm(prevT.tutor)} `.includes(` ${target} `));
+        if (p.correct && !shown) indepNew++;
+      }
+      indep.push({ learner: s.learnerIdx, rep: s.rep, arm: s.arm, group: l.group, firstTries, indepNew });
     }
-    write(path.join(dir, 'TAGS.json'), rows); write(path.join(dir, 'STUCK.json'), stuck); console.log('turn rows', rows.length, 'stuck runs', stuck.length);
+    write(path.join(dir, 'TAGS.json'), rows); write(path.join(dir, 'STUCK.json'), stuck); write(path.join(dir, 'INDEP.json'), indep); console.log('turn rows', rows.length, 'stuck runs', stuck.length);
   } else if (cmd === 'agreeprep') {
     // 10% of all event-judge cases of all rounds (rand('pln2-agree', caseId) < 0.1), judged again blind, batches of 72; run after round 5's japply.
     const dir = dirArg(a1); const cases: { id: string; text: string }[] = []; const key: Record<string, string> = {};

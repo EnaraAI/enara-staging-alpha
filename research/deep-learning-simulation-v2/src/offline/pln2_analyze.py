@@ -176,8 +176,9 @@ def indep_correct(arm):
         for k in range(1, len(ts)):
             if ts[k].get('verdict') in ('CORRECT', 'CORRECT_WITH_EQUIVALENT_FORMULATION') and not (set(ts[k - 1].get('moves') or []) & HELP_MOVES): n += 1
     return n
-gv = {a: {'stuck': sum(1 for s in stuck if s['arm'] == a), 'indepCorrect': indep_correct(a), 'earlyLeaks': sum(1 for t in tags if t['arm'] == a and (t.get('earlyLeakFinal') or 0) > 0)} for a in ARMS}
-guards = {'values': gv, 'stuckOk': gv['P2']['stuck'] <= gv['OFF']['stuck'], 'indepOk': gv['P2']['indepCorrect'] >= gv['OFF']['indepCorrect'], 'leaksOk': gv['P2']['earlyLeaks'] <= gv['OFF']['earlyLeaks']}
+indep2 = J('INDEP.json') or []  # plan §4 fix A: right on the first try at a new item whose answer was not shown just before
+gv = {a: {'stuck': sum(1 for s in stuck if s['arm'] == a), 'indepCorrect': sum(r['indepNew'] for r in indep2 if r['arm'] == a) if indep2 else indep_correct(a), 'indepCorrectOld': indep_correct(a), 'firstTries': sum(r['firstTries'] for r in indep2 if r['arm'] == a), 'earlyLeaks': sum(1 for t in tags if t['arm'] == a and (t.get('earlyLeakFinal') or 0) > 0)} for a in ARMS}
+guards = {'values': gv, 'stuckOk': gv['P2']['stuck'] <= gv['OFF']['stuck'], 'indepOk': (gv['P2']['indepCorrect'] / gv['P2']['firstTries'] >= gv['OFF']['indepCorrect'] / gv['OFF']['firstTries']) if indep2 and gv['P2']['firstTries'] and gv['OFF']['firstTries'] else gv['P2']['indepCorrect'] >= gv['OFF']['indepCorrect'], 'leaksOk': gv['P2']['earlyLeaks'] <= gv['OFF']['earlyLeaks']}
 guards['pass'] = guards['stuckOk'] and guards['indepOk'] and guards['leaksOk']
 judges = {'event': (ev_ag or {}).get('agreement'), 'eventMissing': (ev_ag or {}).get('missing'), 'fit': (fit_ag or {}).get('agreement'), 'fitWithin1': (fit_ag or {}).get('within1')}
 judges['pass'] = bool(ev_ag and fit_ag and ev_ag.get('missing') == 0 and (ev_ag.get('agreement') or 0) >= 0.85 and (fit_ag.get('agreement') or 0) >= 0.85)
@@ -209,7 +210,7 @@ def score_table(title, blk):
 
 
 score_table('Delayed test, primary items (no-harm measure)', delayed)
-L.extend([f"Guards (amendment D): stuck runs OFF {gv['OFF']['stuck']} / P2 {gv['P2']['stuck']} -> {'ok' if guards['stuckOk'] else 'FAIL'}; independent correct answers OFF {gv['OFF']['indepCorrect']} / P2 {gv['P2']['indepCorrect']} -> {'ok' if guards['indepOk'] else 'FAIL'}; early answer leaks OFF {gv['OFF']['earlyLeaks']} / P2 {gv['P2']['earlyLeaks']} -> {'ok' if guards['leaksOk'] else 'FAIL'}", ''])
+L.extend([f"Guards (amendment D): stuck runs OFF {gv['OFF']['stuck']} / P2 {gv['P2']['stuck']} -> {'ok' if guards['stuckOk'] else 'FAIL'}; independent correct answers (fix A: first try, new item, answer not shown) OFF {gv['OFF']['indepCorrect']} / P2 {gv['P2']['indepCorrect']} of {gv['OFF']['firstTries']} / {gv['P2']['firstTries']} first tries -> {'ok' if guards['indepOk'] else 'FAIL'} (old measure OFF {gv['OFF']['indepCorrectOld']} / P2 {gv['P2']['indepCorrectOld']}); early answer leaks OFF {gv['OFF']['earlyLeaks']} / P2 {gv['P2']['earlyLeaks']} -> {'ok' if guards['leaksOk'] else 'FAIL'}", ''])
 score_table('Immediate test, primary items', immediate)
 score_table('Use (amendment C): own-sentence items 7-9 on the delayed test, share of 6 points', use_del)
 L.extend([f"Use check (reported, not part of the verdict): P2 - OFF >= -0.05 for TASK and LAD: {use_check}", ''])

@@ -65,8 +65,8 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `f050cc444573f03da7ffcf5bff7e504c002e503f54c343632acbff007b222d58` |
-| `src/offline/pln2_analyze.py` (this analysis) | `7fa7fe396c9d0ec052d8a1bd046e63495d3cdb6c470682b2f1fc51fc257d17d6` |
+| `src/offline/pln2Study.ts` (this runner) | `4057e7c4a38ba56976de142f24ac762284f7c09c173755693bea7c2a0314c8bc` |
+| `src/offline/pln2_analyze.py` (this analysis) | `5e4501439d1f9a68de91cc13d71cb61d12d6c8131ac5db4d9b50997ef45b555c` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
 
@@ -191,3 +191,12 @@ Recorded before any PLN2c agent run. Why adults only: the planner2c change (amen
 6. **Estimate:** 14 Sonnet tutor runs + about 13 Opus runs (7 round judges, 1 event agreement, 2 fit, 1 fitagree, 2 recheck).
 7. **Deviation 1 (after round 2, before round 3).** The planner2c rule could not fire in time. A task sentence has no course key, so it is graded only after the tutor's reply (the tutor's assessment). At planning time the latest wrong answer was therefore unknown: the same one-reply lag as the PLN2 quick check. Found because 6 of 12 adults had sent the same wrong sentence twice and the planner still chose "task". Fix (`progressFromHistory`, code only): if the learner sends again the very message that was already graded wrong, it counts as wrong in this turn. Test added (`planner2.test.ts`, 120 tests pass). Rounds 1–2 are unaffected: no earlier graded learner answer existed at turns 1–2, so those prompts are unchanged. The run continues from round 3. Hashes refreshed in §3.
 8. **Deviation 2 and restart (owner decision "go with B", after round 3 of the first PLN2c run).** With deviation 1 in place, 6 adults reached language focus one reply earlier, but 3 sent the same wrong sentence a third time: stuck 3 vs 0. Cause: ENARA's "answer after two failed tries" rule counted only tries on course items (with a key). A free task sentence has no key, so the count stayed at 0 and the tutor kept hinting. Fix (`languageTeachingContext.ts`, planner2 only): `repeatedWrongAnswers` counts the same message sent again after it was graded wrong as a failed try. From the second time, the reply gives the answer with its reason (the existing release text). Tests in `planner2RepeatWrong.test.ts` (132 tests pass with planner2 and ESL5 tests; planner2 off unchanged). The first PLN2c run (rounds 1–3 judged, round 4 replies) is kept in git history at commit d72dd5d9. Its folder was removed, and PLN2c restarts from round 1 with the same learners. Hashes refreshed in §3.
+
+## Amendment H (19 Nov 2026, owner "go" on plan §4 fix A): the independent-correct guard, measured properly
+The old measure counted a right answer only when the reply before it had no feedback or help move. A feedback move comes on almost every reply, so only the first answer of a lesson could count. PLN2c adults: OFF 2 vs ON 0, both after the opening.
+New measure (`pln2Study.ts tags` → `INDEP.json`): a right answer on the **first try at a new item or task**, when the reply before it did not show that item's answer. That means no leak of a lesson item's accepted answer, and not the task's target sentence. Guard: the ON rate (independent correct ÷ first tries) ≥ the OFF rate. The old count is still reported.
+Re-scored on existing transcripts, by code only:
+- PLN2b: OFF 177/231 (0.766), ON 166/225 (0.738): fail.
+- PLN2c adults: OFF 39/50 (0.780), ON 41/49 (0.837): ok.
+- planner2c combined (amendment F): OFF 171/223 (0.767), ON 173/223 (0.776): ok.
+This measure is pre-registered for the kids-pack test and the final 48-learner run. Hashes refreshed in §3.

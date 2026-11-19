@@ -13,7 +13,7 @@ Verdict (pre-registered pass rules): **NOT PASSED**
 | KIDPPP | 12 | 0.917 | 0.917 | 0.000 | [0.000, 0.000] | 0 / 12 / 0 |
 | ALL | 48 | 0.859 | 0.875 | 0.016 | [-0.031, 0.068] | 5 / 39 / 4 |
 
-Guards (amendment D): stuck runs OFF 0 / P2 1 -> FAIL; independent correct answers OFF 8 / P2 15 -> ok; early answer leaks OFF 8 / P2 6 -> ok
+Guards (amendment D): stuck runs OFF 0 / P2 1 -> FAIL; independent correct answers (fix A: first try, new item, answer not shown) OFF 177 / P2 166 of 231 / 225 first tries -> FAIL (old measure OFF 8 / P2 15); early answer leaks OFF 8 / P2 6 -> ok
 
 ### Immediate test, primary items
 
