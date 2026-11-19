@@ -16,11 +16,11 @@
    "W1": 0,
    "W2": 2,
    "C1": 1,
-   "C2": 0
+   "C2": 2
   },
   "indep": {
    "C1": 0,
-   "C2": 0
+   "C2": 1
   },
   "start": {
    "W1": 1,
@@ -519,7 +519,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 2: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe answer is \"rainy\". After It is, we need a describing word. Rain is a noun, and rainy describes the weather.\nRight: It is snowy today. Wrong: It is snow today.\nNow you try alone.\nComplete: \"I wear a coat because it is very ___.\"\n\nLEARNER'S LAST MESSAGE:\ncold\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"cold\" is correct. It is a describing word for the weather.\nNow write one sentence about a person you know. Use a weather word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 2: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe answer is \"rainy\". After It is, we need a describing word. Rain is a noun, and rainy describes the weather.\nRight: It is snowy today. Wrong: It is snow today.\nNow you try alone.\nComplete: \"I wear a coat because it is very ___.\"\n\nLEARNER'S LAST MESSAGE:\ncold\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"cold\" is correct. It is a describing word for the weather.\nNow write one sentence about a person you know. Use a weather word.",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"cold\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"cold\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My sister likes sunny days.",
+    "errors": {
+     "W1": "My sister likes sun days.",
+     "W2": "My sister likes sny days."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister likes sny days.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "My sister likes sny days.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

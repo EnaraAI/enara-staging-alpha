@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -543,7 +543,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"are going to play\" is correct.\nHere is a new situation. Do this one alone.\nComplete: \"We ___ (buy) bread at the shop after school.\" (a plan)\n\nLEARNER'S LAST MESSAGE:\nare going to buy\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"are going to buy\" is correct. You did this one alone.\nNow write one sentence about a person you know. Use going to."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"are going to play\" is correct.\nHere is a new situation. Do this one alone.\nComplete: \"We ___ (buy) bread at the shop after school.\" (a plan)\n\nLEARNER'S LAST MESSAGE:\nare going to buy\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"are going to buy\" is correct. You did this one alone.\nNow write one sentence about a person you know. Use going to.",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 'are going to buy' is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "are going to buy"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother is going to visit our aunt.",
+    "errors": {
+     "W1": "My brother going to visit our aunt."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother is going to visit our aunt.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother is going to visit our aunt.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

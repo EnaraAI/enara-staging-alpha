@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -376,7 +376,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 2: many + countable plural, much + uncountable. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a little\"! Rice is uncountable and we have only a small amount. Good job. Next exercise. Write much or many: We don't have ___ milk. (Answer with only the missing word.)\n\nLEARNER'S LAST MESSAGE:\nmuch\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"much\"! Milk is uncountable, so we say \"much milk\". Good job. Next exercise. Write much or many: How ___ eggs do we need? (Answer with only the missing word.)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 2: many + countable plural, much + uncountable. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a little\"! Rice is uncountable and we have only a small amount. Good job. Next exercise. Write much or many: We don't have ___ milk. (Answer with only the missing word.)\n\nLEARNER'S LAST MESSAGE:\nmuch\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"much\"! Milk is uncountable, so we say \"much milk\". Good job. Next exercise. Write much or many: How ___ eggs do we need? (Answer with only the missing word.)",
+   "stateBefore": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"much\"!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"much\"!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Milk is uncountable, so we say \"much milk\"."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "many",
+    "errors": {
+     "W1": "much"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "many",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "many",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

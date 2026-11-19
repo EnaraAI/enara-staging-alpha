@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -506,7 +506,106 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 3: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"can't\" fits, since the speaker never learned.\nNow write one sentence about a person you know using can with a base verb. Add the rule behind it in a few words.\n\nLEARNER'S LAST MESSAGE:\nMy sister can swim.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"can swim\" is can plus the base form. You again left out the rule phrase I asked for. Next, a harder variant: write two sentences about someone you know, one with can and one with can't, and add the rule in a few words.\n\nNow write one new sentence about a place you visited, using the same point in this new situation."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 3: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"can't\" fits, since the speaker never learned.\nNow write one sentence about a person you know using can with a base verb. Add the rule behind it in a few words.\n\nLEARNER'S LAST MESSAGE:\nMy sister can swim.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"can swim\" is can plus the base form. You again left out the rule phrase I asked for. Next, a harder variant: write two sentences about someone you know, one with can and one with can't, and add the rule in a few words.\n\nNow write one new sentence about a place you visited, using the same point in this new situation.",
+   "stateBefore": {
+    "form": "can",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: 'can swim' is can plus the base form."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My sister can swim."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother can cook.",
+    "errors": {
+     "W1": "My brother can cooks."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "can",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother can cooks.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My brother can cooks.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

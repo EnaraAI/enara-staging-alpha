@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -483,7 +483,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour polite sentence \"Can I have a glass of water, please?\" is right.\nBut some or any does not fit every sentence. Use a or an with one thing you can count. Use some with things you cannot count.\nRight: I'd like a sandwich, please. Right: I'd like some rice, please. Wrong: I'd like some sandwich, please.\nNow on your own. You are in a cafe. Ask politely for juice.\n\nLEARNER'S LAST MESSAGE:\nI'd like any juice, please.\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\n\"I'd like\" and \"please\" make a polite request, and that part is right. But the word \"any\" is usually for questions and \"not\" sentences. Think about the word before \"juice\" and write your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour polite sentence \"Can I have a glass of water, please?\" is right.\nBut some or any does not fit every sentence. Use a or an with one thing you can count. Use some with things you cannot count.\nRight: I'd like a sandwich, please. Right: I'd like some rice, please. Wrong: I'd like some sandwich, please.\nNow on your own. You are in a cafe. Ask politely for juice.\n\nLEARNER'S LAST MESSAGE:\nI'd like any juice, please.\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\n\"I'd like\" and \"please\" make a polite request, and that part is right. But the word \"any\" is usually for questions and \"not\" sentences. Think about the word before \"juice\" and write your sentence again.",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "the word 'any' is usually for questions and 'not' sentences."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I'd like some juice, please.",
+    "errors": {
+     "W1": "I'd like any juice, please."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I'd like some juice, please.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I'd like some juice, please.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

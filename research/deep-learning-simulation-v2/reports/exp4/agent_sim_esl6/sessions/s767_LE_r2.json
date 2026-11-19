@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -565,7 +565,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 2: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 3: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 2.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"We usually have lunch.\" is correct.\nLook: \"She always drinks juice.\" The word always comes before the verb drinks. Put always, usually or never before the main verb.\nRight: He never eats fish. Wrong: He eats never fish.\nNow write one sentence about a person you know. Use always, usually or never.\n\nLEARNER'S LAST MESSAGE:\nMy brother always plays football.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My brother always plays football.\" has the subject first, then the verb, then the object. The word always is before the main verb.\nNow a new one, in a new situation.\nPut in order: \"Maya / usually / rides / her bike / to school\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 2: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 3: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 2.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"We usually have lunch.\" is correct.\nLook: \"She always drinks juice.\" The word always comes before the verb drinks. Put always, usually or never before the main verb.\nRight: He never eats fish. Wrong: He eats never fish.\nNow write one sentence about a person you know. Use always, usually or never.\n\nLEARNER'S LAST MESSAGE:\nMy brother always plays football.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My brother always plays football.\" has the subject first, then the verb, then the object. The word always is before the main verb.\nNow a new one, in a new situation.\nPut in order: \"Maya / usually / rides / her bike / to school\"",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My brother always plays football.\" has the subject first, then the verb, then the object."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My brother always plays football."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Maya usually rides her bike to school.",
+    "errors": {
+     "W1": "Rides Maya usually her bike to school."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Maya usually rides her bike to school.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "Maya usually rides her bike to school.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

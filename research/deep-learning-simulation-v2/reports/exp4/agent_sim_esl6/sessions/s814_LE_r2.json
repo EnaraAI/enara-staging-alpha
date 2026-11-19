@@ -14,7 +14,7 @@
   ],
   "s": {
    "W1": 1,
-   "W2": 2,
+   "W2": 1,
    "C1": 1,
    "C2": 0
   },
@@ -522,7 +522,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 2: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 1: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe answer is \"kitchen\". It is the room where we cook.\nRight: I cook dinner in the kitchen. Wrong: I cook dinner in the bathroom.\nNow try this one on your own.\nComplete: \"I wash my face in the ___.\"\n\nLEARNER'S LAST MESSAGE:\nwashing room\nFACT: the last learner message contained the error of W2 (translates the Arabic phrase (\"the sleeping room\" for bedroom)).\n\nTUTOR TURN TO JUDGE:\nYour idea about washing is right. But English does not always say \"washing room\". Many rooms have one special name.\nRight: We sleep in the bedroom.\nWrong: We sleep in the sleeping room.\nTry again. Complete: \"I wash my face in the ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 2: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 1: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe answer is \"kitchen\". It is the room where we cook.\nRight: I cook dinner in the kitchen. Wrong: I cook dinner in the bathroom.\nNow try this one on your own.\nComplete: \"I wash my face in the ___.\"\n\nLEARNER'S LAST MESSAGE:\nwashing room\nFACT: the last learner message contained the error of W2 (translates the Arabic phrase (\"the sleeping room\" for bedroom)).\n\nTUTOR TURN TO JUDGE:\nYour idea about washing is right. But English does not always say \"washing room\". Many rooms have one special name.\nRight: We sleep in the bedroom.\nWrong: We sleep in the sleeping room.\nTry again. Complete: \"I wash my face in the ___.\"",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: We sleep in the bedroom. Wrong: We sleep in the sleeping room."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "bathroom",
+    "errors": {
+     "W1": "bathrom",
+     "W2": "washing room"
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "bathrom",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "bathrom",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

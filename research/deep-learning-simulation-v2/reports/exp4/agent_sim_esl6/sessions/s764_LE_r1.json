@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 1,
    "C1": 1,
    "C2": 0
@@ -509,7 +509,90 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 1: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 0.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Sam plays chess on Mondays.\" is correct. Good fix.\nTell me the rule in your own words.\n\nLEARNER'S LAST MESSAGE:\nI think the verb can come first, as in Arabic.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nNot quite. In English, the verb does not come first in a statement. The person or thing comes first.\nSay the rule again in one short sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 1: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 0.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Sam plays chess on Mondays.\" is correct. Good fix.\nTell me the rule in your own words.\n\nLEARNER'S LAST MESSAGE:\nI think the verb can come first, as in Arabic.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nNot quite. In English, the verb does not come first in a statement. The person or thing comes first.\nSay the rule again in one short sentence.",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English, the verb does not come first in a statement. The person or thing comes first."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "rule"
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I think the verb can come first, as in Arabic.",
+   "production": {
+    "kind": "rule",
+    "text": "I think the verb can come first, as in Arabic."
+   }
   }
  ],
  "assess": {

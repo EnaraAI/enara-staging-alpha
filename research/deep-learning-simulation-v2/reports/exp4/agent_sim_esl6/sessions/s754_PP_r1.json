@@ -20,7 +20,7 @@
   },
   "indep": {
    "C1": 0,
-   "C2": 2
+   "C2": 3
   },
   "start": {
    "W1": 3,
@@ -410,7 +410,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 0: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 3: there is / there are needs is or are after \"there\". Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"A big table\" is one thing, so we say \"There is\".\n\nNow try a new one. Complete: \"___ two books on the desk.\"\nWhat are the missing words?\n\nLEARNER'S LAST MESSAGE:\nThere are\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Two books\" is more than one, so we say \"There are\".\n\nNow a new one. Complete: \"___ a cat in the garden.\"\nWhat are the missing words?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 0: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 3: there is / there are needs is or are after \"there\". Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"A big table\" is one thing, so we say \"There is\".\n\nNow try a new one. Complete: \"___ two books on the desk.\"\nWhat are the missing words?\n\nLEARNER'S LAST MESSAGE:\nThere are\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Two books\" is more than one, so we say \"There are\".\n\nNow a new one. Complete: \"___ a cat in the garden.\"\nWhat are the missing words?",
+   "stateBefore": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "There are"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "There is",
+    "errors": {
+     "W2": "There"
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 3
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "There is",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "There is",
+    "probes": [
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

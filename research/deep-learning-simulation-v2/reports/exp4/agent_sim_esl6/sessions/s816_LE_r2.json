@@ -15,11 +15,11 @@
   "s": {
    "W1": 2,
    "W2": 1,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -518,7 +518,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 1: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe answer is \"kitchen\". You make food in that place, and the spelling has -tch- in the middle.\nRight: We sleep in the bedroom. Wrong: We sleep in the kitchen.\nNow try this one without help.\nComplete: \"We grow flowers in the ___.\"\n\nLEARNER'S LAST MESSAGE:\ngarden\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"garden\" is correct. Flowers grow there.\nNow write one sentence about a person you know. Say what the person does in a place at home."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 1: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe answer is \"kitchen\". You make food in that place, and the spelling has -tch- in the middle.\nRight: We sleep in the bedroom. Wrong: We sleep in the kitchen.\nNow try this one without help.\nComplete: \"We grow flowers in the ___.\"\n\nLEARNER'S LAST MESSAGE:\ngarden\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"garden\" is correct. Flowers grow there.\nNow write one sentence about a person you know. Say what the person does in a place at home.",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 'garden' is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, 'garden' is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother sleeps in the bedroom.",
+    "errors": {
+     "W1": "My brother sleeps in the bedrom.",
+     "W2": "My brother sleeps in the sleeping room."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother sleeps in the sleeping room.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "My brother sleeps in the sleeping room.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

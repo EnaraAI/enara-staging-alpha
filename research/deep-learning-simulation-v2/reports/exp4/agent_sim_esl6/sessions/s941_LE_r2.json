@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -485,7 +485,111 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLook: My uncle is funny. I use is with a word like funny or young.\nRight: He is young. Wrong: He young.\nYou wrote \"He has hair short black.\" \"He has\" is a good start. Tell me what you were thinking about the words after \"has\".\n\nLEARNER'S LAST MESSAGE:\nI think adjectives follow the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for telling me. In English, adjectives come before the noun, not after it. So the answer is \"He has short black hair.\"\nRight: My aunt has long red hair. Wrong: My aunt has hair long red.\nNow one alone: write one sentence about the eyes of a person you know. Use two describing words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLook: My uncle is funny. I use is with a word like funny or young.\nRight: He is young. Wrong: He young.\nYou wrote \"He has hair short black.\" \"He has\" is a good start. Tell me what you were thinking about the words after \"has\".\n\nLEARNER'S LAST MESSAGE:\nI think adjectives follow the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for telling me. In English, adjectives come before the noun, not after it. So the answer is \"He has short black hair.\"\nRight: My aunt has long red hair. Wrong: My aunt has hair long red.\nNow one alone: write one sentence about the eyes of a person you know. Use two describing words.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English, adjectives come before the noun, not after it."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: My aunt has long red hair. Wrong: My aunt has hair long red."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "So the answer is \"He has short black hair.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My friend has big brown eyes.",
+    "errors": {
+     "W1": "My friend has eyes big brown."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My friend has big brown eyes.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My friend has big brown eyes.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

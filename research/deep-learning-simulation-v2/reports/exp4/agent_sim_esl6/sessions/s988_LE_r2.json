@@ -19,8 +19,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 1,
-   "C2": 1
+   "C1": 2,
+   "C2": 2
   },
   "start": {
    "W1": 0,
@@ -535,7 +535,113 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 3: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: after did, the main verb stays in the base form.\nNow write the second question for your friend about last weekend, with did and an irregular verb.\n\nLEARNER'S LAST MESSAGE:\nDid you go to the cinema last weekend?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"Did you go to the cinema last weekend?\" keeps \"go\" in the base form after \"Did\".\nNow write one sentence about a person you know, using a regular verb in the past simple."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 3: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: after did, the main verb stays in the base form.\nNow write the second question for your friend about last weekend, with did and an irregular verb.\n\nLEARNER'S LAST MESSAGE:\nDid you go to the cinema last weekend?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"Did you go to the cinema last weekend?\" keeps \"go\" in the base form after \"Did\".\nNow write one sentence about a person you know, using a regular verb in the past simple.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"Did you go to the cinema last weekend?\""
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct: \"Did you go to the cinema last weekend?\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"Did you go to the cinema last weekend?\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct: \"Did you go to the cinema last weekend?\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "My sister visited her friend yesterday.",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister visited her friend yesterday.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister visited her friend yesterday.",
+    "probes": []
+   }
   }
  ],
  "assess": {

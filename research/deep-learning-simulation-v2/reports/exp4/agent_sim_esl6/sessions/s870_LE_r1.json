@@ -12,9 +12,9 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -495,7 +495,111 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are using \"going to\" alone here. Part of your idea is right: the sentence needs \"going to\". It also needs one more word before it: am, is or are.\nExample: My mother is going to cook tomorrow.\nNow write the fixed sentence for the task again.\n\nLEARNER'S LAST MESSAGE:\nI am going to visit my aunt.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I am going to visit my aunt.\" uses am going to correctly. But it is a new sentence, not the task sentence.\nFor the task, the answer is \"I am going to study tonight.\" The word I needs am before going to.\nRight: We are going to swim on Sunday.\nWrong: We going to swim on Sunday.\nNow try a new one on your own.\nCorrect: \"He going to cook dinner tomorrow.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are using \"going to\" alone here. Part of your idea is right: the sentence needs \"going to\". It also needs one more word before it: am, is or are.\nExample: My mother is going to cook tomorrow.\nNow write the fixed sentence for the task again.\n\nLEARNER'S LAST MESSAGE:\nI am going to visit my aunt.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"I am going to visit my aunt.\" uses am going to correctly. But it is a new sentence, not the task sentence.\nFor the task, the answer is \"I am going to study tonight.\" The word I needs am before going to.\nRight: We are going to swim on Sunday.\nWrong: We going to swim on Sunday.\nNow try a new one on your own.\nCorrect: \"He going to cook dinner tomorrow.\"",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"I am going to visit my aunt.\" uses am going to correctly."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "For the task, the answer is \"I am going to study tonight.\""
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: We are going to swim on Sunday. Wrong: We going to swim on Sunday."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "He is going to cook dinner tomorrow.",
+    "errors": {
+     "W1": "He going to cook dinner tomorrow."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "He is going to cook dinner tomorrow.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "He is going to cook dinner tomorrow.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

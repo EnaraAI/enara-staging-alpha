@@ -510,7 +510,111 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 1: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHere is an example: I bought a hat. The hat is red.\nThe rule: use the for a thing you already talked about.\nRight: I have a cat. The cat is black. Wrong: I have a cat. A cat is black.\nYou wrote \"A\" for the garden sentence. Tell me in your own words: what were you thinking?\n\nLEARNER'S LAST MESSAGE:\nI think \"the\" goes with general nouns and is left out for known things, as with Arabic al-.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for telling me. For this item, the missing word is “the”. The garden was already mentioned, so we use “the”.\nRight: I see a bird. The bird is small. Wrong: I see a bird. A bird is small.\nNow try this one on your own.\nWrite a or the: I have a bag. ___ bag is blue."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 1: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHere is an example: I bought a hat. The hat is red.\nThe rule: use the for a thing you already talked about.\nRight: I have a cat. The cat is black. Wrong: I have a cat. A cat is black.\nYou wrote \"A\" for the garden sentence. Tell me in your own words: what were you thinking?\n\nLEARNER'S LAST MESSAGE:\nI think \"the\" goes with general nouns and is left out for known things, as with Arabic al-.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for telling me. For this item, the missing word is “the”. The garden was already mentioned, so we use “the”.\nRight: I see a bird. The bird is small. Wrong: I see a bird. A bird is small.\nNow try this one on your own.\nWrite a or the: I have a bag. ___ bag is blue.",
+   "stateBefore": {
+    "form": "the",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "For this item, the missing word is “the”."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The garden was already mentioned, so we use “the”."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: I see a bird. The bird is small. Wrong: I see a bird. A bird is small."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "A"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "the",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "The",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "The",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

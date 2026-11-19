@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -397,7 +397,112 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 2: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, 'had' is correct! Have is irregular, so the past form is had, not haved. Well done!\n\nNext one: Write the past form of 'tell': Last night he ___ me a story.\n\nLEARNER'S LAST MESSAGE:\ntold\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, 'told' is correct! Tell is irregular, so the past form is told, not telled. Great job!\n\nNew exercise: Write the past form of 'buy': Last week she ___ a new bag."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 2: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, 'had' is correct! Have is irregular, so the past form is had, not haved. Well done!\n\nNext one: Write the past form of 'tell': Last night he ___ me a story.\n\nLEARNER'S LAST MESSAGE:\ntold\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, 'told' is correct! Tell is irregular, so the past form is told, not telled. Great job!\n\nNew exercise: Write the past form of 'buy': Last week she ___ a new bag.",
+   "stateBefore": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 'told' is correct!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "told"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "the past form is told, not telled"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "bought",
+    "errors": {
+     "W1": "buyed"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "buyed",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "buyed",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

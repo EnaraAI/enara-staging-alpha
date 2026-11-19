@@ -524,7 +524,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 3: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"can't\" is correct.\nNow write one sentence about a person you know. Use can and a plain verb.\n\nLEARNER'S LAST MESSAGE:\nMy sister can swims.\nFACT: the last learner message contained the error of W1 (adds -s to the verb after can (\"She can swims.\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"My sister can swims.\" has a problem after can. After can, the verb stays plain with no ending, so the part to fix is \"can swim\".\nWrite your sentence again with this change."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 3: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"can't\" is correct.\nNow write one sentence about a person you know. Use can and a plain verb.\n\nLEARNER'S LAST MESSAGE:\nMy sister can swims.\nFACT: the last learner message contained the error of W1 (adds -s to the verb after can (\"She can swims.\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"My sister can swims.\" has a problem after can. After can, the verb stays plain with no ending, so the part to fix is \"can swim\".\nWrite your sentence again with this change.",
+   "stateBefore": {
+    "form": "can",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After can, the verb stays plain with no ending"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"My sister can swims.\" has a problem ... the part to fix is \"can swim\""
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "the part to fix is \"can swim\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister can swim.",
+    "errors": {
+     "W1": "My sister can swims."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "can",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister can swim.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister can swim.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

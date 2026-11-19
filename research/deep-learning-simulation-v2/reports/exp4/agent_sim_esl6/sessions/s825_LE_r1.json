@@ -15,11 +15,11 @@
   "s": {
    "W1": 2,
    "W2": 1,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -487,7 +487,108 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-numbers-time (numbers and time words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: f and v are the same. Its error: writes v for f or f for v in a number (\"fivteen\").\nW2 (wrong) strength 1: Arabic sa'a means both hour and clock. Its error: uses clock for hour (\"one clock long\" for one hour).\nC1 (correct) strength 1: numbers keep their English consonants (fifteen, five with f then v). Independent correct productions so far: 0.\nC2 (correct) strength 0: English time phrases: an hour is a length of time, a clock is a thing. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nI am not sure \"one\" fits your dialogue. One was the final time in my example about lunch, and your lesson has its own dialogue.\nTell me in your own words: which two times do you see in your dialogue, first and then the changed time?\n\nLEARNER'S LAST MESSAGE:\nThe first time is three and the changed time is four.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThank you. You found both times: three first, then four. A changed time replaces the first one.\n\nLook at those two times again. Which one is the time of the lesson? Write one word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-numbers-time (numbers and time words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: f and v are the same. Its error: writes v for f or f for v in a number (\"fivteen\").\nW2 (wrong) strength 1: Arabic sa'a means both hour and clock. Its error: uses clock for hour (\"one clock long\" for one hour).\nC1 (correct) strength 1: numbers keep their English consonants (fifteen, five with f then v). Independent correct productions so far: 0.\nC2 (correct) strength 0: English time phrases: an hour is a length of time, a clock is a thing. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nI am not sure \"one\" fits your dialogue. One was the final time in my example about lunch, and your lesson has its own dialogue.\nTell me in your own words: which two times do you see in your dialogue, first and then the changed time?\n\nLEARNER'S LAST MESSAGE:\nThe first time is three and the changed time is four.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThank you. You found both times: three first, then four. A changed time replaces the first one.\n\nLook at those two times again. Which one is the time of the lesson? Write one word.",
+   "stateBefore": {
+    "form": "numtime",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "You found both times: three first, then four."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "You found both times: three first, then four."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "four",
+    "errors": {
+     "W1": "vour"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "numtime",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "vour",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "vour",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

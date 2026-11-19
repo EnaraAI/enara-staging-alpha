@@ -362,7 +362,100 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-clothes-shopping (clothes, colours and sizes). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adjective goes after the noun. Its error: puts the colour or size after the noun (\"I want a shirt blue, size big.\").\nC1 (correct) strength 1: colour and size adjectives go before the noun. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, people will understand you! But the usual question is a little different. Hint: use the pattern \"Do you have this jacket in ...?\" Try again.\n\nLEARNER'S LAST MESSAGE:\nDo you have this jacket size small?\nFACT: the last learner message contained the error of W1 (puts the colour or size after the noun (\"I want a shirt blue, size big.\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. The usual question is: \"Do you have this jacket in small?\" We say \"in\" before the size, and we ask with \"Do you have this jacket in ...?\" Do you see the word \"in\" before \"small\"?\n\nNew one. You want the same hat in blue. Ask the shop assistant."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-clothes-shopping (clothes, colours and sizes). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adjective goes after the noun. Its error: puts the colour or size after the noun (\"I want a shirt blue, size big.\").\nC1 (correct) strength 1: colour and size adjectives go before the noun. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, people will understand you! But the usual question is a little different. Hint: use the pattern \"Do you have this jacket in ...?\" Try again.\n\nLEARNER'S LAST MESSAGE:\nDo you have this jacket size small?\nFACT: the last learner message contained the error of W1 (puts the colour or size after the noun (\"I want a shirt blue, size big.\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. The usual question is: \"Do you have this jacket in small?\" We say \"in\" before the size, and we ask with \"Do you have this jacket in ...?\" Do you see the word \"in\" before \"small\"?\n\nNew one. You want the same hat in blue. Ask the shop assistant.",
+   "stateBefore": {
+    "form": "clothes",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The usual question is: \"Do you have this jacket in small?\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Do you have this hat in blue?",
+    "errors": {
+     "W1": "Do you have this hat blue?"
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "clothes",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Do you have this hat blue?",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "Do you have this hat blue?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

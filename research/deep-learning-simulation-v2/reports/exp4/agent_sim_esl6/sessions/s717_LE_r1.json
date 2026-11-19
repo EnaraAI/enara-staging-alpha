@@ -14,7 +14,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -522,7 +522,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 1: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nI see no word yet. That is fine. Look at this example: I see a bird. The bird is red. The second time, I say the bird.\nRule: use the when you talk about the same thing again.\nRight: I have a cup. The cup is blue. Wrong: I have a cup. A cup is blue.\nNow try again. Write one word: We have a garden. ___ garden is small.\n\nLEARNER'S LAST MESSAGE:\nThe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"The\" is correct here. The garden was already mentioned, so we use the.\n\nNow write one sentence about a person you know. Use the for something you already mentioned."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 1: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nI see no word yet. That is fine. Look at this example: I see a bird. The bird is red. The second time, I say the bird.\nRule: use the when you talk about the same thing again.\nRight: I have a cup. The cup is blue. Wrong: I have a cup. A cup is blue.\nNow try again. Write one word: We have a garden. ___ garden is small.\n\nLEARNER'S LAST MESSAGE:\nThe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"The\" is correct here. The garden was already mentioned, so we use the.\n\nNow write one sentence about a person you know. Use the for something you already mentioned.",
+   "stateBefore": {
+    "form": "the",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"The\" is correct here."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The garden was already mentioned, so we use the."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My friend has a cat. The cat is white.",
+    "errors": {
+     "W1": "My friend has a cat. Cat is white."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "the",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My friend has a cat. The cat is white.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My friend has a cat. The cat is white.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

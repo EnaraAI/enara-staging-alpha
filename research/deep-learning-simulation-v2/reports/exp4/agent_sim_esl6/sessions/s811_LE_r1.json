@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 1,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -520,7 +520,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 1: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThanks for explaining. In English, vowels cannot be left out of a word. The answer is \"kitchen\": we make toast in the kitchen, and the word needs its e.\nRight: We wash our hands in the bathroom. Wrong: We wash our hands in the bathrm.\nNow try one on your own: \"We grow flowers in the ___.\"\n\nLEARNER'S LAST MESSAGE:\ngarden\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"garden\" is correct: we grow flowers in the garden.\nNow write one sentence about a person you know. Say what that person does in one place in a home."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 1: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThanks for explaining. In English, vowels cannot be left out of a word. The answer is \"kitchen\": we make toast in the kitchen, and the word needs its e.\nRight: We wash our hands in the bathroom. Wrong: We wash our hands in the bathrm.\nNow try one on your own: \"We grow flowers in the ___.\"\n\nLEARNER'S LAST MESSAGE:\ngarden\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"garden\" is correct: we grow flowers in the garden.\nNow write one sentence about a person you know. Say what that person does in one place in a home.",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "'garden' is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "garden"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother sleeps in the bedroom.",
+    "errors": {
+     "W1": "My brother sleeps in the bedrom.",
+     "W2": "My brother sleeps in the sleeping room."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother sleeps in the bedroom.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother sleeps in the bedroom.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

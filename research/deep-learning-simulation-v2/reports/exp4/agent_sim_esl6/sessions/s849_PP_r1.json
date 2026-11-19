@@ -388,7 +388,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 3: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"But\" shows a contrast: The bus is cheap but it is slow. Well done. Next exercise. Join with \"because\": \"I am happy. It is my birthday.\"\n\nLEARNER'S LAST MESSAGE:\nI am happy because it is my birthday.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Because\" gives a reason: I am happy because it is my birthday. Great work on all three. Now your turn to write. Write one sentence with \"because\", for example about why you like a day of the week."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 3: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"But\" shows a contrast: The bus is cheap but it is slow. Well done. Next exercise. Join with \"because\": \"I am happy. It is my birthday.\"\n\nLEARNER'S LAST MESSAGE:\nI am happy because it is my birthday.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Because\" gives a reason: I am happy because it is my birthday. Great work on all three. Now your turn to write. Write one sentence with \"because\", for example about why you like a day of the week.",
+   "stateBefore": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! \"Because\" gives a reason"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"Because\" gives a reason"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I like Friday because I do not go to school.",
+    "errors": {
+     "W1": "I like Friday and I do not go to school."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I like Friday because I do not go to school.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I like Friday because I do not go to school.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

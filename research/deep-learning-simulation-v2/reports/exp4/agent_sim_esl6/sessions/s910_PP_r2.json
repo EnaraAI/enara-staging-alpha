@@ -19,8 +19,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 2
+   "C1": 3,
+   "C2": 3
   },
   "start": {
    "W1": 2,
@@ -449,7 +449,122 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 2.\nC2 (correct) strength 3: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nVery good! A girl is reading a book uses is + -ing correctly, and now you have two details. Next one. Write one sentence about the weather in the picture.\n\nLEARNER'S LAST MESSAGE:\nIt is raining.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nVery good! It is raining uses is + -ing correctly to describe the weather. Next one. Write one more sentence about the picture: what is a child or a dog doing near the tree?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 2.\nC2 (correct) strength 3: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nVery good! A girl is reading a book uses is + -ing correctly, and now you have two details. Next one. Write one sentence about the weather in the picture.\n\nLEARNER'S LAST MESSAGE:\nIt is raining.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nVery good! It is raining uses is + -ing correctly to describe the weather. Next one. Write one more sentence about the picture: what is a child or a dog doing near the tree?",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Very good! It is raining uses is + -ing correctly"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "It is raining uses is + -ing correctly to describe the weather."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "It is raining."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "It is raining."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The dog is running near the tree.",
+    "errors": {
+     "W1": "The dog running near the tree.",
+     "W2": "The dog runs near the tree."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "The dog is running near the tree.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "The dog is running near the tree.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

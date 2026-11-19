@@ -14,13 +14,13 @@
   ],
   "s": {
    "W1": 1,
-   "W2": 1,
+   "W2": 0,
    "C1": 3,
-   "C2": 2
+   "C2": 3
   },
   "indep": {
    "C1": 1,
-   "C2": 1
+   "C2": 2
   },
   "start": {
    "W1": 1,
@@ -410,7 +410,109 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-a-an (a and an). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 1: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, The is correct! You already heard about a book in the first sentence, so the second time we say the book. Next one: Write a, an or the: We saw ___ elephant at the zoo. Write only the missing word.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, an is correct! Elephant starts with the vowel sound /e/, so we use an. Next one: Write a, an or the: It is cold. Please close ___ door. Write only the missing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-a-an (a and an). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 1: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 3: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, The is correct! You already heard about a book in the first sentence, so the second time we say the book. Next one: Write a, an or the: We saw ___ elephant at the zoo. Write only the missing word.\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, an is correct! Elephant starts with the vowel sound /e/, so we use an. Next one: Write a, an or the: It is cold. Please close ___ door. Write only the missing word.",
+   "stateBefore": {
+    "form": "aan",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "articles"
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, an is correct!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "an"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Elephant starts with the vowel sound /e/, so we use an."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "the",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "aan",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "articles"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "the",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "the",
+    "probes": []
+   }
   }
  ],
  "assess": {

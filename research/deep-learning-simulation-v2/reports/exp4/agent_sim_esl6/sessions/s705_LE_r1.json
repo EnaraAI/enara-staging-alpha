@@ -16,11 +16,11 @@
    "W1": 0,
    "W2": 0,
    "C1": 1,
-   "C2": 0
+   "C2": 2
   },
   "indep": {
    "C1": 0,
-   "C2": 0
+   "C2": 1
   },
   "start": {
    "W1": 1,
@@ -533,7 +533,118 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-a-an (a and an). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe answer is \"an\". The word \"orange\" starts with a vowel sound. Also, a singular noun usually needs a, an or the before it.\nRight: Ana has a cat. Wrong: Ana has an cat.\nNow try this one on your own. Write a or an: Tom wants ___ ice cream. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"an\" is correct. Ice starts with a vowel sound.\n\nNow write one sentence about a person you know. Use a before a consonant sound, or an before a vowel sound. Write one real sentence of your own."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-a-an (a and an). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 1: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 0: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe answer is \"an\". The word \"orange\" starts with a vowel sound. Also, a singular noun usually needs a, an or the before it.\nRight: Ana has a cat. Wrong: Ana has an cat.\nNow try this one on your own. Write a or an: Tom wants ___ ice cream. (answer with only the missing word)\n\nLEARNER'S LAST MESSAGE:\nan\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"an\" is correct. Ice starts with a vowel sound.\n\nNow write one sentence about a person you know. Use a before a consonant sound, or an before a vowel sound. Write one real sentence of your own.",
+   "stateBefore": {
+    "form": "aan",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "articles"
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"an\" is correct."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Ice starts with a vowel sound."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My sister has an orange cat.",
+    "errors": {
+     "W1": "My sister has orange cat.",
+     "W2": "My sister has a orange cat."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "aan",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "articles"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister has an orange cat.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister has an orange cat.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

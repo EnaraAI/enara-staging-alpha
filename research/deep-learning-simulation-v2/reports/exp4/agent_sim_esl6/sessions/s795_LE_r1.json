@@ -494,7 +494,97 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 2: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 1: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"She\" is correct here.\nNow write one sentence about a person you know. Start with \"This is my\" and a family word.\n\nLEARNER'S LAST MESSAGE:\nThis is my wfe.\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\n\"This is my wfe.\" has the right form: This is my + a family word. Check the spelling of the family word.\n\nNow write two short sentences about another person in your family. Start with \"This is my\", then say one fact with \"He is\" or \"She is\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 2: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 1: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"She\" is correct here.\nNow write one sentence about a person you know. Start with \"This is my\" and a family word.\n\nLEARNER'S LAST MESSAGE:\nThis is my wfe.\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\n\"This is my wfe.\" has the right form: This is my + a family word. Check the spelling of the family word.\n\nNow write two short sentences about another person in your family. Start with \"This is my\", then say one fact with \"He is\" or \"She is\".",
+   "stateBefore": {
+    "form": "family",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "This is my husband. He is a teacher.",
+    "errors": {
+     "W1": "This is my hsband. He is a teacher.",
+     "W2": "This is my man. He is a teacher."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "family",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "This is my man. He is a teacher.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "This is my man. He is a teacher.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

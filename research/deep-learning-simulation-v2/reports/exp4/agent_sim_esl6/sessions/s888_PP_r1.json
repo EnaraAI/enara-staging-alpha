@@ -19,8 +19,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 2
+   "C1": 3,
+   "C2": 3
   },
   "start": {
    "W1": 2,
@@ -473,7 +473,134 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 2.\nC2 (correct) strength 3: a past question is did + subject + base verb. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, correct! \"Did she watch a film last night?\" After \"did\" we use the base verb \"watch\", not \"watched\". Great job.\n\nExercise 3. Make a question with did: \"They played football yesterday.\"\nWrite the question.\n\nLEARNER'S LAST MESSAGE:\nDid they play football yesterday?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, correct! \"Did they play football yesterday?\" After \"did\" we use the base verb \"play\", not \"played\". Great job.\n\nNew exercise. Make a question with did: \"He ate lunch at school.\"\nWrite the question."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 2.\nC2 (correct) strength 3: a past question is did + subject + base verb. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, correct! \"Did she watch a film last night?\" After \"did\" we use the base verb \"watch\", not \"watched\". Great job.\n\nExercise 3. Make a question with did: \"They played football yesterday.\"\nWrite the question.\n\nLEARNER'S LAST MESSAGE:\nDid they play football yesterday?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, correct! \"Did they play football yesterday?\" After \"did\" we use the base verb \"play\", not \"played\". Great job.\n\nNew exercise. Make a question with did: \"He ate lunch at school.\"\nWrite the question.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, correct! \"Did they play football yesterday?\""
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, correct! \"Did they play football yesterday?\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Did they play football yesterday?"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Did they play football yesterday?"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After \"did\" we use the base verb \"play\", not \"played\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "the base verb \"play\", not \"played\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did he eat lunch at school?",
+    "errors": {
+     "W1": "Did he ate lunch at school?",
+     "W2": "He ate lunch at school?"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Did he eat lunch at school?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Did he eat lunch at school?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

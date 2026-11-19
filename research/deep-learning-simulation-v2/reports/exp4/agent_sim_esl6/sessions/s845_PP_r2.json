@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -370,7 +370,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 1: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, but \"and\" is not right here. The bus is cheap (good), but it is slow (not so good). Hint: we use a different word to show a contrast.\n\nTry again: join with \"but\": \"The bus is cheap. It is slow.\"\n\nLEARNER'S LAST MESSAGE:\nThe bus is cheap and it is slow.\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\")).\n\nTUTOR TURN TO JUDGE:\nLet me explain. The bus is cheap (good), but it is slow (not so good). \"But\" shows a contrast, so we say: The bus is cheap but it is slow. \"And\" adds a similar idea.\n\nNew exercise. Join with because: \"I am happy. It is my birthday.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 1: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, but \"and\" is not right here. The bus is cheap (good), but it is slow (not so good). Hint: we use a different word to show a contrast.\n\nTry again: join with \"but\": \"The bus is cheap. It is slow.\"\n\nLEARNER'S LAST MESSAGE:\nThe bus is cheap and it is slow.\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\")).\n\nTUTOR TURN TO JUDGE:\nLet me explain. The bus is cheap (good), but it is slow (not so good). \"But\" shows a contrast, so we say: The bus is cheap but it is slow. \"And\" adds a similar idea.\n\nNew exercise. Join with because: \"I am happy. It is my birthday.\"",
+   "stateBefore": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"But\" shows a contrast ... \"And\" adds a similar idea."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "so we say: The bus is cheap but it is slow."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I am happy because it is my birthday.",
+    "errors": {
+     "W1": "I am happy and it is my birthday."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I am happy because it is my birthday.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I am happy because it is my birthday.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

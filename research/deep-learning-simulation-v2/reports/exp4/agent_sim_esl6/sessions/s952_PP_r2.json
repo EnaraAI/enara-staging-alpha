@@ -382,7 +382,100 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 3: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, airport is the right idea! But one letter is missing. Hint: say air + port, and port has an o in it. Try writing the word again.\n\nLEARNER'S LAST MESSAGE:\nairprt\nFACT: the last learner message contained the error of W1 (leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\")).\n\nTUTOR TURN TO JUDGE:\nGood try, but the spelling is still not correct. The word is airport: a-i-r-p-o-r-t, with an o after the p. Let's try a new one. Complete: \"A nurse works in a ___.\" Hint: it starts with h."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 3: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, airport is the right idea! But one letter is missing. Hint: say air + port, and port has an o in it. Try writing the word again.\n\nLEARNER'S LAST MESSAGE:\nairprt\nFACT: the last learner message contained the error of W1 (leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\")).\n\nTUTOR TURN TO JUDGE:\nGood try, but the spelling is still not correct. The word is airport: a-i-r-p-o-r-t, with an o after the p. Let's try a new one. Complete: \"A nurse works in a ___.\" Hint: it starts with h.",
+   "stateBefore": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is airport: a-i-r-p-o-r-t, with an o after the p."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "hospital",
+    "errors": {
+     "W1": "hospitl"
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "hospitl",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "hospitl",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

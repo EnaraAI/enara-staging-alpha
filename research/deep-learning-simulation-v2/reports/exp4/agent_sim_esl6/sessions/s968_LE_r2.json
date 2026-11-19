@@ -573,7 +573,104 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 2.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"windy\" is correct. Now write one real sentence about a person you know. Use a weather word in it.\n\nLEARNER'S LAST MESSAGE:\nIt is wind, so my father stays at home.\nFACT: the last learner message contained the error of W1 (uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\")).\n\nTUTOR TURN TO JUDGE:\nLook at \"It is wind\". After \"It is\", we use a describing word for the weather, not the name of a thing.\nWrite your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 2.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"windy\" is correct. Now write one real sentence about a person you know. Use a weather word in it.\n\nLEARNER'S LAST MESSAGE:\nIt is wind, so my father stays at home.\nFACT: the last learner message contained the error of W1 (uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\")).\n\nTUTOR TURN TO JUDGE:\nLook at \"It is wind\". After \"It is\", we use a describing word for the weather, not the name of a thing.\nWrite your sentence again.",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After \"It is\", we use a describing word for the weather, not the name of a thing."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "It is windy, so my father stays at home.",
+    "errors": {
+     "W1": "It is wind, so my father stays at home.",
+     "W2": "It is windi, so my father stays at home."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "It is windy, so my father stays at home.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "It is windy, so my father stays at home.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

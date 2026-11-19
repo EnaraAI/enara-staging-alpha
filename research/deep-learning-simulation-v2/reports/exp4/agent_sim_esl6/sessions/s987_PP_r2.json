@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -362,7 +362,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 3: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! You wrote the full sentence, and watches has -es after watch. Well done.\n\nNow a challenge. Write a sentence about your own friend's routine. Use he or she, an adverb like usually, and a verb with -s.\n\nLEARNER'S LAST MESSAGE:\nMy friend usually plays football.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! My friend usually plays football. Usually goes before the main verb, and plays has -s after my friend (he or she). Great job.\n\nNew one. Put never in this sentence: \"He watches TV in the morning.\" Write the whole sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 3: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! You wrote the full sentence, and watches has -es after watch. Well done.\n\nNow a challenge. Write a sentence about your own friend's routine. Use he or she, an adverb like usually, and a verb with -s.\n\nLEARNER'S LAST MESSAGE:\nMy friend usually plays football.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! My friend usually plays football. Usually goes before the main verb, and plays has -s after my friend (he or she). Great job.\n\nNew one. Put never in this sentence: \"He watches TV in the morning.\" Write the whole sentence.",
+   "stateBefore": {
+    "form": "freq",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes! My friend usually plays football."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes! My friend usually plays football."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Usually goes before the main verb"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "He never watches TV in the morning.",
+    "errors": {
+     "W1": "He watches never TV in the morning."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "He never watches TV in the morning.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "He never watches TV in the morning.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

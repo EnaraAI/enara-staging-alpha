@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -495,7 +495,111 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"He has hair short black\". \"He has\" is right for one person.\nA word that describes a thing usually comes before that thing.\nLook: my uncle is tall. Tall tells us how he is, so we use is.\nRule: use is with words like tall, young or kind.\nRight: She is kind. Wrong: She kind.\nTell me in your own words: what were you thinking about the order of the words in your sentence?\n\nLEARNER'S LAST MESSAGE:\nI think adjectives follow the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nIn English, a describing word goes before the thing it describes. So the answer is \"short black hair\".\nRight: She has long red hair. Wrong: She has hair long red.\nNow write one sentence about a famous singer's eyes. Use has."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"He has hair short black\". \"He has\" is right for one person.\nA word that describes a thing usually comes before that thing.\nLook: my uncle is tall. Tall tells us how he is, so we use is.\nRule: use is with words like tall, young or kind.\nRight: She is kind. Wrong: She kind.\nTell me in your own words: what were you thinking about the order of the words in your sentence?\n\nLEARNER'S LAST MESSAGE:\nI think adjectives follow the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nIn English, a describing word goes before the thing it describes. So the answer is \"short black hair\".\nRight: She has long red hair. Wrong: She has hair long red.\nNow write one sentence about a famous singer's eyes. Use has.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English, a describing word goes before the thing it describes."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "So the answer is \"short black hair\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: She has long red hair. Wrong: She has hair long red."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "She has big brown eyes.",
+    "errors": {
+     "W1": "She has eyes big brown."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "She has big brown eyes.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She has big brown eyes.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

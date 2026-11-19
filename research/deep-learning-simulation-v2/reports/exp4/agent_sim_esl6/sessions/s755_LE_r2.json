@@ -14,7 +14,7 @@
   ],
   "s": {
    "W1": 1,
-   "W2": 1,
+   "W2": 0,
    "C1": 0,
    "C2": 0
   },
@@ -515,7 +515,101 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 1: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 0: there is / there are needs is or are after \"there\". Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"There\". That part is right. The answer is \"There are\". Three means more than one, so we use are and a plural noun: windows.\nRight: There are two cats. Wrong: There are two cat.\nNow you try: Complete: \"___ four books on the desk.\"\n\nLEARNER'S LAST MESSAGE:\nThere\nFACT: the last learner message contained the error of W2 (leaves out is/are after there (\"There a cat in the garden.\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"There\". That part is right, but the gap needs one more small word.\nLook: Right: There is a lamp. Wrong: There a lamp.\nTry again: \"___ four books on the desk.\" Write the whole gap."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 1: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 0: there is / there are needs is or are after \"there\". Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"There\". That part is right. The answer is \"There are\". Three means more than one, so we use are and a plural noun: windows.\nRight: There are two cats. Wrong: There are two cat.\nNow you try: Complete: \"___ four books on the desk.\"\n\nLEARNER'S LAST MESSAGE:\nThere\nFACT: the last learner message contained the error of W2 (leaves out is/are after there (\"There a cat in the garden.\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"There\". That part is right, but the gap needs one more small word.\nLook: Right: There is a lamp. Wrong: There a lamp.\nTry again: \"___ four books on the desk.\" Write the whole gap.",
+   "stateBefore": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: There is a lamp. Wrong: There a lamp."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "There are",
+    "errors": {
+     "W2": "There"
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "There are",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "There are",
+    "probes": [
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

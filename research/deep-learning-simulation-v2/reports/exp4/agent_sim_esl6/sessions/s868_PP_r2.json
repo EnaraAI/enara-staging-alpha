@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -377,7 +377,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, but the word before going to is still missing. They is plural, so we use are: They are going to play football next Saturday. Let's try a new one. Correct: \"I going to study tonight.\"\n\nLEARNER'S LAST MESSAGE:\nI going to study tonight.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before going to (\"I going to visit my aunt.\")).\n\nTUTOR TURN TO JUDGE:\nGood try, but that is the same sentence, and it is still not correct. After I we need am before going to. Hint: I ___ going to study tonight. Which word goes in the gap? Write the full sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, but the word before going to is still missing. They is plural, so we use are: They are going to play football next Saturday. Let's try a new one. Correct: \"I going to study tonight.\"\n\nLEARNER'S LAST MESSAGE:\nI going to study tonight.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before going to (\"I going to visit my aunt.\")).\n\nTUTOR TURN TO JUDGE:\nGood try, but that is the same sentence, and it is still not correct. After I we need am before going to. Hint: I ___ going to study tonight. Which word goes in the gap? Write the full sentence again.",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After I we need am before going to."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "am",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "am",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "am",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

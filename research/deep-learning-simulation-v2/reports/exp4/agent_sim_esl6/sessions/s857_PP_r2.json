@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -362,7 +362,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"Watch\" ends in -ch, so we add -es: watches. Great job!\n\nExercise 3. Put the word \"usually\" in the right place: \"He plays football on Fridays.\"\n\nLEARNER'S LAST MESSAGE:\nHe usually plays football on Fridays.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Usually\" goes before the main verb \"plays\": He usually plays football on Fridays.\n\nNew exercise. Put the word \"never\" in the right place: \"My sister eats fish.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! \"Watch\" ends in -ch, so we add -es: watches. Great job!\n\nExercise 3. Put the word \"usually\" in the right place: \"He plays football on Fridays.\"\n\nLEARNER'S LAST MESSAGE:\nHe usually plays football on Fridays.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Usually\" goes before the main verb \"plays\": He usually plays football on Fridays.\n\nNew exercise. Put the word \"never\" in the right place: \"My sister eats fish.\"",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! \"Usually\" goes before the main verb \"plays\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! ... He usually plays football on Fridays."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"Usually\" goes before the main verb"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister never eats fish.",
+    "errors": {
+     "W1": "My sister eats never fish."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister never eats fish.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister never eats fish.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -562,7 +562,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 3: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Can I have a tea, please?\" is polite and clear.\nNew situation: you are at a hotel desk. You need a key for your room. Ask for it politely.\n\nNow write one new sentence about a place you visited, using the same point in this new situation.\n\nLEARNER'S LAST MESSAGE:\nCan I have the key for my room, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes. \"Can I have the key for my room, please?\" is polite. It has Can I have and please.\nNow write one sentence about a person you know. In it, that person asks for something politely."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 3: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Can I have a tea, please?\" is polite and clear.\nNew situation: you are at a hotel desk. You need a key for your room. Ask for it politely.\n\nNow write one new sentence about a place you visited, using the same point in this new situation.\n\nLEARNER'S LAST MESSAGE:\nCan I have the key for my room, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes. \"Can I have the key for my room, please?\" is polite. It has Can I have and please.\nNow write one sentence about a person you know. In it, that person asks for something politely.",
+   "stateBefore": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes. \"Can I have the key for my room, please?\" is polite."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"Can I have the key for my room, please?\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister says, \"Can I have a pen, please?\"",
+    "errors": {
+     "W1": "My sister says, \"Give me a pen.\""
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister says, \"Can I have a pen, please?\"",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister says, \"Can I have a pen, please?\"",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

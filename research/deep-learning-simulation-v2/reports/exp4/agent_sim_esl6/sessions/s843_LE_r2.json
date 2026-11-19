@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -529,7 +529,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 3: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"more expensive\" is correct for a long adjective.\nNow write one sentence about a person you know. Compare that person with another person.\n\nLEARNER'S LAST MESSAGE:\nMy brother is taller than my sister.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My brother is taller than my sister.\" is correct. You formed the comparative and used \"than\".\nNow compare two places or two animals. Write one or two sentences."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 3: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"more expensive\" is correct for a long adjective.\nNow write one sentence about a person you know. Compare that person with another person.\n\nLEARNER'S LAST MESSAGE:\nMy brother is taller than my sister.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My brother is taller than my sister.\" is correct. You formed the comparative and used \"than\".\nNow compare two places or two animals. Write one or two sentences.",
+   "stateBefore": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My brother is taller than my sister.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"My brother is taller than my sister.\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "A lion is bigger than a cat.",
+    "errors": {
+     "W1": "A lion is biger than a cat."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "A lion is bigger than a cat.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "A lion is bigger than a cat.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

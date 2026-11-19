@@ -14,11 +14,11 @@
   "s": {
    "W1": 2,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -469,7 +469,106 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour order \"Can I have a juice, please?\" is right. It uses \"a\" because you can count one juice. Some does not fit every sentence. We use some with things we cannot count, like rice.\nRight: I'd like some rice, please. Wrong: I'd like a rice, please.\nNow try this on your own. You want soup. Write your order.\n\nLEARNER'S LAST MESSAGE:\nCan I have some soup, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, “Can I have some soup, please?” is polite and correct. Soup is not counted, so “some” fits.\nNow write one real sentence about a person you know. Use Can I have or I’d like."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour order \"Can I have a juice, please?\" is right. It uses \"a\" because you can count one juice. Some does not fit every sentence. We use some with things we cannot count, like rice.\nRight: I'd like some rice, please. Wrong: I'd like a rice, please.\nNow try this on your own. You want soup. Write your order.\n\nLEARNER'S LAST MESSAGE:\nCan I have some soup, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, “Can I have some soup, please?” is polite and correct. Soup is not counted, so “some” fits.\nNow write one real sentence about a person you know. Use Can I have or I’d like.",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, “Can I have some soup, please?” is polite and correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Can I have some soup, please?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Can I have some water, please?",
+    "errors": {
+     "W1": "Can I have any water, please?"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Can I have any water, please?",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "Can I have any water, please?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

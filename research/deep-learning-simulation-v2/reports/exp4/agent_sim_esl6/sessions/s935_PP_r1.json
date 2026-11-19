@@ -14,7 +14,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -375,7 +375,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, and you used has correctly! But the word order is not right. In English, the adjectives come before the noun: long black hair, not hair long black. Can you write the sentence again? Then add a second sentence about her personality.\n\nLEARNER'S LAST MESSAGE:\nShe has long black hair.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, 'She has long black hair.' is correct now! The adjectives come before the noun. Well done!\n\nNow write a second sentence about her personality. Hint: use 'She is' + an adjective like kind or funny."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, and you used has correctly! But the word order is not right. In English, the adjectives come before the noun: long black hair, not hair long black. Can you write the sentence again? Then add a second sentence about her personality.\n\nLEARNER'S LAST MESSAGE:\nShe has long black hair.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, 'She has long black hair.' is correct now! The adjectives come before the noun. Well done!\n\nNow write a second sentence about her personality. Hint: use 'She is' + an adjective like kind or funny.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 'She has long black hair.' is correct now!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The adjectives come before the noun."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "She is kind.",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "She is kind.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She is kind.",
+    "probes": []
+   }
   }
  ],
  "assess": {

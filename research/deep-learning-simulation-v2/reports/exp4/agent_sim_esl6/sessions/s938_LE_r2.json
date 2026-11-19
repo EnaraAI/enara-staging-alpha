@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -501,7 +501,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"He has hair short black.\" The start, \"He has\", is good.\nExample: \"my aunt is kind\" becomes \"My aunt is kind.\"\nRule: Use is before a word like kind, and start the sentence with a capital letter.\nRight: My brother is funny. Wrong: my brother funny.\nNow write one sentence about the actor's personality.\n\nLEARNER'S LAST MESSAGE:\nHe is very kind.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"He is very kind.\" is correct for personality.\nNow look at your first sentence: \"He has hair short black.\" Here is an example: She has long red hair. The describing words come before \"hair\".\nWrite your first sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"He has hair short black.\" The start, \"He has\", is good.\nExample: \"my aunt is kind\" becomes \"My aunt is kind.\"\nRule: Use is before a word like kind, and start the sentence with a capital letter.\nRight: My brother is funny. Wrong: my brother funny.\nNow write one sentence about the actor's personality.\n\nLEARNER'S LAST MESSAGE:\nHe is very kind.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"He is very kind.\" is correct for personality.\nNow look at your first sentence: \"He has hair short black.\" Here is an example: She has long red hair. The describing words come before \"hair\".\nWrite your first sentence again.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The describing words come before \"hair\"."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "He has short black hair.",
+    "errors": {
+     "W1": "He has hair short black."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "He has short black hair.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "He has short black hair.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

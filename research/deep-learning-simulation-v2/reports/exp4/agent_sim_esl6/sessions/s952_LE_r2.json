@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -503,7 +503,112 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 3: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour idea fits a pilot. But I am not sure which word you mean by \"airprt\".\nTell me in your own words what you were thinking when you wrote it.\n\nLEARNER'S LAST MESSAGE:\nI think: each job and workplace word is spelled with its vowels (doctor, teacher, hospital).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYou are right that these words keep their vowels, but \"airprt\" leaves them out. The word is \"airport\", because a pilot works where planes arrive and leave.\nRight: A baker works in a bakery.\nWrong: A baker works in a bkry.\nNow try alone. Complete: \"A doctor works in a ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 3: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour idea fits a pilot. But I am not sure which word you mean by \"airprt\".\nTell me in your own words what you were thinking when you wrote it.\n\nLEARNER'S LAST MESSAGE:\nI think: each job and workplace word is spelled with its vowels (doctor, teacher, hospital).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYou are right that these words keep their vowels, but \"airprt\" leaves them out. The word is \"airport\", because a pilot works where planes arrive and leave.\nRight: A baker works in a bakery.\nWrong: A baker works in a bkry.\nNow try alone. Complete: \"A doctor works in a ___.\"",
+   "stateBefore": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "You are right that these words keep their vowels, but 'airprt' leaves them out."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: A baker works in a bakery. Wrong: A baker works in a bkry."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is 'airport'"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "hospital",
+    "errors": {
+     "W1": "hospitl"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "hospitl",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "hospitl",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

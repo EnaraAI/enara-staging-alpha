@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -390,7 +390,106 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 3: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nVery good! Can I have a tea, please? is polite, and you added please. Now one more. You are in a cafe and you want some water. Ask for it politely.\n\nLEARNER'S LAST MESSAGE:\nCan I have some water, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nVery good! Can I have some water, please? is polite, and you added please. Now let's try another way. You are in a cafe and you want a coffee. Ask politely, but this time start with I would like."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 3: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nVery good! Can I have a tea, please? is polite, and you added please. Now one more. You are in a cafe and you want some water. Ask for it politely.\n\nLEARNER'S LAST MESSAGE:\nCan I have some water, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nVery good! Can I have some water, please? is polite, and you added please. Now let's try another way. You are in a cafe and you want a coffee. Ask politely, but this time start with I would like.",
+   "stateBefore": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Very good! Can I have some water, please? is polite"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Very good! Can I have some water, please?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I would like a coffee, please.",
+    "errors": {
+     "W1": "I want a coffee."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I want a coffee.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "I want a coffee.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

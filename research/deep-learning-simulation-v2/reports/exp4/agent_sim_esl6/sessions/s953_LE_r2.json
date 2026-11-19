@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -503,7 +503,111 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 3: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"airprt\". I can see the place you mean. Check how you wrote the whole word.\nTell me what you were thinking, then write the word again.\n\nLEARNER'S LAST MESSAGE:\nI think: each job and workplace word is spelled with its vowels (doctor, teacher, hospital).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYes, your idea is right: workplace words need their vowels. The answer is \"airport\". A pilot works at an airport, and the word has the vowels a, i and o.\nRight: A cook works in a kitchen. Wrong: A cook works in a ktchn.\nNow try one alone. Complete: \"A farmer works on a ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 3: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"airprt\". I can see the place you mean. Check how you wrote the whole word.\nTell me what you were thinking, then write the word again.\n\nLEARNER'S LAST MESSAGE:\nI think: each job and workplace word is spelled with its vowels (doctor, teacher, hospital).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYes, your idea is right: workplace words need their vowels. The answer is \"airport\". A pilot works at an airport, and the word has the vowels a, i and o.\nRight: A cook works in a kitchen. Wrong: A cook works in a ktchn.\nNow try one alone. Complete: \"A farmer works on a ___.\"",
+   "stateBefore": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "workplace words need their vowels"
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"airport\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: A cook works in a kitchen. Wrong: A cook works in a ktchn."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "farm",
+    "errors": {
+     "W1": "frm"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "farm",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "farm",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

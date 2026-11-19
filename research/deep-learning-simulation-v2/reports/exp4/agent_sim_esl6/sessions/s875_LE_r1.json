@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -548,7 +548,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 3: many + countable plural, much + uncountable. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a little\" is correct.\nLook: \"There is water in the jug.\" We cannot count water, so we say \"There is too much water.\"\nRule: use much with things you cannot count.\nRight: She has too much homework. Wrong: She has too much books.\nNow write one sentence about a person you know. Use much.\n\nLEARNER'S LAST MESSAGE:\nMy father drinks too much coffee.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My father drinks too much coffee.\" Yes, much with coffee is right.\nHere is one on a new topic.\nWrite much or many: We do not have ___ time."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 3: many + countable plural, much + uncountable. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a little\" is correct.\nLook: \"There is water in the jug.\" We cannot count water, so we say \"There is too much water.\"\nRule: use much with things you cannot count.\nRight: She has too much homework. Wrong: She has too much books.\nNow write one sentence about a person you know. Use much.\n\nLEARNER'S LAST MESSAGE:\nMy father drinks too much coffee.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My father drinks too much coffee.\" Yes, much with coffee is right.\nHere is one on a new topic.\nWrite much or many: We do not have ___ time.",
+   "stateBefore": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, much with coffee is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My father drinks too much coffee."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "much",
+    "errors": {
+     "W1": "many"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "much",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "much",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

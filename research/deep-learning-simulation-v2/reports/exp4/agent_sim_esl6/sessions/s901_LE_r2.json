@@ -533,7 +533,100 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 3: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Last weekend I visited my aunt.\" is correct. You used -ed for a finished action.\nNow write one sentence about a person you know. Say what that person did, and use a verb with -ed.\n\nLEARNER'S LAST MESSAGE:\nMy brother clean his room yesterday.\nFACT: the last learner message contained the error of W1 (leaves the verb in the present form with a past time word (\"Yesterday I play football.\")).\n\nTUTOR TURN TO JUDGE:\nThe -ed form is not right yet in \"My brother clean his room yesterday.\" Yesterday means the action is finished, so the verb needs -ed: \"cleaned\".\nTell me when you are ready for the next step."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 3: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Last weekend I visited my aunt.\" is correct. You used -ed for a finished action.\nNow write one sentence about a person you know. Say what that person did, and use a verb with -ed.\n\nLEARNER'S LAST MESSAGE:\nMy brother clean his room yesterday.\nFACT: the last learner message contained the error of W1 (leaves the verb in the present form with a past time word (\"Yesterday I play football.\")).\n\nTUTOR TURN TO JUDGE:\nThe -ed form is not right yet in \"My brother clean his room yesterday.\" Yesterday means the action is finished, so the verb needs -ed: \"cleaned\".\nTell me when you are ready for the next step.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Yesterday means the action is finished, so the verb needs -ed"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "The -ed form is not right yet in 'My brother clean his room yesterday.' ... 'cleaned'"
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "the verb needs -ed: 'cleaned'"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "none"
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "OK. Can I have an exercise, please?",
+   "production": {
+    "kind": "none",
+    "text": "OK. Can I have an exercise, please?"
+   }
   }
  ],
  "assess": {
