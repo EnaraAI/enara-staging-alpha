@@ -60,7 +60,7 @@ Judges' main reasons for "does not fit": too many steps for the band, rule sente
 | - | Guided practice (ENARA technique) | 22 | 0 | 0 | 0 | 22 | 45/0 |
 
 - The plan is now re-selected every turn: 22 switches worked example -> guided practice after no improvement (M1). Reason codes: {"PROCEDURAL_ERROR": 512, "STRATEGY_CHANGED": 22, "NO_IMPROVEMENT": 22, "NOVICE_EXPLICIT_VOCABULARY": 6}.
-- Misconceptions come from the pre-test (M2): 174 of 180 learners had 2+ pre-test errors, so the plan is still mostly Worked Examples; 6 vocabulary novices with no diagnosed error got Direct Instruction.
+- Misconceptions come from the pre-test (M2): 178 of 180 learners had at least one pre-test error (160 had two or more), so the plan is still mostly Worked Examples; the 2 learners with no pre-test error (both vocabulary outcomes) got Direct Instruction (6 turns).
 - Corrective-feedback ladder (M3, engine): {"elicitation": 62, "metalinguistic": 19} in LE main; kids {'elicitation': 65, 'metalinguistic': 34}. No answer release (needs a 3rd failed attempt; only 3 turns).
 - Interleaving (M5): the engine's interleave line fired on 80 LE turns; the plan layer never added it (the plan is chosen before the current answer is checked). Retrieval/spacing (M4) cannot fire in session 1 (unit-tested only).
 - Rule template: grammar 360 turns, vocabulary 180 turns (M6). Under-13 frame (M7): narrative 72 / game 18 supporting turns in the kids set; 90 child turns carried the frame line.
