@@ -16,7 +16,7 @@
   "s": {
    "W1": 1,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -465,7 +465,104 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote: \"I think the -ing verb alone is enough.\" Let us test that with the example sentence.\n\n\"A man is carrying a box.\"\n\nLook at the words before \"carrying\". My question was about the verb group, which has two parts. Which word, or words, sit with \"carrying\" in that group?\n\nTell me the two parts you find. Then try once more to write one sentence about something you can see or hear around you now.\n\nLEARNER'S LAST MESSAGE:\nis carrying\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes: \"is carrying\" is the verb group. It has two parts, a form of be and the verb with -ing. That answers my question.\n\nNow write one sentence of your own about a person you know. Say what that person is doing right now."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote: \"I think the -ing verb alone is enough.\" Let us test that with the example sentence.\n\n\"A man is carrying a box.\"\n\nLook at the words before \"carrying\". My question was about the verb group, which has two parts. Which word, or words, sit with \"carrying\" in that group?\n\nTell me the two parts you find. Then try once more to write one sentence about something you can see or hear around you now.\n\nLEARNER'S LAST MESSAGE:\nis carrying\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes: \"is carrying\" is the verb group. It has two parts, a form of be and the verb with -ing. That answers my question.\n\nNow write one sentence of your own about a person you know. Say what that person is doing right now.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes: \"is carrying\" is the verb group."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother is working now.",
+    "errors": {
+     "W1": "My brother working now.",
+     "W2": "My brother works now."
+    }
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother is working now.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother is working now.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

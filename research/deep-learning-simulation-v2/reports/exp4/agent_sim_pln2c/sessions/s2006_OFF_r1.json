@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -393,7 +393,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 1: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"This car is biger than that car.\" has a good structure: you used -er and \"than\" before the second car.\nOne part needs a second look: the spelling of the word before \"than\". Check the letters at the end of the adjective, just before -er. Do you hear and see everything that should be there?\nLook again and write the sentence once more.\n\nLEARNER'S LAST MESSAGE:\nThis car is biger than that car.\nFACT: the last learner message contained the error of W1 (spells the comparative by sound (\"biger\", \"hapier\", \"nicr\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence uses \"than\" correctly. The spelling needs one change: \"bigger\". A short word that ends in one vowel and one consonant usually doubles the last letter before -er.\n\nHere is a right and wrong pair on the same point:\nright: My coffee is hotter than yours.\nwrong: My coffee is hoter than yours.\n\nNow try a new one on your own:\n\"This box is ___ (thin) than that one.\"\nWrite only the missing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 1: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"This car is biger than that car.\" has a good structure: you used -er and \"than\" before the second car.\nOne part needs a second look: the spelling of the word before \"than\". Check the letters at the end of the adjective, just before -er. Do you hear and see everything that should be there?\nLook again and write the sentence once more.\n\nLEARNER'S LAST MESSAGE:\nThis car is biger than that car.\nFACT: the last learner message contained the error of W1 (spells the comparative by sound (\"biger\", \"hapier\", \"nicr\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence uses \"than\" correctly. The spelling needs one change: \"bigger\". A short word that ends in one vowel and one consonant usually doubles the last letter before -er.\n\nHere is a right and wrong pair on the same point:\nright: My coffee is hotter than yours.\nwrong: My coffee is hoter than yours.\n\nNow try a new one on your own:\n\"This box is ___ (thin) than that one.\"\nWrite only the missing word.",
+   "stateBefore": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The spelling needs one change: \"bigger\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A short word that ends in one vowel and one consonant usually doubles the last letter before -er."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "right: My coffee is hotter than yours. wrong: My coffee is hoter than yours."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "thinner",
+    "errors": {
+     "W1": "thiner"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "thinner",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "thinner",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

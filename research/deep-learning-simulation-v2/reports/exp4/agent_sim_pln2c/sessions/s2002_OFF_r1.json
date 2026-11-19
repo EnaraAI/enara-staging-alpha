@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 1,
    "C1": 1,
    "C2": 0
@@ -386,7 +386,116 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 1: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThanks for sharing your idea. Let us compare it with my worked example.\nLook at the result sentence: \"She is reading a magazine.\" Count the words that describe the action. Is \"reading\" the only one?\nLook again, then try the task: \"The men ___ ___ (carry) boxes.\"\nWrite the missing words.\n\nLEARNER'S LAST MESSAGE:\ncarrying\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before -ing (\"He watching TV now.\")).\n\nTUTOR TURN TO JUDGE:\nThe answer for \"The men ___ ___ (carry) boxes.\" is \"are carrying\". The present continuous needs am/is/are before the -ing verb, and \"the men\" takes \"are\".\n\nHere is a right and wrong pair on the same point:\nright: The girls are singing.\nwrong: The girls singing.\n\nNow try a new one on your own:\n\"Our neighbours ___ ___ (wash) the car.\"\nWrite the missing words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 1: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThanks for sharing your idea. Let us compare it with my worked example.\nLook at the result sentence: \"She is reading a magazine.\" Count the words that describe the action. Is \"reading\" the only one?\nLook again, then try the task: \"The men ___ ___ (carry) boxes.\"\nWrite the missing words.\n\nLEARNER'S LAST MESSAGE:\ncarrying\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before -ing (\"He watching TV now.\")).\n\nTUTOR TURN TO JUDGE:\nThe answer for \"The men ___ ___ (carry) boxes.\" is \"are carrying\". The present continuous needs am/is/are before the -ing verb, and \"the men\" takes \"are\".\n\nHere is a right and wrong pair on the same point:\nright: The girls are singing.\nwrong: The girls singing.\n\nNow try a new one on your own:\n\"Our neighbours ___ ___ (wash) the car.\"\nWrite the missing words.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer for \"The men ___ ___ (carry) boxes.\" is \"are carrying\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The present continuous needs am/is/are before the -ing verb"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "right: The girls are singing. wrong: The girls singing."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "are washing",
+    "errors": {
+     "W1": "washing",
+     "W2": "wash"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "are washing",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "are washing",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -443,7 +443,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote: \"I think a time word shows the past, so the verb need not change.\" Let us test that with my example.\n\n\"On Saturday I cleaned my flat.\"\n\n\"On Saturday\" is a time word, but look at the verb too. Compare \"cleaned\" with \"clean\" and check the end of the word. Is it the same in both?\n\nTell me what you see. Then write one sentence about something you did yesterday, and check the verb in it.\n\nLEARNER'S LAST MESSAGE:\nI think a time word shows the past, so the verb need not change.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe verb does need to change. In \"On Saturday I cleaned my flat\", the time word \"On Saturday\" helps, but the finished action is also shown by the verb ending: \"clean\" becomes \"cleaned\" with -ed.\n\nRight: Yesterday we cooked dinner.\nWrong: Yesterday we cook dinner.\n\nNow try a new one on your own. Write the correct past form of the verb:\n\"Last night I ___ (wash) the car.\"\n\nAnswer with only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote: \"I think a time word shows the past, so the verb need not change.\" Let us test that with my example.\n\n\"On Saturday I cleaned my flat.\"\n\n\"On Saturday\" is a time word, but look at the verb too. Compare \"cleaned\" with \"clean\" and check the end of the word. Is it the same in both?\n\nTell me what you see. Then write one sentence about something you did yesterday, and check the verb in it.\n\nLEARNER'S LAST MESSAGE:\nI think a time word shows the past, so the verb need not change.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe verb does need to change. In \"On Saturday I cleaned my flat\", the time word \"On Saturday\" helps, but the finished action is also shown by the verb ending: \"clean\" becomes \"cleaned\" with -ed.\n\nRight: Yesterday we cooked dinner.\nWrong: Yesterday we cook dinner.\n\nNow try a new one on your own. Write the correct past form of the verb:\n\"Last night I ___ (wash) the car.\"\n\nAnswer with only the verb.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The verb does need to change. ... the finished action is also shown by the verb ending: \"clean\" becomes \"cleaned\" with -ed."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Yesterday we cooked dinner. Wrong: Yesterday we cook dinner."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "washed",
+    "errors": {
+     "W1": "wash"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "washed",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "washed",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

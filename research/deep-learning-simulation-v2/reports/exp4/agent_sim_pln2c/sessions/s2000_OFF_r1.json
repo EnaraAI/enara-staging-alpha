@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -403,7 +403,115 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThanks for saying what you think. Let us test it against my worked example.\nLook at the verb in the brackets, \"fix\", and then at the verb in the result sentence: \"My colleague fixes the printer.\" Compare them letter by letter. Does the verb look the same in both places?\nLook again, then try the task: \"My manager ___ (start) work at eight.\"\nWrite only the verb with its ending.\n\nLEARNER'S LAST MESSAGE:\nstart\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe answer for \"My manager ___ (start) work at eight.\" is \"starts\". \"My manager\" means he or she, so the verb needs -s.\n\nHere is a right and wrong pair on the same point:\nright: Our neighbour waits for the bus.\nwrong: Our neighbour wait for the bus.\n\nNow try a new one on your own:\n\"Her brother ___ (open) the shop at nine.\"\nWrite only the verb with its ending."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThanks for saying what you think. Let us test it against my worked example.\nLook at the verb in the brackets, \"fix\", and then at the verb in the result sentence: \"My colleague fixes the printer.\" Compare them letter by letter. Does the verb look the same in both places?\nLook again, then try the task: \"My manager ___ (start) work at eight.\"\nWrite only the verb with its ending.\n\nLEARNER'S LAST MESSAGE:\nstart\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe answer for \"My manager ___ (start) work at eight.\" is \"starts\". \"My manager\" means he or she, so the verb needs -s.\n\nHere is a right and wrong pair on the same point:\nright: Our neighbour waits for the bus.\nwrong: Our neighbour wait for the bus.\n\nNow try a new one on your own:\n\"Her brother ___ (open) the shop at nine.\"\nWrite only the verb with its ending.",
+   "stateBefore": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer for \"My manager ___ (start) work at eight.\" is \"starts\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"My manager\" means he or she, so the verb needs -s."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "right: Our neighbour waits for the bus. wrong: Our neighbour wait for the bus."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "opens",
+    "errors": {
+     "W1": "open"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "opens",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "opens",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

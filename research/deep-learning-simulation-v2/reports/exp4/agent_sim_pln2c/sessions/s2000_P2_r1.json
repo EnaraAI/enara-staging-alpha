@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 1,
    "C1": 1,
    "C2": 0
@@ -457,7 +457,109 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote: \"I think the verb does not change after he/she/it.\" The check is in the two sentences I gave, so let us test it against them.\n\n\"I walk to work.\"\n\"My neighbour walks to work.\"\n\nLook at the end of the verb in each sentence, letter by letter. Is the verb exactly the same in both?\n\nTell me what you see, and then say again what you think happens to the verb after he, she or it.\n\nLEARNER'S LAST MESSAGE:\nI think the verb does not change after he/she/it.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe verb does change after he, she and it. In my example, \"walk\" becomes \"walks\": the verb takes an -s ending because the subject is one person.\n\nRight: My manager writes emails every morning.\nWrong: My manager write emails every morning.\n\nNow try a new one on your own. Write the correct form of the verb:\n\"Our driver ___ (open) the office door at eight.\"\n\nAnswer with only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote: \"I think the verb does not change after he/she/it.\" The check is in the two sentences I gave, so let us test it against them.\n\n\"I walk to work.\"\n\"My neighbour walks to work.\"\n\nLook at the end of the verb in each sentence, letter by letter. Is the verb exactly the same in both?\n\nTell me what you see, and then say again what you think happens to the verb after he, she or it.\n\nLEARNER'S LAST MESSAGE:\nI think the verb does not change after he/she/it.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe verb does change after he, she and it. In my example, \"walk\" becomes \"walks\": the verb takes an -s ending because the subject is one person.\n\nRight: My manager writes emails every morning.\nWrong: My manager write emails every morning.\n\nNow try a new one on your own. Write the correct form of the verb:\n\"Our driver ___ (open) the office door at eight.\"\n\nAnswer with only the verb.",
+   "stateBefore": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The verb does change after he, she and it ... the verb takes an -s ending because the subject is one person."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: My manager writes emails every morning. Wrong: My manager write emails every morning."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "opens",
+    "errors": {
+     "W1": "open"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "opens",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "opens",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
