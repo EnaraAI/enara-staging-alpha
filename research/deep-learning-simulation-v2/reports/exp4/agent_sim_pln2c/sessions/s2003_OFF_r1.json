@@ -15,7 +15,7 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 2,
+   "W2": 0,
    "C1": 3,
    "C2": 2
   },
@@ -1008,7 +1008,109 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 3.\nC2 (correct) strength 2: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nPart of \"Your sister watched the film last night?\" is right: \"watched\" has the -ed ending, and \"last night\" shows a finished action in the past.\n\nBefore I say more, I would like to understand your thinking. Why did you choose to start your question with \"Your sister\" and to use \"watched\" there? Please tell me in one or two short sentences.\n\nLEARNER'S LAST MESSAGE:\nI think: after did the main verb is in the base form.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour rule is right: after did, the main verb is in the base form. The part to change is the start of the question. The correct question is \"Did your sister watch the film last night?\" A question about the past begins with \"Did\", then the subject, then the base verb.\n\nright: Did your brother clean the car?\nwrong: Your brother cleaned the car?\n\nNow a new question to write on your own, without help. Ask a friend about a party. Use these words:\n\nMaria / enjoy / the party / on Saturday\n\nWrite the whole question."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 3.\nC2 (correct) strength 2: a past question is did + subject + base verb. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nPart of \"Your sister watched the film last night?\" is right: \"watched\" has the -ed ending, and \"last night\" shows a finished action in the past.\n\nBefore I say more, I would like to understand your thinking. Why did you choose to start your question with \"Your sister\" and to use \"watched\" there? Please tell me in one or two short sentences.\n\nLEARNER'S LAST MESSAGE:\nI think: after did the main verb is in the base form.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour rule is right: after did, the main verb is in the base form. The part to change is the start of the question. The correct question is \"Did your sister watch the film last night?\" A question about the past begins with \"Did\", then the subject, then the base verb.\n\nright: Did your brother clean the car?\nwrong: Your brother cleaned the car?\n\nNow a new question to write on your own, without help. Ask a friend about a party. Use these words:\n\nMaria / enjoy / the party / on Saturday\n\nWrite the whole question.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after did, the main verb is in the base form."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A question about the past begins with \"Did\", then the subject, then the base verb."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "right: Did your brother clean the car? wrong: Your brother cleaned the car?"
+    },
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The correct question is \"Did your sister watch the film last night?\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did Maria enjoy the party on Saturday?",
+    "errors": {
+     "W1": "Did Maria enjoyed the party on Saturday?",
+     "W2": "Maria enjoyed the party on Saturday?"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2",
+    "R2:W2",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1025,5 +1127,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 2
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 1
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

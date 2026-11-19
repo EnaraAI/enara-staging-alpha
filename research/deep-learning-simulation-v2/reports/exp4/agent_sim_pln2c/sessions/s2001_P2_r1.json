@@ -1118,7 +1118,87 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 3: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe -s on \"drinks\" in \"My uncle drinks never coffee after lunch.\" is right. The problem is the position of \"never\".\n\nLook at where you put \"never\" and at which word comes directly before it. Check that against the goal for today: a frequency word and the main verb have a fixed order.\n\nTry the sentence again and write the whole sentence.\n\nLEARNER'S LAST MESSAGE:\nMy uncle never drinks coffee after lunch.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My uncle never drinks coffee after lunch.\" is correct. \"never\" now comes before the main verb \"drinks\", and the -s ending is still there.\n\nThat answer came after some help, so here is a fresh one to do on your own. Rewrite this sentence and add the word \"always\" in the correct place:\n\n\"My aunt reads the news at breakfast.\"\n\nWrite the whole sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 3: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe -s on \"drinks\" in \"My uncle drinks never coffee after lunch.\" is right. The problem is the position of \"never\".\n\nLook at where you put \"never\" and at which word comes directly before it. Check that against the goal for today: a frequency word and the main verb have a fixed order.\n\nTry the sentence again and write the whole sentence.\n\nLEARNER'S LAST MESSAGE:\nMy uncle never drinks coffee after lunch.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My uncle never drinks coffee after lunch.\" is correct. \"never\" now comes before the main verb \"drinks\", and the -s ending is still there.\n\nThat answer came after some help, so here is a fresh one to do on your own. Rewrite this sentence and add the word \"always\" in the correct place:\n\n\"My aunt reads the news at breakfast.\"\n\nWrite the whole sentence.",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"My uncle never drinks coffee after lunch.\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My aunt always reads the news at breakfast.",
+    "errors": {
+     "W1": "My aunt reads always the news at breakfast."
+    }
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1135,5 +1215,34 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "freq",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

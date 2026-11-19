@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 3,
+   "C1": 4,
    "C2": 0
   },
   "start": {
@@ -1026,7 +1026,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 3: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"took\" is correct for \"Two days ago my sister ___ a taxi to the airport.\" It is an irregular verb, so it has no -ed.\n\nNow a new task. Write only the verb.\n\nWrite the past form of 'tell': Last night he ___ me a story.\n\nLEARNER'S LAST MESSAGE:\ntold\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"told\" is correct for \"Last night he ___ me a story.\" It is an irregular verb, so it has no -ed.\n\nNow a freer task. Write two sentences about what you did yesterday. Use a different irregular past verb in each sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 3: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"took\" is correct for \"Two days ago my sister ___ a taxi to the airport.\" It is an irregular verb, so it has no -ed.\n\nNow a new task. Write only the verb.\n\nWrite the past form of 'tell': Last night he ___ me a story.\n\nLEARNER'S LAST MESSAGE:\ntold\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"told\" is correct for \"Last night he ___ me a story.\" It is an irregular verb, so it has no -ed.\n\nNow a freer task. Write two sentences about what you did yesterday. Use a different irregular past verb in each sentence.",
+   "stateBefore": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"told\" is correct for \"Last night he ___ me a story.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"told\" is correct for \"Last night he ___ me a story.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "It is an irregular verb, so it has no -ed."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Yesterday I went to the park.",
+    "errors": {
+     "W1": "Yesterday I goed to the park."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1043,5 +1135,34 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "pastirr",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 4,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }
