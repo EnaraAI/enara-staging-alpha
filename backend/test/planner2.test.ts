@@ -264,7 +264,7 @@ describe('stages', () => {
     expect(currentStage('TASK', { tries: 0, right: 0 })).toBe('pretask');
     expect(currentStage('TASK', { tries: 0, right: 0, opened: true })).toBe('task');
     expect(currentStage('TASK', { tries: 1, right: 0, opened: true, taskDone: true })).toBe('focus');
-    expect(currentStage('TASK', { tries: 2, right: 1, opened: true, taskDone: true, rightAfterTest: 1 })).toBe('repeat');
+    expect(currentStage('TASK', { tries: 2, right: 1, opened: true, taskDone: true, rightAfterTask: 1 })).toBe('repeat');
     expect(currentStage('LAD', { tries: 0, right: 0 })).toBe('listen');
     expect(currentStage('LAD', { tries: 1, right: 1 })).toBe('do');
     expect(currentStage('LAD', { tries: 2, right: 2 })).toBe('chant');
@@ -417,5 +417,44 @@ describe('Arabic-transfer errors (l1_transfer)', () => {
     const lp = withEnv(ESL, () => planLesson(base({ masteryStatus: 'emerging', belowB1: true, misconceptions: [{ id: 'l1', category: 'l1_transfer', status: 'suspected' }] }), adult()));
     expect([lp.plan.primary, lp.methodRule]).toEqual(['analogy', 'P1_L1_CONTRAST']);
     expect(shapeLines(lp).join('\n')).toMatch(/Contrast the English form with how Arabic says it/);
+  });
+});
+
+describe('fixes from the harness build', () => {
+  const g = (verdict?: string) => ({ role: 'assistant', languageTurn: verdict ? { assessment: { verdict } } : {} });
+  const u = { role: 'user' };
+  it('children and other no-check lessons are not reset at the 4th graded answer', () => {
+    const h = [u, g('CORRECT'), u, g('CORRECT'), u, g('CORRECT'), u, g('INCORRECT')];
+    const p = progressFromHistory(h);
+    const kid = planLesson(base({ masteryStatus: 'emerging' }), { ageBand: 'child', ageYears: 10, level: 'A1' });
+    expect(kid.quickCheckUsed).toBe(false);
+    expect(stageNow(kid, p)).toBe('produce');
+    const lad = planLesson(base({ masteryStatus: 'emerging' }), { ageBand: 'child', ageYears: 7, level: 'A1' });
+    expect(stageNow(lad, p)).toBe('chant');
+  });
+  it('TASK moves on: pre-task, task (2 role-play answers), focus, then repeat after a right fix', () => {
+    const s = adult({ level: 'B1', goal: 'work' });
+    const lp = planLesson(base({ masteryStatus: 'developing' }), s);
+    expect(stageNow(lp, progressFromHistory([]))).toBe('pretask');
+    expect(stageNow(lp, progressFromHistory([u, g()]))).toBe('task');
+    expect(stageNow(lp, progressFromHistory([u, g(), u, g(), u, g()]))).toBe('task');
+    expect(stageNow(lp, progressFromHistory([u, g(), u, g(), u, g(), u, g('INCORRECT')]))).toBe('focus');
+    expect(stageNow(lp, progressFromHistory([u, g(), u, g(), u, g(), u, g('INCORRECT'), u, g('CORRECT')]))).toBe('repeat');
+  });
+  it('the quick check closes after 4 learner answers even if fewer than 3 could be graded', () => {
+    const p = progressFromHistory([u, g('CORRECT'), u, g(), u, g(), u, g()]);
+    expect(p.quickCheck).toEqual({ right: 1, of: 1 });
+    const lp = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p, false) });
+    expect([lp.shape, lp.shapeRule, stageNow(lp, p)]).toEqual(['TTT', 'S4', 'teach']);
+    const p0 = progressFromHistory([u, g(), u, g(), u, g(), u, g()]);
+    const lp0 = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p0, false) });
+    expect([lp0.shape, lp0.shapeRule]).toEqual(['PPP', 'S5']);
+  });
+  it('during the quick check the method instructions are replaced and the no-teaching line overrides the rest', async () => {
+    const m = await import('../src/services/lessonPlanner');
+    const lp = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), quickCheckPending: true });
+    expect(m.quickCheckActive(lp)).toBe(true);
+    expect(m.QUICK_CHECK_PLAN_LINE).toMatch(/none during the opening quick check/);
+    expect(QUICK_CHECK_LINE).toMatch(/overrides any instruction above/);
   });
 });

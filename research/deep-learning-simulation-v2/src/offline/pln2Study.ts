@@ -31,7 +31,7 @@ import { engineV2 } from '../../../../backend/src/services/engineV2';
 import { strandOfMoves } from '../../../../backend/src/services/strandLog';
 import { selectTeachingPlan, belowB1, type PlanInput, type TeachingPlan } from '../../../../backend/src/services/pedagogyPolicy';
 import { planLines, STATUS_WORDS } from '../../../../backend/src/services/learningContext';
-import { planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow, levelRank, type LessonPlan, type PlannerSignals, type StageProgress, type Goal } from '../../../../backend/src/services/lessonPlanner';
+import { QUICK_CHECK_PLAN_LINE, quickCheckActive, planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow, levelRank, type LessonPlan, type PlannerSignals, type StageProgress, type Goal } from '../../../../backend/src/services/lessonPlanner';
 import { applyTurn, summarizeProfile, applyLiveErrors, applyKnownPoints, liveErrorTypes, type Esl5Record } from '../../../../backend/src/services/learnerLanguageProfile';
 import { gradeAnswers } from '../../../../backend/src/services/grading';
 import { graderV2On } from '../../../../backend/src/services/graderV2';
@@ -248,7 +248,7 @@ function planOf(s: Sess): PlanOut {
   const op = reviewOpener(signals, input);
   const lesson = planLesson(input, { ...signals, ...quickCheckSignals(signals, progress, op) });
   const stage = stageNow(lesson, progress);
-  return { plan: lesson.plan, text: wrap([...head, ...planLines(lesson.plan, undefined, l.status), ...shapeLines(lesson, stage), ...tail]), lesson, stage, quickCheck: lesson.shapeRule === 'S4q', progress, l1: l1.length, l1Added };
+  return { plan: lesson.plan, text: wrap([...head, ...(quickCheckActive(lesson) ? [QUICK_CHECK_PLAN_LINE] : planLines(lesson.plan, undefined, l.status)), ...shapeLines(lesson, stage), ...tail]), lesson, stage, quickCheck: lesson.shapeRule === 'S4q', progress, l1: l1.length, l1Added };
 }
 const nowOf = (s: Sess) => new Date(T0 + s.turns.length * 60_000);
 const esl5Record = (r: Rec): Esl5Record => ({ live: liveErrorTypes({ entries: r.entries, liveErrors: r.liveErrors }), knownPoints: { ...r.knownPoints } });

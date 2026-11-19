@@ -2087,7 +2087,7 @@ export function languageStateScope(p: { institutionId?: string; studentId?: stri
 
 /** planner2 quick check: moves that teach or correct, removed during the 3 test items. */
 export const QUICK_CHECK_DROPPED = new Set<MoveId>(['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'l1_support', 'activate_prior_knowledge']);
-export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this lesson opens with three short exercises, one at a time, to see what the learner already knows. Do not teach, explain, hint, correct or give any answer during them. After each answer say only a short neutral thanks (for example "Thanks, noted.") and give the next exercise. After the third, say the lesson starts now.';
+export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this lesson opens with three short exercises, one at a time, to see what the learner already knows. Do not teach, explain, hint, correct or give any answer during them. After each answer say only a short neutral thanks (for example "Thanks, noted.") and give the next exercise. After the third, say the lesson starts now. This overrides any instruction above to confirm, correct, explain or model an answer.';
 
 export async function buildLanguageTeachingContext(params: {
   institutionId?: string;

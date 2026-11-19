@@ -38,11 +38,11 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | File | SHA-256 |
 |---|---|
 | `backend/src/services/engineV2.ts` | `2f2a68665796c1322ccbc56f9893c936505830037422a50172785b91a018e9a7` |
-| `backend/src/services/lessonPlanner.ts` | `332cf79cd683d4b337fbfce55bd30568f9ded0337da9a3c4c9702cb265043fa5` |
+| `backend/src/services/lessonPlanner.ts` | `70398801a067399709636eb3b8110f8baa50013f10297719fe5966bcd453af90` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
-| `backend/src/services/learningContext.ts` | `eeeb0e5c51e1c266e0d2d65093d1a6cb5d171e6d3e81075b32564787a65b0260` |
+| `backend/src/services/learningContext.ts` | `e04770f8982c8e77a54e7f66fa3cc92090df6554460acd6cbc9053767a55ec83` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
-| `backend/src/services/languageTeachingContext.ts` | `d6fc0326de448bba8533eda2515071d4fe9718f86d73b34ebbe507b9c0a7dbd5` |
+| `backend/src/services/languageTeachingContext.ts` | `a137619242368092113f07ec1c17137dc2c5beaa6e7e892de05d48a13ed2fe5e` |
 | `backend/src/services/languageTurnPipeline.ts` | `2673ec40c37eec5a66ee364b5d0d65054d809bd2f38ff13f48b6843f93dfd9b1` |
 | `backend/src/services/languageLearningState.ts` | `d6ad94373485734fe2cd8b52a849a4af1c7b0055c3566d4bb72425b4837a2927` |
 | `backend/src/services/learnerLanguageProfile.ts` | `78e783f1d129339aa84e45fc6d49a3a2090ff09fe4f103793fb21ad936f56ec4` |
@@ -65,7 +65,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `c660d0d5ed6ef473401813a873ef7a1bfc88504a8d4438062db6e87838b45f19` |
+| `src/offline/pln2Study.ts` (this runner) | `2893297ae34e7d3d8e5d37b355e590be273a170905772f3c562e81e5f6d5b38c` |
 | `src/offline/pln2_analyze.py` (this analysis) | `a12f50f7e993b1af899c115a464efe8c59778268112f6f3b5c569abd4d8b739b` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
@@ -142,3 +142,11 @@ Per group and overall: delayed primary score P2 − OFF with a paired 95% percen
 ## 11. Run plan
 
 `RUNBOOK.md` (exact commands and the number of agent task files per step). **Dry run** (scripted replies, judges, fit judges and scorers; no agents) of the whole pipeline, 2026-11-19: 96 sessions, 6 cells × 5 rounds, 2 judge batches per round, 0 rejected events, grader null 0, agreement sample 44 cases, fit 96 cases in 8 batches + 12 agreement cases, recheck 242 distinct pairs (7 batches per scorer), analysis complete with every table. Dry output is never committed (`reports/exp4/agent_sim_pln2_dry/` is git-ignored).
+
+## Changes before the first real run (19 Nov 2026, no agent run yet)
+The harness build found 4 planner bugs; fixed in `lessonPlanner.ts` (tests in `planner2.test.ts`) and re-verified with the full dry run:
+1. PPP/LAD lessons without a quick check (children, unknown age, review openers) were reset to the first stage at the 4th graded answer. Now only a lesson that really opened with the check discounts the test answers (`quickCheckUsed`).
+2. TASK lessons never left the "task" stage. Now: pre-task, task (the opening message plus 2 role-play answers), language focus, then repeat after a right fix.
+3. During the quick check the main method's instructions were still in the prompt next to the no-teaching line. Now they are replaced (`QUICK_CHECK_PLAN_LINE`), and the quick-check line says it overrides any instruction to confirm, correct, explain or model.
+4. The quick check had no cap. It now closes after 4 learner answers with whatever was graded (0 graded: PPP); a TTT lesson then goes to "teach", not back to "test".
+Hashes in §3 refreshed after these changes.

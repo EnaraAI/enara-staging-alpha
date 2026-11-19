@@ -8,7 +8,7 @@ import { PedagogicalDecision } from '../models/PedagogicalDecision';
 import { Student } from '../models/Student';
 import { Institution } from '../models/Institution';
 import { ageFromBirthDate, loadTrustedAgeBand } from './languageTeachingContext';
-import { planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow, type LessonPlan, type PlannerSignals, type StageProgress } from './lessonPlanner';
+import { QUICK_CHECK_PLAN_LINE, quickCheckActive, planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow, type LessonPlan, type PlannerSignals, type StageProgress } from './lessonPlanner';
 import { L1_TRANSFER_CODES } from './languageLearningState';
 import { recordL1Transfer } from './misconceptionRules';
 import { StudentMisconception } from '../models/StudentMisconception';
@@ -272,7 +272,7 @@ export async function buildObjectiveContext(params: {
         : '- No assessed answers on it yet.',
       ...weak.map((w) => `- Prerequisite not secure yet: ${w.code} "${w.title}".`),
       ...misconceptions.map((m) => `- Possible misconception (${m.status === 'confirmed' ? 'confirmed by a teacher' : 'not confirmed'}): ${m.description}`),
-      ...planLines(plan, target && target.id !== objective.id ? `${target.code} "${target.title}"` : undefined, status, params.compact),
+      ...(quickCheckActive(lesson) ? [QUICK_CHECK_PLAN_LINE] : planLines(plan, target && target.id !== objective.id ? `${target.code} "${target.title}"` : undefined, status, params.compact)),
       ...(lesson ? shapeLines(lesson, progress ? stageNow(lesson, progress) : undefined) : []),
       '- Assessment integrity: never give the answers to the student\'s assessment or quick-check questions. If they paste one, teach the method with a different example.',
       plan.requiresReassessment
