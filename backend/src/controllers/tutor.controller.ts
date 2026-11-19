@@ -5,7 +5,7 @@ import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSo
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
 import { type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
 import { engineV2 } from '../services/engineV2';
-import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
 import {
   curriculumFromCourse,
@@ -180,6 +180,9 @@ interface TutorTurn {
   turnLockReleased?: boolean;
   // Builds the direct-model request (retrieval, objective focus, learner snapshot).
   directParams?: () => Promise<TutorRequestParams>;
+  // TRACK 2 (exampleGuard): hits on the model's first draft, and whether one regeneration was made.
+  guardHits?: number;
+  guardRegenerated?: boolean;
 }
 
 async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
@@ -308,6 +311,9 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     hintsOnly: tutorPolicy.policy === 'hints_only',
     masteryStatus: turn.plan?.masteryStatus,
     planPrimary: turn.plan?.teaching.primary,
+    // TRACK 2: the plan's objective (rule-bank entry, guard pool of its assessment items).
+    objectiveId: turn.plan?.teaching.objectiveId,
+    objectiveCode: turn.plan?.objectiveCode,
   }, 'chat'))?.context ?? null;
   if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language) {
     turn.orchestrator = {
@@ -382,9 +388,11 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
   turn.reservation = undefined;
   // Fix 1: before the learner's first attempt, example lines that show the tested
   // form are removed (stored and sent text alike; the stream gets a replace event).
-  let preAttemptRemoved = 0; let closingAsk: ClosingAskStatus | undefined;
+  let preAttemptRemoved = 0; let closingAsk: ClosingAskStatus | undefined; let postCheck: string[] | undefined;
   if (turn.language && reply) {
     const g = applyReplyGuards(turn.language, aiResult.answer, turn.text);
+    postCheck = g.postCheck;
+    if (turn.guardHits === undefined && g.guardHits) turn.guardHits = g.guardHits; // stream path: no regeneration, the sentences were removed
     // g.text also changes when the engine adds the closing ask (closing / shortRecap) without removing anything.
     if (g.removed || g.text !== aiResult.answer) { aiResult = { ...aiResult, answer: g.text }; preAttemptRemoved = g.removed; }
     closingAsk = g.closingAsk;
@@ -392,7 +400,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
   const citations = citationsIn(aiResult.answer, turn.sources);
   const assistantId = generateMessageId();
   const languageTurn = turn.language && reply
-    ? await completeLanguageTurn({ language: turn.language, objectiveId: turn.plan?.teaching.objectiveId, reply: aiResult.answer, learnerText: turn.text, messageId: assistantId, marker: turn.languageMarker, removed: preAttemptRemoved, closingAsk, institutionId: turn.session.institutionId as string, studentId: turn.studentId })
+    ? await completeLanguageTurn({ language: turn.language, objectiveId: turn.plan?.teaching.objectiveId, reply: aiResult.answer, learnerText: turn.text, messageId: assistantId, marker: turn.languageMarker, removed: preAttemptRemoved, closingAsk, institutionId: turn.session.institutionId as string, studentId: turn.studentId, guardHits: turn.guardHits, regenerated: turn.guardRegenerated, postCheck })
     : undefined;
   const assistantMessage = {
     id: assistantId,
@@ -442,12 +450,26 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
   if (turn.orchestrator) reply = await queryOrchestratorChat(turn.orchestrator);
   // Orchestrator down or unconfigured: answer with the direct model instead.
   if (!reply && turn.directParams) {
-    reply = await queryDirectTutorModel(await turn.directParams());
+    const params = await turn.directParams();
+    reply = await queryDirectTutorModel(params);
     // r4: the hidden assessment line is read and removed before anything is stored or sent.
     if (reply && turn.language) {
       const stripped = stripAssessmentMarkers(reply.answer);
       turn.languageMarker = stripped;
       reply = stripped.text ? { ...reply, answer: stripped.text } : null;
+    }
+    // TRACK 2 (exampleGuard): a draft whose example answers an item the learner will solve gets ONE regeneration with the reason; if the new draft
+    // still hits (or the call fails), the first draft is kept and the reply guards remove the flagged sentences.
+    if (reply && turn.language) {
+      const hits = exampleGuardCheck(turn.language, reply.answer, turn.text);
+      if (hits.length) {
+        turn.guardHits = hits.length; turn.guardRegenerated = true;
+        const again = await queryDirectTutorModel({ ...params, pedagogy: [params.pedagogy, exampleGuardRegenNote(hits)].filter(Boolean).join('\n\n') });
+        if (again) {
+          const stripped2 = stripAssessmentMarkers(again.answer);
+          if (stripped2.text && !exampleGuardCheck(turn.language, stripped2.text, turn.text).length) { turn.languageMarker = stripped2; reply = { ...again, answer: stripped2.text }; }
+        }
+      }
     }
   }
   const { aiResult, assistantMessage } = await finishTutorTurn(turn, reply);

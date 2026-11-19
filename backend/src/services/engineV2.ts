@@ -21,15 +21,31 @@
 //  ownSentence   - ESL5 (framework §5 focus on form in their own sentences, §6 pushed output): from the learner's 3rd message of the session on (second half of the 5-message session the closing assumes), at most one "write one sentence about ... using ..." task per session, with feedback on the target form only; named-only, NOT part of "all"
 //  esl5          - bundle: turns on liveError, releaseAfterTwo, reviewOpen, fadeKnown and ownSentence together; itself NOT part of "all"
 //  graderV2    - SIMULATION ONLY / DRAFT: the five answer-key fixes (services/graderV2.ts): normalised matching, several accepted answers, option letter = text, target-form scorer 0/1/2, meaning-check guard; affects lessons, assignments, assessments, diagnostics and placement; named-only, NOT part of "all"
+//  ruleBank     - TRACK 2 (teaching quality): the rule line, its right/wrong pair and the worked example come from the checked rule bank (services/ruleBank.ts, one entry per
+//                 outcome), the criterion is chosen to match the outcome (never "criterion 1"), vocabulary outcomes get the vocabulary template (meaning from a clue,
+//                 spelling, use in a frame), and a post-check flags a right/wrong pair that does not differ; named-only, NOT part of "all"
+//  exampleGuard - TRACK 2: no modelled sentence may complete any item the learner will solve (unsolved lesson items + the objective's assessment items, kept
+//                 server-side) or score as a correct answer to an open item; a hit gets one regeneration with the reason (chat JSON path), otherwise the
+//                 sentence is removed; the worked example uses the contrasting answer / a different scene; named-only, NOT part of "all"
+//  feedbackLadder - TRACK 2 (M3): corrective feedback is a named, logged ladder: elicitation, then a metalinguistic clue, and a recast/explicit correction only
+//                 after two failed prompts (the answer release moves from the 2nd to the 3rd genuine failed attempt); named-only, NOT part of "all"
+//  methodSelect - TRACK 2 (M2, M4, M5, M7): plan selection: an A1-A2 novice with no diagnosed error gets direct instruction; a later-session opening on live
+//                 errors is retrieval + spacing (agrees with reviewOpen); a form right twice in a session adds interleaving with its confusable form; under 13
+//                 a narrative or game frame is added as support (never replacing focus on form); named-only, NOT part of "all"
+//  kidsBand     - TRACK 2 (§5): when no age band is set, a staff-entered birth date (under 13 child, 13-17 teen, 18+ adult) or the Enara Kids interface sets the
+//                 tutor's band; band rules for sentence length, instructions per message, tone (praise effort or strategy, never ability); named-only, NOT part of "all"
+//  teach2       - bundle: ruleBank, exampleGuard, feedbackLadder, methodSelect and kidsBand; itself NOT part of "all"
 //  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
-export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2';
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2' | 'ruleBank' | 'exampleGuard' | 'feedbackLadder' | 'methodSelect' | 'kidsBand';
 const ESL5: EngineV2Feature[] = ['liveError', 'releaseAfterTwo', 'reviewOpen', 'fadeKnown', 'ownSentence'];
+export const TEACH2: EngineV2Feature[] = ['ruleBank', 'exampleGuard', 'feedbackLadder', 'methodSelect', 'kidsBand'];
 export const engineV2 = (feature: EngineV2Feature): boolean => {
   if (feature === 'socraticOff' && process.env.NODE_ENV === 'production') return false; // research-only
   const v = (process.env.ENARA_ENGINE_V2 ?? '').split(',').map((x) => x.trim());
   if (feature === 'arbitration' && v.includes('levelExplicit')) return true; // levelExplicit always runs with arbitration
   if (v.includes('esl5') && ESL5.includes(feature)) return true; // the esl5 bundle (never turned on by "all")
-  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', ...ESL5].includes(feature));
+  if (v.includes('teach2') && TEACH2.includes(feature)) return true; // the track-2 bundle (never turned on by "all")
+  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', ...ESL5, ...TEACH2].includes(feature));
 };
 
 /** True when `arbitration` is on only because `levelExplicit` forced it (recorded in the turn evidence). */

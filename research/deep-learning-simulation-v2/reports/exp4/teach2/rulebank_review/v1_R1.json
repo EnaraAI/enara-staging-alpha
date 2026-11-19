@@ -1,0 +1,107 @@
+{
+  "reviewer": "R1",
+  "version": "v1",
+  "entries": {
+    "EN-F-A1-GR-article-a-an": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A1-GR-article-the": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A1-GR-copula-be": {
+      "ok": false,
+      "problems": ["rule falsely says every sentence needs am/is/are (sentences with an action verb do not)"],
+      "fix": {"rule": "A sentence with no action word needs am, is or are: I am, he/she/it is, you/we/they are."}
+    },
+    "EN-F-A1-GR-possessive-adjectives": {
+      "ok": false,
+      "problems": ["his = a man / her = a woman leaves out boys and girls (child learners, e.g. Lina, Omar)"],
+      "fix": {"rule": "Pick by the owner: his (boy, man), her (girl, woman), their (more than one), plus my, your, our."}
+    },
+    "EN-F-A1-GR-prepositions-time": {
+      "ok": false,
+      "problems": ["interleaving item ambiguous: 'The cat is on the box' is also correct"],
+      "fix": {"interleaving_item": "Write in or on: The cat is ___ the box. It is hiding inside. -> answer: in"}
+    },
+    "EN-F-A1-GR-there-is-are": {
+      "ok": false,
+      "problems": ["'the noun after a number takes -s' is false for one (one duck)"],
+      "fix": {"rule": "Say there is for one thing and there are for two or more; then the noun takes -s."}
+    },
+    "EN-F-A1-GR-can-ability": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A1-GR-word-order-svo": {
+      "ok": false,
+      "problems": ["rule does not cover place or time at the end, which the outcome requires ('then the rest' is vague)"],
+      "fix": {"rule": "Put who first, then the action, then what, then place or time; describing words go before nouns."}
+    },
+    "EN-F-A1-GR-capitals-full-stops": {
+      "ok": false,
+      "problems": ["usual error (one long line joined with and) is not what the wrong sentence shows"],
+      "fix": {"usual_error": "no capital at the start, a small i for I, or no full stop at the end"}
+    },
+    "EN-F-A2-GR-third-person-s": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-GR-present-continuous": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-GR-past-simple-regular": {
+      "ok": false,
+      "problems": ["rule says 'add -ed' for every past action (not true for irregular verbs) and does not match the -d / -ied examples"],
+      "fix": {"rule": "For a finished past action, most verbs add -ed (walked, moved, carried), even with yesterday."}
+    },
+    "EN-F-A2-GR-past-simple-irregular": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-GR-past-questions-did": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-GR-frequency-adverbs": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-GR-comparatives": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-GR-going-to": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-GR-much-many": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-GR-some-any": {
+      "ok": false,
+      "problems": ["interleaving answer 'an' is not one of the offered choices (a or some)"],
+      "fix": {"interleaving_item": "Write a, an or some: The horse wants ___ apple. -> answer: an"}
+    },
+    "EN-F-A2-GR-conjunctions": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-FN-polite-requests": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A1-VO-family": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A1-VO-food-drink": {
+      "ok": false,
+      "problems": ["'liquids' is above level", "usual error 'spoon food' unclear", "word set repeats banana/bananas"],
+      "fix": {
+        "rule": "We eat food, and we eat soup too; we drink water, juice and milk.",
+        "usual_error": "drink soup instead of eat soup",
+        "word_set": "bread, rice, apple, milk, egg, fish, soup, water, juice, tea, cheese, chicken, banana, eat, drink"
+      }
+    },
+    "EN-F-A1-VO-classroom-objects": {
+      "ok": false,
+      "problems": ["rule mentions v/f but no word in the set has v; 'bag' is a confusing example of p", "'rubber' has an adult meaning in US English"],
+      "fix": {
+        "rule": "Classroom things have short English names; write p, not b: pen, pencil, paper.",
+        "usual_error": "b for p (ben, bencil), or an Arabic phrase word for word",
+        "worked_examples": "[eraser] The robot has an eraser. | [scissors] The robot cuts paper with scissors.",
+        "word_set": "desk, chair, pen, pencil, book, board, bag, ruler, eraser, marker, notebook, scissors"
+      }
+    },
+    "EN-F-A1-VO-home-rooms": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A1-VO-numbers-time": {
+      "ok": false,
+      "problems": ["usual error says v for f but the wrong form shows f for v (sefen)"],
+      "fix": {"usual_error": "f and v mixed up in a number (fivteen, sefen), or clock for hour"}
+    },
+    "EN-F-A1-VO-days-months": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A1-VO-common-adjectives": {
+      "ok": false,
+      "problems": ["wrong sentence 'little big' is not the named usual error (wrong partner of a pair)"],
+      "fix": {"right": "A giraffe is tall.", "wrong": "A giraffe is long."}
+    },
+    "EN-F-A2-VO-jobs-workplaces": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-VO-weather": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-VO-clothes-shopping": {"ok": true, "problems": [], "fix": {}},
+    "EN-F-A2-VO-appearance": {
+      "ok": false,
+      "problems": ["word set has kind, funny, friendly (personality, not hair/eyes/height)", "clue 'not fat' is body-shaming risk for children"],
+      "fix": {
+        "word_set": "hair, eyes, nose, big, tall, short, long, curly, straight, thin, black, brown, blonde, blue, green, grey",
+        "clue": "\"hair that is not curly\" -> straight"
+      }
+    },
+    "EN-F-A2-VO-make-do": {
+      "ok": false,
+      "problems": ["rule (make = new things) does not explain the real confusion 'make a mistake'"],
+      "fix": {"rule": "We make new things (a cake, a plan) and a mistake; we do jobs and tasks (homework, the dishes)."}
+    }
+  }
+}

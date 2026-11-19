@@ -1,0 +1,400 @@
+{
+ "set": "main",
+ "arm": "PP",
+ "learnerIdx": 1524,
+ "outcome": "EN-F-A2-GR-past-questions-did",
+ "seed": "teach2b|L1524",
+ "state": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "start": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "rec": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
+ },
+ "pre": {
+  "form": "B",
+  "wrong": 7,
+  "points": 5,
+  "max": 12
+ },
+ "turns": [
+  {
+   "learner": "Hello! Can you give me an exercise on past questions with did?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "tutor": "Hi! Sure.\n\nIn past questions, **did** shows the past, so the main verb stays in the base form.\nExample: What did you do last weekend?\n\nExercise: Correct this question:\n\"Did she watched the match?\"",
+   "guardHitsRaw": 1,
+   "guardRaw": [
+    {
+     "item": "EN-F-A2-GR-past-questions-did-A-7",
+     "source": "assessment",
+     "why": "scores_open_item",
+     "sentence": "What did you do last weekend?"
+    }
+   ],
+   "shownEarlyRaw": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on past questions with did?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi! Sure.\n\nIn past questions, **did** shows the past, so the main verb stays in the base form.\nExample: What did you do last weekend?\n\nExercise: Correct this question:\n\"Did she watched the match?\"",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In past questions, did shows the past, so the main verb stays in the base form."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Did she watch the match?",
+    "errors": {
+     "W1": "Did she watched the match?"
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "learner": "Did she watch the match?",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "Did she watch the match?"
+   },
+   "tutor": "Correct! ✅ **Did she watch the match?** 'Did' already shows the past, so the verb stays in the base form: watch, not watched.\n\nNext one. Make a question with did:\n\"you / feed / the cat / this morning\"",
+   "guardHitsRaw": 0,
+   "guardRaw": [],
+   "shownEarlyRaw": 1,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Sure.\n\nIn past questions, **did** shows the past, so the main verb stays in the base form.\nExample: What did you do last weekend?\n\nExercise: Correct this question:\n\"Did she watched the match?\"\n\nLEARNER'S LAST MESSAGE:\nDid she watch the match?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! ✅ **Did she watch the match?** 'Did' already shows the past, so the verb stays in the base form: watch, not watched.\n\nNext one. Make a question with did:\n\"you / feed / the cat / this morning\"",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! ✅ **Did she watch the match?**"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! ✅ **Did she watch the match?**"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "'Did' already shows the past, so the verb stays in the base form"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "watch, not watched."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you feed the cat this morning?",
+    "errors": {
+     "W1": "Did you fed the cat this morning?",
+     "W2": "You fed the cat this morning?"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "learner": "You fed the cat this morning?",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "You fed the cat this morning?"
+   },
+   "tutor": "Good — 'fed' is the right past form of feed, and the words are right. But the exercise asks for a question with **did**. Remember: **Did + subject + base verb?** When we use did, the main verb goes back to the base form.\n\nTry again:\n\"you / feed / the cat / this morning\"",
+   "guardHitsRaw": 0,
+   "guardRaw": [],
+   "shownEarlyRaw": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 3: after did the main verb is in the base form. Independent correct productions so far: 1.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! ✅ **Did she watch the match?** 'Did' already shows the past, so the verb stays in the base form: watch, not watched.\n\nNext one. Make a question with did:\n\"you / feed / the cat / this morning\"\n\nLEARNER'S LAST MESSAGE:\nYou fed the cat this morning?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nGood — 'fed' is the right past form of feed, and the words are right. But the exercise asks for a question with **did**. Remember: **Did + subject + base verb?** When we use did, the main verb goes back to the base form.\n\nTry again:\n\"you / feed / the cat / this morning\"",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "the exercise asks for a question with did. Remember: Did + subject + base verb?"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "When we use did, the main verb goes back to the base form."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you feed the cat this morning?",
+    "errors": {
+     "W1": "Did you fed the cat this morning?",
+     "W2": "You fed the cat this morning?"
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  }
+ ]
+}

@@ -606,7 +606,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   // The engine reads stored turn state, so it gets the stored history (chat and voice turns alike), not the browser's copy.
   const storedHistory = session.studentId && session.courseId ? languageHistoryFrom((await loadTutorMessages({ id: session.id, studentId: session.studentId } as never).catch(() => [])) as { role: string; text: string; meta?: unknown }[]) : [];
   const languagePrep = session.studentId && course.curriculumId
-    ? await prepareLanguageContext({ institutionId: session.institutionId, curriculumId: course.curriculumId, lessonId: session.lessonId, studentId: session.studentId, sessionId: session.id, courseId: session.courseId, message: last?.content ?? '', history: storedHistory, hintsOnly: tutorPolicy.policy === 'hints_only', masteryStatus: plan?.masteryStatus, planPrimary: plan?.teaching.primary }, 'voice').catch((error) => { logger.warn('avatar_language_context_failed', { error: serializeError(error) }); return null; })
+    ? await prepareLanguageContext({ institutionId: session.institutionId, curriculumId: course.curriculumId, lessonId: session.lessonId, studentId: session.studentId, sessionId: session.id, courseId: session.courseId, message: last?.content ?? '', history: storedHistory, hintsOnly: tutorPolicy.policy === 'hints_only', masteryStatus: plan?.masteryStatus, planPrimary: plan?.teaching.primary, objectiveId: plan?.teaching.objectiveId, objectiveCode: plan?.objectiveCode }, 'voice').catch((error) => { logger.warn('avatar_language_context_failed', { error: serializeError(error) }); return null; })
     : null;
 
   const lessonTitle =

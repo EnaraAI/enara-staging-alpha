@@ -1,0 +1,421 @@
+{
+ "set": "main",
+ "arm": "PP",
+ "learnerIdx": 1578,
+ "outcome": "EN-F-A2-VO-weather",
+ "seed": "teach2b|L1578",
+ "state": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 2,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 1
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "start": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "rec": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
+ },
+ "pre": {
+  "form": "B",
+  "wrong": 4,
+  "points": 6,
+  "max": 12
+ },
+ "turns": [
+  {
+   "learner": "Hello! Can you give me an exercise on weather words?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "tutor": "Hi! Sure.\n\nWe describe the weather with **It is** + adjective: It is cloudy. It is windy. It is hot.\n\nExercise: Complete:\n\"My hat flew away! It is very ___.\"",
+   "guardHitsRaw": 2,
+   "guardRaw": [
+    {
+     "item": "EN-F-A2-VO-weather-A-4",
+     "source": "assessment",
+     "why": "completes_item",
+     "sentence": "We describe the weather with It is + adjective: It is cloudy."
+    },
+    {
+     "item": "EN-F-A2-VO-weather-A-2",
+     "source": "assessment",
+     "why": "completes_item",
+     "sentence": "It is windy."
+    }
+   ],
+   "shownEarlyRaw": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 2: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on weather words?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi! Sure.\n\nWe describe the weather with **It is** + adjective: It is cloudy. It is windy. It is hot.\n\nExercise: Complete:\n\"My hat flew away! It is very ___.\"",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "We describe the weather with It is + adjective: It is cloudy. It is windy. It is hot."
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "windy",
+    "errors": {
+     "W1": "wind",
+     "W2": "windi"
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "learner": "windy",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "windy"
+   },
+   "tutor": "Correct! 🎉 **It is very windy.** Strong wind can blow a hat away.\n\nNext one. Complete:\n\"Take an umbrella. It is ___ today.\"",
+   "guardHitsRaw": 1,
+   "guardRaw": [
+    {
+     "item": "v2",
+     "source": "lesson",
+     "why": "completes_item",
+     "sentence": "🎉 It is very windy. Strong wind can blow a hat away."
+    }
+   ],
+   "shownEarlyRaw": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 2: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Sure.\n\nWe describe the weather with **It is** + adjective: It is cloudy. It is windy. It is hot.\n\nExercise: Complete:\n\"My hat flew away! It is very ___.\"\n\nLEARNER'S LAST MESSAGE:\nwindy\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! 🎉 **It is very windy.** Strong wind can blow a hat away.\n\nNext one. Complete:\n\"Take an umbrella. It is ___ today.\"",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! 🎉 **It is very windy.**"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! 🎉 **It is very windy.**"
+    }
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "rainy",
+    "errors": {
+     "W1": "rain",
+     "W2": "rany"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 2,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "learner": "rainy",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "rainy"
+   },
+   "tutor": "Correct! 👍 **It is rainy today.** When it rains, we take an umbrella.\n\nNow write one sentence about the weather where you are today. Use **It is ...**",
+   "guardHitsRaw": 1,
+   "guardRaw": [
+    {
+     "item": "v1",
+     "source": "lesson",
+     "why": "completes_item",
+     "sentence": "👍 It is rainy today. When it rains, we take an umbrella."
+    }
+   ],
+   "shownEarlyRaw": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 2: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 2: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 1: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! 🎉 **It is very windy.** Strong wind can blow a hat away.\n\nNext one. Complete:\n\"Take an umbrella. It is ___ today.\"\n\nLEARNER'S LAST MESSAGE:\nrainy\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! 👍 **It is rainy today.** When it rains, we take an umbrella.\n\nNow write one sentence about the weather where you are today. Use **It is ...**",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 2,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! 👍 It is rainy today."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! 👍 It is rainy today."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! 👍 It is rainy today."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Correct! 👍 It is rainy today."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "It is sunny today.",
+    "errors": {
+     "W1": "It is sun today.",
+     "W2": "It is sny today."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  }
+ ]
+}
