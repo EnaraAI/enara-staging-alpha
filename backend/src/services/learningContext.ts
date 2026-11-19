@@ -7,7 +7,8 @@ import { Curriculum } from '../models/Curriculum';
 import { PedagogicalDecision } from '../models/PedagogicalDecision';
 import { Student } from '../models/Student';
 import { Institution } from '../models/Institution';
-import { loadTrustedAgeBand } from './languageTeachingContext';
+import { ageFromBirthDate, loadTrustedAgeBand } from './languageTeachingContext';
+import { planLesson, shapeLines, type LessonPlan } from './lessonPlanner';
 import { StudentMisconception } from '../models/StudentMisconception';
 import { StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import type { TeachingMeta } from '../models/TutorMessage';
@@ -103,7 +104,7 @@ export async function buildObjectiveContext(params: {
         .lean(),
       PedagogicalDecision.find({ studentId: params.studentId, objectiveId: objective.id }).sort({ at: -1 }).limit(10).lean(),
       ObjectiveRetentionState.findOne({ studentId: params.studentId, objectiveId: objective.id }).lean(),
-      Student.findOne({ id: params.studentId }).select('grade').lean(),
+      Student.findOne({ id: params.studentId }).select(engineV2('planner2') ? 'grade +birthDate' : 'grade').lean(),
       LearningEvent.findOne({ studentId: params.studentId, at: { $lt: new Date(Date.now() - 60_000) } }).sort({ at: -1 }).select('at').lean(),
       related,
     ]);
@@ -173,7 +174,21 @@ export async function buildObjectiveContext(params: {
         ? await StudentObjectiveMastery.countDocuments({ studentId: params.studentId, objectiveId: { $in: relatedObjectives.map((o) => o.id) }, masteryStatus: { $in: [...MET] } })
         : 0,
     };
-    const plan = selectTeachingPlan(input);
+    // planner2: lesson shape first, then the main method inside it (lessonPlanner.ts). Off: ped-v2 unchanged.
+    let lesson: LessonPlan | undefined;
+    if (engineV2('planner2')) {
+      const level = objective.curriculumId ? (await Curriculum.findOne({ id: objective.curriculumId }).select('level').lean())?.level : undefined;
+      const ageBand = input.ageBand ?? (await loadTrustedAgeBand({ institutionId: params.institutionId, studentId: params.studentId, learningSettings: params.institutionId ? (await Institution.findOne({ id: params.institutionId }).select('learningSettings').lean() as { learningSettings?: unknown } | null)?.learningSettings : undefined })).band;
+      // Not recorded yet (see docs/tutor/PLANNER_METHODS_TABLE.md): the learner's goal and a quick-check result, so TASK and TTT
+      // are reached only once those signals exist; until then teens and adults get PPP (S5).
+      lesson = planLesson(input, {
+        ageBand,
+        ageYears: ageFromBirthDate((student as { birthDate?: Date } | null)?.birthDate, new Date()),
+        level: typeof level === 'string' ? level : undefined,
+        reviewDue: input.retention?.due,
+      });
+    }
+    const plan = lesson ? lesson.plan : selectTeachingPlan(input);
     const primary = STRATEGY_BY_ID.get(plan.primary)!;
     const target = plan.targetObjectiveId === objective.id ? objective : weak.find((w) => w.id === plan.targetObjectiveId);
 
@@ -187,7 +202,8 @@ export async function buildObjectiveContext(params: {
         lastForSession.strategyId === plan.primary &&
         (lastForSession.supportingStrategyIds ?? []).join() === plan.supporting.join() &&
         (lastForSession.reinforcementStrategyId ?? '') === (plan.reinforcement ?? '') &&
-        lastForSession.objectiveId === objective.id;
+        lastForSession.objectiveId === objective.id &&
+        (lastForSession.lessonShape ?? '') === (lesson?.shape ?? '');
       if (!same) {
         id = `pd-${randomUUID()}`;
         await PedagogicalDecision.create({
@@ -220,6 +236,7 @@ export async function buildObjectiveContext(params: {
           channel: params.channel,
           masteryAtDecision: estimate,
           masteryStatusAtDecision: mine?.masteryStatus ?? 'not_assessed',
+          ...(lesson ? { lessonShape: lesson.shape, shapeRule: lesson.shapeRule, methodRule: lesson.methodRule, plannerVersion: lesson.plannerVersion, explanation: lesson.explanation } : {}),
         });
       } else {
         id = lastForSession.id;
@@ -236,6 +253,7 @@ export async function buildObjectiveContext(params: {
       ...weak.map((w) => `- Prerequisite not secure yet: ${w.code} "${w.title}".`),
       ...misconceptions.map((m) => `- Possible misconception (${m.status === 'confirmed' ? 'confirmed by a teacher' : 'not confirmed'}): ${m.description}`),
       ...planLines(plan, target && target.id !== objective.id ? `${target.code} "${target.title}"` : undefined, status, params.compact),
+      ...(lesson ? shapeLines(lesson) : []),
       '- Assessment integrity: never give the answers to the student\'s assessment or quick-check questions. If they paste one, teach the method with a different example.',
       plan.requiresReassessment
         ? '- When they seem ready, suggest a quick check to confirm (practice with you does not count as proof of understanding).'
@@ -253,6 +271,7 @@ export async function buildObjectiveContext(params: {
       primaryVersion: primary.version,
       decisionVersion: plan.decisionVersion,
       registryVersion: plan.registryVersion,
+      ...(lesson ? { lessonShape: lesson.shape, shapeRule: lesson.shapeRule, methodRule: lesson.methodRule, plannerVersion: lesson.plannerVersion, explanation: lesson.explanation } : {}),
     };
     return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching, ...(objective.code ? { objectiveCode: String(objective.code) } : {}) };
   } catch (error) {

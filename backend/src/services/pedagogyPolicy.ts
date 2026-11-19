@@ -172,7 +172,158 @@ export const belowB1 = (level?: string): boolean => /\b(pre-?a1|a1|a2)\b/i.test(
 export const LEVEL_GATED_METHODS = ['socratic_questioning', 'inquiry_based', 'problem_based', 'case_based', 'project_based', 'blooms_guided'];
 const BASE_MODIFIERS = ['adaptive_pathways', 'differentiated_instruction', 'formative_feedback'];
 
+/** What one main-method rule sees: the input plus the helpers every rule shares. */
+export interface MethodRuleContext {
+  input: PlanInput;
+  status: string;
+  novice: boolean;
+  profile: SubjectProfile;
+  usable: (id: string) => boolean;
+  levelGated: (id: string) => boolean;
+  switchFrom: (from: string, signal: SwitchSignal) => string | undefined;
+  last2Wrong: boolean;
+}
+/** A rule's choice: the main method with its supporting and reinforcement methods, why, and (prerequisite rule only) a different target objective. */
+export interface MethodPick {
+  primary: string;
+  supporting?: string[];
+  reinforcement?: string;
+  reasons: string[];
+  gap: string;
+  target?: string;
+}
+/** One row of the main-method rule table: `pick` returns a choice when the row applies, otherwise undefined. */
+export interface MethodRule {
+  id: string;
+  pick: (c: MethodRuleContext) => MethodPick | undefined;
+}
+
+// The main-method rules of ped-v2, in order; the first row that applies wins. This table is the same if/else chain the
+// planner has always had, written as rows so that each decision names its row (planner2) and a caller may skip a row's
+// choice (planner2: a method with no stage in the lesson shape). With nothing skipped the result is unchanged.
+export const METHOD_RULES: MethodRule[] = [
+  {
+    id: 'M1_TEACHER',
+    pick: ({ input }) => (input.teacherStrategyId && STRATEGY_BY_ID.get(input.teacherStrategyId)?.roles?.includes('primary')
+      ? { primary: input.teacherStrategyId, reasons: ['TEACHER_ASSIGNED'], gap: 'Teacher-assigned approach.' } : undefined),
+  },
+  {
+    id: 'M2_PREREQUISITE',
+    pick: ({ input, novice }) => (input.weakPrerequisiteIds.length
+      ? { primary: 'prerequisite_remediation', supporting: novice ? ['worked_example'] : [], reasons: ['PREREQUISITE_GAP'], gap: 'A prerequisite objective is not secure yet.', target: input.weakPrerequisiteIds[0] } : undefined),
+  },
+  {
+    // M4: a later session opens with recall from memory before any re-teaching (Roediger & Karpicke 2006), spaced (Cepeda et al. 2006).
+    id: 'M3_REVIEW_OPENING',
+    pick: ({ input }) => (engineV2('methodSelect') && input.reviewOpening
+      ? { primary: 'retrieval_practice', reinforcement: 'spaced_repetition', reasons: ['REVIEW_OPENING'], gap: 'A later session: recall the earlier points from memory before re-teaching.' } : undefined),
+  },
+  {
+    id: 'M4_RETENTION_LAPSED',
+    pick: ({ input, status }) => (input.retention?.lapsed && RANK[status] >= 2
+      ? { primary: 'retrieval_practice', reinforcement: 'spaced_repetition', reasons: ['RETENTION_DECAY'], gap: 'Previously secure, but a later retrieval failed.' } : undefined),
+  },
+  {
+    // Evidence-based switching from the previous plan for this objective.
+    id: 'M5_SWITCH',
+    pick: ({ input, status, switchFrom, last2Wrong }) => {
+      const prev = input.previous;
+      let switched: string | undefined;
+      if (prev?.newEvidenceSince) {
+        if (RANK[status] >= 4 && prev.primary !== 'retrieval_practice') switched = switchFrom(prev.primary, 'mastery_reached');
+        else if (prev.improved === false) switched = switchFrom(prev.primary, last2Wrong ? 'repeated_errors' : 'no_improvement_after_new_evidence') ?? switchFrom(prev.primary, 'no_improvement_after_new_evidence');
+      }
+      return switched
+        ? { primary: switched, reasons: ['STRATEGY_CHANGED', RANK[status] >= 4 ? 'MASTERY_REACHED' : last2Wrong ? 'REPEATED_ERRORS' : 'NO_IMPROVEMENT'], gap: `Previous approach (${prev!.primary}) did not move the evidence.` }
+        : undefined;
+    },
+  },
+  {
+    id: 'M6_PERSISTENT',
+    pick: ({ input }) => (input.misconceptions.some((m) => m.status === 'confirmed') && input.triedWithoutImprovement.length >= 1
+      ? { primary: 'metacognitive', supporting: ['think_aloud'], reasons: ['PERSISTENT_MISCONCEPTION'], gap: 'A confirmed misconception persists after a change of approach.' } : undefined),
+  },
+  {
+    id: 'M7a_CONCEPTUAL',
+    pick: ({ input, usable, novice }) => (input.misconceptions.some((m) => m.category === 'conceptual_misunderstanding')
+      ? { primary: usable('analogy') ? 'analogy' : 'visual_explanation', supporting: [novice ? 'worked_example' : 'elaborative_interrogation'], reasons: ['CONCEPTUAL_MISCONCEPTION'], gap: 'Possible conceptual misunderstanding.' } : undefined),
+  },
+  {
+    id: 'M7b_PROCEDURAL',
+    pick: ({ input, usable, novice }) => (input.misconceptions.some((m) => m.category === 'procedural_error' || m.category === 'calculation_error')
+      ? { primary: usable('worked_example') ? 'worked_example' : 'guided_practice', supporting: ['think_aloud'], reinforcement: novice ? undefined : 'guided_practice', reasons: ['PROCEDURAL_ERROR'], gap: 'Procedural or calculation errors.' } : undefined),
+  },
+  {
+    id: 'M7c_MISREAD',
+    pick: ({ input }) => (input.misconceptions.some((m) => m.category === 'misinterpretation' || m.category === 'incomplete_reasoning')
+      ? { primary: 'error_analysis', supporting: ['think_aloud'], reasons: ['MISINTERPRETATION'], gap: 'Misreads the task or reasoning is incomplete.' } : undefined),
+  },
+  {
+    // M2: an A1-A2 novice with no diagnosed error gets explicit instruction (Norris & Ortega 2000; Spada & Tomita 2010); a vocabulary outcome is
+    // taught as form, meaning and use (Nation 2013) inside it.
+    id: 'M8_NOVICE_EXPLICIT',
+    pick: ({ input, status }) => (engineV2('methodSelect') && input.belowB1 && RANK[status] <= 1 && !input.misconceptions.length
+      ? { primary: 'direct_instruction', supporting: ['worked_example'], reasons: [input.vocabulary ? 'NOVICE_EXPLICIT_VOCABULARY' : 'NOVICE_EXPLICIT'], gap: 'A1-A2 novice with no diagnosed error: explicit instruction first.' } : undefined),
+  },
+  {
+    id: 'M9_APPLICATION_GAP',
+    pick: ({ input, status, usable, levelGated }) => (input.applicationGap && RANK[status] >= 2 && !levelGated('blooms_guided')
+      ? { primary: 'blooms_guided', supporting: usable('inquiry_based') ? ['inquiry_based'] : [], reasons: ['APPLICATION_GAP'], gap: 'Recall is right but application is not.' } : undefined),
+  },
+  {
+    id: 'M10_BY_MASTERY',
+    pick: ({ input, status, profile, usable }) => {
+      switch (status) {
+        case 'emerging':
+          return { primary: 'direct_instruction', supporting: ['worked_example'], reasons: ['EMERGING'], gap: 'Little understanding shown so far.' };
+        case 'developing':
+          return { primary: 'scaffolding', supporting: ['metacognitive'], reinforcement: 'guided_practice', reasons: ['DEVELOPING'], gap: 'Partly understood.' };
+        case 'proficient': {
+          const related = input.relatedSecureObjectives ?? 0;
+          if (profile === 'discussion' && input.gradeLevel !== undefined && usable('socratic_questioning')) {
+            // Guide matrix: understands, needs deeper thinking -> Socratic + Elaborative.
+            return { primary: 'socratic_questioning', supporting: ['elaborative_interrogation'], reinforcement: related >= 2 ? 'concept_mapping' : undefined, reasons: ['DEEPEN_REASONING'], gap: 'Mostly secure; reasoning needs to go deeper.' };
+          }
+          // Procedural skills interleave; other subjects consolidate as a concept map.
+          const reinforce = related >= 1 ? (profile === 'procedural' || profile === 'unknown' ? 'interleaving' : related >= 2 ? 'concept_mapping' : 'retrieval_practice') : 'retrieval_practice';
+          return { primary: 'mastery_learning', supporting: ['elaborative_interrogation'], reinforcement: reinforce, reasons: ['VERIFY_TO_MASTERY'], gap: 'Mostly secure; needs consistent independent success.' };
+        }
+        case 'mastered': {
+          const related = input.relatedSecureObjectives ?? 0;
+          if (input.retention?.due) return { primary: 'retrieval_practice', reinforcement: 'spaced_repetition', reasons: ['REVIEW_DUE'], gap: 'Mastered; a review is due.' };
+          if (profile === 'discussion' && input.gradeLevel !== undefined && usable('case_based')) {
+            // Guide matrix: judgment and professional reasoning -> Case-Based + Socratic.
+            return { primary: 'case_based', supporting: ['socratic_questioning'], reasons: ['EXTEND_JUDGMENT'], gap: 'Mastered; extend to judgment in realistic cases.' };
+          }
+          if (profile === 'applied' && input.gradeLevel !== undefined && usable('problem_based')) {
+            // Guide matrix: complex, multi-session challenge -> Problem-Based (+ differentiation).
+            return { primary: 'problem_based', supporting: [], reasons: ['EXTEND_APPLICATION'], gap: 'Mastered; extend to an open, realistic problem.' };
+          }
+          return { primary: 'retrieval_practice', reinforcement: related >= 3 ? 'concept_mapping' : 'spaced_repetition', reasons: [related >= 3 ? 'CONSOLIDATE_UNIT' : 'MAINTAIN'], gap: 'Mastered; maintain and connect.' };
+        }
+        default:
+          return { primary: 'formative_feedback', supporting: ['retrieval_practice'], reasons: ['NO_EVIDENCE'], gap: 'No assessed evidence yet: find the starting point first.' };
+      }
+    },
+  },
+];
+
+/** planner2 options: skip a rule's choice when its main method is not allowed (the next row applies); the rows (id) that applied are reported. */
+export interface PlanOptions {
+  allowPrimary?: (id: string) => boolean;
+  /** Used when every row's choice was skipped. */
+  fallback?: MethodPick;
+  /** Extra rows (planner2), each placed just before the named row of the table; they obey allowPrimary too. */
+  insertBefore?: Record<string, MethodRule[]>;
+}
+
+/** ped-v2: the teaching plan for one learner and objective (no AI call). */
 export function selectTeachingPlan(input: PlanInput): TeachingPlan {
+  return planWithTrace(input).plan;
+}
+
+/** The same plan, plus the rule-table row that chose the main method and the choices skipped on the way (planner2). */
+export function planWithTrace(input: PlanInput, opts: PlanOptions = {}): { plan: TeachingPlan; ruleId: string; skipped: string[] } {
   const status = input.masteryStatus ?? 'not_assessed';
   const novice = RANK[status] <= 1;
   const profile = subjectProfile(input.subject);
@@ -181,9 +332,6 @@ export function selectTeachingPlan(input: PlanInput): TeachingPlan {
   let target = input.objectiveId;
   let gap = '';
   let c: MethodComposition = { primary: 'formative_feedback', supporting: [], modifiers: [] };
-  const set = (primary: string, supporting: string[] = [], reinforcement?: string) => {
-    c = { primary, supporting, reinforcement, modifiers: [] };
-  };
   const levelGated = (id: string) => Boolean(input.belowB1) && engineV2('levelExplicit') && LEVEL_GATED_METHODS.includes(id);
   const usable = (id: string) =>
     !levelGated(id) &&
@@ -192,124 +340,30 @@ export function selectTeachingPlan(input: PlanInput): TeachingPlan {
     !(novice && STRATEGY_BY_ID.get(id)?.withholdsAnswer);
   const switchFrom = (from: string, signal: SwitchSignal) => STRATEGY_BY_ID.get(from)?.switchWhen?.find((w) => w.signal === signal && usable(w.to))?.to;
   const last2Wrong = input.recentResults.slice(0, 2).length === 2 && input.recentResults.slice(0, 2).every((r) => r === 'incorrect');
+  const ctx: MethodRuleContext = { input, status, novice, profile, usable, levelGated, switchFrom, last2Wrong };
 
-  if (input.teacherStrategyId && STRATEGY_BY_ID.get(input.teacherStrategyId)?.roles?.includes('primary')) {
-    set(input.teacherStrategyId);
-    reasons.push('TEACHER_ASSIGNED');
-    gap = 'Teacher-assigned approach.';
-  } else if (input.weakPrerequisiteIds.length) {
-    target = input.weakPrerequisiteIds[0];
-    set('prerequisite_remediation', novice ? ['worked_example'] : []);
-    reasons.push('PREREQUISITE_GAP');
-    gap = 'A prerequisite objective is not secure yet.';
-  } else if (engineV2('methodSelect') && input.reviewOpening) {
-    // M4: a later session opens with recall from memory before any re-teaching (Roediger & Karpicke 2006), spaced (Cepeda et al. 2006).
-    set('retrieval_practice', [], 'spaced_repetition');
-    reasons.push('REVIEW_OPENING');
-    gap = 'A later session: recall the earlier points from memory before re-teaching.';
-  } else if (input.retention?.lapsed && RANK[status] >= 2) {
-    set('retrieval_practice', [], 'spaced_repetition');
-    reasons.push('RETENTION_DECAY');
-    gap = 'Previously secure, but a later retrieval failed.';
-  } else {
-    // Evidence-based switching from the previous plan for this objective.
-    const prev = input.previous;
-    let switched: string | undefined;
-    if (prev?.newEvidenceSince) {
-      if (RANK[status] >= 4 && prev.primary !== 'retrieval_practice') switched = switchFrom(prev.primary, 'mastery_reached');
-      else if (prev.improved === false) switched = switchFrom(prev.primary, last2Wrong ? 'repeated_errors' : 'no_improvement_after_new_evidence') ?? switchFrom(prev.primary, 'no_improvement_after_new_evidence');
+  let ruleId = 'FALLBACK';
+  const skipped: string[] = [];
+  let chosen: MethodPick | undefined;
+  const rows = METHOD_RULES.flatMap((r) => [...(opts.insertBefore?.[r.id] ?? []), r]);
+  for (const rule of rows) {
+    const p = rule.pick(ctx);
+    if (!p) continue;
+    if (opts.allowPrimary && !opts.allowPrimary(p.primary)) {
+      skipped.push(`${rule.id}:${p.primary}`);
+      continue;
     }
-    const categories = new Set(input.misconceptions.map((m) => m.category));
-    const persistent = input.misconceptions.some((m) => m.status === 'confirmed') && input.triedWithoutImprovement.length >= 1;
-    if (switched) {
-      set(switched);
-      reasons.push('STRATEGY_CHANGED', RANK[status] >= 4 ? 'MASTERY_REACHED' : last2Wrong ? 'REPEATED_ERRORS' : 'NO_IMPROVEMENT');
-      gap = `Previous approach (${prev!.primary}) did not move the evidence.`;
-    } else if (persistent) {
-      set('metacognitive', ['think_aloud']);
-      reasons.push('PERSISTENT_MISCONCEPTION');
-      gap = 'A confirmed misconception persists after a change of approach.';
-    } else if (categories.has('conceptual_misunderstanding')) {
-      set(usable('analogy') ? 'analogy' : 'visual_explanation', [novice ? 'worked_example' : 'elaborative_interrogation']);
-      reasons.push('CONCEPTUAL_MISCONCEPTION');
-      gap = 'Possible conceptual misunderstanding.';
-    } else if (categories.has('procedural_error') || categories.has('calculation_error')) {
-      set(usable('worked_example') ? 'worked_example' : 'guided_practice', ['think_aloud'], novice ? undefined : 'guided_practice');
-      reasons.push('PROCEDURAL_ERROR');
-      gap = 'Procedural or calculation errors.';
-    } else if (categories.has('misinterpretation') || categories.has('incomplete_reasoning')) {
-      set('error_analysis', ['think_aloud']);
-      reasons.push('MISINTERPRETATION');
-      gap = 'Misreads the task or reasoning is incomplete.';
-    } else if (engineV2('methodSelect') && input.belowB1 && RANK[status] <= 1 && !input.misconceptions.length) {
-      // M2: an A1-A2 novice with no diagnosed error gets explicit instruction (Norris & Ortega 2000; Spada & Tomita 2010); a vocabulary outcome is
-      // taught as form, meaning and use (Nation 2013) inside it.
-      set('direct_instruction', ['worked_example']);
-      reasons.push(input.vocabulary ? 'NOVICE_EXPLICIT_VOCABULARY' : 'NOVICE_EXPLICIT');
-      gap = 'A1-A2 novice with no diagnosed error: explicit instruction first.';
-    } else if (input.applicationGap && RANK[status] >= 2 && !levelGated('blooms_guided')) {
-      set('blooms_guided', usable('inquiry_based') ? ['inquiry_based'] : []);
-      reasons.push('APPLICATION_GAP');
-      gap = 'Recall is right but application is not.';
-    } else {
-      switch (status) {
-        case 'emerging':
-          set('direct_instruction', ['worked_example']);
-          reasons.push('EMERGING');
-          gap = 'Little understanding shown so far.';
-          break;
-        case 'developing':
-          set('scaffolding', ['metacognitive'], 'guided_practice');
-          reasons.push('DEVELOPING');
-          gap = 'Partly understood.';
-          break;
-        case 'proficient': {
-          const related = input.relatedSecureObjectives ?? 0;
-          if (profile === 'discussion' && input.gradeLevel !== undefined && usable('socratic_questioning')) {
-            // Guide matrix: understands, needs deeper thinking -> Socratic + Elaborative.
-            set('socratic_questioning', ['elaborative_interrogation'], related >= 2 ? 'concept_mapping' : undefined);
-            reasons.push('DEEPEN_REASONING');
-            gap = 'Mostly secure; reasoning needs to go deeper.';
-          } else {
-            // Procedural skills interleave; other subjects consolidate as a concept map.
-            const reinforce = related >= 1 ? (profile === 'procedural' || profile === 'unknown' ? 'interleaving' : related >= 2 ? 'concept_mapping' : 'retrieval_practice') : 'retrieval_practice';
-            set('mastery_learning', ['elaborative_interrogation'], reinforce);
-            reasons.push('VERIFY_TO_MASTERY');
-            gap = 'Mostly secure; needs consistent independent success.';
-          }
-          break;
-        }
-        case 'mastered': {
-          const related = input.relatedSecureObjectives ?? 0;
-          if (input.retention?.due) {
-            set('retrieval_practice', [], 'spaced_repetition');
-            reasons.push('REVIEW_DUE');
-            gap = 'Mastered; a review is due.';
-          } else if (profile === 'discussion' && input.gradeLevel !== undefined && usable('case_based')) {
-            // Guide matrix: judgment and professional reasoning -> Case-Based + Socratic.
-            set('case_based', ['socratic_questioning']);
-            reasons.push('EXTEND_JUDGMENT');
-            gap = 'Mastered; extend to judgment in realistic cases.';
-          } else if (profile === 'applied' && input.gradeLevel !== undefined && usable('problem_based')) {
-            // Guide matrix: complex, multi-session challenge -> Problem-Based (+ differentiation).
-            set('problem_based', []);
-            reasons.push('EXTEND_APPLICATION');
-            gap = 'Mastered; extend to an open, realistic problem.';
-          } else {
-            set('retrieval_practice', [], related >= 3 ? 'concept_mapping' : 'spaced_repetition');
-            reasons.push(related >= 3 ? 'CONSOLIDATE_UNIT' : 'MAINTAIN');
-            gap = 'Mastered; maintain and connect.';
-          }
-          break;
-        }
-        default:
-          set('formative_feedback', ['retrieval_practice']);
-          reasons.push('NO_EVIDENCE');
-          gap = 'No assessed evidence yet: find the starting point first.';
-      }
-    }
+    chosen = p;
+    ruleId = rule.id;
+    break;
   }
-
+  chosen ??= opts.fallback;
+  if (chosen) {
+    c = { primary: chosen.primary, supporting: [...(chosen.supporting ?? [])], reinforcement: chosen.reinforcement, modifiers: [] };
+    reasons.push(...chosen.reasons);
+    gap = chosen.gap;
+    if (chosen.target) target = chosen.target;
+  }
   // Engagement: only on a recorded signal (inactivity), never by default.
   if (input.disengaged) {
     const extra = (input.gradeLevel ?? 99) <= 8 && ['retrieval_practice', 'guided_practice', 'mastery_learning', 'independent_practice'].includes(c.primary) ? 'gamification' : 'narrative_contextual';
@@ -359,7 +413,7 @@ export function selectTeachingPlan(input: PlanInput): TeachingPlan {
   const confidence: TeachingPlan['confidence'] =
     input.evidenceStrength === 'substantial' ? 'high' : input.evidenceStrength === 'moderate' ? 'medium' : 'low';
   const primary = STRATEGY_BY_ID.get(c.primary)!;
-  return {
+  const plan: TeachingPlan = {
     ...c,
     strategyId: c.primary,
     targetObjectiveId: target,
@@ -374,4 +428,5 @@ export function selectTeachingPlan(input: PlanInput): TeachingPlan {
     decisionVersion: PEDAGOGY_PLAN_VERSION,
     registryVersion: REGISTRY_VERSION,
   };
+  return { plan, ruleId, skipped };
 }
