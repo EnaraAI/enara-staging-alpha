@@ -66,3 +66,18 @@ The run paused mid round 2 (commit 950ae1db) is **discarded**. Its round-1 data,
     - Both outcomes use the same lesson (PROTOCOL §5a and §12, limit 12), so the same first item fits both.
     - The other 45 replies in the cell are distinct. Kept as written: it is not a scripted or grouped cell.
     - **Effect:** negligible (1 of 1,128 round-1 replies).
+11. **Round 2: shared replies.**
+    - LE11, LE12 and LE24 each reused one reply for the same pair of learners on the shared in/on/at lesson (s745/s781, s746/s782, s748/s784). In each pair both learners answered "at".
+    - LE22 (s842/s986) and LE24 (s934/s940) each reused one reply for two learners on the same outcome who gave the same correct answer.
+    - Every other reply in those cells is distinct. Kept as written, on the same reasoning as deviation 10.
+    - **Effect:** negligible.
+12. **Agent scratch files.**
+    - The round-1 LE15 tutor agent left an empty file `/tmp/claude-0/le15.txt`, outside the repository; it was found and deleted during round 2.
+    - The round-2 PP25 tutor agent saved its `tprompts` output to a scratchpad file to read it, reported this, and the file was deleted. All 47 PP25 replies are distinct.
+    - From then on, tutor agents are told to re-read the output in parts instead of saving it.
+    - **Effect: none.**
+13. **Concurrency raised (user request, 2026-11-19, from round 2 judging).**
+    - Up to 8 agents run at once. The protocol allows at most 3, and amendment A4 had set 2.
+    - Every batch is still independent and blind. Each judge reads only its own batch, and outputs go only to its own file.
+    - The number of agent runs and the models are unchanged.
+    - **Effect:** none on the data; only wall-clock time changes.
