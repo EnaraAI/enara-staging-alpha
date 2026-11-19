@@ -1,5 +1,7 @@
 # The 23 methods → lesson shape, stage, age, level, rule
 
+**Approved 19 Nov 2026** with one change to S2 (LAD only under 9 or Pre-A1; children 9–12 at A1+ get PPP with child supports).
+
 19 Nov 2026. Tutor track. For approval before any planner code. Agent runs for this step: 0.
 
 Source of today's rules: `pedagogyPolicy.ts` (ped-v2) and `strategyRegistry.ts` on `claude/tutor-teaching`. **★ = new or changed rule** compared with today; everything else keeps today's behaviour.
@@ -11,7 +13,7 @@ Source of today's rules: `pedagogyPolicy.ts` (ped-v2) and `strategyRegistry.ts` 
 | **PPP**: present, practise, produce | Present → Practise → Produce → Check | Default for A1–A2 teens and adults, and for any learner new to the form |
 | **TTT**: test, teach, test | Test (3 items) → Teach the gaps → Test again | Teens and adults who already know part of the form |
 | **TASK**: task-based | Pre-task (context) → Task (role-play) → Language focus → Repeat task | B1+ teens and adults with a real-life goal |
-| **LAD**: listen and do | Listen (story/chant) → Do (tap/drag/say) → Chant again → Check | Children (under 13) and Pre-A1 |
+| **LAD**: listen and do | Listen (story/chant) → Do (tap/drag/say) → Chant again → Check | Children under 9, and Pre-A1 at any age |
 | **Review** opener | Recall → back to the lesson's shape | Any learner, session 2 onward or when a review is due |
 
 ## Rule that picks the shape (first match wins) ★
@@ -19,7 +21,9 @@ Source of today's rules: `pedagogyPolicy.ts` (ped-v2) and `strategyRegistry.ts` 
 | # | Signals | Shape |
 |---|---|---|
 | S1 | Session ≥ 2 and earlier errors exist, or a review is due | Review opener, then S2–S6 |
-| S2 | Age band child, or level Pre-A1 | LAD |
+| S2a | Level Pre-A1, any age | LAD |
+| S2b | Child with a known age under 9 | LAD |
+| S2c | Child 9–12, or child of unknown exact age, at A1+ | PPP with child supports on (gamification, narrative, short replies, scaffolding) |
 | S3 | Level B1+, mastery ≥ developing, goal set (work, exam, daily life) | TASK |
 | S4 | Teen or adult, quick check ≥ 2 of 3 right | TTT |
 | S5 | Teen or adult, quick check < 2 of 3 right, or no quick check | PPP |
