@@ -14,6 +14,9 @@ from collections import Counter, defaultdict
 
 D = sys.argv[1]
 ARMS = ('OFF', 'P2'); GROUPS = ('TASK', 'TTT', 'LAD', 'KIDPPP'); ROUNDS = 7; N_PER_GROUP = 12
+# amendment F: a run folder with GROUPS.json runs only those groups; the fit-judge agreement can come from another file (fitAgreementFrom).
+_GF = os.path.join(D, 'GROUPS.json'); GCONF = json.load(open(_GF)) if os.path.exists(_GF) else {}
+if GCONF.get('groups'): GROUPS = tuple(GCONF['groups'])
 RUBRIC = {
     'TASK': ['task_goal', 'feedback_after_task', 'task_repeat'],
     'TTT': ['test_first_clean', 'teach_targets_gaps', 'retest_end'],
@@ -25,7 +28,7 @@ EXPECTED_SHAPES = {'TASK': {'TASK'}, 'TTT': {'TTT', 'PPP'}, 'LAD': {'LAD', 'PPP'
 L1_CODES = ('article_omitted', 'copula_omitted', 'progressive_no_be', 'be_with_base_verb', 'subject_doubled', 'resumptive_pronoun', 'age_with_have')
 J = lambda f: json.load(open(os.path.join(D, f))) if os.path.exists(os.path.join(D, f)) else None
 post = J('POST.json') or []; tags = J('TAGS.json') or []; stuck = J('STUCK.json') or []; fit = J('FIT.json') or []
-fit_ag = J('FIT_AGREEMENT.json'); ev_ag = J('JUDGE_AGREEMENT.json'); recheck = J('GRADER_RECHECK.json')
+fit_ag = json.load(open(os.path.join(D, GCONF['fitAgreementFrom']))) if GCONF.get('fitAgreementFrom') else J('FIT_AGREEMENT.json'); fit_ag_own = J('FIT_AGREEMENT.json'); ev_ag = J('JUDGE_AGREEMENT.json'); recheck = J('GRADER_RECHECK.json')
 mean = lambda xs: sum(xs) / len(xs) if xs else None
 r4 = lambda x: None if x is None else round(x, 4)
 
@@ -66,7 +69,7 @@ def diff_block(time, what):
 
 
 use_del = diff_block('del', 'use'); use_imm = diff_block('imm', 'use')
-use_check = {g: {'diff': use_del[g]['diff'], 'ok': use_del[g]['diff'] is not None and use_del[g]['diff'] >= -0.05} for g in ('TASK', 'LAD')}
+use_check = {g: {'diff': use_del[g]['diff'], 'ok': use_del[g]['diff'] is not None and use_del[g]['diff'] >= -0.05} for g in ('TASK', 'LAD') if g in GROUPS}
 delayed = diff_block('del', 'primary'); immediate = diff_block('imm', 'primary'); delayed_whole = diff_block('del', 'whole'); pre = diff_block('pre', 'primary')
 
 # ---------------------------------------------------------------------------------------------- turn tags: stuck, two asks, leaks
@@ -152,8 +155,8 @@ for l in sorted(by):
         if r['rounds'] != ROUNDS: missing.append(f'{l}:{a}:rounds {r["rounds"]}')
         for tm in ('pre', 'imm', 'del'):
             if tm not in (r.get('assess') or {}): missing.append(f'{l}:{a}:{tm}')
-if len(by) != 4 * N_PER_GROUP: missing.append(f'learners {len(by)} of {4 * N_PER_GROUP}')
-if len(fit) != 2 * 4 * N_PER_GROUP: missing.append(f'fit cases {len(fit)} of {2 * 4 * N_PER_GROUP}')
+if len(by) != len(GROUPS) * N_PER_GROUP: missing.append(f'learners {len(by)} of {len(GROUPS) * N_PER_GROUP}')
+if len(fit) != 2 * len(GROUPS) * N_PER_GROUP: missing.append(f'fit cases {len(fit)} of {2 * len(GROUPS) * N_PER_GROUP}')
 if not ev_ag: missing.append('JUDGE_AGREEMENT.json')
 if not fit_ag: missing.append('FIT_AGREEMENT.json')
 complete = not missing
@@ -161,7 +164,7 @@ complete = not missing
 no_harm = {'overallCiLower': delayed['ALL']['ci95'][0], 'groupDiffs': {g: delayed[g]['diff'] for g in GROUPS}}
 no_harm['pass'] = no_harm['overallCiLower'] is not None and no_harm['overallCiLower'] > -0.05 and all(v is not None and v >= -0.05 for v in no_harm['groupDiffs'].values())
 fit_rule = {'ownRubric': {g: fit_table[g]['_ownRubric'] for g in GROUPS}, 'quickCheckCompliance': qc['rate']}
-fit_rule['pass'] = all(fit_table[g]['_ownRubric']['P2'] is not None and fit_table[g]['_ownRubric']['OFF'] is not None and fit_table[g]['_ownRubric']['P2'] >= fit_table[g]['_ownRubric']['OFF'] for g in GROUPS) and qc['rate'] is not None and qc['rate'] >= 0.95
+fit_rule['pass'] = all(fit_table[g]['_ownRubric']['P2'] is not None and fit_table[g]['_ownRubric']['OFF'] is not None and fit_table[g]['_ownRubric']['P2'] >= fit_table[g]['_ownRubric']['OFF'] for g in GROUPS) and ('TTT' not in GROUPS or (qc['rate'] is not None and qc['rate'] >= 0.95))
 # amendment D guards (ENARA's strengths): stuck runs P2 <= OFF; independent correct answers P2 >= OFF; early answer leaks P2 <= OFF
 HELP_MOVES = {'scaffold_hint', 'corrective_feedback_retry', 'answer_with_reasoning', 'reteach_simpler', 'short_explanation', 'comprehensible_model'}
 def indep_correct(arm):

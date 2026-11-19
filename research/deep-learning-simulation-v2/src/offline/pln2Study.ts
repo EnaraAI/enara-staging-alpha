@@ -89,7 +89,9 @@ const LESSON_ID = 'lsn';
 const NS = 'pln2';
 const norm = (t: string) => t.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
 const coreOf = (prompt: string) => prompt.replace(/\s*\(answer with only the (missing word|verb)\)\s*$/i, '').replace(/^[^:]*:\s*/, '');
-const dirArg = (d: string) => path.resolve(d);
+/** Amendment F: a run folder with GROUPS.json ({"groups":["TASK"]}) runs only those groups' learners (same ids, seeds and outcomes), one cell per arm. */
+let GROUP_FILTER: Group[] | null = null;
+const dirArg = (d: string) => { const r = path.resolve(d); const gf = path.join(r, 'GROUPS.json'); if (existsSync(gf)) { GROUP_FILTER = JSON.parse(readFileSync(gf, 'utf8')).groups; LRN = undefined; } return r; };
 
 // ---------------------------------------------------------------------------------------------------------- python bridge (esl6_forget.py, esl6_outcomes.py; unchanged)
 const PY = `
@@ -166,7 +168,7 @@ function buildLearners(): Learner[] {
   return out;
 }
 let LRN: Learner[] | undefined;
-const LEARNERS = () => (LRN ??= buildLearners());
+const LEARNERS = () => (LRN ??= buildLearners().filter((l) => !GROUP_FILTER || GROUP_FILTER.includes(l.group)));
 const L_OF = (idx: number): Learner => LEARNERS().find((l) => l.idx === idx)!;
 const seedOf = (idx: number, rep: number) => `${NS}|L${idx}|rep${rep}`;
 /** TTT "mostly known" start: no wrong belief (error 0.05 per probed item), every used correct belief at 1 (known, not secure: after F1 the recall floor
@@ -201,7 +203,7 @@ const opener = (l: Learner): Turn => {
   return { session: 1, learner: text, production: { kind: 'none', text: '' } };
 };
 // Cells: arm x 3 parts (learner id mod 3) = 6 cells per round of 16 sessions (4 per group).
-const cells = () => ARMS.flatMap((arm) => Array.from({ length: CELLS_PER_ARM }, (_, p) => ({ id: `${arm}_${p + 1}`, arm, keys: LEARNERS().filter((l) => l.idx % CELLS_PER_ARM === p).map((l) => keyOf({ learnerIdx: l.idx, arm, rep: 1 })) })));
+const cells = () => ARMS.flatMap((arm) => Array.from({ length: GROUP_FILTER ? 1 : CELLS_PER_ARM }, (_, p) => ({ id: `${arm}_${p + 1}`, arm, keys: LEARNERS().filter((l) => GROUP_FILTER || l.idx % CELLS_PER_ARM === p).map((l) => keyOf({ learnerIdx: l.idx, arm, rep: 1 })) })));
 const caseId = (f: string, round: number) => `c${sha(`${NS}|${f}|${round}`).slice(0, 10)}`;
 
 // ---------------------------------------------------------------------------------------------------------- engine glue
@@ -414,8 +416,8 @@ function walk(dir: string, out: string[] = []) { if (!existsSync(dir) || existsS
 function overlapCheck(studyDir: string) {
   const own = path.resolve(studyDir);
   // amendment D: PLN2b re-checks the SAME 48 learners and seeds as PLN2 by design, so PLN2's own run folder is not a clash for it (nothing else is exempt).
-  const reuse = path.basename(own).startsWith('agent_sim_pln2b') ? path.resolve(ROOT, 'reports/exp4/agent_sim_pln2') : null;
-  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && path.resolve(f).startsWith(reuse + path.sep)));
+  const reuse = /^agent_sim_pln2[bc]/.test(path.basename(own)) ? path.resolve(ROOT, 'reports/exp4/agent_sim_pln2') : null; // amendment F: pln2c reuses pln2 and pln2b
+  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && /^agent_sim_pln2[bc]?$/.test(path.relative(path.join(ROOT, 'reports/exp4'), path.resolve(f)).split(path.sep)[0])));
   const ids = new Set<number>(); const seeds = new Set<string>();
   for (const f of files) { const t = readFileSync(f, 'utf8'); for (const m of t.matchAll(/"learnerIdx":\s*(\d+)/g)) ids.add(Number(m[1])); for (const m of t.matchAll(/"seed":\s*"([^"]+)"/g)) seeds.add(m[1]); }
   // ids defined in code (ESL1 0-17, ESL2 0-35, ESL3 100-159, ESL3 validation 200-211, ESL4 300-407, ESL5 500-619, ESL6 700-991, teach2 1100-1799 reserved)

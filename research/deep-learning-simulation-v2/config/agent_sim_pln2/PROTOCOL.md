@@ -38,7 +38,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | File | SHA-256 |
 |---|---|
 | `backend/src/services/engineV2.ts` | `2f2a68665796c1322ccbc56f9893c936505830037422a50172785b91a018e9a7` |
-| `backend/src/services/lessonPlanner.ts` | `23579e070f058681e6fa615db59d680be848731075e0fad658f9ea0266681b30` |
+| `backend/src/services/lessonPlanner.ts` | `c8ecf382a0190189f4b96ac480d10bfde1694b6a46eb6f94a8e8d70895f77edd` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
 | `backend/src/services/learningContext.ts` | `5ed9c73478d66a178e569dac761415938e8125d8e78fc9a704ead49004bb1000` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
@@ -65,8 +65,8 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `391876d36e7d06dbe3777bf99a8730899cf1a34c8bfd16ca5f47d02f5af9dec5` |
-| `src/offline/pln2_analyze.py` (this analysis) | `2df8f1d4e110a56297c26d43a265282208e20cf4e377f4d6126ae048a53d23b4` |
+| `src/offline/pln2Study.ts` (this runner) | `c78495b3e52218dc85d380c7b5fc4dffc6f8997d62071452f497c00ce1e87123` |
+| `src/offline/pln2_analyze.py` (this analysis) | `7fa7fe396c9d0ec052d8a1bd046e63495d3cdb6c470682b2f1fc51fc257d17d6` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
 
@@ -180,3 +180,12 @@ Recorded before any new agent run. The PLN2b results, transcripts and main fit t
 2. **9–12 fit items with 0/1/2 anchors** (`KIDPPP_E` in `pln2Study.ts`): counts for long sentences (> 12 words), messages with two or more instructions, effort praise; game/story across turns; the present → practise → produce steps. Other groups' items unchanged.
 3. **Fit-agreement re-run only:** the same 12 sessions as `fitagree/`, judged blind twice with the anchored items by two new Opus agents (`fitE/`, batches `fitE_a_j01`, `fitE_b_j01`; new case ids per side). Agreement = identical item scores between the two (`FIT_AGREEMENT_E.json`); the rule stays ≥ 85%. Two agent runs.
 4. Hashes after this amendment: `lessonPlanner.ts` `c8ecf382a0190189f4b96ac480d10bfde1694b6a46eb6f94a8e8d70895f77edd`; `pln2Study.ts` `aa59f5d29b8ddc893023c64862461b62e8784fdd0716bf1208f37de42174b65d`.
+
+## Amendment F (19 Nov 2026, owner decision "proceed"): PLN2c, adults-only re-check of planner2c
+Recorded before any PLN2c agent run. Why adults only: the planner2c change (amendment E.1) touches only the TASK stage machine. The other three groups' plans and stages are unchanged (`planner2.test.ts` goldens unchanged), so their PLN2b results stand.
+1. **Run folder** `reports/exp4/agent_sim_pln2c` with `GROUPS.json` = TASK only. Same 12 adult learners (ids, seeds, outcomes) and both arms, 7 rounds, the same tests, the same measures and the same pass rules as PLN2b (amendments B, C, D). One tutor cell of 12 sessions per arm. Task files: `tasks_c/`.
+2. **Fit-judge agreement:** taken from amendment E (85.3%, `agent_sim_pln2b/FIT_AGREEMENT_E.json`; the TASK rubric is unchanged), because 10% of 24 cases (about 3) cannot measure it. PLN2c's own fitagree is reported, not used.
+3. **Overlap check:** the PLN2, PLN2b and PLN2c folders are exempt from each other (same learners by design).
+4. **Verdict for planner2c:** the PLN2c result for adults, plus the PLN2b results for teens, under-9s and 9–12s.
+5. **§3 hashes refreshed** for `lessonPlanner.ts` (planner2c), `pln2Study.ts` (group filter, fitE) and `pln2_analyze.py` (group-aware). The PLN2b-run hashes are in git history at commit 6eb7d833. A full scripted dry run passed before this amendment.
+6. **Estimate:** 14 Sonnet tutor runs + about 13 Opus runs (7 round judges, 1 event agreement, 2 fit, 1 fitagree, 2 recheck).
