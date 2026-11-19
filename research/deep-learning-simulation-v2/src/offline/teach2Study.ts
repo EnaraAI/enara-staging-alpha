@@ -1,5 +1,5 @@
 // SIMULATION ONLY. NO API. TRACK 2 teaching check (TUTOR_TRACK2_TEACHING_PLAN.md, "How it's tested"), offline harness. Built from esl6Study.ts (same P+ baseline,
-// same engine glue, same simulated learner rules and judge text) with: NEW learners and seeds (ids 1100-1279 main, 1300-1389 kids; namespace teach2), the
+// same engine glue, same simulated learner rules and judge text) with: NEW learners and seeds (run 2: ids 1400-1579 main, 1600-1689 kids; namespace teach2b), the
 // TRACK 2 lessons (teach2Fixtures.ts: ESL6 lessons + the four approved data fixes), arm LE = ESL6 LE + the teach2 bundle (ruleBank, exampleGuard,
 // feedbackLadder, methodSelect, kidsBand), turns 1-3 of session 1 only. ESL6 sessions, rounds and files are NOT read or written (overlap check refuses clashes).
 //   M1: the teaching plan is re-selected EVERY turn from the session record (previous plan, ENARA's verdicts, methods tried without improvement); logged per turn.
@@ -48,7 +48,9 @@ export const ENV_OF: Record<Arm, string> = { PP: '', LE: `${BASE},levelExplicit,
 const GRADER_ENV = 'graderV2';
 const TURNS = 3; const DAY = 86_400_000; const T0 = Date.parse('2027-05-03T09:00:00Z');
 const LESSON_ID = 'lsn';
-const NS = 'teach2';
+// run 2 (fresh seeds and learners): the guard's false hits found in run 1's raw round-1 replies (before any judging) were fixed, so the check
+// restarted on new ids and a new seed namespace (run 1 is kept unjudged in reports/exp4/teach2/discarded_run1).
+const NS = 'teach2b';
 const norm = (t: string) => t.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
 const coreOf = (prompt: string) => prompt.replace(/\s*\(answer with only the (missing word|verb)\)\s*$/i, '').replace(/^[^:]*:\s*/, '');
 const dirArg = (d: string) => path.resolve(d);
@@ -93,9 +95,9 @@ function buildLearners(): Learner[] {
   OUTCOME_IDS.forEach((oid, b) => {
     const two = O[oid].ws.length === 2; const a1 = /^EN-F-A1-/.test(oid);
     // main: 6 per outcome (the ESL6 block-of-6 pattern: A1 for the first 3 of an A1 outcome; not_assessed / emerging; primary belief W2 on 2,4,5)
-    for (let p = 0; p < 6; p++) out.push({ idx: 1100 + 6 * b + p, set: 'main', outcome: oid, band: a1 && p < 3 ? 'A1' : 'A2', status: p < 3 ? 'not_assessed' : 'emerging', primary: two && [2, 4, 5].includes(p) ? 'W2' : 'W1', preForm: (['A', 'B', 'C'] as const)[p % 3] });
+    for (let p = 0; p < 6; p++) out.push({ idx: 1400 + 6 * b + p, set: 'main', outcome: oid, band: a1 && p < 3 ? 'A1' : 'A2', status: p < 3 ? 'not_assessed' : 'emerging', primary: two && [2, 4, 5].includes(p) ? 'W2' : 'W1', preForm: (['A', 'B', 'C'] as const)[p % 3] });
     // kids: one learner per age band (A1 for A1 outcomes, else A2; not_assessed; primary W1)
-    (['child', 'teen', 'adult'] as FitBand[]).forEach((age, k) => out.push({ idx: 1300 + 3 * b + k, set: 'kids', outcome: oid, band: a1 ? 'A1' : 'A2', status: 'not_assessed', primary: 'W1', preForm: (['A', 'B', 'C'] as const)[k], age }));
+    (['child', 'teen', 'adult'] as FitBand[]).forEach((age, k) => out.push({ idx: 1600 + 3 * b + k, set: 'kids', outcome: oid, band: a1 ? 'A1' : 'A2', status: 'not_assessed', primary: 'W1', preForm: (['A', 'B', 'C'] as const)[k], age }));
   });
   return out;
 }
@@ -317,7 +319,7 @@ function overlapCheck(own: string) {
   const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(path.resolve(own) + path.sep) && !/[\\/]teach2[\\/]/.test(f));
   const ids = new Set<number>(); const seeds = new Set<string>();
   for (const f of files) { const t = readFileSync(f, 'utf8'); for (const m of t.matchAll(/"learnerIdx":\s*(\d+)/g)) ids.add(Number(m[1])); for (const m of t.matchAll(/"seed":\s*"([^"]+)"/g)) seeds.add(m[1]); }
-  for (const [a, b] of [[0, 35], [100, 159], [200, 211], [300, 407], [500, 619], [700, 991]]) for (let i = a; i <= b; i++) ids.add(i);
+  for (const [a, b] of [[0, 35], [100, 159], [200, 211], [300, 407], [500, 619], [700, 991], [1100, 1389]]) for (let i = a; i <= b; i++) ids.add(i);
   const mine = LEARNERS().map((l) => l.idx); const clash = mine.filter((i) => ids.has(i)); const seedClash = mine.map(seedOf).filter((x) => seeds.has(x)) ; const ns = [...seeds].filter((x) => x.startsWith(`${NS}|`));
   return { _label: 'SIMULATION ONLY', filesScanned: files.length, priorIds: ids.size, ids: `${Math.min(...mine)}-${Math.max(...mine)} (${mine.length})`, idClash: clash, seedClash, namespaceClash: ns, pass: !clash.length && !seedClash.length && !ns.length };
 }
@@ -333,7 +335,7 @@ function dataCheck() {
 }
 function forbidden(): RegExp[] {
   const esc = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const res: RegExp[] = [/\b[WC][12]\b/, /strength/i, /KNOWLEDGE STATE/i, /\bprimary (wrong )?belief/i, /teach2\|L\d/, /Independent correct productions/i, /ITEM_BELIEF|WRONG_ANSWERS/];
+  const res: RegExp[] = [/\b[WC][12]\b/, /strength/i, /KNOWLEDGE STATE/i, /\bprimary (wrong )?belief/i, /teach2b?\|L\d/, /Independent correct productions/i, /ITEM_BELIEF|WRONG_ANSWERS/];
   for (const o of Object.values(outcomes())) for (const t of [...Object.values(o.C), ...Object.values(o.W), ...Object.values(o.E)]) res.push(new RegExp(esc(t), 'i'));
   for (const it of bank().items.values()) { const c = coreOf(it.prompt).replace(/_+/g, '___').trim(); if (c.split(/\s+/).length >= 4) res.push(new RegExp(esc(c), 'i')); const k = String(it.answerKey ?? ''); if (k.split(/\s+/).length >= 3 && !/^e\.g\./.test(k)) res.push(new RegExp(esc(k), 'i')); }
   return res;

@@ -43,7 +43,8 @@ export function poolFromLessonItems(items: LessonItemLike[], openTargetForm?: st
 }
 export function poolFromBankItems(items: BankItemLike[]): PoolItem[] {
   return items.map((b) => {
-    const open = b.scoring === 'target_form_0_1_2' || OPEN_TYPES.test(b.type ?? '');
+    // an item with a gap is checked by its frame (frame + key), whatever its type; only gap-free free-writing items are open
+    const open = !GAP.test(b.prompt) && (b.scoring === 'target_form_0_1_2' || OPEN_TYPES.test(b.type ?? ''));
     const sens = sensitivityOf(b);
     const keys = acceptedKeys({ answerKey: b.answerKey, acceptedAnswers: b.acceptedAnswers }).filter((k) => !/^e\.g\.|\.\.\.|…/.test(k));
     return { id: b.id, source: 'assessment' as const, prompt: b.prompt, keys, caseKept: sens !== 'none', open, targetForm: b.targetForm, scoring: b.scoring, matchingNote: b.matchingNote };
@@ -59,7 +60,8 @@ const STOP = new Set(('a an the and or but of to in on at for with about from by
   'can cant will would could should much many did does done regular irregular verb verbs than comparing compare going plan plans like well yet very ' +
   'question questions negative positive give tell have has had got get look around please day days week weeks month months year years ' +
   'always usually sometimes never often some any last next ago yesterday tomorrow tonight today eat drink favourite ' +
-  "don't doesn't didn't isn't aren't wasn't can't not no") .split(' '));
+  "don't doesn't didn't isn't aren't wasn't can't not no " +
+  'think out step example examples rule clue means mean opposite note') .split(' '));
 /** Semantic groups for the open-item scene check (a model about an uncle is in the scene of "someone in your family"). */
 const GROUPS: Record<string, string[]> = {
   family: ['family', 'mother', 'father', 'mum', 'mom', 'dad', 'brother', 'sister', 'uncle', 'aunt', 'cousin', 'grandmother', 'grandfather', 'grandma', 'grandpa', 'son', 'daughter', 'parents', 'wife', 'husband', 'baby', 'twins'],
@@ -71,7 +73,7 @@ const GROUPS: Record<string, string[]> = {
 const contentWords = (t: string) => plain(t).split(' ').filter((w) => w.length > 2 && !STOP.has(w));
 const sceneOf = (t: string): Set<string> => {
   const out = new Set<string>();
-  for (const w of contentWords(t)) { out.add(w); for (const [g, ws] of Object.entries(GROUPS)) if (ws.includes(w)) out.add(`#${g}`); }
+  for (const w of contentWords(t.replace(/\((?:e\.g\.|for example)[^)]*\)/gi, ' '))) { out.add(w); for (const [g, ws] of Object.entries(GROUPS)) if (ws.includes(w)) out.add(`#${g}`); }
   return out;
 };
 const toks = (t: string, caseKept: boolean) => (caseKept ? t.replace(/[“”"]/g, ' ').replace(/[^\p{L}\p{N}\s'.,!?]/gu, ' ').replace(/([.,!?])/g, ' $1 ') : normaliseV2(t)).split(/\s+/).filter(Boolean);
@@ -112,6 +114,8 @@ export function modelledSentences(reply: string, learnerText = '', pool: PoolIte
       s = s.replace(LABEL, '').replace(/\*\*/g, '').trim();
       if (!s) continue;
       const p = plain(s);
+      // a list of forms or words ("go - went, see - saw", "half past two = 2:30", "sunny, rainy, windy") is not a model of an answer
+      if (/→|=|\s->\s/.test(s) || (s.match(/\b[\p{L}']+ - [\p{L}']+/gu) ?? []).length >= 2 || (s.match(/,/g) ?? []).length >= 3) continue;
       if (cores.some((c) => (c.caseKept ? s.replace(/["“”]/g, '').includes(c.raw.replace(/["“”]/g, '')) : p.includes(plain(c.raw))))) continue; // the tutor presenting an item (the task line)
       if (confirmed.some((c) => c && ` ${p} `.includes(` ${c} `))) continue; // confirming an item the learner has just solved (its completed sentence)
       if (learner.trim().split(' ').length >= 3 && (learner.includes(` ${p} `) || ` ${p} `.includes(learner))) continue; // restating the learner's own answer

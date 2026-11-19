@@ -1681,7 +1681,8 @@ export function buildTeach2(ctx: Pick<LanguageTeachingContext, 'signals' | 'less
   const kidsFrame = engineV2('methodSelect') && ctx.learner.ageBand.status === 'known' && ctx.learner.ageBand.value === 'child';
   const openTask = task.some((i) => !(i.acceptedAnswers ?? []).length);
   const guarded = new Set(guardedItems(ctx).map((i) => i.id));
-  const confirmed = confirmedSentences((ctx.lesson.spec?.items ?? []).filter((i) => !guarded.has(i.id)));
+  // plus the rule bank's own sentences, which are checked offline against the outcome's whole pool (test/teach2.test.ts)
+  const confirmed = [...confirmedSentences((ctx.lesson.spec?.items ?? []).filter((i) => !guarded.has(i.id))), ...(entry ? [entry.rule, entry.right, ...entry.models.map((m) => m.sentence)].map((x) => x.toLowerCase().replace(/[^\p{L}\p{N}\s']/gu, ' ').replace(/\s+/g, ' ').trim()) : [])];
   return { ...(entry ? { entryId: entry.id, template: entry.kind === 'vocab' ? 'vocab' as const : 'grammar' as const } : {}), ...(model ? { model: { form: model.form, sentence: model.sentence } } : {}), pool, ...(rung ? { rung } : {}), ...(interleave ? { interleave } : {}), ...(kidsFrame ? { kidsFrame: true } : {}), ...(openTask ? { openTask: true } : {}), ...(confirmed.length ? { confirmed } : {}) };
 }
 /** kidsBand (TRACK 2, §5): the band register with sentence-length limits and effort-not-ability praise; the r1 register otherwise. */

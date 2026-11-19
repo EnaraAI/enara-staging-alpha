@@ -56,6 +56,15 @@ describe('example guard: a worked example never uses an item the learner will so
     expect(exampleGuardHits('Wrong: There is a big table in the kitchen.', lesson)).toHaveLength(0);
     expect(exampleGuardHits('You wrote "There is a big table in the kitchen".', lesson, 'There is a big table in the kitchen')).toHaveLength(0);
   });
+  it('a list of forms or words is not a model ("go - went, buy - bought, see - saw", "sunny, rainy, windy, cloudy")', () => {
+    const pool = poolFromBankItems(bankItems('EN-F-A2-GR-past-simple-irregular'));
+    expect(exampleGuardHits('Rule: some verbs have their own past form: go - went, buy - bought, see - saw.', pool)).toEqual([]);
+    expect(exampleGuardHits('go → went, see → saw', pool)).toEqual([]);
+  });
+  it('a gapped transfer item is checked by its frame, not as an open item', () => {
+    const pool = poolFromBankItems(bankItems('EN-F-A1-VO-numbers-time'));
+    expect(pool.filter((p) => /____/.test(p.prompt)).every((p) => !p.open)).toBe(true);
+  });
   it('applyReplyGuards removes a hit only with the switch on', () => {
     const ctx: any = { lesson: { status: 'structured', spec: { items: [] } }, signals: {}, moves: [], teach2: { pool: lesson } };
     const r = 'Look: There is a big table in the kitchen.\nNow you: "___ three windows in my room."';
