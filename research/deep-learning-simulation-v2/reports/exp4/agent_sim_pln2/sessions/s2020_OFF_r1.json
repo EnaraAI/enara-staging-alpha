@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -536,7 +536,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"He has hair short black.\" The start, \"He has\", is right for hair.\n\nLook at a personality example: My teacher is kind.\nUse is with words for height, age and personality.\nRight: \"My uncle is tall.\" Wrong: \"My uncle has tall.\"\n\nNow look at the words after \"has\" in your sentence. In a few words, tell me what you were thinking about their order, then write the hair sentence again.\n\nLEARNER'S LAST MESSAGE:\nI think adjectives follow the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for telling me your idea. In English the describing word comes before the noun, so the sentence is \"He has short black hair.\" Here \"short black\" tells us about \"hair\".\n\nRight: \"He has a small nose.\" Wrong: \"He has a nose small.\"\n\nNow try a new one on your own. Write one sentence about the eyes of a famous singer. Use has."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"He has hair short black.\" The start, \"He has\", is right for hair.\n\nLook at a personality example: My teacher is kind.\nUse is with words for height, age and personality.\nRight: \"My uncle is tall.\" Wrong: \"My uncle has tall.\"\n\nNow look at the words after \"has\" in your sentence. In a few words, tell me what you were thinking about their order, then write the hair sentence again.\n\nLEARNER'S LAST MESSAGE:\nI think adjectives follow the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for telling me your idea. In English the describing word comes before the noun, so the sentence is \"He has short black hair.\" Here \"short black\" tells us about \"hair\".\n\nRight: \"He has a small nose.\" Wrong: \"He has a nose small.\"\n\nNow try a new one on your own. Write one sentence about the eyes of a famous singer. Use has.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "so the sentence is \"He has short black hair.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English the describing word comes before the noun"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"He has a small nose.\" Wrong: \"He has a nose small.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "She has big blue eyes.",
+    "errors": {
+     "W1": "She has eyes big blue."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "She has big blue eyes.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She has big blue eyes.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

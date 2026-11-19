@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 2,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -626,7 +626,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 3: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"I have a cat and a dog.\" is correct. \"and\" joins the two ideas in one sentence.\n\nNow try it in a new situation. Write one sentence about a person you know, using \"and\" to add an idea.\n\nLEARNER'S LAST MESSAGE:\nmy sister likes tea and she reads books and she is happy\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\")).\n\nTUTOR TURN TO JUDGE:\nYes, \"my sister likes tea and she reads books and she is happy\" uses \"and\" correctly to add ideas.\n\nNow the next word.\n\nJoin with but: \"The bus is cheap. It is slow.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 3: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence \"I have a cat and a dog.\" is correct. \"and\" joins the two ideas in one sentence.\n\nNow try it in a new situation. Write one sentence about a person you know, using \"and\" to add an idea.\n\nLEARNER'S LAST MESSAGE:\nmy sister likes tea and she reads books and she is happy\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\")).\n\nTUTOR TURN TO JUDGE:\nYes, \"my sister likes tea and she reads books and she is happy\" uses \"and\" correctly to add ideas.\n\nNow the next word.\n\nJoin with but: \"The bus is cheap. It is slow.\"",
+   "stateBefore": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R7",
+     "belief": "W1",
+     "quote": "Yes, \"my sister likes tea and she reads books and she is happy\" uses \"and\" correctly to add ideas."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The bus is cheap but it is slow.",
+    "errors": {
+     "W1": "The bus is cheap and it is slow."
+    }
+   },
+   "applied": [
+    "R7:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "The bus is cheap but it is slow.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "The bus is cheap but it is slow.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

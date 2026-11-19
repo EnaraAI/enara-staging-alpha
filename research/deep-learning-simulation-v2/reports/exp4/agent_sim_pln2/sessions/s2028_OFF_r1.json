@@ -600,7 +600,97 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 2: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 1.\nC2 (correct) strength 2: rooms have single English names (bedroom, living room). Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"kitchen\" is right. Small slip: check the spelling of \"kitchn\".\n\nNow a new one. Write the place.\n\nComplete: \"I sleep in the ___.\"\n\nLEARNER'S LAST MESSAGE:\nbedrom\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nYes, you matched the place to the job. Small slip: check the spelling of \"bedrom\".\n\nNow write one sentence about a person you know. Say what this person does in one place at home."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 2: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 1.\nC2 (correct) strength 2: rooms have single English names (bedroom, living room). Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"kitchen\" is right. Small slip: check the spelling of \"kitchn\".\n\nNow a new one. Write the place.\n\nComplete: \"I sleep in the ___.\"\n\nLEARNER'S LAST MESSAGE:\nbedrom\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nYes, you matched the place to the job. Small slip: check the spelling of \"bedrom\".\n\nNow write one sentence about a person you know. Say what this person does in one place at home.",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 2,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My mother cooks in the kitchen.",
+    "errors": {
+     "W1": "My mother cooks in the kitchn.",
+     "W2": "My mother cooks in the cooking room."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 2,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My mother cooks in the kitchn.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My mother cooks in the kitchn.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

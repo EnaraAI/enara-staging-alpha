@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -546,7 +546,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote the same sentence again: \"I going to study tonight.\" Nothing has changed yet.\n\nLook at the words between \"I\" and \"going to\". Is that part of the sentence complete? Decide what in the sentence needs to change, then write it again.\n\nLEARNER'S LAST MESSAGE:\nI going to study tonight.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before going to (\"I going to visit my aunt.\")).\n\nTUTOR TURN TO JUDGE:\nYou are writing \"going to\" straight after \"I\" here, and the sentence stays the same, so let's try a different way.\n\nRule: before \"going to\" we need am, is or are. Then we add the base verb.\n\nExample with a different word: \"He is going to call his friend tomorrow.\"\n\nNow look at \"I going to study tonight.\" again. Write it with the missing part."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote the same sentence again: \"I going to study tonight.\" Nothing has changed yet.\n\nLook at the words between \"I\" and \"going to\". Is that part of the sentence complete? Decide what in the sentence needs to change, then write it again.\n\nLEARNER'S LAST MESSAGE:\nI going to study tonight.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before going to (\"I going to visit my aunt.\")).\n\nTUTOR TURN TO JUDGE:\nYou are writing \"going to\" straight after \"I\" here, and the sentence stays the same, so let's try a different way.\n\nRule: before \"going to\" we need am, is or are. Then we add the base verb.\n\nExample with a different word: \"He is going to call his friend tomorrow.\"\n\nNow look at \"I going to study tonight.\" again. Write it with the missing part.",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: before \"going to\" we need am, is or are. Then we add the base verb."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I am going to study tonight.",
+    "errors": {
+     "W1": "I going to study tonight."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I am going to study tonight.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "I am going to study tonight.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

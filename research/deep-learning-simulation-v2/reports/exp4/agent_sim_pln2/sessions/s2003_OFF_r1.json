@@ -15,7 +15,7 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 1,
    "C2": 0
   },
@@ -548,7 +548,104 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are using the past form of the main verb after \"did\". Here is the rule: \"did\" already shows the past, so the main verb stays in its simple form.\nWorked example, with my thinking. Statement: \"He opened the window.\" I start with \"Did\". The past is in \"did\", so \"opened\" goes back to \"open\". Question: \"Did he open the window?\"\nNow try this item again. Write a question with did for: \"They finished the report.\"\n\nLEARNER'S LAST MESSAGE:\nThey finished the report?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"They finished the report?\" has no \"did\". It is still a statement with a question mark.\n\nLet us use a smaller step. Look at this pair:\n\nRight: Did Anna cook dinner?\nWrong: Anna cooked dinner?\n\nCompare the pair with your sentence. Then write your question again for: \"They finished the report.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are using the past form of the main verb after \"did\". Here is the rule: \"did\" already shows the past, so the main verb stays in its simple form.\nWorked example, with my thinking. Statement: \"He opened the window.\" I start with \"Did\". The past is in \"did\", so \"opened\" goes back to \"open\". Question: \"Did he open the window?\"\nNow try this item again. Write a question with did for: \"They finished the report.\"\n\nLEARNER'S LAST MESSAGE:\nThey finished the report?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"They finished the report?\" has no \"did\". It is still a statement with a question mark.\n\nLet us use a smaller step. Look at this pair:\n\nRight: Did Anna cook dinner?\nWrong: Anna cooked dinner?\n\nCompare the pair with your sentence. Then write your question again for: \"They finished the report.\"",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: Did Anna cook dinner? Wrong: Anna cooked dinner?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did they finish the report?",
+    "errors": {
+     "W1": "Did they finished the report?",
+     "W2": "They finished the report?"
+    }
+   },
+   "applied": [
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Did they finish the report?",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "Did they finish the report?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
