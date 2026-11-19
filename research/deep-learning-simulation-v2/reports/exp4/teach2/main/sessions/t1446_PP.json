@@ -1,0 +1,383 @@
+{
+ "set": "main",
+ "arm": "PP",
+ "learnerIdx": 1446,
+ "outcome": "EN-F-A1-GR-word-order-svo",
+ "seed": "teach2b|L1446",
+ "state": {
+  "form": "svo",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 2,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "start": {
+  "form": "svo",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "rec": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
+ },
+ "pre": {
+  "form": "B",
+  "wrong": 3,
+  "points": 9,
+  "max": 12
+ },
+ "turns": [
+  {
+   "learner": "Hello! Can you give me an exercise on word order (subject + verb + object)?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   },
+   "tutor": "Hi! Sure.\n\nRemember: subject → verb → object. Words like always, usually and often go **before** the main verb.\nExample: We usually have lunch at one.\n\nExercise: Put the words in order:\n\"often / my aunt / tea / makes\"",
+   "guardHitsRaw": 1,
+   "guardRaw": [
+    {
+     "item": "p2",
+     "source": "lesson",
+     "why": "completes_item",
+     "sentence": "We usually have lunch at one."
+    }
+   ],
+   "shownEarlyRaw": 1,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 2: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 1: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 0.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on word order (subject + verb + object)?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi! Sure.\n\nRemember: subject → verb → object. Words like always, usually and often go **before** the main verb.\nExample: We usually have lunch at one.\n\nExercise: Put the words in order:\n\"often / my aunt / tea / makes\"",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Remember: subject → verb → object."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My aunt often makes tea.",
+    "errors": {
+     "W1": "Makes my aunt often tea."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "learner": "My aunt often makes tea.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My aunt often makes tea."
+   },
+   "tutor": "Excellent! ✅ **My aunt often makes tea.** Subject (my aunt) + often + verb (makes) + object (tea). 'Often' goes before the main verb.\n\nNext one. Put the words in order:\n\"usually / we / lunch / have\"",
+   "guardHitsRaw": 0,
+   "guardRaw": [],
+   "shownEarlyRaw": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 2: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 1: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 0.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Sure.\n\nRemember: subject → verb → object. Words like always, usually and often go **before** the main verb.\nExample: We usually have lunch at one.\n\nExercise: Put the words in order:\n\"often / my aunt / tea / makes\"\n\nLEARNER'S LAST MESSAGE:\nMy aunt often makes tea.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nExcellent! ✅ **My aunt often makes tea.** Subject (my aunt) + often + verb (makes) + object (tea). 'Often' goes before the main verb.\n\nNext one. Put the words in order:\n\"usually / we / lunch / have\"",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Excellent! ✅ **My aunt often makes tea.**"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Excellent! ✅ **My aunt often makes tea.**"
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "We usually have lunch.",
+    "errors": {
+     "W1": "Have we usually lunch."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "learner": "We usually have lunch.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "We usually have lunch."
+   },
+   "tutor": "Correct! ✅ **We usually have lunch.** Subject (we) + usually + verb (have) + object (lunch).\n\nNow a harder one. Write your own sentence about your family. Use subject + **often** or **always** + verb + object.",
+   "guardHitsRaw": 0,
+   "guardRaw": [],
+   "shownEarlyRaw": 0,
+   "twoAsks": false,
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 2: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 3: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExcellent! ✅ **My aunt often makes tea.** Subject (my aunt) + often + verb (makes) + object (tea). 'Often' goes before the main verb.\n\nNext one. Put the words in order:\n\"usually / we / lunch / have\"\n\nLEARNER'S LAST MESSAGE:\nWe usually have lunch.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! ✅ **We usually have lunch.** Subject (we) + usually + verb (have) + object (lunch).\n\nNow a harder one. Write your own sentence about your family. Use subject + **often** or **always** + verb + object.",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! ✅ We usually have lunch."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! ✅ We usually have lunch."
+    }
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My father often reads books.",
+    "errors": {
+     "W1": "Often reads my father books."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  }
+ ]
+}

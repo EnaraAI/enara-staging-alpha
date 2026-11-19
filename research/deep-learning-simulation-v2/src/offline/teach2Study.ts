@@ -147,7 +147,7 @@ interface PlanLog { primary: string; supporting: string[]; reinforcement?: strin
 interface Sess { set: 'main' | 'kids'; arm: Arm; learnerIdx: number; outcome: string; seed: string; state: KState; start: KState; rec: Rec; pre: { form: string; wrong: number; points: number; max: number }; turns: Turn[] }
 const keyOf = (s: { learnerIdx: number; arm: Arm }) => `t${s.learnerIdx}_${s.arm}`;
 const sf = (dir: string, key: string) => path.join(dir, 'sessions', `${key}.json`);
-const load = (dir: string, key: string): Sess => JSON.parse(readFileSync(sf(dir, key), 'utf8'));
+const load = (dir: string, key: string): Sess => JSON.parse(readFileSync(sf(dir, key), 'utf8'), (k, v) => (/At$/.test(k) && typeof v === 'string' ? new Date(v) : v)); // dates revived (as esl6Study.ts)
 const save = (dir: string, s: Sess) => writeFileSync(sf(dir, keyOf(s)), JSON.stringify(s, null, 1));
 const sessionFiles = (dir: string) => readdirSync(path.join(dir, 'sessions')).filter((f) => f.endsWith('.json')).sort();
 const lessonOf = (oid: string) => LESSONS_T2[oid];
@@ -375,13 +375,18 @@ function report(dir: string, kidsDir?: string) {
   res.methods = { turns: LE.turns, perMethod: Object.fromEntries([...GUIDE_METHODS.map((m) => m.id), ...Object.keys(mt).filter((x) => !GUIDE_METHODS.some((m) => m.id === x))].map((id) => { const v = mt[id]; return [id, v ? { name: STRATEGY_BY_ID.get(id)?.name, primary: v.primary, supporting: v.supporting, reinforcement: v.reinforcement, modifier: v.modifier, sessions: v.sessions.size } : { name: STRATEGY_BY_ID.get(id)?.name, primary: 0, supporting: 0, reinforcement: 0, modifier: 0, sessions: 0 }]; })), planSwitchesWithinSession: switches, reasonCodes: reasons, engineMoves: moves, feedbackRungs: rungs, ruleTemplates: tmpl, interleaveTurns: interleave, kidsFrameTurns: kidsFrame, postCheckTurns: postCheck };
   res.lists = { r5: r5List, r6: r6List, guard: guardList };
   if (kidsDir) {
-    let n = 0; let within = 0; let fits = 0; let judged = 0; const flags: Record<string, number> = {}; const byBand: Record<string, { n: number; within: number; fits: number }> = {};
+    let n = 0; let within = 0; let within2 = 0; let fits = 0; let judged = 0; const flags: Record<string, number> = {}; const flags2: Record<string, number> = {}; const byBand: Record<string, { n: number; within: number; within2?: number; fits: number }> = {};
     for (const f of sessionFiles(kidsDir)) {
       const s = load(kidsDir, f.replace(/\.json$/, '')); const l = L_OF(s.learnerIdx); const B = (byBand[l.age!] ??= { n: 0, within: 0, fits: 0 });
-      for (const t of s.turns) { if (t.tutor === undefined) continue; n++; B.n++; if (t.ageFit?.within) { within++; B.within++; } for (const x of t.ageFit?.flags ?? []) flags[x] = (flags[x] ?? 0) + 1; if (t.fitVotes) { judged++; if (t.fits) { fits++; B.fits++; } } }
+      // ageFit as recorded at apply time (v1) and recomputed with the measurement fix (v2: quote-aware sentence split; labels the lesson itself names,
+      // in its grammar line, success criteria or objectives, count as taught). The tutor replies are the same; only the check changed.
+      const Ls = lessonOf(l.outcome).spec; const lw = [...(Ls.vocabulary ?? []), ...(Ls.examples ?? []), ...(Ls.items ?? []).map((i) => i.prompt), ...(Ls.grammar ?? [])];
+      const taught = [...(Ls.grammar ?? []), ...(Ls.successCriteria ?? []), ...(Ls.objectives ?? [])].flatMap((g) => g.split(/[^A-Za-z]+/));
+      for (const t of s.turns) { if (t.tutor === undefined) continue; n++; B.n++; if (t.ageFit?.within) { within++; B.within++; } for (const x of t.ageFit?.flags ?? []) flags[x] = (flags[x] ?? 0) + 1; const f2 = ageFit(t.tutor, l.age!, lw, taught); t.ageFitV2 = f2; if (f2.within) { within2++; B.within2 = (B.within2 ?? 0) + 1; } for (const x of f2.flags) flags2[x] = (flags2[x] ?? 0) + 1; if (t.fitVotes) { judged++; if (t.fits) { fits++; B.fits++; } } }
+      save(kidsDir, s);
     }
-    res.kids = { turns: n, withinLimits: within, withinPct: pct(within, n), judged, fits, fitsPct: pct(fits, judged), flags, byBand };
-    res.bars.kids = { pass: (res.kids.withinPct ?? 0) >= 95 && (res.kids.fitsPct ?? 0) >= 90, withinPct: res.kids.withinPct, fitsPct: res.kids.fitsPct };
+    res.kids = { turns: n, withinLimits: within, withinPct: pct(within, n), withinLimitsV2: within2, withinPctV2: pct(within2, n), judged, fits, fitsPct: pct(fits, judged), flags, flagsV2: flags2, byBand };
+    res.bars.kids = { pass: (res.kids.withinPct ?? 0) >= 95 && (res.kids.fitsPct ?? 0) >= 90, withinPct: res.kids.withinPct, withinPctV2: res.kids.withinPctV2, passV2: (res.kids.withinPctV2 ?? 0) >= 95 && (res.kids.fitsPct ?? 0) >= 90, fitsPct: res.kids.fitsPct };
   }
   return res;
 }
