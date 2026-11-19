@@ -44,3 +44,39 @@ Move the tutor from grammar study only to the four strands and the four lesson s
 ## Not in this plan
 
 ESL7 grammar switches, avatar latency, ESL6b, the real-learner pilot. Those stay as already planned.
+
+---
+
+# Plan: planner as a code rule table
+
+Waiting for "go". Comes before the lesson shapes above, so the shapes are built as rows of the table.
+
+## Today
+
+- **Code:** `selectTeachingPlan` (`pedagogyPolicy.ts`, ped-v2) picks the method from the 23 with no AI call; `selectLanguageMoves` + `esl5Adjust` pick per-turn moves.
+- **Model:** only receives the chosen method's instructions as text and writes the reply. Nothing checks live that it followed them.
+- **Gaps:** no lesson-shape layer; rules are an if/else chain, not a table; tested only inside broader tests; two layers (plan, moves) can disagree.
+
+## Steps
+
+1. **Signals** (one typed object, all from code): age band, CEFR level, mastery, last error type, quick-check result, goal (exam / work / daily life / school), session number, engagement.
+2. **Rule table as data** (`lessonPlanner.ts`): each row = conditions → lesson shape + primary method + supporting methods + reason code. First matching row wins; a final default row. Pure function `planLesson(signals)`, no AI, no database.
+3. **Two levels:** lesson shape chosen once per lesson; per-turn method and moves (existing ped-v2 + language moves) must stay inside what the shape allows. One owner per decision, no overlap.
+4. **Model contract:** the prompt gets only the current shape step + method instructions. The model writes the reply. Existing code checks (two-asks guard, answer protection) stay.
+5. **Explainable:** every decision logs rule id, signals and reason. A plain sentence for teachers and parents: "Test, teach, test, because the quick check showed 3 of 5 known."
+6. **Switch** `planner2`, off by default; off = today's behaviour exactly.
+
+## Tests
+
+- Table-driven unit test: one case per row.
+- Coverage test: every signal combination hits exactly one intended row; no unreachable rows.
+- Off-parity test: switch off gives identical plans to today.
+- Golden traces: 20 fixed learner journeys, plans snapshotted.
+- Simulation no-harm: ESL6 design, planner2 vs current, small batches, Opus judges.
+
+## Later: learning from real learners
+
+- Log every decision with its outcome (next check, delayed test).
+- Offline first: estimate which row works for which learner from logged data only.
+- Then a bandit that may only choose among methods the table allows for that learner (rules stay as safety rails), with a small exploration share.
+- Only with real learners and enough data; separate plan and "go".
