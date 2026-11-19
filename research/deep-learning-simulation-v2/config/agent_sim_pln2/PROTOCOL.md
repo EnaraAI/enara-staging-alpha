@@ -65,8 +65,8 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `2893297ae34e7d3d8e5d37b355e590be273a170905772f3c562e81e5f6d5b38c` |
-| `src/offline/pln2_analyze.py` (this analysis) | `a12f50f7e993b1af899c115a464efe8c59778268112f6f3b5c569abd4d8b739b` |
+| `src/offline/pln2Study.ts` (this runner) | `b861336ad365ce456c070b666cc87f9fba1753decc8c2fbfb13b01d501cc93e0` |
+| `src/offline/pln2_analyze.py` (this analysis) | `553542d7ab2f471dab9c7b249db3f9760077e6b4f3ac7d17411a3bcd6284d6ff` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
 
@@ -86,7 +86,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 
 ## 5. Design
 
-- **One session of 5 turns (5 rounds)**, as ESL6 amendment A1, then F1 v2 for **7 days** before the delayed test. One replication: 48 learners × 2 arms = **96 sessions**, 480 tutor turns.
+- **One session of 7 turns (7 rounds; amendment B, was 5)**, as ESL6 amendment A1 but longer, then F1 v2 for **7 days** before the delayed test. One replication: 48 learners × 2 arms = **96 sessions**, 672 tutor turns.
 - **Tutor cells:** arm × (learner id mod 3) → **6 cells of 16 sessions per round** (4 learners of each group per cell), one Sonnet tutor agent per cell (`tasks/TUTOR_TASK.md`). A cell holds one arm only, so no tutor agent sees both settings.
 - **Event judging:** the ESL6 judge task (ESL2 `JUDGE_INSTRUCTIONS.md`, ESL6 `LEARNING_RULES.md`, rules R1–R7 applied to the rule-based learner state through `esl6_forget.apply_events`), blind to the arm (the hidden marker and the word ENARA are removed). **72 cases per batch** (2 batches per round: 72 + 24). Opus. The learner's next message comes from the judge's `next_task` and the seeded dice (LEARNING_RULES §2, §2a, §3a).
 - **Event-judge agreement:** a stable 10% of all 480 event cases (`rand('pln2-agree', caseId) < 0.1`, 44 cases; the case ids are fixed by the session keys) judged a second time, blind, in one batch after round 5 (`agreeprep`); compared as in ESL6 (state after each judge's events, `esl6_forget.comparable`).
@@ -142,6 +142,12 @@ Per group and overall: delayed primary score P2 − OFF with a paired 95% percen
 ## 11. Run plan
 
 `RUNBOOK.md` (exact commands and the number of agent task files per step). **Dry run** (scripted replies, judges, fit judges and scorers; no agents) of the whole pipeline, 2026-11-19: 96 sessions, 6 cells × 5 rounds, 2 judge batches per round, 0 rejected events, grader null 0, agreement sample 44 cases, fit 96 cases in 8 batches + 12 agreement cases, recheck 242 distinct pairs (7 batches per scorer), analysis complete with every table. Dry output is never committed (`reports/exp4/agent_sim_pln2_dry/` is git-ignored).
+
+## Amendment B (19 Nov 2026, before round 1, owner decision "go with B")
+- **7 rounds instead of 5** (one session of 7 tutor turns). Reason: the teen quick check uses the first 3–4 turns, so with 5 rounds a TTT lesson had only 1–2 teaching turns against 5 in OFF; that would test the short simulated lesson, not the planner. All other groups also get 7 rounds, in both arms.
+- **1 grader-recheck scorer instead of 3.** Reason: the same grader agreed 100% with 3 scorers in ESL6 (1,293 answers). The pass rule is unchanged (≥ 95% on gap-fill and choice items) and now compares the grader with this one scorer.
+- Agent runs: ≤ 73 (42 Sonnet tutors, 14 event judges, 1 event-agreement, 8 fit judges, 1 fit-agreement, ≤ 7 recheck), instead of ≤ 71.
+- Pass rules (§ above) unchanged.
 
 ## Changes before the first real run (19 Nov 2026, no agent run yet)
 The harness build found 4 planner bugs; fixed in `lessonPlanner.ts` (tests in `planner2.test.ts`) and re-verified with the full dry run:

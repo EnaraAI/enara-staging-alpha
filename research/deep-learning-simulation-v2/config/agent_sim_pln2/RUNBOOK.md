@@ -15,13 +15,13 @@ T="npx tsx $S"
 
 | Step | Task file | Model | Per round | Total |
 |---|---|---|---|---|
-| Tutor turns (6 cells × 16 sessions) | `tasks/TUTOR_TASK.md` | Sonnet | 6 | **30** |
-| Event judges (72 + 24 cases) | `tasks/JUDGE_TASK.md` (JDIR `judge`) | Opus | 2 | **10** |
-| Event-judge agreement (44 cases, after round 5) | `tasks/JUDGE_TASK.md` (JDIR `agree`, batch `ag_j01`) | Opus | – | **1** |
+| Tutor turns (6 cells × 16 sessions) | `tasks/TUTOR_TASK.md` | Sonnet | 6 | **42** |
+| Event judges (72 + 24 cases) | `tasks/JUDGE_TASK.md` (JDIR `judge`) | Opus | 2 | **14** |
+| Event-judge agreement (about 67 cases, after round 7) | `tasks/JUDGE_TASK.md` (JDIR `agree`, batch `ag_j01`) | Opus | – | **1** |
 | Fit judges (96 cases, 12 per batch) | `tasks/FIT_TASK.md` (FOLDER `fit`, `fit_j01`–`fit_j08`) | Opus | – | **8** |
 | Fit-judge agreement (12 cases) | `tasks/FIT_TASK.md` (FOLDER `fitagree`, `fag_j01`) | Opus | – | **1** |
-| Grader recheck (3 scorers × ≤ 7 batches of 40 pairs) | `tasks/RECHECK_TASK.md` | Opus | – | **≤ 21** (21 in the dry run; 266 sampled answers, the number of distinct pairs depends on the answers) |
-| **All** | | | | **≤ 71** (30 Sonnet + ≤ 41 Opus) |
+| Grader recheck (1 scorer, amendment B, × ≤ 7 batches of 40 pairs) | `tasks/RECHECK_TASK.md` | Opus | – | **≤ 7** |
+| **All** | | | | **≤ 73** (42 Sonnet + ≤ 31 Opus) |
 
 The counts of the first five rows are fixed by the design (case ids are hashes of the session keys); only the recheck count depends on the answers.
 
@@ -84,7 +84,7 @@ $T assess $D del
 ```sh
 $T recheckprep $D                   # "batches per scorer K"
 ```
-3 × K scorer agents (`tasks/RECHECK_TASK.md`, Opus): SCORER `s1`, `s2`, `s3` × BATCH `rc01` … `rcK`.
+K scorer agents (`tasks/RECHECK_TASK.md`, Opus): SCORER `s1` × BATCH `rc01` … `rcK` (amendment B: one scorer).
 ```sh
 $T recheckscore $D                  # GRADER_RECHECK.json
 ```
@@ -106,7 +106,7 @@ Scripted tutor replies (a hidden marker that grades the learner's last answer, t
 DD=../research/deep-learning-simulation-v2/reports/exp4/agent_sim_pln2_dry
 rm -rf $DD && mkdir -p $DD && touch $DD/DRY_RUN
 $T init $DD && $T assess $DD pre
-for r in 1 2 3 4 5; do $T promptcheck $DD && $T dryreply $DD $r && $T jprep $DD $r && $T dryjudge $DD $r && $T japply $DD $r; done
+for r in 1 2 3 4 5 6 7; do $T promptcheck $DD && $T dryreply $DD $r && $T jprep $DD $r && $T dryjudge $DD $r && $T japply $DD $r; done
 $T agreeprep $DD && $T dryagree $DD && $T agreescore $DD
 $T fitprep $DD && $T dryfit $DD && $T fitapply $DD
 $T assess $DD imm && $T f1 $DD 7 && $T assess $DD del

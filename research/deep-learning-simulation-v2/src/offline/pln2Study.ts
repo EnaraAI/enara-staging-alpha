@@ -10,7 +10,7 @@
 //     skips ruleFirst and appends QUICK_CHECK_LINE (as buildLanguageTeachingContext); 2+ in-session Arabic-transfer diagnoses add the l1_transfer
 //     misconception (as learningContext).
 //   - Fit judging (fitprep / fitapply): one arm-blind case per finished session with the group's rubric; 12 cases per batch; a 10% re-judged sample.
-//   - Event-judge agreement: a 10% sample of all rounds' cases (one agreeprep after round 5).
+//   - Event-judge agreement: a 10% sample of all rounds' cases (one agreeprep after the last round).
 // The engine sees only what a real tutor sees (learner messages, lesson data, course level, objective status, staff-set age band, birth-date age, goal,
 // ENARA's own stored record); never the simulator state (promptcheck enforces it before every round).
 // Run from backend/:  npx tsx ../research/deep-learning-simulation-v2/src/offline/pln2Study.ts <cmd> ...
@@ -81,9 +81,9 @@ const BASE = 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog';
 export const ENV_OF: Record<Arm, string> = { OFF: `${BASE},levelExplicit,esl5,graderV2`, P2: `${BASE},levelExplicit,esl5,graderV2,planner2` };
 const PRIMARY_TYPES = new Set(['gap_fill', 'controlled_gap_fill', 'multiple_choice', 'controlled_choice']);
 const GRADER_ENV = 'graderV2';
-const SESSIONS = 1; const TURNS_PER_SESSION = 5; const ROUNDS = SESSIONS * TURNS_PER_SESSION; const DAY = 86_400_000; const T0 = Date.parse('2027-04-05T09:00:00Z');
+const SESSIONS = 1; const TURNS_PER_SESSION = 7; /* amendment B: 7 rounds (TTT gets teaching turns after the quick check) */ const ROUNDS = SESSIONS * TURNS_PER_SESSION; const DAY = 86_400_000; const T0 = Date.parse('2027-04-05T09:00:00Z');
 const DELAY_DAYS = 7;
-const JUDGE_PER = 72; const FIT_PER = 12; const AGREE_SHARE = 0.1; const FIT_AGREE_SHARE = 0.1; const RECHECK_PER = 40;
+const JUDGE_PER = 72; const FIT_PER = 12; const AGREE_SHARE = 0.1; const FIT_AGREE_SHARE = 0.1; const RECHECK_PER = 40; const SCORERS = ['s1']; /* amendment B: 1 recheck scorer (ESL6 recheck agreed 100%) */
 const CELLS_PER_ARM = 3;                               // 3 cells of 16 sessions per arm -> 6 tutor task files per round
 const LESSON_ID = 'lsn';
 const NS = 'pln2';
@@ -593,7 +593,7 @@ async function main() {
     }
     write(path.join(dir, 'TAGS.json'), rows); write(path.join(dir, 'STUCK.json'), stuck); console.log('turn rows', rows.length, 'stuck runs', stuck.length);
   } else if (cmd === 'agreeprep') {
-    // 10% of all event-judge cases of rounds 1-5 (rand('pln2-agree', caseId) < 0.1), judged again blind, batches of 72; run after round 5's japply.
+    // 10% of all event-judge cases of all rounds (rand('pln2-agree', caseId) < 0.1), judged again blind, batches of 72; run after round 5's japply.
     const dir = dirArg(a1); const cases: { id: string; text: string }[] = []; const key: Record<string, string> = {};
     for (let round = 1; round <= ROUNDS; round++) {
       const p = path.join(dir, 'judge', `r${round}_KEY.json`); if (!existsSync(p)) throw new Error(`round ${round} not judged`);
@@ -618,7 +618,7 @@ async function main() {
     const sample = all.filter((r) => rand(`${NS}-recheck`, r.answerId) < 0.1); const key: Record<string, any> = {};
     const uidOf = (r: any) => `u${sha(`${NS}-recheck-pair|${r.itemId}|${r.answer}`).slice(0, 12)}`;
     const uniq = [...new Map(sample.map((r) => [uidOf(r), { ...r, answerId: uidOf(r) }] as const)).values()];
-    for (const sc of ['s1', 's2', 's3']) {
+    for (const sc of SCORERS) {
       const d = path.join(dir, 'recheck', sc); mkdirSync(d, { recursive: true });
       const order = [...uniq].sort((x, y) => (sha(`${NS}-recheck|${sc}|${x.answerId}`) < sha(`${NS}-recheck|${sc}|${y.answerId}`) ? -1 : 1));
       const files: { batch: string; ids: string[] }[] = [];
@@ -633,10 +633,10 @@ async function main() {
     write(path.join(dir, 'recheck', 'KEY.json'), key); console.log('recheck answers', sample.length, 'of', all.length, 'distinct item+answer pairs', uniq.length, 'batches per scorer', Math.ceil(uniq.length / RECHECK_PER));
   } else if (cmd === 'recheckscore') {
     const dir = dirArg(a1); const key = JSON.parse(readFileSync(path.join(dir, 'recheck', 'KEY.json'), 'utf8')) as Record<string, any>; const got: Record<string, Record<string, number>> = {}; const missing: string[] = [];
-    for (const sc of ['s1', 's2', 's3']) { const files = JSON.parse(readFileSync(path.join(dir, 'recheck', sc, 'FILES.json'), 'utf8')) as { batch: string; ids: string[] }[]; for (const f of files) { const p = path.join(dir, 'recheck', sc, `${f.batch}.json`); if (!existsSync(p)) { missing.push(`${sc}/${f.batch}`); continue; } const d = JSON.parse(readFileSync(p, 'utf8')); for (const id of f.ids) { const v = d.scores?.[id]; if (typeof v !== 'number') missing.push(`${sc}/${f.batch}:${id}`); else (got[id] ??= {})[sc] = v; } } }
+    for (const sc of SCORERS) { const files = JSON.parse(readFileSync(path.join(dir, 'recheck', sc, 'FILES.json'), 'utf8')) as { batch: string; ids: string[] }[]; for (const f of files) { const p = path.join(dir, 'recheck', sc, `${f.batch}.json`); if (!existsSync(p)) { missing.push(`${sc}/${f.batch}`); continue; } const d = JSON.parse(readFileSync(p, 'utf8')); for (const id of f.ids) { const v = d.scores?.[id]; if (typeof v !== 'number') missing.push(`${sc}/${f.batch}:${id}`); else (got[id] ??= {})[sc] = v; } } }
     const ref = (v: number[]) => { const c: Record<number, number> = {}; v.forEach((x) => (c[x] = (c[x] ?? 0) + 1)); const m = Object.entries(c).find(([, n]) => n >= 2); return m ? Number(m[0]) : [...v].sort((a, b) => a - b)[1]; };
     const prim: { g: number; r: number }[] = []; const ex: { g: number; r: number }[] = []; const tf: { g: number; r: number }[] = [];
-    for (const [id, k] of Object.entries(key)) { const v = got[k.uid ?? id]; if (!v || Object.keys(v).length !== 3) continue; const r = ref([v.s1, v.s2, v.s3]); (k.scoring === 'exact' ? ex : tf).push({ g: k.grader, r }); if (k.scoring === 'exact' && PRIMARY_TYPES.has(bank().items.get(k.itemId)?.type ?? '')) prim.push({ g: k.grader, r }); }
+    for (const [id, k] of Object.entries(key)) { const v = got[k.uid ?? id]; if (!v || Object.keys(v).length !== SCORERS.length) continue; const r = SCORERS.length === 1 ? v.s1 : ref(SCORERS.map((x) => v[x])); (k.scoring === 'exact' ? ex : tf).push({ g: k.grader, r }); if (k.scoring === 'exact' && PRIMARY_TYPES.has(bank().items.get(k.itemId)?.type ?? '')) prim.push({ g: k.grader, r }); }
     const agree = (xs: { g: number; r: number }[]) => (xs.length ? +(xs.filter((x) => x.g === x.r).length / xs.length).toFixed(4) : null);
     const res = { _label: 'SIMULATION ONLY', sampled: Object.keys(key).length, primaryItems: prim.length, primaryAgreement: agree(prim), exactItems: ex.length, exactAgreement: agree(ex), freeItems: tf.length, freeExactAgreement: agree(tf), missing, guard: 'primary (gap-fill/choice) exact agreement >= 0.95 (ESL6 guard; reported, not a PLN2 pass rule)', pass: !missing.length && (agree(prim) ?? 0) >= 0.95 };
     write(path.join(dir, 'GRADER_RECHECK.json'), res); console.log(JSON.stringify({ ...res, missing: missing.length }));
@@ -705,7 +705,7 @@ async function main() {
   } else if (cmd === 'dryscore') {
     const dir = dirArg(a1); needDry(dir);
     const byU = new Map(Object.values(JSON.parse(readFileSync(path.join(dir, 'recheck', 'KEY.json'), 'utf8')) as any[]).map((k) => [k.uid, { points: k.grader }] as const));
-    for (const sc of ['s1', 's2', 's3']) { const files = JSON.parse(readFileSync(path.join(dir, 'recheck', sc, 'FILES.json'), 'utf8')) as { batch: string; ids: string[] }[]; for (const f of files) write(path.join(dir, 'recheck', sc, `${f.batch}.json`), { batch: f.batch, scores: Object.fromEntries(f.ids.map((id) => { const g = byU.get(id)!.points ?? 0; return [id, sc === 's3' && rand('dryscore', id) < 0.05 ? (g === 0 ? 1 : 0) : g]; })) }); }
+    for (const sc of SCORERS) { const files = JSON.parse(readFileSync(path.join(dir, 'recheck', sc, 'FILES.json'), 'utf8')) as { batch: string; ids: string[] }[]; for (const f of files) write(path.join(dir, 'recheck', sc, `${f.batch}.json`), { batch: f.batch, scores: Object.fromEntries(f.ids.map((id) => { const g = byU.get(id)!.points ?? 0; return [id, sc === 's3' && rand('dryscore', id) < 0.05 ? (g === 0 ? 1 : 0) : g]; })) }); }
     console.log('dry scorer files written');
   } else if (cmd === 'dryfit') {
     // scripted fit judges: a hash-based score per item (arm-blind); the agreement judge copies it except 1 item score in 10

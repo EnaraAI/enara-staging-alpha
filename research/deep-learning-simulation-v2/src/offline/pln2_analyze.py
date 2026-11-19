@@ -13,7 +13,7 @@ import json, os, random, sys
 from collections import Counter, defaultdict
 
 D = sys.argv[1]
-ARMS = ('OFF', 'P2'); GROUPS = ('TASK', 'TTT', 'LAD', 'KIDPPP'); ROUNDS = 5; N_PER_GROUP = 12
+ARMS = ('OFF', 'P2'); GROUPS = ('TASK', 'TTT', 'LAD', 'KIDPPP'); ROUNDS = 7; N_PER_GROUP = 12
 RUBRIC = {
     'TASK': ['task_goal', 'feedback_after_task', 'task_repeat'],
     'TTT': ['test_first_clean', 'teach_targets_gaps', 'retest_end'],
