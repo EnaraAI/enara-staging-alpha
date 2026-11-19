@@ -15,8 +15,8 @@
   "s": {
    "W1": 0,
    "W2": 1,
-   "C1": 1,
-   "C2": 0
+   "C1": 2,
+   "C2": 1
   },
   "indep": {
    "C1": 0,
@@ -200,7 +200,109 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-copula-be (am, is and are). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 1: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Remember: am goes with I, is goes with he, she and it, and are goes with you, we and they. Never leave the word out! Your first exercise: She ___ at home today. Write only the missing word.\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, is is correct! We use is with she. Next one. Write am, is or are: They ___ happy. Write only the missing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-copula-be (am, is and are). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 1: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Remember: am goes with I, is goes with he, she and it, and are goes with you, we and they. Never leave the word out! Your first exercise: She ___ at home today. Write only the missing word.\n\nLEARNER'S LAST MESSAGE:\nis\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, is is correct! We use is with she. Next one. Write am, is or are: They ___ happy. Write only the missing word.",
+   "stateBefore": {
+    "form": "cop",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "copula"
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, is is correct! We use is with she."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, is is correct! We use is with she."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "are",
+    "errors": {
+     "W2": "is"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "cop",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 2,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "copula"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "are",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "are",
+    "probes": [
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

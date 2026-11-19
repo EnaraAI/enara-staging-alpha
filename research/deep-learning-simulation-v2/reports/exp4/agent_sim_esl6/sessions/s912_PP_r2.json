@@ -14,7 +14,7 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 1,
    "C2": 0
   },
@@ -200,7 +200,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 1: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! We use am/is/are + verb-ing for things happening now. Example: Two children are playing football. Now you try. Imagine a park. Write two sentences about what people are doing now.\n\nLEARNER'S LAST MESSAGE:\nA man runs in the park.\nFACT: the last learner message contained the error of W2 (uses the plain present for now (\"Look! It rains.\")).\n\nTUTOR TURN TO JUDGE:\nGood sentence, but runs is not for now. For things happening now we use is + verb-ing. Hint: change runs to is ... Can you write A man ... in the park again, and add one more sentence?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 1: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! We use am/is/are + verb-ing for things happening now. Example: Two children are playing football. Now you try. Imagine a park. Write two sentences about what people are doing now.\n\nLEARNER'S LAST MESSAGE:\nA man runs in the park.\nFACT: the last learner message contained the error of W2 (uses the plain present for now (\"Look! It rains.\")).\n\nTUTOR TURN TO JUDGE:\nGood sentence, but runs is not for now. For things happening now we use is + verb-ing. Hint: change runs to is ... Can you write A man ... in the park again, and add one more sentence?",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "For things happening now we use is + verb-ing."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "For things happening now we use is + verb-ing."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "A man is running in the park.",
+    "errors": {
+     "W1": "A man running in the park.",
+     "W2": "A man runs in the park."
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "A man is running in the park.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "A man is running in the park.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

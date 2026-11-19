@@ -183,7 +183,101 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 0: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 3: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 3: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure! Each place in the home has its own use: we cook in the kitchen, sleep in the bedroom, wash in the bathroom, and relax in the garden. Example: I cook dinner in the kitchen.\n\nTry this one. Complete: \"I make toast in the ___.\"\n\nLEARNER'S LAST MESSAGE:\nkitchn\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nYou chose the right place, but the spelling is slightly off. Check the word carefully: there is a letter missing before the final n. Try writing \"kitchen\" in full. Then make your own sentence with it."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 0: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 3: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 3: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nSure! Each place in the home has its own use: we cook in the kitchen, sleep in the bedroom, wash in the bathroom, and relax in the garden. Example: I cook dinner in the kitchen.\n\nTry this one. Complete: \"I make toast in the ___.\"\n\nLEARNER'S LAST MESSAGE:\nkitchn\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nYou chose the right place, but the spelling is slightly off. Check the word carefully: there is a letter missing before the final n. Try writing \"kitchen\" in full. Then make your own sentence with it.",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "Try writing \"kitchen\" in full."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "kitchen",
+    "errors": {
+     "W1": "kitchn"
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "kitchen",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "kitchen",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

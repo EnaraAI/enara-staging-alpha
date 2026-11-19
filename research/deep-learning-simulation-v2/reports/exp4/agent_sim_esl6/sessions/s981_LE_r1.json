@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -243,7 +243,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 3: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHere is the first item. Correct the sentence: \"She can swims.\"\nWrite the corrected sentence in one line.\n\nLEARNER'S LAST MESSAGE:\nShe can swim.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"She can swim.\" After a modal verb such as can, the bare infinitive is used, so there is no third-person -s.\n\nNext item. Complete: \"I ___ ride a bike. I never learned.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level B2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 3: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHere is the first item. Correct the sentence: \"She can swims.\"\nWrite the corrected sentence in one line.\n\nLEARNER'S LAST MESSAGE:\nShe can swim.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"She can swim.\" After a modal verb such as can, the bare infinitive is used, so there is no third-person -s.\n\nNext item. Complete: \"I ___ ride a bike. I never learned.\"",
+   "stateBefore": {
+    "form": "can",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"She can swim.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "She can swim."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After a modal verb such as can, the bare infinitive is used, so there is no third-person -s."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "can't",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "can",
+    "band": "B2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "can't",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "can't",
+    "probes": []
+   }
   }
  ],
  "assess": {

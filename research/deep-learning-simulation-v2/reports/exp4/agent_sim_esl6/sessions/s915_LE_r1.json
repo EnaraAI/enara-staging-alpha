@@ -15,12 +15,12 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
-   "C2": 0
+   "C1": 3,
+   "C2": 2
   },
   "indep": {
-   "C1": 0,
-   "C2": 0
+   "C1": 1,
+   "C2": 1
   },
   "start": {
    "W1": 2,
@@ -273,7 +273,122 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExample: A man is cooking soup in a kitchen. He is cooking now, so I write is and cooking.\nRule: use am, is or are and a verb with -ing to say what is happening now.\nRight: The girls are singing. Wrong: The girls singing.\nNow you try. Imagine a park. Write two sentences about what people are doing now.\n\nLEARNER'S LAST MESSAGE:\nA man is reading a book.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"A man is reading a book.\" correctly says what a person is doing now. You have one sentence, and the task needs two.\nWhat is another person in the park doing? Write one more sentence about that."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExample: A man is cooking soup in a kitchen. He is cooking now, so I write is and cooking.\nRule: use am, is or are and a verb with -ing to say what is happening now.\nRight: The girls are singing. Wrong: The girls singing.\nNow you try. Imagine a park. Write two sentences about what people are doing now.\n\nLEARNER'S LAST MESSAGE:\nA man is reading a book.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"A man is reading a book.\" correctly says what a person is doing now. You have one sentence, and the task needs two.\nWhat is another person in the park doing? Write one more sentence about that.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"A man is reading a book.\" correctly says what a person is doing now."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"A man is reading a book.\" correctly says what a person is doing now."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "A man is reading a book."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "A man is reading a book."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "A girl is playing with a ball.",
+    "errors": {
+     "W1": "A girl playing with a ball.",
+     "W2": "A girl plays with a ball."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "A girl is playing with a ball.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "A girl is playing with a ball.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

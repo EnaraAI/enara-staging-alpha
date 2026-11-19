@@ -14,11 +14,11 @@
   "s": {
    "W1": 1,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -186,7 +186,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 1: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Some verbs change in the past and do not take -ed. Example: eat becomes ate, and go becomes went.\n\nExercise 1. Write the past form of 'have': Yesterday I ___ a big lunch.\n\nLEARNER'S LAST MESSAGE:\nhad\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! Have is irregular: have becomes had. Well done.\n\nExercise 2. Write the past form of 'tell': Last night he ___ me a story."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 1: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Some verbs change in the past and do not take -ed. Example: eat becomes ate, and go becomes went.\n\nExercise 1. Write the past form of 'have': Yesterday I ___ a big lunch.\n\nLEARNER'S LAST MESSAGE:\nhad\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! Have is irregular: have becomes had. Well done.\n\nExercise 2. Write the past form of 'tell': Last night he ___ me a story.",
+   "stateBefore": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! Have is irregular: have becomes had. Well done."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "had"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "told",
+    "errors": {
+     "W1": "telled"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "told",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "told",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -14,11 +14,11 @@
   "s": {
    "W1": 2,
    "W2": 0,
-   "C1": 0,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -186,7 +186,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 0: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Let's practise capital letters and full stops. Every sentence starts with a capital letter and ends with a full stop. Example: My aunt lives in a big house. Now you try. Rewrite this correctly: \"my brother likes tea\"\n\nLEARNER'S LAST MESSAGE:\nMy brother likes tea.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nExcellent! My brother likes tea. has a capital M and a full stop at the end. Now a new one. Rewrite correctly: \"i am ten years old\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 0: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Let's practise capital letters and full stops. Every sentence starts with a capital letter and ends with a full stop. Example: My aunt lives in a big house. Now you try. Rewrite this correctly: \"my brother likes tea\"\n\nLEARNER'S LAST MESSAGE:\nMy brother likes tea.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nExcellent! My brother likes tea. has a capital M and a full stop at the end. Now a new one. Rewrite correctly: \"i am ten years old\"",
+   "stateBefore": {
+    "form": "caps",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Excellent! My brother likes tea. has a capital M and a full stop"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Excellent!"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I am ten years old.",
+    "errors": {
+     "W1": "i am ten years old"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "caps",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I am ten years old.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "I am ten years old.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

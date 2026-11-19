@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -258,7 +258,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nRemember: yesterday means a finished time. Example: Ben helped his friend yesterday. Rule: Add -ed to a regular verb to talk about a finished action.\nRight: We stayed at home. Wrong: We stay at home yesterday.\nCheck: Write the past form. Last week she ___ (open) the window.\n\nLEARNER'S LAST MESSAGE:\nopened\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"opened\" is correct. Last week is finished, so you used the past form.\nNow write one or two sentences of your own about something you did last week."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nRemember: yesterday means a finished time. Example: Ben helped his friend yesterday. Rule: Add -ed to a regular verb to talk about a finished action.\nRight: We stayed at home. Wrong: We stay at home yesterday.\nCheck: Write the past form. Last week she ___ (open) the window.\n\nLEARNER'S LAST MESSAGE:\nopened\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"opened\" is correct. Last week is finished, so you used the past form.\nNow write one or two sentences of your own about something you did last week.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"opened\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"opened\" is correct"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I visited my grandmother last week.",
+    "errors": {
+     "W1": "I visit my grandmother last week."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I visited my grandmother last week.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I visited my grandmother last week.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

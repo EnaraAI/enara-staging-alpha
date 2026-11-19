@@ -12,9 +12,9 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -186,7 +186,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Regular verbs take -ed in the past simple: watch becomes watched, visit becomes visited.\n\nComplete the sentence with the past form of \"visit\": Last weekend I ___ my grandmother.\n\nLEARNER'S LAST MESSAGE:\nvisited\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Visit\" is a regular verb, so we add -ed: visited.\n\nNew exercise. Complete the sentence with the past form of \"watch\": Yesterday I ___ a film."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Regular verbs take -ed in the past simple: watch becomes watched, visit becomes visited.\n\nComplete the sentence with the past form of \"visit\": Last weekend I ___ my grandmother.\n\nLEARNER'S LAST MESSAGE:\nvisited\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Visit\" is a regular verb, so we add -ed: visited.\n\nNew exercise. Complete the sentence with the past form of \"watch\": Yesterday I ___ a film.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! \"Visit\" is a regular verb, so we add -ed: visited."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"Visit\" is a regular verb, so we add -ed"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "watched",
+    "errors": {
+     "W1": "watch"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "watched",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "watched",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

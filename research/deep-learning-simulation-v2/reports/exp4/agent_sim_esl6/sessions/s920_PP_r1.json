@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -187,7 +187,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! We use some in positive sentences (I have some rice) and any in negatives and questions (I don't have any sugar. Do you have any tea?).\n\nExercise: Complete with some or any: \"I don't have ___ sugar.\"\n\nLEARNER'S LAST MESSAGE:\nsome\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\nNot quite. In a negative sentence we use 'any', not 'some'. Remember: I don't have any sugar. Hint: look at the word 'don't'. Try again: I don't have ___ sugar."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! We use some in positive sentences (I have some rice) and any in negatives and questions (I don't have any sugar. Do you have any tea?).\n\nExercise: Complete with some or any: \"I don't have ___ sugar.\"\n\nLEARNER'S LAST MESSAGE:\nsome\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\nNot quite. In a negative sentence we use 'any', not 'some'. Remember: I don't have any sugar. Hint: look at the word 'don't'. Try again: I don't have ___ sugar.",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In a negative sentence we use 'any', not 'some'."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "Remember: I don't have any sugar."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "any",
+    "errors": {
+     "W1": "some"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "any",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "any",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

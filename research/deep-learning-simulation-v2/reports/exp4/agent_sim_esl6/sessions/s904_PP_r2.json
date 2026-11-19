@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -186,7 +186,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! To talk about finished actions, add -ed to the verb: I cleaned my room. Here is your exercise. Write the past form of 'watch': On Saturday we ___ a film.\n\nLEARNER'S LAST MESSAGE:\nwatched\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nRight! Watch is regular, so we add -ed: watched. Next one. Write the past form of 'go': Last weekend we ___ to the beach."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! To talk about finished actions, add -ed to the verb: I cleaned my room. Here is your exercise. Write the past form of 'watch': On Saturday we ___ a film.\n\nLEARNER'S LAST MESSAGE:\nwatched\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nRight! Watch is regular, so we add -ed: watched. Next one. Write the past form of 'go': Last weekend we ___ to the beach.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Right!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Right!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Watch is regular, so we add -ed: watched."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "went",
+    "errors": {
+     "W1": "go"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "went",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "went",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -14,13 +14,13 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 1,
-   "C2": 0
+   "C2": 2
   },
   "indep": {
    "C1": 0,
-   "C2": 0
+   "C2": 1
   },
   "start": {
    "W1": 1,
@@ -200,7 +200,109 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-copula-be (am, is and are). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 1: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Quick reminder: am goes with I, is goes with he, she and it, and are goes with you, we and they. In English we never leave this word out. Example: He is tired.\n\nExercise 1. Write am, is or are: I ___ a student.\n(Answer with only the missing word.)\n\nLEARNER'S LAST MESSAGE:\nam\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Am\" goes with \"I\": I am a student.\n\nExercise 2. Write am, is or are: She ___ at home today.\n(Answer with only the missing word.)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-copula-be (am, is and are). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 1: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 0: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Quick reminder: am goes with I, is goes with he, she and it, and are goes with you, we and they. In English we never leave this word out. Example: He is tired.\n\nExercise 1. Write am, is or are: I ___ a student.\n(Answer with only the missing word.)\n\nLEARNER'S LAST MESSAGE:\nam\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! \"Am\" goes with \"I\": I am a student.\n\nExercise 2. Write am, is or are: She ___ at home today.\n(Answer with only the missing word.)",
+   "stateBefore": {
+    "form": "cop",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "copula"
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! \"Am\" goes with \"I\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "am"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "\"Am\" goes with \"I\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "is",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "cop",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "copula"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "is",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "is",
+    "probes": []
+   }
   }
  ],
  "assess": {

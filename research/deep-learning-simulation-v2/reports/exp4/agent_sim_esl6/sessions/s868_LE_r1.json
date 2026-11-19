@@ -14,11 +14,11 @@
   "s": {
    "W1": 1,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -257,7 +257,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExample: We are going to see a film on Friday. The rule: for a plan, use am, is or are, then going to, then the plain verb.\nRight: He is going to call his friend. Wrong: He are going to call his friend.\nNow you try. Write the correct sentence.\nCorrect: \"I going to study tonight.\"\n\nLEARNER'S LAST MESSAGE:\nI am going to study tonight.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"I am going to study tonight.\" is correct. The plan has am and a time word. Next one.\nComplete: \"They ___ (play) football next Saturday.\" (a plan)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nExample: We are going to see a film on Friday. The rule: for a plan, use am, is or are, then going to, then the plain verb.\nRight: He is going to call his friend. Wrong: He are going to call his friend.\nNow you try. Write the correct sentence.\nCorrect: \"I going to study tonight.\"\n\nLEARNER'S LAST MESSAGE:\nI am going to study tonight.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"I am going to study tonight.\" is correct. The plan has am and a time word. Next one.\nComplete: \"They ___ (play) football next Saturday.\" (a plan)",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"I am going to study tonight.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"I am going to study tonight.\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "are going to play",
+    "errors": {
+     "W1": "going to play"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "are going to play",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "are going to play",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

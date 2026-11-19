@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -258,7 +258,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou asked about the past simple with -ed, so let us look at it.\nExample: Yesterday I walked home. Walk is the plain verb, and walked is the past.\nRule: To make the past of a regular verb, add -ed.\nRight: He jumped over the box. Wrong: He jump over the box yesterday.\nNow try a new one.\nWrite the past form: Yesterday my sister (wash) the car.\n\nLEARNER'S LAST MESSAGE:\nwashed\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"washed\" is correct. Now write one or two sentences of your own about yesterday. Use a regular verb in the past in each sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou asked about the past simple with -ed, so let us look at it.\nExample: Yesterday I walked home. Walk is the plain verb, and walked is the past.\nRule: To make the past of a regular verb, add -ed.\nRight: He jumped over the box. Wrong: He jump over the box yesterday.\nNow try a new one.\nWrite the past form: Yesterday my sister (wash) the car.\n\nLEARNER'S LAST MESSAGE:\nwashed\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"washed\" is correct. Now write one or two sentences of your own about yesterday. Use a regular verb in the past in each sentence.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"washed\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"washed\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Yesterday I played football.",
+    "errors": {
+     "W1": "Yesterday I play football."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Yesterday I played football.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Yesterday I played football.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

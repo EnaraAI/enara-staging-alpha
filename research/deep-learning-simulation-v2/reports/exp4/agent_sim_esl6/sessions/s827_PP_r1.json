@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -192,7 +192,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 1: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! To ask politely, use 'Can I have ... please?' or 'I would like ... please'. Avoid a bare command like 'Give me'. Example: Can I have a glass of water, please?\n\nTry this: Make this polite: \"Give me a coffee.\"\n\nLEARNER'S LAST MESSAGE:\nCan I have a coffee, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nVery good! 'Can I have a coffee, please?' is polite because it uses Can I have and please. Great job!\n\nNext one: You are thirsty in a cafe. Ask for a tea politely."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 1: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! To ask politely, use 'Can I have ... please?' or 'I would like ... please'. Avoid a bare command like 'Give me'. Example: Can I have a glass of water, please?\n\nTry this: Make this polite: \"Give me a coffee.\"\n\nLEARNER'S LAST MESSAGE:\nCan I have a coffee, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nVery good! 'Can I have a coffee, please?' is polite because it uses Can I have and please. Great job!\n\nNext one: You are thirsty in a cafe. Ask for a tea politely.",
+   "stateBefore": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Very good! 'Can I have a coffee, please?' is polite"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Can I have a coffee, please?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Can I have a tea, please?",
+    "errors": {
+     "W1": "Give me a tea."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Can I have a tea, please?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Can I have a tea, please?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
