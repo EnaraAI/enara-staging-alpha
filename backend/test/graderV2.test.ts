@@ -294,16 +294,19 @@ describe('round-4 fixes (new examples, not round-4 answers)', () => {
     expect(matchKeyV2({ ...gap('Write the word:', ["they're"]), matchingNote: 'Case- and punctuation-sensitive.' }, 'theyre')).toBe(false);
     expect(targetFormMissing({ ...it1, id: 'X-VO-x', targetForm: 'that' }, 'thats')).toBe(false);
   });
-  it('2. error correction: target-only, slips outside the target ignored', () => {
+  it('2. error correction: target-only (round 12: no slip allowance outside the target, rubric 1A)', () => {
     const ec = (prompt: string, key: string, targetForm = ''): TargetFormItem => ({ type: 'error_correction', prompt, answerKey: key, acceptedAnswers: [key], targetForm, scoring: 'exact' });
     const a = ec('Find and correct the mistake. Rewrite the sentence: My sistr works in a hospital.', 'My sister works in a hospital.');
-    expect(matchKeyV2(a, 'My sister work in a hospital.')).toBe(true);
-    expect(matchKeyV2(a, 'My sister works in hospital.')).toBe(true);
+    expect(matchKeyV2(a, 'My sister works in a hospital.')).toBe(true);
+    expect(matchKeyV2(a, 'my sister works in a hospital')).toBe(true);
+    expect(matchKeyV2(a, 'My sister work in a hospital.')).toBe(false); // round 12: a new mistake outside the target = 0 under 1A
+    expect(matchKeyV2(a, 'My sister works in hospital.')).toBe(false); // round 12: a dropped word = 0 under 1A
     expect(matchKeyV2(a, 'My sistr works in a hospital.')).toBe(false);
     expect(matchKeyV2(a, 'My sistar works in a hospital.')).toBe(false);
     expect(matchKeyV2(a, 'My brother works in a hospital.')).toBe(false);
     const c = ec('Fix the mistake: My bag is more heavier than yours.', 'My bag is heavier than yours.', 'adjective-er / more + adjective + than');
-    expect(matchKeyV2(c, 'My bag is heavier than your.')).toBe(true);
+    expect(matchKeyV2(c, 'My bag is heavier than yours.')).toBe(true);
+    expect(matchKeyV2(c, 'My bag is heavier than your.')).toBe(false); // round 12: new mistake outside the target
     expect(matchKeyV2(c, 'My bag is heavier then yours.')).toBe(false); // than is part of the comparative target
     expect(matchKeyV2(c, 'My bag is more heavier than yours.')).toBe(false);
     expect(matchKeyV2(c, 'My bag is heavyer than yours.')).toBe(false);
@@ -528,5 +531,57 @@ describe('option B2: error-correction check (ENARA_EC_CHECK, off by default)', (
     expect(vi.mocked(askForJson).mock.calls[0][0].system).toMatch(/error-correction item/);
     expect(e.points).toBe(0);
     expect(e.flags).toContain('error_correction_check');
+  });
+});
+
+describe('round-12 change: rules E and F on gap items, no slip allowance in error correction (rubric 1A)', () => {
+  it('E: the whole sentence written in the gap, word for word, with an accepted answer (round-8 item, not round-12 data)', () => {
+    expect(key('A1-GR-copula-be-A-2', 'I am tired after work today.')).toBe(true);
+    expect(key('A1-GR-copula-be-A-2', "I'm tired after work today")).toBe(true); // contraction of the key, case and full stop ignored
+    expect(key('A2-GR-past-simple-irregular-A-1', 'Last Monday I went to the dentist.')).toBe(true); // hint "(go)" is not part of the sentence
+    expect(key('A2-GR-present-continuous-A-1', "Look! The children're playing in the rain.")).toBe(true);
+  });
+  it('E must stay 0: wrong form, misspelling, extra word, missing word, the hint copied, capital item', () => {
+    expect(key('A1-GR-copula-be-A-2', 'I is tired after work today.')).toBe(false);
+    expect(key('A1-GR-copula-be-A-2', 'I am tierd after work today.')).toBe(false); // never accepts a misspelt word
+    expect(key('A1-GR-copula-be-A-2', 'I am very tired after work today.')).toBe(false);
+    expect(key('A1-GR-copula-be-A-2', 'I am tired after work.')).toBe(false);
+    expect(key('A2-GR-past-simple-irregular-A-1', 'Last Monday I goed to the dentist.')).toBe(false);
+    expect(key('A2-GR-past-simple-irregular-A-1', 'Last Monday I went (go) to the dentist.')).toBe(false);
+    expect(key('A1-VO-days-months-A-1', 'The day after Monday is Tuesday.')).toBe(false); // capital-sensitive item: E is off
+    expect(key('A1-VO-family-A-1', "My mother's mother is my grandmother.")).toBe(false); // spelling item (-VO-): E is off
+  });
+  it('F: a standard contraction of an accepted answer, alone or with the subject before the gap', () => {
+    expect(key('A2-FN-polite-requests-A-2', "'d")).toBe(true);
+    expect(key('A2-FN-polite-requests-A-2', '’d')).toBe(true);
+    expect(key('A2-FN-polite-requests-A-2', "I'd")).toBe(true);
+    expect(key('A2-FN-polite-requests-A-2', "I'd like a cheese sandwich, please.")).toBe(true);
+    expect(key('A1-GR-copula-be-A-2', "'m")).toBe(true);
+  });
+  it('F must stay 0: the contraction of another word, a wrong form, a misspelt contraction, an extra word, a capital item', () => {
+    expect(key('A2-FN-polite-requests-A-2', "'ll")).toBe(false);
+    expect(key('A2-FN-polite-requests-A-2', "'s")).toBe(false);
+    expect(key('A2-FN-polite-requests-A-2', "wo'd")).toBe(false);
+    expect(key('A2-FN-polite-requests-A-2', 'd')).toBe(false); // no apostrophe: not a contraction
+    expect(key('A2-FN-polite-requests-A-2', "I'd really")).toBe(false);
+    expect(key('A1-GR-copula-be-A-2', "'re")).toBe(false);
+    expect(key('A1-GR-copula-be-A-2', "'s")).toBe(false);
+    const she: TargetFormItem = { type: 'gap_fill', prompt: 'Complete: She ___ a teacher.', answerKey: 'is', acceptedAnswers: ['is'], scoring: 'exact' };
+    expect(matchKeyV2(she, "'s")).toBe(true);
+    expect(matchKeyV2({ ...she, matchingNote: 'Case- and punctuation-sensitive.' }, "'s")).toBe(false); // capital/punctuation item: F is off
+    expect(matchKeyV2({ ...she, id: 'X-VO-x' }, "'s")).toBe(false); // spelling item: F is off
+  });
+  it('error correction: no slip allowance; the harmless preposition swap (round-8 B) stays', () => {
+    expect(key('A2-GR-third-person-s-B-6', 'He washes his hands before dinner.')).toBe(true);
+    expect(key('A2-GR-third-person-s-B-6', 'He washes his hands befor dinner.')).toBe(false); // misspelling elsewhere = new mistake
+    expect(key('A2-GR-third-person-s-B-6', 'He washes hands before dinner.')).toBe(false); // dropped word
+    expect(key('A2-GR-third-person-s-B-6', 'He washes his hands before the dinner.')).toBe(false); // added word
+    expect(key('A2-GR-conjunctions-B-5', 'We took a taxi because of the bus was late.')).toBe(false); // new mistake in the target
+    expect(key('A1-GR-word-order-svo-A-6', 'Adel bought a black bag in the market.')).toBe(true); // round-8 pattern B kept
+    expect(key('A1-VO-days-months-A-5', 'My birthday is in february.')).toBe(false); // capital item unchanged
+  });
+  it('the rules are graderV2-ON only', () => {
+    delete process.env.ENARA_ENGINE_V2;
+    expect(graderV2On()).toBe(false);
   });
 });
