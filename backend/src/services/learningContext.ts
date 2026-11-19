@@ -11,6 +11,7 @@ import { ageFromBirthDate, loadTrustedAgeBand } from './languageTeachingContext'
 import { planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow, type LessonPlan, type PlannerSignals, type StageProgress } from './lessonPlanner';
 import { L1_TRANSFER_CODES } from './languageLearningState';
 import { recordL1Transfer } from './misconceptionRules';
+import { kidsPackOn, ladLines, lessonFor, loadKidsPack } from './kidsPack';
 import { StudentMisconception } from '../models/StudentMisconception';
 import { StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import type { TeachingMeta } from '../models/TutorMessage';
@@ -274,6 +275,8 @@ export async function buildObjectiveContext(params: {
       ...misconceptions.map((m) => `- Possible misconception (${m.status === 'confirmed' ? 'confirmed by a teacher' : 'not confirmed'}): ${m.description}`),
       ...planLines(plan, target && target.id !== objective.id ? `${target.code} "${target.title}"` : undefined, status, params.compact),
       ...(lesson ? shapeLines(lesson, progress ? stageNow(lesson, progress) : undefined) : []),
+      // kidsPack: the listen-and-do content for this stage (code picks it; the model says it).
+      ...(lesson?.shape === 'LAD' && kidsPackOn() ? ladLines((() => { const d = loadKidsPack(); return d ? lessonFor(d, objective.code ? String(objective.code) : undefined, objective.title) : undefined; })(), progress ? stageNow(lesson, progress) : lesson.startStage, progress?.tries ?? 0) : []),
       '- Assessment integrity: never give the answers to the student\'s assessment or quick-check questions. If they paste one, teach the method with a different example.',
       plan.requiresReassessment
         ? '- When they seem ready, suggest a quick check to confirm (practice with you does not count as proof of understanding).'

@@ -1303,10 +1303,15 @@ const LENGTH: Record<AgeBand, Record<string, [number, number]>> = {
   adult: { prea1: [60, 100], a1: [70, 110], a2: [90, 140], b1: [120, 180], b2: [140, 210], c1: [160, 240], c2: [160, 240], none: [90, 140] },
 };
 
+// kidsPack: child replies sized for young learners (about 3-6 short sentences at A1, fewer at Pre-A1), replacing the child row
+// that allowed 45-70 words at A1 (6-9 sentences at the 8-word child sentence limit).
+export const KIDS_PACK_CHILD_LENGTH: Record<string, [number, number]> = { prea1: [20, 35], a1: [30, 50], a2: [40, 65], b1: [55, 85], b2: [70, 100], c1: [80, 110], c2: [80, 110], none: [30, 50] };
+
 export function lengthTarget(ageBand: Fact<AgeBand>, level?: string): LengthTarget {
   const age: AgeBand = ageBand.status === 'known' && ageBand.value ? ageBand.value : 'unknown';
   const step = cefrStep(level) ?? 'none';
-  const [targetWords, maxWords] = LENGTH[age][step] ?? LENGTH[age].none;
+  const row = age === 'child' && engineV2('kidsPack') ? KIDS_PACK_CHILD_LENGTH : LENGTH[age];
+  const [targetWords, maxWords] = row[step] ?? row.none;
   return { targetWords, maxWords, basis: `${age === 'unknown' ? 'age_unknown' : age}:${step}` };
 }
 

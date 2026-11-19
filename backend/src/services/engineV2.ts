@@ -35,10 +35,12 @@
 //  kidsBand     - TRACK 2 (§5): when no age band is set, a staff-entered birth date (under 13 child, 13-17 teen, 18+ adult) or the Enara Kids interface sets the
 //                 tutor's band; band rules for sentence length, instructions per message, tone (praise effort or strategy, never ability); named-only, NOT part of "all"
 //  teach2       - bundle: ruleBank, exampleGuard, feedbackLadder, methodSelect and kidsBand; itself NOT part of "all"
+//  kidsPack     - Enara Kids pack (kidsPack.ts): shorter child replies, Pre-A1 Starters outcomes and words, listen-and-do lesson content per
+//                 stage for the LAD shape; needs planner2 for the shape; named-only, NOT part of "all"
 //  planner2     - the lesson planner as a rule table (lessonPlanner.ts): lesson shape first (S1-S6), then the main method from the ped-v2 rule
 //                 table, skipping methods with no stage in the shape or outside the approved age/level gates; named-only, NOT part of "all"
 //  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
-export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2' | 'ruleBank' | 'exampleGuard' | 'feedbackLadder' | 'methodSelect' | 'kidsBand' | 'planner2';
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2' | 'ruleBank' | 'exampleGuard' | 'feedbackLadder' | 'methodSelect' | 'kidsBand' | 'planner2' | 'kidsPack';
 const ESL5: EngineV2Feature[] = ['liveError', 'releaseAfterTwo', 'reviewOpen', 'fadeKnown', 'ownSentence'];
 export const TEACH2: EngineV2Feature[] = ['ruleBank', 'exampleGuard', 'feedbackLadder', 'methodSelect', 'kidsBand'];
 export const engineV2 = (feature: EngineV2Feature): boolean => {
@@ -47,7 +49,7 @@ export const engineV2 = (feature: EngineV2Feature): boolean => {
   if (feature === 'arbitration' && v.includes('levelExplicit')) return true; // levelExplicit always runs with arbitration
   if (v.includes('esl5') && ESL5.includes(feature)) return true; // the esl5 bundle (never turned on by "all")
   if (v.includes('teach2') && TEACH2.includes(feature)) return true; // the track-2 bundle (never turned on by "all")
-  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', 'planner2', ...ESL5, ...TEACH2].includes(feature));
+  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', 'planner2', 'kidsPack', ...ESL5, ...TEACH2].includes(feature));
 };
 
 /** True when `arbitration` is on only because `levelExplicit` forced it (recorded in the turn evidence). */
