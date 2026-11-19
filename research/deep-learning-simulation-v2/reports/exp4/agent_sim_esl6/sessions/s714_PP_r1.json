@@ -472,7 +472,87 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 2: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, correct! \"Ant\" starts with a vowel sound (a), so we use \"an\": I see an ant on the table. Well done.\n\nNow you try. Write one sentence with \"a dog\" and then say more about the dog with \"The dog ...\".\n\nLEARNER'S LAST MESSAGE:\nI have a dog. Dog is brown.\nFACT: the last learner message contained the error of W1 (uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\")).\n\nTUTOR TURN TO JUDGE:\nGood try! \"I have a dog\" is perfect. But in the second sentence, you need a small word before \"dog\". Hint: it is the same dog again, so which word do we use, like in \"The dog is brown\"? Try again: write the second sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 2: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, correct! \"Ant\" starts with a vowel sound (a), so we use \"an\": I see an ant on the table. Well done.\n\nNow you try. Write one sentence with \"a dog\" and then say more about the dog with \"The dog ...\".\n\nLEARNER'S LAST MESSAGE:\nI have a dog. Dog is brown.\nFACT: the last learner message contained the error of W1 (uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\")).\n\nTUTOR TURN TO JUDGE:\nGood try! \"I have a dog\" is perfect. But in the second sentence, you need a small word before \"dog\". Hint: it is the same dog again, so which word do we use, like in \"The dog is brown\"? Try again: write the second sentence.",
+   "stateBefore": {
+    "form": "the",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "like in \"The dog is brown\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The dog is brown.",
+    "errors": {
+     "W1": "Dog is brown."
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "the",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -489,5 +569,68 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEndS2": {
+  "form": "the",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateAfterS1": {
+  "form": "the",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "recAfterS1": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
  }
 }

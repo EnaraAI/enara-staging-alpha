@@ -15,12 +15,12 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 3
   },
   "indep": {
-   "C1": 0,
-   "C2": 2
+   "C1": 1,
+   "C2": 3
   },
   "start": {
    "W1": 1,
@@ -716,7 +716,109 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-copula-be (am, is and are). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nEnglish needs am, is or are between the subject and the word that describes it.\nRight: \"My bag is heavy.\" Wrong: \"My bag heavy.\"\nYour sentence \"My friends kind.\" has no verb like that.\nWrite the sentence again with the missing word: \"My teacher tall.\"\n\nLEARNER'S LAST MESSAGE:\nMy teacher is tall.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My teacher is tall.\" is right.\n\nOne last task on your own.\nWrite the sentence again with the missing word: \"The soup hot.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-copula-be (am, is and are). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 1: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 0.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nEnglish needs am, is or are between the subject and the word that describes it.\nRight: \"My bag is heavy.\" Wrong: \"My bag heavy.\"\nYour sentence \"My friends kind.\" has no verb like that.\nWrite the sentence again with the missing word: \"My teacher tall.\"\n\nLEARNER'S LAST MESSAGE:\nMy teacher is tall.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My teacher is tall.\" is right.\n\nOne last task on your own.\nWrite the sentence again with the missing word: \"The soup hot.\"",
+   "stateBefore": {
+    "form": "cop",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "copula"
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My teacher is tall.\" is right."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"My teacher is tall.\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My teacher is tall."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My teacher is tall."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "cop",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "copula"
+   }
   }
  ],
  "assess": {
@@ -732,6 +834,80 @@
    "primaryMax": 4,
    "ecRewrite": 1,
    "ecRewriteMax": 2
+  }
+ },
+ "stateEndS2": {
+  "form": "cop",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 3
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false,
+  "sec1": "copula"
+ },
+ "stateAfterS1": {
+  "form": "cop",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 3
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false,
+  "sec1": "copula"
+ },
+ "recAfterS1": {
+  "entries": [],
+  "liveErrors": {
+   "copula_omitted": {
+    "seen": 1,
+    "lastCorrect": true
+   }
+  },
+  "knownPoints": {
+   "lsn:1": 2
   }
  }
 }

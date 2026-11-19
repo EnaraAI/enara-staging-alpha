@@ -460,7 +460,89 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 1: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 0.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try! You used \"This is a ...\" correctly. But check the spelling of the last word. Hint: it starts with p, and it has an e in the middle: p-_-n. Try again: write the whole sentence.\n\nLEARNER'S LAST MESSAGE:\nThis is a ben.\nFACT: the last learner message contained the error of W1 (writes b for p or f for v (\"bencil\", \"bage\")).\n\nTUTOR TURN TO JUDGE:\nLet me explain. The word is \"pen\": p-e-n. It starts with p, not b. So the sentence is: This is a pen.\n\nNow try a new one. Write a sentence with \"This is a ...\" for \"desk\" or \"bag\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 1: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 0.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try! You used \"This is a ...\" correctly. But check the spelling of the last word. Hint: it starts with p, and it has an e in the middle: p-_-n. Try again: write the whole sentence.\n\nLEARNER'S LAST MESSAGE:\nThis is a ben.\nFACT: the last learner message contained the error of W1 (writes b for p or f for v (\"bencil\", \"bage\")).\n\nTUTOR TURN TO JUDGE:\nLet me explain. The word is \"pen\": p-e-n. It starts with p, not b. So the sentence is: This is a pen.\n\nNow try a new one. Write a sentence with \"This is a ...\" for \"desk\" or \"bag\".",
+   "stateBefore": {
+    "form": "class",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is \"pen\": p-e-n. ... So the sentence is: This is a pen."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "This is a bag.",
+    "errors": {
+     "W1": "This is a bage."
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "class",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -477,5 +559,70 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEndS2": {
+  "form": "class",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateAfterS1": {
+  "form": "class",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "recAfterS1": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
  }
 }

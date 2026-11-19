@@ -13,13 +13,13 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 1,
    "C1": 3,
-   "C2": 2
+   "C2": 3
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 1
   },
   "start": {
@@ -512,7 +512,103 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 3: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 1.\nC2 (correct) strength 2: rooms have single English names (bedroom, living room). Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLet me explain. The word is \"bathroom\", spelled b-a-t-h-r-o-o-m. You wrote \"bathrom\", so one \"o\" is missing. It is bath + room, and \"room\" has two o's. We wash our hands in the bathroom.\n\nNew exercise. Complete: \"There is a tree in the ___.\" (Hint: it is outside the house, and it starts with g.)\n\nLEARNER'S LAST MESSAGE:\ngarden\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! A tree is in the garden. Well done, and your spelling is right!\n\nNew exercise. Complete: \"I read a book in my ___.\" (Hint: it is the room with your bed, and it starts with b.)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 3: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 1.\nC2 (correct) strength 2: rooms have single English names (bedroom, living room). Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLet me explain. The word is \"bathroom\", spelled b-a-t-h-r-o-o-m. You wrote \"bathrom\", so one \"o\" is missing. It is bath + room, and \"room\" has two o's. We wash our hands in the bathroom.\n\nNew exercise. Complete: \"There is a tree in the ___.\" (Hint: it is outside the house, and it starts with g.)\n\nLEARNER'S LAST MESSAGE:\ngarden\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! A tree is in the garden. Well done, and your spelling is right!\n\nNew exercise. Complete: \"I read a book in my ___.\" (Hint: it is the room with your bed, and it starts with b.)",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! A tree is in the garden. Well done, and your spelling is right!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Correct! A tree is in the garden."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "your spelling is right!"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "bedroom",
+    "errors": {
+     "W1": "bedrom",
+     "W2": "sleeping room"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -529,5 +625,70 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEndS2": {
+  "form": "rooms",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateAfterS1": {
+  "form": "rooms",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "recAfterS1": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
  }
 }

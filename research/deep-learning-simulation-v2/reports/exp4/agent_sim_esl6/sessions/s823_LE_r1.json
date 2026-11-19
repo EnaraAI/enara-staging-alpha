@@ -614,7 +614,81 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-numbers-time (numbers and time words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: f and v are the same. Its error: writes v for f or f for v in a number (\"fivteen\").\nW2 (wrong) strength 2: Arabic sa'a means both hour and clock. Its error: uses clock for hour (\"one clock long\" for one hour).\nC1 (correct) strength 1: numbers keep their English consonants (fifteen, five with f then v). Independent correct productions so far: 0.\nC2 (correct) strength 0: English time phrases: an hour is a length of time, a clock is a thing. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are giving the rule, not a time. The question asks for one time, so write a time in your answer.\nExample: A: We start at three. B: No, at quarter past three. The final time is quarter past three.\nNow try again: What time is the lesson?\n\nLEARNER'S LAST MESSAGE:\n<the final agreed time from the dialogue>\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour last message is a description in brackets, not a time. An answer to this question must be a time, like \"six o'clock\".\nRight: The final time is six o'clock.\nWrong: the final time they agree on\nNow a new one.\nA: We eat at half past six. B: Sorry, at quarter to seven. What time do they eat?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-numbers-time (numbers and time words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: f and v are the same. Its error: writes v for f or f for v in a number (\"fivteen\").\nW2 (wrong) strength 2: Arabic sa'a means both hour and clock. Its error: uses clock for hour (\"one clock long\" for one hour).\nC1 (correct) strength 1: numbers keep their English consonants (fifteen, five with f then v). Independent correct productions so far: 0.\nC2 (correct) strength 0: English time phrases: an hour is a length of time, a clock is a thing. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are giving the rule, not a time. The question asks for one time, so write a time in your answer.\nExample: A: We start at three. B: No, at quarter past three. The final time is quarter past three.\nNow try again: What time is the lesson?\n\nLEARNER'S LAST MESSAGE:\n<the final agreed time from the dialogue>\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour last message is a description in brackets, not a time. An answer to this question must be a time, like \"six o'clock\".\nRight: The final time is six o'clock.\nWrong: the final time they agree on\nNow a new one.\nA: We eat at half past six. B: Sorry, at quarter to seven. What time do they eat?",
+   "stateBefore": {
+    "form": "numtime",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "quarter to seven",
+    "errors": {
+     "W1": "quarter to sefen"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "numtime",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -631,5 +705,70 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEndS2": {
+  "form": "numtime",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateAfterS1": {
+  "form": "numtime",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "recAfterS1": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
  }
 }

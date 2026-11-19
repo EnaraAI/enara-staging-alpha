@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -485,7 +485,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-prepositions-time (at, on and in for time). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: one preposition (in, like Arabic fi) works for every time. Its error: uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\").\nC1 (correct) strength 1: at + clock time, on + day/date, in + month/year. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! April is a month, so we use \"in\": in April. Well done. Here is a new one. Write in, on or at: I play football ___ Monday. (Answer with only the missing word.)\n\nLEARNER'S LAST MESSAGE:\non\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! Monday is a day, so we use \"on\": on Monday. Well done. Now try writing your own sentence. Write one sentence with \"at\" and a clock time, for example about when your lesson starts."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-prepositions-time (at, on and in for time). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: one preposition (in, like Arabic fi) works for every time. Its error: uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\").\nC1 (correct) strength 1: at + clock time, on + day/date, in + month/year. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect! April is a month, so we use \"in\": in April. Well done. Here is a new one. Write in, on or at: I play football ___ Monday. (Answer with only the missing word.)\n\nLEARNER'S LAST MESSAGE:\non\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect! Monday is a day, so we use \"on\": on Monday. Well done. Now try writing your own sentence. Write one sentence with \"at\" and a clock time, for example about when your lesson starts.",
+   "stateBefore": {
+    "form": "preptime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct! Monday is a day"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct! Monday is a day"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Monday is a day, so we use \"on\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My lesson starts at 9 o'clock.",
+    "errors": {
+     "W1": "My lesson starts in 9 o'clock."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "preptime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -502,5 +594,68 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEndS2": {
+  "form": "preptime",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateAfterS1": {
+  "form": "preptime",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "recAfterS1": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
  }
 }

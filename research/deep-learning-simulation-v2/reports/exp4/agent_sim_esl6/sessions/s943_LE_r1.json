@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -625,7 +625,93 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-clothes-shopping (clothes, colours and sizes). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the adjective goes after the noun. Its error: puts the colour or size after the noun (\"I want a shirt blue, size big.\").\nC1 (correct) strength 1: colour and size adjectives go before the noun. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour question \"Do you have a jacket small like this?\" is a full question. That part is right.\nExample: You want this bag in green. You ask: Do you have this bag in green?\nRule: put the size or colour after \"in\", at the end of the question.\nRight: Do you have these boots in black? Wrong: Do you have a bag green like this?\n\nLEARNER'S LAST MESSAGE:\nOK. Can I have an exercise, please?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHere is the answer to the last task: \"Do you have this jacket in small?\" The size goes after \"in\", at the end.\nRight: Do you have this scarf in green?\nWrong: Do you have a scarf green like this?\nNow your new exercise. You want the same coat in blue. Ask the shop assistant."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-clothes-shopping (clothes, colours and sizes). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the adjective goes after the noun. Its error: puts the colour or size after the noun (\"I want a shirt blue, size big.\").\nC1 (correct) strength 1: colour and size adjectives go before the noun. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour question \"Do you have a jacket small like this?\" is a full question. That part is right.\nExample: You want this bag in green. You ask: Do you have this bag in green?\nRule: put the size or colour after \"in\", at the end of the question.\nRight: Do you have these boots in black? Wrong: Do you have a bag green like this?\n\nLEARNER'S LAST MESSAGE:\nOK. Can I have an exercise, please?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHere is the answer to the last task: \"Do you have this jacket in small?\" The size goes after \"in\", at the end.\nRight: Do you have this scarf in green?\nWrong: Do you have a scarf green like this?\nNow your new exercise. You want the same coat in blue. Ask the shop assistant.",
+   "stateBefore": {
+    "form": "clothes",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "Here is the answer to the last task: \"Do you have this jacket in small?\""
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Do you have this scarf in green? Wrong: Do you have a scarf green like this?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Do you have this coat in blue?",
+    "errors": {
+     "W1": "Do you have a coat blue like this?"
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "clothes",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -642,5 +728,68 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEndS2": {
+  "form": "clothes",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateAfterS1": {
+  "form": "clothes",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "recAfterS1": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
  }
 }

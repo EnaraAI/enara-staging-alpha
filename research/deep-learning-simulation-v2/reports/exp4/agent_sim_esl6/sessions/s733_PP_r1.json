@@ -487,7 +487,93 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 2: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, but the sentence is not ready yet. Look at the word 'i' and the end of the sentence. Hint: the word 'I' is always a capital letter, and every sentence ends with a full stop (.). Try again: 'i am ten years old'\n\nLEARNER'S LAST MESSAGE:\ni am ten years old\nFACT: the last learner message contained the error of W1 (writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. The sentence needs three changes: 'I' must be a capital letter, and the sentence ends with a full stop. So it is: I am ten years old.\n\nNow try the last one. Rewrite correctly: 'we live in london'"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 2: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, but the sentence is not ready yet. Look at the word 'i' and the end of the sentence. Hint: the word 'I' is always a capital letter, and every sentence ends with a full stop (.). Try again: 'i am ten years old'\n\nLEARNER'S LAST MESSAGE:\ni am ten years old\nFACT: the last learner message contained the error of W1 (writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. The sentence needs three changes: 'I' must be a capital letter, and the sentence ends with a full stop. So it is: I am ten years old.\n\nNow try the last one. Rewrite correctly: 'we live in london'",
+   "stateBefore": {
+    "form": "caps",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "So it is: I am ten years old."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "'I' must be a capital letter, and the sentence ends with a full stop."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "We live in London.",
+    "errors": {
+     "W1": "we live in london"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "caps",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -504,5 +590,68 @@
    "ecRewrite": 1,
    "ecRewriteMax": 4
   }
+ },
+ "stateEndS2": {
+  "form": "caps",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateAfterS1": {
+  "form": "caps",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "recAfterS1": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
  }
 }

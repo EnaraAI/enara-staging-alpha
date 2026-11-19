@@ -476,7 +476,91 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-days-months (days and months). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: vowels can be left out or changed. Its error: leaves out or changes letters in a day or month (\"Wensday\", \"Fbruary\").\nW2 (wrong) strength 3: a month is named by its number. Its error: names a month by its number (\"in month five\" for in May).\nC1 (correct) strength 2: days and months have fixed spellings with all their letters (Wednesday, February). Independent correct productions so far: 1.\nC2 (correct) strength 0: months have names (May, June), not numbers. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! I go to school on Wednesday is correct. Wednesday is a day, so we use on. Good job.\n\nNow write one sentence with in and a month, like: My holiday is in July.\n\nLEARNER'S LAST MESSAGE:\nMy birthday is in Febuary.\nFACT: the last learner message contained the error of W1 (leaves out or changes letters in a day or month (\"Wensday\", \"Fbruary\")).\n\nTUTOR TURN TO JUDGE:\nGood sentence! My birthday is in February uses in with a month, and that is right. But the spelling of the month is not quite right. February has an r after the b: F-e-b-r-u-a-r-y. Can you write the sentence again?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-days-months (days and months). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: vowels can be left out or changed. Its error: leaves out or changes letters in a day or month (\"Wensday\", \"Fbruary\").\nW2 (wrong) strength 3: a month is named by its number. Its error: names a month by its number (\"in month five\" for in May).\nC1 (correct) strength 2: days and months have fixed spellings with all their letters (Wednesday, February). Independent correct productions so far: 1.\nC2 (correct) strength 0: months have names (May, June), not numbers. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! I go to school on Wednesday is correct. Wednesday is a day, so we use on. Good job.\n\nNow write one sentence with in and a month, like: My holiday is in July.\n\nLEARNER'S LAST MESSAGE:\nMy birthday is in Febuary.\nFACT: the last learner message contained the error of W1 (leaves out or changes letters in a day or month (\"Wensday\", \"Fbruary\")).\n\nTUTOR TURN TO JUDGE:\nGood sentence! My birthday is in February uses in with a month, and that is right. But the spelling of the month is not quite right. February has an r after the b: F-e-b-r-u-a-r-y. Can you write the sentence again?",
+   "stateBefore": {
+    "form": "days",
+    "band": "A1",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "February has an r after the b: F-e-b-r-u-a-r-y."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My birthday is in February.",
+    "errors": {
+     "W1": "My birthday is in Febuary.",
+     "W2": "My birthday is in month two."
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "days",
+    "band": "A1",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -493,5 +577,70 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEndS2": {
+  "form": "days",
+  "band": "A1",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 3,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 3,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateAfterS1": {
+  "form": "days",
+  "band": "A1",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 3,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 3,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "recAfterS1": {
+  "entries": [],
+  "liveErrors": {},
+  "knownPoints": {}
  }
 }
