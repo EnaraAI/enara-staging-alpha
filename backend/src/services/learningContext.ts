@@ -6,6 +6,8 @@ import { ObjectiveRetentionState } from '../models/ObjectiveRetentionState';
 import { Curriculum } from '../models/Curriculum';
 import { PedagogicalDecision } from '../models/PedagogicalDecision';
 import { Student } from '../models/Student';
+import { Institution } from '../models/Institution';
+import { loadTrustedAgeBand } from './languageTeachingContext';
 import { StudentMisconception } from '../models/StudentMisconception';
 import { StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import type { TeachingMeta } from '../models/TutorMessage';
@@ -47,6 +49,8 @@ export interface ObjectiveContext {
   masteryStatus?: string;
   prompt: string;
   teaching: TeachingMeta;
+  // TRACK 2: the objective's code (an outcome id such as EN-F-A2-GR-some-any selects the rule-bank entry). Not stored.
+  objectiveCode?: string;
 }
 
 export type Channel = 'chat' | 'stream' | 'voice' | 'intervention';
@@ -160,6 +164,11 @@ export async function buildObjectiveContext(params: {
       disengaged: lastActivity ? Date.now() - new Date(lastActivity.at).getTime() > DISENGAGED_DAYS * 86_400_000 : false,
       subject,
       ...(engineV2('levelExplicit') && objective.curriculumId && belowB1((await Curriculum.findOne({ id: objective.curriculumId }).select('level').lean())?.level) ? { belowB1: true } : {}),
+      // methodSelect (TRACK 2, M6/M7): the trusted age band (under 13: story/game support) and a vocabulary outcome; the same resolver as the language engine.
+      ...(engineV2('methodSelect') ? {
+        ageBand: (await loadTrustedAgeBand({ institutionId: params.institutionId, studentId: params.studentId, learningSettings: params.institutionId ? (await Institution.findOne({ id: params.institutionId }).select('learningSettings').lean() as { learningSettings?: unknown } | null)?.learningSettings : undefined })).band,
+        ...(/-VO-/.test(String(objective.code ?? '')) ? { vocabulary: true } : {}),
+      } : {}),
       relatedSecureObjectives: relatedObjectives.length
         ? await StudentObjectiveMastery.countDocuments({ studentId: params.studentId, objectiveId: { $in: relatedObjectives.map((o) => o.id) }, masteryStatus: { $in: [...MET] } })
         : 0,
@@ -245,7 +254,7 @@ export async function buildObjectiveContext(params: {
       decisionVersion: plan.decisionVersion,
       registryVersion: plan.registryVersion,
     };
-    return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching };
+    return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching, ...(objective.code ? { objectiveCode: String(objective.code) } : {}) };
   } catch (error) {
     logger.warn('learning_context_failed', { error: serializeError(error) });
     return null;

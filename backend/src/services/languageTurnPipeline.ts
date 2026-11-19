@@ -10,6 +10,16 @@ import {
 import { recordProfileTurn } from './learnerLanguageProfile';
 import { engineV2 } from './engineV2';
 import { stripPreAttemptModels, stripCopyReadyModels, isSuccess, isFailure, type StrippedReply } from './languageLearningState';
+import { exampleGuardHits, removeGuardHits, ruleLinePostCheck, GUARD_REGEN_REASON, type GuardHit } from './teachingQuality';
+import { ruleBankEntry } from './ruleBank';
+
+/** TRACK 2 (exampleGuard, plan §2): the guard check on its own (no change to the text), for the one regeneration in the chat path and for the harness. */
+export function exampleGuardCheck(language: LanguageTeachingContext, answer: string, learnerText: string): GuardHit[] {
+  if (!engineV2('exampleGuard') || !language.teach2?.pool.length) return [];
+  return exampleGuardHits(answer, language.teach2.pool, learnerText, language.teach2.confirmed ?? []);
+}
+/** The instruction added to the one regeneration after a guard hit. */
+export const exampleGuardRegenNote = (hits: GuardHit[]): string => GUARD_REGEN_REASON(hits);
 
 export type LanguageChannel = 'chat' | 'voice';
 /** The single policy version both channels report. */
@@ -44,8 +54,17 @@ const ruleLineFor = (language: LanguageTeachingContext): string | undefined => {
   return texts.length ? `${texts.join('; ')}.` : undefined;
 };
 
-export function applyReplyGuards(language: LanguageTeachingContext, answer: string, learnerText: string): { text: string; removed: number; closingAsk?: ClosingAskStatus } {
-  let text = answer; let removed = 0; let closingAsk: ClosingAskStatus | undefined;
+export function applyReplyGuards(language: LanguageTeachingContext, answer: string, learnerText: string): { text: string; removed: number; closingAsk?: ClosingAskStatus; guardHits?: number; postCheck?: string[] } {
+  let text = answer; let removed = 0; let closingAsk: ClosingAskStatus | undefined; let guardHits = 0; let postCheck: string[] | undefined;
+  // TRACK 2 (exampleGuard): a modelled sentence that completes an item the learner will solve is removed (the fallback after the one regeneration).
+  const hits = exampleGuardCheck(language, text, learnerText);
+  if (hits.length) { text = removeGuardHits(text, hits); removed += hits.length; guardHits = hits.length; }
+  // TRACK 2 (ruleBank, §3.5): a right/wrong pair that does not differ is removed (it teaches nothing); a vocabulary reply with no target word is flagged.
+  if (engineV2('ruleBank')) {
+    const pc = ruleLinePostCheck(text, ruleBankEntry(language.teach2?.entryId));
+    if (pc.problems.length) postCheck = pc.problems;
+    if (pc.problems.includes('pair_identical') && pc.pair) text = text.replace(new RegExp(`\\bWrong\\s*:\\s*\\**["“]?${pc.pair.wrong.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["”]?\\**\\.?`, 'i'), '').replace(/[ \t]{2,}/g, ' ').trim();
+  }
   const guarded = stripPreAttemptModels(text, guardedItems(language), learnerText, [...(language.lesson.spec?.vocabulary ?? []), ...(language.lesson.spec?.examples ?? [])]);
   if (guarded.removed.length) { text = guarded.text; removed += guarded.removed.length; }
   const copy = stripCopyReadyModels(text, learnerText);
@@ -78,13 +97,15 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
     const one = enforceSingleAsk(text);
     if (one.droppedClosing) { text = one.text; closingAsk = 'deferred'; }
   }
-  return { text, removed, ...(closingAsk ? { closingAsk } : {}) };
+  return { text, removed, ...(closingAsk ? { closingAsk } : {}), ...(guardHits ? { guardHits } : {}), ...(postCheck ? { postCheck } : {}) };
 }
 
 /** Evidence stored with the reply and used by the next turn's engine state; also records the cross-session learner profile. */
 export async function completeLanguageTurn(opts: {
   language: LanguageTeachingContext; objectiveId?: string; reply: string; learnerText: string; messageId: string; marker?: StrippedReply; removed: number; closingAsk?: ClosingAskStatus;
   institutionId: string; studentId: string;
+  // TRACK 2 (tags only): example-guard hits on the draft, whether one regeneration was made, post-check problems.
+  guardHits?: number; regenerated?: boolean; postCheck?: string[];
 }): Promise<LanguageTurnEvidence> {
   const { language, marker } = opts;
   const lt = {
@@ -97,6 +118,9 @@ export async function completeLanguageTurn(opts: {
     // ownSentence (ESL5, tag only): the task counts as set only when the reply actually set it; feedback is tagged on the next turn.
     ...(ownSentenceNow(language) === 'ask' && OWN_SENTENCE_SET.test(opts.reply) ? { ownSentence: 'asked' as const } : ownSentenceNow(language) === 'feedback' ? { ownSentence: 'feedback' as const } : {}),
     ...(opts.closingAsk ? { closingAsk: opts.closingAsk } : {}),
+    ...(opts.guardHits ? { exampleGuardHits: opts.guardHits } : {}),
+    ...(opts.regenerated !== undefined ? { exampleGuardRegenerated: opts.regenerated } : {}),
+    ...(opts.postCheck?.length ? { postCheck: opts.postCheck } : {}),
   };
   // fadeKnown (ESL5): a failed quick check is recorded (support returns for the rest of the session; the record's count for the point restarts).
   const fadeFailed = engineV2('fadeKnown') && lt.fadeCheckAnswered?.length && isFailure(lt.assessment.verdict) ? lt.fadeCheckAnswered : undefined;

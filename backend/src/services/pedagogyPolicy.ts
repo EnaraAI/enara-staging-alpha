@@ -128,6 +128,13 @@ export interface PlanInput {
   subject?: string;
   // Language courses (levelExplicit): the course level is below B1 (A1, A2 or pre-A1). Absent for other courses and when the level is unknown.
   belowB1?: boolean;
+  // methodSelect (TRACK 2): the learner's trusted age band (child = under 13: narrative/game support, M7); a later session that opens with recall of
+  // live errors (retrieval + spacing, agreeing with the engine's reviewOpen move, M4); a form answered right twice in this session (interleaving, M5);
+  // a vocabulary outcome (form, meaning and use, M6).
+  ageBand?: 'child' | 'teen' | 'adult' | 'unknown';
+  reviewOpening?: boolean;
+  formRightTwice?: boolean;
+  vocabulary?: boolean;
 }
 
 // Kind of subject, from its name (English and Arabic keywords). A heuristic:
@@ -195,6 +202,11 @@ export function selectTeachingPlan(input: PlanInput): TeachingPlan {
     set('prerequisite_remediation', novice ? ['worked_example'] : []);
     reasons.push('PREREQUISITE_GAP');
     gap = 'A prerequisite objective is not secure yet.';
+  } else if (engineV2('methodSelect') && input.reviewOpening) {
+    // M4: a later session opens with recall from memory before any re-teaching (Roediger & Karpicke 2006), spaced (Cepeda et al. 2006).
+    set('retrieval_practice', [], 'spaced_repetition');
+    reasons.push('REVIEW_OPENING');
+    gap = 'A later session: recall the earlier points from memory before re-teaching.';
   } else if (input.retention?.lapsed && RANK[status] >= 2) {
     set('retrieval_practice', [], 'spaced_repetition');
     reasons.push('RETENTION_DECAY');
@@ -229,6 +241,12 @@ export function selectTeachingPlan(input: PlanInput): TeachingPlan {
       set('error_analysis', ['think_aloud']);
       reasons.push('MISINTERPRETATION');
       gap = 'Misreads the task or reasoning is incomplete.';
+    } else if (engineV2('methodSelect') && input.belowB1 && RANK[status] <= 1 && !input.misconceptions.length) {
+      // M2: an A1-A2 novice with no diagnosed error gets explicit instruction (Norris & Ortega 2000; Spada & Tomita 2010); a vocabulary outcome is
+      // taught as form, meaning and use (Nation 2013) inside it.
+      set('direct_instruction', ['worked_example']);
+      reasons.push(input.vocabulary ? 'NOVICE_EXPLICIT_VOCABULARY' : 'NOVICE_EXPLICIT');
+      gap = 'A1-A2 novice with no diagnosed error: explicit instruction first.';
     } else if (input.applicationGap && RANK[status] >= 2 && !levelGated('blooms_guided')) {
       set('blooms_guided', usable('inquiry_based') ? ['inquiry_based'] : []);
       reasons.push('APPLICATION_GAP');
@@ -297,6 +315,20 @@ export function selectTeachingPlan(input: PlanInput): TeachingPlan {
     const extra = (input.gradeLevel ?? 99) <= 8 && ['retrieval_practice', 'guided_practice', 'mastery_learning', 'independent_practice'].includes(c.primary) ? 'gamification' : 'narrative_contextual';
     if (c.supporting.length < 2) c.supporting.push(extra);
     reasons.push('DISENGAGED');
+  }
+  if (engineV2('methodSelect')) {
+    // M5: once the form is right twice, practise it mixed with a confusable form (Nakata & Suzuki 2019); not for the youngest (minGrade).
+    if (input.formRightTwice && c.primary !== 'interleaving' && (input.gradeLevel === undefined || (STRATEGY_BY_ID.get('interleaving')?.minGrade ?? 0) <= input.gradeLevel)) {
+      c.reinforcement = 'interleaving';
+      reasons.push('FORM_RIGHT_TWICE');
+    }
+    // M7: under 13, a story or game frame as SUPPORT (Cameron 2001): never the primary, never replacing focus on form.
+    if (input.ageBand === 'child' && !c.supporting.some((x) => x === 'narrative_contextual' || x === 'gamification')) {
+      const frame = ['retrieval_practice', 'guided_practice', 'mastery_learning', 'independent_practice', 'spaced_repetition'].includes(c.primary) ? 'gamification' : 'narrative_contextual';
+      if (c.supporting.length >= 2) c.supporting.pop();
+      c.supporting.push(frame);
+      reasons.push('UNDER_13_FRAME');
+    }
   }
   // Modifiers: always adaptive pathways (this plan), differentiation and the
   // formative feedback policy; Bloom's guidance once the objective is secure.
