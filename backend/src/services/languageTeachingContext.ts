@@ -269,6 +269,8 @@ export interface TurnSignals {
   liveTarget?: string;
   // releaseAfterTwo (ESL5): genuine failed attempts on the open item, this message included (empty, "I don't know" and copies of the prompt don't count).
   genuineFailedAttempts?: number;
+  // planner2c (PLN2c): the learner sent again a free answer (no course key, e.g. a task sentence) that was already graded wrong; it counts as a failed try.
+  repeatWrong?: number;
   // reviewOpen (ESL5): the recall error types the previous reply opened with (read back from its stored evidence).
   prevReview?: string[];
   // fadeKnown (ESL5): criteria of this turn's item that the record shows as known (faded: no rule line, quick check), or whose quick check is being answered now.
@@ -959,6 +961,10 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
     else if (turnNo >= OWN_SENTENCE_FROM && !tags.includes('asked') && (sig.answeringCheck || sig.unpromptedSentence)) sig.ownSentence = 'ask';
   }
   if ((engineV2('releaseAfterTwo') || engineV2('feedbackLadder')) && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope);
+  if (engineV2('planner2') && !sig.keyVerdict) {
+    const r = repeatedWrongAnswers(text, history, scope);
+    if (r >= 2) { sig.repeatWrong = r; sig.genuineFailedAttempts = Math.max(sig.genuineFailedAttempts ?? 0, r); }
+  }
   return sig;
 }
 
@@ -999,6 +1005,20 @@ export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<Tur
   const ok = s.keyVerdict === 'CORRECT' || s.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
   if (!ok && genuineAttempt(text, prevTutor, s.activeLessonItem, s.learnerResponse ?? 'no_pending_task')) n += 1;
   return n;
+}
+/** planner2c: how many times in a row the learner has sent this same message, each earlier copy graded wrong by the reply after it (this one
+ *  included). A free answer (no course key) is graded only after the reply, so a repeat is the code's evidence of a failed try now. 0: not a repeat. */
+export function repeatedWrongAnswers(text: string, history: Turn[], scope?: string): number {
+  const same = (a: string) => norm(a) !== '' && norm(a) === norm(text);
+  let n = 1;
+  for (let i = history.length - 1; i >= 0; i -= 1) {
+    if (history[i].role !== 'user') continue;
+    const next = history.slice(i + 1).find((x) => x.role === 'assistant');
+    const lt = next && inScope(next.languageTurn, scope) ? next.languageTurn : undefined;
+    if (!same(history[i].content) || !isFailure(lt?.assessment?.verdict)) break;
+    n += 1;
+  }
+  return n >= 2 ? n : 0;
 }
 /** releaseAfterTwo: the reply after two genuine failed attempts gives the answer (never earlier). */
 export const RELEASE_AFTER = 2;
@@ -1179,7 +1199,7 @@ export function selectLanguageMoves(input: {
   // open item the answer is given with its reason and a right/wrong pair, then a new item on the same point. Never earlier: any other answer move
   // becomes a hint until then (the leak guards keep hiding the open item's answer, see guardedItems). A hints-only policy never releases.
   if (engineV2('releaseAfterTwo') && !input.hintsOnly) {
-    const engaged = s.answeringCheck || s.dontKnow || s.answerRequest || s.hintRequest || s.whyAfterAttempt;
+    const engaged = s.answeringCheck || s.dontKnow || s.answerRequest || s.hintRequest || s.whyAfterAttempt || (s.repeatWrong ?? 0) >= 2;
     if ((s.genuineFailedAttempts ?? 0) >= releaseAfter() && engaged) {
       for (let k = moves.length - 1; k >= 0; k -= 1) if (['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning'].includes(moves[k].id)) moves.splice(k, 1);
       moves.unshift({ id: 'answer_with_reasoning', reasons: ['release_after_two_genuine_attempts'], ledger: ['LTC-D6'] });
