@@ -56,6 +56,23 @@ async function upsertSuspected(params: {
   });
 }
 
+/** planner2 (l1_transfer): two or more Arabic-transfer errors on one objective in a session -> a suspected l1_transfer
+ *  misconception (one slip is not enough, as for rule A). Teacher decisions are never overwritten (upsertSuspected). */
+export async function recordL1Transfer(params: { institutionId?: string; studentId: string; objectiveId: string; codes: string[] }) {
+  if (params.codes.length < 2 || !(await isFeatureEnabled(params.institutionId, 'misconception_detection_enabled'))) return;
+  const kinds = [...new Set(params.codes)];
+  await upsertSuspected({
+    institutionId: params.institutionId,
+    studentId: params.studentId,
+    objectiveId: params.objectiveId,
+    ruleKey: `l1:${params.objectiveId}`,
+    category: 'l1_transfer',
+    description: `Errors carried over from Arabic: ${kinds.map((k) => k.replace(/_/g, ' ')).join(', ')}.`,
+    confidence: Math.min(0.9, 0.35 * params.codes.length),
+    supportingEvidenceIds: [],
+  });
+}
+
 export async function detectMisconceptions(studentId: string, objectiveIds: string[], institutionId?: string) {
   if (!objectiveIds.length || !(await isFeatureEnabled(institutionId, 'misconception_detection_enabled'))) return;
 

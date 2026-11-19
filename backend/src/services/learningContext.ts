@@ -8,7 +8,9 @@ import { PedagogicalDecision } from '../models/PedagogicalDecision';
 import { Student } from '../models/Student';
 import { Institution } from '../models/Institution';
 import { ageFromBirthDate, loadTrustedAgeBand } from './languageTeachingContext';
-import { currentStage, planLesson, progressFromHistory, shapeLines, type LessonPlan } from './lessonPlanner';
+import { planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow, type LessonPlan, type PlannerSignals, type StageProgress } from './lessonPlanner';
+import { L1_TRANSFER_CODES } from './languageLearningState';
+import { recordL1Transfer } from './misconceptionRules';
 import { StudentMisconception } from '../models/StudentMisconception';
 import { StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import type { TeachingMeta } from '../models/TutorMessage';
@@ -52,6 +54,8 @@ export interface ObjectiveContext {
   teaching: TeachingMeta;
   // TRACK 2: the objective's code (an outcome id such as EN-F-A2-GR-some-any selects the rule-bank entry). Not stored.
   objectiveCode?: string;
+  // planner2: the lesson shape and this turn's stage (code-set); quickCheck = inside the opening 3-item check.
+  lessonStage?: { shape: string; stage: string; quickCheck: boolean };
 }
 
 export type Channel = 'chat' | 'stream' | 'voice' | 'intervention';
@@ -106,7 +110,7 @@ export async function buildObjectiveContext(params: {
         .lean(),
       PedagogicalDecision.find({ studentId: params.studentId, objectiveId: objective.id }).sort({ at: -1 }).limit(10).lean(),
       ObjectiveRetentionState.findOne({ studentId: params.studentId, objectiveId: objective.id }).lean(),
-      Student.findOne({ id: params.studentId }).select(engineV2('planner2') ? 'grade +birthDate' : 'grade').lean(),
+      Student.findOne({ id: params.studentId }).select(engineV2('planner2') ? 'grade +birthDate learningGoal' : 'grade').lean(),
       LearningEvent.findOne({ studentId: params.studentId, at: { $lt: new Date(Date.now() - 60_000) } }).sort({ at: -1 }).select('at').lean(),
       related,
     ]);
@@ -178,17 +182,30 @@ export async function buildObjectiveContext(params: {
     };
     // planner2: lesson shape first, then the main method inside it (lessonPlanner.ts). Off: ped-v2 unchanged.
     let lesson: LessonPlan | undefined;
+    let progress: StageProgress | undefined;
     if (engineV2('planner2')) {
       const level = objective.curriculumId ? (await Curriculum.findOne({ id: objective.curriculumId }).select('level').lean())?.level : undefined;
       const ageBand = input.ageBand ?? (await loadTrustedAgeBand({ institutionId: params.institutionId, studentId: params.studentId, learningSettings: params.institutionId ? (await Institution.findOne({ id: params.institutionId }).select('learningSettings').lean() as { learningSettings?: unknown } | null)?.learningSettings : undefined })).band;
-      // Not recorded yet (see docs/tutor/PLANNER_METHODS_TABLE.md): the learner's goal and a quick-check result, so TASK and TTT
-      // are reached only once those signals exist; until then teens and adults get PPP (S5).
-      lesson = planLesson(input, {
+      const goal = (student as { learningGoal?: string } | null)?.learningGoal;
+      const signals: PlannerSignals = {
         ageBand,
         ageYears: ageFromBirthDate((student as { birthDate?: Date } | null)?.birthDate, new Date()),
         level: typeof level === 'string' ? level : undefined,
+        goal: goal === 'work' || goal === 'exam' || goal === 'daily' || goal === 'school' ? goal : undefined,
         reviewDue: input.retention?.due,
+      };
+      // Arabic-transfer errors graded in this session (2 or more) -> a suspected l1_transfer error for this objective.
+      const l1 = (params.history ?? []).flatMap((t) => {
+        const code = t.role === 'assistant' ? (t.languageTurn as { diagnosis?: string } | null | undefined)?.diagnosis : undefined;
+        return code && (L1_TRANSFER_CODES as string[]).includes(code) ? [code] : [];
       });
+      if (l1.length >= 2) {
+        if (!input.misconceptions.some((m) => m.category === 'l1_transfer')) input.misconceptions = [{ id: `l1-session-${objective.id}`, category: 'l1_transfer', status: 'suspected' }, ...input.misconceptions];
+        if (params.record) await recordL1Transfer({ institutionId: params.institutionId, studentId: params.studentId, objectiveId: objective.id, codes: l1 });
+      }
+      progress = params.history ? progressFromHistory(params.history) : undefined;
+      const opener = reviewOpener(signals, input);
+      lesson = planLesson(input, { ...signals, ...quickCheckSignals(signals, progress, opener) });
     }
     const plan = lesson ? lesson.plan : selectTeachingPlan(input);
     const primary = STRATEGY_BY_ID.get(plan.primary)!;
@@ -205,7 +222,8 @@ export async function buildObjectiveContext(params: {
         (lastForSession.supportingStrategyIds ?? []).join() === plan.supporting.join() &&
         (lastForSession.reinforcementStrategyId ?? '') === (plan.reinforcement ?? '') &&
         lastForSession.objectiveId === objective.id &&
-        (lastForSession.lessonShape ?? '') === (lesson?.shape ?? '');
+        (lastForSession.lessonShape ?? '') === (lesson?.shape ?? '') &&
+        (lastForSession.shapeRule ?? '') === (lesson?.shapeRule ?? '');
       if (!same) {
         id = `pd-${randomUUID()}`;
         await PedagogicalDecision.create({
@@ -255,7 +273,7 @@ export async function buildObjectiveContext(params: {
       ...weak.map((w) => `- Prerequisite not secure yet: ${w.code} "${w.title}".`),
       ...misconceptions.map((m) => `- Possible misconception (${m.status === 'confirmed' ? 'confirmed by a teacher' : 'not confirmed'}): ${m.description}`),
       ...planLines(plan, target && target.id !== objective.id ? `${target.code} "${target.title}"` : undefined, status, params.compact),
-      ...(lesson ? shapeLines(lesson, params.history ? currentStage(lesson.shape, progressFromHistory(params.history)) : undefined) : []),
+      ...(lesson ? shapeLines(lesson, progress ? stageNow(lesson, progress) : undefined) : []),
       '- Assessment integrity: never give the answers to the student\'s assessment or quick-check questions. If they paste one, teach the method with a different example.',
       plan.requiresReassessment
         ? '- When they seem ready, suggest a quick check to confirm (practice with you does not count as proof of understanding).'
@@ -275,7 +293,8 @@ export async function buildObjectiveContext(params: {
       registryVersion: plan.registryVersion,
       ...(lesson ? { lessonShape: lesson.shape, shapeRule: lesson.shapeRule, methodRule: lesson.methodRule, plannerVersion: lesson.plannerVersion, explanation: lesson.explanation } : {}),
     };
-    return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching, ...(objective.code ? { objectiveCode: String(objective.code) } : {}) };
+    const lessonStage = lesson ? { shape: lesson.shape, stage: progress ? stageNow(lesson, progress) : lesson.startStage, quickCheck: lesson.shapeRule === 'S4q' } : undefined;
+    return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching, ...(lessonStage ? { lessonStage } : {}), ...(objective.code ? { objectiveCode: String(objective.code) } : {}) };
   } catch (error) {
     logger.warn('learning_context_failed', { error: serializeError(error) });
     return null;

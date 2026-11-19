@@ -2,6 +2,10 @@ import { LEARNER_AGE_BANDS, type LearnerAgeBand } from './learnerAgeBand';
 import { Schema, model, Document } from 'mongoose';
 
 export const STUDENT_UI_MODES = ['standard', 'kids'] as const;
+// planner2: the learner's main goal for English (lesson shape TASK needs work, exam or daily life).
+export const LEARNING_GOALS = ['work', 'exam', 'daily', 'school'] as const;
+export type LearningGoal = (typeof LEARNING_GOALS)[number];
+export const isLearningGoal = (v: unknown): v is LearningGoal => typeof v === 'string' && (LEARNING_GOALS as readonly string[]).includes(v);
 export type StudentUiMode = (typeof STUDENT_UI_MODES)[number];
 
 export interface IStudent extends Document {
@@ -81,6 +85,12 @@ export interface IStudent extends Document {
   pendingPhotoUrl?: string;
   pendingPhotoKey?: string;
   pendingPhotoAt?: Date;
+  // planner2: main goal, asked once at onboarding (teen/adult: the learner; child: the parent or school) and editable.
+  learningGoal?: LearningGoal;
+  learningGoalSetAt?: Date;
+  learningGoalSetBy?: 'student' | 'parent' | 'school';
+  // The onboarding question was shown and skipped: not asked again automatically.
+  learningGoalSkippedAt?: Date;
 }
 
 const studentSchema = new Schema<IStudent>(
@@ -102,6 +112,10 @@ const studentSchema = new Schema<IStudent>(
     groupId: { type: String },
     learnerAgeBand: { type: String, enum: LEARNER_AGE_BANDS, select: false },
     birthDate: { type: Date, select: false },
+    learningGoal: { type: String, enum: LEARNING_GOALS },
+    learningGoalSetAt: { type: Date },
+    learningGoalSetBy: { type: String, enum: ['student', 'parent', 'school'] },
+    learningGoalSkippedAt: { type: Date },
     progress: { type: Number, default: 0 },
     avgScore: { type: Number, default: 0 },
     studyTime: { type: String, default: '0h/week' },

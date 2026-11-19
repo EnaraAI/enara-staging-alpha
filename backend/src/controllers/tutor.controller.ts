@@ -315,6 +315,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     // TRACK 2: the plan's objective (rule-bank entry, guard pool of its assessment items).
     objectiveId: turn.plan?.teaching.objectiveId,
     objectiveCode: turn.plan?.objectiveCode,
+    ...(turn.plan?.lessonStage?.quickCheck ? { quickCheck: true } : {}),
   }, 'chat'))?.context ?? null;
   if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language) {
     turn.orchestrator = {

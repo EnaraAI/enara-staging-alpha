@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { planWithTrace, selectTeachingPlan, METHOD_RULES, type PlanInput } from '../src/services/pedagogyPolicy';
 import { STRATEGIES, validateComposition } from '../src/services/strategyRegistry';
 import {
-  METHOD_TABLE, SHAPE_RULES, SHAPE_STAGES, allowedMain, chooseShape, currentStage, levelRank, methodGateOk, planLesson, progressFromHistory, reviewOpener, shapeLines,
+  METHOD_TABLE, SHAPE_RULES, SHAPE_STAGES, allowedMain, chooseShape, currentStage, levelRank, methodGateOk, planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow,
   type LessonShape, type PlannerSignals,
 } from '../src/services/lessonPlanner';
 import { engineV2 } from '../src/services/engineV2';
@@ -170,7 +170,7 @@ const GOALS: PlannerSignals['goal'][] = [undefined, 'work', 'exam', 'daily', 'sc
 const CHECKS: PlannerSignals['quickCheck'][] = [undefined, { right: 0, of: 3 }, { right: 1, of: 3 }, { right: 2, of: 3 }, { right: 3, of: 3 }];
 const MASTERY = ['not_assessed', 'emerging', 'developing', 'proficient', 'mastered'];
 function* signalGrid(): Generator<[PlannerSignals, string]> {
-  for (const [ageBand, ageYears] of AGES) for (const level of LEVELS) for (const goal of GOALS) for (const quickCheck of CHECKS) for (const m of MASTERY) yield [{ ageBand, ageYears, level, goal, quickCheck }, m];
+  for (const [ageBand, ageYears] of AGES) for (const level of LEVELS) for (const goal of GOALS) for (const quickCheck of CHECKS) for (const m of MASTERY) for (const quickCheckPending of [false, true]) yield [{ ageBand, ageYears, level, goal, quickCheck, quickCheckPending }, m];
 }
 
 describe('coverage', () => {
@@ -188,11 +188,11 @@ describe('coverage', () => {
       // LAD exactly for Pre-A1, or a child known to be under 9
       expect(r.shape === 'LAD').toBe(lr === 0 || (s.ageBand === 'child' && s.ageYears !== undefined && s.ageYears < 9));
       if (s.ageBand === 'child') expect(['LAD', 'PPP']).toContain(r.shape);
-      if (r.shape === 'TTT') expect(s.quickCheck!.right * 3 >= s.quickCheck!.of * 2).toBe(true);
+      if (r.shape === 'TTT') expect(r.id === 'S4q' ? s.quickCheckPending : s.quickCheck!.right * 3 >= s.quickCheck!.of * 2).toBe(true);
       if (r.shape === 'TASK') expect((lr ?? -1) >= 3 && ['work', 'exam', 'daily'].includes(s.goal ?? '')).toBe(true);
       if (s.ageBand === 'unknown') expect(r.shape).toBe(lr === 0 ? 'LAD' : 'PPP');
     }
-    expect(n).toBe(AGES.length * LEVELS.length * GOALS.length * CHECKS.length * MASTERY.length);
+    expect(n).toBe(AGES.length * LEVELS.length * GOALS.length * CHECKS.length * MASTERY.length * 2);
     expect([...reached].sort()).toEqual(SHAPE_RULES.map((r) => r.id).sort());
   });
 
@@ -328,5 +328,94 @@ describe('golden traces', () => {
       return { shape: lp.shape, shapeRule: lp.shapeRule, opener: lp.opener, startStage: lp.startStage, methodStage: lp.methodStage, childSupports: lp.childSupports, methodRule: lp.methodRule, skipped: lp.skipped, primary: lp.plan.primary, supporting: lp.plan.supporting, reinforcement: lp.plan.reinforcement ?? null, reasons: lp.plan.reasonCodes, explanation: lp.explanation };
     }));
     expect(trace).toMatchSnapshot();
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// 6. Live signals: quick check, goal, birth date, Arabic-transfer errors.
+import { detectL1Transfer, diagnoseError, L1_TRANSFER_CODES } from '../src/services/languageLearningState';
+import { parseBirthDate, parseGoal } from '../src/services/learnerSignals';
+import { QUICK_CHECK_DROPPED, QUICK_CHECK_LINE } from '../src/services/languageTeachingContext';
+
+describe('quick check', () => {
+  const g = (verdict: string) => ({ role: 'assistant', languageTurn: { assessment: { verdict } } });
+  it('teens and adults (not Pre-A1, no review opener) open with a pending check; children and voice never', () => {
+    const p0 = progressFromHistory([]);
+    expect(quickCheckSignals(adult(), p0, false)).toEqual({ quickCheckPending: true });
+    expect(quickCheckSignals({ ageBand: 'teen', level: 'B1' }, p0, false)).toEqual({ quickCheckPending: true });
+    expect(quickCheckSignals({ ageBand: 'child', ageYears: 10, level: 'A1' }, p0, false)).toEqual({});
+    expect(quickCheckSignals(adult({ level: 'Pre-A1' }), p0, false)).toEqual({});
+    expect(quickCheckSignals(adult(), p0, true)).toEqual({});
+    expect(quickCheckSignals(adult(), undefined, false)).toEqual({}); // voice: no history
+  });
+  it('2 of 3 right -> TTT at teach; 1 of 3 -> PPP from present (the 3 test items do not count as practice)', () => {
+    const h2 = [g('CORRECT'), g('INCORRECT'), g('CORRECT')];
+    const p2 = progressFromHistory(h2);
+    expect(p2.quickCheck).toEqual({ right: 2, of: 3 });
+    const lp2 = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p2, false) });
+    expect([lp2.shape, lp2.shapeRule, stageNow(lp2, p2)]).toEqual(['TTT', 'S4', 'teach']);
+    const h1 = [g('INCORRECT'), g('INCORRECT'), g('CORRECT')];
+    const p1 = progressFromHistory(h1);
+    const lp1 = planLesson(base({ masteryStatus: 'emerging' }), { ...adult(), ...quickCheckSignals(adult(), p1, false) });
+    expect([lp1.shape, lp1.shapeRule, stageNow(lp1, p1)]).toEqual(['PPP', 'S5', 'present']);
+    const p1b = progressFromHistory([...h1, g('CORRECT'), g('CORRECT')]);
+    expect(stageNow(lp1, p1b)).toBe('produce');
+  });
+  it('while pending: TTT test stage, the prompt says quick check; the language engine drops teaching moves', () => {
+    const p = progressFromHistory([g('CORRECT')]);
+    const lp = planLesson(base({ masteryStatus: 'not_assessed', belowB1: true }), { ...adult(), ...quickCheckSignals(adult(), p, false) });
+    expect([lp.shape, lp.shapeRule, stageNow(lp, p)]).toEqual(['TTT', 'S4q', 'test']);
+    expect(shapeLines(lp, 'test').join('\n')).toMatch(/Quick check/);
+    for (const m of ['corrective_feedback_retry', 'scaffold_hint', 'answer_with_reasoning', 'short_explanation']) expect(QUICK_CHECK_DROPPED.has(m as never)).toBe(true);
+    expect(QUICK_CHECK_DROPPED.has('present_lesson_item' as never)).toBe(false);
+    expect(QUICK_CHECK_LINE).toMatch(/Do not teach, explain, hint, correct or give any answer/);
+  });
+  it('a TASK learner skips the quick check (S3 comes first)', () => {
+    const s = adult({ level: 'B1', goal: 'work' });
+    const lp = planLesson(base({ masteryStatus: 'developing' }), { ...s, ...quickCheckSignals(s, progressFromHistory([]), false) });
+    expect(lp.shape).toBe('TASK');
+  });
+  it('the prompt never lets the tutor ask the age', () => {
+    expect(shapeLines(planLesson(base(), adult())).join('\n')).toMatch(/Never ask the learner their age/);
+  });
+});
+
+describe('goal and birth date input', () => {
+  it('goal: only work, exam, daily, school', () => {
+    for (const g of ['work', 'exam', 'daily', 'school']) expect(parseGoal(g)).toBe(g);
+    for (const g of ['Work', 'travel', '', null, 3]) expect(() => parseGoal(g)).toThrow();
+  });
+  it('birth date: YYYY-MM-DD, age 3-100', () => {
+    const now = new Date('2026-11-19T00:00:00Z');
+    expect(parseBirthDate('2018-05-01', now).toISOString()).toBe('2018-05-01T00:00:00.000Z');
+    for (const d of ['2025-01-01', '1900-01-01', '01/05/2018', '2018-13-01', 'x', 20180501]) expect(() => parseBirthDate(d, now)).toThrow();
+  });
+});
+
+describe('Arabic-transfer errors (l1_transfer)', () => {
+  const yes: [string, string][] = [
+    ['She teacher.', 'copula_omitted'], ['He is doctor.', 'article_omitted'], ['He going to school now.', 'progressive_no_be'],
+    ['I am agree with you.', 'be_with_base_verb'], ['My brother he works in a bank.', 'subject_doubled'],
+    ['This is the book that I read it.', 'resumptive_pronoun'], ['I have 25 years.', 'age_with_have'],
+  ];
+  const no = ['She is a teacher.', 'He is going to school now.', 'I agree with you.', 'My brother works in a bank.', 'This is the book that I read.', 'I am 25 years old.', 'I have lived here for 5 years.', 'Nothing happened.', 'Good morning everyone.'];
+  it.each(yes)('finds: %s', (text, code) => { expect(detectL1Transfer(text)?.code).toBe(code); });
+  it.each(no.map((x) => [x]))('silent: %s', (text) => { expect(detectL1Transfer(text)).toBeNull(); });
+  it('every code is an Arabic-transfer code with a cue that names no answer word', () => {
+    for (const [t] of yes) {
+      const d = detectL1Transfer(t)!;
+      expect(L1_TRANSFER_CODES).toContain(d.code);
+      expect(d.cue).not.toMatch(/\b(is|am|are|a|an|the)\b/);
+    }
+  });
+  it('the item diagnosis uses it only with planner2 (off: unchanged)', () => {
+    const item = { id: 'i', prompt: 'Write a sentence about your brother.', acceptedAnswers: ['My brother works in a bank.'], targetForms: ['works'] } as never;
+    expect(withEnv('', () => diagnoseError('My brother he works in a bank.', item))?.code).not.toBe('subject_doubled');
+    expect(withEnv('planner2', () => diagnoseError('My brother he works in a bank.', item))?.code).toBe('subject_doubled');
+  });
+  it('two in-session Arabic-transfer errors make the plan contrast with Arabic', () => {
+    const lp = withEnv(ESL, () => planLesson(base({ masteryStatus: 'emerging', belowB1: true, misconceptions: [{ id: 'l1', category: 'l1_transfer', status: 'suspected' }] }), adult()));
+    expect([lp.plan.primary, lp.methodRule]).toEqual(['analogy', 'P1_L1_CONTRAST']);
+    expect(shapeLines(lp).join('\n')).toMatch(/Contrast the English form with how Arabic says it/);
   });
 });

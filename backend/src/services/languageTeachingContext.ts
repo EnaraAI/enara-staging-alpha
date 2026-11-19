@@ -119,7 +119,7 @@ export function resolveTrustedAgeBand(learningSettings: unknown, studentBand?: u
   if (raw === true) return { band: 'adult', status: 'known', source: 'school_setting_adult_learners' };
   if (isLearnerAgeBand(studentBand)) return { band: studentBand, status: 'known', source: 'student_age_band' };
   if (isLearnerAgeBand(classBand)) return { band: classBand, status: 'known', source: 'class_age_band' };
-  if (engineV2('kidsBand')) {
+  if (engineV2('kidsBand') || engineV2('planner2')) {
     const age = ageFromBirthDate(extra.birthDate, extra.now ?? new Date());
     if (age !== undefined) return { band: age < 13 ? 'child' : age < 18 ? 'teen' : 'adult', status: 'known', source: 'student_birth_date' };
     if (extra.uiMode === 'kids') return { band: 'child', status: 'known', source: 'kids_mode' };
@@ -143,7 +143,7 @@ export function ageFromBirthDate(birthDate: Date | string | null | undefined, no
 export async function loadTrustedAgeBand(params: { institutionId?: string; studentId?: string; learningSettings?: unknown }): Promise<TrustedAgeBand> {
   if (!params.institutionId) return resolveTrustedAgeBand(params.learningSettings);
   const student = params.studentId
-    ? await Student.findOne({ id: params.studentId, institutionId: params.institutionId }).select(engineV2('kidsBand') ? '+learnerAgeBand +birthDate batchId uiMode' : '+learnerAgeBand batchId').lean()
+    ? await Student.findOne({ id: params.studentId, institutionId: params.institutionId }).select(engineV2('kidsBand') || engineV2('planner2') ? '+learnerAgeBand +birthDate batchId uiMode' : '+learnerAgeBand batchId').lean()
     : null;
   const batch = student?.batchId
     ? await Batch.findOne({ id: student.batchId, institutionId: params.institutionId }).select('+learnerAgeBand').lean()
@@ -331,6 +331,8 @@ export interface LanguageTeachingContext {
   // TRACK 2 (ruleBank / exampleGuard / feedbackLadder / methodSelect): the rule-bank entry, the worked example chosen for this reply, the corrective-feedback
   // rung, interleaving and the under-13 frame; and the server-side pool of items the learner will solve (NEVER rendered into the prompt).
   teach2?: Teach2Context;
+  // planner2: this turn is inside the lesson's opening quick check.
+  quickCheck?: boolean;
   prompt: string;
 }
 export interface Teach2Context {
@@ -2083,6 +2085,10 @@ export function languageStateScope(p: { institutionId?: string; studentId?: stri
   return createHash('sha256').update(key).digest('hex').slice(0, 24);
 }
 
+/** planner2 quick check: moves that teach or correct, removed during the 3 test items. */
+export const QUICK_CHECK_DROPPED = new Set<MoveId>(['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'l1_support', 'activate_prior_knowledge']);
+export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this lesson opens with three short exercises, one at a time, to see what the learner already knows. Do not teach, explain, hint, correct or give any answer during them. After each answer say only a short neutral thanks (for example "Thanks, noted.") and give the next exercise. After the third, say the lesson starts now.';
+
 export async function buildLanguageTeachingContext(params: {
   institutionId?: string;
   curriculumId?: string;
@@ -2102,6 +2108,8 @@ export async function buildLanguageTeachingContext(params: {
   // TRACK 2: the objective of this turn's plan (its id or code selects the rule-bank entry and the assessment items of the guard pool).
   objectiveId?: string;
   objectiveCode?: string;
+  // planner2: this turn is inside the 3-item quick check that opens the lesson (no teaching, no correction).
+  quickCheck?: boolean;
 }): Promise<LanguageTeachingContext | null> {
   try {
     if (!params.curriculumId) return null;
@@ -2135,7 +2143,11 @@ export async function buildLanguageTeachingContext(params: {
     });
     // ESL5 (reviewOpen, fadeKnown): ENARA's own stored learner record, read only when one of those switches is on.
     const record = engineV2('reviewOpen') || engineV2('fadeKnown') ? (await loadEsl5Record(params.institutionId, params.studentId)) ?? undefined : undefined;
-    const { signals, moves } = esl5Adjust({ signals: signals0, moves: moves0, record, history: params.history, lessonId: lesson.lessonId, scope });
+    const adjusted = esl5Adjust({ signals: signals0, moves: moves0, record, history: params.history, lessonId: lesson.lessonId, scope });
+    const quickCheck = Boolean(params.quickCheck) && engineV2('planner2');
+    const signals = adjusted.signals;
+    // planner2 quick check: only presenting and recording; every teaching or correcting move is dropped for these 3 items.
+    const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : adjusted.moves;
     const base0 = lengthTarget(learner.ageBand, learner.proficiency.value);
     // r2: a clarification-only turn is one short question, so a tighter target.
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
@@ -2146,10 +2158,12 @@ export async function buildLanguageTeachingContext(params: {
     // levelExplicit: decided per learner and objective; explicit-first learners get the rule before their first try (rulesToIntroduce, once per rule per session).
     const outcomeId = ruleBankEntry(params.objectiveCode) ? params.objectiveCode : params.objectiveId;
     const teach2 = buildTeach2({ signals, lesson, moves, learner }, { objectiveId: outcomeId, history: params.history, assessmentItems: engineV2('exampleGuard') || engineV2('ruleBank') ? await loadObjectiveItems(params.institutionId, [params.objectiveId, params.objectiveCode, outcomeId]) : [] });
-    const { explicit, ruleFirst } = ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
+    const { explicit, ruleFirst } = quickCheck ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
     const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}), ...(teach2 ? { teach2 } : {}) } as const;
-    const parts = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
-    return { ...base, ...(parts ? { parts } : {}), prompt: renderLanguageContextPrompt(base) };
+    const parts0 = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
+    const parts = parts0 && quickCheck ? { ...parts0, dynamic: `${parts0.dynamic}\n\n${QUICK_CHECK_LINE}` } : parts0;
+    const prompt = renderLanguageContextPrompt(base);
+    return { ...base, ...(quickCheck ? { quickCheck: true } : {}), ...(parts ? { parts } : {}), prompt: quickCheck ? `${prompt}\n\n${QUICK_CHECK_LINE}` : prompt };
   } catch (error) {
     logger.warn('language_context_failed', { error: serializeError(error) });
     return null;

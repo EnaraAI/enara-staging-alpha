@@ -60,6 +60,8 @@ export interface PlannerSignals {
   level?: string;
   goal?: Goal;
   quickCheck?: { right: number; of: number };
+  /** The lesson's 3-item quick check is still running (teen/adult; set by quickCheckSignals). */
+  quickCheckPending?: boolean;
   sessionNumber?: number;
   earlierErrors?: boolean;
   reviewDue?: boolean;
@@ -96,6 +98,7 @@ export const SHAPE_RULES: ShapeRow[] = [
     id: 'S3', shape: 'TASK', when: 'B1 or above, partly secure or better, with a real-life goal',
     test: (s, m) => teenOrAdult(s) && (levelRank(s.level) ?? -1) >= 3 && RANK[m] >= 2 && (s.goal === 'work' || s.goal === 'exam' || s.goal === 'daily'),
   },
+  { id: 'S4q', shape: 'TTT', when: 'a 3-item quick check opens the lesson', test: (s) => teenOrAdult(s) && Boolean(s.quickCheckPending) },
   { id: 'S4', shape: 'TTT', when: 'the quick check showed at least 2 of 3 known', test: (s) => teenOrAdult(s) && !!s.quickCheck && s.quickCheck.of > 0 && s.quickCheck.right * 3 >= s.quickCheck.of * 2 },
   { id: 'S5', shape: 'PPP', when: 'new to the form, or no quick check yet', test: (s) => teenOrAdult(s) },
   { id: 'S6', shape: 'PPP', when: 'age not known', test: () => true },
@@ -330,7 +333,7 @@ export function currentStage(shape: LessonShape, p: { tries: number; right: numb
   }
 }
 
-export interface StageProgress { tries: number; right: number; ownSentenceDone?: boolean; taskDone?: boolean; triesAfterTest?: number; rightAfterTest?: number; opened?: boolean }
+export interface StageProgress { quickCheck?: { right: number; of: number }; tries: number; right: number; ownSentenceDone?: boolean; taskDone?: boolean; triesAfterTest?: number; rightAfterTest?: number; opened?: boolean }
 type HistoryLike = { role: string; languageTurn?: unknown };
 /** Progress in this lesson from the stored language-turn evidence (code-graded verdicts; never the model's own claim). */
 export function progressFromHistory(history: HistoryLike[]): StageProgress {
@@ -339,6 +342,7 @@ export function progressFromHistory(history: HistoryLike[]): StageProgress {
   let rightAfterTest = 0;
   let triesAfterTest = 0;
   let ownSentenceDone = false;
+  let firstThreeRight = 0;
   for (const t of history) {
     if (t.role !== 'assistant' || !t.languageTurn || typeof t.languageTurn !== 'object') continue;
     const lt = t.languageTurn as { assessment?: { verdict?: string }; ownSentence?: string };
@@ -346,13 +350,31 @@ export function progressFromHistory(history: HistoryLike[]): StageProgress {
     const ok = v === 'CORRECT' || v === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
     const bad = v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
     if (ok || bad) {
+      if (tries < 3 && ok) firstThreeRight++;
       if (tries >= 3) { triesAfterTest++; if (ok) rightAfterTest++; }
       tries++;
       if (ok) right++;
     }
     if (lt.ownSentence === 'feedback') ownSentenceDone = true;
   }
-  return { tries, right, ownSentenceDone, triesAfterTest, rightAfterTest, opened: history.some((t) => t.role === 'assistant') };
+  return { ...(tries >= 3 ? { quickCheck: { right: firstThreeRight, of: 3 } } : {}), tries, right, ownSentenceDone, triesAfterTest, rightAfterTest, opened: history.some((t) => t.role === 'assistant') };
+}
+
+/** Quick-check signals (planner2): a teen or adult lesson (not Pre-A1, no review opener) opens with 3 graded items. Until 3 are
+ *  graded the check is pending; then its result decides TTT (2 or 3 right) or PPP. Without turn history there is no check. */
+export function quickCheckSignals(s: PlannerSignals, progress: StageProgress | undefined, opener: boolean): Pick<PlannerSignals, 'quickCheck' | 'quickCheckPending'> {
+  if (!progress || opener || !(s.ageBand === 'teen' || s.ageBand === 'adult') || levelRank(s.level) === 0) return {};
+  return progress.quickCheck ? { quickCheck: progress.quickCheck } : { quickCheckPending: true };
+}
+
+/** The stage for this turn: the quick check while pending; after it, PPP and LAD count only what came after the 3 test items
+ *  (TTT's own test stage is the quick check). */
+export function stageNow(lp: LessonPlan, progress: StageProgress): Stage {
+  if (lp.shapeRule === 'S4q') return 'test';
+  if (progress.quickCheck && (lp.shape === 'PPP' || lp.shape === 'LAD')) {
+    return currentStage(lp.shape, { ...progress, tries: progress.tries - 3, right: progress.right - progress.quickCheck.right });
+  }
+  return currentStage(lp.shape, progress);
 }
 
 /** Prompt lines for the chosen shape and stage (the model writes the reply inside them). Without a stage (no turn history,
@@ -360,9 +382,12 @@ export function progressFromHistory(history: HistoryLike[]): StageProgress {
 export function shapeLines(lp: LessonPlan, stage?: Stage): string[] {
   return [
     `- Lesson shape: ${SHAPE_NAMES[lp.shape]} (${lp.stages.map((x) => STAGE_WORDS[x].split(':')[0]).join(' → ')}).${lp.opener ? ' First a short review from memory of earlier points.' : ''}`,
-    stage
+    lp.shapeRule === 'S4q'
+      ? '- This turn\'s stage: Quick check (3 short exercises before any teaching; the system grades them and then picks the lesson shape).'
+      : stage
       ? `- This turn's stage: ${STAGE_WORDS[stage]}. Stay in this stage; the system moves the stage on.`
       : `- Start with: ${STAGE_WORDS[lp.startStage]}; go on to the next stage only after the learner succeeds.`,
+    '- Never ask the learner their age or birth date.',
     ...(lp.childSupports ? ['- Child learner: very short sentences, one instruction at a time, praise effort, a small game or story frame.'] : []),
     ...(lp.plan.supporting.includes('elaborative_interrogation') ? ['- If you ask "why", the learner may answer in Arabic.'] : []),
     ...(lp.methodRule === 'P1_L1_CONTRAST' ? ['- Contrast the English form with how Arabic says it, in one short line.'] : []),
