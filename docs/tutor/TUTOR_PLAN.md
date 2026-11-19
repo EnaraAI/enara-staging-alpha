@@ -39,8 +39,7 @@
   - re-score the pre-test;
   - LE stays the frozen ESL5 string + `graderV2`.
 - Then run Rounds 1–10 as pre-registered: n = 270, delayed 7-day test, judge agreement ≥85%.
-- **Cost:** about 240 tutor runs and about 250 judge runs, roughly 500 agent runs over several days.
-- **Your choice:** keep n = 270 (power about 0.65; I recommend this), or cut n to save usage, at power well below 0.5.
+- **Cost and power by number of rounds:** see `ESL6_ROUNDS.md`. Corrected: 10 rounds is about 890 agent runs (the grader recheck was missing before), and power at n = 270 is 0.82, not 0.65 (0.65 was for n = 180).
 
 ## 3. ESL7: Track 2 switches, one at a time, against ESL5
 - **First:** fix the Track 2 misses:
