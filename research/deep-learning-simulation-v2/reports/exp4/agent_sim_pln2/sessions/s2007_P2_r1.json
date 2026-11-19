@@ -926,7 +926,100 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 2: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I'd like\" and \"please\" are right, so your order is polite.\n\nThe part to check is the word before \"tea\" and the word before \"rice\". Look at those two words again. Do they fit these two things in a cafe order?\n\nThen write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nI'd like any tea and any rice, please.\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\nYou are using \"any\" before \"tea\" and before \"rice\" here. \"I'd like\" and \"please\" are still right.\n\nRule: in an order, we do not use \"any\". For things we do not count, like water or milk, we say \"some\".\n\nExample: \"I'd like some milk, please.\"\n\nNow try your order for tea and rice again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 2: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I'd like\" and \"please\" are right, so your order is polite.\n\nThe part to check is the word before \"tea\" and the word before \"rice\". Look at those two words again. Do they fit these two things in a cafe order?\n\nThen write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nI'd like any tea and any rice, please.\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\nYou are using \"any\" before \"tea\" and before \"rice\" here. \"I'd like\" and \"please\" are still right.\n\nRule: in an order, we do not use \"any\". For things we do not count, like water or milk, we say \"some\".\n\nExample: \"I'd like some milk, please.\"\n\nNow try your order for tea and rice again.",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R6",
+     "belief": "W1",
+     "quote": "For things we do not count, like water or milk, we say \"some\"."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I'd like some tea and some rice, please.",
+    "errors": {
+     "W1": "I'd like any tea and any rice, please."
+    }
+   },
+   "applied": [
+    "R6"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I'd like any tea and any rice, please.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "I'd like any tea and any rice, please.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -940,7 +940,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 3: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My sister sometimes reads books.\" is correct. \"Sometimes\" is before the main verb, and \"reads\" has -s.\n\nLast task, in a new situation. Try it on your own.\n\nPut \"never\" in the correct place:\n\"My uncle drinks tea at night.\"\n\nLEARNER'S LAST MESSAGE:\nMy uncle never drinks tea at night.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My uncle never drinks tea at night.\" is correct. \"Never\" is before \"drinks\", and \"drinks\" has -s.\n\nNow a freer task. Write two sentences about a friend's week. Use usually in one sentence and always in the other."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 3: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My sister sometimes reads books.\" is correct. \"Sometimes\" is before the main verb, and \"reads\" has -s.\n\nLast task, in a new situation. Try it on your own.\n\nPut \"never\" in the correct place:\n\"My uncle drinks tea at night.\"\n\nLEARNER'S LAST MESSAGE:\nMy uncle never drinks tea at night.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My uncle never drinks tea at night.\" is correct. \"Never\" is before \"drinks\", and \"drinks\" has -s.\n\nNow a freer task. Write two sentences about a friend's week. Use usually in one sentence and always in the other.",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My uncle never drinks tea at night.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My uncle never drinks tea at night."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My friend usually plays football on Saturday.",
+    "errors": {
+     "W1": "My friend plays usually football on Saturday."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My friend usually plays football on Saturday.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My friend usually plays football on Saturday.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
