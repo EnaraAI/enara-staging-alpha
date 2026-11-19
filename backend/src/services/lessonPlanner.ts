@@ -324,9 +324,10 @@ export const QUICK_CHECK_MAX_TURNS = 1;
 export const TASK_TURNS = 3;
 /** TASK: this many wrong learner messages in a row inside the task end it early and go to the language focus (planner2c). */
 export const TASK_BAD_RUN = 2;
-type HistoryLike = { role: string; languageTurn?: unknown };
+type HistoryLike = { role: string; content?: string; languageTurn?: unknown };
+const sameText = (a?: string, b?: string) => { const n = (x?: string) => (x ?? '').toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim(); return Boolean(n(a)) && n(a) === n(b); };
 /** Progress in this lesson from the stored language-turn evidence (code-graded verdicts; never the model's own claim). */
-export function progressFromHistory(history: HistoryLike[], current?: { verdict?: string | null }): StageProgress {
+export function progressFromHistory(history: HistoryLike[], current?: { verdict?: string | null; message?: string }): StageProgress {
   let tries = 0;
   let right = 0;
   let rightAfterTest = 0;
@@ -361,7 +362,11 @@ export function progressFromHistory(history: HistoryLike[], current?: { verdict?
   // engine cannot grade must not keep the learner in the no-teaching check). 0 graded -> PPP (S5).
   // The answer just given, graded by code in this turn (keyVerdict): counted now, not one reply later (pln2 amendment C).
   const cv = current?.verdict;
-  events.push(cv === 'CORRECT' || cv === 'CORRECT_WITH_EQUIVALENT_FORMULATION' ? 'ok' : cv === 'INCORRECT' || cv === 'PARTIALLY_CORRECT' ? 'bad' : 'none');
+  // planner2c: a free answer (no course key, e.g. a task sentence) is graded only after the reply. If the learner sends again the very
+  // message that was already graded wrong, that is evidence now: count it as wrong in this turn (PLN2c: the repeat came one reply late).
+  const lastUser = [...history].reverse().find((t) => t.role === 'user');
+  const repeatWrong = !cv && events.length > 0 && events[events.length - 1] === 'bad' && sameText(current?.message, lastUser?.content);
+  events.push(cv === 'CORRECT' || cv === 'CORRECT_WITH_EQUIVALENT_FORMULATION' ? 'ok' : cv === 'INCORRECT' || cv === 'PARTIALLY_CORRECT' || repeatWrong ? 'bad' : 'none');
   if (cv === 'CORRECT' || cv === 'CORRECT_WITH_EQUIVALENT_FORMULATION' || cv === 'INCORRECT' || cv === 'PARTIALLY_CORRECT') {
     const ok = cv === 'CORRECT' || cv === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
     if (tries < QUICK_CHECK_ITEMS && ok) firstThreeRight++;

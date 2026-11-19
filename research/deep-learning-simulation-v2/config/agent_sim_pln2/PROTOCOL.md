@@ -38,9 +38,9 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | File | SHA-256 |
 |---|---|
 | `backend/src/services/engineV2.ts` | `2f2a68665796c1322ccbc56f9893c936505830037422a50172785b91a018e9a7` |
-| `backend/src/services/lessonPlanner.ts` | `c8ecf382a0190189f4b96ac480d10bfde1694b6a46eb6f94a8e8d70895f77edd` |
+| `backend/src/services/lessonPlanner.ts` | `e29a427ecbf4cf240dcfa80ef6a30258ead418132f455532ded70def16fb4118` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
-| `backend/src/services/learningContext.ts` | `5ed9c73478d66a178e569dac761415938e8125d8e78fc9a704ead49004bb1000` |
+| `backend/src/services/learningContext.ts` | `5b9823d39f74d1d4679712c7acaab1d74c2429f7ecf9f92dce8b92e5e791b1f2` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
 | `backend/src/services/languageTeachingContext.ts` | `9f577d4edf3fb8f4469fb8928ed94fd57072eb1ecaa16a8f567fe33f8bbed5bf` |
 | `backend/src/services/languageTurnPipeline.ts` | `2673ec40c37eec5a66ee364b5d0d65054d809bd2f38ff13f48b6843f93dfd9b1` |
@@ -65,7 +65,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `c78495b3e52218dc85d380c7b5fc4dffc6f8997d62071452f497c00ce1e87123` |
+| `src/offline/pln2Study.ts` (this runner) | `f050cc444573f03da7ffcf5bff7e504c002e503f54c343632acbff007b222d58` |
 | `src/offline/pln2_analyze.py` (this analysis) | `7fa7fe396c9d0ec052d8a1bd046e63495d3cdb6c470682b2f1fc51fc257d17d6` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
@@ -179,7 +179,7 @@ Recorded before any new agent run. The PLN2b results, transcripts and main fit t
 1. **planner2c task rule** (`lessonPlanner.ts`, PLANNER_VERSION planner2-v3): two wrong learner messages in a row inside the task end the task early → language focus (TASK_BAD_RUN = 2). Cause: PLN2b stuck learner s2001 (the same wrong sentence three times while the task ran for 3 messages). Test in `planner2.test.ts`. Not re-simulated in this amendment.
 2. **9–12 fit items with 0/1/2 anchors** (`KIDPPP_E` in `pln2Study.ts`): counts for long sentences (> 12 words), messages with two or more instructions, effort praise; game/story across turns; the present → practise → produce steps. Other groups' items unchanged.
 3. **Fit-agreement re-run only:** the same 12 sessions as `fitagree/`, judged blind twice with the anchored items by two new Opus agents (`fitE/`, batches `fitE_a_j01`, `fitE_b_j01`; new case ids per side). Agreement = identical item scores between the two (`FIT_AGREEMENT_E.json`); the rule stays ≥ 85%. Two agent runs.
-4. Hashes after this amendment: `lessonPlanner.ts` `c8ecf382a0190189f4b96ac480d10bfde1694b6a46eb6f94a8e8d70895f77edd`; `pln2Study.ts` `aa59f5d29b8ddc893023c64862461b62e8784fdd0716bf1208f37de42174b65d`.
+4. Hashes after this amendment: `lessonPlanner.ts` `e29a427ecbf4cf240dcfa80ef6a30258ead418132f455532ded70def16fb4118`; `pln2Study.ts` `aa59f5d29b8ddc893023c64862461b62e8784fdd0716bf1208f37de42174b65d`.
 
 ## Amendment F (19 Nov 2026, owner decision "proceed"): PLN2c, adults-only re-check of planner2c
 Recorded before any PLN2c agent run. Why adults only: the planner2c change (amendment E.1) touches only the TASK stage machine. The other three groups' plans and stages are unchanged (`planner2.test.ts` goldens unchanged), so their PLN2b results stand.
@@ -189,3 +189,4 @@ Recorded before any PLN2c agent run. Why adults only: the planner2c change (amen
 4. **Verdict for planner2c:** the PLN2c result for adults, plus the PLN2b results for teens, under-9s and 9–12s.
 5. **§3 hashes refreshed** for `lessonPlanner.ts` (planner2c), `pln2Study.ts` (group filter, fitE) and `pln2_analyze.py` (group-aware). The PLN2b-run hashes are in git history at commit 6eb7d833. A full scripted dry run passed before this amendment.
 6. **Estimate:** 14 Sonnet tutor runs + about 13 Opus runs (7 round judges, 1 event agreement, 2 fit, 1 fitagree, 2 recheck).
+7. **Deviation 1 (after round 2, before round 3).** The planner2c rule could not fire in time. A task sentence has no course key, so it is graded only after the tutor's reply (the tutor's assessment). At planning time the latest wrong answer was therefore unknown: the same one-reply lag as the PLN2 quick check. Found because 6 of 12 adults had sent the same wrong sentence twice and the planner still chose "task". Fix (`progressFromHistory`, code only): if the learner sends again the very message that was already graded wrong, it counts as wrong in this turn. Test added (`planner2.test.ts`, 120 tests pass). Rounds 1–2 are unaffected: no earlier graded learner answer existed at turns 1–2, so those prompts are unchanged. The run continues from round 3. Hashes refreshed in §3.

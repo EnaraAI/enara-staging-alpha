@@ -293,7 +293,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     interventionId: session.interventionId,
     tutorSessionId: session.id,
     channel: req.path.endsWith('/stream') ? 'stream' : 'chat',
-    ...(engineV2('planner2') ? { history: languageHistory, currentVerdict: await currentKeyVerdict({ institutionId: session.institutionId, curriculumId: resolvedCurriculumId, lessonId: session.lessonId, message: text.trim(), history: languageHistory }) } : {}),
+    ...(engineV2('planner2') ? { history: languageHistory, currentMessage: text.trim(), currentVerdict: await currentKeyVerdict({ institutionId: session.institutionId, curriculumId: resolvedCurriculumId, lessonId: session.lessonId, message: text.trim(), history: languageHistory }) } : {}),
   });
   // Language course: labelled learner/lesson context and this turn's teaching
   // moves. Built from server-side records only (session owner, enrolled course,

@@ -249,7 +249,7 @@ function planOf(s: Sess): PlanOut {
   // amendment C: the code grade of the learner's message in this turn (tutor.controller -> currentKeyVerdict), as live.
   const stAll = sessionTurns(s); const lz = lessonOf(l.outcome);
   const currentVerdict = detectTurnSignals(stAll[stAll.length - 1].learner, hist, { title: lz.title, spec: lz.spec } as never).keyVerdict ?? null;
-  const progress = progressFromHistory(hist, { verdict: currentVerdict });
+  const progress = progressFromHistory(hist, { verdict: currentVerdict, message: stAll[stAll.length - 1].learner }); // amendment F deviation 1: repeat of a wrong answer
   const op = reviewOpener(signals, input);
   const lesson = planLesson(input, { ...signals, ...quickCheckSignals(signals, progress, op) });
   const stage = stageNow(lesson, progress);

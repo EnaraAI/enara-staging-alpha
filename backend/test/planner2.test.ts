@@ -517,6 +517,23 @@ describe('planner2b: move on only on evidence; on errors go back to teaching', (
     expect(stageMachine('TASK', [o, 'bad', 'ok', 'bad'])).toBe('focus'); // ends at 3 messages with errors, as before
     expect(stageMachine('TASK', [o, 'ok', 'none', 'none'])).toBe('done');
   });
+  it('planner2c: a task sentence is graded only after the reply, so the same wrong sentence sent again counts as wrong now', () => {
+    const wrong = { assessment: { verdict: 'INCORRECT' } };
+    const hist = [
+      { role: 'user', content: 'Hello! I have an exam. Can we practise always and usually?' },
+      { role: 'assistant', content: 'Tell me about your morning.', languageTurn: { assessment: { verdict: 'NOT_EVALUATED' } } },
+      { role: 'user', content: 'I get up always at seven.' },
+      { role: 'assistant', content: 'Nice. And after that?', languageTurn: wrong },
+    ];
+    const rep = progressFromHistory(hist, { verdict: null, message: 'I get up always at seven.' });
+    expect(rep.events).toEqual(['none', 'bad', 'bad']);
+    expect(stageMachine('TASK', rep.events!)).toBe('focus'); // teach now, one reply earlier than before
+    const other = progressFromHistory(hist, { verdict: null, message: 'Then I drink coffee.' });
+    expect(other.events).toEqual(['none', 'bad', 'none']); // a new sentence is not graded yet
+    expect(stageMachine('TASK', other.events!)).toBe('task');
+    const afterRight = progressFromHistory([...hist.slice(0, 3), { role: 'assistant', content: 'Good.', languageTurn: { assessment: { verdict: 'CORRECT' } } }], { verdict: null, message: 'I get up always at seven.' });
+    expect(afterRight.events).toEqual(['none', 'ok', 'none']); // only a repeat of a WRONG answer counts
+  });
   it('a diagnosed error counts as an error even without a wrong verdict', () => {
     const h = [{ role: 'user' }, { role: 'assistant', languageTurn: { diagnosis: 'copula_omitted' } }];
     expect(progressFromHistory(h).events).toEqual(['bad', 'none']);
