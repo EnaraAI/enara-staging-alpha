@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -663,7 +663,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"He has\" is a good start, and the capital letter and full stop are there. Check the order of the words after it.\n\nHere is a different idea: \"He is kind.\" We use is with an adjective to say how tall, old or kind someone is.\nRight: She is tall.\nWrong: She tall.\n\nNow look at your sentence again. Rewrite it, and tell me in a few words what you were thinking about the order.\n\nLEARNER'S LAST MESSAGE:\nHe has hair short black.\nFACT: the last learner message contained the error of W1 (puts appearance adjectives after the noun (\"She has hair long black.\")).\n\nTUTOR TURN TO JUDGE:\nThe hair sentence should be: \"He has short black hair.\" The describing words come before the noun, so short black comes before hair.\n\nRight: She has long red hair.\nWrong: She has hair long red.\n\nNow the personality part. Example: \"My coach is friendly.\" Use is + an adjective to say what a person is like.\n\nYour turn: write one sentence about a friend's personality."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"He has\" is a good start, and the capital letter and full stop are there. Check the order of the words after it.\n\nHere is a different idea: \"He is kind.\" We use is with an adjective to say how tall, old or kind someone is.\nRight: She is tall.\nWrong: She tall.\n\nNow look at your sentence again. Rewrite it, and tell me in a few words what you were thinking about the order.\n\nLEARNER'S LAST MESSAGE:\nHe has hair short black.\nFACT: the last learner message contained the error of W1 (puts appearance adjectives after the noun (\"She has hair long black.\")).\n\nTUTOR TURN TO JUDGE:\nThe hair sentence should be: \"He has short black hair.\" The describing words come before the noun, so short black comes before hair.\n\nRight: She has long red hair.\nWrong: She has hair long red.\n\nNow the personality part. Example: \"My coach is friendly.\" Use is + an adjective to say what a person is like.\n\nYour turn: write one sentence about a friend's personality.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The hair sentence should be: \"He has short black hair.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The describing words come before the noun, so short black comes before hair."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: She has long red hair. Wrong: She has hair long red."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "My friend is kind.",
+    "errors": {}
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My friend is kind.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My friend is kind.",
+    "probes": []
+   }
   }
  ],
  "assess": {

@@ -14,8 +14,8 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
-   "W2": 2,
+   "W1": 0,
+   "W2": 0,
    "C1": 1,
    "C2": 0
   },
@@ -636,7 +636,122 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"visited\" is a good past form for a finished action. Now look at your question \"You visited your family last weekend?\" again. Your task was to use \"did\" in the question. Check the beginning of your question: is \"did\" there?\n\nLook again and write your question once more.\n\nLEARNER'S LAST MESSAGE:\nYou visited your family last weekend?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nThe question needs \"did\" at the start, and the main verb stays in its base form: \"Did you visit your family last weekend?\"\nRight: Did she watch TV yesterday?\nWrong: She watched TV yesterday?\nNow a new one on your own. Imagine a colleague played football on Saturday. Write a question to ask about it. Use \"did\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 2: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"visited\" is a good past form for a finished action. Now look at your question \"You visited your family last weekend?\" again. Your task was to use \"did\" in the question. Check the beginning of your question: is \"did\" there?\n\nLook again and write your question once more.\n\nLEARNER'S LAST MESSAGE:\nYou visited your family last weekend?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nThe question needs \"did\" at the start, and the main verb stays in its base form: \"Did you visit your family last weekend?\"\nRight: Did she watch TV yesterday?\nWrong: She watched TV yesterday?\nNow a new one on your own. Imagine a colleague played football on Saturday. Write a question to ask about it. Use \"did\".",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "\"Did you visit your family last weekend?\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "The question needs \"did\" at the start"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "the main verb stays in its base form"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: Did she watch TV yesterday? Wrong: She watched TV yesterday?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did your colleague play football on Saturday?",
+    "errors": {
+     "W1": "Did your colleague played football on Saturday?",
+     "W2": "Your colleague played football on Saturday?"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W2",
+    "R1:W1",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Did your colleague play football on Saturday?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Did your colleague play football on Saturday?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

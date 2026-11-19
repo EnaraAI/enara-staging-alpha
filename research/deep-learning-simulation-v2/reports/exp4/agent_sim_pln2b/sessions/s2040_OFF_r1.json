@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 3,
+   "W1": 1,
    "W2": 1,
    "C1": 0,
    "C2": 0
@@ -530,7 +530,113 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 0: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 0.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nI see \"poard\". You are near.\n\nPlease tell me in your own words: what were you thinking about this word?\n\nLEARNER'S LAST MESSAGE:\nI think p and b (f and v) are the same letter.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"board\". The letters p and b are different, and this word starts with b.\n\nRight: \"This is a bag.\" Wrong: \"This is a pag.\"\n\nNow try this on your own: Complete: \"I read a ___ in class.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 0: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 0.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nI see \"poard\". You are near.\n\nPlease tell me in your own words: what were you thinking about this word?\n\nLEARNER'S LAST MESSAGE:\nI think p and b (f and v) are the same letter.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"board\". The letters p and b are different, and this word starts with b.\n\nRight: \"This is a bag.\" Wrong: \"This is a pag.\"\n\nNow try this on your own: Complete: \"I read a ___ in class.\"",
+   "stateBefore": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"board\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The letters p and b are different, and this word starts with b."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"This is a bag.\" Wrong: \"This is a pag.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "book",
+    "errors": {
+     "W1": "pook"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "book",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "book",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -596,7 +596,102 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 2: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot yet. Look: \"Ana always reads books.\" Words like always and usually go before the verb.\n\nNot right: \"Ana reads always books.\"\n\nTry again: usually / we / lunch / have\nWrite the full sentence.\n\nLEARNER'S LAST MESSAGE:\nHave we usually lunch.\nFACT: the last learner message contained the error of W1 (puts the verb before the subject (\"Plays Ahmed football.\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"We usually have lunch.\" The subject \"we\" comes first, then \"usually\", then the verb \"have\".\n\nRight: \"Tom often drinks tea.\" Wrong: \"Tom drinks often tea.\"\n\nNow try on your own: Put in order: \"never / Mia / eats / meat\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 2: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot yet. Look: \"Ana always reads books.\" Words like always and usually go before the verb.\n\nNot right: \"Ana reads always books.\"\n\nTry again: usually / we / lunch / have\nWrite the full sentence.\n\nLEARNER'S LAST MESSAGE:\nHave we usually lunch.\nFACT: the last learner message contained the error of W1 (puts the verb before the subject (\"Plays Ahmed football.\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"We usually have lunch.\" The subject \"we\" comes first, then \"usually\", then the verb \"have\".\n\nRight: \"Tom often drinks tea.\" Wrong: \"Tom drinks often tea.\"\n\nNow try on your own: Put in order: \"never / Mia / eats / meat\"",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"We usually have lunch.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Mia never eats meat.",
+    "errors": {
+     "W1": "Eats Mia never meat."
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Eats Mia never meat.",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "Eats Mia never meat.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
