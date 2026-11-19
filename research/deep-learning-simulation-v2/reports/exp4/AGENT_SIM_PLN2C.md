@@ -35,7 +35,7 @@ Amendment F set the rule in advance: adults from PLN2c, plus teens, under-9s and
 ## Limits (read before switching on)
 
 - **The adults-only check is small** (n = 12). Its own no-harm interval is wide (−0.146), so it would not pass alone. The combined 48 learners pass.
-- **Adults alone: independent correct answers were 0 with the planner ON vs 2 OFF.** The ON tutor gives the answer sooner after repeats. At the end of the lessons the OFF adults were slightly lower (0.17 vs 0.33). The delayed test difference is small (−0.021).
+- **Adults alone: independent correct answers were 0 with the planner ON vs 2 OFF.** Correction (checked after this report was written): this is not "answer given sooner". Both OFF cases are the first answer of the lesson, after a worked-example opening. The ON opening is a pre-task with no model. Answer-with-reason moves were 11 ON vs 13 OFF. See `docs/tutor/PLANNER2C_NEXT_PLAN.md` §4. At the end of the lessons the OFF adults were slightly lower (0.17 vs 0.33). The delayed test difference is small (−0.021).
 - **This run's own fit-agreement sample was 3 cases, at 60%.** The rule uses the amendment E figure (85.3%, 12 cases). That one passed by a single item score.
 - **There is no listen-and-do content yet.** Under-9s got present-practise-produce. The kids pack is a separate test.
 
