@@ -592,3 +592,11 @@ describe('planner2k fixes (PLN2k report)', () => {
     expect(lines).not.toMatch(/say the word again slowly/);
   });
 });
+
+describe('fix B (owner yes, 20 Nov): task-based pre-task with one model sentence', () => {
+  it('the pre-task stage asks for ONE short model sentence of the target form, then the task', async () => {
+    const { STAGE_WORDS } = await import('../src/services/lessonPlanner');
+    expect(STAGE_WORDS.pretask).toMatch(/ONE short model sentence/);
+    expect(STAGE_WORDS.pretask).toMatch(/then set the task/);
+  });
+});

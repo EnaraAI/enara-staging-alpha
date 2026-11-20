@@ -11,7 +11,7 @@
 import { planWithTrace, type MethodPick, type MethodRule, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { STRATEGY_BY_ID, validateComposition } from './strategyRegistry';
 
-export const PLANNER_VERSION = 'planner2-v3';
+export const PLANNER_VERSION = 'planner2-v4';
 
 export type LessonShape = 'PPP' | 'TTT' | 'TASK' | 'LAD';
 export type Stage =
@@ -43,7 +43,8 @@ export const STAGE_WORDS: Record<Stage, string> = {
   test: 'Test: three quick items before any teaching',
   teach: 'Teach the gaps: only what the test showed is missing',
   retest: 'Test again: new items on the same form',
-  pretask: 'Pre-task: set the scene and the goal',
+  // fix B (owner "yes", 20 Nov): the pre-task gives one model sentence of the target form in the task's setting (task-based "useful language").
+  pretask: 'Pre-task: set the scene and the goal, give ONE short model sentence that uses the target form in this setting, then set the task',
   task: 'Task: a short role-play with a real goal',
   focus: 'Language focus: fix one or two errors from the task',
   repeat: 'Repeat the task, using the fix',

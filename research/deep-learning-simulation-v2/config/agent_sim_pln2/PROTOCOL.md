@@ -38,7 +38,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | File | SHA-256 |
 |---|---|
 | `backend/src/services/engineV2.ts` | `ac1124a7bd7eacfbc63b6c3e88f45b8cce05354932f9e262063ee4d039656950` |
-| `backend/src/services/lessonPlanner.ts` | `0b8bacafc5b1fd1510cf43996a2235e317cc100dbf86f56f93eab7c2736591cb` |
+| `backend/src/services/lessonPlanner.ts` | `599a541e742030475b1b04b9c446b378b997cd9b610ad457bd2e12a2654cf7da` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
 | `backend/src/services/learningContext.ts` | `a012b90eb88d26c3891921694848219f5a37922b1552e9638f46c10fd0113d6d` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
@@ -65,7 +65,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `aee7d83761a42711461faaeaebdf46d0ab9a5398793c70e096ed59592473e21e` |
+| `src/offline/pln2Study.ts` (this runner) | `6800aa097e3e64e86dcf99480a171cd563d5329a1b2777ff6a3257d979957d83` |
 | `src/offline/pln2_analyze.py` (this analysis) | `5e4501439d1f9a68de91cc13d71cb61d12d6c8131ac5db4d9b50997ef45b555c` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
@@ -179,7 +179,7 @@ Recorded before any new agent run. The PLN2b results, transcripts and main fit t
 1. **planner2c task rule** (`lessonPlanner.ts`, PLANNER_VERSION planner2-v3): two wrong learner messages in a row inside the task end the task early → language focus (TASK_BAD_RUN = 2). Cause: PLN2b stuck learner s2001 (the same wrong sentence three times while the task ran for 3 messages). Test in `planner2.test.ts`. Not re-simulated in this amendment.
 2. **9–12 fit items with 0/1/2 anchors** (`KIDPPP_E` in `pln2Study.ts`): counts for long sentences (> 12 words), messages with two or more instructions, effort praise; game/story across turns; the present → practise → produce steps. Other groups' items unchanged.
 3. **Fit-agreement re-run only:** the same 12 sessions as `fitagree/`, judged blind twice with the anchored items by two new Opus agents (`fitE/`, batches `fitE_a_j01`, `fitE_b_j01`; new case ids per side). Agreement = identical item scores between the two (`FIT_AGREEMENT_E.json`); the rule stays ≥ 85%. Two agent runs.
-4. Hashes after this amendment: `lessonPlanner.ts` `0b8bacafc5b1fd1510cf43996a2235e317cc100dbf86f56f93eab7c2736591cb`; `pln2Study.ts` `aa59f5d29b8ddc893023c64862461b62e8784fdd0716bf1208f37de42174b65d`.
+4. Hashes after this amendment: `lessonPlanner.ts` `599a541e742030475b1b04b9c446b378b997cd9b610ad457bd2e12a2654cf7da`; `pln2Study.ts` `aa59f5d29b8ddc893023c64862461b62e8784fdd0716bf1208f37de42174b65d`.
 
 ## Amendment F (19 Nov 2026, owner decision "proceed"): PLN2c, adults-only re-check of planner2c
 Recorded before any PLN2c agent run. Why adults only: the planner2c change (amendment E.1) touches only the TASK stage machine. The other three groups' plans and stages are unchanged (`planner2.test.ts` goldens unchanged), so their PLN2b results stand.
@@ -236,3 +236,16 @@ Code only. No agent run.
      - PLN2c: 1 → 1.
 4. **Tests:** 143 pass (planner2, kidsPack, repeat-wrong, ESL5 release and off-parity). The dry run shows the override in all 12 ON prompts and in none of the OFF prompts. §3 hashes refreshed.
 5. **Re-run (owner choice "re-run kids test first"): PLN2k2.** Folder `reports/exp4/agent_sim_pln2k2`, task files `tasks_k2/`. Everything is as in amendment G (same 12 children, arms, rounds, tests, rules and guards; fit agreement from amendment E), with fixes 1–3 above. The overlap check exempts pln2k2 too. Estimate: 14 Sonnet + about 13 Opus.
+
+## Amendment J (20 Nov 2026, owner decisions 2–4): PLN2f, the final 48-learner check
+Recorded before any PLN2f run.
+1. **Planner:** planner2c (amendments E.1 and F, deviations 1–2) plus **fix B**: the task-based pre-task gives one short model sentence of the target form in the task's setting (`STAGE_WORDS.pretask`, PLANNER_VERSION planner2-v4, with a test). The planner2k fixes of amendment I are in the code but only act with `kidsPack`.
+2. **Kids pack off.** The ON arm is ESL5 + `planner2`, without `kidsPack`. Under-9s get present-practise-produce with child supports (S2c).
+3. **The kids content rule** (owner, recorded for the pack, not used in this run): lesson lines never reuse a test-item sentence. The checker uses `ITEM_SENTENCES_TESTS.json` and `ITEM_SENTENCES_COURSE.json`. 6 lines were reworded and 29 lessons are OK. Tested.
+4. **Run:** folder `reports/exp4/agent_sim_pln2f`, task files `tasks_f/`. The same 48 learners, arms, 7 rounds, tests, measures and pass rules as PLN2b (amendments B–D), with these measures:
+   - the independent-correct guard of amendment H (rate);
+   - the leak detector of amendment I.3;
+   - the fit items of amendment E for 9–12s (`KIDPPP_E` used in the main fit);
+   - fit agreement measured in this run (10% sample, rule ≥ 85%).
+5. **Small batches:** 6 tutor cells of 16 and 2 judge batches per round, committed after each step. A usage-limit stop resumes from the last commit (`RESUME.md` in the run folder).
+6. **Estimate:** 42 Sonnet + about 31 Opus.

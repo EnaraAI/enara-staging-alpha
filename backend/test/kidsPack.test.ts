@@ -101,3 +101,17 @@ describe('A1-linked lessons (PLN2k, amendment G)', () => {
     expect(lessonFor(d, undefined, 'What you can eat at the party')?.linkOnly).not.toBe(true);
   });
 });
+
+describe('content rule (owner, 20 Nov): lesson lines never reuse a test-item sentence', () => {
+  it('the checker flags a lesson line that repeats a test or course item sentence; all 29 lessons are clean', () => {
+    const out = execFileSync('npx', ['tsx', 'src/scripts/kidsLessonCheck.ts', '../data/kids/prea1/LESSONS.json'], { cwd: path.join(__dirname, '..'), encoding: 'utf8' });
+    expect(out).toMatch(/OK: 29 lessons/);
+    const dir = mkdtempSync(path.join(os.tmpdir(), 'kids-'));
+    const bad = JSON.parse(readFileSync(path.join(__dirname, '../../data/kids/prea1/LESSONS.json'), 'utf8')).filter((l: { id: string }) => l.id === 'lad-28-can');
+    bad[0].chant[0] = 'She can swim, she can swim,';
+    writeFileSync(path.join(dir, 'bad.json'), JSON.stringify(bad));
+    let msg = '';
+    try { execFileSync('npx', ['tsx', 'src/scripts/kidsLessonCheck.ts', path.join(dir, 'bad.json')], { cwd: path.join(__dirname, '..'), encoding: 'utf8' }); } catch (e) { msg = String((e as { stdout?: string }).stdout); }
+    expect(msg).toMatch(/reuses a test-item sentence \("she can swim"\)/);
+  }, 60000);
+});

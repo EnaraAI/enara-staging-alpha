@@ -423,8 +423,8 @@ function walk(dir: string, out: string[] = []) { if (!existsSync(dir) || existsS
 function overlapCheck(studyDir: string) {
   const own = path.resolve(studyDir);
   // amendment D: PLN2b re-checks the SAME 48 learners and seeds as PLN2 by design, so PLN2's own run folder is not a clash for it (nothing else is exempt).
-  const reuse = /^agent_sim_pln2[bck]/.test(path.basename(own)) ? path.resolve(ROOT, 'reports/exp4/agent_sim_pln2') : null; // amendment F: pln2c reuses pln2 and pln2b
-  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && /^agent_sim_pln2([bck]\d?)?$/.test(path.relative(path.join(ROOT, 'reports/exp4'), path.resolve(f)).split(path.sep)[0])));
+  const reuse = /^agent_sim_pln2[bckf]/.test(path.basename(own)) ? path.resolve(ROOT, 'reports/exp4/agent_sim_pln2') : null; // amendment F: pln2c reuses pln2 and pln2b
+  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && /^agent_sim_pln2([bckf]\d?)?$/.test(path.relative(path.join(ROOT, 'reports/exp4'), path.resolve(f)).split(path.sep)[0])));
   const ids = new Set<number>(); const seeds = new Set<string>();
   for (const f of files) { const t = readFileSync(f, 'utf8'); for (const m of t.matchAll(/"learnerIdx":\s*(\d+)/g)) ids.add(Number(m[1])); for (const m of t.matchAll(/"seed":\s*"([^"]+)"/g)) seeds.add(m[1]); }
   // ids defined in code (ESL1 0-17, ESL2 0-35, ESL3 100-159, ESL3 validation 200-211, ESL4 300-407, ESL5 500-619, ESL6 700-991, teach2 1100-1799 reserved)
@@ -682,7 +682,7 @@ async function main() {
     const dir = dirArg(a1); const cases: { id: string; text: string }[] = []; const key: Record<string, any> = {}; const again: { id: string; text: string }[] = []; const akey: Record<string, any> = {};
     for (const s of allSessions(dir)) {
       if (s.turns.filter((t) => t.tutor !== undefined).length < ROUNDS) throw new Error(`${keyOf(s)}: session not finished (${ROUNDS} tutor turns)`);
-      const id = fitCaseId(keyOf(s)); const text = fitCaseText(s); cases.push({ id, text }); key[id] = { session: keyOf(s), arm: s.arm, group: s.group, learner: s.learnerIdx };
+      const id = fitCaseId(keyOf(s)); const text = fitCaseText(s, /agent_sim_pln2f/.test(dir) ? fitItemsE : fitItems); // amendment J: anchored 9-12 items in the final run cases.push({ id, text }); key[id] = { session: keyOf(s), arm: s.arm, group: s.group, learner: s.learnerIdx };
       if (rand(`${NS}-fitagree`, id) < FIT_AGREE_SHARE) { const gid = `g${id.slice(1)}`; again.push({ id: gid, text }); akey[gid] = { ...key[id], of: id }; }
     }
     for (const [sub, cs, k, tag] of [['fit', cases, key, 'fit'], ['fitagree', again, akey, 'fag']] as const) {
@@ -733,6 +733,11 @@ async function main() {
       save(dir, s);
     }
     console.log('early-leak replies before', before, 'after', after);
+  } else if (cmd === 'itemsentences') {
+    // Kids content rule (owner, 20 Nov): the sentences of the course lesson items (filled-in gap or accepted answer, 3+ words), for the kids lesson checker.
+    const out = new Set<string>();
+    for (const o of OUTCOME_IDS) for (const it of lessonOf(o).spec.items ?? []) { const core = coreOf(it.prompt); for (const a of it.acceptedAnswers ?? []) { const t = (core.includes('___') ? core.replace('___', a) : a).trim(); if (t.split(/\s+/).length >= 3) out.add(t); } }
+    writeFileSync(a1, JSON.stringify([...out].sort(), null, 1)); console.log('item sentences', out.size);
   } else if (cmd === 'status') {
     const dir = dirArg(a1); const c: Record<string, number> = {};
     for (const s of allSessions(dir)) { const k = `${s.turns.filter((t) => t.tutor !== undefined).length} replies / ${s.turns.filter((t) => t.events).length} judged${s.stateDelayed ? ' / f1-7' : ''}`; c[k] = (c[k] ?? 0) + 1; }
