@@ -6,7 +6,7 @@ import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSo
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
 import { currentKeyVerdict, independentSuccessItem, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
 import { engineV2 } from '../services/engineV2';
-import { recordTutorOutcome, removeExamItems } from '../services/errorsToWorkOn';
+import { recordOutcomeForError, recordTutorOutcome, removeExamItems } from '../services/errorsToWorkOn';
 import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
 import {
@@ -181,6 +181,8 @@ interface TutorTurn {
   // r4: the hidden assessment read from the model's reply (stripped before display/storage).
   // r4.1: plus how many markers were removed but not trusted (POST-02).
   languageMarker?: StrippedReply;
+  /** workOn: the error the previous reply set a practice item for (its hidden line named it), and that reply's hint level. */
+  prevWorkOn?: { errorId: string; hintLevel: number };
   turnLockId?: string;
   turnLockReleased?: boolean;
   // Builds the direct-model request (retrieval, objective focus, learner snapshot).
@@ -256,6 +258,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
   // r4: the same recent turns with their stored language-turn state, for the
   // engine only (the model never receives metadata; it gets `history`).
   const languageHistory = languageHistoryFrom(earlier as { role: string; text: string; meta?: unknown }[]);
+  const prevLt = [...languageHistory].reverse().find((t) => t.role === 'assistant')?.languageTurn as { workOnErrorId?: string; hintLevel?: number } | null | undefined;
 
   const enrichedQuery = [
     curriculumSummary ? `Curriculum context: ${curriculumSummary}` : '',
@@ -280,6 +283,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
   }
   const extraRules = [session.handoff?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean) as string[];
   const turn: TutorTurn = { studentId, session, text: text.trim(), method, userMessage, earlierCount: earlier.length, lessonTitle, sources: [], turnLockId };
+  if (prevLt?.workOnErrorId) turn.prevWorkOn = { errorId: prevLt.workOnErrorId, hintLevel: prevLt.hintLevel ?? 0 }; // workOn
   if (!(enaraCourseId || isDirectTutorModelConfigured())) return turn;
 
   try {
@@ -424,6 +428,15 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
     const right = Boolean(verdict && independentSuccessItem(turn.language, { assessment: { verdict } }));
     const wrong = turn.language.signals.answeringCheck && (verdict === 'INCORRECT' || verdict === 'PARTIALLY_CORRECT');
     if (right || wrong) await recordTutorOutcome({ studentId: turn.session.studentId, objectiveId: turn.plan?.teaching.objectiveId, sessionId: turn.session.id, right });
+    // An answer to the practice item the previous reply set for a listed error (any objective): right with no hint, or wrong.
+    if (turn.prevWorkOn && turn.language.signals.answeringCheck && verdict && verdict !== 'NOT_EVALUATED' && verdict !== 'AMBIGUOUS') {
+      const ok = verdict === 'CORRECT' || verdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
+      await recordOutcomeForError({ errorId: turn.prevWorkOn.errorId, studentId: turn.session.studentId, sessionId: turn.session.id, right: ok && turn.prevWorkOn.hintLevel === 0 && !((languageTurn as { hintLevel?: number }).hintLevel ?? 0) });
+    }
+    // This reply set a practice item for a listed error: remember which one, for the learner's next answer.
+    const focus = (turn.languageMarker?.assessment as { focus?: number } | null | undefined)?.focus;
+    const errorId = focus ? turn.plan?.workOn?.errorIds[focus - 1] : undefined;
+    if (errorId) (languageTurn as { workOnErrorId?: string }).workOnErrorId = errorId;
   }
   const assistantMessage = {
     id: assistantId,

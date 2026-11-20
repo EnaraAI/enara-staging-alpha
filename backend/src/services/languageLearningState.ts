@@ -95,7 +95,7 @@ export function sanitizeBelief(v: string | undefined): string | undefined {
   const t = v.replace(/_+/g, ' ').replace(/[^\p{L}\p{N} '’-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 80);
   return t.length >= 3 ? t : undefined;
 }
-export type ParsedMarker = Omit<Assessment, 'source'> & { nextMissing?: true };
+export type ParsedMarker = Omit<Assessment, 'source'> & { nextMissing?: true; focus?: number };
 export function parseAssessmentMarker(marker: string): ParsedMarker | null {
   const m = /^\[\[assess\b([^\]]*)\]\]$/i.exec(marker.trim());
   if (!m) return null;
@@ -121,6 +121,8 @@ export function parseAssessmentMarker(marker: string): ParsedMarker | null {
     ...(item && /^[\w-]{1,40}$/.test(item) ? { item } : {}),
     ...(sanitizeBelief(kv.get('belief')) ? { belief: sanitizeBelief(kv.get('belief')) } : {}),
     ...(kv.has('next') ? {} : { nextMissing: true as const }),
+    // Learner memory (workOn): focus=E1..E3 names the error to work on that this reply's new practice item is for.
+    ...(/^E[1-3]$/i.test(kv.get('focus') ?? '') ? { focus: Number(kv.get('focus')!.slice(1)) } : {}),
   };
 }
 

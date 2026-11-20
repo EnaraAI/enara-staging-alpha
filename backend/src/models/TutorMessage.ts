@@ -146,6 +146,10 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           explicitFirst: Boolean, // levelExplicit tags
           arbitrationForced: Boolean,
           diagnosis: String,
+          // Learner memory (workOn): the error to work on this reply set a practice item for (its id only).
+          workOnErrorId: String,
+          // Reply guards' post-check codes (e.g. pair_not_wrong:meaning_swap), for the learner memory report.
+          postCheck: { type: [String], default: undefined },
           liveError: String, // liveError (ESL5): error-type code only
           answerReleased: Boolean, // releaseAfterTwo (ESL5)
           reviewOpen: { type: [String], default: undefined }, // reviewOpen (ESL5): codes only

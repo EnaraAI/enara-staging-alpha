@@ -88,3 +88,19 @@ describe('errors to work on: what the tutor gets', () => {
     expect(out.text).toMatch(/umbrella/);
   });
 });
+
+// Memory gaps closed (owner "do all", 20 Nov): practice attempts feed the list; tutor practice on any listed error counts via focus=EN.
+import { parseAssessmentMarker } from '../src/services/languageLearningState';
+import { PRACTICE_KINDS } from '../src/services/errorsToWorkOn';
+describe('errors to work on: practice and cross-objective tutor practice', () => {
+  it('self-study kinds count as practice (usable at once); tests do not', () => {
+    for (const k of ['practice', 'formative', 'retention_check']) expect(PRACTICE_KINDS.has(k)).toBe(true);
+    for (const k of ['quiz', 'unit_test', 'midterm', 'final', 'teacher_exam', 'standardized', 'diagnostic']) expect(PRACTICE_KINDS.has(k)).toBe(false);
+  });
+  it('the hidden line can name which listed error a practice item is for (focus=E1..E3 only)', () => {
+    expect(parseAssessmentMarker('[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NEW_ITEM focus=E2]]')?.focus).toBe(2);
+    expect(parseAssessmentMarker('[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NEW_ITEM focus=E7]]')?.focus).toBeUndefined();
+    expect(parseAssessmentMarker('[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NEW_ITEM focus=x]]')?.focus).toBeUndefined();
+    expect(briefLines([{ errorCode: 'x', occurrences: 1 }]).join('\n')).toMatch(/add focus=E1, E2 or E3/);
+  });
+});

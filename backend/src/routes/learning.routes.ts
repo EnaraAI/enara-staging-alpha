@@ -13,7 +13,7 @@ import {
 } from '../controllers/learningDiagnostics.controller';
 import { listStudentMisconceptions, updateMisconception } from '../controllers/learningMisconceptions.controller';
 import { listErrorsToWorkOn, updateErrorToWorkOn } from '../controllers/errorsToWorkOn.controller';
-import { getLearnerProfile, getStudyHabits, getWhatWorks, listSessionSummaries, updateLearnerProfile } from '../controllers/learnerMemory.controller';
+import { getLearnerProfile, getMemoryReport, getStudyHabits, getWhatWorks, listSessionSummaries, updateLearnerProfile } from '../controllers/learnerMemory.controller';
 import {
   cancelIntervention,
   completeIntervention,
@@ -125,6 +125,7 @@ router.get('/students/:studentId/profile', anyRole, getLearnerProfile);
 router.put('/students/:studentId/profile', anyRole, updateLearnerProfile);
 router.get('/students/:studentId/study-habits', anyRole, getStudyHabits);
 router.get('/students/:studentId/what-works', anyRole, getWhatWorks);
+router.get('/memory-report', anyRole, getMemoryReport);
 
 const pedagogy = [anyRole, requireFeature('learning_intelligence_enabled'), requireFeature('adaptive_pedagogy_enabled')];
 router.get('/strategies', requireRole('teacher', 'admin', 'enara-admin'), requireFeature('learning_intelligence_enabled'), listStrategies);

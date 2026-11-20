@@ -1100,6 +1100,15 @@ export const fetchSessionSummaries = (studentId: string) => request<{ sessions: 
 export const fetchMemoryProfile = (studentId: string) => request<LearnerProfileView>('GET', `${LS(studentId)}/profile`);
 export const updateMemoryProfile = (studentId: string, patch: Partial<Pick<LearnerProfileView, 'firstLanguage' | 'interests' | 'accommodations'>>) => request<LearnerProfileView>('PUT', `${LS(studentId)}/profile`, patch);
 export const fetchStudyHabits = (studentId: string) => request<{ habits: StudyHabitsView | null }>('GET', `${LS(studentId)}/study-habits`);
+export interface MemoryReportView {
+  period: { days: number; from: string; to: string };
+  errorsToWorkOn: { recorded: number; open: number; resolved: number; reopened: number; dismissed: number; learnersWithOpen: number; fromPractice: number; practiceItemsSetByTutor: number };
+  sessions: { summarised: number; right: number; wrong: number; stoppedWithOpenItem: number; nextStep: Record<string, number> };
+  profiles: { withFirstLanguage: number; withInterests: number; withAccommodations: number };
+  habits: { activeLearners: number; minutes: number };
+  tutorReplies: { total: number; guardRemovals: Record<string, number> };
+}
+export const fetchMemoryReport = (days = 7) => request<MemoryReportView>('GET', `/api/learning/memory-report?days=${days}`);
 export const fetchWhatWorks = (studentId: string) => request<WhatWorksView>('GET', `${LS(studentId)}/what-works`);
 export const fetchMisconceptions = (studentId = 'me') =>
   request<{ misconceptions: any[] }>('GET', `/api/learning/students/${encodeURIComponent(studentId)}/misconceptions`);

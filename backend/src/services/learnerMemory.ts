@@ -239,3 +239,36 @@ export async function whatWorksFor(studentId: string, now = new Date()) {
   const lp = await LearnerLanguageProfile.findOne({ studentId }).select('worked').lean();
   return { methods, explanationStylesBeforeSuccess: (lp?.worked ?? []).map((w: { style: string; count: number }) => ({ style: w.style, count: w.count })), note: 'Observational: shows what was used before an independent success, not that it caused it.' };
 }
+
+// ------------------------------------------------------------------------------------------------ memory report (owner: "watch real use on lms-test")
+/** School-level counts for the last `days` days (ids and counts only): errors to work on, sessions, profiles, habits, tutor guards. */
+export async function memoryReport(p: { institutionId?: string; days: number; now?: Date }) {
+  const now = p.now ?? new Date(); const since = new Date(now.getTime() - p.days * 86_400_000);
+  const school = p.institutionId ? { institutionId: p.institutionId } : {};
+  const { ErrorToWorkOn } = await import('../models/ErrorToWorkOn');
+  const { TutorMessage } = await import('../models/TutorMessage');
+  const errs = await ErrorToWorkOn.find(school).select('studentId status firstSeenAt statusHistory sources').lean();
+  const inPeriod = (d?: Date) => Boolean(d && new Date(d) >= since);
+  const moves = (to: string) => errs.reduce((n, e) => n + (e.statusHistory ?? []).filter((h) => h.to === to && h.from && inPeriod(h.at)).length, 0);
+  const replies = await TutorMessage.find({ ...school, role: 'ai', timestamp: { $gte: since } }).select('studentId meta.languageTurn.workOnErrorId meta.languageTurn.postCheck').lean() as unknown as { studentId: string; meta?: { languageTurn?: { workOnErrorId?: string; postCheck?: string[] } } }[];
+  const pc = new Map<string, number>();
+  for (const r of replies) for (const c of r.meta?.languageTurn?.postCheck ?? []) pc.set(c, (pc.get(c) ?? 0) + 1);
+  const summaries = await SessionSummary.find({ ...school, endedAt: { $gte: since } }).select('right wrong nextStep stoppedWithOpenItem').lean();
+  const next = new Map<string, number>(); summaries.forEach((s) => next.set(s.nextStep, (next.get(s.nextStep) ?? 0) + 1));
+  const profiles = await LearnerProfile.find(school).select('firstLanguage interests accommodations').lean();
+  const habits = await StudyHabitDaily.find({ ...school, day: { $gte: since } }).select('studentId minutes').lean();
+  return {
+    period: { days: p.days, from: since, to: now },
+    errorsToWorkOn: {
+      recorded: errs.filter((e) => inPeriod(e.firstSeenAt)).length, open: errs.filter((e) => e.status === 'open').length,
+      resolved: moves('resolved'), reopened: moves('open'), dismissed: moves('dismissed'),
+      learnersWithOpen: new Set(errs.filter((e) => e.status === 'open').map((e) => e.studentId)).size,
+      fromPractice: errs.filter((e) => inPeriod(e.firstSeenAt) && (e.sources ?? []).some((s) => s.kind === 'practice_attempt')).length,
+      practiceItemsSetByTutor: replies.filter((r) => r.meta?.languageTurn?.workOnErrorId).length,
+    },
+    sessions: { summarised: summaries.length, right: summaries.reduce((n, s) => n + s.right, 0), wrong: summaries.reduce((n, s) => n + s.wrong, 0), stoppedWithOpenItem: summaries.filter((s) => s.stoppedWithOpenItem).length, nextStep: Object.fromEntries(next) },
+    profiles: { withFirstLanguage: profiles.filter((x) => x.firstLanguage).length, withInterests: profiles.filter((x) => x.interests?.length).length, withAccommodations: profiles.filter((x) => x.accommodations?.length).length },
+    habits: { activeLearners: new Set(habits.map((h) => h.studentId)).size, minutes: habits.reduce((n, h) => n + h.minutes, 0) },
+    tutorReplies: { total: replies.length, guardRemovals: Object.fromEntries(pc) },
+  };
+}
