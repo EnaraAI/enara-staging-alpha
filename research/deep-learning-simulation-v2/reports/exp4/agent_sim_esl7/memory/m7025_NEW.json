@@ -22,10 +22,11 @@
    "occurrences": 2,
    "firstSeenAt": "2027-05-03T08:30:00.000Z",
    "lastSeenAt": "2027-05-03T08:30:00.000Z",
-   "status": "open",
-   "rightStreak": 0,
+   "status": "resolved",
+   "rightStreak": 1,
    "countedKeys": [
-    "attempt:pre-7025"
+    "attempt:pre-7025",
+    "session:s7025_NEW_o2_S1"
    ],
    "statusHistory": [
     {
@@ -33,18 +34,28 @@
      "by": "system",
      "to": "open",
      "reason": "released_assessment"
+    },
+    {
+     "at": "2027-05-05T09:03:00.000Z",
+     "by": "tutor",
+     "from": "open",
+     "to": "resolved",
+     "reason": "unassisted_right_after_delay"
     }
    ],
    "lastWrongAt": "2027-05-03T08:30:00.001Z",
    "reviewStep": 0,
-   "nextReviewAt": "2027-05-04T08:30:00.001Z"
+   "nextReviewAt": "2027-05-26T09:03:00.000Z",
+   "resolvedAt": "2027-05-05T09:03:00.000Z"
   }
  ],
  "rec": {
   "entries": [],
   "liveErrors": {},
   "knownPoints": {
-   "lsn-EN-F-A1-VO-food-drink:1": 2
+   "lsn-EN-F-A1-VO-food-drink:1": 2,
+   "lsn-EN-F-A1-GR-word-order-svo:1": 1,
+   "lsn-EN-F-A1-GR-word-order-svo:3": 1
   }
  },
  "log": [
@@ -52,6 +63,18 @@
    "at": "2027-05-03T08:30:00.000Z",
    "event": "pre-test released",
    "rows": 1
+  },
+  {
+   "track": "s7025_NEW_o2",
+   "turn": 3,
+   "events": [
+    {
+     "row": "ewo_48e26e836475",
+     "right": true,
+     "at": "2027-05-05T09:03:00.000Z",
+     "via": "objective"
+    }
+   ]
   }
  ]
 }
