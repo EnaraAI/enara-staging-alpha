@@ -21,3 +21,4 @@
 14. **QUICK CHECK block vs a teaching move that asks for a recall item only** (s7011).
 15. **"Use words that appear in no lesson exercise" vs the A1 rule "use only the lesson word list".**
 16. **The under-9 sentence cap leaves no room for a full am/is/are rule or for the greeting and reconnect step.**
+17. **Finding 12 is settled differently from round to round.** In round 11 the tutor followed "rule first". In round 16 (the session-2 opener for outcome 2) the tutor followed "Reviews due first". The conflict is unresolved in the prompt, so the outcome depends on the tutor.
