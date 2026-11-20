@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -330,7 +330,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Here is your exercise. Fix the mistake.\nCorrect: \"I going to study tonight.\"\n\nLEARNER'S LAST MESSAGE:\nI going to study tonight.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before going to (\"I going to visit my aunt.\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote the sentence without a change. Look: We are going to visit my aunt tomorrow. Use am, is or are before \"going to\". Wrong: We going to visit my aunt tomorrow. Now try this one.\nCorrect: \"He going to cook tomorrow.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Here is your exercise. Fix the mistake.\nCorrect: \"I going to study tonight.\"\n\nLEARNER'S LAST MESSAGE:\nI going to study tonight.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before going to (\"I going to visit my aunt.\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote the sentence without a change. Look: We are going to visit my aunt tomorrow. Use am, is or are before \"going to\". Wrong: We going to visit my aunt tomorrow. Now try this one.\nCorrect: \"He going to cook tomorrow.\"",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Use am, is or are before \"going to\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Look: We are going to visit my aunt tomorrow. ... Wrong: We going to visit my aunt tomorrow."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "He is going to cook tomorrow.",
+    "errors": {
+     "W1": "He going to cook tomorrow."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "He is going to cook tomorrow.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "He is going to cook tomorrow.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

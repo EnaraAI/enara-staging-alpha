@@ -174,7 +174,100 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 1: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Yes. Different jobs work in different places. We say \"A teacher works at a school.\" We use works in or works at. Words: nurse, hospital, chef, restaurant, farmer, farm, pilot, airport. Let's try one: \"A chef works in a ___.\" Which place fits?\n\nLEARNER'S LAST MESSAGE:\nrestrant\nFACT: the last learner message contained the error of W1 (leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\")).\n\nTUTOR TURN TO JUDGE:\nYes, restaurant is the right place! A chef works in a restaurant. Your spelling is close, but some letters are missing. Hint: the word has the letters \"au\" in the middle, after \"rest\". Try writing it again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 1: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Yes. Different jobs work in different places. We say \"A teacher works at a school.\" We use works in or works at. Words: nurse, hospital, chef, restaurant, farmer, farm, pilot, airport. Let's try one: \"A chef works in a ___.\" Which place fits?\n\nLEARNER'S LAST MESSAGE:\nrestrant\nFACT: the last learner message contained the error of W1 (leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\")).\n\nTUTOR TURN TO JUDGE:\nYes, restaurant is the right place! A chef works in a restaurant. Your spelling is close, but some letters are missing. Hint: the word has the letters \"au\" in the middle, after \"rest\". Try writing it again.",
+   "stateBefore": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "C1",
+     "quote": "Yes, restaurant is the right place! A chef works in a restaurant."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "restaurant",
+    "errors": {
+     "W1": "restrant"
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "restrant",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "restrant",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

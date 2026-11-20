@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 3,
+   "W1": 2,
    "W2": 1,
    "C1": 0,
    "C2": 0
@@ -349,7 +349,102 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 1: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 0: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLet's use family words. Look: \"This is my mother.\" Say This is my, then the family word.\nExample: \"This is my sister.\"\nYour turn. Write the missing letter: \"This is my f_ther.\"\n\nLEARNER'S LAST MESSAGE:\ne\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\nThe letter e does not fit in this word. Each family word has its own vowel letters: a, e, i, o, u. Say the word slowly and listen. Then try again: \"This is my f_ther.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 1: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 0: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLet's use family words. Look: \"This is my mother.\" Say This is my, then the family word.\nExample: \"This is my sister.\"\nYour turn. Write the missing letter: \"This is my f_ther.\"\n\nLEARNER'S LAST MESSAGE:\ne\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\nThe letter e does not fit in this word. Each family word has its own vowel letters: a, e, i, o, u. Say the word slowly and listen. Then try again: \"This is my f_ther.\"",
+   "stateBefore": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Each family word has its own vowel letters"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": "e"
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "e",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "e",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

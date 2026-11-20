@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 1,
    "C1": 1,
    "C2": 0
@@ -336,7 +336,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 1: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Here is your exercise. Write your two sentences in the chat.\n\nImagine a park. Write two sentences about what people are doing now.\n\nLEARNER'S LAST MESSAGE:\nA boy playing football.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before -ing (\"He watching TV now.\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"A boy playing football.\" needs one more small word before \"playing\". Example: the girl, read, a book. Step 1: one girl, so I use \"is\". Step 2: I add -ing to the verb. So: \"The girl is reading a book.\" Rule: use am, is or are before the -ing verb. Right: \"Two boys are swimming.\" Wrong: \"Two boys swimming.\" Now try a new one: a man, cook, dinner. Write one sentence about him now."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 1: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Here is your exercise. Write your two sentences in the chat.\n\nImagine a park. Write two sentences about what people are doing now.\n\nLEARNER'S LAST MESSAGE:\nA boy playing football.\nFACT: the last learner message contained the error of W1 (leaves out am/is/are before -ing (\"He watching TV now.\")).\n\nTUTOR TURN TO JUDGE:\nYour sentence \"A boy playing football.\" needs one more small word before \"playing\". Example: the girl, read, a book. Step 1: one girl, so I use \"is\". Step 2: I add -ing to the verb. So: \"The girl is reading a book.\" Rule: use am, is or are before the -ing verb. Right: \"Two boys are swimming.\" Wrong: \"Two boys swimming.\" Now try a new one: a man, cook, dinner. Write one sentence about him now.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: use am, is or are before the -ing verb."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"Two boys are swimming.\" Wrong: \"Two boys swimming.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "A man is cooking dinner.",
+    "errors": {
+     "W1": "A man cooking dinner.",
+     "W2": "A man cooks dinner."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "A man cooks dinner.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "A man cooks dinner.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

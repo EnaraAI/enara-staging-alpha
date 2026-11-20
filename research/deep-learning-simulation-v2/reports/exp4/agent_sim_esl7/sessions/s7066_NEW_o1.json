@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 1,
    "C1": 1,
    "C2": 0
@@ -343,7 +343,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 1: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 0.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Here is your exercise. Write a short text.\nWrite 30-50 words about your last holiday. Use and, but and because.\n\nLEARNER'S LAST MESSAGE:\nlast summer we went to alexandria and my uncle lives there and we swam\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\")).\n\nTUTOR TURN TO JUDGE:\nYour past verbs \"went\" and \"swam\" are right. Look: We went to the beach. We played football because it was sunny. Use full stops, not a long chain of \"and\". Wrong: we went to the beach and we played football and we were tired. Now write two sentences about last weekend. Use \"because\" once."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 1: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 0.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Here is your exercise. Write a short text.\nWrite 30-50 words about your last holiday. Use and, but and because.\n\nLEARNER'S LAST MESSAGE:\nlast summer we went to alexandria and my uncle lives there and we swam\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\")).\n\nTUTOR TURN TO JUDGE:\nYour past verbs \"went\" and \"swam\" are right. Look: We went to the beach. We played football because it was sunny. Use full stops, not a long chain of \"and\". Wrong: we went to the beach and we played football and we were tired. Now write two sentences about last weekend. Use \"because\" once.",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Use full stops, not a long chain of \"and\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Look: We went to the beach. We played football because it was sunny. ... Wrong: we went to the beach and we played football and we were tired."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Last weekend I stayed at home because it was cold.",
+    "errors": {
+     "W1": "last weekend i stayed at home and it was cold and i was sad",
+     "W2": "Last weekend I stay at home because it is cold."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Last weekend I stay at home because it is cold.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "Last weekend I stay at home because it is cold.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

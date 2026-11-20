@@ -13,14 +13,14 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 1,
-   "C1": 1,
-   "C2": 0
+   "C1": 3,
+   "C2": 2
   },
   "indep": {
-   "C1": 0,
-   "C2": 0
+   "C1": 1,
+   "C2": 1
   },
   "start": {
    "W1": 2,
@@ -346,7 +346,134 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 1: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 0.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Here is your exercise. Write a short text.\nWrite 30-50 words about your last holiday. Use and, but and because.\n\nLEARNER'S LAST MESSAGE:\nLast summer I went to Alexandria. It was hot, but we swam because the sea was cool.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour full stops and past verbs are right, and you used \"but\" and \"because\". Your text needs \"and\" and more words. Example: We ate lunch and we played games. Use and to add an idea, but to show a difference, because to give a reason. Wrong: We ate and we played and we ran and we slept. Now add one sentence about your holiday with \"and\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 1: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 0.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Here is your exercise. Write a short text.\nWrite 30-50 words about your last holiday. Use and, but and because.\n\nLEARNER'S LAST MESSAGE:\nLast summer I went to Alexandria. It was hot, but we swam because the sea was cool.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour full stops and past verbs are right, and you used \"but\" and \"because\". Your text needs \"and\" and more words. Example: We ate lunch and we played games. Use and to add an idea, but to show a difference, because to give a reason. Wrong: We ate and we played and we ran and we slept. Now add one sentence about your holiday with \"and\".",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Your full stops and past verbs are right, and you used \"but\" and \"because\"."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Your full stops and past verbs are right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Last summer I went to Alexandria. It was hot, but we swam because the sea was cool."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Last summer I went to Alexandria. It was hot, but we swam because the sea was cool."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Use and to add an idea, but to show a difference, because to give a reason."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Example: We ate lunch and we played games. ... Wrong: We ate and we played and we ran and we slept."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "We went to the beach and we ate fish.",
+    "errors": {
+     "W1": "we went to the beach and we ate fish and we swam and we played",
+     "W2": "We go to the beach and we eat fish."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "We went to the beach and we ate fish.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "We went to the beach and we ate fish.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
