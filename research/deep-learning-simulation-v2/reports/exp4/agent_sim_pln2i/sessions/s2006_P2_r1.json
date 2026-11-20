@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -467,7 +467,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 1: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence has a clear comparison, and \"than\" is in the right place: \"The new office is biger than the old office.\" There is one error to fix, and it is in the spelling of the comparative word.\n\nLook again at \"biger\". Check how its letters are written before -er. Then send the sentence again with your correction.\n\nLEARNER'S LAST MESSAGE:\nThe new office is biger than the old office.\nFACT: the last learner message contained the error of W1 (spells the comparative by sound (\"biger\", \"hapier\", \"nicr\")).\n\nTUTOR TURN TO JUDGE:\nThe word \"than\" is in the right place, but the comparative is still not right. The correct word is \"bigger\": \"big\" is a short word that ends in one vowel and one consonant, so you double the last letter before -er.\n\nRight: \"The red bag is bigger than the blue bag.\"\nWrong: \"The red bag is more big than the blue bag.\"\n\nNow try this one on your own:\nComplete: \"My office is ___ (hot) than your office.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 1: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence has a clear comparison, and \"than\" is in the right place: \"The new office is biger than the old office.\" There is one error to fix, and it is in the spelling of the comparative word.\n\nLook again at \"biger\". Check how its letters are written before -er. Then send the sentence again with your correction.\n\nLEARNER'S LAST MESSAGE:\nThe new office is biger than the old office.\nFACT: the last learner message contained the error of W1 (spells the comparative by sound (\"biger\", \"hapier\", \"nicr\")).\n\nTUTOR TURN TO JUDGE:\nThe word \"than\" is in the right place, but the comparative is still not right. The correct word is \"bigger\": \"big\" is a short word that ends in one vowel and one consonant, so you double the last letter before -er.\n\nRight: \"The red bag is bigger than the blue bag.\"\nWrong: \"The red bag is more big than the blue bag.\"\n\nNow try this one on your own:\nComplete: \"My office is ___ (hot) than your office.\"",
+   "stateBefore": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The correct word is \"bigger\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"big\" is a short word that ends in one vowel and one consonant, so you double the last letter before -er."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "hotter",
+    "errors": {
+     "W1": "hoter"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "hotter",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "hotter",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
