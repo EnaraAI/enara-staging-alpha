@@ -18,7 +18,8 @@ export function spellingSlip(text: string, lessonWords: string[] = []): Spelling
         if (w !== right) return { kind: 'doubling', wrong: w, base, right };
       }
     }
-    const near = lessonWords.map((x) => x.toLowerCase()).find((x) => /^[a-z]+$/.test(x) && x !== w && misspellingOf(w, x));
+    // A real word in any form ("lives", "went") is never a slip, even when it is close to a lesson word ("liked").
+    const near = isWord(w) ? undefined : lessonWords.map((x) => x.toLowerCase()).find((x) => /^[a-z]+$/.test(x) && x !== w && misspellingOf(w, x));
     if (near) return { kind: 'letters', wrong: w, right: near };
   }
   return null;
