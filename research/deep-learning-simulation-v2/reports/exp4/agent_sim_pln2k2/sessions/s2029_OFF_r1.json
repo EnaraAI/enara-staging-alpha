@@ -15,11 +15,11 @@
   "s": {
    "W1": 3,
    "W2": 0,
-   "C1": 0,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -535,7 +535,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-food-drink (eat and drink). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: soup and spoon food are \"drunk\", as with Arabic shariba. Its error: uses drink for soup or spoon food (\"I drink my soup.\").\nC1 (correct) strength 0: eat for food and soup, drink for liquids you drink. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"milk\" is right. You name the drink well.\nNow write one sentence about a person you know and a food.\n\nLEARNER'S LAST MESSAGE:\nMy sister eats soup.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"soup\" is a food word. That is right. Now try this one.\nComplete: \"I eat an ___ every morning.\" (a red or green fruit)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-food-drink (eat and drink). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: soup and spoon food are \"drunk\", as with Arabic shariba. Its error: uses drink for soup or spoon food (\"I drink my soup.\").\nC1 (correct) strength 0: eat for food and soup, drink for liquids you drink. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"milk\" is right. You name the drink well.\nNow write one sentence about a person you know and a food.\n\nLEARNER'S LAST MESSAGE:\nMy sister eats soup.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"soup\" is a food word. That is right. Now try this one.\nComplete: \"I eat an ___ every morning.\" (a red or green fruit)",
+   "stateBefore": {
+    "form": "food",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"soup\" is a food word. That is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"soup\" is a food word. That is right."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "apple",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "food",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "apple",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "apple",
+    "probes": []
+   }
   }
  ],
  "assess": {
