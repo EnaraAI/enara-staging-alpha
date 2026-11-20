@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -721,7 +721,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-prepositions-time (at, on and in for time). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one preposition (in, like Arabic fi) works for every time. Its error: uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\").\nC1 (correct) strength 3: at + clock time, on + day/date, in + month/year. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"at\" is right with \"5 o'clock\". Now write one sentence about a person you know. Use at and a clock time.\n\nLEARNER'S LAST MESSAGE:\nMy mother gets up in 7 o'clock.\nFACT: the last learner message contained the error of W1 (uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\")).\n\nTUTOR TURN TO JUDGE:\nThe form \"in 7 o'clock\" is not right. It should be \"at 7 o'clock\", because we use at with a clock time.\nNow try one on your own.\nWrite in, on or at: Our school bus comes ___ 8 o'clock."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-prepositions-time (at, on and in for time). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one preposition (in, like Arabic fi) works for every time. Its error: uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\").\nC1 (correct) strength 3: at + clock time, on + day/date, in + month/year. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"at\" is right with \"5 o'clock\". Now write one sentence about a person you know. Use at and a clock time.\n\nLEARNER'S LAST MESSAGE:\nMy mother gets up in 7 o'clock.\nFACT: the last learner message contained the error of W1 (uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\")).\n\nTUTOR TURN TO JUDGE:\nThe form \"in 7 o'clock\" is not right. It should be \"at 7 o'clock\", because we use at with a clock time.\nNow try one on your own.\nWrite in, on or at: Our school bus comes ___ 8 o'clock.",
+   "stateBefore": {
+    "form": "preptime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "It should be \"at 7 o'clock\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "because we use at with a clock time"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "The form \"in 7 o'clock\" is not right. It should be \"at 7 o'clock\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "at",
+    "errors": {
+     "W1": "in"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "preptime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "at",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "at",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
