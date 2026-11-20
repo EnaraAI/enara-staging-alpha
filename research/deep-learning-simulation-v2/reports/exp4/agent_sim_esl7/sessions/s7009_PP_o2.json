@@ -12,9 +12,9 @@
    "W1"
   ],
   "s": {
-   "W1": 0.5,
+   "W1": 0,
    "W2": 0,
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "indep": {
@@ -28,7 +28,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -667,7 +669,104 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0.5: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 0: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Hi! Yes, let's learn \"the\". We say \"a\" the first time, and \"the\" the second time. Example: I have a dog. The dog is brown. Now you try. Write a or the: We have a garden. ___ garden is small.\" | \"Not quite. We use \"a\" the first time, and \"the\" the second time. Look: \"We have a garden.\" The garden is already in the first sentence. So which word goes in: \"___ garden is small\"? Try again with a o\" | \"Not quite, but let's look at it together. We said \"a garden\" in the first sentence. The second time we say the same thing, we use \"the\". So the answer is: \"The garden is small.\" Now a new one. Write a\" | \"Yes, an is right! The word ant starts with a vowel sound, so we use an. Next one. Write a or an: She eats ___ apple every day.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Yes, let's practise the. We use the when we talk about the same thing a second time. Example: I have a dog. The dog is brown. Now try this one: \"We have a garden. ___ garden is small.\" Write a or the.\n\nLEARNER'S LAST MESSAGE:\nThe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"The\" is right! We already know which garden (the one we have), so we use \"the\" for the second mention. Now try this one: \"I see ___ ant on the table.\" Write a or an."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0.5: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 0: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Hi! Yes, let's learn \"the\". We say \"a\" the first time, and \"the\" the second time. Example: I have a dog. The dog is brown. Now you try. Write a or the: We have a garden. ___ garden is small.\" | \"Not quite. We use \"a\" the first time, and \"the\" the second time. Look: \"We have a garden.\" The garden is already in the first sentence. So which word goes in: \"___ garden is small\"? Try again with a o\" | \"Not quite, but let's look at it together. We said \"a garden\" in the first sentence. The second time we say the same thing, we use \"the\". So the answer is: \"The garden is small.\" Now a new one. Write a\" | \"Yes, an is right! The word ant starts with a vowel sound, so we use an. Next one. Write a or an: She eats ___ apple every day.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Yes, let's practise the. We use the when we talk about the same thing a second time. Example: I have a dog. The dog is brown. Now try this one: \"We have a garden. ___ garden is small.\" Write a or the.\n\nLEARNER'S LAST MESSAGE:\nThe\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"The\" is right! We already know which garden (the one we have), so we use \"the\" for the second mention. Now try this one: \"I see ___ ant on the table.\" Write a or an.",
+   "stateBefore": {
+    "form": "the",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0.5,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 'The' is right!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "so we use 'the' for the second mention."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "an",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "the",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "an",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "an",
+    "probes": []
+   }
   }
  ],
  "assess": {

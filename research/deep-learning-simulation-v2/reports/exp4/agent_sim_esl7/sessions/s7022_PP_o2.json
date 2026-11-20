@@ -14,7 +14,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1.2,
+   "C1": 2.2,
    "C2": 0
   },
   "indep": {
@@ -28,7 +28,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -707,7 +709,104 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 1.2: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Hello! Here is a simple rule: a sentence starts with a capital letter, the word I is always a capital letter, and a sentence ends with a full stop. Example: I walk to the park with my dog. Now you try\" | \"You wrote the same words, but a sentence needs a capital letter at the start and a full stop at the end. Hint: change the first letter and add one small mark at the end. Try again: rewrite \"my brother\" | \"Let me explain it clearly. A sentence starts with a capital letter, so my becomes My. A sentence ends with a full stop. So the answer is: \"My brother likes tea.\" Now a new one. Rewrite correctly: \"i a\" | \"Yes, \"I am ten years old.\" is right! You wrote I as a capital letter, started with a capital letter, and ended with a full stop. Next one. Rewrite correctly: \"we live in london\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, let's practise. Every sentence starts with a capital letter and ends with a full stop. The word I is always a capital letter. Example: I walk to the park with my dog. Now rewrite this correctly: \"my brother likes tea\"\n\nLEARNER'S LAST MESSAGE:\nMy brother likes tea.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nWell done! You started with a capital M and ended with a full stop. Now try a new one. Rewrite this correctly: \"i am ten years old\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 1.2: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Hello! Here is a simple rule: a sentence starts with a capital letter, the word I is always a capital letter, and a sentence ends with a full stop. Example: I walk to the park with my dog. Now you try\" | \"You wrote the same words, but a sentence needs a capital letter at the start and a full stop at the end. Hint: change the first letter and add one small mark at the end. Try again: rewrite \"my brother\" | \"Let me explain it clearly. A sentence starts with a capital letter, so my becomes My. A sentence ends with a full stop. So the answer is: \"My brother likes tea.\" Now a new one. Rewrite correctly: \"i a\" | \"Yes, \"I am ten years old.\" is right! You wrote I as a capital letter, started with a capital letter, and ended with a full stop. Next one. Rewrite correctly: \"we live in london\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, let's practise. Every sentence starts with a capital letter and ends with a full stop. The word I is always a capital letter. Example: I walk to the park with my dog. Now rewrite this correctly: \"my brother likes tea\"\n\nLEARNER'S LAST MESSAGE:\nMy brother likes tea.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nWell done! You started with a capital M and ended with a full stop. Now try a new one. Rewrite this correctly: \"i am ten years old\"",
+   "stateBefore": {
+    "form": "caps",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Well done! You started with a capital M and ended with a full stop."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I am ten years old.",
+    "errors": {
+     "W1": "i am ten years old"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "caps",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I am ten years old.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "I am ten years old.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

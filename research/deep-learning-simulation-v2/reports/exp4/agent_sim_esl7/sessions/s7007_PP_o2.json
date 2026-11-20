@@ -29,8 +29,12 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
-   "C2": []
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
   },
   "afterF1": true
  },
@@ -730,7 +734,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 1: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 0.2: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 1.\nC2 (correct) strength 0.2: am/is/are is needed in a present sentence. Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Hello! Good idea. When we answer a question, we use a full sentence, not one word. Example: What is your favourite animal? My favourite animal is the horse. Now you try. Who is your best teacher? Answ\" | \"Good, Mr Ali is the right answer. But it is only a name. Let's make a full sentence. Hint: start with \"My best teacher is ...\". Try again: Who is your best teacher?\" | \"Let me explain it clearly. A full sentence has a subject and a verb. So the answer is: \"My best teacher is Mr Ali.\" Now a new one. What is your favourite animal? Answer with a full sentence.\" | \"Yes, that is a full sentence! You started with \"My favourite animal is ...\", so it is correct. Now it is your turn to ask. Ask me a question about my home town. Start with \"Where ...\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, let's practise. When we answer a question, we use a full sentence, not one word. Example: My favourite animal is the horse. Now your turn. Who is your best teacher? Answer with a full sentence.\n\nLEARNER'S LAST MESSAGE:\nMr Ali.\nFACT: the last learner message contained the error of W1 (answers with one word or a fragment (\"How old are you?\" -> \"Ten.\")).\n\nTUTOR TURN TO JUDGE:\nGood, Mr Ali is your best teacher. But that is only a short answer. Let's make it a full sentence. Hint: start with \"My best teacher ...\". Try again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 1: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 0.2: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 1.\nC2 (correct) strength 0.2: am/is/are is needed in a present sentence. Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Hello! Good idea. When we answer a question, we use a full sentence, not one word. Example: What is your favourite animal? My favourite animal is the horse. Now you try. Who is your best teacher? Answ\" | \"Good, Mr Ali is the right answer. But it is only a name. Let's make a full sentence. Hint: start with \"My best teacher is ...\". Try again: Who is your best teacher?\" | \"Let me explain it clearly. A full sentence has a subject and a verb. So the answer is: \"My best teacher is Mr Ali.\" Now a new one. What is your favourite animal? Answer with a full sentence.\" | \"Yes, that is a full sentence! You started with \"My favourite animal is ...\", so it is correct. Now it is your turn to ask. Ask me a question about my home town. Start with \"Where ...\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, let's practise. When we answer a question, we use a full sentence, not one word. Example: My favourite animal is the horse. Now your turn. Who is your best teacher? Answer with a full sentence.\n\nLEARNER'S LAST MESSAGE:\nMr Ali.\nFACT: the last learner message contained the error of W1 (answers with one word or a fragment (\"How old are you?\" -> \"Ten.\")).\n\nTUTOR TURN TO JUDGE:\nGood, Mr Ali is your best teacher. But that is only a short answer. Let's make it a full sentence. Hint: start with \"My best teacher ...\". Try again.",
+   "stateBefore": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 0.2,
+     "C2": 0.2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [],
+   "retrieval": [
+    "C1",
+    "C2"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My best teacher is Mr Ali.",
+    "errors": {
+     "W1": "Mr Ali.",
+     "W2": "My best teacher Mr Ali."
+    }
+   },
+   "applied": [
+    "retrieval:C1",
+    "retrieval:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 0.2,
+     "C2": 0.2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Mr Ali.",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "Mr Ali.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

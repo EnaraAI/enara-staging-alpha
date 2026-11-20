@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1.2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 3,
+   "C1": 4,
    "C2": 0
   },
   "start": {
@@ -1316,7 +1316,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1.2: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Your turn. Write the verb in the past: \"Last week my friend ___ (call) me.\"\" | \"Now write one or two sentences about something you did last weekend. Use a regular verb in the past.\" | \"Write one sentence about a person you know using -ed for regular verbs.\" | \"Now a different past form. Complete: \"Last weekend my friends ___ (eat) pizza.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Look: \"Last Saturday I cleaned the garage.\" The action is finished, so I add -ed to \"clean\". Rule: for a finished action, add -ed to a regular verb. Example: \"They opened the shop at nine yesterday.\" Write it in the past: \"Yesterday my manager ___ (call) me.\"\n\nLEARNER'S LAST MESSAGE:\ncalled\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"called\" is right. Now write one or two sentences about what you did yesterday or last weekend. Use regular verbs."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1.2: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Your turn. Write the verb in the past: \"Last week my friend ___ (call) me.\"\" | \"Now write one or two sentences about something you did last weekend. Use a regular verb in the past.\" | \"Write one sentence about a person you know using -ed for regular verbs.\" | \"Now a different past form. Complete: \"Last weekend my friends ___ (eat) pizza.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Look: \"Last Saturday I cleaned the garage.\" The action is finished, so I add -ed to \"clean\". Rule: for a finished action, add -ed to a regular verb. Example: \"They opened the shop at nine yesterday.\" Write it in the past: \"Yesterday my manager ___ (call) me.\"\n\nLEARNER'S LAST MESSAGE:\ncalled\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"called\" is right. Now write one or two sentences about what you did yesterday or last weekend. Use regular verbs.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"called\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"called\" is right."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Yesterday I cleaned my room.",
+    "errors": {
+     "W1": "Yesterday I clean my room."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Yesterday I cleaned my room.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Yesterday I cleaned my room.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

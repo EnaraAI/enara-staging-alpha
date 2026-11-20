@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1.2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 4,
+   "C1": 5,
    "C2": 0
   },
   "start": {
@@ -28,7 +28,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -1302,7 +1304,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 1.2: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Write the past form of 'have': Yesterday I ___ a big lunch.\" | \"Write the past form of 'tell': Last night he ___ me a story.\" | \"Write the past form of 'buy': Last Saturday we ___ new shoes.\" | \"Now write one sentence about a person you know. Use went, bought or saw.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Look: I swim today. Yesterday I swam. Rule: irregular verbs have a special past form, not -ed. Right: Yesterday I swam in the lake. Wrong: Yesterday I swimmed in the lake. Now you: write the past form of 'write': Last week I ___ a long email.\n\nLEARNER'S LAST MESSAGE:\nwrote\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"wrote\" is right. It does not use -ed.\nNow write two sentences about yesterday or last week. Use went, bought or saw."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 1.2: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Write the past form of 'have': Yesterday I ___ a big lunch.\" | \"Write the past form of 'tell': Last night he ___ me a story.\" | \"Write the past form of 'buy': Last Saturday we ___ new shoes.\" | \"Now write one sentence about a person you know. Use went, bought or saw.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Look: I swim today. Yesterday I swam. Rule: irregular verbs have a special past form, not -ed. Right: Yesterday I swam in the lake. Wrong: Yesterday I swimmed in the lake. Now you: write the past form of 'write': Last week I ___ a long email.\n\nLEARNER'S LAST MESSAGE:\nwrote\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"wrote\" is right. It does not use -ed.\nNow write two sentences about yesterday or last week. Use went, bought or saw.",
+   "stateBefore": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 'wrote' is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "wrote"
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Yesterday I went to the market.",
+    "errors": {
+     "W1": "Yesterday I goed to the market."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Yesterday I went to the market.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Yesterday I went to the market.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

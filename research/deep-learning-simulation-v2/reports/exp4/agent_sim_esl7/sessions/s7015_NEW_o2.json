@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1.2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 4,
+   "C1": 5,
    "C2": 0
   },
   "start": {
@@ -28,7 +28,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -1330,7 +1332,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 1.2: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Rewrite correctly: \"my brother likes tea\"\" | \"Rewrite correctly: \"i am ten years old\"\" | \"Write one sentence about a person you know, starting with a capital letter.\" | \"Here is one more. Rewrite correctly: \"my sister and i like rice\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Look: \"The bus is late.\" It starts with a capital letter, T. Rule: begin every sentence with a capital letter. Right: She works in a bank. Wrong: she works in a bank. Now you: rewrite correctly \"the shop is open.\"\n\nLEARNER'S LAST MESSAGE:\nThe shop is open.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The shop is open.\" starts with a capital letter and ends with a full stop. That is correct.\nNext: Rewrite correctly: \"we live in london\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 1.2: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Rewrite correctly: \"my brother likes tea\"\" | \"Rewrite correctly: \"i am ten years old\"\" | \"Write one sentence about a person you know, starting with a capital letter.\" | \"Here is one more. Rewrite correctly: \"my sister and i like rice\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Look: \"The bus is late.\" It starts with a capital letter, T. Rule: begin every sentence with a capital letter. Right: She works in a bank. Wrong: she works in a bank. Now you: rewrite correctly \"the shop is open.\"\n\nLEARNER'S LAST MESSAGE:\nThe shop is open.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"The shop is open.\" starts with a capital letter and ends with a full stop. That is correct.\nNext: Rewrite correctly: \"we live in london\"",
+   "stateBefore": {
+    "form": "caps",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "starts with a capital letter and ends with a full stop. That is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "The shop is open."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "We live in London.",
+    "errors": {
+     "W1": "we live in london"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "caps",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "We live in London.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "We live in London.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

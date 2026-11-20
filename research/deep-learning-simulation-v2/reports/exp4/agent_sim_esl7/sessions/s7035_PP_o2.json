@@ -14,7 +14,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1.2,
+   "C1": 2.2,
    "C2": 0
   },
   "indep": {
@@ -28,7 +28,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -693,7 +695,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1.2: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Hello! For finished actions in the past, we add -ed to regular verbs. Examples: I played football. She visited her aunt. Now you try. Write the past form of 'watch': Yesterday I ___ a film.\" | \"Yes, watched is right! Watch is a regular verb, so we add -ed. Now an irregular verb. Write the past form of 'go': Last weekend I ___ to the beach.\" | \"Yes, went is right! Go is an irregular verb, so the past form is went and not goed. Next one. Write the past form of 'see': Yesterday I ___ my friend.\" | \"Yes, saw is right! See is irregular, so the past form is saw and not seed. Next one. Write the past form of 'eat': Last night I ___ dinner at nine.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, let's practise the past simple. For regular verbs we add -ed to talk about finished actions. Example: I played football yesterday. Now you try. Write the past form of 'watch': \"Last weekend I ___ a film.\"\n\nLEARNER'S LAST MESSAGE:\nwatched\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, watched is right! Watch is a regular verb, so we add -ed. Now try one with an irregular verb. Write the past form of 'go': \"Last weekend I ___ to the beach.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1.2: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Hello! For finished actions in the past, we add -ed to regular verbs. Examples: I played football. She visited her aunt. Now you try. Write the past form of 'watch': Yesterday I ___ a film.\" | \"Yes, watched is right! Watch is a regular verb, so we add -ed. Now an irregular verb. Write the past form of 'go': Last weekend I ___ to the beach.\" | \"Yes, went is right! Go is an irregular verb, so the past form is went and not goed. Next one. Write the past form of 'see': Yesterday I ___ my friend.\" | \"Yes, saw is right! See is irregular, so the past form is saw and not seed. Next one. Write the past form of 'eat': Last night I ___ dinner at nine.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, let's practise the past simple. For regular verbs we add -ed to talk about finished actions. Example: I played football yesterday. Now you try. Write the past form of 'watch': \"Last weekend I ___ a film.\"\n\nLEARNER'S LAST MESSAGE:\nwatched\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, watched is right! Watch is a regular verb, so we add -ed. Now try one with an irregular verb. Write the past form of 'go': \"Last weekend I ___ to the beach.\"",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, watched is right!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Watch is a regular verb, so we add -ed."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "went",
+    "errors": {
+     "W1": "go"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "go",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "go",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

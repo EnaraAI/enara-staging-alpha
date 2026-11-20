@@ -14,7 +14,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1.2,
+   "C1": 2.2,
    "C2": 0
   },
   "indep": {
@@ -28,7 +28,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -1314,7 +1316,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1.2: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Your turn. Write the past form: Last week they ___ (paint) the fence.\" | \"Now write two sentences about something you did last week. Use a regular verb.\" | \"Write one sentence about a person you know using -ed for regular verbs.\" | \"Now a quick check on your own. Write the past form: Last Friday my neighbours ___ (visit) us.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Look: I wash my car today. Yesterday I washed my car. Rule: for regular verbs, add -ed to talk about the past. Right: Yesterday we cooked dinner. Wrong: Yesterday we cook dinner. Now you: write the past form. Last week they (paint) the kitchen.\n\nLEARNER'S LAST MESSAGE:\npainted\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"painted\" is right. A regular verb takes -ed for a finished action.\nNow write two sentences about yesterday. Use one regular verb with -ed and one of went, had, saw or ate."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1.2: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Your turn. Write the past form: Last week they ___ (paint) the fence.\" | \"Now write two sentences about something you did last week. Use a regular verb.\" | \"Write one sentence about a person you know using -ed for regular verbs.\" | \"Now a quick check on your own. Write the past form: Last Friday my neighbours ___ (visit) us.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Look: I wash my car today. Yesterday I washed my car. Rule: for regular verbs, add -ed to talk about the past. Right: Yesterday we cooked dinner. Wrong: Yesterday we cook dinner. Now you: write the past form. Last week they (paint) the kitchen.\n\nLEARNER'S LAST MESSAGE:\npainted\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"painted\" is right. A regular verb takes -ed for a finished action.\nNow write two sentences about yesterday. Use one regular verb with -ed and one of went, had, saw or ate.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"painted\" is right."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A regular verb takes -ed for a finished action."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Yesterday I cooked dinner.",
+    "errors": {
+     "W1": "Yesterday I cook dinner."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Yesterday I cooked dinner.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Yesterday I cooked dinner.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
