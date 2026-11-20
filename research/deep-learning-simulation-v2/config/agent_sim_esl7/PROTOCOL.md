@@ -114,3 +114,16 @@ The harness has no database, so it runs the deployed pure functions on records i
   - about 20 fit batches, about 15 scoring batches and 6 validation runs;
   - **about 330 agent runs.**
 - **Engine:** the code on this branch, which contains PRs #44–#47.
+
+## Amendment A (20 Nov 2026, before any tutor reply)
+1. **72 learners, not 78.** The 3 bank outcomes with no wrong belief (`possessive-adjectives`, `common-adjectives`, `make-do`) cannot be simulated, as in ESL6. So there are 30 + 6 = 36 outcomes, each taught to 4 learners per arm: 34 A1 and 38 A2 learners.
+2. **`workOnTrusted` in the NEW arm** treats gap items as trusted, as if `graderV2` were on, because the tests are scored with graderV2. Otherwise only choice items would count.
+3. **The memory code** also adds the deployed "back after 7+ days" review line (`learnerProfile`) where the gap is 7+ days. This applies to BASE and NEW alike.
+4. **Session-2 judge cases** state the real gap (7 or 12 days).
+5. **No frozen-file hash table:** the engine is the code on this branch at the commit that starts round 1.
+6. **Writing mastery** = task ≥ 2 and language ≥ 2 (the two criteria in the new items).
+7. **Grader validation** passed before round 1: `validation/VALIDATION.md`.
+8. **Estimate:**
+   - 20 rounds × (9 tutor cells + 3 judge batches);
+   - plus about 18 fit batches, scoring batches and 1 agreement batch;
+   - **about 270 agent runs.**
