@@ -1081,6 +1081,15 @@ export function shownLessonItems(history: Turn[], items: LessonItem[], scope?: s
  *  go through the pair check (a "wrong" sentence that is acceptable English is removed). All off: exactly as before. */
 /** planner2f (PLN2g: time lessons never taught quarter past / to): a lesson about clock times gets the clock words once, with their clock times. */
 export const CLOCK_TIMES_LINE = 'Clock times in this lesson: teach each clock word once with its time before asking for it: seven o\'clock (7:00), half past seven (7:30), quarter past seven (7:15), quarter to eight (7:45, fifteen minutes BEFORE eight). Practise quarter past and quarter to, not only o\'clock.';
+/** planner2g (PLN2h, learner 2006: the tutor turned a spelling question aside): a learner's own question on the lesson point is answered first. */
+export const OWN_QUESTION_LINE = 'If they ask about this lesson\'s point or its words (a spelling, a meaning, a rule), answer it in one or two short sentences first, then go back to the task. Never turn their question aside.';
+/** planner2g (PLN2h, learner 2006: "Good." on a sentence with "biger"): no praise for an answer that still has an error. */
+export const NO_PRAISE_ON_ERROR_LINE = 'If their answer still has an error (spelling included), never call it good, right or correct as a whole: name the part that is right ("than" is in the right place), then the one error.';
+/** planner2g (PLN2h teacher remark: explanations too long for a 10-year-old): a child gets at most two short explanation sentences. */
+export const CHILD_EXPLAIN_LINE = 'For a child: explain in at most two short sentences of about ten words each, then the task.';
+/** planner2g (PLN2h, learner 2043: the rule was given as "-s" only): the endings a rule lists ("-s or -es"), or none. */
+export const ruleForms = (texts: string[]): string[] => { const f = [...new Set(texts.join(' ').match(/(?<![\w-])-[a-z]{1,4}\b/g) ?? [])]; return f.length >= 2 ? f : []; };
+export const formsClause = (texts: string[]): string => { const f = ruleForms(texts); return engineV2('planner2') && f.length ? ` The rule sentence names every ending it lists (${f.join(', ')}), not only the first.` : ''; };
 export const clockLesson = (spec?: { objectives?: string[]; successCriteria?: string[]; vocabulary?: string[] }): boolean =>
   /\b(quarter (past|to)|half past|o'clock|what time|clock times?|telling (the )?time)\b/i.test([...(spec?.objectives ?? []), ...(spec?.successCriteria ?? []), ...(spec?.vocabulary ?? [])].join(' | '));
 export const pairsAsked = (): boolean => ['releaseAfterTwo', 'liveError', 'ruleBank', 'planner2'].some((f) => engineV2(f as never)); // not clarity/levelExplicit alone: their off-parity tests pin the pre-ESL5 prompt
@@ -1474,7 +1483,7 @@ const RULE_LINE_TASK = (hasNext?: boolean) => `(3) ask them to apply the rule to
  *  levelExplicit the recap closing, which says "Do not set a new exercise this turn"), the rule line sets none. */
 export const RULE_LINE_TASK_BELOW = '(3) the task for this reply is the one set by the instruction below (one task only): set no other item.';
 const ruleFirstLine0 = (rf: { texts: string[] }, planPrimary?: string, hasNext?: boolean) =>
-  `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). In this reply, inside the teaching method above: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) ask them to apply the rule to a new item${hasNext ? ' (if their answer was right, present the next lesson item given below exactly as written; otherwise one short new item)' : ': one short new item you write'} made of words that appear in no lesson exercise. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule, and the hint-level limits on stating the rule. Never write the answer to the exercise you are asking about or any part of it, never show its target form, never model on the learner's own answer.`;
+  `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). In this reply, inside the teaching method above: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) ask them to apply the rule to a new item${hasNext ? ' (if their answer was right, present the next lesson item given below exactly as written; otherwise one short new item)' : ': one short new item you write'} made of words that appear in no lesson exercise. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule, and the hint-level limits on stating the rule. Never write the answer to the exercise you are asking about or any part of it, never show its target form, never model on the learner's own answer.${formsClause(rf.texts)}`;
 /** The explicit-first decision and the rule to state this turn (levelExplicit and ruleFirst). Pure: used by buildLanguageTeachingContext and by the tests. */
 export function ruleFirstDecision(i: { band: LevelBand; masteryStatus?: string; history: { role: string; languageTurn?: unknown }[]; signals: Parameters<typeof rulesToIntroduce>[1]; spec: { successCriteria?: string[] } | undefined; moves?: { id: string }[]; record?: Esl5Record; lessonId?: string; entry?: RuleBankEntry }): { explicit?: boolean; ruleFirst?: { criteria: number[]; texts: string[] } } {
   const explicit = engineV2('levelExplicit') ? explicitFirst(i.band, i.masteryStatus) : undefined;
@@ -1519,7 +1528,7 @@ function bankTexts<T extends { ruleFirst?: { criteria: number[]; texts: string[]
 }
 /** levelExplicit, the reply that presents the exercise to an explicit-first learner: the rule first, then the item for the first try. Replaces the "no rule before the first try" rule for this reply only. */
 export const ruleBeforeFirstTryLine = (rf: { texts: string[] }, planPrimary?: string) =>
-  `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). This learner needs the rule before the first try. In this reply, inside the teaching method above, before the exercise: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) then present the lesson item to present now (named in this block) exactly as written, with one short line saying what to do, and let them try it. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule. Never write the answer to the exercise, never show its target form, never model on the learner's own answer.`;
+  `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). This learner needs the rule before the first try. In this reply, inside the teaching method above, before the exercise: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) then present the lesson item to present now (named in this block) exactly as written, with one short line saying what to do, and let them try it. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule. Never write the answer to the exercise, never show its target form, never model on the learner's own answer.${formsClause(rf.texts)}`;
 /** levelExplicit: explicit-first = the course band is A1-A2 (beginner), or the learner's record for this objective is not_assessed or emerging. Everyone else is questioning-first. */
 export const explicitFirst = (band: LevelBand, masteryStatus?: string): boolean => band === 'beginner' || masteryStatus === 'not_assessed' || masteryStatus === 'emerging';
 export function supportStage(s: { answeringCheck?: boolean; keyVerdict?: string | null; whyAfterAttempt?: boolean; hintRequest?: boolean; activeLessonItem?: unknown; learning?: { attemptsOnItem?: number; lastAssessment?: { verdict?: string }; activeItem?: unknown } }): 'teach_rule' | 'summarise' | null {
@@ -1930,6 +1939,7 @@ export function renderLanguageContextParts(ctx: Omit<LanguageTeachingContext, 'p
     GROUNDING_RULES,
     ...(pairsAsked() ? [PAIR_RULE] : []),
     ...(engineV2('planner2') && clockLesson(lesson.spec) ? [CLOCK_TIMES_LINE] : []),
+    ...(engineV2('planner2') ? [OWN_QUESTION_LINE, NO_PRAISE_ON_ERROR_LINE, ...(band === 'child' ? [CHILD_EXPLAIN_LINE] : [])] : []),
     assessmentInstruction(),
   ].join('\n');
   const dynamic = [
@@ -1974,6 +1984,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
     GROUNDING_RULES,
     ...(pairsAsked() ? [PAIR_RULE] : []),
     ...(engineV2('planner2') && clockLesson(lesson.spec) ? [CLOCK_TIMES_LINE] : []),
+    ...(engineV2('planner2') ? [OWN_QUESTION_LINE, NO_PRAISE_ON_ERROR_LINE, ...(band === 'child' ? [CHILD_EXPLAIN_LINE] : [])] : []),
     assessmentInstruction(),
     '</language_teaching_context>',
   );

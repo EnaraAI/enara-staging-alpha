@@ -59,6 +59,16 @@ const ruleLineFor = (language: LanguageTeachingContext): string | undefined => {
   return texts.length ? `${texts.join('; ')}.` : undefined;
 };
 
+const BARE_PRAISE = /(^|[.!?:][\"”'*]*\s+|\n\s*)(?:(?:very |really )?good|great|well done|excellent|perfect|correct|nice|good (?:work|job))\s*[.!]+(?=\s|$)/gi;
+const ERROR_CUE = /\b(?:(?:check|look)\b[^.!?\n]{0,40}\bagain|not quite|almost right|one (?:small )?(?:error|mistake|problem)|the (?:error|mistake|problem) is|needs? (?:a |one )?(?:fix|change)|try again|is(?: not|n't) (?:right|correct)|(?:the )?spelling (?:is wrong|needs))\b/i;
+/** planner2g: drop bare praise sentences ("Good.", "Well done!") from a reply that also points to an error; returns the reply unchanged otherwise. */
+export function removeMixedPraise(text: string): { text: string; removed: number } {
+  if (!ERROR_CUE.test(text)) return { text, removed: 0 };
+  let removed = 0;
+  const out = text.replace(BARE_PRAISE, (_m, lead: string) => { removed += 1; return lead; }).replace(/[ \t]{2,}/g, ' ').replace(/^\s+/, '');
+  return { text: removed ? out : text, removed };
+}
+
 export function applyReplyGuards(language: LanguageTeachingContext, answer: string, learnerText: string): { text: string; removed: number; closingAsk?: ClosingAskStatus; guardHits?: number; postCheck?: string[] } {
   let text = answer; let removed = 0; let closingAsk: ClosingAskStatus | undefined; let guardHits = 0; let postCheck: string[] | undefined;
   // TRACK 2 (exampleGuard): a modelled sentence that completes an item the learner will solve is removed (the fallback after the one regeneration).
@@ -75,6 +85,12 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
   if (pairsAsked()) {
     const pc = removeFalseWrongs(text);
     if (pc.removed.length) { text = pc.text; postCheck = [...(postCheck ?? []), ...pc.removed.map((r) => `pair_not_wrong:${r}`)]; }
+  }
+  // planner2g (PLN2h, learner 2006: "... biger than my old office." Good. Now check ...): a bare praise sentence in a reply that then points to an
+  // error is removed (a mixed message); effort praise ("Good try") and praise in a reply with no error cue stay.
+  if (engineV2('planner2')) {
+    const mp = removeMixedPraise(text);
+    if (mp.removed) { text = mp.text; postCheck = [...(postCheck ?? []), 'praise_on_error'] ; }
   }
   const guarded = stripPreAttemptModels(text, guardedItems(language), learnerText, [...(language.lesson.spec?.vocabulary ?? []), ...(language.lesson.spec?.examples ?? [])]);
   if (guarded.removed.length) { text = guarded.text; removed += guarded.removed.length; }

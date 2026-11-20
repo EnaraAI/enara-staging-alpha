@@ -38,12 +38,12 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | File | SHA-256 |
 |---|---|
 | `backend/src/services/engineV2.ts` | `ac1124a7bd7eacfbc63b6c3e88f45b8cce05354932f9e262063ee4d039656950` |
-| `backend/src/services/lessonPlanner.ts` | `4f180cab2911ebed9cf93c02b6b3b193f74d4aad4ac3c996047b6d27542ee86b` |
+| `backend/src/services/lessonPlanner.ts` | `f9498908395b33c9b5f599d855723c19ac0cdd95bd3cc205557b7237c7eed082` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
 | `backend/src/services/learningContext.ts` | `a012b90eb88d26c3891921694848219f5a37922b1552e9638f46c10fd0113d6d` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
-| `backend/src/services/languageTeachingContext.ts` | `a501efeed194a8e9477cffd5c272d249533b3342256c5a46ce0a755dbbdb6796` |
-| `backend/src/services/languageTurnPipeline.ts` | `36544d0651b59f4b2b157b627435ba1ca309862d513735b66cbae363b78c700c` |
+| `backend/src/services/languageTeachingContext.ts` | `b25cd104920adaaa3f9a566c3b8633a47e8ccdcc57278cd37a4bfcd715b2ea89` |
+| `backend/src/services/languageTurnPipeline.ts` | `e0ca47a0dbce80c47346e4325dc60187b03489429710b2fd88bd9f7a886f0a46` |
 | `backend/src/services/languageLearningState.ts` | `d6ad94373485734fe2cd8b52a849a4af1c7b0055c3566d4bb72425b4837a2927` |
 | `backend/src/services/learnerLanguageProfile.ts` | `78e783f1d129339aa84e45fc6d49a3a2090ff09fe4f103793fb21ad936f56ec4` |
 | `backend/src/services/strandLog.ts` | `0e45c79426e1b6321f8f40f282d4d502f86accb0e338882bd8f21fff88a05553` |
@@ -65,7 +65,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `184527bab0412970994c650c985ac99050af9bf88f462ba90262a3215fa4d81f` |
+| `src/offline/pln2Study.ts` (this runner) | `8f632b9b8915410644e4e3ca0926a656416110c8bb29ec3acd286c465cbcf4ac` |
 | `src/offline/pln2_analyze.py` (this analysis) | `5e4501439d1f9a68de91cc13d71cb61d12d6c8131ac5db4d9b50997ef45b555c` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
@@ -289,3 +289,21 @@ Recorded before any PLN2h run.
    - the fit item "teacher would accept".
 4. **Estimate:** 7 Sonnet tutors, 7 Opus judges, 1 Opus fit judge and 1 Opus pair check: about 16 agent runs.
 5. §3 hashes refreshed.
+
+## Amendment M (20 Nov 2026, owner "go with 3"): PLN2i, the planner2g tutor-writing re-check
+Recorded before any PLN2i run.
+1. **Code:** planner2g (`planner2-v8`), all behind `planner2`:
+   - the learner's own question on the lesson point is answered first, never turned aside;
+   - no praise for an answer that still has an error (prompt rule, and a code check that drops a bare "Good." next to an error cue);
+   - a child gets at most two short explanation sentences;
+   - a rule that lists several endings (-s, -es) names all of them.
+   - Also the PLN2h pair-check rule: both comparative forms ("more red" / "redder") are not a "wrong" example.
+2. **Learners:** the same 5 as PLN2h (2006, 2027, 2040, 2043, 2045). Planner ON only, same seeds, 7 rounds, immediate and 7-day delayed tests.
+3. **Measures (descriptive, compared with PLN2f and PLN2h):**
+   - the delayed test;
+   - "teacher would accept";
+   - bare praise next to an error;
+   - turned-aside questions;
+   - misspelled examples shown.
+4. **Estimate:** 7 Sonnet tutors, 7 Opus judges, 1 Opus fit judge and 1 Opus pair check: about 16 agent runs.
+5. §3 hashes refreshed. Task files: `tasks_i/`.
