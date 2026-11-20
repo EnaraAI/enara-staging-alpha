@@ -1,0 +1,111 @@
+# Pair check batch pc_j01 (SIMULATION RESEARCH)
+
+107 pairs. Each pair is a "Right" and a "Wrong" example sentence a tutor showed an English learner.
+
+- **p000** (lesson point: EN-F-A1-GR-article-a-an) | Right: An owl sleeps all day. | Wrong: A owl sleeps all day.
+- **p001** (lesson point: EN-F-A1-GR-article-the) | Right: Mia drew a horse. The horse was purple. | Wrong: Mia drew a horse. Horse was purple.
+- **p002** (lesson point: EN-F-A1-GR-copula-be) | Right: The giraffe is very tall. | Wrong: The giraffe very tall.
+- **p003** (lesson point: EN-F-A1-GR-possessive-adjectives) | Right: Lina feeds her rabbit. | Wrong: Lina feeds his rabbit.
+- **p004** (lesson point: EN-F-A1-GR-prepositions-time) | Right: The film starts at six o'clock. | Wrong: The film starts in six o'clock.
+- **p005** (lesson point: EN-F-A1-GR-there-is-are) | Right: There are four ducks on the lake. | Wrong: There is four ducks on the lake.
+- **p006** (lesson point: EN-F-A1-GR-can-ability) | Right: A penguin can swim. | Wrong: A penguin can swims.
+- **p007** (lesson point: EN-F-A1-GR-word-order-svo) | Right: The farmer feeds the cows. | Wrong: Feeds the farmer the cows.
+- **p008** (lesson point: EN-F-A1-GR-capitals-full-stops) | Right: Today I saw a big ship. | Wrong: today i saw a big ship
+- **p009** (lesson point: EN-F-A2-GR-third-person-s) | Right: The robot washes the floor. | Wrong: The robot wash the floor.
+- **p010** (lesson point: EN-F-A2-GR-present-continuous) | Right: At the zoo, the monkey is eating a banana. | Wrong: At the zoo, the monkey eating a banana.
+- **p011** (lesson point: EN-F-A2-GR-past-simple-regular) | Right: On Monday the farmer counted the sheep. | Wrong: On Monday the farmer count the sheep.
+- **p012** (lesson point: EN-F-A2-GR-past-simple-irregular) | Right: Last night our cat caught a mouse. | Wrong: Last night our cat catched a mouse.
+- **p013** (lesson point: EN-F-A2-GR-past-questions-did) | Right: Did the pirate find the gold? | Wrong: Did the pirate found the gold?
+- **p014** (lesson point: EN-F-A2-GR-frequency-adverbs) | Right: Owls usually hunt at night. | Wrong: Owls hunt usually at night.
+- **p015** (lesson point: EN-F-A2-GR-comparatives) | Right: A horse is heavier than a dog. | Wrong: A horse is heavyer than a dog.
+- **p016** (lesson point: EN-F-A2-GR-going-to) | Right: The farmer is going to sell his sheep. | Wrong: The farmer going to sell his sheep.
+- **p017** (lesson point: EN-F-A2-GR-much-many) | Right: How many ducks are on the lake? | Wrong: How much ducks are on the lake?
+- **p018** (lesson point: EN-F-A2-GR-some-any) | Right: The farmer doesn't sell any milk. | Wrong: The farmer doesn't sell some milk.
+- **p019** (lesson point: EN-F-A2-GR-conjunctions) | Right: The dog barked because it was hungry. | Wrong: The dog barked and it was hungry.
+- **p020** (lesson point: EN-F-A2-FN-polite-requests) | Right: Can I have a red balloon, please? | Wrong: Give me a red balloon.
+- **p021** (lesson point: EN-F-A1-VO-family) | Right: The farmer's wife grows roses. | Wrong: The farmer's woman grows roses.
+- **p022** (lesson point: EN-F-A1-VO-family) | Right: his wife | Wrong: his woman
+- **p023** (lesson point: EN-F-A1-VO-food-drink) | Right: Bears eat soup in stories. | Wrong: Bears drink soup in stories.
+- **p024** (lesson point: EN-F-A1-VO-food-drink) | Right: eat soup | Wrong: drink soup
+- **p025** (lesson point: EN-F-A1-VO-classroom-objects) | Right: The robot has a blue pen. | Wrong: The robot has a blue ben.
+- **p026** (lesson point: EN-F-A1-VO-classroom-objects) | Right: pen | Wrong: ben
+- **p027** (lesson point: EN-F-A1-VO-home-rooms) | Right: The cat sleeps in the kitchen. | Wrong: The cat sleeps in the kitchn.
+- **p028** (lesson point: EN-F-A1-VO-home-rooms) | Right: bedroom | Wrong: sleeping room
+- **p029** (lesson point: EN-F-A1-VO-numbers-time) | Right: My sister is fifteen. | Wrong: My sister is fivteen.
+- **p030** (lesson point: EN-F-A1-VO-numbers-time) | Right: fifteen | Wrong: fivteen
+- **p031** (lesson point: EN-F-A1-VO-days-months) | Right: The circus comes on Wednesday. | Wrong: The circus comes on Wensday.
+- **p032** (lesson point: EN-F-A1-VO-days-months) | Right: Wednesday | Wrong: Wensday
+- **p033** (lesson point: EN-F-A1-VO-common-adjectives) | Right: My brother is very tall. | Wrong: My brother is very long.
+- **p034** (lesson point: EN-F-A1-VO-common-adjectives) | Right: a tall giraffe | Wrong: a long giraffe
+- **p035** (lesson point: EN-F-A2-VO-jobs-workplaces) | Right: A vet works in an animal clinic. | Wrong: A vt works in an animal clinic.
+- **p036** (lesson point: EN-F-A2-VO-jobs-workplaces) | Right: doctor | Wrong: doctr
+- **p037** (lesson point: EN-F-A2-VO-weather) | Right: It is foggy on the mountain. | Wrong: It is fog on the mountain.
+- **p038** (lesson point: EN-F-A2-VO-weather) | Right: It is stormy. | Wrong: It is storm.
+- **p039** (lesson point: EN-F-A2-VO-clothes-shopping) | Right: The clown wears a green hat. | Wrong: The clown wears a hat green.
+- **p040** (lesson point: EN-F-A2-VO-clothes-shopping) | Right: a red dress | Wrong: a dress red
+- **p041** (lesson point: EN-F-A2-VO-appearance) | Right: The lion has thick yellow hair. | Wrong: The lion has hair thick yellow.
+- **p042** (lesson point: EN-F-A2-VO-appearance) | Right: thick yellow hair | Wrong: hair thick yellow
+- **p043** (lesson point: EN-F-A2-VO-make-do) | Right: The robot makes pizza. | Wrong: The robot does pizza.
+- **p044** (lesson point: EN-F-A2-VO-make-do) | Right: make a mistake | Wrong: do a mistake
+- **p045** (lesson point: article_omitted) | Right: She has a cat. | Wrong: She has cat.
+- **p046** (lesson point: copula_omitted) | Right: My bag is heavy. | Wrong: My bag heavy.
+- **p047** (lesson point: EN-F-A2-GR-third-person-s) | Right: He works late on Fridays. | Wrong: He work late on Fridays.
+- **p048** (lesson point: EN-F-A2-GR-third-person-s) | Right: My brother cooks dinner. | Wrong: My brother cook dinner.
+- **p049** (lesson point: EN-F-A2-GR-frequency-adverbs) | Right: She always eats fruit at lunch. | Wrong: She eats always fruit at lunch.
+- **p050** (lesson point: EN-F-A2-GR-frequency-adverbs) | Right: We often eat rice at lunch. | Wrong: We eat often rice at lunch.
+- **p051** (lesson point: EN-F-A2-GR-frequency-adverbs) | Right: They never watch TV at night. | Wrong: They watch never TV at night.
+- **p052** (lesson point: EN-F-A2-GR-present-continuous) | Right: Our neighbours are watching TV. | Wrong: Our neighbours watching TV.
+- **p053** (lesson point: EN-F-A2-GR-past-questions-did) | Right: Did she call the client? | Wrong: Did she called the client?
+- **p054** (lesson point: EN-F-A2-GR-past-questions-did) | Right: Did they watch the match? | Wrong: Did they watched the match?
+- **p055** (lesson point: EN-F-A2-GR-past-questions-did) | Right: Did they open the shop? | Wrong: They opened the shop?
+- **p056** (lesson point: EN-F-A2-GR-past-questions-did) | Right: Did he call the manager? | Wrong: He called the manager?
+- **p057** (lesson point: EN-F-A2-GR-past-questions-did) | Right: Did she call the client? | Wrong: Did she called the client?
+- **p058** (lesson point: EN-F-A2-GR-past-questions-did) | Right: Did he watch the match last night? | Wrong: He watched the match last night?
+- **p059** (lesson point: EN-F-A2-GR-much-many) | Right: How much milk do we need? | Wrong: How many milk do we need?
+- **p060** (lesson point: EN-F-A2-GR-much-many) | Right: How many chairs are in the room? | Wrong: How much chairs are in the room?
+- **p061** (lesson point: EN-F-A2-GR-comparatives) | Right: The new chair is thinner than the old chair. | Wrong: The new chair is thiner than the old chair.
+- **p062** (lesson point: EN-F-A2-GR-comparatives) | Right: Today is hotter than yesterday. | Wrong: Today is hoter than yesterday.
+- **p063** (lesson point: EN-F-A2-GR-some-any) | Right: I'd like some soup, please. | Wrong: I'd like any soup, please.
+- **p064** (lesson point: EN-F-A2-GR-some-any) | Right: I'd like some soup, please. | Wrong: I'd like any soup, please.
+- **p065** (lesson point: EN-F-A2-GR-some-any) | Right: Can I have some rice, please? | Wrong: Can I have any rice, please?
+- **p066** (lesson point: EN-F-A2-GR-conjunctions) | Right: The hotel is small but it is clean. | Wrong: The hotel is small and it is clean.
+- **p067** (lesson point: EN-F-A2-GR-past-simple-regular) | Right: She cooked dinner yesterday. | Wrong: She cook dinner yesterday.
+- **p068** (lesson point: EN-F-A2-GR-past-simple-irregular) | Right: We saw a film last week. | Wrong: We seed a film last week.
+- **p069** (lesson point: EN-F-A2-VO-jobs-workplaces) | Right: A teacher works at a school. | Wrong: A teacher works at a hospital.
+- **p070** (lesson point: EN-F-A2-VO-jobs-workplaces) | Right: A doctor works in a clinic. | Wrong: A doctor works in a bank.
+- **p071** (lesson point: EN-F-A2-GR-past-simple-irregular) | Right: I swam in the lake with my friend. | Wrong: I swimmed in the lake with my friend.
+- **p072** (lesson point: EN-F-A2-GR-past-simple-irregular) | Right: My friend saw a film. | Wrong: My friend seed a film.
+- **p073** (lesson point: EN-F-A2-GR-comparatives) | Right: My bag is heavier than your bag. | Wrong: My bag is heavy than your bag.
+- **p074** (lesson point: EN-F-A2-GR-comparatives) | Right: A lake is deeper than a pond. | Wrong: A lake is deep than a pond.
+- **p075** (lesson point: EN-F-A2-VO-clothes-shopping) | Right: How much is this bag? | Wrong: How much are this bag?
+- **p076** (lesson point: EN-F-A2-VO-clothes-shopping) | Right: Do you have this shirt in green? | Wrong: I want this shirt in green.
+- **p077** (lesson point: EN-F-A2-VO-clothes-shopping) | Right: How much are these shoes? | Wrong: How much is these shoes?
+- **p078** (lesson point: EN-F-A2-VO-clothes-shopping) | Right: Do you have this shirt in green? | Wrong: I want this shirt in green.
+- **p079** (lesson point: EN-F-A2-GR-present-continuous) | Right: My friend is playing a game on his phone. | Wrong: My friend playing a game on his phone.
+- **p080** (lesson point: EN-F-A2-VO-weather) | Right: I wear a coat. | Wrong: I wear a coat.
+- **p081** (lesson point: EN-F-A2-VO-weather) | Right: The sun is bright. It is sunny. | Wrong: Snow is falling.
+- **p082** (lesson point: EN-F-A2-GR-going-to) | Right: She is going to cook dinner on Friday. | Wrong: She are going to cook dinner on Friday.
+- **p083** (lesson point: EN-F-A2-GR-going-to) | Right: She is going to call her friend tomorrow. | Wrong: She going to call her friend tomorrow.
+- **p084** (lesson point: EN-F-A2-VO-appearance) | Right: My friends have long legs. | Wrong: My friends having long legs.
+- **p085** (lesson point: EN-F-A2-VO-appearance) | Right: Our neighbour is friendly. | Wrong: Our neighbour friendly.
+- **p086** (lesson point: EN-F-A2-VO-appearance) | Right: My teacher has a big blue bag. | Wrong: My teacher has a bag big blue.
+- **p087** (lesson point: EN-F-A2-VO-appearance) | Right: My neighbour has a beard. | Wrong: My neighbour have a beard.
+- **p088** (lesson point: EN-F-A2-VO-appearance) | Right: My uncle is quiet. | Wrong: My uncle quiet.
+- **p089** (lesson point: EN-F-A2-GR-conjunctions) | Right: She plays football and she plays chess. | Wrong: She plays football she plays chess.
+- **p090** (lesson point: EN-F-A2-GR-conjunctions) | Right: My sister likes rice but she does not like soup. | Wrong: My sister likes rice but she likes soup.
+- **p091** (lesson point: EN-F-A2-GR-conjunctions) | Right: Ali is late because he missed the train. | Wrong: Ali is late.
+- **p092** (lesson point: EN-F-A2-GR-conjunctions) | Right: She sings and she dances. | Wrong: She sings she dances.
+- **p093** (lesson point: EN-F-A2-GR-conjunctions) | Right: She is small but she is strong. | Wrong: She is small but she is my friend.
+- **p094** (lesson point: EN-F-A2-GR-conjunctions) | Right: He is tired because he ran today. | Wrong: He is tired.
+- **p095** (lesson point: EN-F-A2-GR-some-any) | Right: Can I have a sandwich, please? | Wrong: Give me a sandwich.
+- **p096** (lesson point: EN-F-A2-GR-some-any) | Right: Can I have some tea, please? | Wrong: Can I have any tea, please?
+- **p097** (lesson point: EN-F-A2-FN-polite-requests) | Right: Could I have a sandwich, please? | Wrong: I want a sandwich.
+- **p098** (lesson point: EN-F-A2-FN-polite-requests) | Right: Can I have some juice, please? | Wrong: Give me some juice.
+- **p099** (lesson point: EN-F-A2-FN-polite-requests) | Right: Can I have some juice, please? | Wrong: I want some juice.
+- **p100** (lesson point: EN-F-A1-VO-days-months) | Right: We eat at 6:15. | Wrong: We eat in 6:15.
+- **p101** (lesson point: EN-F-A1-VO-days-months) | Right: We swim on Monday. | Wrong: We swim at Monday.
+- **p102** (lesson point: EN-F-A1-VO-days-months) | Right: Class starts at 9 o'clock. | Wrong: Class starts in 9 o'clock.
+- **p103** (lesson point: EN-F-A1-VO-days-months) | Right: We sing on Friday. | Wrong: We sing at Friday.
+- **p104** (lesson point: EN-F-A1-GR-article-a-an) | Right: a pen". | Wrong: an pen".
+- **p105** (lesson point: EN-F-A1-GR-article-a-an) | Right: an apple". | Wrong: a apple".
+- **p106** (lesson point: EN-F-A1-GR-article-a-an) | Right: I see a cat. | Wrong: I see an cat.

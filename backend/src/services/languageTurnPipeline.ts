@@ -4,7 +4,7 @@
 // channel stops using the shared functions or if the policy version differs between them.
 import {
   buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, independentSuccessItem, turnEvidence, LANGUAGE_CONTEXT_VERSION,
-  isClosingTurn, knownKey, ownSentenceNow, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk, learnerAsks, CLOSING_ASK_SENTENCE,
+  isClosingTurn, knownKey, ownSentenceNow, pairsAsked, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk, learnerAsks, CLOSING_ASK_SENTENCE,
   type LanguageTeachingContext, type LanguageTurnEvidence,
 } from './languageTeachingContext';
 import { recordProfileTurn } from './learnerLanguageProfile';
@@ -12,6 +12,7 @@ import { engineV2 } from './engineV2';
 import { stripPreAttemptModels, stripCopyReadyModels, isSuccess, isFailure, type StrippedReply } from './languageLearningState';
 import { exampleGuardHits, removeGuardHits, ruleLinePostCheck, GUARD_REGEN_REASON, type GuardHit } from './teachingQuality';
 import { ruleBankEntry } from './ruleBank';
+import { removeFalseWrongs } from './pairCheck';
 
 /** TRACK 2 (exampleGuard, plan §2): the guard check on its own (no change to the text), for the one regeneration in the chat path and for the harness. */
 export function exampleGuardCheck(language: LanguageTeachingContext, answer: string, learnerText: string): GuardHit[] {
@@ -64,6 +65,12 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
     const pc = ruleLinePostCheck(text, ruleBankEntry(language.teach2?.entryId));
     if (pc.problems.length) postCheck = pc.problems;
     if (pc.problems.includes('pair_identical') && pc.pair) text = text.replace(new RegExp(`\\bWrong\\s*:\\s*\\**["“]?${pc.pair.wrong.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["”]?\\**\\.?`, 'i'), '').replace(/[ \t]{2,}/g, ' ').trim();
+  }
+  // planner2e fix 1: a right/wrong pair whose "wrong" sentence is acceptable English (a meaning, joining-word, pronoun or politeness swap,
+  // a statement question, a shorter sentence) loses that sentence: labelling good English wrong teaches something false.
+  if (pairsAsked()) {
+    const pc = removeFalseWrongs(text);
+    if (pc.removed.length) { text = pc.text; postCheck = [...(postCheck ?? []), ...pc.removed.map((r) => `pair_not_wrong:${r}`)]; }
   }
   const guarded = stripPreAttemptModels(text, guardedItems(language), learnerText, [...(language.lesson.spec?.vocabulary ?? []), ...(language.lesson.spec?.examples ?? [])]);
   if (guarded.removed.length) { text = guarded.text; removed += guarded.removed.length; }

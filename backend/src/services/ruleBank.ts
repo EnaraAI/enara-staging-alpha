@@ -33,7 +33,7 @@ export interface RuleBankEntry {
   confusion?: { right: string; wrong: string };
 }
 
-export const RULE_BANK_VERSION = 'rb-v1';
+export const RULE_BANK_VERSION = 'rb-v2'; // rb-v2 (planner2e): every wrong example is wrong English (pair check + Opus review)
 
 export const RULE_BANK: RuleBankEntry[] = [
   // ------------------------------------------------------------------ A1 grammar
@@ -67,8 +67,8 @@ export const RULE_BANK: RuleBankEntry[] = [
   {
     id: 'EN-F-A1-GR-possessive-adjectives', kind: 'grammar',
     rule: 'Choose by the owner: my, your, his (boy or man), her (girl or woman), our, their (more than one).',
-    right: 'Lina feeds her rabbit.', wrong: 'Lina feeds his rabbit.',
-    usualError: 'his/her chosen by the thing, not the owner; they instead of their',
+    right: 'Lina feeds her rabbit.', wrong: 'Lina feeds she rabbit.',
+    usualError: 'the subject word for the owner (she rabbit, he bag); his/her chosen by the thing, not the owner; they instead of their',
     models: [{ form: 'his', sentence: 'Omar is brushing his horse.' }, { form: 'their', sentence: 'The girls packed their kites.' }, { form: 'her', sentence: 'Laila waters her plants.' }],
     confusable: { form: 'subject pronouns', note: 'he/she/they do the action; his/her/their show the owner', item: 'Write they or their: ___ kite is very big.', answer: 'Their' },
     keywords: ['my', 'his', 'her', 'their', 'owner', 'possessive'],
@@ -166,7 +166,7 @@ export const RULE_BANK: RuleBankEntry[] = [
   {
     id: 'EN-F-A2-GR-frequency-adverbs', kind: 'grammar',
     rule: 'Put always, usually, sometimes or never before the action word, but after am, is or are.',
-    right: 'Owls usually hunt at night.', wrong: 'Owls hunt usually at night.',
+    right: 'Owls usually eat mice at night.', wrong: 'Owls eat usually mice at night.',
     usualError: 'the adverb after the main verb or at the end',
     models: [{ form: 'before the verb', sentence: 'Cats never eat carrots.', keyPattern: '\\b(always|usually|sometimes|never|often) (?!(is|am|are)\\b)[a-z]+' }, { form: 'after be', sentence: 'The zoo is always busy.', keyPattern: '\\b(is|am|are) (always|usually|sometimes|never|often)\\b' }],
     confusable: { form: 'third person -s', note: 'the verb after he/she/it still takes -s (she always reads)', item: 'Write the correct form: The parrot always ___ (sing) in the morning.', answer: 'sings' },
@@ -202,7 +202,7 @@ export const RULE_BANK: RuleBankEntry[] = [
   {
     id: 'EN-F-A2-GR-some-any', kind: 'grammar',
     rule: 'Use some in positive sentences, offers and requests; use any in negatives and most questions.',
-    right: 'The farmer doesn\'t sell any milk.', wrong: 'The farmer doesn\'t sell some milk.',
+    right: 'The farmer has some milk.', wrong: 'The farmer has any milk.',
     usualError: 'some in a negative or a question, or any in a positive sentence',
     models: [{ form: 'any (negative)', sentence: 'The robot doesn\'t need any oil.', keyPattern: '^any$' }, { form: 'some (positive)', sentence: 'The robot wants some paint.', keyPattern: '^some$' }, { form: 'any (question)', sentence: 'Are there any frogs in the pond?', keyPattern: '^any$' }],
     confusable: { form: 'a/an', note: 'a/an for one countable thing; some/any for more or for non-count nouns', item: 'Write a, an or some: The horse wants ___ apple.', answer: 'an' },
@@ -211,16 +211,16 @@ export const RULE_BANK: RuleBankEntry[] = [
   {
     id: 'EN-F-A2-GR-conjunctions', kind: 'grammar',
     rule: 'Join two ideas in one sentence: and adds, but shows a difference, because gives a reason.',
-    right: 'The dog barked because it was hungry.', wrong: 'The dog barked and it was hungry.',
-    usualError: 'chaining every idea with and, whatever the meaning',
+    right: 'The dog barked because it was hungry.', wrong: 'The dog barked because hungry.',
+    usualError: 'because with no subject and verb after it (because hungry); chaining every idea with and, whatever the meaning',
     models: [{ form: 'but', sentence: 'The lion is big but the mouse is small.', keyPattern: '\\bbut\\b' }, { form: 'because', sentence: 'The ducks swam because the sun was hot.', keyPattern: '\\bbecause\\b' }, { form: 'and', sentence: 'The cat sleeps and the dog plays.', keyPattern: '\\band\\b' }],
     keywords: ['and', 'but', 'because', 'join', 'linking'],
   },
   {
     id: 'EN-F-A2-FN-polite-requests', kind: 'function',
     rule: 'Ask politely with Can I have ... or I would like ..., and add please.',
-    right: 'Can I have a red balloon, please?', wrong: 'Give me a red balloon.',
-    usualError: 'a bare command or I want',
+    right: 'Can I have a red balloon, please?', wrong: 'Can I to have a red balloon, please?',
+    usualError: 'to after can (Can I to have); a bare command or I want',
     models: [{ form: 'Can I have', sentence: 'At the zoo gate: Can I have a zoo map, please?', keyPattern: '\\b(can|could) i have\\b' }, { form: 'I would like', sentence: 'At the zoo gate: I would like a zoo map, please.', keyPattern: "\\b(would|'d) like\\b" }],
     keywords: ['can i have', 'could i have', 'i would like', 'please', 'request'],
   },
@@ -228,24 +228,24 @@ export const RULE_BANK: RuleBankEntry[] = [
   {
     id: 'EN-F-A1-VO-family', kind: 'vocab',
     rule: 'Family words name people: a man\'s wife, a woman\'s husband, mother, brother, sister.',
-    right: 'The farmer\'s wife grows roses.', wrong: 'The farmer\'s woman grows roses.',
-    usualError: 'vowels left out or changed (brthr, mather), or a word-for-word Arabic meaning (his woman for his wife)',
+    right: 'The farmer\'s wife grows roses.', wrong: 'The farmer wife grows roses.',
+    usualError: 'the \'s left out (the farmer wife), vowels left out or changed (brthr, mather), or a word-for-word Arabic meaning (his woman for his wife)',
     models: [{ form: 'husband', sentence: 'The baker\'s husband drives a bus.' }, { form: 'parents', sentence: 'The twins visit their parents.' }],
     keywords: ['family word', 'family'],
     targetWords: ['mother', 'father', 'brother', 'sister', 'grandmother', 'grandfather', 'aunt', 'uncle', 'cousin', 'wife', 'husband', 'son', 'daughter', 'parents'],
     clue: { clue: 'the man a woman is married to', word: 'husband' },
-    confusion: { right: 'his wife', wrong: 'his woman' },
+    confusion: { right: 'brother', wrong: 'brothr' },
   },
   {
     id: 'EN-F-A1-VO-food-drink', kind: 'vocab',
     rule: 'We eat food, and we eat soup too; we drink water, juice and milk.',
-    right: 'Bears eat soup in stories.', wrong: 'Bears drink soup in stories.',
-    usualError: 'drink soup instead of eat soup',
+    right: 'Bears eat sandwiches in stories.', wrong: 'Bears eat sandwitches in stories.',
+    usualError: 'spelling slips (sandwitch, chiken); drink soup instead of eat soup',
     models: [{ form: 'eat', sentence: 'A monkey eats a banana.' }, { form: 'drink', sentence: 'Cows drink water in the field.' }],
     keywords: ['food', 'names the food', 'like'],
     targetWords: ['bread', 'rice', 'apple', 'milk', 'egg', 'fish', 'soup', 'water', 'juice', 'tea', 'cheese', 'chicken', 'banana'],
     clue: { clue: 'it is yellow and long, and monkeys love it', word: 'banana' },
-    confusion: { right: 'eat soup', wrong: 'drink soup' },
+    confusion: { right: 'sandwich', wrong: 'sandwitch' },
   },
   {
     id: 'EN-F-A1-VO-classroom-objects', kind: 'vocab',
@@ -267,7 +267,7 @@ export const RULE_BANK: RuleBankEntry[] = [
     keywords: ['place', 'room', 'place word', 'matches each place'],
     targetWords: ['kitchen', 'bedroom', 'bathroom', 'living room', 'garage', 'hall', 'dining room'],
     clue: { clue: 'the place where a car sleeps at night', word: 'garage' },
-    confusion: { right: 'bedroom', wrong: 'sleeping room' },
+    confusion: { right: 'bedroom', wrong: 'bed room' },
   },
   {
     id: 'EN-F-A1-VO-numbers-time', kind: 'vocab',
@@ -294,13 +294,13 @@ export const RULE_BANK: RuleBankEntry[] = [
   {
     id: 'EN-F-A1-VO-common-adjectives', kind: 'vocab',
     rule: 'Many describing words come in opposite pairs: big - small, hot - cold, old - new, old - young.',
-    right: 'My brother is very tall.', wrong: 'My brother is very long.',
-    usualError: 'the wrong word of a pair (long for tall with people and animals, new for young)',
+    right: 'My brother has a tall friend.', wrong: 'My brother has a friend tall.',
+    usualError: 'the describing word after the thing (a friend tall), or the wrong word of a pair (long for tall with people and animals, new for young)',
     models: [{ form: 'wet', sentence: 'The towel is not dry; it is wet.' }, { form: 'full', sentence: 'The bottle is not empty; it is full.' }],
     keywords: ['opposite', 'adjective', 'describing'],
     targetWords: ['big', 'small', 'hot', 'cold', 'old', 'new', 'young', 'tall', 'short', 'long', 'fast', 'slow', 'wet', 'dry', 'full', 'empty', 'heavy', 'light'],
     clue: { clue: 'the opposite of dry', word: 'wet' },
-    confusion: { right: 'a tall giraffe', wrong: 'a long giraffe' },
+    confusion: { right: 'a tall giraffe', wrong: 'a giraffe tall' },
   },
   {
     id: 'EN-F-A2-VO-jobs-workplaces', kind: 'vocab',
@@ -349,7 +349,7 @@ export const RULE_BANK: RuleBankEntry[] = [
   {
     id: 'EN-F-A2-VO-make-do', kind: 'vocab',
     rule: 'We make new things (a cake, a plan) and a mistake; we do jobs and tasks (homework, the dishes).',
-    right: 'The robot makes pizza.', wrong: 'The robot does pizza.',
+    right: 'The robot makes a mistake.', wrong: 'The robot does a mistake.',
     usualError: 'do for make or make for do with a fixed noun',
     models: [{ form: 'make', sentence: 'The bees make honey.' }, { form: 'do', sentence: 'The robot does puzzles.' }],
     keywords: ['make', 'do'],

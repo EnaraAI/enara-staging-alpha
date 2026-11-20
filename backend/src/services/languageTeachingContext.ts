@@ -5,6 +5,7 @@ import { Institution } from '../models/Institution';
 import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
 import { Assessment as AssessmentModel } from '../models/Assessment';
+import { PAIR_RULE } from './pairCheck';
 import { isLearnerAgeBand } from '../models/learnerAgeBand';
 import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
 import { graderV2On } from './graderV2';
@@ -1074,6 +1075,9 @@ export function shownLessonItems(history: Turn[], items: LessonItem[], scope?: s
   }
   return out;
 }
+/** planner2e fix 1: the switches whose instructions ask for right/wrong pairs; with any of them on, the prompt carries PAIR_RULE and replies
+ *  go through the pair check (a "wrong" sentence that is acceptable English is removed). All off: exactly as before. */
+export const pairsAsked = (): boolean => ['releaseAfterTwo', 'clarity', 'hints', 'levelExplicit', 'ruleFirst', 'ruleBank', 'liveError', 'planner2'].some((f) => engineV2(f as never));
 // r4: structured learning state, lesson items and the hint ceiling for this turn.
 function r4Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, scope?: string): Partial<TurnSignals> {
   const learning = deriveLearningState(history, scope);
@@ -1913,6 +1917,7 @@ export function renderLanguageContextParts(ctx: Omit<LanguageTeachingContext, 'p
     registerLine(band),
     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
     GROUNDING_RULES,
+    ...(pairsAsked() ? [PAIR_RULE] : []),
     assessmentInstruction(),
   ].join('\n');
   const dynamic = [
@@ -1955,6 +1960,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
     registerLine(band),
     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
     GROUNDING_RULES,
+    ...(pairsAsked() ? [PAIR_RULE] : []),
     assessmentInstruction(),
     '</language_teaching_context>',
   );

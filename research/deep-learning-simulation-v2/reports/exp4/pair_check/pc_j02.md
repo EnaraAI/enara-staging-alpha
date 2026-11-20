@@ -1,0 +1,85 @@
+# Pair check batch pc_j02 (SIMULATION RESEARCH)
+
+81 pairs. Each pair is a "Right" and a "Wrong" example sentence a tutor showed an English learner.
+
+- **p107** (lesson point: EN-F-A1-GR-article-a-an) | Right: I see an owl. | Wrong: I see a owl.
+- **p108** (lesson point: EN-F-A1-GR-article-a-an) | Right: I have an egg. | Wrong: I have a egg.
+- **p109** (lesson point: EN-F-A1-GR-capitals-full-stops) | Right: Birds fly. | Wrong: birds fly.
+- **p110** (lesson point: EN-F-A1-GR-capitals-full-stops) | Right: Dogs run. | Wrong: dogs run.
+- **p111** (lesson point: EN-F-A1-GR-capitals-full-stops) | Right: Mia and I play. | Wrong: Mia and i play.
+- **p112** (lesson point: EN-F-A1-VO-family) | Right: This is my father. | Wrong: This is mother.
+- **p113** (lesson point: EN-F-A1-VO-family) | Right: This is my father. | Wrong: This is father.
+- **p114** (lesson point: EN-F-A1-VO-family) | Right: This is my father. | Wrong: This is my fathr.
+- **p115** (lesson point: EN-F-A1-VO-home-rooms) | Right: A tree is in the garden. | Wrong: A tree is in the kitchen.
+- **p116** (lesson point: EN-F-A1-VO-home-rooms) | Right: We play in the garden. | Wrong: We play in the bathroom.
+- **p117** (lesson point: EN-F-A1-VO-home-rooms) | Right: We wash in the bathroom. | Wrong: We wash in the garden.
+- **p118** (lesson point: EN-F-A1-VO-home-rooms) | Right: A tree is in the garden. | Wrong: A tree is in the kitchen.
+- **p119** (lesson point: EN-F-A1-VO-food-drink) | Right: Toast is made from bread. | Wrong: Toast is made from fish.
+- **p120** (lesson point: EN-F-A1-VO-food-drink) | Right: bread. | Wrong: rice.
+- **p121** (lesson point: EN-F-A1-VO-food-drink) | Right: I like milk. | Wrong: I drink milk.
+- **p122** (lesson point: EN-F-A1-VO-numbers-time) | Right: The final time is four. | Wrong: The final time is three.
+- **p123** (lesson point: EN-F-A1-VO-numbers-time) | Right: I see a van. | Wrong: I see a fan.
+- **p124** (lesson point: EN-F-A1-VO-numbers-time) | Right: they say four, then five, so five. | Wrong: they say four, then five, so four.
+- **p125** (lesson point: EN-F-A1-VO-numbers-time) | Right: nine". | Wrong: eight", because B changed it.
+- **p126** (lesson point: EN-F-A1-VO-numbers-time) | Right: A says ten, B says eleven, so eleven. | Wrong: so ten.
+- **p127** (lesson point: EN-F-A1-GR-article-the) | Right: I see an egg. | Wrong: I see a egg.
+- **p128** (lesson point: EN-F-A1-GR-article-the) | Right: I see a bird. The bird sings. | Wrong: I see a bird.
+- **p129** (lesson point: EN-F-A1-GR-article-the) | Right: I see a cat. | Wrong: I see an cat.
+- **p130** (lesson point: EN-F-A1-GR-article-the) | Right: I see a bird. The bird is red. | Wrong: I see a bird.
+- **p131** (lesson point: EN-F-A1-GR-prepositions-time) | Right: We eat lunch at 12:00. | Wrong: We eat lunch in 12:00.
+- **p132** (lesson point: EN-F-A1-GR-prepositions-time) | Right: We play on Sunday. | Wrong: We play at Sunday.
+- **p133** (lesson point: EN-F-A1-GR-prepositions-time) | Right: Lunch is at 12:30. | Wrong: Lunch is in 12:30.
+- **p134** (lesson point: EN-F-A1-VO-classroom-objects) | Right: This is a desk. | Wrong: I read a book.
+- **p135** (lesson point: EN-F-A1-VO-classroom-objects) | Right: This is a pen. | Wrong: This is a thing for writing.
+- **p136** (lesson point: EN-F-A1-VO-classroom-objects) | Right: I point at a bag. "This is a bag. | Wrong: I point at a bag. "This is a desk.
+- **p137** (lesson point: EN-F-A1-GR-can-ability) | Right: Tom can cook. | Wrong: Tom can cooks.
+- **p138** (lesson point: EN-F-A1-GR-can-ability) | Right: He can sing. | Wrong: He can to sing.
+- **p139** (lesson point: EN-F-A1-GR-copula-be) | Right: He is seven. | Wrong: He are seven.
+- **p140** (lesson point: EN-F-A1-GR-copula-be) | Right: I am late. | Wrong: I is late.
+- **p141** (lesson point: EN-F-A1-GR-copula-be) | Right: She is Mia. | Wrong: She am Mia.
+- **p142** (lesson point: EN-F-A1-GR-copula-be) | Right: I am happy. | Wrong: I happy.
+- **p143** (lesson point: EN-F-A1-GR-there-is-are) | Right: There are two chairs. | Wrong: There is two chairs.
+- **p144** (lesson point: EN-F-A1-GR-there-is-are) | Right: two apples | Wrong: two apple
+- **p145** (lesson point: EN-F-A1-GR-there-is-are) | Right: three cats | Wrong: three cat
+- **p146** (lesson point: EN-F-A1-GR-there-is-are) | Right: There are three chairs. | Wrong: There is three chairs.
+- **p147** (lesson point: EN-F-A1-GR-there-is-are) | Right: She has a cat. | Wrong: She has cat.
+- **p148** (lesson point: EN-F-A2-VO-jobs-workplaces) | Right: A nurse works in a hospital. | Wrong: A nurse works at a farm.
+- **p149** (lesson point: EN-F-A2-VO-jobs-workplaces) | Right: A farmer works at a farm. | Wrong: A farmer works in a hospital.
+- **p150** (lesson point: EN-F-A1-GR-article-a-an) | Right: I see an ant. | Wrong: I see a ant.
+- **p151** (lesson point: EN-F-A1-GR-article-a-an) | Right: He has a dog. | Wrong: He has dog.
+- **p152** (lesson point: EN-F-A1-GR-article-a-an) | Right: an egg. | Wrong: a egg.
+- **p153** (lesson point: EN-F-A1-GR-article-a-an) | Right: She has a cat. | Wrong: She has cat.
+- **p154** (lesson point: EN-F-A2-GR-past-questions-did) | Right: Yesterday I cleaned my room. | Wrong: Yesterday I clean my room.
+- **p155** (lesson point: EN-F-A2-GR-past-questions-did) | Right: Yesterday I cooked. | Wrong: Yesterday I cook.
+- **p156** (lesson point: EN-F-A2-GR-past-questions-did) | Right: Did Tom paint the wall? | Wrong: Did Tom painted the wall?
+- **p157** (lesson point: EN-F-A1-VO-classroom-objects) | Right: you hold a book and say "This is a book. | Wrong: you hold a book and say "This is a desk.
+- **p158** (lesson point: EN-F-A1-VO-classroom-objects) | Right: I point at a book. | Wrong: I point at a book.
+- **p159** (lesson point: EN-F-A1-VO-classroom-objects) | Right: This is a book. | Wrong: This is a buk.
+- **p160** (lesson point: EN-F-A2-GR-past-simple-regular) | Right: Mia jumped over the box. | Wrong: Yesterday Mia jump over the box.
+- **p161** (lesson point: EN-F-A2-GR-past-simple-regular) | Right: Yesterday I jumped. | Wrong: Yesterday I jump.
+- **p162** (lesson point: EN-F-A2-GR-past-simple-regular) | Right: Yesterday I saw a film. | Wrong: Yesterday I see a film.
+- **p163** (lesson point: EN-F-A1-GR-prepositions-time) | Right: We eat at 6:15. | Wrong: We eat in 6:15.
+- **p164** (lesson point: EN-F-A1-GR-prepositions-time) | Right: The bus comes at 4:45. | Wrong: The bus comes in 4:45.
+- **p165** (lesson point: EN-F-A1-GR-prepositions-time) | Right: Class starts at 9 o'clock. | Wrong: Class starts on 9 o'clock.
+- **p166** (lesson point: EN-F-A1-GR-prepositions-time) | Right: School starts at 8 o'clock. | Wrong: School starts in 8 o'clock.
+- **p167** (lesson point: EN-F-A1-GR-prepositions-time) | Right: We sing on Friday. | Wrong: We sing at Friday.
+- **p168** (lesson point: EN-F-A2-GR-third-person-s) | Right: She sings at school. | Wrong: She sing at school.
+- **p169** (lesson point: EN-F-A2-GR-third-person-s) | Right: She sings at school. | Wrong: She sing at school.
+- **p170** (lesson point: EN-F-A2-GR-third-person-s) | Right: He washes the car. | Wrong: He washs the car.
+- **p171** (lesson point: EN-F-A2-GR-third-person-s) | Right: He teaches English. | Wrong: He teachs English.
+- **p172** (lesson point: EN-F-A1-VO-numbers-time) | Right: At two? No, at three" means three. | Wrong: it means two.
+- **p173** (lesson point: EN-F-A1-VO-numbers-time) | Right: I drive a van. | Wrong: I drive a fan.
+- **p174** (lesson point: EN-F-A1-VO-numbers-time) | Right: one. | Wrong: twelve.
+- **p175** (lesson point: EN-F-A2-GR-comparatives) | Right: A horse is faster than a dog. | Wrong: A horse is fast than a dog.
+- **p176** (lesson point: EN-F-A2-GR-comparatives) | Right: Tom is sadder than Ben. | Wrong: Tom is sader than Ben.
+- **p177** (lesson point: EN-F-A2-GR-comparatives) | Right: A mouse is smaller than a cat. | Wrong: A mouse is small than a cat.
+- **p178** (lesson point: EN-F-A2-GR-comparatives) | Right: This dog is fatter than that dog. | Wrong: This dog is fater than that dog.
+- **p179** (lesson point: EN-F-A1-GR-word-order-svo) | Right: Dan eats an apple. | Wrong: Eats Dan an apple.
+- **p180** (lesson point: EN-F-A1-GR-word-order-svo) | Right: Lily swims in the pool. | Wrong: Lily in the pool swims.
+- **p181** (lesson point: EN-F-A1-GR-word-order-svo) | Right: Ana always drinks milk. | Wrong: Ana drinks always milk.
+- **p182** (lesson point: EN-F-A1-GR-word-order-svo) | Right: Tom eats rice. | Wrong: Eats rice Tom.
+- **p183** (lesson point: EN-F-A1-GR-word-order-svo) | Right: Leo rides a bike at the park. | Wrong: Leo rides at the park a bike.
+- **p184** (lesson point: EN-F-A1-GR-word-order-svo) | Right: Dad never drinks milk. | Wrong: Dad drinks never milk.
+- **p185** (lesson point: EN-F-A2-GR-much-many) | Right: She has many pens. | Wrong: She has much pens.
+- **p186** (lesson point: EN-F-A2-GR-much-many) | Right: I have many pens. | Wrong: I have much pens.
+- **p187** (lesson point: EN-F-A2-GR-much-many) | Right: I do not have much milk. | Wrong: I do not have many milk.
