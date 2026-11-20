@@ -64,9 +64,10 @@ test('the flags manifest accepts exactly ENARA_ENGINE_V2 (tutor engine, comma li
   assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { ENARA_ENGINE_V2: 'planner2; rm -rf /' } }] }), /short plain string/);
   assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { ENARA_ENGINE_V2: 'a b' } }] }), /short plain string/);
   // The real manifest: ESL5 setting + planner2c on lms-test; the kids pack stays off.
+  // Owner decision (20 Nov): without graderV2, so LMS assignment auto-grading on lms-test stays as it is.
   const real = manifestFlags(m).ENARA_ENGINE_V2;
-  assert.equal(real, list);
-  assert.ok(!real.split(',').includes('kidsPack') && !real.split(',').includes('all'));
+  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2');
+  for (const off of ['kidsPack', 'all', 'graderV2']) assert.ok(!real.split(',').includes(off), off);
 });
 
 test('the flags manifest: the current lms-test set, switches only', () => {
