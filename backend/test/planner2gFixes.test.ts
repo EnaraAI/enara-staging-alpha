@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { OWN_QUESTION_LINE, NO_PRAISE_ON_ERROR_LINE, CHILD_EXPLAIN_LINE, ruleForms, formsClause, ruleBeforeFirstTryLine, renderLanguageContextPrompt } from '../src/services/languageTeachingContext';
-import { removeMixedPraise } from '../src/services/languageTurnPipeline';
+import { removeMixedPraise, setsTask } from '../src/services/languageTurnPipeline';
 import { PLANNER_VERSION } from '../src/services/lessonPlanner';
 import { withEnv, build } from './esl5Helpers';
 
@@ -45,5 +45,13 @@ describe('planner2g: no praise next to an error', () => {
     expect(removeMixedPraise(ok)).toEqual({ text: ok, removed: 0 });
     const effort = 'Good try! The spelling needs one more letter. Look at the word again.';
     expect(removeMixedPraise(effort).text).toContain('Good try!');
+  });
+});
+
+describe('planner2g: "send it again" is a task (PLN2i, learner 2006: the closing line was added as a second task)', () => {
+  it('a reply asking to send or rewrite the sentence sets a task', () => {
+    expect(setsTask('Look at the letters at the end of "big" before -er.\n\nSend the sentence again with your correction.')).toBe(true);
+    expect(setsTask('Rewrite your sentence with the right ending.')).toBe(true);
+    expect(setsTask('Well done, that is right.')).toBe(false);
   });
 });

@@ -47,7 +47,7 @@ export const CLOSING_FOLD_AFTER = 3;
 const OWN_SENTENCE_SET = /\bwrite one sentence about\b/i;
 /** reviewOpen: the closing item asked when the model set no task at all (new situation, same point; one task). */
 /** planner2e fix A: the reply already sets a task: an invitation, or a "Now you: write ..." / "Join the two sentences ..." style instruction. */
-const TASK_VERBS = 'write|say|make|join|combine|complete|tell|use|choose|answer|type|fill|put|ask|describe|try|spell|read|point|draw|find|order|match|change|correct';
+const TASK_VERBS = 'write|rewrite|send|resend|say|make|join|combine|complete|tell|use|choose|answer|type|fill|put|ask|describe|try|spell|read|point|draw|find|order|match|change|correct';
 const TASK_SENTENCE = new RegExp(`(?:^|[.!?:]\\s+|\\n)\\s*(?:(?:now|then|next|ok|okay)[,\\s]+)?(?:(?:you|your turn|try|on your own|now you)\\s*[:,!.]\\s*)?(?:${TASK_VERBS})\\b`, 'i');
 export const setsTask = (text: string): boolean => Boolean(taskInvitation(text)) || TASK_SENTENCE.test(text);
 export const REVIEW_CLOSE_FALLBACK = 'Now write one new sentence about a place you visited, using the same point in this new situation.';
