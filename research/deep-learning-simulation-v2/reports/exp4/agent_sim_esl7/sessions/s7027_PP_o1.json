@@ -13,8 +13,8 @@
    "W2"
   ],
   "s": {
-   "W1": 1.5,
-   "W2": 0.5,
+   "W1": 0.5,
+   "W2": 0,
    "C1": 0.95,
    "C2": 0.95
   },
@@ -631,7 +631,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-WR-simple-sentences (writing short sentences with capitals and full stops). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1.5: a text is one long line joined with \"and\", no capitals or full stops. Its error: writes one long line with \"and\" and no capitals or full stops (\"my sister is ten and she has a cat\").\nW2 (wrong) strength 0.5: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"My sister ten.\").\nC1 (correct) strength 0.95: each idea is its own sentence with a capital and a full stop. Independent correct productions so far: 0.\nC2 (correct) strength 0.95: each present sentence has am/is/are (or have/has). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. Write 2 sentences about your neighbour.\" | \"Good ideas! Your sentence says your neighbour is kind and has a cat. But please fix two things. A sentence starts with a capital letter, and each sentence ends with a full stop. Also, do not join the \" | \"Yes, correct! Both sentences start with a capital letter and end with a full stop. You used is and has, and you did not join the ideas with \"and\". Well done. Next one. Write these words as two sentenc\" | \"Good idea, and \"my uncle is a driver\" is right. But two things still need fixing. A sentence starts with a capital letter and ends with a full stop. Also, do not join the ideas with \"and\". Hint: the t\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise writing short sentences with capitals and full stops again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nWelcome back! Let's keep practising short sentences. Remember: a capital letter at the start, a capital \"I\", a full stop at the end, and am/is/are or have/has in each sentence.\n\nExample: Our neighbour is old. He has a big garden.\n\nYour turn. Write 2 sentences about your neighbour."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-WR-simple-sentences (writing short sentences with capitals and full stops). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1.5: a text is one long line joined with \"and\", no capitals or full stops. Its error: writes one long line with \"and\" and no capitals or full stops (\"my sister is ten and she has a cat\").\nW2 (wrong) strength 0.5: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"My sister ten.\").\nC1 (correct) strength 0.95: each idea is its own sentence with a capital and a full stop. Independent correct productions so far: 0.\nC2 (correct) strength 0.95: each present sentence has am/is/are (or have/has). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. Write 2 sentences about your neighbour.\" | \"Good ideas! Your sentence says your neighbour is kind and has a cat. But please fix two things. A sentence starts with a capital letter, and each sentence ends with a full stop. Also, do not join the \" | \"Yes, correct! Both sentences start with a capital letter and end with a full stop. You used is and has, and you did not join the ideas with \"and\". Well done. Next one. Write these words as two sentenc\" | \"Good idea, and \"my uncle is a driver\" is right. But two things still need fixing. A sentence starts with a capital letter and ends with a full stop. Also, do not join the ideas with \"and\". Hint: the t\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise writing short sentences with capitals and full stops again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nWelcome back! Let's keep practising short sentences. Remember: a capital letter at the start, a capital \"I\", a full stop at the end, and am/is/are or have/has in each sentence.\n\nExample: Our neighbour is old. He has a big garden.\n\nYour turn. Write 2 sentences about your neighbour.",
+   "stateBefore": {
+    "form": "wr1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1.5,
+     "W2": 0.5,
+     "C1": 0.95,
+     "C2": 0.95
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "a capital letter at the start, a capital \"I\", a full stop at the end"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "and am/is/are or have/has in each sentence"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My neighbour is kind. She has a cat.",
+    "errors": {
+     "W1": "my neighbour is kind and she has a cat",
+     "W2": "My neighbour kind. She has a cat."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0.5,
+     "W2": 0,
+     "C1": 0.95,
+     "C2": 0.95
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My neighbour kind. She has a cat.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "My neighbour kind. She has a cat.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

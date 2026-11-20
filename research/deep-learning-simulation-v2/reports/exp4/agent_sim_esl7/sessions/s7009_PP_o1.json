@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2.5,
+   "W1": 1.5,
    "W2": 1,
    "C1": 0,
    "C2": 0.95
@@ -600,7 +600,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2.5: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 1: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 0: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 0.\nC2 (correct) strength 0.95: am/is/are is needed in a present sentence. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. What is your favourite animal? Answer with a full sentence.\" | \"Good, you used a full sentence! One word is missing. We need is after \"favourite animal\". Hint: My favourite animal ___ the cat. Try again with the full sentence.\" | \"Yes, \"is\" is the missing word. Now put it in the sentence. Write the whole sentence: My favourite animal ___ the cat. Remember, we answer with a full sentence, not one word.\" | \"Yes, correct! You used a full sentence and you wrote is after \"favourite animal\". Well done. Next one. Who is your best teacher? Answer with a full sentence.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHi again! Can we practise answering personal questions with a full sentence again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi! Good to see you again. Today we answer with a full sentence, not one word. For example: What is your favourite animal? My favourite animal is the horse.\n\nNow you try. What is your favourite animal? Please answer with a full sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2.5: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 1: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 0: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 0.\nC2 (correct) strength 0.95: am/is/are is needed in a present sentence. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. What is your favourite animal? Answer with a full sentence.\" | \"Good, you used a full sentence! One word is missing. We need is after \"favourite animal\". Hint: My favourite animal ___ the cat. Try again with the full sentence.\" | \"Yes, \"is\" is the missing word. Now put it in the sentence. Write the whole sentence: My favourite animal ___ the cat. Remember, we answer with a full sentence, not one word.\" | \"Yes, correct! You used a full sentence and you wrote is after \"favourite animal\". Well done. Next one. Who is your best teacher? Answer with a full sentence.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHi again! Can we practise answering personal questions with a full sentence again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi! Good to see you again. Today we answer with a full sentence, not one word. For example: What is your favourite animal? My favourite animal is the horse.\n\nNow you try. What is your favourite animal? Please answer with a full sentence.",
+   "stateBefore": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2.5,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0.95
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Today we answer with a full sentence, not one word."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "What is your favourite animal? My favourite animal is the horse."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My favourite animal is the horse.",
+    "errors": {
+     "W1": "The horse.",
+     "W2": "My favourite animal the horse."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1.5,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0.95
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The horse.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "The horse.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
