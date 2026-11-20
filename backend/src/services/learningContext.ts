@@ -11,7 +11,7 @@ import { ageFromBirthDate, loadTrustedAgeBand } from './languageTeachingContext'
 import { QUICK_CHECK_PLAN_LINE, quickCheckActive, planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow, type LessonPlan, type PlannerSignals, type StageProgress } from './lessonPlanner';
 import { L1_TRANSFER_CODES } from './languageLearningState';
 import { recordL1Transfer } from './misconceptionRules';
-import { kidsPackOn, ladLines, lessonFor, loadKidsPack } from './kidsPack';
+import { kidsPackOn, ladContentFor, ladLines, lessonFor, loadKidsPack } from './kidsPack';
 import { StudentMisconception } from '../models/StudentMisconception';
 import { StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import type { TeachingMeta } from '../models/TutorMessage';
@@ -198,6 +198,7 @@ export async function buildObjectiveContext(params: {
         level: typeof level === 'string' ? level : undefined,
         goal: goal === 'work' || goal === 'exam' || goal === 'daily' || goal === 'school' ? goal : undefined,
         reviewDue: input.retention?.due,
+        ladContent: ladContentFor(objective.code ? String(objective.code) : undefined, objective.title),
       };
       // Arabic-transfer errors graded in this session (2 or more) -> a suspected l1_transfer error for this objective.
       const l1 = (params.history ?? []).flatMap((t) => {

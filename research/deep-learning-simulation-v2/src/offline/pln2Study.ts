@@ -32,6 +32,7 @@ import { strandOfMoves } from '../../../../backend/src/services/strandLog';
 import { selectTeachingPlan, belowB1, type PlanInput, type TeachingPlan } from '../../../../backend/src/services/pedagogyPolicy';
 import { planLines, STATUS_WORDS } from '../../../../backend/src/services/learningContext';
 import { QUICK_CHECK_PLAN_LINE, quickCheckActive, planLesson, progressFromHistory, quickCheckSignals, reviewOpener, shapeLines, stageNow, levelRank, type LessonPlan, type PlannerSignals, type StageProgress, type Goal } from '../../../../backend/src/services/lessonPlanner';
+import { kidsPackOn, ladContentFor, ladLines, lessonFor, loadKidsPack } from '../../../../backend/src/services/kidsPack';
 import { applyTurn, summarizeProfile, applyLiveErrors, applyKnownPoints, liveErrorTypes, type Esl5Record } from '../../../../backend/src/services/learnerLanguageProfile';
 import { gradeAnswers } from '../../../../backend/src/services/grading';
 import { graderV2On } from '../../../../backend/src/services/graderV2';
@@ -91,7 +92,7 @@ const norm = (t: string) => t.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').re
 const coreOf = (prompt: string) => prompt.replace(/\s*\(answer with only the (missing word|verb)\)\s*$/i, '').replace(/^[^:]*:\s*/, '');
 /** Amendment F: a run folder with GROUPS.json ({"groups":["TASK"]}) runs only those groups' learners (same ids, seeds and outcomes), one cell per arm. */
 let GROUP_FILTER: Group[] | null = null;
-const dirArg = (d: string) => { const r = path.resolve(d); const gf = path.join(r, 'GROUPS.json'); if (existsSync(gf)) { GROUP_FILTER = JSON.parse(readFileSync(gf, 'utf8')).groups; LRN = undefined; } return r; };
+const dirArg = (d: string) => { const r = path.resolve(d); const gf = path.join(r, 'GROUPS.json'); if (existsSync(gf)) { const g = JSON.parse(readFileSync(gf, 'utf8')); GROUP_FILTER = g.groups; LRN = undefined; if (g.p2Extra && !ENV_OF.P2.includes(g.p2Extra)) ENV_OF.P2 = `${ENV_OF.P2},${g.p2Extra}`; } /* amendment G: p2Extra (kidsPack) on the ON arm */ return r; };
 
 // ---------------------------------------------------------------------------------------------------------- python bridge (esl6_forget.py, esl6_outcomes.py; unchanged)
 const PY = `
@@ -222,7 +223,7 @@ function planInput(l: Learner): PlanInput {
   };
 }
 /** Planner signals (from code: staff-set band, birth-date age, course level, learner goal). Same object in both arms; only P2 reads it. */
-const signalsOf = (l: Learner): PlannerSignals => ({ ageBand: l.ageBand, ...(l.ageYears !== undefined ? { ageYears: l.ageYears } : {}), level: l.level, ...(l.goal ? { goal: l.goal } : {}) });
+const signalsOf = (l: Learner): PlannerSignals => ({ ageBand: l.ageBand, ...(l.ageYears !== undefined ? { ageYears: l.ageYears } : {}), level: l.level, ...(l.goal ? { goal: l.goal } : {}), ...(ladContentFor(l.outcome, lessonOf(l.outcome).title) ? { ladContent: true } : {}) });
 const trustedOf = (l: Learner): TrustedAgeBand => ({ band: l.ageBand, status: 'known', source: 'student_age_band' });
 const sessionTurns = (s: Sess) => { const cur = s.turns[s.turns.length - 1].session; return s.turns.filter((t) => t.session === cur); };
 const shownItem = (tutor: string, oid: string) => [...lessonOf(oid).spec.items].reverse().find((it) => norm(tutor).includes(norm(coreOf(it.prompt)).slice(0, 30)));
@@ -253,7 +254,7 @@ function planOf(s: Sess): PlanOut {
   const op = reviewOpener(signals, input);
   const lesson = planLesson(input, { ...signals, ...quickCheckSignals(signals, progress, op) });
   const stage = stageNow(lesson, progress);
-  return { plan: lesson.plan, text: wrap([...head, ...(quickCheckActive(lesson) ? [QUICK_CHECK_PLAN_LINE] : planLines(lesson.plan, undefined, l.status)), ...shapeLines(lesson, stage), ...tail]), lesson, stage, quickCheck: lesson.shapeRule === 'S4q', progress, l1: l1.length, l1Added };
+  return { plan: lesson.plan, text: wrap([...head, ...(quickCheckActive(lesson) ? [QUICK_CHECK_PLAN_LINE] : planLines(lesson.plan, undefined, l.status)), ...shapeLines(lesson, stage), ...(lesson.shape === 'LAD' && kidsPackOn() ? ladLines((() => { const d = loadKidsPack(); return d ? lessonFor(d, l.outcome, lessonOf(l.outcome).title) : undefined; })(), stage, progress.tries ?? 0) : []), ...tail]), lesson, stage, quickCheck: lesson.shapeRule === 'S4q', progress, l1: l1.length, l1Added };
 }
 const nowOf = (s: Sess) => new Date(T0 + s.turns.length * 60_000);
 const esl5Record = (r: Rec): Esl5Record => ({ live: liveErrorTypes({ entries: r.entries, liveErrors: r.liveErrors }), knownPoints: { ...r.knownPoints } });
@@ -416,8 +417,8 @@ function walk(dir: string, out: string[] = []) { if (!existsSync(dir) || existsS
 function overlapCheck(studyDir: string) {
   const own = path.resolve(studyDir);
   // amendment D: PLN2b re-checks the SAME 48 learners and seeds as PLN2 by design, so PLN2's own run folder is not a clash for it (nothing else is exempt).
-  const reuse = /^agent_sim_pln2[bc]/.test(path.basename(own)) ? path.resolve(ROOT, 'reports/exp4/agent_sim_pln2') : null; // amendment F: pln2c reuses pln2 and pln2b
-  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && /^agent_sim_pln2[bc]?$/.test(path.relative(path.join(ROOT, 'reports/exp4'), path.resolve(f)).split(path.sep)[0])));
+  const reuse = /^agent_sim_pln2[bck]/.test(path.basename(own)) ? path.resolve(ROOT, 'reports/exp4/agent_sim_pln2') : null; // amendment F: pln2c reuses pln2 and pln2b
+  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && /^agent_sim_pln2[bck]?$/.test(path.relative(path.join(ROOT, 'reports/exp4'), path.resolve(f)).split(path.sep)[0])));
   const ids = new Set<number>(); const seeds = new Set<string>();
   for (const f of files) { const t = readFileSync(f, 'utf8'); for (const m of t.matchAll(/"learnerIdx":\s*(\d+)/g)) ids.add(Number(m[1])); for (const m of t.matchAll(/"seed":\s*"([^"]+)"/g)) seeds.add(m[1]); }
   // ids defined in code (ESL1 0-17, ESL2 0-35, ESL3 100-159, ESL3 validation 200-211, ESL4 300-407, ESL5 500-619, ESL6 700-991, teach2 1100-1799 reserved)

@@ -13,6 +13,8 @@ export interface LadLesson {
   id: string;
   outcomeIds: string[];
   topic: string;
+  /** Written for one A1 objective (A1_LINK.json): matched by outcome id only, never by a title word. */
+  linkOnly?: boolean;
   words: string[];
   /** 4-6 short lines, every word from the Starters list or the lesson words. */
   story: string[];
@@ -41,6 +43,12 @@ export function loadKidsPack(dir = DATA_DIR): KidsPackData | null {
   return data;
 }
 export const kidsPackOn = (): boolean => engineV2('kidsPack') && engineV2('planner2');
+/** planner2b ladContent signal: listen-and-do runs only when a reviewed kids-pack lesson exists for this objective (by outcome id, else topic). */
+export function ladContentFor(objectiveCode?: string, title?: string): boolean {
+  if (!kidsPackOn()) return false;
+  const d = loadKidsPack();
+  return Boolean(d && lessonFor(d, objectiveCode, title));
+}
 
 const norm = (w: string) => w.toLowerCase().replace(/[’]/g, "'").replace(/[^a-z'-]/g, '');
 /** Base form for the word-list check (plural -s/-es, -ing, -ed, 's). Conservative: only strips when the base is listed. */
@@ -78,7 +86,8 @@ export function checkLesson(lesson: LadLesson, words: StartersWord[], extra: str
 /** The lesson for an objective: by outcome id, else by topic word in the objective title. */
 export function lessonFor(data: KidsPackData, objectiveCode?: string, title?: string): LadLesson | undefined {
   return data.lessons.find((l) => objectiveCode && l.outcomeIds.includes(objectiveCode))
-    ?? data.lessons.find((l) => title && new RegExp(`\\b${l.topic}\\b`, 'i').test(title));
+    // linkOnly lessons (written for one A1 objective, topics like "an", "the", "can") match by outcome id only, never by a title word.
+    ?? data.lessons.find((l) => !l.linkOnly && title && new RegExp(`\\b${l.topic}\\b`, 'i').test(title));
 }
 
 /** Prompt lines for one LAD stage with the lesson's content (code picks the content; the model says it). */

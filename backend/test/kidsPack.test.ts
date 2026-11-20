@@ -81,12 +81,23 @@ describe('kidsPack', () => {
     for (const w of ['cat', 'children', 'feet', 'ice', 'cream', 'colour', 'twenty', 'point', 'clap']) expect(t.has(w), w).toBe(true);
     for (const w of ['extraordinary', 'mischievous', 'airport']) expect(t.has(w), w).toBe(false);
   });
-  it('the 20 reviewed lessons pass the lesson checker and cover 9 of the 10 can-dos (copying needs the Kids app screen)', () => {
+  it('the 29 lessons (20 Starters + 9 A1-linked) pass the lesson checker and cover 9 of the 10 can-dos (copying needs the Kids app screen)', () => {
     const out = execFileSync('npx', ['tsx', path.resolve(__dirname, '../src/scripts/kidsLessonCheck.ts'), path.resolve(__dirname, '../../data/kids/prea1/LESSONS.json')], { encoding: 'utf8' });
-    expect(out).toMatch(/OK: 20 lessons/);
+    expect(out).toMatch(/OK: 29 lessons/);
     const d = loadKidsPack()!;
     const covered = new Set(d.lessons.flatMap((l) => l.outcomeIds));
     // PREA1-10 (copy words, phrases and short sentences) needs the written word on screen: a Kids app task, not a spoken lesson.
     expect(d.outcomes.filter((o) => !covered.has(o.id)).map((o) => o.id)).toEqual(['PREA1-10']);
   }, 60000);
+});
+
+describe('A1-linked lessons (PLN2k, amendment G)', () => {
+  it('every one of the 12 under-9 A1 objectives has a lesson by outcome id; linkOnly lessons never match by a title word', async () => {
+    const { loadKidsPack, lessonFor } = await import('../src/services/kidsPack');
+    const d = loadKidsPack()!;
+    const ids = ['EN-F-A1-VO-days-months', 'EN-F-A1-GR-article-a-an', 'EN-F-A1-GR-capitals-full-stops', 'EN-F-A1-VO-family', 'EN-F-A1-VO-home-rooms', 'EN-F-A1-VO-food-drink', 'EN-F-A1-VO-numbers-time', 'EN-F-A1-GR-article-the', 'EN-F-A1-GR-prepositions-time', 'EN-F-A1-VO-classroom-objects', 'EN-F-A1-GR-can-ability', 'EN-F-A1-GR-copula-be'];
+    for (const id of ids) expect(lessonFor(d, id)?.outcomeIds).toContain(id);
+    expect(lessonFor(d, 'EN-F-A1-GR-there-is-are', 'There is and there are')).toBeUndefined(); // "the", "be" topics must not catch it
+    expect(lessonFor(d, undefined, 'What you can eat at the party')?.linkOnly).not.toBe(true);
+  });
 });

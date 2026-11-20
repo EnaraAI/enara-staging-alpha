@@ -37,12 +37,12 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 
 | File | SHA-256 |
 |---|---|
-| `backend/src/services/engineV2.ts` | `2f2a68665796c1322ccbc56f9893c936505830037422a50172785b91a018e9a7` |
+| `backend/src/services/engineV2.ts` | `ac1124a7bd7eacfbc63b6c3e88f45b8cce05354932f9e262063ee4d039656950` |
 | `backend/src/services/lessonPlanner.ts` | `e29a427ecbf4cf240dcfa80ef6a30258ead418132f455532ded70def16fb4118` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
-| `backend/src/services/learningContext.ts` | `5b9823d39f74d1d4679712c7acaab1d74c2429f7ecf9f92dce8b92e5e791b1f2` |
+| `backend/src/services/learningContext.ts` | `02b00250d5f341a406d3b232de30c29b47f7e2c51626e109014b6217f9cf3be6` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
-| `backend/src/services/languageTeachingContext.ts` | `af514dc7989575888e406281ed7f623df2f66b6cc5ac580ad3f23b48a834993c` |
+| `backend/src/services/languageTeachingContext.ts` | `9ba5debb1b772847a46b8b05a0463e8b7796cb21a25dd6898773451307c67655` |
 | `backend/src/services/languageTurnPipeline.ts` | `2673ec40c37eec5a66ee364b5d0d65054d809bd2f38ff13f48b6843f93dfd9b1` |
 | `backend/src/services/languageLearningState.ts` | `d6ad94373485734fe2cd8b52a849a4af1c7b0055c3566d4bb72425b4837a2927` |
 | `backend/src/services/learnerLanguageProfile.ts` | `78e783f1d129339aa84e45fc6d49a3a2090ff09fe4f103793fb21ad936f56ec4` |
@@ -65,7 +65,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `4057e7c4a38ba56976de142f24ac762284f7c09c173755693bea7c2a0314c8bc` |
+| `src/offline/pln2Study.ts` (this runner) | `4f4d907d4e9fbca99ca837494dbcf4fae9e32f188292e261dc8fd4dce107ff13` |
 | `src/offline/pln2_analyze.py` (this analysis) | `5e4501439d1f9a68de91cc13d71cb61d12d6c8131ac5db4d9b50997ef45b555c` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
@@ -200,3 +200,21 @@ Re-scored on existing transcripts, by code only:
 - PLN2c adults: OFF 39/50 (0.780), ON 41/49 (0.837): ok.
 - planner2c combined (amendment F): OFF 171/223 (0.767), ON 173/223 (0.776): ok.
 This measure is pre-registered for the kids-pack test and the final 48-learner run. Hashes refreshed in §3.
+
+## Amendment G (20 Nov 2026, owner "go" and choice "write 9 matching lessons"): PLN2k, kids-pack listen-and-do test
+Recorded before any PLN2k tutor run. Branch `claude/tutor-kids-pack`, with planner2c merged in.
+1. **Content:** 9 new listen-and-do lessons for the A1 objectives of the 12 under-9 learners.
+   - Written by 1 Opus agent from `lessons/WRITER_BRIEF_A1.md`.
+   - Rules in `A1_LINK.json`: the objective's focus, and a few allowed A1 words such as days and o'clock.
+   - Each lesson must pass the lesson checker, then 1 Opus review against `review/REVIEW_BRIEF.md`; fixes are applied before round 1.
+   - The 3 existing lessons (family, home, classroom) are linked to their A1 objectives.
+2. **Signal:** `ladContent` = a kids-pack lesson exists for the objective, with the `kidsPack` switch on (`ladContentFor`). Listen-and-do prompt lines come from that lesson (`ladLines`), as in `learningContext`.
+3. **Run:** folder `reports/exp4/agent_sim_pln2k`, with `GROUPS.json` = {"groups": ["LAD"], "p2Extra": "kidsPack"}.
+   - The same 12 under-9 learners (ids, seeds, outcomes).
+   - OFF = today; ON = planner2c + kidsPack.
+   - 7 rounds and the 7-day delayed test.
+   - The same measures, pass rules and guards, with the independent-correct guard of amendment H.
+   - Fit uses the listen-and-do rubric. Fit-judge agreement is taken from amendment E (85.3%); PLN2k's own 10% sample is reported only.
+4. **Overlap check:** the PLN2-family folders (pln2, pln2b, pln2c, pln2k) are exempt from each other.
+5. **Estimate:** 2 content runs (writer, reviewer) + 14 Sonnet tutors + about 11 Opus (7 judges, 1 agreement, 2 fit, 1 fit agreement; the recheck is folded in).
+6. **Before round 1:** the review marked 5 of 9 lessons "fix", and all 16 suggestions were applied. The dry run's prompt check also caught one story line that was the exact answer to a test item (lad-21: "My birthday is in February."). It was reworded to "I have a birthday in February." The checker shows 29 lessons OK. Tests: 133 pass, including the A1-lesson mapping test (linkOnly lessons match by outcome id only). A full scripted dry run passed. §3 hashes refreshed for this branch (kids pack changes to engineV2, learningContext, languageTeachingContext and the runner). Task files: `tasks_k/`.
