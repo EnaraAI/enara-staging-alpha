@@ -200,6 +200,22 @@ async function applyFlags(dryRun) {
   summary(`**Flags (enara-lms-test, Production):** ${plan.map((p) => `\`${p.key}\` ${p.action}`).join(', ')}`);
 }
 
+/** Read-only account check (backend/src/maintenance/accountCheck.ts). Takes the SHA-256 of the lower-case email, so the address is never in a log. */
+async function accountCheck(sha) {
+  if (!/^[a-f0-9]{64}$/.test(String(sha ?? ''))) throw new Error('account-check <sha256 of the lower-case email>');
+  const r = await site('/api/maintenance/account-check', { method: 'POST', auth: true, body: { emailSha256: sha } });
+  if (r.status !== 200 || !r.json) throw new Error(`account-check: HTTP ${r.status}`);
+  const j = r.json;
+  const lines = [`**Account check (lms-test):** ${j.verdict}`];
+  if (j.account) lines.push(`- Account: role \`${j.account.role}\`, status \`${j.account.status}\`, school \`${j.account.institutionId ?? '-'}\`, created ${j.account.createdAt ?? '-'}, updated ${j.account.updatedAt ?? '-'}, sessions reset ${j.account.tokenVersion} time(s)`);
+  if (j.student) lines.push(`- Student \`${j.student.studentId}\`: archived ${j.student.archivedAt ?? 'no'}${j.student.deleted ? ', student record deleted' : ''}`);
+  lines.push(`- Password resets (30 days): ${j.passwordResets30d.length ? j.passwordResets30d.map((x) => `asked ${x.requestedAt}, used ${x.usedAt ?? 'no'}`).join('; ') : 'none'}`);
+  lines.push(`- Audit: ${j.auditEvents.length ? j.auditEvents.map((a) => `${a.at} \`${a.action}\` (${a.actorRole ?? '-'})`).join('; ') : 'none'}`);
+  lines.push(`- Last sign-ins: ${j.signIns.length ? j.signIns.map((x) => `${x.at} \`${x.result}\``).join('; ') : 'none kept'}`);
+  console.log(lines.join('\n'));
+  summary(lines.join('\n'));
+}
+
 async function maintenance(what) {
   const paths = { migrate: '/api/maintenance/migrate', setup: '/api/maintenance/health-check/setup', run: '/api/maintenance/health-check/run' };
   if (!paths[what]) throw new Error('maintenance migrate|setup|run');
@@ -292,6 +308,9 @@ try {
       break;
     case 'maintenance':
       await maintenance(args[0]);
+      break;
+    case 'account-check':
+      await accountCheck(args[0]);
       break;
     case 'rollback': {
       const [prevId, prevUrl] = args;

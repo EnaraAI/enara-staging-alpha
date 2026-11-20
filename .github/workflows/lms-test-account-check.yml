@@ -1,0 +1,48 @@
+# Read-only account check on lms-test.enara.app (owner "go", 20 Nov 2026):
+# says why a sign-in fails (unknown account, disabled account, or wrong
+# password) and what changed the account. lms-test only; test.enara.app is
+# frozen and never called. The request is the SHA-256 of the lower-case email
+# in deploy/lms-test/account-check.sha256, so the address is never in the
+# repository, a log or the summary. The answer holds codes, roles, IDs and
+# times only (backend/src/maintenance/accountCheck.ts).
+#
+# Run it: push a new hash in that file to claude/tutor-lms-accountcheck-run,
+# or (once this file is on main) Actions > "lms-test account check" > Run workflow.
+name: lms-test account check
+
+on:
+  push:
+    branches: ['claude/tutor-lms-accountcheck-run']
+    paths: ['deploy/lms-test/account-check.sha256']
+  workflow_dispatch:
+    inputs:
+      email_sha256:
+        description: 'SHA-256 of the lower-case email (never the email itself)'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lms-test-account-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Account check (read-only)
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+          INPUT_SHA: ${{ github.event.inputs.email_sha256 }}
+        run: |
+          set -euo pipefail
+          sha="${INPUT_SHA:-}"
+          if [ -z "$sha" ]; then sha=$(tr -d ' \n\r' < deploy/lms-test/account-check.sha256); fi
+          node deploy/lms-test/cli.mjs account-check "$sha"

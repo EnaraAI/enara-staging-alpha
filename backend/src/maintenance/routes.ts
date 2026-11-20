@@ -11,6 +11,7 @@ import { maintenanceAllowed, maintenanceAuthorised } from './guards';
 import { seedLmsTest } from './lmsTestSeed';
 import { mockLmsRouter } from './mockLms';
 import { runHealthCheck, setupHealthCheck } from './healthCheck';
+import { accountCheck } from './accountCheck';
 
 // Maintenance for the LMS TEST deployment only (lms-test.enara.app): 404 unless
 // switched on AND MONGODB_URI is the test cluster AND a maintenance token is
@@ -45,6 +46,18 @@ router.post('/health-check/setup', async (_req, res, next) => {
     logger.info('maintenance_health_setup', { ok: out.ok, code: out.code });
     res.status(out.ok ? 200 : 409).json(out);
   } catch (e) {
+    next(e);
+  }
+});
+
+// Read-only account check (accountCheck.ts): body { emailSha256 }. Codes, roles, IDs and times only.
+router.post('/account-check', async (req, res, next) => {
+  try {
+    const out = await accountCheck(String((req.body as { emailSha256?: unknown })?.emailSha256 ?? ''));
+    logger.info('maintenance_account_check', { found: out.found });
+    res.json(out);
+  } catch (e) {
+    if ((e as { status?: number }).status === 400) { res.status(400).json({ error: (e as Error).message }); return; }
     next(e);
   }
 });
