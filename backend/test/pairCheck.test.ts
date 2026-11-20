@@ -18,6 +18,7 @@ describe('pair check: a "wrong" example must be wrong English', () => {
       ['The hotel is small but it is clean.', 'The hotel is small and it is clean.', 'joining_word_swap'],
       ['Lina feeds her rabbit.', 'Lina feeds his rabbit.', 'pronoun_swap'],
       ['Did they open the shop?', 'They opened the shop?', 'statement_question'],
+      ['Do you have these shoes in black?', 'You have these shoes in black.', 'statement_question'], // PLN2g Opus check
       ['Can I have some juice, please?', 'Give me some juice.', 'politeness_only'],
       ['Do you have this shirt in green?', 'I want this shirt in green.', 'politeness_only'],
       ['Can I have some rice, please?', 'Can I have any rice, please?', 'some_any_question'],

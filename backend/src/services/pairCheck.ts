@@ -65,7 +65,7 @@ export function pairProblem(right: string, wrong: string): PairProblem | null {
   if (NEG(r) !== NEG(w)) return 'negation_swap';
   if (removed.some((x) => JOINERS.has(x)) && added.some((x) => JOINERS.has(x))) return 'joining_word_swap';
   if (removed.length === 1 && added.length === 1 && PRONOUNS.some((g) => g.includes(removed[0]) && g.includes(added[0]))) return 'pronoun_swap';
-  if (/\?\s*["”]?$/.test(wrong.trim()) && AUX_START.test(bare(right)) && !AUX_START.test(bare(wrong)) && !/^(what|where|when|who|why|how|which)\b/i.test(bare(wrong))
+  if (/\?\s*["”]?$/.test(right.trim()) && AUX_START.test(bare(right)) && !AUX_START.test(bare(wrong)) && !/^(what|where|when|who|why|how|which)\b/i.test(bare(wrong))
     && added.every((x) => removed.some((y) => sameWord(x, y)))) return 'statement_question';
   if ((/\bplease\b|^(can|could|may) i\b/i.test(bare(right)) || /\?\s*["”]?$/.test(right.trim())) && /^(give me|i want|i need)\b/i.test(bare(wrong))) return 'politeness_only';
   if (/\?\s*["”]?$/.test(wrong.trim()) && removed.length === 1 && added.length === 1 && [removed[0], added[0]].sort().join() === 'any,some') return 'some_any_question';
