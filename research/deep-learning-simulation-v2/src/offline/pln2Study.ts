@@ -682,7 +682,7 @@ async function main() {
     const dir = dirArg(a1); const cases: { id: string; text: string }[] = []; const key: Record<string, any> = {}; const again: { id: string; text: string }[] = []; const akey: Record<string, any> = {};
     for (const s of allSessions(dir)) {
       if (s.turns.filter((t) => t.tutor !== undefined).length < ROUNDS) throw new Error(`${keyOf(s)}: session not finished (${ROUNDS} tutor turns)`);
-      const id = fitCaseId(keyOf(s)); const text = fitCaseText(s, /agent_sim_pln2f/.test(dir) ? fitItemsE : fitItems); // amendment J: anchored 9-12 items in the final run cases.push({ id, text }); key[id] = { session: keyOf(s), arm: s.arm, group: s.group, learner: s.learnerIdx };
+      const id = fitCaseId(keyOf(s)); const text = fitCaseText(s, /agent_sim_pln2f/.test(dir) ? fitItemsE : fitItems); /* amendment J: anchored 9-12 items in the final run */ cases.push({ id, text }); key[id] = { session: keyOf(s), arm: s.arm, group: s.group, learner: s.learnerIdx };
       if (rand(`${NS}-fitagree`, id) < FIT_AGREE_SHARE) { const gid = `g${id.slice(1)}`; again.push({ id: gid, text }); akey[gid] = { ...key[id], of: id }; }
     }
     for (const [sub, cs, k, tag] of [['fit', cases, key, 'fit'], ['fitagree', again, akey, 'fag']] as const) {
