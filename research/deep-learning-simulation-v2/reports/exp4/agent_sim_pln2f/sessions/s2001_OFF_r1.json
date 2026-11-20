@@ -827,7 +827,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 2: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe correct sentence is \"I never watch TV in the evening.\" The reason: \"never\" goes before the main verb \"watch\", not after it.\n\nRight: \"She always eats fruit at lunch.\"\nWrong: \"She eats always fruit at lunch.\"\n\nNow one new task, on your own. Write one sentence about something you sometimes do on Saturday morning. Use \"sometimes\" in your sentence.\n\nLEARNER'S LAST MESSAGE:\nI go sometimes to the park on Saturday morning.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"I go sometimes to the park on Saturday morning.\" The idea is clear, and \"on Saturday morning\" fits a routine well.\n\nThe word \"sometimes\" is in a similar place as in your last sentence. Look at a new pair:\nRight: \"We often eat rice at lunch.\"\nWrong: \"We eat often rice at lunch.\"\n\nCompare this pair with \"go sometimes\" in your sentence. Then write your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 2: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe correct sentence is \"I never watch TV in the evening.\" The reason: \"never\" goes before the main verb \"watch\", not after it.\n\nRight: \"She always eats fruit at lunch.\"\nWrong: \"She eats always fruit at lunch.\"\n\nNow one new task, on your own. Write one sentence about something you sometimes do on Saturday morning. Use \"sometimes\" in your sentence.\n\nLEARNER'S LAST MESSAGE:\nI go sometimes to the park on Saturday morning.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"I go sometimes to the park on Saturday morning.\" The idea is clear, and \"on Saturday morning\" fits a routine well.\n\nThe word \"sometimes\" is in a similar place as in your last sentence. Look at a new pair:\nRight: \"We often eat rice at lunch.\"\nWrong: \"We eat often rice at lunch.\"\n\nCompare this pair with \"go sometimes\" in your sentence. Then write your sentence again.",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"We often eat rice at lunch.\" Wrong: \"We eat often rice at lunch.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I sometimes go to the park on Saturday morning.",
+    "errors": {
+     "W1": "I go sometimes to the park on Saturday morning."
+    }
+   },
+   "applied": [
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I sometimes go to the park on Saturday morning.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I sometimes go to the park on Saturday morning.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

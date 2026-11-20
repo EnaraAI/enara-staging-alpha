@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 4,
+   "C1": 5,
    "C2": 0
   },
   "start": {
@@ -878,7 +878,106 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My sister is going to visit our aunt on Friday.\" is correct. \"is going to\" with a verb is right, and \"on Friday\" shows when.\n\nNew task. Your friend asks: \"What are you and your family going to do next weekend?\" Reply in two short sentences. Use going to and say when.\n\nLEARNER'S LAST MESSAGE:\nWe are going to visit my grandmother next Saturday.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"We are going to visit my grandmother next Saturday.\" is correct. You used \"are going to\" with a verb, and you said when.\n\nNow a longer task. Write three short sentences about your plans for next week: one about you, one about a friend, and one about your family."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My sister is going to visit our aunt on Friday.\" is correct. \"is going to\" with a verb is right, and \"on Friday\" shows when.\n\nNew task. Your friend asks: \"What are you and your family going to do next weekend?\" Reply in two short sentences. Use going to and say when.\n\nLEARNER'S LAST MESSAGE:\nWe are going to visit my grandmother next Saturday.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"We are going to visit my grandmother next Saturday.\" is correct. You used \"are going to\" with a verb, and you said when.\n\nNow a longer task. Write three short sentences about your plans for next week: one about you, one about a friend, and one about your family.",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"We are going to visit my grandmother next Saturday.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"We are going to visit my grandmother next Saturday.\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I am going to play football on Monday.",
+    "errors": {
+     "W1": "I going to play football on Monday."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I going to play football on Monday.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "I going to play football on Monday.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

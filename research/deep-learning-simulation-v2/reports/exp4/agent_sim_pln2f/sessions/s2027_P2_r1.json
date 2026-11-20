@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 3,
    "C1": 1,
    "C2": 0
@@ -1030,7 +1030,107 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 3: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 1: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"wife\". That is not one of our family words.\n\nRule: say \"This is my\" and then one family word from our lesson. Example: \"This is my grandfather.\"\n\nTry again. Write: \"This is my ___.\"\n\nLEARNER'S LAST MESSAGE:\nbrthr\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\nGood try! The answer is \"brother\". It is a family word from our lesson, so check every letter.\n\nRight: \"This is my father.\" Wrong: \"This is my fathr.\"\n\nYour turn. Introduce your mother. Write one sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 3: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 1: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"wife\". That is not one of our family words.\n\nRule: say \"This is my\" and then one family word from our lesson. Example: \"This is my grandfather.\"\n\nTry again. Write: \"This is my ___.\"\n\nLEARNER'S LAST MESSAGE:\nbrthr\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\nGood try! The answer is \"brother\". It is a family word from our lesson, so check every letter.\n\nRight: \"This is my father.\" Wrong: \"This is my fathr.\"\n\nYour turn. Introduce your mother. Write one sentence.",
+   "stateBefore": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"brother\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"This is my father.\" Wrong: \"This is my fathr.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "This is my mother.",
+    "errors": {
+     "W1": "This is my mther."
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 3,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "This is my mother.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "This is my mother.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
