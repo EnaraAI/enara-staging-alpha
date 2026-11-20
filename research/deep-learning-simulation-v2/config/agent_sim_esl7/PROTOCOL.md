@@ -137,3 +137,4 @@ The harness has no database, so it runs the deployed pure functions on records i
 **Other notes from rounds 1–2:**
 - One BASE tutor agent (BASE_1, round 2) said it skimmed the repeated instruction lines and did not open with the errors-to-work-on brief. The replies were kept, and later tutor tasks were told to read every line.
 - One BASE prompt said "partly right" for a correct polite request (s7040, s7046). The tutor marked it CORRECT.
+- **Second fix, from round 3 (same commit as PR #48, `73458935`):** `ruleOnWrong` stands down when the first-time rule block is in the same reply. In round 2, six NEW sessions got both (one says "same item again", the other "a new item"); the tutors followed the first-time block.
