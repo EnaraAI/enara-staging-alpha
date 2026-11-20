@@ -58,7 +58,7 @@ const PRONOUNS = [['he', 'she', 'it', 'they', 'we', 'i', 'you'], ['his', 'her', 
 const AUX_START = /^(do|does|did|is|are|am|was|were|can|could|will|would|have|has|should|may)\b/i;
 const bare = (t: string) => t.trim().replace(/^[\s"“”'*]+|[\s"“”'*]+$/g, '');
 
-export type PairProblem = 'misspelling_shown' | 'same' | 'meaning_swap' | 'joining_word_swap' | 'negation_swap' | 'pronoun_swap' | 'statement_question' | 'politeness_only' | 'some_any_question' | 'shorter_not_wrong';
+export type PairProblem = 'misspelling_shown' | 'same' | 'both_comparatives_ok' | 'meaning_swap' | 'joining_word_swap' | 'negation_swap' | 'pronoun_swap' | 'statement_question' | 'politeness_only' | 'some_any_question' | 'shorter_not_wrong';
 /** Why the "wrong" sentence is probably acceptable English (so it must not be labelled wrong), or null when it has a form error.
  *  Form errors pass: a missing, extra or wrong small word, a wrong ending, a misspelling, a capital or full stop, word order, an over-regular past. */
 export function pairProblem(right: string, wrong: string): PairProblem | null {
@@ -69,6 +69,7 @@ export function pairProblem(right: string, wrong: string): PairProblem | null {
   if (!removed.length && !added.length) return null; // capitals, punctuation or word order: a form point
   // planner2f (owner): never show a misspelling as an example, not even as the "wrong" one. An over-regular past ("swimmed") is grammar, not spelling.
   if (added.some((x) => removed.some((y) => misspellingOf(x, y)))) return 'misspelling_shown';
+  if (bothComparativesOk(removed, added)) return 'both_comparatives_ok';
   if (NEG(r) !== NEG(w)) return 'negation_swap';
   if (removed.some((x) => JOINERS.has(x)) && added.some((x) => JOINERS.has(x))) return 'joining_word_swap';
   if (removed.length === 1 && added.length === 1 && PRONOUNS.some((g) => g.includes(removed[0]) && g.includes(added[0]))) return 'pronoun_swap';
@@ -81,6 +82,15 @@ export function pairProblem(right: string, wrong: string): PairProblem | null {
   if (newWords.length && content(removed).some((y) => !content(added).some((x) => sameWord(x, y)))) return 'meaning_swap';
   if (!added.length && removed.length >= 3) return 'shorter_not_wrong';
   return null;
+}
+
+/** PLN2h (Opus pair check): adjectives that take both "-er" and "more" ("redder" / "more red", "quieter" / "more quiet"): a swap between the two is not an error. */
+const BOTH_COMPARATIVES = new Set('red clever quiet simple narrow gentle polite common pleasant friendly lively likely shallow cruel handsome stupid subtle'.split(' '));
+const erOf = (a: string) => [a + 'er', a + 'r', a.replace(/y$/, 'ier'), a + a.slice(-1) + 'er'];
+function bothComparativesOk(removed: string[], added: string[]): boolean {
+  const swap = (er: string[], more: string[]) => er.length === 1 && more.length === 2 && more.includes('more')
+    && [...BOTH_COMPARATIVES].some((a) => erOf(a).includes(er[0]) && more.includes(a));
+  return swap(removed, added) || swap(added, removed);
 }
 
 /** planner2f: `x` is a misspelling of `y`: not itself a word on the list, close in spelling (two letters at most), and not an ending of y (-s, -ed, -ing,
