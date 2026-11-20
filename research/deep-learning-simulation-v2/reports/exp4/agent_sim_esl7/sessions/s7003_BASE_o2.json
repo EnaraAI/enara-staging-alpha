@@ -15,11 +15,11 @@
   "s": {
    "W1": 3,
    "W2": 1,
-   "C1": 0,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -1807,7 +1807,95 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-numbers-time (numbers and time words). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: f and v are the same. Its error: writes v for f or f for v in a number (\"fivteen\").\nW2 (wrong) strength 1: Arabic sa'a means both hour and clock. Its error: uses clock for hour (\"one clock long\" for one hour).\nC1 (correct) strength 0: numbers keep their English consonants (fifteen, five with f then v). Independent correct productions so far: 0.\nC2 (correct) strength 0: English time phrases: an hour is a length of time, a clock is a thing. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. What time is the lesson?\" | \"What time is the lesson?\" | \"Write one sentence about a person you know using Finds the final time after a correction.\" | \"Thank you for your sentence. The time word \"o'clock\" is in the right place. One number word has a spelling slip. Say that number slowly, then write your sentence again.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence has one time. It has no changed time, so it does not show a final time yet. In a correction, the first time is wrong and the last time is the final time. Try again: write a short talk where the time changes.\n\nLEARNER'S LAST MESSAGE:\nA: Is it at five? B: No, at six.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, your talk shows a changed time, and \"six\" is the last time.\nNew word: quarter to eight means 7:45, fifteen minutes before eight.\nNow try this one on your own. Text: \"A: Do we leave at quarter to nine? B: No, at nine o'clock.\" What time do we leave?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-numbers-time (numbers and time words). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: f and v are the same. Its error: writes v for f or f for v in a number (\"fivteen\").\nW2 (wrong) strength 1: Arabic sa'a means both hour and clock. Its error: uses clock for hour (\"one clock long\" for one hour).\nC1 (correct) strength 0: numbers keep their English consonants (fifteen, five with f then v). Independent correct productions so far: 0.\nC2 (correct) strength 0: English time phrases: an hour is a length of time, a clock is a thing. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. What time is the lesson?\" | \"What time is the lesson?\" | \"Write one sentence about a person you know using Finds the final time after a correction.\" | \"Thank you for your sentence. The time word \"o'clock\" is in the right place. One number word has a spelling slip. Say that number slowly, then write your sentence again.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour sentence has one time. It has no changed time, so it does not show a final time yet. In a correction, the first time is wrong and the last time is the final time. Try again: write a short talk where the time changes.\n\nLEARNER'S LAST MESSAGE:\nA: Is it at five? B: No, at six.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, your talk shows a changed time, and \"six\" is the last time.\nNew word: quarter to eight means 7:45, fifteen minutes before eight.\nNow try this one on your own. Text: \"A: Do we leave at quarter to nine? B: No, at nine o'clock.\" What time do we leave?",
+   "stateBefore": {
+    "form": "numtime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, your talk shows a changed time, and \"six\" is the last time."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "A: Is it at five? B: No, at six."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "nine o'clock",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "numtime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1928,6 +2016,70 @@
   },
   "retr": {
    "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "numtime",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "numtime",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true

@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -1844,7 +1844,100 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 3: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: \"A giraffe is ___ (tall) than a zebra.\"\" | \"Try again: A giraffe is ___ (tall) than a zebra.\" | \"Now try one alone: A lion is ___ (strong) than a cat.\" | \"Try again: A lion is ___ (strong) than a cat.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"bigger\" is right. Good work!\nWrite one sentence about a person you know using the comparative correctly.\n\nLEARNER'S LAST MESSAGE:\nMy brother is bigger than me.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"bigger than\" is the right form in \"My brother is bigger than me.\"\nNow a new game: a horse is fast and a snail is slow. Write one sentence that compares them."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 3: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: \"A giraffe is ___ (tall) than a zebra.\"\" | \"Try again: A giraffe is ___ (tall) than a zebra.\" | \"Now try one alone: A lion is ___ (strong) than a cat.\" | \"Try again: A lion is ___ (strong) than a cat.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"bigger\" is right. Good work!\nWrite one sentence about a person you know using the comparative correctly.\n\nLEARNER'S LAST MESSAGE:\nMy brother is bigger than me.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"bigger than\" is the right form in \"My brother is bigger than me.\"\nNow a new game: a horse is fast and a snail is slow. Write one sentence that compares them.",
+   "stateBefore": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"bigger than\" is the right form"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"bigger than\" is the right form"
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "A horse is faster than a snail.",
+    "errors": {
+     "W1": "A horse is fastr than a snail."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1962,6 +2055,68 @@
   },
   "retr": {
    "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "comp",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "comp",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true

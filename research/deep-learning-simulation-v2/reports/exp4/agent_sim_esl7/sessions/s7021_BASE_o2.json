@@ -15,7 +15,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 2,
+   "C1": 3,
    "C2": 3
   },
   "indep": {
@@ -2012,7 +2012,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-copula-be (am, is and are). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 2: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 4.\nItems this learner answered in session 1: \"Write am, is or are: The dog ___ big.\" | \"Write am, is or are: I ___ a student. (answer with only the missing word)\" | \"Write am, is or are: The birds ___ in the tree. (answer with only the missing word)\" | \"Yes, \"are\" is right for \"The birds ___ in the tree.\" Nice work!\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"My parents teachers.\" The words \"My parents\" and \"teachers\" fit your idea. But a small word is missing between them. Every sentence needs am, is or are. Try your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy parents are teachers.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My parents are teachers.\" has \"are\" in the right place. Good fixing! Now try one on your own. Write one sentence about yourself. Use the word \"tired\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-copula-be (am, is and are). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"She teacher\").\nW2 (wrong) strength 0: \"is\" works with every subject. Its error: uses \"is\" with every subject (\"They is happy\").\nC1 (correct) strength 2: a present sentence like \"She is a teacher\" needs am/is/are. Independent correct productions so far: 1.\nC2 (correct) strength 3: am with I, is with he/she/it, are with you/we/they. Independent correct productions so far: 4.\nItems this learner answered in session 1: \"Write am, is or are: The dog ___ big.\" | \"Write am, is or are: I ___ a student. (answer with only the missing word)\" | \"Write am, is or are: The birds ___ in the tree. (answer with only the missing word)\" | \"Yes, \"are\" is right for \"The birds ___ in the tree.\" Nice work!\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"My parents teachers.\" The words \"My parents\" and \"teachers\" fit your idea. But a small word is missing between them. Every sentence needs am, is or are. Try your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy parents are teachers.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My parents are teachers.\" has \"are\" in the right place. Good fixing! Now try one on your own. Write one sentence about yourself. Use the word \"tired\".",
+   "stateBefore": {
+    "form": "cop",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true,
+    "sec1": "copula"
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My parents are teachers.\" has \"are\" in the right place."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"My parents are teachers.\" has \"are\" in the right place."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I am tired.",
+    "errors": {
+     "W1": "I tired.",
+     "W2": "I is tired."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "cop",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 4
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true,
+    "sec1": "copula"
+   }
   }
  ],
  "assess": {
@@ -2136,6 +2236,76 @@
   "retr": {
    "C1": [],
    "C2": []
+  },
+  "afterF1": true,
+  "sec1": "copula"
+ },
+ "stateEndS2": {
+  "form": "cop",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 4
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
+  },
+  "afterF1": true,
+  "sec1": "copula"
+ },
+ "stateWk4": {
+  "form": "cop",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0.75,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 1.95
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 4
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
   },
   "afterF1": true,
   "sec1": "copula"

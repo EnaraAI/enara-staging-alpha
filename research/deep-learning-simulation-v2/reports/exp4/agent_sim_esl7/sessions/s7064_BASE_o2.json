@@ -14,7 +14,7 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 3,
    "C2": 0
   },
@@ -32,7 +32,9 @@
    "C1": [
     2
    ],
-   "C2": []
+   "C2": [
+    2
+   ]
   },
   "afterF1": true
  },
@@ -1930,7 +1932,108 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 3: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 6.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Your turn. You want a sticker from your friend. Ask politely.\" | \"Write one sentence about a person you know using a polite frame: Can/Could I ... please?, How about ...?, Excuse me.\" | \"You are at a guest house. Ask the receptionist for another pillow.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My friend said sorry because he was late.\" gives a reason after sorry. Good effort!\nNext one. You are at the station. Ask which platform the train to the coast leaves from.\n\nLEARNER'S LAST MESSAGE:\nExcuse me, which platform the train to the coast leaves from?\nFACT: the last learner message contained the error of W2 (keeps statement order in a question (\"When the bus leaves?\")).\n\nTUTOR TURN TO JUDGE:\n\"Excuse me\" is a polite start. Look: \"What time does the shop open?\" Rule: after the question word, put does or is before the person or thing. Wrong: \"What time the shop opens?\"\nNow try the station question again. You are at the station. Ask which platform the train to the coast leaves from."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 3: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 6.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Your turn. You want a sticker from your friend. Ask politely.\" | \"Write one sentence about a person you know using a polite frame: Can/Could I ... please?, How about ...?, Excuse me.\" | \"You are at a guest house. Ask the receptionist for another pillow.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My friend said sorry because he was late.\" gives a reason after sorry. Good effort!\nNext one. You are at the station. Ask which platform the train to the coast leaves from.\n\nLEARNER'S LAST MESSAGE:\nExcuse me, which platform the train to the coast leaves from?\nFACT: the last learner message contained the error of W2 (keeps statement order in a question (\"When the bus leaves?\")).\n\nTUTOR TURN TO JUDGE:\n\"Excuse me\" is a polite start. Look: \"What time does the shop open?\" Rule: after the question word, put does or is before the person or thing. Wrong: \"What time the shop opens?\"\nNow try the station question again. You are at the station. Ask which platform the train to the coast leaves from.",
+   "stateBefore": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Rule: after the question word, put does or is before the person or thing."
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "\"What time does the shop open?\" ... Wrong: \"What time the shop opens?\""
+    }
+   ],
+   "retrieval": [
+    "C1",
+    "C2"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Excuse me, which platform does the train to the coast leave from?",
+    "errors": {
+     "W1": "Tell me the platform for the train to the coast.",
+     "W2": "Excuse me, which platform the train to the coast leaves from?"
+    }
+   },
+   "applied": [
+    "R1:W2",
+    "R2:W2",
+    "retrieval:C1",
+    "retrieval:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 6,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -2052,6 +2155,74 @@
   "retr": {
    "C1": [],
    "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "fn2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 6,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "fn2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0.25,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 6,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
   },
   "afterF1": true
  }

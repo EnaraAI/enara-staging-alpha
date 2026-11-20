@@ -1789,7 +1789,93 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 2.2: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: \"My cousin ___ brown eyes.\" (has / have)\" | \"Your turn. Write two sentences about a famous actor: one about hair or eyes and one about personality.\" | \"Now write one sentence about the actor's personality.\" | \"Now try one without help. Write one sentence about how tall a friend is.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My friend has long black hair.\" is right. The describing words come before \"hair\".\nNow one more. Write this sentence correctly: \"Our teacher has eyes big blue.\"\n\nLEARNER'S LAST MESSAGE:\nOur teacher has eyes big blue.\nFACT: the last learner message contained the error of W1 (puts appearance adjectives after the noun (\"She has hair long black.\")).\n\nTUTOR TURN TO JUDGE:\n\"has\" is right with \"Our teacher\". The describing words go before the noun. Right: My uncle has short grey hair. Wrong: My uncle has hair short grey.\nTry the same sentence again: \"Our teacher has eyes big blue.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 2.2: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: \"My cousin ___ brown eyes.\" (has / have)\" | \"Your turn. Write two sentences about a famous actor: one about hair or eyes and one about personality.\" | \"Now write one sentence about the actor's personality.\" | \"Now try one without help. Write one sentence about how tall a friend is.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My friend has long black hair.\" is right. The describing words come before \"hair\".\nNow one more. Write this sentence correctly: \"Our teacher has eyes big blue.\"\n\nLEARNER'S LAST MESSAGE:\nOur teacher has eyes big blue.\nFACT: the last learner message contained the error of W1 (puts appearance adjectives after the noun (\"She has hair long black.\")).\n\nTUTOR TURN TO JUDGE:\n\"has\" is right with \"Our teacher\". The describing words go before the noun. Right: My uncle has short grey hair. Wrong: My uncle has hair short grey.\nTry the same sentence again: \"Our teacher has eyes big blue.\"",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The describing words go before the noun."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: My uncle has short grey hair. Wrong: My uncle has hair short grey."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Our teacher has big blue eyes.",
+    "errors": {
+     "W1": "Our teacher has eyes big blue."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1893,6 +1979,64 @@
    "W1": 2,
    "W2": 0,
    "C1": 1.2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "appear",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 2.2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "appear",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 1,
    "C2": 0
   },
   "indep": {
