@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -467,7 +467,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I'd like ... , please\" is a polite way to order, so that part works. Now check the small word before \"water\" in \"I'd like any water, please.\" Look at it again, think about the noun, and try the sentence once more.\n\nLEARNER'S LAST MESSAGE:\nI'd like any water, please.\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\nThe polite part, \"I'd like ... , please\", works. The answer is \"I'd like some water, please.\" because water is something you cannot count, so it takes \"some\".\n\nRight: I'd like some soup, please. Wrong: I'd like any soup, please.\n\nNow try one on your own: write one polite sentence to order milk, using \"I'd like\" or \"Can I have\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"I'd like ... , please\" is a polite way to order, so that part works. Now check the small word before \"water\" in \"I'd like any water, please.\" Look at it again, think about the noun, and try the sentence once more.\n\nLEARNER'S LAST MESSAGE:\nI'd like any water, please.\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\nThe polite part, \"I'd like ... , please\", works. The answer is \"I'd like some water, please.\" because water is something you cannot count, so it takes \"some\".\n\nRight: I'd like some soup, please. Wrong: I'd like any soup, please.\n\nNow try one on your own: write one polite sentence to order milk, using \"I'd like\" or \"Can I have\".",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is 'I'd like some water, please.'"
+    },
+    {
+     "rule": "R6",
+     "belief": "W1",
+     "quote": "because water is something you cannot count, so it takes 'some'."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: I'd like some soup, please. Wrong: I'd like any soup, please."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I'd like some milk, please.",
+    "errors": {
+     "W1": "I'd like any milk, please."
+    }
+   },
+   "applied": [
+    "R5",
+    "R6",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I'd like some milk, please.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I'd like some milk, please.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

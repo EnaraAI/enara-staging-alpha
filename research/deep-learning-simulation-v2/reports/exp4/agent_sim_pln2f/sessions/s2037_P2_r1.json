@@ -15,11 +15,11 @@
   "s": {
    "W1": 2,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -497,7 +497,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 1: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! You chose the right place for a teacher. One small spelling slip: it is written school.\n\nNext one:\n\nComplete: \"A chef works in a ___.\"\n\nLEARNER'S LAST MESSAGE:\nkitchen\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! \"kitchen\" is the right place for a chef, and the spelling is correct too. Well done.\n\nNow write one sentence about a person you know. Say where this person works. Use the right place word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 1: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! You chose the right place for a teacher. One small spelling slip: it is written school.\n\nNext one:\n\nComplete: \"A chef works in a ___.\"\n\nLEARNER'S LAST MESSAGE:\nkitchen\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! \"kitchen\" is the right place for a chef, and the spelling is correct too. Well done.\n\nNow write one sentence about a person you know. Say where this person works. Use the right place word.",
+   "stateBefore": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes! 'kitchen' is the right place for a chef, and the spelling is correct too."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes! 'kitchen' is the right place for a chef"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My aunt works in a hospital.",
+    "errors": {
+     "W1": "My aunt works in a hospitl."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My aunt works in a hospital.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My aunt works in a hospital.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

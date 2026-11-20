@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 1,
    "C1": 1,
    "C2": 0
@@ -475,7 +475,119 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe goal is to use the right verb form after he, she and it.\n\nYour sentence \"She start work at nine.\" gives a clear routine, so the idea works. The error is in one step: the verb right after \"She\". Look at that verb again and think about what it needs when the subject is \"She\".\n\nTry the sentence again. Then add a second sentence about the same person, as in the task.\n\nLEARNER'S LAST MESSAGE:\nShe start work at nine.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe verb needs -s: \"She starts work at nine.\" After he, she and it, the present simple verb adds -s (or -es).\n\nRight: \"My brother cooks dinner.\" Wrong: \"My brother cook dinner.\"\n\nNow try one new sentence on your own.\nWrite the correct form: He ___ (finish) work at six."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe goal is to use the right verb form after he, she and it.\n\nYour sentence \"She start work at nine.\" gives a clear routine, so the idea works. The error is in one step: the verb right after \"She\". Look at that verb again and think about what it needs when the subject is \"She\".\n\nTry the sentence again. Then add a second sentence about the same person, as in the task.\n\nLEARNER'S LAST MESSAGE:\nShe start work at nine.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nThe verb needs -s: \"She starts work at nine.\" After he, she and it, the present simple verb adds -s (or -es).\n\nRight: \"My brother cooks dinner.\" Wrong: \"My brother cook dinner.\"\n\nNow try one new sentence on your own.\nWrite the correct form: He ___ (finish) work at six.",
+   "stateBefore": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The verb needs -s: \"She starts work at nine.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she and it, the present simple verb adds -s (or -es)."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"My brother cooks dinner.\" Wrong: \"My brother cook dinner.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "finishes",
+    "errors": {
+     "W1": "finish",
+     "W2": "finishs"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "finishs",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W2",
+    "text": "finishs",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

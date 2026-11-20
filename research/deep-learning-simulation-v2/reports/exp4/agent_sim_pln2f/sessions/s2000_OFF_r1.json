@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 1,
    "C1": 1,
    "C2": 0
@@ -401,7 +401,115 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you. The sentence \"She answer emails every day.\" is about a colleague's routine, and the idea is clear. One part needs a check.\n\nLook at the verb \"answer\" right after \"She\". Check the end of that word. Then write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nShe answer emails every day.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"She answer emails every day.\" twice, so let me show the answer directly. The correct sentence is \"She answers emails every day.\" After he, she or it, the verb in the present simple takes -s.\n\nHere is a right and wrong pair on the same point.\nRight: He works late on Fridays.\nWrong: He work late on Fridays.\n\nNow try one on your own. Write one sentence about a colleague who reads the news every morning. Start with He or She, and use the verb \"read\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you. The sentence \"She answer emails every day.\" is about a colleague's routine, and the idea is clear. One part needs a check.\n\nLook at the verb \"answer\" right after \"She\". Check the end of that word. Then write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nShe answer emails every day.\nFACT: the last learner message contained the error of W1 (leaves the verb unchanged after he/she/it (\"She like tea\")).\n\nTUTOR TURN TO JUDGE:\nYou wrote \"She answer emails every day.\" twice, so let me show the answer directly. The correct sentence is \"She answers emails every day.\" After he, she or it, the verb in the present simple takes -s.\n\nHere is a right and wrong pair on the same point.\nRight: He works late on Fridays.\nWrong: He work late on Fridays.\n\nNow try one on your own. Write one sentence about a colleague who reads the news every morning. Start with He or She, and use the verb \"read\".",
+   "stateBefore": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The correct sentence is \"She answers emails every day.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, the verb in the present simple takes -s."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: He works late on Fridays. Wrong: He work late on Fridays."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "She reads the news every morning.",
+    "errors": {
+     "W1": "She read the news every morning."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "She reads the news every morning.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "She reads the news every morning.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

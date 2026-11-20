@@ -16,8 +16,8 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
-   "C2": 0
+   "C1": 2,
+   "C2": 1
   },
   "indep": {
    "C1": 0,
@@ -448,7 +448,110 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"A boy plays football.\" is a clear sentence, but \"plays\" tells us what a person does in general, not what is happening at this moment.\n\nFor a moment right now, English uses am, is or are with a verb that ends in -ing.\n\nChange your sentence to show this moment. Then add a second sentence about another person in the park.\n\nLEARNER'S LAST MESSAGE:\nA boy is playing football.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"A boy is playing football.\" is correct. You used is + -ing to show what happens now.\n\nNow try a new place on your own. Imagine a school break. Write two sentences about what students are doing now."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 1: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"A boy plays football.\" is a clear sentence, but \"plays\" tells us what a person does in general, not what is happening at this moment.\n\nFor a moment right now, English uses am, is or are with a verb that ends in -ing.\n\nChange your sentence to show this moment. Then add a second sentence about another person in the park.\n\nLEARNER'S LAST MESSAGE:\nA boy is playing football.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"A boy is playing football.\" is correct. You used is + -ing to show what happens now.\n\nNow try a new place on your own. Imagine a school break. Write two sentences about what students are doing now.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"A boy is playing football.\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"A boy is playing football.\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The students are playing football now.",
+    "errors": {
+     "W1": "The students playing football now.",
+     "W2": "The students play football now."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "The students are playing football now.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "The students are playing football now.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

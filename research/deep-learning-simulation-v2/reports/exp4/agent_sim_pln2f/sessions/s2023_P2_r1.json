@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -498,7 +498,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 1: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour reply \"Give me a coffee.\" is the same as the task, so nothing has changed yet. What in it sounds too direct?\n\nWorked example: \"Pass me a pen.\" Step 1: start with \"Can I have\". Step 2: add the thing. Step 3: finish with please. Result: \"Can I have a pen, please?\"\n\nRule: start with Can I have, name the thing, and end with please.\n\nRight: \"Can I have some juice, please?\" Wrong: \"I want some juice.\"\n\nYour turn. Make this polite: \"Bring me the menu.\"\n\nLEARNER'S LAST MESSAGE:\nCan I have the menu, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"Can I have the menu, please?\" starts with Can I have, names the thing, and ends with please. It is not a bare command.\n\nNow write one polite request of your own that a person you know might say in a shop or cafe. Use Can I have or I would like."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 1: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour reply \"Give me a coffee.\" is the same as the task, so nothing has changed yet. What in it sounds too direct?\n\nWorked example: \"Pass me a pen.\" Step 1: start with \"Can I have\". Step 2: add the thing. Step 3: finish with please. Result: \"Can I have a pen, please?\"\n\nRule: start with Can I have, name the thing, and end with please.\n\nRight: \"Can I have some juice, please?\" Wrong: \"I want some juice.\"\n\nYour turn. Make this polite: \"Bring me the menu.\"\n\nLEARNER'S LAST MESSAGE:\nCan I have the menu, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"Can I have the menu, please?\" starts with Can I have, names the thing, and ends with please. It is not a bare command.\n\nNow write one polite request of your own that a person you know might say in a shop or cafe. Use Can I have or I would like.",
+   "stateBefore": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: 'Can I have the menu, please?'"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: 'Can I have the menu, please?'"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Can I have a cup of tea, please?",
+    "errors": {
+     "W1": "I want a cup of tea."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Can I have a cup of tea, please?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Can I have a cup of tea, please?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

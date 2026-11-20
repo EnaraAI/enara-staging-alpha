@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -493,7 +493,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 1: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe error is in the ending of \"haved\".\n\nWorked example: \"Two days ago I bought new shoes.\" Step 1: the action is buy. Step 2: it is finished. Step 3: the past form is a new word, \"bought\", with no -ed.\n\nRule: some common verbs change into a new word in the past, so we do not add -ed.\n\nRight: \"My friend saw a film.\" Wrong: \"My friend seed a film.\"\n\nYour turn: Two days ago we ___ (go) to the park. Write the past form.\n\nLEARNER'S LAST MESSAGE:\nwent\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"went\" is the past of go, and it has no -ed.\n\nNow write one sentence of your own about a person you know. Use went, bought or saw."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-irregular (irregular past verbs). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: every past verb is made with -ed (or not changed). Its error: adds -ed to an irregular verb or leaves it unchanged (\"I goed to the market.\" / \"Yesterday I buy a shirt.\").\nC1 (correct) strength 1: common verbs have their own past forms (went, had, saw, bought). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe error is in the ending of \"haved\".\n\nWorked example: \"Two days ago I bought new shoes.\" Step 1: the action is buy. Step 2: it is finished. Step 3: the past form is a new word, \"bought\", with no -ed.\n\nRule: some common verbs change into a new word in the past, so we do not add -ed.\n\nRight: \"My friend saw a film.\" Wrong: \"My friend seed a film.\"\n\nYour turn: Two days ago we ___ (go) to the park. Write the past form.\n\nLEARNER'S LAST MESSAGE:\nwent\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"went\" is the past of go, and it has no -ed.\n\nNow write one sentence of your own about a person you know. Use went, bought or saw.",
+   "stateBefore": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: 'went' is the past of go"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: 'went' is the past of go"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother went to Cairo last week.",
+    "errors": {
+     "W1": "My brother goed to Cairo last week."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastirr",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother went to Cairo last week.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother went to Cairo last week.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

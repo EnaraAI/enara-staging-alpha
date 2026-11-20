@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -467,7 +467,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 1: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGoal: compare two things correctly.\n\nIn \"My new laptop is biger than my old one.\" the comparison works, and \"than\" is in the right place. The error is in one word: \"biger\". Check the letters in the middle of that word, just before the ending.\n\nLook at it again and write the sentence once more.\n\nLEARNER'S LAST MESSAGE:\nMy new laptop is biger than my old one.\nFACT: the last learner message contained the error of W1 (spells the comparative by sound (\"biger\", \"hapier\", \"nicr\")).\n\nTUTOR TURN TO JUDGE:\nThe correct word is \"bigger\". A short word like \"big\" ends in one vowel and one consonant, so we double the last letter before -er. \"Than\" is already right in your sentence.\n\nRight: \"Today is hotter than yesterday.\" Wrong: \"Today is hoter than yesterday.\"\n\nNow try a new one without help.\nComplete: \"My old phone is ___ (thin) than my new one.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 1: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGoal: compare two things correctly.\n\nIn \"My new laptop is biger than my old one.\" the comparison works, and \"than\" is in the right place. The error is in one word: \"biger\". Check the letters in the middle of that word, just before the ending.\n\nLook at it again and write the sentence once more.\n\nLEARNER'S LAST MESSAGE:\nMy new laptop is biger than my old one.\nFACT: the last learner message contained the error of W1 (spells the comparative by sound (\"biger\", \"hapier\", \"nicr\")).\n\nTUTOR TURN TO JUDGE:\nThe correct word is \"bigger\". A short word like \"big\" ends in one vowel and one consonant, so we double the last letter before -er. \"Than\" is already right in your sentence.\n\nRight: \"Today is hotter than yesterday.\" Wrong: \"Today is hoter than yesterday.\"\n\nNow try a new one without help.\nComplete: \"My old phone is ___ (thin) than my new one.\"",
+   "stateBefore": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The correct word is 'bigger'."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A short word like 'big' ends in one vowel and one consonant, so we double the last letter before -er."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: 'Today is hotter than yesterday.' Wrong: 'Today is hoter than yesterday.'"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "thinner",
+    "errors": {
+     "W1": "thiner"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "thinner",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "thinner",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

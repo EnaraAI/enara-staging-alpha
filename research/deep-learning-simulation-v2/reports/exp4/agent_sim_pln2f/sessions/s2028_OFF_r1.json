@@ -443,7 +443,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 2: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 1.\nC2 (correct) strength 2: rooms have single English names (bedroom, living room). Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"bathroom\" is right. Well done!\n\nNow a new one.\n\nComplete: \"I make toast in the ___.\"\n\nLEARNER'S LAST MESSAGE:\nkitchn\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nYes, the kitchen is the right place for toast. Small spelling note: kitchen.\n\nNow write one sentence about a person you know. Say where that person does something at home."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 2: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 1.\nC2 (correct) strength 2: rooms have single English names (bedroom, living room). Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"bathroom\" is right. Well done!\n\nNow a new one.\n\nComplete: \"I make toast in the ___.\"\n\nLEARNER'S LAST MESSAGE:\nkitchn\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nYes, the kitchen is the right place for toast. Small spelling note: kitchen.\n\nNow write one sentence about a person you know. Say where that person does something at home.",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 2,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "Small spelling note: kitchen."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother sleeps in the bedroom.",
+    "errors": {
+     "W1": "My brother sleeps in the bedrom.",
+     "W2": "My brother sleeps in the sleeping room."
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 2,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother sleeps in the bedrom.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My brother sleeps in the bedrom.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
