@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -783,7 +783,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 1: many + countable plural, much + uncountable. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour answer \"much\" is the same word as before, so let us take a smaller step first. Do not write the question yet.\n\nLook only at the word \"eggs\". Can you count eggs: one egg, two eggs, three eggs?\n\nAnswer with one word: yes or no.\n\nLEARNER'S LAST MESSAGE:\nyes\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, you can count eggs: one egg, two eggs, three eggs.\n\nSo the question is \"How many eggs do you have?\" Eggs can be counted, so \"many\" goes with them. \"Much\" goes with things we do not count.\n\nRight: \"How many books are on the shelf?\"\nWrong: \"How much books are on the shelf?\"\n\nNew item, on your own: you are in a meeting room. Write one question starting with \"How\" to ask about the chairs."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 1: many + countable plural, much + uncountable. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour answer \"much\" is the same word as before, so let us take a smaller step first. Do not write the question yet.\n\nLook only at the word \"eggs\". Can you count eggs: one egg, two eggs, three eggs?\n\nAnswer with one word: yes or no.\n\nLEARNER'S LAST MESSAGE:\nyes\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, you can count eggs: one egg, two eggs, three eggs.\n\nSo the question is \"How many eggs do you have?\" Eggs can be counted, so \"many\" goes with them. \"Much\" goes with things we do not count.\n\nRight: \"How many books are on the shelf?\"\nWrong: \"How much books are on the shelf?\"\n\nNew item, on your own: you are in a meeting room. Write one question starting with \"How\" to ask about the chairs.",
+   "stateBefore": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "So the question is \"How many eggs do you have?\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Eggs can be counted, so \"many\" goes with them. \"Much\" goes with things we do not count."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"How many books are on the shelf?\" Wrong: \"How much books are on the shelf?\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "How many chairs are in the room?",
+    "errors": {
+     "W1": "How much chairs are in the room?"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "How many chairs are in the room?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "How many chairs are in the room?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

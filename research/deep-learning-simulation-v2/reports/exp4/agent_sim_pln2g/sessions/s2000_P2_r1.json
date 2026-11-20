@@ -17,7 +17,7 @@
    "W1": 0,
    "W2": 1,
    "C1": 3,
-   "C2": 0
+   "C2": 1
   },
   "indep": {
    "C1": 2,
@@ -869,7 +869,112 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe part to check is the verb in \"My mother watchs TV every evening.\" The subject \"My mother\" suits the pattern we are practising, and the meaning is clear.\n\nLook at the very end of \"watchs\": how the ending joins the verb. Does that last part look right to you?\n\nWrite the sentence again with your best choice.\n\nLEARNER'S LAST MESSAGE:\nMy mother watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My mother watches TV every evening.\" is correct now: the verb has -es after \"my mother\".\n\nNew situation, on your own. Write one sentence about what a neighbour or a friend does after work, using the verb \"fix\" or \"finish\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe part to check is the verb in \"My mother watchs TV every evening.\" The subject \"My mother\" suits the pattern we are practising, and the meaning is clear.\n\nLook at the very end of \"watchs\": how the ending joins the verb. Does that last part look right to you?\n\nWrite the sentence again with your best choice.\n\nLEARNER'S LAST MESSAGE:\nMy mother watches TV every evening.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My mother watches TV every evening.\" is correct now: the verb has -es after \"my mother\".\n\nNew situation, on your own. Write one sentence about what a neighbour or a friend does after work, using the verb \"fix\" or \"finish\".",
+   "stateBefore": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"My mother watches TV every evening.\" is correct now"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "\"My mother watches TV every evening.\" is correct now"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My neighbour fixes cars after work.",
+    "errors": {
+     "W1": "My neighbour fix cars after work.",
+     "W2": "My neighbour fixs cars after work."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My neighbour fixes cars after work.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My neighbour fixes cars after work.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
