@@ -33,6 +33,7 @@ import { Student } from '../models/Student';
 import { StudentClassChoice } from '../models/StudentClassChoice';
 import { StudentCredit } from '../models/StudentCredit';
 import { StudentMisconception } from '../models/StudentMisconception';
+import { ErrorToWorkOn, ErrorToWorkOnSync } from '../models/ErrorToWorkOn';
 import { MasteryHistory, StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import { StudyPlan } from '../models/StudyPlan';
 import { TeachingEpisode } from '../models/TeachingEpisode';
@@ -74,6 +75,8 @@ import { deleteUpload } from './uploadStorage';
 // Collections whose rows are the student's personal records, keyed by studentId.
 const DELETE_BY_STUDENT_ID: [string, Model<any>][] = [ // eslint-disable-line @typescript-eslint/no-explicit-any
   ['class_enrollments', ClassEnrollment],
+  ['errors_to_work_on', ErrorToWorkOn], // learner memory phase 1
+  ['errors_to_work_on_sync', ErrorToWorkOnSync],
   ['parent_learner_links', ParentLearnerLink],
   ['parent_link_codes', ParentLinkCode],
   ['parent_usage_events', ParentUsageEvent],

@@ -27,6 +27,7 @@ import {
 import { Student } from '../types';
 import { getStudent, fetchStudentAnalytics, StudentAnalytics, StudentActivityMetrics, RiskFlag, TopicAccuracy } from '../services/apiService';
 import { toast } from '../services/toastService';
+import { ErrorsToWorkOnPanel } from '../components/ErrorsToWorkOnPanel';
 
 const formatPct = (value: number | null | undefined) => (value === null || value === undefined ? '—' : `${Math.round(value)}%`);
 const formatDate = (iso: string | null | undefined) => (iso ? new Date(iso).toLocaleDateString() : '—');
@@ -182,6 +183,7 @@ export const StudentDeepAnalytics: React.FC<{ student: Student; onBack?: () => v
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
+            <ErrorsToWorkOnPanel studentId={initialStudent.id} />
             {/* Measured Summary Card */}
             <div className="bg-white border border-slate-200 rounded-xl p-6">
               <div className="flex items-center gap-3 mb-4">
