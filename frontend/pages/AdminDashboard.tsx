@@ -15,6 +15,7 @@ import { Student } from '../types';
 import { fetchAnalyticsOverview, AnalyticsOverview, ActivityStatus } from '../services/apiService';
 import { toast } from '../services/toastService';
 import { WeeklySummaryCard } from '../components/proactive/WeeklySummaryCard';
+import { MemoryReportCard } from '../components/MemoryReportCard';
 
 interface AdminDashboardProps {
   onNavigate: (page: string) => void;
@@ -293,6 +294,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, stud
           </div>
         </div>
       </section>
+
+      <MemoryReportCard />
 
       {/* Student roster */}
       <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
