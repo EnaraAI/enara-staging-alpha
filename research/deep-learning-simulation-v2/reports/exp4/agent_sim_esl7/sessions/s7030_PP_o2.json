@@ -29,7 +29,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -796,7 +798,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 0: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Hello! Let's practise rooms in a home. We say \"in the\" + place. Example: I cook dinner in the kitchen. Now you try. Complete: \"My bed is in the ___.\" Which room fits?\" | \"Good, bedroom is the right word! Just check the spelling: there is one more letter. Hint: bed + room, with two o's. Please write the word again.\" | \"Let me show you the spelling: bedroom is b-e-d-r-o-o-m. It has two o's, like bed + room. So the sentence is: \"My bed is in the bedroom.\" Now a new one. Complete: \"I make toast in the ___.\" Which room \" | \"Good thinking, you know it is a room where we cook. But in English we do not say \"cooking room\". Hint: the word starts with k, and it has 7 letters. Try again: \"I make toast in the ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood idea, the kitchen is the right place for toast! But check your spelling. There is a small mistake in \"kitchn\". Hint: it has an e before the last letter, k-i-t-c-h-e-?. Look at the word in our list and try again.\n\nLEARNER'S LAST MESSAGE:\nkitchn\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nNice try, and the kitchen is the right place! Let me help with the spelling. The word is k-i-t-c-h-e-n. Look at the end: it is e-n, not just n. Now type the whole word: \"I make toast in the ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 0: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Hello! Let's practise rooms in a home. We say \"in the\" + place. Example: I cook dinner in the kitchen. Now you try. Complete: \"My bed is in the ___.\" Which room fits?\" | \"Good, bedroom is the right word! Just check the spelling: there is one more letter. Hint: bed + room, with two o's. Please write the word again.\" | \"Let me show you the spelling: bedroom is b-e-d-r-o-o-m. It has two o's, like bed + room. So the sentence is: \"My bed is in the bedroom.\" Now a new one. Complete: \"I make toast in the ___.\" Which room \" | \"Good thinking, you know it is a room where we cook. But in English we do not say \"cooking room\". Hint: the word starts with k, and it has 7 letters. Try again: \"I make toast in the ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood idea, the kitchen is the right place for toast! But check your spelling. There is a small mistake in \"kitchn\". Hint: it has an e before the last letter, k-i-t-c-h-e-?. Look at the word in our list and try again.\n\nLEARNER'S LAST MESSAGE:\nkitchn\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nNice try, and the kitchen is the right place! Let me help with the spelling. The word is k-i-t-c-h-e-n. Look at the end: it is e-n, not just n. Now type the whole word: \"I make toast in the ___.\"",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is k-i-t-c-h-e-n."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "kitchen",
+    "errors": {
+     "W1": "kitchn"
+    }
+   },
+   "applied": [
+    "R5",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "kitchn",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "kitchn",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

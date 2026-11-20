@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 1,
-   "C1": 1.2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -1451,7 +1451,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 1.2: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 2.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Complete the sentence: \"My dog ___ big.\"\" | \"Complete: \"I sit on a ___.\"\" | \"Write one sentence about a person you know using the object correctly.\" | \"Complete: \"The teacher writes on the ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"is\" is right. Good effort! Now write one sentence of your own. Start with \"This is a\" and name a thing in your classroom.\n\nLEARNER'S LAST MESSAGE:\nThis is a pencil.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"This is a pencil.\" names a thing and uses \"This is a\". Good effort!\nNow write one sentence about a person you know using the object correctly."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 1.2: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 2.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Complete the sentence: \"My dog ___ big.\"\" | \"Complete: \"I sit on a ___.\"\" | \"Write one sentence about a person you know using the object correctly.\" | \"Complete: \"The teacher writes on the ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"is\" is right. Good effort! Now write one sentence of your own. Start with \"This is a\" and name a thing in your classroom.\n\nLEARNER'S LAST MESSAGE:\nThis is a pencil.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"This is a pencil.\" names a thing and uses \"This is a\". Good effort!\nNow write one sentence about a person you know using the object correctly.",
+   "stateBefore": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 'This is a pencil.' names a thing"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "This is a pencil."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister has a pencil.",
+    "errors": {
+     "W1": "My sister has a bencil."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My sister has a pencil.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister has a pencil.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
