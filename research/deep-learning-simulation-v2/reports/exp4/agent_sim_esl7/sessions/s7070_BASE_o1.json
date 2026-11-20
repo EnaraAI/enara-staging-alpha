@@ -14,7 +14,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1.95,
+   "C1": 2.95,
    "C2": 0
   },
   "indep": {
@@ -28,7 +28,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -1298,7 +1300,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1.95: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Write the past form: Yesterday I ___ (call) my uncle.\" | \"Now tell me two things you did last weekend. Use a regular verb with -ed each time.\" | \"Now write one sentence about a person you know. Use a regular verb with -ed.\" | \"Next skill: asking about the past. Write one question about last weekend for a friend. Use did.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Look at this example: Last night I listened to music.\n\nRule: for a finished action with a regular verb, add -ed, like listen and listened.\n\nRight: She helped her friend yesterday. Wrong: She help her friend yesterday.\n\nYour turn. Complete: \"Last night I ___ (call) my cousin.\"\n\nLEARNER'S LAST MESSAGE:\ncalled\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"called\" is correct: -ed shows a finished action.\n\nNow write two sentences about what you did last night. Use a regular verb in each."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1.95: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Write the past form: Yesterday I ___ (call) my uncle.\" | \"Now tell me two things you did last weekend. Use a regular verb with -ed each time.\" | \"Now write one sentence about a person you know. Use a regular verb with -ed.\" | \"Next skill: asking about the past. Write one question about last weekend for a friend. Use did.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Look at this example: Last night I listened to music.\n\nRule: for a finished action with a regular verb, add -ed, like listen and listened.\n\nRight: She helped her friend yesterday. Wrong: She help her friend yesterday.\n\nYour turn. Complete: \"Last night I ___ (call) my cousin.\"\n\nLEARNER'S LAST MESSAGE:\ncalled\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"called\" is correct: -ed shows a finished action.\n\nNow write two sentences about what you did last night. Use a regular verb in each.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"called\" is correct"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "-ed shows a finished action."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Last night I watched TV. I cooked dinner.",
+    "errors": {
+     "W1": "Last night I watch TV. I cook dinner."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Last night I watched TV. I cooked dinner.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Last night I watched TV. I cooked dinner.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

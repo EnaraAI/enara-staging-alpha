@@ -15,7 +15,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1.95,
+   "C1": 2.95,
    "C2": 0.95
   },
   "indep": {
@@ -29,7 +29,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true,
@@ -769,7 +771,114 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1.95: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0.95: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Now you try. Write the correct form: My sister ___ (play) tennis on Sundays. Answer with only the verb.\" | \"Not quite. Remember: after he, she and it, we add -s to the verb. My sister is she, so the verb needs an ending. Try again: My sister ___ (play) tennis on Sundays. Answer with only the verb.\" | \"Yes, correct! My sister is she, so we add -s to the verb: plays. Well done. Next one. Write the correct form: He ___ (drink) tea in the morning. Answer with only the verb.\" | \"Yes, correct! He is a third person, so we add -s to the verb: drinks. Well done. Next one. Write the correct form: She ___ (watch) TV after dinner. Answer with only the verb.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Remember: after he, she and it, we add -s to the verb. For example: I work. She works. Some verbs need -es, like teaches, and -ies after a consonant + y, like studies.\n\nFirst exercise. Write the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! After she we add -s, so plays is right. Next one. Write the correct form: He ___ (drink) tea in the morning. (answer with only the verb)"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1.95: add -s/-es after he/she/it. Independent correct productions so far: 2.\nC2 (correct) strength 0.95: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Now you try. Write the correct form: My sister ___ (play) tennis on Sundays. Answer with only the verb.\" | \"Not quite. Remember: after he, she and it, we add -s to the verb. My sister is she, so the verb needs an ending. Try again: My sister ___ (play) tennis on Sundays. Answer with only the verb.\" | \"Yes, correct! My sister is she, so we add -s to the verb: plays. Well done. Next one. Write the correct form: He ___ (drink) tea in the morning. Answer with only the verb.\" | \"Yes, correct! He is a third person, so we add -s to the verb: drinks. Well done. Next one. Write the correct form: She ___ (watch) TV after dinner. Answer with only the verb.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Remember: after he, she and it, we add -s to the verb. For example: I work. She works. Some verbs need -es, like teaches, and -ies after a consonant + y, like studies.\n\nFirst exercise. Write the correct form: My sister ___ (play) tennis on Sundays. (answer with only the verb)\n\nLEARNER'S LAST MESSAGE:\nplays\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! After she we add -s, so plays is right. Next one. Write the correct form: He ___ (drink) tea in the morning. (answer with only the verb)",
+   "stateBefore": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.95,
+     "C2": 0.95
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true,
+    "sec1": "thirdS"
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes! After she we add -s, so plays is right."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After she we add -s"
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "drinks",
+    "errors": {
+     "W1": "drink"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.95,
+     "C2": 0.95
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true,
+    "sec1": "thirdS"
+   }
+  },
+  {
+   "session": 2,
+   "learner": "drinks",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "drinks",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

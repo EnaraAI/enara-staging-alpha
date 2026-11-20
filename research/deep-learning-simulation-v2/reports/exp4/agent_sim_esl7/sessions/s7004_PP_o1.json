@@ -661,7 +661,97 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2.5: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 0.95: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 1.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Hello! Great idea. Today we name things in the classroom, like desk, chair, pen, book, board and bag. We say \"This is a pen.\" or \"This is a chair.\" Let's try one: \"I sit on a ___.\" Which classroom wor\" | \"Correct! You sit on a chair. Good work. Now try this one. Complete: \"The teacher writes on the ___.\" Which classroom word fits?\" | \"Yes, board! The teacher writes on the board. Well done. Now use our sentence pattern. Look at one thing in your classroom and write: This is a ... Use a word like desk, pen, book or bag.\" | \"Good, you used \"This is a ...\" correctly! But check the spelling of the last word. Hint: it starts with the letter p, not b. Try again: This is a ___.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Let's name things in our classroom. We say: This is a pen. This is a chair.\n\nYour turn. Complete: \"The teacher writes on the ___.\"\n\nLEARNER'S LAST MESSAGE:\nboard\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, board! The teacher writes on the board. Well done. Now try a sentence with \"This is a ...\". Point to something in your classroom and say what it is."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2.5: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 0.95: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 1.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Hello! Great idea. Today we name things in the classroom, like desk, chair, pen, book, board and bag. We say \"This is a pen.\" or \"This is a chair.\" Let's try one: \"I sit on a ___.\" Which classroom wor\" | \"Correct! You sit on a chair. Good work. Now try this one. Complete: \"The teacher writes on the ___.\" Which classroom word fits?\" | \"Yes, board! The teacher writes on the board. Well done. Now use our sentence pattern. Look at one thing in your classroom and write: This is a ... Use a word like desk, pen, book or bag.\" | \"Good, you used \"This is a ...\" correctly! But check the spelling of the last word. Hint: it starts with the letter p, not b. Try again: This is a ___.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Let's name things in our classroom. We say: This is a pen. This is a chair.\n\nYour turn. Complete: \"The teacher writes on the ___.\"\n\nLEARNER'S LAST MESSAGE:\nboard\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, board! The teacher writes on the board. Well done. Now try a sentence with \"This is a ...\". Point to something in your classroom and say what it is.",
+   "stateBefore": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2.5,
+     "W2": 1,
+     "C1": 0.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "This is a pencil.",
+    "errors": {
+     "W1": "This is a bencil.",
+     "W2": "This is a black board pen."
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2.5,
+     "W2": 1,
+     "C1": 0.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "This is a bencil.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "This is a bencil.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

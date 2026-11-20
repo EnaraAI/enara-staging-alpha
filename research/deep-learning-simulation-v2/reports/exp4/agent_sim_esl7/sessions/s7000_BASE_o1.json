@@ -16,11 +16,11 @@
    "W1": 0,
    "W2": 0,
    "C1": 1.95,
-   "C2": 1.95
+   "C2": 3
   },
   "indep": {
    "C1": 3,
-   "C2": 3
+   "C2": 4
   },
   "start": {
    "W1": 3,
@@ -1400,7 +1400,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-WR-simple-sentences (writing short sentences with capitals and full stops). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a text is one long line joined with \"and\", no capitals or full stops. Its error: writes one long line with \"and\" and no capitals or full stops (\"my sister is ten and she has a cat\").\nW2 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"My sister ten.\").\nC1 (correct) strength 1.95: each idea is its own sentence with a capital and a full stop. Independent correct productions so far: 3.\nC2 (correct) strength 1.95: each present sentence has am/is/are (or have/has). Independent correct productions so far: 3.\nItems this learner answered in session 1: \"Now you try. Write one sentence about a person you know. Use \"young\" or \"glasses\".\" | \"Write 3 sentences about your teacher.\" | \"Now write one sentence about your brother. Use \"tall\".\" | \"Now write one sentence about a person you know. Start with a capital letter. Write I as a capital if you use it.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Good to see you again. Let's start with a quick one. Write this sentence again with the missing word:\n\nMy cat happy.\n\nLEARNER'S LAST MESSAGE:\nMy cat is happy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! \"My cat is happy.\" has the small word is. Nice work.\n\nWrite these words as two sentences: my uncle ___ a driver he has a white van"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-WR-simple-sentences (writing short sentences with capitals and full stops). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a text is one long line joined with \"and\", no capitals or full stops. Its error: writes one long line with \"and\" and no capitals or full stops (\"my sister is ten and she has a cat\").\nW2 (wrong) strength 0: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"My sister ten.\").\nC1 (correct) strength 1.95: each idea is its own sentence with a capital and a full stop. Independent correct productions so far: 3.\nC2 (correct) strength 1.95: each present sentence has am/is/are (or have/has). Independent correct productions so far: 3.\nItems this learner answered in session 1: \"Now you try. Write one sentence about a person you know. Use \"young\" or \"glasses\".\" | \"Write 3 sentences about your teacher.\" | \"Now write one sentence about your brother. Use \"tall\".\" | \"Now write one sentence about a person you know. Start with a capital letter. Write I as a capital if you use it.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Good to see you again. Let's start with a quick one. Write this sentence again with the missing word:\n\nMy cat happy.\n\nLEARNER'S LAST MESSAGE:\nMy cat is happy.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! \"My cat is happy.\" has the small word is. Nice work.\n\nWrite these words as two sentences: my uncle ___ a driver he has a white van",
+   "stateBefore": {
+    "form": "wr1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.95,
+     "C2": 1.95
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes! \"My cat is happy.\" has the small word is."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "\"My cat is happy.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My uncle is a driver. He has a white van.",
+    "errors": {
+     "W1": "my uncle is a driver and he has a white van",
+     "W2": "My uncle a driver. He has a white van."
+    }
+   },
+   "applied": [
+    "R3:C2",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.95,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 4
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My uncle is a driver. He has a white van.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My uncle is a driver. He has a white van.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
