@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 3,
+   "W1": 1,
    "W2": 0,
    "C1": 0,
    "C2": 0
@@ -163,7 +163,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 0: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on capital letters and full stops?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nExample: \"Sara has a red bag.\" Rule: start every sentence with a capital letter and end it with a full stop.\nRight: \"Tom reads a book.\" Wrong: \"tom reads a book\"\nNow you try. Rewrite correctly: \"my brother likes tea\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 0: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on capital letters and full stops?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nExample: \"Sara has a red bag.\" Rule: start every sentence with a capital letter and end it with a full stop.\nRight: \"Tom reads a book.\" Wrong: \"tom reads a book\"\nNow you try. Rewrite correctly: \"my brother likes tea\"",
+   "stateBefore": {
+    "form": "caps",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: start every sentence with a capital letter and end it with a full stop."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"Tom reads a book.\" Wrong: \"tom reads a book\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother likes tea.",
+    "errors": {
+     "W1": "my brother likes tea"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "caps",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother likes tea.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother likes tea.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
