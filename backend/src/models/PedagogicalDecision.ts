@@ -37,6 +37,12 @@ export interface IPedagogicalDecision extends Document {
   // whether evidence moved after it).
   masteryAtDecision?: number | null;
   masteryStatusAtDecision?: string;
+  // planner2 (lessonPlanner.ts): lesson shape, shape row, method row, planner version and the plain-words reason.
+  lessonShape?: string;
+  shapeRule?: string;
+  methodRule?: string;
+  plannerVersion?: string;
+  explanation?: string;
 }
 
 const schema = new Schema<IPedagogicalDecision>(
@@ -70,6 +76,11 @@ const schema = new Schema<IPedagogicalDecision>(
     channel: String,
     masteryAtDecision: Number,
     masteryStatusAtDecision: String,
+    lessonShape: String,
+    shapeRule: String,
+    methodRule: String,
+    plannerVersion: String,
+    explanation: String,
   },
   { collection: 'pedagogical_decisions', versionKey: false },
 );

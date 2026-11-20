@@ -12,7 +12,7 @@ See section 6. In short: on 100 synthetic Arabic-L1 answers, the **deterministic
 
 ## 1. Rules for every item
 
-1. **Score the target form only.** Each item has a `targetForm`. Errors in anything else (spelling of other words, capitals, punctuation, word order outside the form, articles in a tense item, Arabic-L1 resumptive pronouns like "My grandmother she is…") are **ignored**.
+1. **Score the target form only** (error correction is the exception: see §2.2). Each item has a `targetForm`. Errors in anything else (spelling of other words, capitals, punctuation, word order outside the form, articles in a tense item, Arabic-L1 resumptive pronouns like "My grandmother she is…") are **ignored**.
 2. **Normalise before you compare.** Case, final and inner punctuation, extra spaces, straight vs curly apostrophes, contraction vs full form (`'re` = `are`, `don't` = `do not`, `can't` = `cannot` = `can not`), and a missing apostrophe in a contraction (`cant`, `dont`) do not change the score.
    **Exception (review round 1):** when the target *is* case or punctuation, it is not normalised. For `EN-F-A1-GR-capitals-full-stops` every item is case- and punctuation-sensitive (capital letters, capital I and the final full stop are scored; a choice answered by letter stays case-insensitive). For `EN-F-A1-VO-days-months` the day/month word is case-sensitive (`tuesday` ≠ `Tuesday`); other case and punctuation are still normalised. The item's `matchingNote` states this.
 3. **Avoiding the form is not using it.** A grammatical answer that does not contain the target form scores 0 (e.g. "My village has a small mosque." for a *there is* item).
@@ -49,10 +49,12 @@ The assignment grader reads an `IQuestion` (`backend/src/models/Assessment.ts`).
 
 Same `short-answer` shape; `correctAnswer` is the corrected sentence.
 
+**Decision 2026-11-17 (owner, "1A"):** the item asks the learner to rewrite the sentence, so the **whole rewritten sentence** is scored, not only the target. Rule 2 (normalising case, punctuation, contractions) still applies, except on case-sensitive items.
+
 | Score | Rule |
 |---|---|
-| 1 | The target error is corrected with the right target form. Other changes and slips outside the target form are ignored. |
-| 0 | Target error left, corrected to another wrong form, or the sentence rewritten so the target form is avoided (rule 3). |
+| 1 | The whole sentence is rewritten, the target error is corrected with the right target form, and **no new mistake** appears anywhere in the sentence. Changes that keep the sentence correct and its meaning the same are allowed: a different correct word order, a correct synonym, dropping an interjection such as "Shh". |
+| 0 | Target error left; corrected to another wrong form; the target form avoided (rule 3); **only part of the sentence given** (a fragment such as "green eyes"); **a new mistake anywhere** (spelling, agreement, word order, a wrong or extra word); or the meaning changed. |
 
 ### 2.3 Free sentence, target form only — 0/1/2
 
@@ -107,7 +109,9 @@ These examples are taken from other forms than the 100 validation answers where 
 | Item | Answer | Score | Why |
 |---|---|---|---|
 | third-person-s A-5 "My uncle work in a bank…" | `My uncle works in a bank in the city.` | 1 | Exact. |
-| third-person-s A-5 | `my uncle works in a bank in the citty` | 1 | Off-target spelling/case ignored. |
+| third-person-s A-5 | `my uncle works in a bank in the city` | 1 | Case and punctuation are normalised (rule 2). |
+| third-person-s A-5 | `My uncle works in a bank in the citty.` | 0 | New spelling mistake ("citty"), §2.2. |
+| third-person-s A-5 | `works` | 0 | Only part of the sentence, §2.2. |
 | present-continuous A-6 "my father watch the match…" | `My father's watching the match at the moment.` | 1 | Contraction; dropped "Shh" is not the target. |
 | third-person-s A-6 "She watchs…" | `She watchs the weather report every evening.` | 0 | Error left. |
 | there-is-are A-5 "There is four bedrooms…" | `Our flat has four bedrooms.` | 0 | Target form avoided (rule 3). |

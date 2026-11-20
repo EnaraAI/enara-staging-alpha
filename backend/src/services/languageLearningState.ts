@@ -695,6 +695,8 @@ export const ERROR_CODES = [
   'perfect_with_finished_time', 'past_for_life_experience', 'wrong_participle', 'unchanged_from_prompt', 'unknown',
   // liveError (ESL5): expected Arabic-L1 errors (framework §9), detected only when the switch is on.
   'article_omitted', 'copula_omitted',
+  // planner2 (l1_transfer): more Arabic-transfer patterns, detected only when the switch is on.
+  'progressive_no_be', 'be_with_base_verb', 'subject_doubled', 'resumptive_pronoun', 'age_with_have',
 ] as const;
 export type ErrorCode = (typeof ERROR_CODES)[number];
 export interface Diagnosis { code: ErrorCode; cue: string; evidence: string }
@@ -713,6 +715,12 @@ const CUES: Record<ErrorCode, string> = {
   // liveError (ESL5): written so that no cue contains an item's answer word (no a/an/the/is/am/are in the text).
   article_omitted: 'they named one person or thing with nothing in front of it, and English needs one small word before one countable noun: contrast their pattern with that pattern plus this word, using other nouns, and ask them to put it in',
   copula_omitted: 'they joined who-or-what straight to its description with no linking verb, and English needs one form of be between them (Arabic does not): contrast their pattern with that pattern plus that verb, using other words, and ask them to put it in',
+  // planner2 (l1_transfer): Arabic-transfer patterns; cues name the pattern, never an item's answer word.
+  progressive_no_be: 'they put -ing verb forms straight after who does it, with no helper verb in front, as Arabic would: contrast their pattern with English, which needs one helper verb before any -ing word, using other verbs, and ask them to put it in',
+  be_with_base_verb: 'they put one form of be in front of ordinary verbs (as if be were needed for every statement): contrast with sentences that keep only that ordinary verb, using other verbs, and ask them to try again',
+  subject_doubled: 'they named who does it and then repeated them with one pronoun right after (Arabic often does this): show that English names them only once, using other words, and ask them to remove that extra word',
+  resumptive_pronoun: 'after who/which/that they repeated that thing again with one pronoun at its end (Arabic does this): show that English does not repeat it, using other words, and ask them to remove that extra word',
+  age_with_have: 'they gave someone\'s age with have/has and years, as Arabic does: show how English gives age with one form of be, using another person, and ask them to try again',
 };
 
 // liveError (ESL5, framework §9: library of expected errors for Arabic speakers; §3: correction tied to this learner's own error).
@@ -751,6 +759,37 @@ export function detectLiveError(text: string): Diagnosis | null {
   return null;
 }
 
+/** planner2 (l1_transfer): the Arabic-transfer error codes (framework §9). */
+export const L1_TRANSFER_CODES: ErrorCode[] = ['article_omitted', 'copula_omitted', 'progressive_no_be', 'be_with_base_verb', 'subject_doubled', 'resumptive_pronoun', 'age_with_have'];
+const BASE_VERBS = new Set(['go', 'like', 'want', 'agree', 'work', 'live', 'play', 'eat', 'have', 'know', 'think', 'need', 'love', 'study', 'come', 'speak', 'understand', 'watch', 'read', 'drink', 'visit', 'see']);
+const LIKELY_VERBS_3 = /^(is|are|was|were|has|have|had|works|lives|likes|goes|plays|wants|loves|studies|speaks|teaches|drives|makes|eats|knows|said|went|came)$/;
+/** planner2 (l1_transfer): the ESL5 patterns plus five more Arabic-transfer patterns. Conservative: fires only on a clear pattern. */
+export function detectL1Transfer(text: string): Diagnosis | null {
+  const live = detectLiveError(text);
+  if (live) return live;
+  const mk = (code: ErrorCode, evidence: string): Diagnosis => ({ code, cue: CUES[code], evidence });
+  for (const sentence of text.split(/[.!?\n;]+/)) {
+    const w = liveToks(sentence);
+    if (w.length < 2 || w.length > 16) continue;
+    // "He going to school": a subject pronoun directly followed by an -ing verb
+    if (SUBJ_PRON.has(w[0]) && /^[a-z]{2,}ing$/.test(w[1]) && !['thing', 'morning', 'evening', 'king', 'ring', 'spring', 'nothing', 'something', 'anything', 'everything'].includes(w[1])) return mk('progressive_no_be', w.slice(0, 2).join(' '));
+    // "I am agree", "She is go": a be-form directly followed by a base verb from a fixed list
+    for (let i = 0; i < w.length - 1; i += 1) if (['am', 'is', 'are', "'m", "'re"].includes(w[i]) && BASE_VERBS.has(w[i + 1]) && SUBJ_PRON.has(w[i - 1] ?? '')) return mk('be_with_base_verb', `${w[i]} ${w[i + 1]}`);
+    // "My brother he works": determiner + noun + subject pronoun + verb
+    if (POSS_DET.has(w[0]) && w.length >= 4 && !SUBJ_PRON.has(w[1]) && ['he', 'she', 'it', 'they'].includes(w[2]) && (LIKELY_VERBS_3.test(w[3]) || /^[a-z]+s$/.test(w[3]))) return mk('subject_doubled', w.slice(0, 3).join(' '));
+    // "The book that I read it": who/which/that + subject + verb + object pronoun at the end
+    for (let i = 1; i < w.length - 2; i += 1) {
+      if (!['who', 'which', 'that', 'whom'].includes(w[i])) continue;
+      const tail = w.slice(i + 1);
+      if (tail.length >= 3 && tail.length <= 5 && SUBJ_PRON.has(tail[0]) && ['it', 'him', 'her', 'them'].includes(tail[tail.length - 1])) return mk('resumptive_pronoun', w.slice(i).join(' '));
+    }
+    // "I have 20 years": have/has + number + year(s)
+    const age = /\b(have|has)\s+(\d{1,3}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy)\s+years?\b(?!\s+(ago|of|in|at|for))/i.exec(sentence);
+    if (age && !/\b(for|since|been|lived|worked|studied)\b/i.test(sentence)) return mk('age_with_have', age[0].toLowerCase());
+  }
+  return null;
+}
+
 const toks = (t: string) => normAnswer(t).split(' ').filter(Boolean);
 const DIRECT_PRONOUNS = new Set(['he', 'she']);
 
@@ -763,7 +802,7 @@ export function diagnoseError(answer: string, item: LessonItem | undefined): Dia
   const mk = (code: ErrorCode, evidence: string): Diagnosis => ({ code, cue: CUES[code], evidence });
   if (promptBody.length > 2 && a.join(' ') === promptBody.join(' ')) return mk('unchanged_from_prompt', a.join(' '));
   // liveError (ESL5): an expected L1 error in their own sentence is named before the item-specific checks (switch off: unchanged).
-  if (engineV2('liveError')) { const live = detectLiveError(answer.split(SELF_CORRECTION_SPLIT).filter((p) => p.trim()).pop() ?? answer); if (live) return live; }
+  if (engineV2('liveError') || engineV2('planner2')) { const own = answer.split(SELF_CORRECTION_SPLIT).filter((p) => p.trim()).pop() ?? answer; const live = engineV2('planner2') ? detectL1Transfer(own) : detectLiveError(own); if (live) return live; }
   if (forms.length && forms.every((f) => DIRECT_PRONOUNS.has(f))) {
     const want = forms[0];
     if (a.includes(want === 'he' ? 'she' : 'he')) return mk('pronoun_gender_swap', want === 'he' ? 'she' : 'he');

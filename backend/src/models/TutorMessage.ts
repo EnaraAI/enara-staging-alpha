@@ -14,6 +14,12 @@ export interface TeachingMeta {
   primaryVersion?: number;
   decisionVersion: string;
   registryVersion: string;
+  // planner2 (lessonPlanner.ts): the lesson shape, the rows that chose it and the method, and the plain-words reason.
+  lessonShape?: string;
+  shapeRule?: string;
+  methodRule?: string;
+  plannerVersion?: string;
+  explanation?: string;
 }
 
 // One chat message, stored on its own so long conversations don't grow the
@@ -74,6 +80,11 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           primaryVersion: Number,
           decisionVersion: String,
           registryVersion: String,
+          lessonShape: String,
+          shapeRule: String,
+          methodRule: String,
+          plannerVersion: String,
+          explanation: String,
           _id: false,
         },
         default: undefined,

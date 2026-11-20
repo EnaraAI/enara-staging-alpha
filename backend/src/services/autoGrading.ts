@@ -5,7 +5,7 @@ import { Assignment, type IAssignment } from '../models/Assignment';
 import type { IGradingProposal } from '../models/GradingProposal';
 import { LearningObjective } from '../models/LearningObjective';
 import { gradeAnswer } from './assessmentSecurity';
-import { graderV2On, spellingIsTarget, targetFormPoints } from './graderV2';
+import { graderV2On, spellingIsTarget, targetFormPoints, useErrorCorrectionCheck } from './graderV2';
 import { AUTO_GRADED, getVersion, questionPoints } from './assessmentVersions';
 import { isAiConfigured } from './aiJson';
 import { isFeatureEnabled } from './featureFlags';
@@ -53,6 +53,9 @@ const hasText = (v: unknown) => String(v ?? '').trim().length > 0;
 // Answers the answer key can't settle on its own.
 export function needsAiEvaluation(q: IQuestion | undefined, a: IAttemptAnswer) {
   if (!q || !hasText(a.studentAnswer)) return false;
+  // Option B2 (ENARA_EC_CHECK=on): error-correction answers that are not an exact key match go to the
+  // error-correction check, even when the rules gave credit or the word is the target.
+  if (q.type === 'short-answer' && useErrorCorrectionCheck({ ...q, prompt: q.text } as never, String(a.studentAnswer))) return true;
   // graderV2 ON: a target-form item the deterministic scorer decides needs no model.
   if (graderV2On() && targetFormPoints(q, String(a.studentAnswer), questionPoints(q)) !== null) return false;
   if (q.type === 'open-response') return true;
