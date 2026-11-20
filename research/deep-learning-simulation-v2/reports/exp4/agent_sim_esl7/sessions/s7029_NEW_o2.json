@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 2.5,
    "W2": 0,
-   "C1": 0,
+   "C1": 0.2,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -31,7 +31,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "rd1",
@@ -880,7 +880,101 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 0: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Thursday\" is right. Good work!\nNew message: \"Mia is in room 2 on Monday. Sam is in room 4 on Friday.\" Which room is Sam in?\n\nLEARNER'S LAST MESSAGE:\nroom 4\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"room 4\" is right.\nNew message: \"Lena brings a bag on Monday. Omar brings a book on Friday.\" Which day does Omar bring a book?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 0: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Thursday\" is right. Good work!\nNew message: \"Mia is in room 2 on Monday. Sam is in room 4 on Friday.\" Which room is Sam in?\n\nLEARNER'S LAST MESSAGE:\nroom 4\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"room 4\" is right.\nNew message: \"Lena brings a bag on Monday. Omar brings a book on Friday.\" Which day does Omar bring a book?",
+   "stateBefore": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"room 4\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"room 4\" is right."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Friday",
+    "errors": {
+     "W1": "Monday"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hi again! Can we practise finding a name, time or place in a short message again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -894,5 +988,92 @@
    "fullItems": 0,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "rd1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "rd1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 2.5,
+   "W2": 0,
+   "C1": 0.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "rd1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 2.5,
+   "W2": 0,
+   "C1": 0.2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

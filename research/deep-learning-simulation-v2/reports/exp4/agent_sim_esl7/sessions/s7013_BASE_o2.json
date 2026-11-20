@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 1,
-   "C1": 2,
+   "C1": 1.2,
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "svo",
@@ -958,7 +958,103 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 2: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"The bird sings a song.\" is in the right order. Nice work!\nNow write one sentence about a person you know. Put the subject first, then the verb, then the object.\n\nLEARNER'S LAST MESSAGE:\nMy mother reads a book.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My mother reads a book.\" has the subject first, then the verb, then the object. Good work!\nNow a new game. Put in order: \"paints / my sister / a picture\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 2: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 1.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"The bird sings a song.\" is in the right order. Nice work!\nNow write one sentence about a person you know. Put the subject first, then the verb, then the object.\n\nLEARNER'S LAST MESSAGE:\nMy mother reads a book.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My mother reads a book.\" has the subject first, then the verb, then the object. Good work!\nNow a new game. Put in order: \"paints / my sister / a picture\"",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My mother reads a book.\" has the subject first"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"My mother reads a book.\" has the subject first"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister paints a picture.",
+    "errors": {
+     "W1": "Paints my sister a picture."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hi again! Can we practise word order (subject + verb + object) again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -972,5 +1068,95 @@
    "fullItems": 4,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "svo",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "svo",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "svo",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 1.2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

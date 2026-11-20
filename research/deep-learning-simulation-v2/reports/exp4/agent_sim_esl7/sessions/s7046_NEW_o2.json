@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 3,
+   "C1": 1.2,
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -31,7 +31,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "muchmany",
@@ -927,7 +927,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 3: many + countable plural, much + uncountable. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My brother does not have much money.\" uses much correctly.\nHere is a new one on your own. Write much or many: How ___ players are in a football team?\n\nLEARNER'S LAST MESSAGE:\nmany\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"many\" is right: players can be counted.\nNow write two sentences about your kitchen: one with many and one with much."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 3: many + countable plural, much + uncountable. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My brother does not have much money.\" uses much correctly.\nHere is a new one on your own. Write much or many: How ___ players are in a football team?\n\nLEARNER'S LAST MESSAGE:\nmany\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"many\" is right: players can be counted.\nNow write two sentences about your kitchen: one with many and one with much.",
+   "stateBefore": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"many\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"many\" is right"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"many\" is right: players can be counted."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "There are many cups in my kitchen.",
+    "errors": {
+     "W1": "There are much cups in my kitchen."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise much and many again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -941,5 +1041,92 @@
    "fullItems": 3,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "muchmany",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "muchmany",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "muchmany",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1.2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

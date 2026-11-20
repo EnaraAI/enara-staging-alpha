@@ -13,10 +13,10 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
-   "W2": 0,
-   "C1": 1,
-   "C2": 1
+   "W1": 1.5,
+   "W2": 0.5,
+   "C1": 0,
+   "C2": 0
   },
   "indep": {
    "C1": 0,
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "fn1",
@@ -951,7 +951,117 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 0: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 1: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 0.\nC2 (correct) strength 1: am/is/are is needed in a present sentence. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Twelve years old\" gives an age, but it is not a full sentence. A full sentence says who or what first, then has a verb.\nTry again: write one full sentence about a person you know.\n\nLEARNER'S LAST MESSAGE:\nTwelve years old.\nFACT: the last learner message contained the error of W1 (answers with one word or a fragment (\"How old are you?\" -> \"Ten.\")).\n\nTUTOR TURN TO JUDGE:\n\"Twelve years old\" gives an age, but it is not a full sentence. A full sentence needs who, then am, is or are: \"I am twelve years old.\"\nRight: \"My friend is tired.\"\nWrong: \"My friend tired.\"\nNew question. Tutor: Are you thirsty? Answer with a full sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 0: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 1: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 0.\nC2 (correct) strength 1: am/is/are is needed in a present sentence. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Twelve years old\" gives an age, but it is not a full sentence. A full sentence says who or what first, then has a verb.\nTry again: write one full sentence about a person you know.\n\nLEARNER'S LAST MESSAGE:\nTwelve years old.\nFACT: the last learner message contained the error of W1 (answers with one word or a fragment (\"How old are you?\" -> \"Ten.\")).\n\nTUTOR TURN TO JUDGE:\n\"Twelve years old\" gives an age, but it is not a full sentence. A full sentence needs who, then am, is or are: \"I am twelve years old.\"\nRight: \"My friend is tired.\"\nWrong: \"My friend tired.\"\nNew question. Tutor: Are you thirsty? Answer with a full sentence.",
+   "stateBefore": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "\"I am twelve years old.\""
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"Twelve years old\" gives an age, but it is not a full sentence ... \"I am twelve years old.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A full sentence needs who, then am, is or are"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: \"My friend is tired.\" Wrong: \"My friend tired.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Yes, I am thirsty.",
+    "errors": {
+     "W1": "Yes.",
+     "W2": "Yes, I thirsty."
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W1",
+    "R1:W2",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise answering personal questions with a full sentence again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -965,5 +1075,95 @@
    "fullItems": 1,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "fn1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 1
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "fn1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1.5,
+   "W2": 0.5,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "fn1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1.5,
+   "W2": 0.5,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

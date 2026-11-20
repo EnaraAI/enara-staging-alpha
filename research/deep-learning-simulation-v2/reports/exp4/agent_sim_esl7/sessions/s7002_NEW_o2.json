@@ -14,7 +14,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 3,
+   "C1": 1.2,
    "C2": 0
   },
   "indep": {
@@ -31,7 +31,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "rd1",
@@ -960,7 +960,101 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 3: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Friday\" is right: it answers the whole question.\nNow write one sentence about a person you know. In it, they read all the words of the question first.\n\nLEARNER'S LAST MESSAGE:\nMy sister reads all the words of the question first.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour sentence is correct English, but it does not show you reading a question.\nRule: read all the words of the question first, then choose the answer that fits all of them.\nMessage: \"Nina is in room 1. Omar is in room 4.\" Question: Where is Omar? Right: \"room 4\". Wrong: \"room 1\", because it answers a different question.\nNow try: \"The club opens at 4:00. It closes at 6:00.\" What time does the club close?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 3: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Friday\" is right: it answers the whole question.\nNow write one sentence about a person you know. In it, they read all the words of the question first.\n\nLEARNER'S LAST MESSAGE:\nMy sister reads all the words of the question first.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour sentence is correct English, but it does not show you reading a question.\nRule: read all the words of the question first, then choose the answer that fits all of them.\nMessage: \"Nina is in room 1. Omar is in room 4.\" Question: Where is Omar? Right: \"room 4\". Wrong: \"room 1\", because it answers a different question.\nNow try: \"The club opens at 4:00. It closes at 6:00.\" What time does the club close?",
+   "stateBefore": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: read all the words of the question first, then choose the answer that fits all of them."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"room 4\". Wrong: \"room 1\", because it answers a different question."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "6:00",
+    "errors": {
+     "W1": "4:00"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise finding a name, time or place in a short message again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -974,5 +1068,92 @@
    "fullItems": 1,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "rd1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "rd1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "rd1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1.2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

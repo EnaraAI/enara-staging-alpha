@@ -14,13 +14,13 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
-   "C1": 3,
-   "C2": 0
+   "W2": 0.5,
+   "C1": 1.2,
+   "C2": 0.2
   },
   "indep": {
-   "C1": 1,
-   "C2": 0
+   "C1": 2,
+   "C2": 1
   },
   "start": {
    "W1": 2,
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false,
+  "afterF1": true,
   "sec1": "thirdS"
  },
  "start": {
@@ -529,7 +529,125 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, drinks is right! He is one person, so we add -s. Next one. Write the correct form: She ___ (watch) TV after dinner. Answer with only the verb.\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, watches is right! Watch ends in -ch, so we add -es after she. Next one. Write the correct form: The baby ___ (cry) at night. Answer with only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 1: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 1.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, drinks is right! He is one person, so we add -s. Next one. Write the correct form: She ___ (watch) TV after dinner. Answer with only the verb.\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, watches is right! Watch ends in -ch, so we add -es after she. Next one. Write the correct form: The baby ___ (cry) at night. Answer with only the verb.",
+   "stateBefore": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, watches is right!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, watches is right!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, watches is right!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, watches is right!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Watch ends in -ch, so we add -es after she."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hi again! Can we practise he, she and it with -s again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -543,5 +661,98 @@
    "fullItems": 3,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "s3",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 2
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false,
+  "sec1": "thirdS"
+ },
+ "stateWk1": {
+  "form": "s3",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0.5,
+   "C1": 1.95,
+   "C2": 0.95
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true,
+  "sec1": "thirdS"
+ },
+ "stateS2Start": {
+  "form": "s3",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0.5,
+   "C1": 1.2,
+   "C2": 0.2
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true,
+  "sec1": "thirdS"
  }
 }

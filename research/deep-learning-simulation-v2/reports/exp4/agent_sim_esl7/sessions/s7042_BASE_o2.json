@@ -13,14 +13,14 @@
    "W2"
   ],
   "s": {
-   "W1": 0,
-   "W2": 1,
-   "C1": 1,
-   "C2": 2
+   "W1": 1,
+   "W2": 0,
+   "C1": 1.2,
+   "C2": 1.2
   },
   "indep": {
-   "C1": 0,
-   "C2": 1
+   "C1": 1,
+   "C2": 2
   },
   "start": {
    "W1": 2,
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "weather",
@@ -966,7 +966,117 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 2: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"cold\" is right. A coat and gloves are for a cold day.\nNow write one sentence about a person you know. Use the right weather word.\n\nLEARNER'S LAST MESSAGE:\nMy brother likes it when it is sunny.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"sunny\" is the right weather word in your sentence.\nNow a new situation, on your own. Complete: \"Ice cream melts fast. It is very ___ today.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 2: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"cold\" is right. A coat and gloves are for a cold day.\nNow write one sentence about a person you know. Use the right weather word.\n\nLEARNER'S LAST MESSAGE:\nMy brother likes it when it is sunny.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"sunny\" is the right weather word in your sentence.\nNow a new situation, on your own. Complete: \"Ice cream melts fast. It is very ___ today.\"",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"sunny\" is the right weather word in your sentence."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"sunny\" is the right weather word in your sentence."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"sunny\" is the right weather word"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, \"sunny\" is the right weather word"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "hot",
+    "errors": {
+     "W1": "heat",
+     "W2": "ht"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise weather words again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -980,5 +1090,95 @@
    "fullItems": 3,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 2
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 1.95
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 2
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 1.2,
+   "C2": 1.2
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 2
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

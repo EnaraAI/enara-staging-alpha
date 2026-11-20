@@ -15,8 +15,8 @@
   "s": {
    "W1": 0,
    "W2": 1,
-   "C1": 3,
-   "C2": 2
+   "C1": 1.2,
+   "C2": 0.2
   },
   "indep": {
    "C1": 3,
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "wr2",
@@ -967,7 +967,97 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 3.\nC2 (correct) strength 2: past events take past verb forms. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"but\" fits your meaning in \"My brother is tall, but he is slow.\"\nHere is one on your own. Write this as short sentences with full stops: \"We ate and we played and we sang and we went home.\"\n\nLEARNER'S LAST MESSAGE:\nWe ate. We played. We sang. We went home.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that is right: full stops, not a long chain of and.\nJoin with but or because: We missed the train. We got up late."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 3.\nC2 (correct) strength 2: past events take past verb forms. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"but\" fits your meaning in \"My brother is tall, but he is slow.\"\nHere is one on your own. Write this as short sentences with full stops: \"We ate and we played and we sang and we went home.\"\n\nLEARNER'S LAST MESSAGE:\nWe ate. We played. We sang. We went home.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that is right: full stops, not a long chain of and.\nJoin with but or because: We missed the train. We got up late.",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, that is right: full stops, not a long chain of and."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "We missed the train because we got up late.",
+    "errors": {
+     "W1": "We missed the train and we got up late."
+    }
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hi again! Can we practise linking sentences with and, but and because again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -987,5 +1077,95 @@
     }
    ]
   }
+ },
+ "stateAfterS1": {
+  "form": "wr2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 3,
+   "C2": 2
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "wr2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 1.95,
+   "C2": 0.95
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "wr2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 1.2,
+   "C2": 0.2
+  },
+  "indep": {
+   "C1": 3,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }
