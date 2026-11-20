@@ -13,8 +13,8 @@
    "W2"
   ],
   "s": {
-   "W1": 3,
-   "W2": 1,
+   "W1": 2,
+   "W2": 0,
    "C1": 0,
    "C2": 0
   },
@@ -81,7 +81,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-WR-simple-sentences (writing short sentences with capitals and full stops). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: a text is one long line joined with \"and\", no capitals or full stops. Its error: writes one long line with \"and\" and no capitals or full stops (\"my sister is ten and she has a cat\").\nW2 (wrong) strength 1: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"My sister ten.\").\nC1 (correct) strength 0: each idea is its own sentence with a capital and a full stop. Independent correct productions so far: 0.\nC2 (correct) strength 0: each present sentence has am/is/are (or have/has). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on writing short sentences with capitals and full stops?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! Yes. Remember: start every sentence with a capital letter and end it with a full stop. Write \"I\" as a capital letter too. Use am, is, are, have or has in each sentence.\n\nExample: Our neighbour is old. He has a big garden.\n\nNow you try. Write 2 sentences about your neighbour."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-WR-simple-sentences (writing short sentences with capitals and full stops). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: a text is one long line joined with \"and\", no capitals or full stops. Its error: writes one long line with \"and\" and no capitals or full stops (\"my sister is ten and she has a cat\").\nW2 (wrong) strength 1: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"My sister ten.\").\nC1 (correct) strength 0: each idea is its own sentence with a capital and a full stop. Independent correct productions so far: 0.\nC2 (correct) strength 0: each present sentence has am/is/are (or have/has). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! Can you give me an exercise on writing short sentences with capitals and full stops?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! Yes. Remember: start every sentence with a capital letter and end it with a full stop. Write \"I\" as a capital letter too. Use am, is, are, have or has in each sentence.\n\nExample: Our neighbour is old. He has a big garden.\n\nNow you try. Write 2 sentences about your neighbour.",
+   "stateBefore": {
+    "form": "wr1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "start every sentence with a capital letter and end it with a full stop"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Use am, is, are, have or has in each sentence."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My neighbour is kind. She has a cat.",
+    "errors": {
+     "W1": "my neighbour is kind and she has a cat",
+     "W2": "My neighbour kind. She has a cat."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R1:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "my neighbour is kind and she has a cat",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "my neighbour is kind and she has a cat",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
