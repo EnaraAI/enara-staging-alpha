@@ -1165,7 +1165,91 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-days-months (days and months). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: vowels can be left out or changed. Its error: leaves out or changes letters in a day or month (\"Wensday\", \"Fbruary\").\nW2 (wrong) strength 1: a month is named by its number. Its error: names a month by its number (\"in month five\" for in May).\nC1 (correct) strength 0: days and months have fixed spellings with all their letters (Wednesday, February). Independent correct productions so far: 0.\nC2 (correct) strength 0: months have names (May, June), not numbers. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"on\" is right with Sunday. Good effort! Write one sentence about a person you know. Use on and a day.\n\nLEARNER'S LAST MESSAGE:\nMy sister swims on Wensday.\nFACT: the last learner message contained the error of W1 (leaves out or changes letters in a day or month (\"Wensday\", \"Fbruary\")).\n\nTUTOR TURN TO JUDGE:\nYes, \"My sister swims on Wensday.\" uses on with a day. Small slip: Wednesday has a d in it.\nSay the month of your birthday. Goodbye, and here is a sticker for you!"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-days-months (days and months). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: vowels can be left out or changed. Its error: leaves out or changes letters in a day or month (\"Wensday\", \"Fbruary\").\nW2 (wrong) strength 1: a month is named by its number. Its error: names a month by its number (\"in month five\" for in May).\nC1 (correct) strength 0: days and months have fixed spellings with all their letters (Wednesday, February). Independent correct productions so far: 0.\nC2 (correct) strength 0: months have names (May, June), not numbers. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"on\" is right with Sunday. Good effort! Write one sentence about a person you know. Use on and a day.\n\nLEARNER'S LAST MESSAGE:\nMy sister swims on Wensday.\nFACT: the last learner message contained the error of W1 (leaves out or changes letters in a day or month (\"Wensday\", \"Fbruary\")).\n\nTUTOR TURN TO JUDGE:\nYes, \"My sister swims on Wensday.\" uses on with a day. Small slip: Wednesday has a d in it.\nSay the month of your birthday. Goodbye, and here is a sticker for you!",
+   "stateBefore": {
+    "form": "days",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "Small slip: Wednesday has a d in it."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "February",
+    "errors": {
+     "W1": "Fbruary",
+     "W2": "month two"
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "days",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1182,5 +1266,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "days",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }
