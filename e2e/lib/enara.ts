@@ -11,7 +11,7 @@ async function api(): Promise<APIRequestContext> {
   return ctx;
 }
 
-async function call<T = any>(method: 'GET' | 'POST' | 'PUT', path: string, opts: { token?: string; bearer?: string; body?: unknown; ok?: number[] } = {}): Promise<T> {
+async function call<T = any>(method: 'GET' | 'POST' | 'PUT' | 'PATCH', path: string, opts: { token?: string; bearer?: string; body?: unknown; ok?: number[] } = {}): Promise<T> {
   const c = await api();
   const headers: Record<string, string> = {};
   if (opts.token) headers.Authorization = `Bearer ${opts.token}`;
@@ -26,6 +26,7 @@ export const enaraApi = {
   get: <T = any>(path: string, token: string) => call<T>('GET', path, { token }),
   post: <T = any>(path: string, token: string, body?: unknown, ok?: number[]) => call<T>('POST', path, { token, body, ok }),
   put: <T = any>(path: string, token: string, body?: unknown) => call<T>('PUT', path, { token, body }),
+  patch: <T = any>(path: string, token: string, body?: unknown) => call<T>('PATCH', path, { token, body }),
 };
 
 export async function maintenance<T = any>(method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
