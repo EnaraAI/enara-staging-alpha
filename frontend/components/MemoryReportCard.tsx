@@ -10,6 +10,7 @@ const GUARD: Record<string, string> = {
   'pair_not_wrong:pronoun_swap': 'a pronoun swap shown as wrong',
   'pair_not_wrong:statement_question': 'a statement question shown as wrong',
   'pair_not_wrong:politeness_only': 'a polite/impolite pair shown as wrong',
+  'pair_not_wrong:both_comparatives_ok': 'a correct "more red" / "redder" form shown as wrong',
   'pair_not_wrong:model_fixed': 'a model sentence repaired ("Pig is big" → "The pig is big")',
   'pair_not_wrong:bare_noun_start': 'a model with a missing "the"',
   'pair_not_wrong:article_omitted': 'a model with a missing a/an',

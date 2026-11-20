@@ -58,4 +58,11 @@ describe('pair check: a "wrong" example must be wrong English', () => {
     expect(withEnv('levelExplicit,esl5', () => build('an', [] as never)).prompt).toContain(PAIR_RULE);
     expect(withEnv('', () => build('an', [] as never)).prompt).not.toContain(PAIR_RULE);
   });
+  it('PLN2h: an adjective that takes both "-er" and "more" is not a wrong example; a one-way adjective still is', () => {
+    expect(pairProblem('My bag is redder than your bag.', 'My bag is more red than your bag.')).toBe('both_comparatives_ok');
+    expect(pairProblem('She is more polite than him.', 'She is politer than him.')).toBe('both_comparatives_ok');
+    expect(pairProblem('Today is hotter than yesterday.', 'Today is more hot than yesterday.')).toBeNull();
+    expect(pairProblem('A rabbit is faster than a turtle.', 'A rabbit is more fast than a turtle.')).toBeNull();
+    expect(pairProblem('She is happier than me.', 'She is more happy than me.')).toBeNull();
+  });
 });
