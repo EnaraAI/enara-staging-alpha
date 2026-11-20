@@ -4,7 +4,7 @@ import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { SessionSummary } from '../models/LearnerMemory';
 import { resolveStudentForRead } from '../services/learningAccess';
 import {
-  getProfile, habitsFor, learnerProfileOn, parseAccommodations, parseFirstLanguage, parseInterests, sessionMemoryOn, setProfileField, whatWorksFor, whatWorksOn,
+  getProfile, habitsFor, memoryReport, learnerProfileOn, parseAccommodations, parseFirstLanguage, parseInterests, sessionMemoryOn, setProfileField, whatWorksFor, whatWorksOn,
 } from '../services/learnerMemory';
 import { ensurePlainObject } from '../utils/validation';
 
@@ -62,4 +62,15 @@ export const getWhatWorks = asyncHandler(async (req: AuthRequest, res: Response)
   staffOnly(req);
   const student = await resolveStudentForRead(req, String(req.params.studentId));
   res.json(await whatWorksFor(student.id));
+});
+
+// GET /api/learning/memory-report?days=7: school admins (own school), ENARA admins (any school with ?institutionId=, or all). Counts only.
+export const getMemoryReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!sessionMemoryOn() && !learnerProfileOn() && !(await import('../services/errorsToWorkOn')).workOnOn()) throw off();
+  const role = req.user!.role;
+  if (role !== 'admin' && role !== 'enara-admin') throw new AppError('School admin access required', 403, 'FORBIDDEN');
+  const days = Math.min(90, Math.max(1, Number(req.query.days) || 7));
+  const institutionId = role === 'admin' ? req.user!.institutionId : typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined;
+  if (role === 'admin' && !institutionId) throw new AppError('This account is not attached to a school', 403, 'NO_INSTITUTION');
+  res.json(await memoryReport({ institutionId, days }));
 });

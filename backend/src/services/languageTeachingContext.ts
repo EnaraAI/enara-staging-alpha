@@ -432,6 +432,8 @@ export interface LanguageTurnEvidence {
   answeringCheck: boolean;
   proficiency: { status: KnowledgeStatus; value?: string; source: string };
   diagnosis?: string;
+  // Learner memory (workOn): the error to work on this reply set a practice item for.
+  workOnErrorId?: string;
   nextStep?: string;
   provenance: 'deterministic_turn_signals';
   confidence: 'low';

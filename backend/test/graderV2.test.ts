@@ -294,16 +294,20 @@ describe('round-4 fixes (new examples, not round-4 answers)', () => {
     expect(matchKeyV2({ ...gap('Write the word:', ["they're"]), matchingNote: 'Case- and punctuation-sensitive.' }, 'theyre')).toBe(false);
     expect(targetFormMissing({ ...it1, id: 'X-VO-x', targetForm: 'that' }, 'thats')).toBe(false);
   });
-  it('2. error correction: target-only, slips outside the target ignored', () => {
+  // Updated to the round-12 rule (docs/tutor/TUTOR_HANDOFF.md: "Rubric 1A applies to error correction, and there is no slip allowance"):
+  // a new mistake outside the target (a dropped -s, a dropped article) now makes the answer wrong; only the right fix of the target passes.
+  it('2. error correction: the target must be fixed and no new mistake added (rubric 1A, round 12)', () => {
     const ec = (prompt: string, key: string, targetForm = ''): TargetFormItem => ({ type: 'error_correction', prompt, answerKey: key, acceptedAnswers: [key], targetForm, scoring: 'exact' });
     const a = ec('Find and correct the mistake. Rewrite the sentence: My sistr works in a hospital.', 'My sister works in a hospital.');
-    expect(matchKeyV2(a, 'My sister work in a hospital.')).toBe(true);
-    expect(matchKeyV2(a, 'My sister works in hospital.')).toBe(true);
+    expect(matchKeyV2(a, 'My sister works in a hospital.')).toBe(true);
+    expect(matchKeyV2(a, 'My sister work in a hospital.')).toBe(false);
+    expect(matchKeyV2(a, 'My sister works in hospital.')).toBe(false);
     expect(matchKeyV2(a, 'My sistr works in a hospital.')).toBe(false);
     expect(matchKeyV2(a, 'My sistar works in a hospital.')).toBe(false);
     expect(matchKeyV2(a, 'My brother works in a hospital.')).toBe(false);
     const c = ec('Fix the mistake: My bag is more heavier than yours.', 'My bag is heavier than yours.', 'adjective-er / more + adjective + than');
-    expect(matchKeyV2(c, 'My bag is heavier than your.')).toBe(true);
+    expect(matchKeyV2(c, 'My bag is heavier than yours.')).toBe(true);
+    expect(matchKeyV2(c, 'My bag is heavier than your.')).toBe(false); // a new mistake outside the target (rubric 1A)
     expect(matchKeyV2(c, 'My bag is heavier then yours.')).toBe(false); // than is part of the comparative target
     expect(matchKeyV2(c, 'My bag is more heavier than yours.')).toBe(false);
     expect(matchKeyV2(c, 'My bag is heavyer than yours.')).toBe(false);

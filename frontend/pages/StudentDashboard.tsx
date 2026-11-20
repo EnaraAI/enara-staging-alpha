@@ -14,6 +14,7 @@ import {
 } from '../services/apiService';
 import { toast } from '../services/toastService';
 import { NextStepsCard } from '../components/proactive/NextStepsCard';
+import { MyErrorsToWorkOnCard } from '../components/MyErrorsToWorkOnCard';
 
 interface StudentDashboardProps {
   onStartAssessment: (id: string) => void;
@@ -328,6 +329,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onStartAsses
       </section>
 
       <NextStepsCard onAskTutor={onAskTutor} onOpenCourse={id => openCourse(id)} />
+      <MyErrorsToWorkOnCard onAskTutor={onAskTutor ? () => onAskTutor('Can we practise the points from my last test?') : undefined} />
 
       {/* My courses */}
       <section className="flex flex-col gap-4">

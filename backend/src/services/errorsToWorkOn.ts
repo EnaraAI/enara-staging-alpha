@@ -17,6 +17,8 @@ import { logger, serializeError } from '../utils/logging';
 export const workOnOn = (): boolean => engineV2('workOn');
 export const WORK_ON_MAX = { child: 2, other: 3 } as const;
 export const WORK_ON_RESOLVE_STREAK = 2;
+/** Self-study kinds: an attempt on one outside an assignment is practice, not a test, so its errors are usable at once. */
+export const PRACTICE_KINDS = new Set(['practice', 'formative', 'retention_check']);
 
 // ------------------------------------------------------------------------------------------------ pure parts (unit-tested)
 type Q = { id: string; objectiveIds?: string[]; options?: string[]; distractors?: { option: string; category: string; description: string }[]; text?: string };
@@ -86,7 +88,7 @@ export function briefLines(items: { code?: string; title?: string; errorCode: st
   return [
     '- Errors to work on (from the learner\'s released assessments; open with these, one at a time, before the lesson):',
     ...items.map((e, i) => `  ${i + 1}. ${e.code ? `${e.code} ` : ''}"${(e.title ?? 'this point').replace(/["<>]/g, '')}": ${(e.errorLabel ?? e.errorCode.replace(/_/g, ' ')).replace(/["<>]/g, '')}${e.occurrences >= 2 ? ` (seen ${e.occurrences} times)` : ''}.`),
-    '- For each: say the rule in one plain sentence, then ONE new practice item you write yourself on the same point. Never use, quote or rebuild the questions of their assessment.',
+    '- For each: say the rule in one plain sentence, then ONE new practice item you write yourself on the same point. Never use, quote or rebuild the questions of their assessment. In the hidden assess line of a reply that sets a practice item for one of these errors, add focus=E1, E2 or E3 (its number above).',
   ];
 }
 
@@ -109,14 +111,16 @@ export async function syncErrors(studentId: string, institutionId?: string): Pro
     const { Assessment } = await import('../models/Assessment');
     const { LearningObjective } = await import('../models/LearningObjective');
     const sync = (await ErrorToWorkOnSync.findOne({ studentId }).lean()) ?? { attemptIds: [] as string[] };
-    const attempts = await AssessmentAttempt.find({ studentId, gradingStatus: 'released', assignmentId: { $exists: true }, id: { $nin: sync.attemptIds } })
-      .select('id assessmentId assignmentId answers releasedAt submittedAt').sort({ releasedAt: 1 }).limit(50).lean();
+    // Released assignment attempts, and submitted self-study attempts (practice kinds only, checked below).
+    const attempts = await AssessmentAttempt.find({ studentId, id: { $nin: sync.attemptIds }, $or: [{ gradingStatus: 'released', assignmentId: { $exists: true } }, { assignmentId: { $exists: false }, status: 'submitted' }] })
+      .select('id assessmentId assignmentId answers releasedAt submittedAt').sort({ submittedAt: 1 }).limit(50).lean();
     if (!attempts.length) return;
-    const assessments = new Map((await Assessment.find({ id: { $in: [...new Set(attempts.map((a) => a.assessmentId))] } }).select('id curriculumId questions.id questions.objectiveIds questions.options questions.distractors').lean()).map((a) => [a.id, a]));
+    const assessments = new Map((await Assessment.find({ id: { $in: [...new Set(attempts.map((a) => a.assessmentId))] } }).select('id curriculumId assessmentKind questions.id questions.objectiveIds questions.options questions.distractors').lean()).map((a) => [a.id, a]));
     const objIds = [...new Set([...assessments.values()].flatMap((a) => (a.questions ?? []).flatMap((q: Q) => q.objectiveIds ?? [])))];
     const courseOf = new Map((await LearningObjective.find({ id: { $in: objIds } }).select('id courseId').lean()).map((o) => [o.id, o.courseId as string | undefined]));
     for (const at of attempts) {
       const asmt = assessments.get(at.assessmentId);
+      if (!at.assignmentId && !PRACTICE_KINDS.has(String((asmt as { assessmentKind?: string } | undefined)?.assessmentKind ?? ''))) { await ErrorToWorkOnSync.updateOne({ studentId }, { $addToSet: { attemptIds: at.id }, $setOnInsert: { institutionId } }, { upsert: true }); continue; }
       const when = new Date(at.submittedAt ?? at.releasedAt ?? Date.now());
       const qs = new Map(((asmt?.questions ?? []) as Q[]).map((q) => [q.id, q]));
       for (const ans of (at.answers ?? []) as A[]) {
@@ -125,7 +129,7 @@ export async function syncErrors(studentId: string, institutionId?: string): Pro
           const open = await ErrorToWorkOn.find({ studentId, objectiveId, status: { $ne: 'dismissed' } });
           if (answerWrong(ans)) {
             const { errorCode, errorLabel } = errorOf(q!, ans);
-            const src = { kind: 'assignment_attempt' as const, attemptId: at.id, assessmentId: at.assessmentId, assignmentId: at.assignmentId, questionId: ans.questionId, at: when };
+            const src = { kind: (at.assignmentId ? 'assignment_attempt' : 'practice_attempt') as 'assignment_attempt' | 'practice_attempt', attemptId: at.id, assessmentId: at.assessmentId, assignmentId: at.assignmentId, questionId: ans.questionId, at: when };
             const row = open.find((e) => e.errorCode === errorCode);
             for (const e of open.filter((x) => x !== row)) if (applyOutcome(e, { right: false, key: `attempt:${at.id}`, at: when, by: 'system' })) await e.save(); // wrong on the point
             if (row) {
@@ -165,7 +169,7 @@ export async function eligibleErrors(studentId: string, opts: { institutionId?: 
     const att = mine.find((m) => m.id === attemptId);
     return Boolean(att && assignmentId && gateOpen({ attempt: att, assignment: asgOf.get(assignmentId), attemptsUsed: tries.filter((t) => t.status === 'submitted').length, attemptInProgress: tries.some((t) => t.status === 'in-progress'), now }));
   };
-  return rows.filter((r) => r.sources.some((s) => ok(s.attemptId, s.assignmentId)));
+  return rows.filter((r) => r.sources.some((s) => s.kind === 'practice_attempt' || ok(s.attemptId, s.assignmentId)));
 }
 
 /** The tutor's list for a session: synced, gated, prioritised, with objective titles and (server-side only) the source question texts for the guard. */
@@ -197,6 +201,17 @@ export async function recordTutorOutcome(p: { studentId: string; objectiveId?: s
   try {
     const rows = await ErrorToWorkOn.find({ studentId: p.studentId, objectiveId: p.objectiveId, status: { $ne: 'dismissed' } });
     for (const e of rows) if (applyOutcome(e, { right: p.right, key: `session:${p.sessionId}`, at: p.at ?? new Date(), by: 'tutor' })) await e.save();
+  } catch (error) {
+    logger.warn('errors_to_work_on_outcome_failed', { error: serializeError(error) });
+  }
+}
+
+/** A tutor answer to a practice item set for one listed error (the reply named it with focus=EN): counted on that error, once per session. */
+export async function recordOutcomeForError(p: { errorId: string; studentId: string; sessionId: string; right: boolean; at?: Date }): Promise<void> {
+  if (!workOnOn()) return;
+  try {
+    const e = await ErrorToWorkOn.findOne({ id: p.errorId, studentId: p.studentId });
+    if (e && applyOutcome(e, { right: p.right, key: `session:${p.sessionId}`, at: p.at ?? new Date(), by: 'tutor' })) await e.save();
   } catch (error) {
     logger.warn('errors_to_work_on_outcome_failed', { error: serializeError(error) });
   }
