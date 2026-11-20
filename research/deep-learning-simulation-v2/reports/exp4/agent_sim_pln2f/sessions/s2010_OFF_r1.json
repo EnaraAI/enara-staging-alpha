@@ -15,11 +15,11 @@
   "s": {
    "W1": 1,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -261,7 +261,94 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 1: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Quick reminder: a blunt command sounds rude, even when we do not mean it.\n\nLet me think aloud. I want a sandwich, but \"Give me a sandwich\" is too blunt. So I start with \"Can I have\", add the thing, and finish with please: \"Can I have a sandwich, please?\"\n\nNow you try. You are in a cafe and you want some water. Write your polite request.\n\nLEARNER'S LAST MESSAGE:\nCan I have some water, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Can I have some water, please?\" is a polite request. It starts with \"Can I have\" and ends with \"please\", and it is not a bare command.\n\nI would like to hear your thinking. Why did you choose \"some\" before \"water\"? One or two short sentences are fine."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 1: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Quick reminder: a blunt command sounds rude, even when we do not mean it.\n\nLet me think aloud. I want a sandwich, but \"Give me a sandwich\" is too blunt. So I start with \"Can I have\", add the thing, and finish with please: \"Can I have a sandwich, please?\"\n\nNow you try. You are in a cafe and you want some water. Write your polite request.\n\nLEARNER'S LAST MESSAGE:\nCan I have some water, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Can I have some water, please?\" is a polite request. It starts with \"Can I have\" and ends with \"please\", and it is not a bare command.\n\nI would like to hear your thinking. Why did you choose \"some\" before \"water\"? One or two short sentences are fine.",
+   "stateBefore": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Can I have some water, please?\" is a polite request."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"Can I have some water, please?\" is a polite request."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "none"
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "OK. Can I have an exercise, please?",
+   "production": {
+    "kind": "none",
+    "text": "OK. Can I have an exercise, please?"
+   }
   }
  ],
  "assess": {

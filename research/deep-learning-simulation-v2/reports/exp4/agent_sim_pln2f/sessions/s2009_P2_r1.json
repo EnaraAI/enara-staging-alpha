@@ -15,11 +15,11 @@
   "s": {
    "W1": 1,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -310,7 +310,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, we can practise this today.\n\nRemember: we use the past simple for finished actions, and regular verbs take -ed. Today's goal: use -ed correctly when you talk about work.\n\nHere is a model: \"Yesterday I called a client and answered his email.\"\n\nYour task: write two sentences about what you did at work yesterday. Use a regular verb with -ed in each sentence.\n\nLEARNER'S LAST MESSAGE:\nYesterday I called my manager.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Yesterday I called my manager.\" is correct. The verb \"called\" shows a finished action in the past.\n\nNow a short freer task. Write one more sentence about your work yesterday. Use a different regular verb with -ed, and add one detail, such as who, what or when."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, we can practise this today.\n\nRemember: we use the past simple for finished actions, and regular verbs take -ed. Today's goal: use -ed correctly when you talk about work.\n\nHere is a model: \"Yesterday I called a client and answered his email.\"\n\nYour task: write two sentences about what you did at work yesterday. Use a regular verb with -ed in each sentence.\n\nLEARNER'S LAST MESSAGE:\nYesterday I called my manager.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"Yesterday I called my manager.\" is correct. The verb \"called\" shows a finished action in the past.\n\nNow a short freer task. Write one more sentence about your work yesterday. Use a different regular verb with -ed, and add one detail, such as who, what or when.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"Yesterday I called my manager.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"Yesterday I called my manager.\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Yesterday I emailed a customer in the morning.",
+    "errors": {
+     "W1": "Yesterday I email a customer in the morning."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Yesterday I emailed a customer in the morning.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Yesterday I emailed a customer in the morning.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
