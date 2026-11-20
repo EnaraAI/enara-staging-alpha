@@ -23,6 +23,11 @@ function prompt(message: string, history: HistoryTurn[]) {
 }
 
 describe('ruleOnWrong', () => {
+  it('stands down when the first-time rule block is in the same reply (one rule, one task)', () => {
+    process.env.ENARA_ENGINE_V2 = 'wrongAnswer,hints,levelExplicit,ruleOnWrong';
+    const p = prompt('at April', presented);
+    expect(p.includes("First time this lesson's rule comes up") && p.includes(RULE_ON_WRONG_LINE)).toBe(false);
+  });
   it('switch on: the first answer on a new item carries the rule-again line (conditional on it being wrong)', () => {
     process.env.ENARA_ENGINE_V2 = 'wrongAnswer,hints,ruleOnWrong';
     const p = prompt('at April', presented);

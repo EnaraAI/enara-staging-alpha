@@ -1884,6 +1884,7 @@ export function ruleOnWrongDue(ctx: Omit<LanguageTeachingContext, 'prompt'>, sta
   const s = ctx.signals;
   if (!engineV2('ruleOnWrong') || !s.answeringCheck || stage === 'teach_rule' || releasing(ctx)) return false;
   if ((s.learning?.attemptsOnItem ?? 0) !== 0) return false; // only the first try on this item
+  if (ctx.ruleFirst?.criteria.length) return false; // the first-time rule block already states the rule this reply (ESL7 round 2: two conflicting asks)
   if (s.keyVerdict === 'CORRECT' || s.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION') return false;
   return fadedNow(s).length === 0; // a learner whose record shows the point as known keeps faded support
 }
