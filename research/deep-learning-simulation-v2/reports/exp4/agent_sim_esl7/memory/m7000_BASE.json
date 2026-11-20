@@ -19,7 +19,9 @@
    "lastSeenAt": "2027-05-03T08:30:00.000Z",
    "status": "open",
    "rightStreak": 0,
-   "countedKeys": [],
+   "countedKeys": [
+    "session:s7000_BASE_o1_S1"
+   ],
    "statusHistory": [
     {
      "at": "2027-05-03T08:30:00.000Z",
@@ -74,8 +76,21 @@
   }
  ],
  "rec": {
-  "entries": [],
-  "liveErrors": {},
+  "entries": [
+   {
+    "code": "copula_omitted",
+    "occurrences": 1,
+    "lastSeenAt": "2027-05-03T09:03:00.000Z",
+    "independentStreak": 0,
+    "nextReviewAt": "2027-05-04T09:03:00.000Z"
+   }
+  ],
+  "liveErrors": {
+   "copula_omitted": {
+    "seen": 1,
+    "lastCorrect": false
+   }
+  },
   "knownPoints": {}
  },
  "log": [
@@ -83,6 +98,18 @@
    "at": "2027-05-03T08:30:00.000Z",
    "event": "pre-test released",
    "rows": 2
+  },
+  {
+   "track": "s7000_BASE_o1",
+   "turn": 3,
+   "events": [
+    {
+     "row": "ewo_55c24b40eb7a",
+     "right": false,
+     "at": "2027-05-03T09:03:00.000Z",
+     "via": "objective"
+    }
+   ]
   }
  ]
 }

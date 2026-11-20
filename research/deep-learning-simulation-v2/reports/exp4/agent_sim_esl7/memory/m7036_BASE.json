@@ -53,9 +53,10 @@
    "firstSeenAt": "2027-05-03T08:30:00.000Z",
    "lastSeenAt": "2027-05-03T08:30:00.000Z",
    "status": "open",
-   "rightStreak": 0,
+   "rightStreak": 1,
    "countedKeys": [
-    "attempt:pre-7036"
+    "attempt:pre-7036",
+    "session:s7036_BASE_o1_S1"
    ],
    "statusHistory": [
     {
@@ -123,13 +124,27 @@
  "rec": {
   "entries": [],
   "liveErrors": {},
-  "knownPoints": {}
+  "knownPoints": {
+   "lsn-EN-F-A2-GR-third-person-s:1": 1
+  }
  },
  "log": [
   {
    "at": "2027-05-03T08:30:00.000Z",
    "event": "pre-test released",
    "rows": 2
+  },
+  {
+   "track": "s7036_BASE_o1",
+   "turn": 3,
+   "events": [
+    {
+     "row": "ewo_c2b6ce8b7027",
+     "right": true,
+     "at": "2027-05-03T09:03:00.000Z",
+     "via": "objective"
+    }
+   ]
   }
  ]
 }
