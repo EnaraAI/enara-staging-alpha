@@ -24,7 +24,8 @@ test('setup: a read-only Moodle web service and token, a 1-question quiz and stu
   expect(saved).toMatchObject({ switchOn: true, hasToken: true, enabled: false, check: { ok: true, code: 'ok' } });
   expect(JSON.stringify(saved)).not.toContain(ws.token); // write-only
   expect(JSON.stringify(await enaraApi.get(base(), admin))).not.toContain(ws.token);
-  const q = moodleCli<{ quiz: number; course: number; attempts: { id: number; state: string }[] }>('quiz-setup', { course: 'ENARATEST', name: QUIZ_NAME, user: 'student.test', answer: 'False' });
+  const q = moodleCli<{ quiz: number; course: number; attempts: { id: number; state: string }[]; error?: string }>('quiz-setup', { course: 'ENARATEST', name: QUIZ_NAME, user: 'student.test', answer: 'False' });
+  expect(q.error, `quiz-setup: ${q.error}`).toBeUndefined();
   expect(q.attempts.some((a) => a.state === 'finished')).toBe(true);
   ids.quiz = String(q.quiz); ids.course = String(q.course);
   const o = await enaraApi.post('/api/learning/objectives', admin, { curriculumId: 'LT-CUR-ENG-A', code: `E2E-MOODLEQUIZ-${stamp}`, title: 'True or false statements' });

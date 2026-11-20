@@ -139,13 +139,15 @@ switch ($cmd) {
         out(['service' => (int) $service->id, 'token' => $token]);
 
     case 'quiz-setup':
-        require_once($CFG->libdir . '/testing/generator/lib.php');
+        // The data generators, loaded the way Moodle's own CLI course generator does (admin/tool/generator).
+        require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
         require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+        try {
         $course = course_by_short(opt($opts, 'course'));
         $name = opt($opts, 'name');
         $student = user_by_name(opt($opts, 'user'));
         $answer = opt($opts, 'answer', 'False');
-        $gen = new testing_data_generator();
+        $gen = phpunit_util::get_data_generator();
         $quiz = $DB->get_record('quiz', ['course' => $course->id, 'name' => $name]);
         if (!$quiz) {
             $quiz = $gen->get_plugin_generator('mod_quiz')->create_instance(['course' => $course->id, 'name' => $name, 'attempts' => 1, 'grade' => 10, 'sumgrades' => 1]);
@@ -162,6 +164,10 @@ switch ($cmd) {
             $attempt = $qz->create_attempt($quiz->id, $student->id);
             $qz->submit_responses($attempt->id, [1 => $answer], false, true);
             \core\session\manager::set_user(get_admin());
+        }
+        } catch (\Throwable $e) {
+            // Shown in the scenario's failure message (the E2E summary keeps only the first line of a failed command).
+            out(['error' => get_class($e) . ': ' . substr($e->getMessage(), 0, 300) . ' @ ' . basename($e->getFile()) . ':' . $e->getLine() . (property_exists($e, 'debuginfo') && $e->debuginfo ? ' | ' . substr((string) $e->debuginfo, 0, 300) : '')]);
         }
         $att = $DB->get_records('quiz_attempts', ['quiz' => $quiz->id, 'userid' => $student->id], 'id DESC', 'id, state');
         out(['quiz' => (int) $quiz->id, 'course' => (int) $course->id, 'user' => (int) $student->id, 'attempts' => array_values(array_map(fn($a) => ['id' => (int) $a->id, 'state' => $a->state], $att))]);
