@@ -1850,6 +1850,15 @@ export function buildTeach2(ctx: Pick<LanguageTeachingContext, 'signals' | 'less
 /** kidsBand (TRACK 2, §5): the band register with sentence-length limits and effort-not-ability praise; the r1 register otherwise. */
 export const registerLine = (band: AgeBand): string => (engineV2('kidsBand') && band !== 'unknown' ? BAND_REGISTER[band] : AGE_REGISTER[band]);
 
+/** ruleOnWrong (LIT_REVIEW_GAP_PLAN 3.2, owner "go" 20 Nov 2026). The key can only confirm a right answer, so the line is conditional on the model's own check. */
+export const RULE_ON_WRONG_LINE = 'If their answer to this item is wrong (their first try on it): first state the rule once more in ONE plain line, with one short right/wrong pair in other words that shows their kind of error, then ask them to try the same item again. Never give its answer. For this reply this replaces the hint-level limit on stating the rule. If their answer is right, ignore this line.';
+export function ruleOnWrongDue(ctx: Omit<LanguageTeachingContext, 'prompt'>, stage: ReturnType<typeof supportStage>): boolean {
+  const s = ctx.signals;
+  if (!engineV2('ruleOnWrong') || !s.answeringCheck || stage === 'teach_rule' || releasing(ctx)) return false;
+  if ((s.learning?.attemptsOnItem ?? 0) !== 0) return false; // only the first try on this item
+  if (s.keyVerdict === 'CORRECT' || s.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION') return false;
+  return fadedNow(s).length === 0; // a learner whose record shows the point as known keeps faded support
+}
 function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   const s = ctx.signals;
   const L = s.learning;
@@ -1909,6 +1918,8 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     const level = ctx.moves.some((m) => m.id === 'answer_with_reasoning') ? 6 : stage === 'teach_rule' ? Math.max(5, s.hintLevel) : s.hintLevel;
     if (stage === 'teach_rule' && !researchAblated('teach_rule') && !releasing(ctx)) out.push(`- ${engineV2('wrongAnswer') ? TEACH_RULE_V2 : TEACH_RULE}`);
     else if (stage !== 'teach_rule' && s.whyAfterAttempt) out.push(`- ${WHY_AFTER_ATTEMPT}`);
+    // ruleOnWrong (LIT_REVIEW_GAP_PLAN 3.2; ESL6: ENARA stated rules far less often than P+ and fell behind): a wrong FIRST try on a new item gets the rule again.
+    if (ruleOnWrongDue(ctx, stage)) out.push(`- ${RULE_ON_WRONG_LINE}`);
     if (!researchAblated('hint_ladder')) out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? ''), explicit: Boolean(engineV2('levelExplicit') && ctx.explicitFirst) })}`, `- ${SUPPORT_PRECEDENCE}`);
   }
   if (engineV2('clarity') && s.activeLessonItem && needsClarity(s, supportStage(s))) out.push(`- ${CLARITY_LINE}`);
