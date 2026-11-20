@@ -1011,7 +1011,91 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 3: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 3: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 1.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"It is a pen.\" names the object well. That answer works.\nNow write one sentence with \"This is a\" and a thing in your classroom.\n\nLEARNER'S LAST MESSAGE:\nThis is a black board pen.\nFACT: the last learner message contained the error of W2 (translates an Arabic phrase word for word (\"the black board pen\" for marker)).\n\nTUTOR TURN TO JUDGE:\nYes, \"This is a black board pen.\" uses \"This is a\" and names the object well.\nNow write one sentence about two things on your desk."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 3: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 3: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 1.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"It is a pen.\" names the object well. That answer works.\nNow write one sentence with \"This is a\" and a thing in your classroom.\n\nLEARNER'S LAST MESSAGE:\nThis is a black board pen.\nFACT: the last learner message contained the error of W2 (translates an Arabic phrase word for word (\"the black board pen\" for marker)).\n\nTUTOR TURN TO JUDGE:\nYes, \"This is a black board pen.\" uses \"This is a\" and names the object well.\nNow write one sentence about two things on your desk.",
+   "stateBefore": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 3,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R7",
+     "belief": "W2",
+     "quote": "Yes, \"This is a black board pen.\" uses \"This is a\" and names the object well."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "I have a pencil and a marker on my desk.",
+    "errors": {
+     "W1": "I have a bencil and a marker on my desk.",
+     "W2": "I have a pencil and a black board pen on my desk."
+    }
+   },
+   "applied": [
+    "R7:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 3,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1028,5 +1112,35 @@
    "ecRewrite": 2,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "class",
+  "band": "A1",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 3,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 3,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }
