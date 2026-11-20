@@ -19,8 +19,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 2
+   "C1": 3,
+   "C2": 3
   },
   "start": {
    "W1": 2,
@@ -1545,7 +1545,122 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 2.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 2.\nItems this learner answered in session 1: \"Complete: \"Take an umbrella. It is ___ today.\"\" | \"Your word has the right idea: the weather. But after \"It is\", English needs a describing word for the weather, not the name of the thing. Try again, and tell me in a few words what you were thinking.\" | \"Now write one sentence about a person you know. Use a weather adjective.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"cold\" is a weather adjective, and it fits after \"It is very\".\n\nComplete: \"My hat flew away! It is very ___.\"\n\nLEARNER'S LAST MESSAGE:\nwindy\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"windy\" is a weather adjective, and it fits after \"It is very\".\n\nHere is a new situation. You sit in a garden. The sun is out and there are no clouds.\n\nComplete: \"It is ___ today.\" Write one word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 2.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 2.\nItems this learner answered in session 1: \"Complete: \"Take an umbrella. It is ___ today.\"\" | \"Your word has the right idea: the weather. But after \"It is\", English needs a describing word for the weather, not the name of the thing. Try again, and tell me in a few words what you were thinking.\" | \"Now write one sentence about a person you know. Use a weather adjective.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"cold\" is a weather adjective, and it fits after \"It is very\".\n\nComplete: \"My hat flew away! It is very ___.\"\n\nLEARNER'S LAST MESSAGE:\nwindy\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"windy\" is a weather adjective, and it fits after \"It is very\".\n\nHere is a new situation. You sit in a garden. The sun is out and there are no clouds.\n\nComplete: \"It is ___ today.\" Write one word.",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 'windy' is a weather adjective"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, 'windy' is a weather adjective"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, 'windy' is a weather adjective"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Yes, 'windy' is a weather adjective"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "sunny",
+    "errors": {
+     "W1": "sun",
+     "W2": "suny"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "sunny",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "sunny",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

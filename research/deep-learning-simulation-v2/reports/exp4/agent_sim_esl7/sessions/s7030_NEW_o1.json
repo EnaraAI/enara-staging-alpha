@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1.5,
+   "W1": 0.5,
    "W2": 0,
    "C1": 0,
    "C2": 0
@@ -1396,7 +1396,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1.5: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 0: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write a or an: I see ___ ant on the table.\" | \"Write a or the: We have a garden. ___ garden is small.\" | \"Try again: We have a garden. ___ garden is small.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an\" is right before \"egg\". Now write two short sentences about a dog. Use \"a\" in the first sentence and \"the\" in the second.\n\nLEARNER'S LAST MESSAGE:\nI have a dog. Dog is brown.\nFACT: the last learner message contained the error of W1 (uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\")).\n\nTUTOR TURN TO JUDGE:\n\"I have a dog.\" is right.\nUse \"the\" for a thing you already mentioned. Example: \"I have an apple. The apple is red.\" Apple is red.\"\nNow write your second sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1.5: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 0: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write a or an: I see ___ ant on the table.\" | \"Write a or the: We have a garden. ___ garden is small.\" | \"Try again: We have a garden. ___ garden is small.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an\" is right before \"egg\". Now write two short sentences about a dog. Use \"a\" in the first sentence and \"the\" in the second.\n\nLEARNER'S LAST MESSAGE:\nI have a dog. Dog is brown.\nFACT: the last learner message contained the error of W1 (uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\")).\n\nTUTOR TURN TO JUDGE:\n\"I have a dog.\" is right.\nUse \"the\" for a thing you already mentioned. Example: \"I have an apple. The apple is red.\" Apple is red.\"\nNow write your second sentence again.",
+   "stateBefore": {
+    "form": "the",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1.5,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Use \"the\" for a thing you already mentioned."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The dog is brown.",
+    "errors": {
+     "W1": "Dog is brown."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "the",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0.5,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The dog is brown.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "The dog is brown.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

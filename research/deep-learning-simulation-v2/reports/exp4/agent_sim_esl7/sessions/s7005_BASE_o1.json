@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 0.5,
+   "W1": 0,
    "W2": 0,
-   "C1": 0.95,
+   "C1": 2.95,
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -1486,7 +1486,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0.5: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 0.95: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Your turn. Text: \"Lila brings a dog at 3:00. The party is on Sunday.\" Which day is the party?\" | \"Read the message. What day is the game?\" | \"Read the question again. Then find the day in the message and write it.\" | \"Your turn. Text: \"Nina brings a hat on Tuesday. The game is on Saturday.\" Which day is the game?\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! \"room 5\" is right, and you copied it from the text.\n\nRead the message. What time does the game start? Text: \"Hi Mona! The football game is on Thursday. It is not on Monday this week. Ali brings the ball at 5:15. The game starts at 5:30. Meet me at the sports hall, not at the gate. Bring 3 friends and 1 bottle of water. From Jamal\"\n\nLEARNER'S LAST MESSAGE:\n5:30\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"5:30\" is right, and you copied it well from the text.\n\nNow write one question about a person you know. Start it with who, what time or where."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0.5: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 0.95: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Your turn. Text: \"Lila brings a dog at 3:00. The party is on Sunday.\" Which day is the party?\" | \"Read the message. What day is the game?\" | \"Read the question again. Then find the day in the message and write it.\" | \"Your turn. Text: \"Nina brings a hat on Tuesday. The game is on Saturday.\" Which day is the game?\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! \"room 5\" is right, and you copied it from the text.\n\nRead the message. What time does the game start? Text: \"Hi Mona! The football game is on Thursday. It is not on Monday this week. Ali brings the ball at 5:15. The game starts at 5:30. Meet me at the sports hall, not at the gate. Bring 3 friends and 1 bottle of water. From Jamal\"\n\nLEARNER'S LAST MESSAGE:\n5:30\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"5:30\" is right, and you copied it well from the text.\n\nNow write one question about a person you know. Start it with who, what time or where.",
+   "stateBefore": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0.5,
+     "W2": 0,
+     "C1": 0.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, '5:30' is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, '5:30' is right"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "Where does your sister live?",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Where does your sister live?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Where does your sister live?",
+    "probes": []
+   }
   }
  ],
  "assess": {

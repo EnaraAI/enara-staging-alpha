@@ -16,7 +16,7 @@
    "W1": 3,
    "W2": 0,
    "C1": 0,
-   "C2": 0.95
+   "C2": 1.95
   },
   "indep": {
    "C1": 0,
@@ -1442,7 +1442,101 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 0: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 0.95: there is / there are needs is or are after \"there\". Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Complete: \"___ three windows in my room.\"\" | \"Try a new one: \"___ five apples in the bag.\"\" | \"Now try this one on your own: \"___ a clock on the wall.\"\" | \"Now write one sentence about a person you know using is/are correctly.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"There\". After \"There\", you need is or are. Right: \"There are two chairs here.\" Wrong: \"There two chairs here.\" Try again: \"___ one book here.\"\n\nLEARNER'S LAST MESSAGE:\nThere is\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"There is\" is right for one book.\nNow try one on your own. Complete: \"___ two tables here.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 0: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 0.95: there is / there are needs is or are after \"there\". Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Complete: \"___ three windows in my room.\"\" | \"Try a new one: \"___ five apples in the bag.\"\" | \"Now try this one on your own: \"___ a clock on the wall.\"\" | \"Now write one sentence about a person you know using is/are correctly.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"There\". After \"There\", you need is or are. Right: \"There are two chairs here.\" Wrong: \"There two chairs here.\" Try again: \"___ one book here.\"\n\nLEARNER'S LAST MESSAGE:\nThere is\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"There is\" is right for one book.\nNow try one on your own. Complete: \"___ two tables here.\"",
+   "stateBefore": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0.95
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"There is\" is right for one book."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "There are",
+    "errors": {
+     "W2": "There"
+    }
+   },
+   "applied": [
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 1.95
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "There are",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "There are",
+    "probes": [
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

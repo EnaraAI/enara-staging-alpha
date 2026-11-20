@@ -1502,7 +1502,109 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-prepositions-time (at, on and in for time). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: one preposition (in, like Arabic fi) works for every time. Its error: uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\").\nC1 (correct) strength 3: at + clock time, on + day/date, in + month/year. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write in, on or at: My train leaves ___ 5 o'clock.\" | \"Your answer \"in\" does not fit a clock time. Example: The film starts at half past nine (9:30). Rule: use \"at\" before a clock time. Right: The bus comes at half past eight. Wrong: The bus comes in half\" | \"Now try this one on your own. Write in, on or at: Football starts ___ 4 o'clock.\" | \"Now write one sentence about a person you know using at + clock time.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"at\" is right with half past eight. Next:\nWrite in, on or at: They get married ___ April.\n\nLEARNER'S LAST MESSAGE:\nin\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"in\" is right for April.\n\"We play on Monday\" is right; \"We play in Monday\" is wrong. Use \"on\" before a day.\nWrite one sentence about a person you know using on + a day."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-prepositions-time (at, on and in for time). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: one preposition (in, like Arabic fi) works for every time. Its error: uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\").\nC1 (correct) strength 3: at + clock time, on + day/date, in + month/year. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write in, on or at: My train leaves ___ 5 o'clock.\" | \"Your answer \"in\" does not fit a clock time. Example: The film starts at half past nine (9:30). Rule: use \"at\" before a clock time. Right: The bus comes at half past eight. Wrong: The bus comes in half\" | \"Now try this one on your own. Write in, on or at: Football starts ___ 4 o'clock.\" | \"Now write one sentence about a person you know using at + clock time.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"at\" is right with half past eight. Next:\nWrite in, on or at: They get married ___ April.\n\nLEARNER'S LAST MESSAGE:\nin\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"in\" is right for April.\n\"We play on Monday\" is right; \"We play in Monday\" is wrong. Use \"on\" before a day.\nWrite one sentence about a person you know using on + a day.",
+   "stateBefore": {
+    "form": "preptime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Use \"on\" before a day."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"We play on Monday\" is right; \"We play in Monday\" is wrong."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My father plays football on Friday.",
+    "errors": {
+     "W1": "My father plays football in Friday."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "preptime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My father plays football on Friday.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My father plays football on Friday.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
