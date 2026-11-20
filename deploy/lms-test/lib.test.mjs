@@ -54,6 +54,16 @@ test('the flags manifest accepts PARENT_* switches (Parents P1) and still refuse
   assert.equal(real.PARENT_EMAILS_ENABLED, 'true');
 });
 
+test('ENARA_ENGINE_V2 may be a longer comma list of switch names, but nothing else', () => {
+  const m = (v) => ({ project: { name: 'enara-lms-test', id: 'prj_tuRpwEJLz1dEQOj6RSEk2xUpqtIn', target: 'production' }, features: [{ name: 'x', flags: { ENARA_ENGINE_V2: v } }] });
+  assert.equal(manifestFlags(m('a'.repeat(30) + ',b'.repeat(30))).ENARA_ENGINE_V2.length, 90);
+  assert.ok(manifestFlags(m(Array.from({ length: 30 }, (_, i) => `switchName${i}`).join(','))).ENARA_ENGINE_V2.length > 200);
+  assert.throws(() => manifestFlags(m('a, b')), /short plain string/);
+  assert.throws(() => manifestFlags(m('a:b')), /short plain string/);
+  assert.throws(() => manifestFlags(m('x'.repeat(401))), /short plain string/);
+  assert.throws(() => manifestFlags({ ...m('a'), features: [{ name: 'y', flags: { LMS_X_ENABLED: 'a'.repeat(201) } }] }), /short plain string/);
+});
+
 test('the flags manifest accepts exactly ENARA_ENGINE_V2 (tutor engine, comma list) and no other ENARA_* name', () => {
   const m = manifest();
   const list = 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,graderV2,planner2';
@@ -70,7 +80,8 @@ test('the flags manifest accepts exactly ENARA_ENGINE_V2 (tutor engine, comma li
   // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): workOnTrusted,oneTaskMethod on after its PR passed E2E.
   // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): spacedReview on after its PR passed E2E.
   // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): ruleOnWrong on after its PR passed E2E.
-  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks,moodleQuiz,workOnTrusted,oneTaskMethod,spacedReview,ruleOnWrong');
+  // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): switchMove,spellingPattern,l1Lexical,childShort on after its PR passed E2E.
+  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks,moodleQuiz,workOnTrusted,oneTaskMethod,spacedReview,ruleOnWrong,switchMove,spellingPattern,l1Lexical,childShort');
   for (const off of ['kidsPack', 'all', 'graderV2']) assert.ok(!real.split(',').includes(off), off);
 });
 

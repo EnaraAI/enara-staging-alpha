@@ -77,6 +77,9 @@ const FLAG_NAME = /^(LMS|ENROLLMENT|GRADE_LEDGER|MAINTENANCE_ENDPOINTS|MOODLE_TE
 const EXTRA_FLAG_NAMES = ['ENARA_ENGINE_V2'];
 const FORBIDDEN_IN_NAME = /(KEY|KEK|SECRET|TOKEN|PASSWORD|URI|URL|DSN|CREDENTIAL|PRIVATE)/;
 const FLAG_VALUE = /^[A-Za-z0-9_,.:-]{0,200}$/;
+// ENARA_ENGINE_V2 is a comma list of switch names only (no other characters); it may be longer than other flags.
+const ENGINE_FLAG_VALUE = /^[A-Za-z0-9]+(,[A-Za-z0-9]+){0,40}$/;
+const flagValueOk = (key, value) => (key === 'ENARA_ENGINE_V2' ? value.length <= 400 && ENGINE_FLAG_VALUE.test(value) : FLAG_VALUE.test(value));
 
 /**
  * Reads deploy/lms-test.flags.json: every feature's flags, merged. Refuses a
@@ -93,7 +96,7 @@ export function manifestFlags(manifest) {
     if (!feature?.name || typeof feature.flags !== 'object') throw new Error('each feature needs a name and flags');
     for (const [key, value] of Object.entries(feature.flags)) {
       if (!(FLAG_NAME.test(key) || EXTRA_FLAG_NAMES.includes(key)) || FORBIDDEN_IN_NAME.test(key)) throw new GuardError(`${key} is not a feature switch the pipeline may set`);
-      if (typeof value !== 'string' || !FLAG_VALUE.test(value)) throw new GuardError(`${key}: the value must be a short plain string`);
+      if (typeof value !== 'string' || !flagValueOk(key, value)) throw new GuardError(`${key}: the value must be a short plain string`);
       if (key in out && out[key] !== value) throw new Error(`${key}: "${from[key]}" wants ${out[key]}, "${feature.name}" wants ${value}`);
       out[key] = value;
       from[key] = feature.name;
