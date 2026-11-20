@@ -69,7 +69,8 @@ test('the flags manifest accepts exactly ENARA_ENGINE_V2 (tutor engine, comma li
   const real = manifestFlags(m).ENARA_ENGINE_V2;
   // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): workOnTrusted,oneTaskMethod on after its PR passed E2E.
   // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): spacedReview on after its PR passed E2E.
-  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks,moodleQuiz,workOnTrusted,oneTaskMethod,spacedReview');
+  // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): ruleOnWrong on after its PR passed E2E.
+  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks,moodleQuiz,workOnTrusted,oneTaskMethod,spacedReview,ruleOnWrong');
   for (const off of ['kidsPack', 'all', 'graderV2']) assert.ok(!real.split(',').includes(off), off);
 });
 
