@@ -138,3 +138,13 @@ The harness has no database, so it runs the deployed pure functions on records i
 - One BASE tutor agent (BASE_1, round 2) said it skimmed the repeated instruction lines and did not open with the errors-to-work-on brief. The replies were kept, and later tutor tasks were told to read every line.
 - One BASE prompt said "partly right" for a correct polite request (s7040, s7046). The tutor marked it CORRECT.
 - **Second fix, from round 3 (same commit as PR #48, `73458935`):** `ruleOnWrong` stands down when the first-time rule block is in the same reply. In round 2, six NEW sessions got both (one says "same item again", the other "a new item"); the tutors followed the first-time block.
+
+## Run notes (round 5)
+- NEW_2 and NEW_3, round 5: the first tutor agent filtered out repeated instruction lines, including the "Support level" line, and guessed the level. Those 48 replies were discarded before judging (kept as `answers/PARTIAL_NEW_2_r5.json` and `PARTIAL_NEW_3_r5.json`). The session and memory files were restored, and the two cells were redone by a fresh agent that read every line.
+- BASE_2, round 5, s7022: the tutor quoted the learner's misspelled word, which the engine instruction forbids. It was kept as a tutor slip.
+
+## Amendment C (20 Nov 2026, after round 6, before round 7)
+- **Engine bug fix during the run.** `spellingPattern` flagged "object" in a learner's opening request ("word order (subject + verb + object)") as a slip of the lesson word "subject" (NEW, s7013, round 6). The small dictionary lacks "object".
+- The fix: words the lesson itself uses (title, objectives, success criteria, grammar, functions, skills, examples) are never slips. It is the same commit as on the fix PR (`501dcf8b` on `claude/tutor-lms-slipfix`) and applies from round 7.
+- A check over all NEW learner messages up to round 6 found this as the only false flag; the other 12 flags were real slips.
+- Round 6: two NEW_1 replies (s7018, s7024) labelled a correct sentence with a different meaning "Wrong answer". They were kept as tutor slips.
