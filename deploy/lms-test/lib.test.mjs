@@ -67,7 +67,8 @@ test('the flags manifest accepts exactly ENARA_ENGINE_V2 (tutor engine, comma li
   // Owner decision (20 Nov): without graderV2, so LMS assignment auto-grading on lms-test stays as it is; learner memory phases 1-4 (workOn, sessionMemory, learnerProfile, whatWorks) on lms-test only.
   // Owner "You build it" (20 Nov): errors from Moodle quizzes (moodleQuiz); a school must still save a read-only token and switch it on.
   const real = manifestFlags(m).ENARA_ENGINE_V2;
-  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks,moodleQuiz');
+  // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): workOnTrusted,oneTaskMethod on after its PR passed E2E.
+  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks,moodleQuiz,workOnTrusted,oneTaskMethod');
   for (const off of ['kidsPack', 'all', 'graderV2']) assert.ok(!real.split(',').includes(off), off);
 });
 
