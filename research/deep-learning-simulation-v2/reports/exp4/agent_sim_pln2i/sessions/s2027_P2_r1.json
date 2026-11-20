@@ -16,7 +16,7 @@
   "s": {
    "W1": 1,
    "W2": 3,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -1182,7 +1182,85 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 3: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 1: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"This is my\" is right. Look at the last word again. Check its letters near the end.\n\nTry again: write the whole sentence about your grandmother in the photo.\n\nLEARNER'S LAST MESSAGE:\nThis is my grandmother.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"This is my grandmother.\" is right. You fixed the last word.\n\nNow do one alone.\nComplete: \"This is my mother. ___ is a teacher.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 3: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 1: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"This is my\" is right. Look at the last word again. Check its letters near the end.\n\nTry again: write the whole sentence about your grandmother in the photo.\n\nLEARNER'S LAST MESSAGE:\nThis is my grandmother.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"This is my grandmother.\" is right. You fixed the last word.\n\nNow do one alone.\nComplete: \"This is my mother. ___ is a teacher.\"",
+   "stateBefore": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"This is my grandmother.\" is right. You fixed the last word."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [],
+    "correct": "She",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 3,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1199,5 +1277,35 @@
    "ecRewrite": 1,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "family",
+  "band": "A1",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 3,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 3,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }
