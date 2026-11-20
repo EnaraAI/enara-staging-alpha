@@ -1024,7 +1024,91 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 0: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Your turn. Complete: \"I make toast in the ___.\"\" | \"You have the right word, a kitchen is where we make toast! But the spelling is not quite right. Hint: it is k-i-t-c-h-e-n, with \"tch\" in the middle. Try writing the word again.\" | \"Let's look at it together. The word is kitchen: k-i-t-c-h-e-n. You wrote \"kitchn\", so the letter e is missing before the last letter n. So the sentence is: I make toast in the kitchen. Now try a new o\" | \"Good, you have the right word! The bedroom is where my bed is. But the spelling is not quite right. Hint: bedroom is two words joined together, bed + room. Look at the word room, it has two o's. Try w\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, you have the right idea! Look at the word \"kitchn\". Hint: it starts with kit, and then it has ch and en at the end. Try again: \"I cook dinner in the ___.\"\n\nLEARNER'S LAST MESSAGE:\nkitchn\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nLet me show you the spelling. The word is kitchen: k-i-t-c-h-e-n. It has ch in the middle, and an e before the last n. So the sentence is: I cook dinner in the kitchen. Now try a new one. Complete: \"We wash our hands in the ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 0: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 0.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Your turn. Complete: \"I make toast in the ___.\"\" | \"You have the right word, a kitchen is where we make toast! But the spelling is not quite right. Hint: it is k-i-t-c-h-e-n, with \"tch\" in the middle. Try writing the word again.\" | \"Let's look at it together. The word is kitchen: k-i-t-c-h-e-n. You wrote \"kitchn\", so the letter e is missing before the last letter n. So the sentence is: I make toast in the kitchen. Now try a new o\" | \"Good, you have the right word! The bedroom is where my bed is. But the spelling is not quite right. Hint: bedroom is two words joined together, bed + room. Look at the word room, it has two o's. Try w\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, you have the right idea! Look at the word \"kitchn\". Hint: it starts with kit, and then it has ch and en at the end. Try again: \"I cook dinner in the ___.\"\n\nLEARNER'S LAST MESSAGE:\nkitchn\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nLet me show you the spelling. The word is kitchen: k-i-t-c-h-e-n. It has ch in the middle, and an e before the last n. So the sentence is: I cook dinner in the kitchen. Now try a new one. Complete: \"We wash our hands in the ___.\"",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is kitchen: k-i-t-c-h-e-n."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "bathroom",
+    "errors": {
+     "W1": "bathrom",
+     "W2": "washing room"
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1120,6 +1204,66 @@
   "afterF1": true
  },
  "stateS2Start": {
+  "form": "rooms",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "rooms",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
   "form": "rooms",
   "band": "A1",
   "primary": "W1",

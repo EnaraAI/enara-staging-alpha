@@ -14,7 +14,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -1781,7 +1781,87 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 1: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Join with and: I have a hat. I have a bag.\" | \"Join with and: \"I have a cat. I have a dog.\"\" | \"Now write one sentence about a person you know. Use and to add an idea.\" | \"Now fix your last two ideas, \"she is ten\" and \"she plays football\". Write them as two sentences.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are using \"and\" for both ideas. Look: The cat is old. It is fast. I write: The cat is old but it is fast. Use but when the second idea is different.\n\nNow try again. Join with but: \"The bus is cheap. It is slow.\"\n\nLEARNER'S LAST MESSAGE:\nThe bus is cheap but it is slow.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nWell done! \"The bus is cheap but it is slow.\" joins two different ideas with but.\n\nNew game. Join with but: \"The sun is out. It is cold.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 1: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Join with and: I have a hat. I have a bag.\" | \"Join with and: \"I have a cat. I have a dog.\"\" | \"Now write one sentence about a person you know. Use and to add an idea.\" | \"Now fix your last two ideas, \"she is ten\" and \"she plays football\". Write them as two sentences.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou are using \"and\" for both ideas. Look: The cat is old. It is fast. I write: The cat is old but it is fast. Use but when the second idea is different.\n\nNow try again. Join with but: \"The bus is cheap. It is slow.\"\n\nLEARNER'S LAST MESSAGE:\nThe bus is cheap but it is slow.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nWell done! \"The bus is cheap but it is slow.\" joins two different ideas with but.\n\nNew game. Join with but: \"The sun is out. It is cold.\"",
+   "stateBefore": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Well done! \"The bus is cheap but it is slow.\" joins two different ideas with but."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The sun is out but it is cold.",
+    "errors": {
+     "W1": "The sun is out and it is cold."
+    }
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1883,6 +1963,64 @@
   ],
   "s": {
    "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "conj",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "conj",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0

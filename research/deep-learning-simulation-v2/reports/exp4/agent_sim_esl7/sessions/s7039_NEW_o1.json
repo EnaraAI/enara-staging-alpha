@@ -1882,7 +1882,95 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 2.95: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 1.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 2.\nItems this learner answered in session 1: \"Complete: \"Take an umbrella. It is ___ today.\"\" | \"Complete: \"The clouds are grey. It is ___ today.\"\" | \"You chose a describing word for the weather, and that is the right kind of word after \"It is\". But \"cldy\" has some letters missing. Try again and write the whole word: \"The clouds are grey. It is ___ \" | \"Now a new one, on your own. Complete: \"The sun is out. It is ___ today.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"windy\" is right. Good work trying again!\nTell me the rule in your own words, in one short sentence.\n\nLEARNER'S LAST MESSAGE:\nI think: weather is described with an adjective after \"It is\" (sunny, rainy).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nRemember: we describe the weather with an adjective after \"It is\".\nWrite one sentence about a person you know using the right weather adjective."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 2.95: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 1.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 2.\nItems this learner answered in session 1: \"Complete: \"Take an umbrella. It is ___ today.\"\" | \"Complete: \"The clouds are grey. It is ___ today.\"\" | \"You chose a describing word for the weather, and that is the right kind of word after \"It is\". But \"cldy\" has some letters missing. Try again and write the whole word: \"The clouds are grey. It is ___ \" | \"Now a new one, on your own. Complete: \"The sun is out. It is ___ today.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"windy\" is right. Good work trying again!\nTell me the rule in your own words, in one short sentence.\n\nLEARNER'S LAST MESSAGE:\nI think: weather is described with an adjective after \"It is\" (sunny, rainy).\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nRemember: we describe the weather with an adjective after \"It is\".\nWrite one sentence about a person you know using the right weather adjective.",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.95,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "we describe the weather with an adjective after \"It is\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "It is sunny, so my sister is at the beach.",
+    "errors": {
+     "W1": "It is sun, so my sister is at the beach.",
+     "W2": "It is suny, so my sister is at the beach."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.95,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -2004,6 +2092,70 @@
   "retr": {
    "C1": [],
    "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 2.95,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 2
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": [
+    2
+   ]
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 1,
+   "C2": 1.425
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 2
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": [
+    2
+   ]
   },
   "afterF1": true
  }

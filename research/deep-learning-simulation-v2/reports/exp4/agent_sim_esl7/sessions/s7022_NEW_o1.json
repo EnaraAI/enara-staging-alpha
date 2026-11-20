@@ -1839,7 +1839,89 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 0.95: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 1.\nC2 (correct) strength 0.95: rooms have single English names (bedroom, living room). Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Complete: \"I make toast in the ___.\"\" | \"Now you try. Complete: \"My bed is in the ___.\"\" | \"Write it again: \"My bed is in the ___.\"\" | \"Now one new item, on your own. Complete: \"We wash our hands in the ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe place you chose fits watering flowers. Now check the spelling: look at the letter after \"d\".\nWrite the word again.\n\nLEARNER'S LAST MESSAGE:\ngardn\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nThe word is \"garden\". Flowers grow outside, so the garden fits.\nRight: \"I read a book in the bedroom.\" Wrong: \"I read a book in bedroom.\"\nNow try one on your own. Complete: \"I cook rice in the ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 0.95: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 1.\nC2 (correct) strength 0.95: rooms have single English names (bedroom, living room). Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Complete: \"I make toast in the ___.\"\" | \"Now you try. Complete: \"My bed is in the ___.\"\" | \"Write it again: \"My bed is in the ___.\"\" | \"Now one new item, on your own. Complete: \"We wash our hands in the ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe place you chose fits watering flowers. Now check the spelling: look at the letter after \"d\".\nWrite the word again.\n\nLEARNER'S LAST MESSAGE:\ngardn\nFACT: the last learner message contained the error of W1 (leaves vowels out of a room word (\"kitchn\", \"bathrom\")).\n\nTUTOR TURN TO JUDGE:\nThe word is \"garden\". Flowers grow outside, so the garden fits.\nRight: \"I read a book in the bedroom.\" Wrong: \"I read a book in bedroom.\"\nNow try one on your own. Complete: \"I cook rice in the ___.\"",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0.95,
+     "C2": 0.95
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is \"garden\"."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "kitchen",
+    "errors": {
+     "W1": "kitchn"
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0.95,
+     "C2": 0.95
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1947,6 +2029,66 @@
    "W2": 1,
    "C1": 0.95,
    "C2": 0.95
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 1
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "rooms",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0.95,
+   "C2": 0.95
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 1
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "rooms",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
   },
   "indep": {
    "C1": 1,

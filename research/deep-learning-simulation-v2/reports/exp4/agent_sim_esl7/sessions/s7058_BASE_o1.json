@@ -1790,7 +1790,91 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. Write the past form: Yesterday I ___ (call) my cousin.\" | \"Now write one or two sentences about what you did last weekend. Use a regular verb with -ed in each one.\" | \"Now write one sentence about a person you know. Use a regular verb with -ed.\" | \"Now a different skill: write one question about last weekend to ask a friend. Use did.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour start \"Did you\" is right. After did, the main verb stays plain: \"play\", not \"played\". The word did already shows the past.\n\nRight: Did she watch the film?\nWrong: Did she watched the film?\n\nNow one on your own. Write a question with did to ask a friend about lunch yesterday.\n\nLEARNER'S LAST MESSAGE:\nYou ate rice for lunch yesterday?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nYour idea about lunch and \"yesterday\" is clear. But \"You ate rice for lunch yesterday?\" is a statement with a question mark. A question about the past needs a special small word at the start.\n\nPlease write your question again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. Write the past form: Yesterday I ___ (call) my cousin.\" | \"Now write one or two sentences about what you did last weekend. Use a regular verb with -ed in each one.\" | \"Now write one sentence about a person you know. Use a regular verb with -ed.\" | \"Now a different skill: write one question about last weekend to ask a friend. Use did.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour start \"Did you\" is right. After did, the main verb stays plain: \"play\", not \"played\". The word did already shows the past.\n\nRight: Did she watch the film?\nWrong: Did she watched the film?\n\nNow one on your own. Write a question with did to ask a friend about lunch yesterday.\n\nLEARNER'S LAST MESSAGE:\nYou ate rice for lunch yesterday?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nYour idea about lunch and \"yesterday\" is clear. But \"You ate rice for lunch yesterday?\" is a statement with a question mark. A question about the past needs a special small word at the start.\n\nPlease write your question again.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   },
+   "events": [],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you eat rice for lunch yesterday?",
+    "errors": {
+     "W1": "Did you ate rice for lunch yesterday?",
+     "W2": "You ate rice for lunch yesterday?"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1912,6 +1996,74 @@
   "retr": {
    "C1": [],
    "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0.5,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
   },
   "afterF1": true
  }

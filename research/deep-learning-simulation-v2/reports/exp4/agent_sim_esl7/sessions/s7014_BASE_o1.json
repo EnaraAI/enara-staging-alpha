@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 2.5,
+   "W1": 0,
    "W2": 0,
-   "C1": 0.95,
+   "C1": 2.95,
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -1760,7 +1760,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-food-drink (eat and drink). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2.5: soup and spoon food are \"drunk\", as with Arabic shariba. Its error: uses drink for soup or spoon food (\"I drink my soup.\").\nC1 (correct) strength 0.95: eat for food and soup, drink for liquids you drink. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write the word: you drink it, it is white. ___\" | \"Complete: \"I eat an ___ every morning.\" (a red or green fruit)\" | \"Now write one sentence about a person you know. Use a food word.\" | \"Complete: \"My friend ___ an egg at breakfast.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My sister likes rice.\" uses a food word correctly.\n\nNew one, on your own. You are at a picnic. Write the missing word: \"We ___ apples and bread.\"\n\nLEARNER'S LAST MESSAGE:\neat\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"eat\" is right with apples and bread. Recap: eat goes with food, and drink goes with a drink.\n\nNew situation. Write two sentences about your breakfast. Use eat in one and drink in the other."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-food-drink (eat and drink). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2.5: soup and spoon food are \"drunk\", as with Arabic shariba. Its error: uses drink for soup or spoon food (\"I drink my soup.\").\nC1 (correct) strength 0.95: eat for food and soup, drink for liquids you drink. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write the word: you drink it, it is white. ___\" | \"Complete: \"I eat an ___ every morning.\" (a red or green fruit)\" | \"Now write one sentence about a person you know. Use a food word.\" | \"Complete: \"My friend ___ an egg at breakfast.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My sister likes rice.\" uses a food word correctly.\n\nNew one, on your own. You are at a picnic. Write the missing word: \"We ___ apples and bread.\"\n\nLEARNER'S LAST MESSAGE:\neat\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"eat\" is right with apples and bread. Recap: eat goes with food, and drink goes with a drink.\n\nNew situation. Write two sentences about your breakfast. Use eat in one and drink in the other.",
+   "stateBefore": {
+    "form": "food",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2.5,
+     "W2": 0,
+     "C1": 0.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"eat\" is right with apples and bread."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"eat\" is right"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Recap: eat goes with food, and drink goes with a drink."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I eat yoghurt for breakfast.",
+    "errors": {
+     "W1": "I drink yoghurt for breakfast."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "food",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1868,6 +1960,64 @@
   },
   "indep": {
    "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "food",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 2.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "food",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 2,
    "C2": 0
   },
   "start": {

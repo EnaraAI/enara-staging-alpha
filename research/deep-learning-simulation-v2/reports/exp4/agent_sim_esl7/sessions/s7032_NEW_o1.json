@@ -1813,7 +1813,89 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 1: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 0.95: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 1.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now write one sentence about your sister.\" | \"Yes! \"My sister is ten.\" is a good sentence about family. Now try: Complete: \"This is my brother. ___ is twelve.\"\" | \"Write one sentence about a person you know, using This is my.\" | \"Write the sentence again.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"This is my\" is right again. Check the letter after the first \"s\" in the family word.\nWrite the sentence again.\n\nLEARNER'S LAST MESSAGE:\nThis is my sester.\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\nThe word is \"sister\". It has an \"i\" after the first \"s\".\nRight: \"This is my brother.\" Wrong: \"This my brother.\"\nNow write one sentence to introduce your father."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 1: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 0.95: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 1.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now write one sentence about your sister.\" | \"Yes! \"My sister is ten.\" is a good sentence about family. Now try: Complete: \"This is my brother. ___ is twelve.\"\" | \"Write one sentence about a person you know, using This is my.\" | \"Write the sentence again.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"This is my\" is right again. Check the letter after the first \"s\" in the family word.\nWrite the sentence again.\n\nLEARNER'S LAST MESSAGE:\nThis is my sester.\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\nThe word is \"sister\". It has an \"i\" after the first \"s\".\nRight: \"This is my brother.\" Wrong: \"This my brother.\"\nNow write one sentence to introduce your father.",
+   "stateBefore": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is \"sister\". It has an \"i\" after the first \"s\"."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "This is my father.",
+    "errors": {
+     "W1": "This is my fathr."
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1920,6 +2002,66 @@
    "W1": 3,
    "W2": 1,
    "C1": 0.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "family",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "family",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
    "C2": 0
   },
   "indep": {

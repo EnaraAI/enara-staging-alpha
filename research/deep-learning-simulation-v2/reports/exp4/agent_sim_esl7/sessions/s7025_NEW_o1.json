@@ -1744,7 +1744,87 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-food-drink (eat and drink). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: soup and spoon food are \"drunk\", as with Arabic shariba. Its error: uses drink for soup or spoon food (\"I drink my soup.\").\nC1 (correct) strength 2: eat for food and soup, drink for liquids you drink. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write the word: you drink it, it is white. ___\" | \"Now write one sentence about a person you know, using a food word.\" | \"Next one. Complete: \"I eat an ___ every morning.\" (a red or green fruit)\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"soup\" is a right food word. Good work!\nA friend asks: \"What do you like to eat?\" Write your answer.\n\nLEARNER'S LAST MESSAGE:\nI like to drink soup.\nFACT: the last learner message contained the error of W1 (uses drink for soup or spoon food (\"I drink my soup.\")).\n\nTUTOR TURN TO JUDGE:\nYes, \"I like to drink soup.\" tells what you like.\nNow write two sentences about foods you like."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-food-drink (eat and drink). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: soup and spoon food are \"drunk\", as with Arabic shariba. Its error: uses drink for soup or spoon food (\"I drink my soup.\").\nC1 (correct) strength 2: eat for food and soup, drink for liquids you drink. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write the word: you drink it, it is white. ___\" | \"Now write one sentence about a person you know, using a food word.\" | \"Next one. Complete: \"I eat an ___ every morning.\" (a red or green fruit)\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"soup\" is a right food word. Good work!\nA friend asks: \"What do you like to eat?\" Write your answer.\n\nLEARNER'S LAST MESSAGE:\nI like to drink soup.\nFACT: the last learner message contained the error of W1 (uses drink for soup or spoon food (\"I drink my soup.\")).\n\nTUTOR TURN TO JUDGE:\nYes, \"I like to drink soup.\" tells what you like.\nNow write two sentences about foods you like.",
+   "stateBefore": {
+    "form": "food",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R7",
+     "belief": "W1",
+     "quote": "Yes, \"I like to drink soup.\" tells what you like."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I like to eat soup.",
+    "errors": {
+     "W1": "I like to drink soup."
+    }
+   },
+   "applied": [
+    "R7:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "food",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1852,6 +1932,64 @@
   },
   "indep": {
    "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "food",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 2,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "food",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
    "C2": 0
   },
   "start": {
