@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { PROJECT_ID, PROJECT_NAME, TEAM_ID } from './lib.mjs';
+import { PROJECT_ID, PROJECT_NAME, TEAM_ID, manifestFlags } from './lib.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const VTOKEN = 'vercel-token-must-never-be-printed-0123456789';
@@ -78,8 +78,10 @@ test('apply-flags: creates missing ones as plain Production vars, corrects diffe
   const writes = r.calls.filter((c) => c.method !== 'GET');
   const creates = writes.filter((c) => c.method === 'POST').map((c) => c.body);
   assert.ok(creates.length >= 5);
+  // Each created value is the manifest's own value ('true', or the ENARA_ENGINE_V2 comma list).
+  const want = manifestFlags(JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'lms-test.flags.json'), 'utf8')));
   for (const b of creates) {
-    assert.deepEqual([b.type, b.target, b.value], ['plain', ['production'], 'true']);
+    assert.deepEqual([b.type, b.target, b.value], ['plain', ['production'], want[b.key]]);
     assert.ok(!['LMS_LTI_ENABLED', 'MAINTENANCE_ENDPOINTS_ENABLED', 'MONGODB_URI'].includes(b.key));
   }
   const patches = writes.filter((c) => c.method === 'PATCH');

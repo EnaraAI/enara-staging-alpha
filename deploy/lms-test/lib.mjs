@@ -72,6 +72,9 @@ export function deploymentProblems(dep) {
 
 // PARENT_ added for Parents P1-P5 (docs/parents/P1_NOTES.md); the secret-looking names below are still refused.
 const FLAG_NAME = /^(LMS|ENROLLMENT|GRADE_LEDGER|MAINTENANCE_ENDPOINTS|MOODLE_TEST_WS|PARENT)_[A-Z0-9_]{1,60}$/;
+// Tutor engine (owner-approved): exactly this one name, not an ENARA_ prefix. Its value is a
+// comma list of engine switches (backend/src/services/engineV2.ts); FLAG_VALUE still applies.
+const EXTRA_FLAG_NAMES = ['ENARA_ENGINE_V2'];
 const FORBIDDEN_IN_NAME = /(KEY|KEK|SECRET|TOKEN|PASSWORD|URI|URL|DSN|CREDENTIAL|PRIVATE)/;
 const FLAG_VALUE = /^[A-Za-z0-9_,.:-]{0,200}$/;
 
@@ -89,7 +92,7 @@ export function manifestFlags(manifest) {
   for (const feature of manifest.features ?? []) {
     if (!feature?.name || typeof feature.flags !== 'object') throw new Error('each feature needs a name and flags');
     for (const [key, value] of Object.entries(feature.flags)) {
-      if (!FLAG_NAME.test(key) || FORBIDDEN_IN_NAME.test(key)) throw new GuardError(`${key} is not a feature switch the pipeline may set`);
+      if (!(FLAG_NAME.test(key) || EXTRA_FLAG_NAMES.includes(key)) || FORBIDDEN_IN_NAME.test(key)) throw new GuardError(`${key} is not a feature switch the pipeline may set`);
       if (typeof value !== 'string' || !FLAG_VALUE.test(value)) throw new GuardError(`${key}: the value must be a short plain string`);
       if (key in out && out[key] !== value) throw new Error(`${key}: "${from[key]}" wants ${out[key]}, "${feature.name}" wants ${value}`);
       out[key] = value;
