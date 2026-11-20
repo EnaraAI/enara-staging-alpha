@@ -6,8 +6,11 @@ import { isWord, misspellingOf } from './pairCheck';
 export type SpellingSlip = { kind: 'doubling'; wrong: string; base: string; right: string } | { kind: 'letters'; wrong: string; right: string };
 const VOWELS = /[aeiou]/g;
 /** A spelling slip in the learner's text: a missed doubled consonant ("biger", "thiner", "stoped"), or a near miss of a lesson word ("mather"). */
-export function spellingSlip(text: string, lessonWords: string[] = []): SpellingSlip | null {
+export function spellingSlip(text: string, lessonWords: string[] = [], knownWords: string[] = []): SpellingSlip | null {
   const words = text.toLowerCase().replace(/[’]/g, "'").match(/[a-z]+/g) ?? [];
+  // Words the lesson itself uses (title, objectives, grammar, examples) are real words even when the small dictionary lacks them
+  // (ESL7 round 6: "object" in "subject + verb + object" was flagged as a slip of "subject").
+  const known = new Set(knownWords.flatMap((x) => x.toLowerCase().match(/[a-z]+/g) ?? []));
   for (const w of words) {
     // One-syllable base ending in consonant-vowel-consonant (not w, x, y): the consonant doubles before -er, -est, -ed, -ing.
     const m = /^([a-z]*[^aeiou][aeiou])([b-df-hj-np-tv-z])(er|est|ed|ing)$/.exec(w);
@@ -19,7 +22,7 @@ export function spellingSlip(text: string, lessonWords: string[] = []): Spelling
       }
     }
     // A real word in any form ("lives", "went") is never a slip, even when it is close to a lesson word ("liked").
-    const near = isWord(w) ? undefined : lessonWords.map((x) => x.toLowerCase()).find((x) => /^[a-z]+$/.test(x) && x !== w && misspellingOf(w, x));
+    const near = isWord(w) || known.has(w) ? undefined : lessonWords.map((x) => x.toLowerCase()).find((x) => /^[a-z]+$/.test(x) && x !== w && misspellingOf(w, x));
     if (near) return { kind: 'letters', wrong: w, right: near };
   }
   return null;
