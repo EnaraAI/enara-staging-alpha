@@ -365,7 +365,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, you used \"Can I have ..., please?\" correctly. But \"any\" is not right here. Water is uncountable, so we need a different word. Hint: it starts with s and means a little amount. Try again: order some water politely.\n\nLEARNER'S LAST MESSAGE:\nCan I have any water, please?\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\nLet me explain it clearly. Water is uncountable, so we use \"some\" and not \"any\" when we ask for it. The correct sentence is: \"Can I have some water, please?\" Now a new one. Order a coffee politely with \"I'd like ...\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, you used \"Can I have ..., please?\" correctly. But \"any\" is not right here. Water is uncountable, so we need a different word. Hint: it starts with s and means a little amount. Try again: order some water politely.\n\nLEARNER'S LAST MESSAGE:\nCan I have any water, please?\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\nLet me explain it clearly. Water is uncountable, so we use \"some\" and not \"any\" when we ask for it. The correct sentence is: \"Can I have some water, please?\" Now a new one. Order a coffee politely with \"I'd like ...\"",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The correct sentence is: \"Can I have some water, please?\""
+    },
+    {
+     "rule": "R6",
+     "belief": "W1",
+     "quote": "Water is uncountable, so we use \"some\" and not \"any\" when we ask for it."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "I'd like a coffee, please.",
+    "errors": {}
+   },
+   "applied": [
+    "R5",
+    "R6"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I'd like a coffee, please.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I'd like a coffee, please.",
+    "probes": []
+   }
   }
  ],
  "assess": {

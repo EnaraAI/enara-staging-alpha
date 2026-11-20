@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -756,7 +756,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 2: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, Friday fits the question. It is the day of the game.\nNow one new message, on your own:\n\"Hi Lina! The film is on Saturday, not on Sunday. Tom brings the bag at 6:00. The film starts at 6:30.\"\nRead the whole question first. What time does the film start?\n\nLEARNER'S LAST MESSAGE:\n6:30\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"6:30\" fits the whole question.\nExample: \"Dina brings the cake at 3:00. The party starts at 3:30.\" When does the party start? I read the whole question first, then pick 3:30.\nRule: read the whole question first, then pick the answer that fits all of it.\nRight: \"The party starts at 3:30.\" Wrong: \"The party starts at 3:00.\"\nNow write one sentence about a person you know who reads all the words of the question before looking in the text."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 2: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, Friday fits the question. It is the day of the game.\nNow one new message, on your own:\n\"Hi Lina! The film is on Saturday, not on Sunday. Tom brings the bag at 6:00. The film starts at 6:30.\"\nRead the whole question first. What time does the film start?\n\nLEARNER'S LAST MESSAGE:\n6:30\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"6:30\" fits the whole question.\nExample: \"Dina brings the cake at 3:00. The party starts at 3:30.\" When does the party start? I read the whole question first, then pick 3:30.\nRule: read the whole question first, then pick the answer that fits all of it.\nRight: \"The party starts at 3:30.\" Wrong: \"The party starts at 3:00.\"\nNow write one sentence about a person you know who reads all the words of the question before looking in the text.",
+   "stateBefore": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"6:30\" fits the whole question."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"6:30\" fits the whole question."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: read the whole question first, then pick the answer that fits all of it."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"The party starts at 3:30.\" Wrong: \"The party starts at 3:00.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "My sister reads all the words of the question first.",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister reads all the words of the question first.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister reads all the words of the question first.",
+    "probes": []
+   }
   }
  ],
  "assess": {

@@ -16,11 +16,11 @@
    "W1": 0,
    "W2": 0,
    "C1": 3,
-   "C2": 2
+   "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 1
+   "C1": 3,
+   "C2": 2
   },
   "start": {
    "W1": 2,
@@ -800,7 +800,113 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 0: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 2.\nC2 (correct) strength 2: past events take past verb forms. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, your text uses full stops and past verbs.\nExample: I write \"We went to the zoo. We saw a lion.\" Rule: use a full stop after each idea and past verbs for finished events.\nRight: \"We ate lunch. We played games.\" Wrong: \"We ate lunch and we played games and we ran and we sang.\"\nWrite one sentence about a person you know using ideas with and, but or because chosen by meaning.\n\nLEARNER'S LAST MESSAGE:\nMy friend was tired, but she went to school.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"but\" fits your two ideas.\nNow a new one, on your own. Write this as three sentences: \"we went to the zoo and we saw a lion and we ate lunch\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 0: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 2.\nC2 (correct) strength 2: past events take past verb forms. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, your text uses full stops and past verbs.\nExample: I write \"We went to the zoo. We saw a lion.\" Rule: use a full stop after each idea and past verbs for finished events.\nRight: \"We ate lunch. We played games.\" Wrong: \"We ate lunch and we played games and we ran and we sang.\"\nWrite one sentence about a person you know using ideas with and, but or because chosen by meaning.\n\nLEARNER'S LAST MESSAGE:\nMy friend was tired, but she went to school.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"but\" fits your two ideas.\nNow a new one, on your own. Write this as three sentences: \"we went to the zoo and we saw a lion and we ate lunch\"",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"but\" fits your two ideas."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"but\" fits your two ideas."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My friend was tired, but she went to school."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "We went to the zoo. We saw a lion. We ate lunch.",
+    "errors": {
+     "W1": "we went to the zoo and we saw a lion and we ate lunch"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "We went to the zoo. We saw a lion. We ate lunch.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "We went to the zoo. We saw a lion. We ate lunch.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

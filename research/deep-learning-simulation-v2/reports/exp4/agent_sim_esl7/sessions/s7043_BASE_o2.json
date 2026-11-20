@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -702,7 +702,111 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"going to play\". The part \"going to play\" is right. Something is missing before it.\nTell me in your own words: what were you thinking when you wrote your answer?\n\nLEARNER'S LAST MESSAGE:\nI think: a plan is am/is/are + going to + base verb.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour rule is right: am, is or are, then going to, then the verb. For this sentence, the missing word is \"are\", because \"They\" goes with \"are\".\nRight: \"My sister is going to swim tomorrow.\" Wrong: \"My sister going to swim tomorrow.\"\nNow one on your own. Complete: \"My mother ___ going to travel next week.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"going to play\". The part \"going to play\" is right. Something is missing before it.\nTell me in your own words: what were you thinking when you wrote your answer?\n\nLEARNER'S LAST MESSAGE:\nI think: a plan is am/is/are + going to + base verb.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour rule is right: am, is or are, then going to, then the verb. For this sentence, the missing word is \"are\", because \"They\" goes with \"are\".\nRight: \"My sister is going to swim tomorrow.\" Wrong: \"My sister going to swim tomorrow.\"\nNow one on your own. Complete: \"My mother ___ going to travel next week.\"",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Your rule is right: am, is or are, then going to, then the verb."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "the missing word is \"are\", because \"They\" goes with \"are\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"My sister is going to swim tomorrow.\" Wrong: \"My sister going to swim tomorrow.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "is",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "is",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "is",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

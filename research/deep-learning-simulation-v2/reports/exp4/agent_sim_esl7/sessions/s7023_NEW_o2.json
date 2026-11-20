@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 3,
+   "W1": 1,
    "W2": 0,
    "C1": 0,
    "C2": 2
@@ -740,7 +740,109 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-a-an (a and an). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an\" is right: \"ice cream\" starts with a vowel sound.\nWrite one sentence about a person you know using a before consonant sounds and an before vowel sounds.\n\nLEARNER'S LAST MESSAGE:\nMy uncle has car and orange cat.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nIn \"My uncle has car and orange cat.\" a small word is missing before each thing. English puts a, an or the before one countable thing.\nRight: \"I see a bird.\" Wrong: \"I see bird.\"\nNow write this again with the missing words: \"My aunt has bike and red hat.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-a-an (a and an). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 0: a singular countable noun needs a/an (or the). Independent correct productions so far: 0.\nC2 (correct) strength 2: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"an\" is right: \"ice cream\" starts with a vowel sound.\nWrite one sentence about a person you know using a before consonant sounds and an before vowel sounds.\n\nLEARNER'S LAST MESSAGE:\nMy uncle has car and orange cat.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nIn \"My uncle has car and orange cat.\" a small word is missing before each thing. English puts a, an or the before one countable thing.\nRight: \"I see a bird.\" Wrong: \"I see bird.\"\nNow write this again with the missing words: \"My aunt has bike and red hat.\"",
+   "stateBefore": {
+    "form": "aan",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "articles"
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "English puts a, an or the before one countable thing."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"I see a bird.\" Wrong: \"I see bird.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My aunt has a bike and a red hat.",
+    "errors": {
+     "W1": "My aunt has bike and red hat."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "aan",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "articles"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My aunt has a bike and a red hat.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My aunt has a bike and a red hat.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

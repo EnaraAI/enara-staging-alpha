@@ -10,3 +10,7 @@
 7. **NEW: the first-time rule block names a rule that is not the learner's actual error** (s7051 word order, s7055, s7058).
 8. **The "never ask why" load limit vs "ask what they were thinking"** (likely-cause line), in A1 sessions.
 9. **Reading texts above 300 characters are cut off** (amendment D; a product limit).
+
+## Round 9
+10. **"Ask for a freer task / free sentence" and "do not ask for another own sentence this session" in the same prompt** (BASE s7054, s7060, s7070, s7035, s7071).
+11. **A2 email items cut mid-word by the 300-character cap**, so the date sentence is lost and the item cannot be answered (s7062 m1, s7068 m2; both engine arms). This is the product limit in amendment D.

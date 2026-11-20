@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -687,7 +687,105 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"He has hair short black.\" \"He has\" is right here. The order of the words after \"has\" needs work.\nExample: I talk about my neighbour. He is shy, so I write \"He is shy.\" Rule: use \"is\" before a word like shy to say what a person is like.\nRight: \"My manager is quiet.\" Wrong: \"My manager quiet.\"\nTell me in your own words: what were you thinking when you put the words in that order?\n\nLEARNER'S LAST MESSAGE:\nI think adjectives follow the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for explaining your idea. \"He has\" is right. But in English, describing words go before the thing they describe.\nExample: I look at the dog next door. It is small and white. I put those words before \"dog\".\nRule: describing words go before the thing they describe.\nRight: \"My neighbour has a small white dog.\" Wrong: \"My neighbour has a dog small white.\"\nNow try a new one. Write one sentence about a bag that a friend has. Use \"has\" and two describing words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"He has hair short black.\" \"He has\" is right here. The order of the words after \"has\" needs work.\nExample: I talk about my neighbour. He is shy, so I write \"He is shy.\" Rule: use \"is\" before a word like shy to say what a person is like.\nRight: \"My manager is quiet.\" Wrong: \"My manager quiet.\"\nTell me in your own words: what were you thinking when you put the words in that order?\n\nLEARNER'S LAST MESSAGE:\nI think adjectives follow the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for explaining your idea. \"He has\" is right. But in English, describing words go before the thing they describe.\nExample: I look at the dog next door. It is small and white. I put those words before \"dog\".\nRule: describing words go before the thing they describe.\nRight: \"My neighbour has a small white dog.\" Wrong: \"My neighbour has a dog small white.\"\nNow try a new one. Write one sentence about a bag that a friend has. Use \"has\" and two describing words.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: describing words go before the thing they describe."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"My neighbour has a small white dog.\" Wrong: \"My neighbour has a dog small white.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My friend has a big black bag.",
+    "errors": {
+     "W1": "My friend has a bag big black."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My friend has a big black bag.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My friend has a big black bag.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
