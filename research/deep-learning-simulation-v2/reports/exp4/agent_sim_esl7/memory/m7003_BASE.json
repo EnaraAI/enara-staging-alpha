@@ -62,11 +62,12 @@
    "occurrences": 2,
    "firstSeenAt": "2027-05-03T08:30:00.000Z",
    "lastSeenAt": "2027-05-03T08:30:00.000Z",
-   "status": "open",
-   "rightStreak": 1,
+   "status": "resolved",
+   "rightStreak": 2,
    "countedKeys": [
     "attempt:pre-7003",
-    "session:s7003_BASE_o2_S1"
+    "session:s7003_BASE_o2_S1",
+    "session:s7003_BASE_o2_S2"
    ],
    "statusHistory": [
     {
@@ -74,15 +75,23 @@
      "by": "system",
      "to": "open",
      "reason": "released_assessment"
+    },
+    {
+     "at": "2027-05-17T09:03:00.000Z",
+     "by": "tutor",
+     "from": "open",
+     "to": "resolved",
+     "reason": "two_independent_rights"
     }
-   ]
+   ],
+   "resolvedAt": "2027-05-17T09:03:00.000Z"
   }
  ],
  "rec": {
   "entries": [],
   "liveErrors": {},
   "knownPoints": {
-   "lsn-EN-F-A1-VO-numbers-time:1": 1,
+   "lsn-EN-F-A1-VO-numbers-time:1": 2,
    "lsn-EN-F-A1-GR-can-ability:1": 1
   }
  },
@@ -125,6 +134,18 @@
      "right": true,
      "at": "2027-05-10T09:02:00.000Z",
      "via": "focus"
+    }
+   ]
+  },
+  {
+   "track": "s7003_BASE_o2",
+   "turn": 8,
+   "events": [
+    {
+     "row": "ewo_e48d61ff4ece",
+     "right": true,
+     "at": "2027-05-17T09:03:00.000Z",
+     "via": "objective"
     }
    ]
   }

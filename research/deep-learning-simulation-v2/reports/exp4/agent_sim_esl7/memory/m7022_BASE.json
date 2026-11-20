@@ -92,11 +92,12 @@
    "occurrences": 5,
    "firstSeenAt": "2027-05-03T08:30:00.000Z",
    "lastSeenAt": "2027-05-03T08:30:00.000Z",
-   "status": "open",
-   "rightStreak": 1,
+   "status": "resolved",
+   "rightStreak": 2,
    "countedKeys": [
     "attempt:pre-7022",
-    "session:s7022_BASE_o2_S1"
+    "session:s7022_BASE_o2_S1",
+    "session:s7022_BASE_o2_S2"
    ],
    "statusHistory": [
     {
@@ -104,8 +105,16 @@
      "by": "system",
      "to": "open",
      "reason": "released_assessment"
+    },
+    {
+     "at": "2027-05-17T09:03:00.000Z",
+     "by": "tutor",
+     "from": "open",
+     "to": "resolved",
+     "reason": "two_independent_rights"
     }
-   ]
+   ],
+   "resolvedAt": "2027-05-17T09:03:00.000Z"
   }
  ],
  "rec": {
@@ -113,8 +122,9 @@
   "liveErrors": {},
   "knownPoints": {
    "lsn-EN-F-A1-VO-home-rooms:1": 1,
-   "lsn-EN-F-A1-GR-capitals-full-stops:1": 3,
-   "lsn-EN-F-A1-GR-capitals-full-stops:3": 3
+   "lsn-EN-F-A1-GR-capitals-full-stops:1": 4,
+   "lsn-EN-F-A1-GR-capitals-full-stops:3": 4,
+   "lsn-EN-F-A1-GR-capitals-full-stops:2": 1
   }
  },
  "log": [
@@ -155,6 +165,18 @@
      "row": "ewo_ba44ca549b7c",
      "right": false,
      "at": "2027-05-10T09:02:00.000Z",
+     "via": "objective"
+    }
+   ]
+  },
+  {
+   "track": "s7022_BASE_o2",
+   "turn": 8,
+   "events": [
+    {
+     "row": "ewo_f65957235a40",
+     "right": true,
+     "at": "2027-05-17T09:03:00.000Z",
      "via": "objective"
     }
    ]

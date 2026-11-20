@@ -85,11 +85,12 @@
    "occurrences": 3,
    "firstSeenAt": "2027-05-03T08:30:00.000Z",
    "lastSeenAt": "2027-05-03T08:30:00.000Z",
-   "status": "open",
-   "rightStreak": 1,
+   "status": "resolved",
+   "rightStreak": 2,
    "countedKeys": [
     "attempt:pre-7005",
-    "session:s7005_BASE_o2_S1"
+    "session:s7005_BASE_o2_S1",
+    "session:s7005_BASE_o2_S2"
    ],
    "statusHistory": [
     {
@@ -97,8 +98,16 @@
      "by": "system",
      "to": "open",
      "reason": "released_assessment"
+    },
+    {
+     "at": "2027-05-17T09:03:00.000Z",
+     "by": "tutor",
+     "from": "open",
+     "to": "resolved",
+     "reason": "two_independent_rights"
     }
-   ]
+   ],
+   "resolvedAt": "2027-05-17T09:03:00.000Z"
   },
   {
    "id": "ewo_e29588289506",
@@ -114,10 +123,11 @@
    "occurrences": 1,
    "firstSeenAt": "2027-05-03T08:30:00.000Z",
    "lastSeenAt": "2027-05-03T08:30:00.000Z",
-   "status": "open",
-   "rightStreak": 1,
+   "status": "resolved",
+   "rightStreak": 2,
    "countedKeys": [
-    "session:s7005_BASE_o2_S1"
+    "session:s7005_BASE_o2_S1",
+    "session:s7005_BASE_o2_S2"
    ],
    "statusHistory": [
     {
@@ -125,15 +135,23 @@
      "by": "system",
      "to": "open",
      "reason": "released_assessment"
+    },
+    {
+     "at": "2027-05-17T09:03:00.000Z",
+     "by": "tutor",
+     "from": "open",
+     "to": "resolved",
+     "reason": "two_independent_rights"
     }
-   ]
+   ],
+   "resolvedAt": "2027-05-17T09:03:00.000Z"
   }
  ],
  "rec": {
   "entries": [],
   "liveErrors": {},
   "knownPoints": {
-   "lsn-EN-F-A1-VO-numbers-time:1": 1,
+   "lsn-EN-F-A1-VO-numbers-time:1": 2,
    "lsn-EN-C-A1-RD-very-short-texts:1": 1,
    "lsn-EN-C-A1-RD-very-short-texts:2": 1
   }
@@ -183,6 +201,24 @@
      "right": true,
      "at": "2027-05-10T09:02:00.000Z",
      "via": "focus"
+    }
+   ]
+  },
+  {
+   "track": "s7005_BASE_o2",
+   "turn": 8,
+   "events": [
+    {
+     "row": "ewo_7b9b3eb214b0",
+     "right": true,
+     "at": "2027-05-17T09:03:00.000Z",
+     "via": "objective"
+    },
+    {
+     "row": "ewo_e29588289506",
+     "right": true,
+     "at": "2027-05-17T09:03:00.000Z",
+     "via": "objective"
     }
    ]
   }
