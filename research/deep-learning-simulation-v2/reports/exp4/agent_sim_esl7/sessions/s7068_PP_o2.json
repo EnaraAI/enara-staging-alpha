@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 2.2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 3,
+   "C1": 4,
    "C2": 0
   },
   "start": {
@@ -890,7 +890,109 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-RD-short-everyday-texts (finding the main idea and details in a short text). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the first sentence is the main idea, and the first detail of the asked type is the answer. Its error: takes the first sentence as the main idea or gives the first detail of the asked type (\"to say hello\" for an email that invites a friend).\nC1 (correct) strength 2.2: the main idea is what the whole text is for, and a detail answer fits all the words of the question. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Hi! Tip: the main idea comes from the whole text, not only the first sentence. Read this email: \"Dear Yasmin, Thank you for your nice letter. I have some news! Our family is moving to a new flat next \" | \"Yes, (b) is right! The whole email is about the news that the family is moving. Now look for a detail. On what date is the moving day? Answer in one or two words from the text.\" | \"Yes, 14 May is right! The question asks about the moving day, and the text says \"The moving day is on 14 May.\" The date of 20 May is for the father's job. Next one. Where is Huda's new school? Answer \" | \"That is not the answer yet. The question asks for the place, so we need to copy the place words from the email. Hint: look for the words \"My new school is near ...\". Read the email again and write the\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"near the river\" is right! The email says the new school is near the river. The mosque is next to the old school. Now a new question. On what date does Huda's father start his new job?\n\nLEARNER'S LAST MESSAGE:\n20 May\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, 20 May is right! The email says \"My father starts his new job on 20 May.\" Well done for matching the whole question. Now a new question. Read the email again. When does Huda ask Yasmin to visit?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-RD-short-everyday-texts (finding the main idea and details in a short text). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the first sentence is the main idea, and the first detail of the asked type is the answer. Its error: takes the first sentence as the main idea or gives the first detail of the asked type (\"to say hello\" for an email that invites a friend).\nC1 (correct) strength 2.2: the main idea is what the whole text is for, and a detail answer fits all the words of the question. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Hi! Tip: the main idea comes from the whole text, not only the first sentence. Read this email: \"Dear Yasmin, Thank you for your nice letter. I have some news! Our family is moving to a new flat next \" | \"Yes, (b) is right! The whole email is about the news that the family is moving. Now look for a detail. On what date is the moving day? Answer in one or two words from the text.\" | \"Yes, 14 May is right! The question asks about the moving day, and the text says \"The moving day is on 14 May.\" The date of 20 May is for the father's job. Next one. Where is Huda's new school? Answer \" | \"That is not the answer yet. The question asks for the place, so we need to copy the place words from the email. Hint: look for the words \"My new school is near ...\". Read the email again and write the\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"near the river\" is right! The email says the new school is near the river. The mosque is next to the old school. Now a new question. On what date does Huda's father start his new job?\n\nLEARNER'S LAST MESSAGE:\n20 May\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, 20 May is right! The email says \"My father starts his new job on 20 May.\" Well done for matching the whole question. Now a new question. Read the email again. When does Huda ask Yasmin to visit?",
+   "stateBefore": {
+    "form": "rd2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 20 May is right!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "20 May"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "<the time the email gives for Yasmin's visit>",
+    "errors": {
+     "W1": "<the first time or date in the email>"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "<the time the email gives for Yasmin's visit>",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "<the time the email gives for Yasmin's visit>",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

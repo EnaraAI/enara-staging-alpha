@@ -15,12 +15,12 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 2.2,
+   "C1": 3,
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 3
+   "C1": 3,
+   "C2": 4
   },
   "start": {
    "W1": 3,
@@ -29,7 +29,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": [
     2
    ]
@@ -1754,7 +1756,133 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 0: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 2.2: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 2.\nC2 (correct) strength 3: am/is/are is needed in a present sentence. Independent correct productions so far: 3.\nItems this learner answered in session 1: \"Tutor: What is your favourite animal? Answer with a full sentence.\" | \"Now you try. Tutor: What colour is the sky? Answer with a full sentence.\" | \"Write one sentence about a person you know, using a full sentence, not one word.\" | \"Now write one sentence about a friend. Use the word tired.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My best teacher is Mr Ali.\" is a full sentence.\nExample: \"What is your pet's name?\" Example: \"My pet's name is Coco.\"\nRule: answer with a full sentence, not one word.\nNow write one sentence about a person you know using a full sentence, not one word.\n\nLEARNER'S LAST MESSAGE:\nMy brother is twelve years old.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My brother is twelve years old.\" is a full sentence, and \"is\" is in the right place.\nNow try this: Ask the tutor about his or her home town."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 0: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 2.2: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 2.\nC2 (correct) strength 3: am/is/are is needed in a present sentence. Independent correct productions so far: 3.\nItems this learner answered in session 1: \"Tutor: What is your favourite animal? Answer with a full sentence.\" | \"Now you try. Tutor: What colour is the sky? Answer with a full sentence.\" | \"Write one sentence about a person you know, using a full sentence, not one word.\" | \"Now write one sentence about a friend. Use the word tired.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My best teacher is Mr Ali.\" is a full sentence.\nExample: \"What is your pet's name?\" Example: \"My pet's name is Coco.\"\nRule: answer with a full sentence, not one word.\nNow write one sentence about a person you know using a full sentence, not one word.\n\nLEARNER'S LAST MESSAGE:\nMy brother is twelve years old.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My brother is twelve years old.\" is a full sentence, and \"is\" is in the right place.\nNow try this: Ask the tutor about his or her home town.",
+   "stateBefore": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "is a full sentence, and \"is\" is in the right place"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "is a full sentence, and \"is\" is in the right place"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My brother is twelve years old."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My brother is twelve years old."
+    }
+   ],
+   "retrieval": [
+    "C1",
+    "C2"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Where are you from?",
+    "errors": {
+     "W1": "Home town?",
+     "W2": "Where you from?"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "retrieval:C1",
+    "retrieval:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 4
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Where are you from?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Where are you from?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

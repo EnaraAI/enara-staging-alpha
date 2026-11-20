@@ -1570,7 +1570,105 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: The cat ___ (sleep) on the sofa.\" | \"Correct the verb: \"She go to bed at ten.\"\" | \"Write one sentence about a person you know. Use he or she, and add -s or -es to the verb.\" | \"Correct the verb: \"My dad watch TV after dinner.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"drinks\" with -s, and that is right. Put always, usually, sometimes or never before the main verb.\nRight: My dog usually eats fish. Wrong: My dog eats usually fish.\nTry your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy father drinks usually tea.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nPut usually before the verb: \"My father usually drinks tea.\"\nRight: Ben sometimes plays games. Wrong: Ben plays sometimes games.\nNow write this with always before the verb: Nora reads books."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: The cat ___ (sleep) on the sofa.\" | \"Correct the verb: \"She go to bed at ten.\"\" | \"Write one sentence about a person you know. Use he or she, and add -s or -es to the verb.\" | \"Correct the verb: \"My dad watch TV after dinner.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote \"drinks\" with -s, and that is right. Put always, usually, sometimes or never before the main verb.\nRight: My dog usually eats fish. Wrong: My dog eats usually fish.\nTry your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy father drinks usually tea.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nPut usually before the verb: \"My father usually drinks tea.\"\nRight: Ben sometimes plays games. Wrong: Ben plays sometimes games.\nNow write this with always before the verb: Nora reads books.",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "Put usually before the verb: \"My father usually drinks tea.\""
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Ben sometimes plays games. Wrong: Ben plays sometimes games."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Nora always reads books.",
+    "errors": {
+     "W1": "Nora reads always books."
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Nora always reads books.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "Nora always reads books.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -16,7 +16,7 @@
    "W1": 0,
    "W2": 0,
    "C1": 3,
-   "C2": 1.2
+   "C2": 2.2
   },
   "indep": {
    "C1": 4,
@@ -32,7 +32,9 @@
    "C1": [
     2
    ],
-   "C2": []
+   "C2": [
+    2
+   ]
   },
   "afterF1": true,
   "sec1": "thirdS"
@@ -1036,7 +1038,130 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 1.2: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\nItems this learner answered in session 1: \"Hello! The rule: after he, she and it, we add -s to the verb. Example: I work. She works. Now you try. Write the correct form: My sister ___ (play) tennis on Sundays. Answer with only the verb.\" | \"Yes, plays is right! Sister is she, so we add -s. Next one. Write the correct form: He ___ (drink) tea in the morning. Answer with only the verb.\" | \"Yes, drinks is right! He is one person, so we add -s. Next one. Write the correct form: She ___ (watch) TV after dinner. Answer with only the verb.\" | \"Yes, watches is right! Watch ends in -ch, so we add -es after she. Next one. Write the correct form: The baby ___ (cry) at night. Answer with only the verb.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, drinks is right! With he we add -s. Now try a new one. Write the correct form: \"She ___ (watch) TV after dinner.\" Answer with only the verb.\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, watches is right! Watch ends in -ch, so with she we add -es. Now try a new one. Write the correct form: \"The baby ___ (cry) at night.\" Answer with only the verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 0: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 3: add -s/-es after he/she/it. Independent correct productions so far: 4.\nC2 (correct) strength 1.2: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 2.\nItems this learner answered in session 1: \"Hello! The rule: after he, she and it, we add -s to the verb. Example: I work. She works. Now you try. Write the correct form: My sister ___ (play) tennis on Sundays. Answer with only the verb.\" | \"Yes, plays is right! Sister is she, so we add -s. Next one. Write the correct form: He ___ (drink) tea in the morning. Answer with only the verb.\" | \"Yes, drinks is right! He is one person, so we add -s. Next one. Write the correct form: She ___ (watch) TV after dinner. Answer with only the verb.\" | \"Yes, watches is right! Watch ends in -ch, so we add -es after she. Next one. Write the correct form: The baby ___ (cry) at night. Answer with only the verb.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, drinks is right! With he we add -s. Now try a new one. Write the correct form: \"She ___ (watch) TV after dinner.\" Answer with only the verb.\n\nLEARNER'S LAST MESSAGE:\nwatches\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, watches is right! Watch ends in -ch, so with she we add -es. Now try a new one. Write the correct form: \"The baby ___ (cry) at night.\" Answer with only the verb.",
+   "stateBefore": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 1.2
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true,
+    "sec1": "thirdS"
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, watches is right!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, watches is right!"
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "Watch ends in -ch, so with she we add -es."
+    }
+   ],
+   "retrieval": [
+    "C1",
+    "C2"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "cries",
+    "errors": {
+     "W1": "cry",
+     "W2": "crys"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R1:W2",
+    "retrieval:C1",
+    "retrieval:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2.2
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true,
+    "sec1": "thirdS"
+   }
+  },
+  {
+   "session": 2,
+   "learner": "cry",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "cry",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

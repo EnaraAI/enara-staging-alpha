@@ -19,7 +19,7 @@
    "C2": 0.2
   },
   "indep": {
-   "C1": 4,
+   "C1": 5,
    "C2": 1
   },
   "start": {
@@ -29,7 +29,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -1717,7 +1719,112 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 4.\nC2 (correct) strength 0.2: past events take past verb forms. Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Choose and, but or because: I wore a coat ___ it was cold.\" | \"Write 30-50 words about your last holiday. Use and, but and because.\" | \"Write one sentence about a person you know. Use and, but or because.\" | \"Here is one on your own. Write this as short sentences with full stops: \"We ate and we played and we sang and we went home.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"We missed the train because we got up late.\" is right.\nNow write one sentence about a person you know using and, but or because.\n\nLEARNER'S LAST MESSAGE:\nMy brother is tired because he works a lot.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"because he works a lot\" gives a reason.\nWrite 30-50 words about your plans for next weekend. Use and, but and because."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 4.\nC2 (correct) strength 0.2: past events take past verb forms. Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Choose and, but or because: I wore a coat ___ it was cold.\" | \"Write 30-50 words about your last holiday. Use and, but and because.\" | \"Write one sentence about a person you know. Use and, but or because.\" | \"Here is one on your own. Write this as short sentences with full stops: \"We ate and we played and we sang and we went home.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"We missed the train because we got up late.\" is right.\nNow write one sentence about a person you know using and, but or because.\n\nLEARNER'S LAST MESSAGE:\nMy brother is tired because he works a lot.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"because he works a lot\" gives a reason.\nWrite 30-50 words about your plans for next weekend. Use and, but and because.",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0.2
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"because he works a lot\" gives a reason."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"My brother is tired because he works a lot.\""
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Next weekend I am going to visit my aunt because it is her birthday. I want to go to the park, but it may rain.",
+    "errors": {
+     "W1": "next weekend i am going to visit my aunt and it is her birthday and i want to go to the park and it may rain"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0.2
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Next weekend I am going to visit my aunt because it is her birthday. I want to go to the park, but it may rain.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Next weekend I am going to visit my aunt because it is her birthday. I want to go to the park, but it may rain.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

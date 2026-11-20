@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1.5,
+   "W1": 0.5,
    "W2": 0,
    "C1": 0,
    "C2": 0
@@ -28,7 +28,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -1633,7 +1635,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1.5: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 0: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete the sentence: \"I see ___ cat on the wall.\"\" | \"Correct the sentence: \"She can swims.\"\" | \"Look at your sentence. Which word needs to change?\" | \"Now write one sentence about a person you know. Use can and a verb.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"can't\" fits \"I ___ ride a bike. I never learned.\"\nNow write one sentence about a person you know using can + base verb.\n\nLEARNER'S LAST MESSAGE:\nMy brother can swims.\nFACT: the last learner message contained the error of W1 (adds -s to the verb after can (\"She can swims.\")).\n\nTUTOR TURN TO JUDGE:\n\"My brother can\" is right. But the verb after \"can\" does not follow the usual rule for he or she. The verb after \"can\" stays plain. Try your sentence again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1.5: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 0: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete the sentence: \"I see ___ cat on the wall.\"\" | \"Correct the sentence: \"She can swims.\"\" | \"Look at your sentence. Which word needs to change?\" | \"Now write one sentence about a person you know. Use can and a verb.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"can't\" fits \"I ___ ride a bike. I never learned.\"\nNow write one sentence about a person you know using can + base verb.\n\nLEARNER'S LAST MESSAGE:\nMy brother can swims.\nFACT: the last learner message contained the error of W1 (adds -s to the verb after can (\"She can swims.\")).\n\nTUTOR TURN TO JUDGE:\n\"My brother can\" is right. But the verb after \"can\" does not follow the usual rule for he or she. The verb after \"can\" stays plain. Try your sentence again.",
+   "stateBefore": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1.5,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "the verb after \"can\" does not follow the usual rule for he or she. The verb after \"can\" stays plain."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother can swim.",
+    "errors": {
+     "W1": "My brother can swims."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0.5,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brother can swims.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My brother can swims.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

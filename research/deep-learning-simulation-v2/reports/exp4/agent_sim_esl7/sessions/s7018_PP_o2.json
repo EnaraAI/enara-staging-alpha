@@ -14,7 +14,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1.2,
+   "C1": 2.2,
    "C2": 0
   },
   "indep": {
@@ -854,7 +854,103 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 1.2: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Hello! Good tip: read the whole question first, then find the answer in the text. Read this message: \"Hi Mona! The football game is on Thursday. It is not on Monday this week. Ali brings the ball at 5\" | \"Yes, Thursday is right! The message says the game is on Thursday, not Monday. Now read the whole question first. What time does the game start? Use the same message.\" | \"Yes, 5:30 is right! The question asks when the game starts, and the message says the game starts at 5:30. Ali brings the ball at 5:15, so that time is not the answer. Next one. Read the whole question\" | \"That is not the answer yet. The question asks for the place, so we need to copy the place from the message. Hint: look at the sentence that starts with \"Meet me at ...\". Read it again and write the pl\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCareful! 5:15 is a real time in the message, but it is the time Ali brings the ball. The question asks when the game starts. Hint: look for the words \"The game starts at\". Read the question again and try once more: What time does the game start?\n\nLEARNER'S LAST MESSAGE:\n5:30\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, 5:30 is right! You read the whole question and found the time the game starts, not the time Ali brings the ball. Well done for trying again! Now a new question. Read the same message again. Where do they meet?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 1.2: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Hello! Good tip: read the whole question first, then find the answer in the text. Read this message: \"Hi Mona! The football game is on Thursday. It is not on Monday this week. Ali brings the ball at 5\" | \"Yes, Thursday is right! The message says the game is on Thursday, not Monday. Now read the whole question first. What time does the game start? Use the same message.\" | \"Yes, 5:30 is right! The question asks when the game starts, and the message says the game starts at 5:30. Ali brings the ball at 5:15, so that time is not the answer. Next one. Read the whole question\" | \"That is not the answer yet. The question asks for the place, so we need to copy the place from the message. Hint: look at the sentence that starts with \"Meet me at ...\". Read it again and write the pl\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCareful! 5:15 is a real time in the message, but it is the time Ali brings the ball. The question asks when the game starts. Hint: look for the words \"The game starts at\". Read the question again and try once more: What time does the game start?\n\nLEARNER'S LAST MESSAGE:\n5:30\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, 5:30 is right! You read the whole question and found the time the game starts, not the time Ali brings the ball. Well done for trying again! Now a new question. Read the same message again. Where do they meet?",
+   "stateBefore": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 5:30 is right!"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "the place after \"Meet me at\"",
+    "errors": {
+     "W1": "the first place in the message"
+    }
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "the place after \"Meet me at\"",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "the place after \"Meet me at\"",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

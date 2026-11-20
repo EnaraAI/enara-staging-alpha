@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1.2,
    "C2": 0
@@ -1553,7 +1553,99 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-clothes-shopping (clothes, colours and sizes). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: the adjective goes after the noun. Its error: puts the colour or size after the noun (\"I want a shirt blue, size big.\").\nC1 (correct) strength 1.2: colour and size adjectives go before the noun. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Correct this question: \"How much cost this hat?\"\" | \"Now you try. You want the same jacket in small. Ask the shop assistant.\" | \"Now one on your own. You want the same shirt in white. Ask the shop assistant.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Do you have this shirt\" is a good start: it is a full question. Can you tell me why you put \"blue\" right after \"shirt\"?\n\nLEARNER'S LAST MESSAGE:\nI think the adjective goes after the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe question is \"Do you have this shirt in blue?\" Put \"in\" before a colour or a size.\nRight: \"Do you have this hat in red?\"\nWrong: \"Do you have this hat red?\"\nNow you try, on your own. You want the same jacket in small. Ask the shop assistant."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-clothes-shopping (clothes, colours and sizes). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: the adjective goes after the noun. Its error: puts the colour or size after the noun (\"I want a shirt blue, size big.\").\nC1 (correct) strength 1.2: colour and size adjectives go before the noun. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Correct this question: \"How much cost this hat?\"\" | \"Now you try. You want the same jacket in small. Ask the shop assistant.\" | \"Now one on your own. You want the same shirt in white. Ask the shop assistant.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Do you have this shirt\" is a good start: it is a full question. Can you tell me why you put \"blue\" right after \"shirt\"?\n\nLEARNER'S LAST MESSAGE:\nI think the adjective goes after the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe question is \"Do you have this shirt in blue?\" Put \"in\" before a colour or a size.\nRight: \"Do you have this hat in red?\"\nWrong: \"Do you have this hat red?\"\nNow you try, on your own. You want the same jacket in small. Ask the shop assistant.",
+   "stateBefore": {
+    "form": "clothes",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"Do you have this hat in red?\" Wrong: \"Do you have this hat red?\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Do you have this jacket in small?",
+    "errors": {
+     "W1": "Do you have this jacket small?"
+    }
+   },
+   "applied": [
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "clothes",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Do you have this jacket in small?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Do you have this jacket in small?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

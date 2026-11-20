@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 4,
+   "C1": 5,
    "C2": 0
   },
   "start": {
@@ -29,7 +29,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -1734,7 +1736,112 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 3: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 4.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. Put in order: \"plays / Sam / chess / on Mondays\"\" | \"Put in order: \"plays / Sam / chess / on Mondays\"\" | \"Write one sentence about a person you know using the subject first, then the verb, then the object.\" | \"Put in order: \"usually / we / lunch / have\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My aunt often makes tea.\" is in the right order.\nNow write one sentence about a person you know using the subject first, then the verb, then the object.\n\nLEARNER'S LAST MESSAGE:\nMy father reads the newspaper.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My father reads the newspaper.\" has the subject first, then the verb, then the object.\nNext one. Put in order: \"usually / we / lunch / have\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 3: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 4.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. Put in order: \"plays / Sam / chess / on Mondays\"\" | \"Put in order: \"plays / Sam / chess / on Mondays\"\" | \"Write one sentence about a person you know using the subject first, then the verb, then the object.\" | \"Put in order: \"usually / we / lunch / have\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My aunt often makes tea.\" is in the right order.\nNow write one sentence about a person you know using the subject first, then the verb, then the object.\n\nLEARNER'S LAST MESSAGE:\nMy father reads the newspaper.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My father reads the newspaper.\" has the subject first, then the verb, then the object.\nNext one. Put in order: \"usually / we / lunch / have\"",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My father reads the newspaper.\" has the subject first, then the verb, then the object."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"My father reads the newspaper.\" has the subject first"
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "We usually have lunch.",
+    "errors": {
+     "W1": "Have we usually lunch."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "We usually have lunch.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "We usually have lunch.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

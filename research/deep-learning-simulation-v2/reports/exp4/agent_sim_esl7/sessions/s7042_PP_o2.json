@@ -19,8 +19,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 2
+   "C1": 3,
+   "C2": 3
   },
   "start": {
    "W1": 2,
@@ -1000,7 +1000,127 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 2.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 2.\nItems this learner answered in session 1: \"Hello! We use \"It is\" + an adjective to describe the weather. Example: It is sunny today. Now you try. Complete: \"Take an umbrella. It is ___ today.\" Choose a weather word.\" | \"Good idea, rain is the right idea. But after \"It is\" we need an adjective, and rain is a noun. Hint: add -y to make the adjective. Try again: \"Take an umbrella. It is ___ today.\"\" | \"Let me explain it clearly. The adjective is rainy: r-a-i-n-y. We add -y to the noun rain, so the sentence is: \"Take an umbrella. It is rainy today.\" Now a new one. Complete: \"My hat flew away! It is v\" | \"Yes, windy is right! Wind + y makes the adjective windy, and the wind took your hat. Next one. Complete: \"The sun is out and the sky is blue. It is ___ today.\" Choose a weather word.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, windy is right! The wind can take a hat away. Now try a new one. Complete: \"I need my sunglasses. It is very ___.\"\n\nLEARNER'S LAST MESSAGE:\nsunny\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, sunny is right! Sunglasses help when it is sunny. Now try a new one. Complete: \"I need a warm coat. It is very ___ today.\" Use one word from our list."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 2.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 2.\nItems this learner answered in session 1: \"Hello! We use \"It is\" + an adjective to describe the weather. Example: It is sunny today. Now you try. Complete: \"Take an umbrella. It is ___ today.\" Choose a weather word.\" | \"Good idea, rain is the right idea. But after \"It is\" we need an adjective, and rain is a noun. Hint: add -y to make the adjective. Try again: \"Take an umbrella. It is ___ today.\"\" | \"Let me explain it clearly. The adjective is rainy: r-a-i-n-y. We add -y to the noun rain, so the sentence is: \"Take an umbrella. It is rainy today.\" Now a new one. Complete: \"My hat flew away! It is v\" | \"Yes, windy is right! Wind + y makes the adjective windy, and the wind took your hat. Next one. Complete: \"The sun is out and the sky is blue. It is ___ today.\" Choose a weather word.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, windy is right! The wind can take a hat away. Now try a new one. Complete: \"I need my sunglasses. It is very ___.\"\n\nLEARNER'S LAST MESSAGE:\nsunny\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, sunny is right! Sunglasses help when it is sunny. Now try a new one. Complete: \"I need a warm coat. It is very ___ today.\" Use one word from our list.",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, sunny is right!"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, sunny is right!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "sunny"
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "sunny"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "cold",
+    "errors": {
+     "W2": "cld"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "cold",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "cold",
+    "probes": [
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

@@ -14,7 +14,7 @@
   "s": {
    "W1": 1,
    "W2": 0,
-   "C1": 1.2,
+   "C1": 2.2,
    "C2": 0
   },
   "indep": {
@@ -1595,7 +1595,99 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1.2: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: \"My cousin ___ brown eyes.\" (has / have)\" | \"Now you try. Write two sentences about a famous actor: one about hair or eyes and one about personality.\" | \"Now try a new one. Write one sentence about a bag that a friend has. Use \"has\" and two describing words.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My brother has\" is right: \"has\" fits one person. But \"hair short black\" is in an order that English does not use. English puts a describing word and a noun in a set order. Try the hair sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy brother has short black hair.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My brother has short black hair.\" is right now. \"Has\" fits one person, and the describing words are in the right order.\nNext one. Write two sentences about a famous actor: one about hair or eyes and one about personality."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1.2: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: \"My cousin ___ brown eyes.\" (has / have)\" | \"Now you try. Write two sentences about a famous actor: one about hair or eyes and one about personality.\" | \"Now try a new one. Write one sentence about a bag that a friend has. Use \"has\" and two describing words.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"My brother has\" is right: \"has\" fits one person. But \"hair short black\" is in an order that English does not use. English puts a describing word and a noun in a set order. Try the hair sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy brother has short black hair.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My brother has short black hair.\" is right now. \"Has\" fits one person, and the describing words are in the right order.\nNext one. Write two sentences about a famous actor: one about hair or eyes and one about personality.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My brother has short black hair.\" is right now."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "He has short black hair.",
+    "errors": {
+     "W1": "He has hair short black."
+    }
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "He has short black hair.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "He has short black hair.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
