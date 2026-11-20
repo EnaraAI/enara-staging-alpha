@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -307,7 +307,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Sure, here is a short exercise on some and any. Complete the sentence with some or any:\n\nI would like ___ water, please.\n\nLEARNER'S LAST MESSAGE:\nsome\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"some\" fits \"I would like ___ water, please.\" Water is something we do not count, so we use \"some\" here.\n\nNow a freer task. You are in a café with a friend. Write one or two sentences to order something to eat and something to drink. Be polite."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Sure, here is a short exercise on some and any. Complete the sentence with some or any:\n\nI would like ___ water, please.\n\nLEARNER'S LAST MESSAGE:\nsome\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"some\" fits \"I would like ___ water, please.\" Water is something we do not count, so we use \"some\" here.\n\nNow a freer task. You are in a café with a friend. Write one or two sentences to order something to eat and something to drink. Be polite.",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"some\" fits \"I would like ___ water, please.\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"some\" fits"
+    },
+    {
+     "rule": "R6",
+     "belief": "W1",
+     "quote": "Water is something we do not count, so we use \"some\" here."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I would like some tea, please.",
+    "errors": {
+     "W1": "I would like any tea, please."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R6"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I would like some tea, please.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I would like some tea, please.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

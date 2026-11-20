@@ -15,11 +15,11 @@
   "s": {
    "W1": 1,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -312,7 +312,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 1: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, we can practise this. These three small words make your English sound much more natural.\n\nQuick question first: which of the words and, but and because do you already use when you write or speak English?\n\nOur goal today: join two short sentences with and (add an idea), but (show a contrast) or because (give a reason).\n\nHere is a model sentence from daily life (my own example): \"I go to the market on Sunday because it is cheap.\"\n\nYour task: write one sentence about your day using and, but or because. Choose the word you like best.\n\nLEARNER'S LAST MESSAGE:\nI was tired, but I went to work.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour sentence \"I was tired, but I went to work.\" is correct. \"but\" shows the contrast between being tired and going to work, and the comma before it is well placed.\n\nNext exercise:\n\nJoin with and: \"I have a cat. I have a dog.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 1: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Yes, we can practise this. These three small words make your English sound much more natural.\n\nQuick question first: which of the words and, but and because do you already use when you write or speak English?\n\nOur goal today: join two short sentences with and (add an idea), but (show a contrast) or because (give a reason).\n\nHere is a model sentence from daily life (my own example): \"I go to the market on Sunday because it is cheap.\"\n\nYour task: write one sentence about your day using and, but or because. Choose the word you like best.\n\nLEARNER'S LAST MESSAGE:\nI was tired, but I went to work.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour sentence \"I was tired, but I went to work.\" is correct. \"but\" shows the contrast between being tired and going to work, and the comma before it is well placed.\n\nNext exercise:\n\nJoin with and: \"I have a cat. I have a dog.\"",
+   "stateBefore": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Your sentence \"I was tired, but I went to work.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"I was tired, but I went to work.\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "I have a cat and I have a dog.",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I have a cat and I have a dog.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I have a cat and I have a dog.",
+    "probes": []
+   }
   }
  ],
  "assess": {
