@@ -15,71 +15,66 @@ Sources: branch `claude/tutor-kids-pack` (`research/deep-learning-simulation-v2/
 
 ## 1. ESL6 per outcome
 
-**What ESL6 is.** A pre-registered simulation (`config/agent_sim_esl6/PROTOCOL.md`).
+**Source:** branch `claude/tutor-esl6`, finished 19 Nov 2026.
+- Report: `research/deep-learning-simulation-v2/reports/exp4/AGENT_SIM_ESL6.md`.
+- Data: `reports/exp4/agent_sim_esl6/` (`POST.json`, `ANALYSIS.json`, `STUCK.json`, `sessions/`).
+- An older, paused copy of this folder on `claude/tutor-kids-pack` has only the pre-test. The first version of this pack used that copy by mistake.
 
-- It compares two arms on the 30 A1–A2 form outcomes:
-  - **ENARA**: arm LE, the ESL5 setting = `wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5` plus `graderV2`;
-  - **P+**: arm PP, the strong plain baseline prompt.
-- Each simulated learner is run twice per arm (2 replications). Both arms start from the same learner state.
-- The planned tests: a 12-point form before the session (pre), right after it (immediate), and 7 simulated days later (delayed).
+**Design:**
+- **ENARA** = arm LE, the ESL5 setting plus `graderV2`. **P+** = arm PP, the strong plain baseline prompt.
+- 30 A1–A2 form outcomes; one 5-turn session; tests before the session, right after it, and 7 simulated days later.
+- 270 explicit-first learners, each run twice per arm (2 replications, averaged).
 
-**Status: ESL6 was paused by the owner in the middle of round 2** (`agent_sim_esl6/RESUME.md`, 17 Nov 2026; LMS work had priority).
-- Only the pre-test was ever scored.
-- The immediate and delayed tests, and the per-arm stuck/leak/double-question counts, were never produced. They are marked "not saved" below.
-- Because both arms start from the same learner state, their pre-test scores are identical by design.
-- No ENARA-vs-P+ difference exists yet, so the rows cannot be sorted by difference. They are sorted by outcome id.
+**Decision: NOT CONFIRMED.**
+- Pre-registered primary result (7-day delayed test, gap-fill and choice items): ENARA 0.773, P+ 0.786.
+- Difference −0.013 (95% interval −0.036 to +0.009), p = 0.28.
+- Learners favouring ENARA / P+ / tied: 50 / 50 / 170.
 
-| Outcome | n per arm (learners × 2 runs) | Pre ENARA | Pre P+ | Immediate ENARA / P+ | 7-day delayed ENARA / P+ | Difference (delayed) |
-|---|---|---|---|---|---|---|
-| EN-F-A1-GR-article-a-an | 10 × 2 = 20 | 0.408 | 0.408 | not saved | not saved | not saved |
-| EN-F-A1-GR-article-the | 9 × 2 = 18 | 0.190 | 0.190 | not saved | not saved | not saved |
-| EN-F-A1-GR-can-ability | 10 × 2 = 20 | 0.808 | 0.808 | not saved | not saved | not saved |
-| EN-F-A1-GR-capitals-full-stops | 9 × 2 = 18 | 0.153 | 0.153 | not saved | not saved | not saved |
-| EN-F-A1-GR-copula-be | 9 × 2 = 18 | 0.394 | 0.394 | not saved | not saved | not saved |
-| EN-F-A1-GR-prepositions-time | 10 × 2 = 20 | 0.496 | 0.496 | not saved | not saved | not saved |
-| EN-F-A1-GR-there-is-are | 9 × 2 = 18 | 0.481 | 0.481 | not saved | not saved | not saved |
-| EN-F-A1-GR-word-order-svo | 10 × 2 = 20 | 0.438 | 0.438 | not saved | not saved | not saved |
-| EN-F-A1-VO-classroom-objects | 9 × 2 = 18 | 0.681 | 0.681 | not saved | not saved | not saved |
-| EN-F-A1-VO-days-months | 9 × 2 = 18 | 0.444 | 0.444 | not saved | not saved | not saved |
-| EN-F-A1-VO-family | 10 × 2 = 20 | 0.617 | 0.617 | not saved | not saved | not saved |
-| EN-F-A1-VO-food-drink | 9 × 2 = 18 | 0.940 | 0.940 | not saved | not saved | not saved |
-| EN-F-A1-VO-home-rooms | 10 × 2 = 20 | 0.546 | 0.546 | not saved | not saved | not saved |
-| EN-F-A1-VO-numbers-time | 9 × 2 = 18 | 0.750 | 0.750 | not saved | not saved | not saved |
-| EN-F-A2-FN-polite-requests | 9 × 2 = 18 | 0.352 | 0.352 | not saved | not saved | not saved |
-| EN-F-A2-GR-comparatives | 10 × 2 = 20 | 0.550 | 0.550 | not saved | not saved | not saved |
-| EN-F-A2-GR-conjunctions | 9 × 2 = 18 | 0.694 | 0.694 | not saved | not saved | not saved |
-| EN-F-A2-GR-frequency-adverbs | 10 × 2 = 20 | 0.283 | 0.283 | not saved | not saved | not saved |
-| EN-F-A2-GR-going-to | 9 × 2 = 18 | 0.245 | 0.245 | not saved | not saved | not saved |
-| EN-F-A2-GR-much-many | 9 × 2 = 18 | 0.134 | 0.134 | not saved | not saved | not saved |
-| EN-F-A2-GR-past-questions-did | 10 × 2 = 20 | 0.438 | 0.438 | not saved | not saved | not saved |
-| EN-F-A2-GR-past-simple-irregular | 9 × 2 = 18 | 0.236 | 0.236 | not saved | not saved | not saved |
-| EN-F-A2-GR-past-simple-regular | 10 × 2 = 20 | 0.325 | 0.325 | not saved | not saved | not saved |
-| EN-F-A2-GR-present-continuous | 9 × 2 = 18 | 0.157 | 0.157 | not saved | not saved | not saved |
-| EN-F-A2-GR-some-any | 9 × 2 = 18 | 0.505 | 0.505 | not saved | not saved | not saved |
-| EN-F-A2-GR-third-person-s | 10 × 2 = 20 | 0.396 | 0.396 | not saved | not saved | not saved |
-| EN-F-A2-VO-appearance | 9 × 2 = 18 | 0.931 | 0.931 | not saved | not saved | not saved |
-| EN-F-A2-VO-clothes-shopping | 10 × 2 = 20 | 0.950 | 0.950 | not saved | not saved | not saved |
-| EN-F-A2-VO-jobs-workplaces | 9 × 2 = 18 | 0.500 | 0.500 | not saved | not saved | not saved |
-| EN-F-A2-VO-weather | 9 × 2 = 18 | 0.352 | 0.352 | not saved | not saved | not saved |
+**How to read the table:**
+- Scores are the share of points on the pre-registered primary items (gap-fill and choice), mean of 2 replications, explicit-first learners.
+- n = learners per arm.
+- Rows are sorted by the delayed difference, biggest ENARA loss first.
+- Stuck runs = 3 or more turns on one item, never right (`STUCK.json`). Early leaks = tutor replies that gave an answer too early. Two questions = final replies with two asks. These three columns count every session of the outcome (both replications), as in the report.
 
-Total: 30 outcomes, 564 sessions per arm. Pre-test = share of the 12 points.
+| Outcome | n learners per arm | Pre ENARA / P+ | Immediate ENARA / P+ | 7-day delayed ENARA / P+ | Delayed difference (ENARA − P+) | Stuck runs ENARA / P+ | Replies with an early leak ENARA / P+ | Two questions in a reply ENARA / P+ |
+|---|---|---|---|---|---|---|---|---|
+| EN-F-A2-GR-frequency-adverbs | 9 | 0.181 / 0.181 | 0.500 / 0.931 | 0.208 / 0.764 | -0.556 | 0 / 0 | 0 / 0 | 0 / 1 |
+| EN-F-A2-GR-past-questions-did | 9 | 0.431 / 0.431 | 0.542 / 0.944 | 0.486 / 0.708 | -0.222 | 0 / 0 | 0 / 0 | 0 / 0 |
+| EN-F-A2-GR-some-any | 9 | 0.639 / 0.639 | 0.611 / 0.792 | 0.625 / 0.819 | -0.194 | 0 / 0 | 0 / 0 | 0 / 0 |
+| EN-F-A1-GR-article-the | 9 | 0.208 / 0.208 | 0.986 / 0.889 | 0.431 / 0.569 | -0.139 | 0 / 0 | 4 / 0 | 0 / 0 |
+| EN-F-A2-GR-third-person-s | 9 | 0.278 / 0.278 | 0.875 / 0.986 | 0.694 / 0.819 | -0.125 | 0 / 0 | 0 / 0 | 0 / 0 |
+| EN-F-A1-GR-copula-be | 9 | 0.639 / 0.639 | 0.944 / 0.972 | 0.903 / 0.944 | -0.042 | 0 / 0 | 0 / 4 | 0 / 0 |
+| EN-F-A2-GR-conjunctions | 9 | 0.444 / 0.444 | 0.917 / 0.889 | 0.736 / 0.764 | -0.028 | 0 / 0 | 0 / 0 | 0 / 0 |
+| EN-F-A1-VO-home-rooms | 9 | 0.681 / 0.681 | 0.764 / 0.750 | 0.653 / 0.667 | -0.014 | 0 / 4 | 6 / 8 | 0 / 0 |
+| EN-F-A1-GR-prepositions-time | 9 | 0.431 / 0.431 | 0.958 / 0.944 | 0.764 / 0.764 | +0.000 | 0 / 0 | 6 / 0 | 0 / 0 |
+| EN-F-A1-GR-word-order-svo | 9 | 0.444 / 0.444 | 0.944 / 0.944 | 0.861 / 0.861 | +0.000 | 0 / 0 | 2 / 6 | 0 / 0 |
+| EN-F-A1-VO-days-months | 9 | 0.333 / 0.333 | 0.347 / 0.347 | 0.319 / 0.319 | +0.000 | 0 / 0 | 0 / 0 | 0 / 0 |
+| EN-F-A1-VO-food-drink | 9 | 1.000 / 1.000 | 1.000 / 1.000 | 1.000 / 1.000 | +0.000 | 0 / 0 | 0 / 0 | 0 / 0 |
+| EN-F-A1-VO-numbers-time | 9 | 0.889 / 0.889 | 0.903 / 0.875 | 0.903 / 0.903 | +0.000 | 0 / 2 | 0 / 1 | 0 / 0 |
+| EN-F-A2-VO-appearance | 9 | 1.000 / 1.000 | 1.000 / 1.000 | 1.000 / 1.000 | +0.000 | 0 / 0 | 0 / 0 | 0 / 0 |
+| EN-F-A2-VO-clothes-shopping | 9 | 1.000 / 1.000 | 1.000 / 1.000 | 1.000 / 1.000 | +0.000 | 0 / 0 | 6 / 19 | 0 / 0 |
+| EN-F-A2-GR-going-to | 9 | 0.375 / 0.375 | 0.958 / 0.958 | 0.944 / 0.931 | +0.014 | 0 / 0 | 0 / 1 | 0 / 0 |
+| EN-F-A2-GR-past-simple-irregular | 9 | 0.194 / 0.194 | 0.972 / 0.972 | 0.917 / 0.903 | +0.014 | 0 / 0 | 0 / 0 | 0 / 0 |
+| EN-F-A1-VO-family | 9 | 0.611 / 0.611 | 0.764 / 0.681 | 0.708 / 0.694 | +0.014 | 0 / 0 | 0 / 2 | 0 / 0 |
+| EN-F-A1-GR-article-a-an | 9 | 0.514 / 0.514 | 0.931 / 0.958 | 0.875 / 0.847 | +0.028 | 0 / 0 | 4 / 0 | 0 / 0 |
+| EN-F-A1-GR-can-ability | 9 | 0.875 / 0.875 | 0.986 / 0.986 | 0.944 / 0.917 | +0.028 | 0 / 0 | 0 / 2 | 0 / 0 |
+| EN-F-A1-GR-capitals-full-stops | 9 | 0.194 / 0.194 | 0.944 / 0.917 | 0.833 / 0.806 | +0.028 | 0 / 0 | 48 / 63 | 0 / 0 |
+| EN-F-A1-GR-there-is-are | 9 | 0.792 / 0.792 | 0.764 / 0.667 | 0.694 / 0.667 | +0.028 | 1 / 0 | 6 / 0 | 0 / 0 |
+| EN-F-A2-VO-weather | 9 | 0.319 / 0.319 | 0.694 / 0.694 | 0.542 / 0.514 | +0.028 | 0 / 1 | 8 / 0 | 0 / 0 |
+| EN-F-A1-VO-classroom-objects | 9 | 0.819 / 0.819 | 0.931 / 0.861 | 0.958 / 0.903 | +0.056 | 0 / 1 | 3 / 1 | 0 / 0 |
+| EN-F-A2-FN-polite-requests | 9 | 0.611 / 0.611 | 1.000 / 0.972 | 0.847 / 0.792 | +0.056 | 0 / 0 | 0 / 1 | 0 / 0 |
+| EN-F-A2-GR-past-simple-regular | 9 | 0.167 / 0.167 | 0.972 / 0.972 | 0.931 / 0.875 | +0.056 | 0 / 0 | 0 / 0 | 0 / 0 |
+| EN-F-A2-VO-jobs-workplaces | 9 | 0.583 / 0.583 | 0.819 / 0.653 | 0.736 / 0.681 | +0.056 | 0 / 4 | 5 / 8 | 0 / 0 |
+| EN-F-A2-GR-comparatives | 9 | 0.333 / 0.333 | 0.931 / 0.861 | 0.889 / 0.764 | +0.125 | 0 / 0 | 9 / 0 | 0 / 0 |
+| EN-F-A2-GR-much-many | 9 | 0.139 / 0.139 | 0.958 / 0.917 | 0.847 / 0.653 | +0.194 | 0 / 0 | 0 / 0 | 0 / 0 |
+| EN-F-A2-GR-present-continuous | 9 | 0.208 / 0.208 | 0.903 / 0.861 | 0.931 / 0.722 | +0.208 | 0 / 0 | 0 / 0 | 0 / 0 |
+| **All outcomes** | 270 | | | | | 1 / 12 | 107 / 116 | 0 / 1 |
 
-**Stuck learners, answer leaks and double questions per arm (ESL6): not saved.** The tagging step runs after the last round and was never reached.
+The totals match the report: stuck runs 1 / 12, early-leak replies 107 / 116, two asks 0 / 1 (the reply guard removed 40 second asks in ENARA).
 
-**Closest saved numbers: ESL5** (`AGENT_SIM_ESL5.md`).
-- Same two arms (ENARA = A0+LE+esl5, without graderV2).
-- Only 3 outcomes, 108 explicit-first learners, immediate test only. No delayed test was run in ESL5.
-
-| ESL5 measure | ENARA (A0+LE) | P+ |
-|---|---|---|
-| Immediate test difference (ENARA − P+) | +0.152 [+0.095, +0.211], p = 6.6 × 10⁻⁷ | — |
-| Learners favouring the arm / tied | 42 | 14 (52 tied) |
-| Stuck runs (3+ turns on one item, never right) | 2 | 0 |
-| Early answer leaks, final reply (pre-registered definition, after the recount) | 31 (14 in the first count; 163 under the strict recount reading) | 68 |
-| Two questions/asks in one reply (final replies) | 0 of 2,400 (the guard removed a second ask in 11 raw replies) | not saved |
-| Answer-protection rating (1–5) | 4.41 | 4.04 |
-
-Leak recount details: `ESL5_LEAK_RECOUNT.md`.
+Report notes:
+- After round 2 P+ led on wrong-belief strength, mainly because it stated rules far more often (196 rule statements against ENARA's 45).
+- The report recommends keeping the ESL5 setting off for learners on lms-test until a change beats P+ on this design. lms-test currently runs it (`esl5` with `planner2`).
 
 ## 2. Three full session transcripts (PLN2i)
 
