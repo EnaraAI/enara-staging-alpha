@@ -23,7 +23,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import path from 'path';
 import {
   detectTurnSignals, deriveLearnerContext, levelBand, renderLanguageContextPrompt, selectLanguageMoves, researchSignals, closingOn, ruleFirstDecision, explicitFirst, hasTwoAsks,
-  esl5Adjust, knownKey, independentSuccessItem, QUICK_CHECK_DROPPED, QUICK_CHECK_LINE, LAD_STEP_DROPPED, LAD_STEP_LINE, type LanguageTeachingContext, type TrustedAgeBand,
+  esl5Adjust, knownKey, independentSuccessItem, QUICK_CHECK_DROPPED, QUICK_CHECK_LINE, LAD_STEP_DROPPED, LAD_STEP_LINE, TASK_STEP_DROPPED, TASK_STEP_LINE, type LanguageTeachingContext, type TrustedAgeBand,
 } from '../../../../backend/src/services/languageTeachingContext';
 import { stripAssessmentMarkers, isFailure, L1_TRANSFER_CODES } from '../../../../backend/src/services/languageLearningState';
 import { applyReplyGuards, arbitratePedagogy, completeLanguageTurn } from '../../../../backend/src/services/languageTurnPipeline';
@@ -69,7 +69,7 @@ function readJudge<T = { events: JudgeEvent[]; next_task: NextTask; retrieval?: 
 type Arm = 'OFF' | 'P2';
 type Group = 'TASK' | 'TTT' | 'LAD' | 'KIDPPP';
 type Time = 'pre' | 'imm' | 'del';
-const ARMS: Arm[] = ['OFF', 'P2'];
+let ARMS: Arm[] = ['OFF', 'P2']; // amendment K: GROUPS.json "arms" can limit a re-check to one arm
 const GROUPS: Group[] = ['TASK', 'TTT', 'LAD', 'KIDPPP'];
 const TIMES: Time[] = ['pre', 'imm', 'del'];
 const ROOT = path.join(__dirname, '../..');            // research/deep-learning-simulation-v2
@@ -92,7 +92,9 @@ const norm = (t: string) => t.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').re
 const coreOf = (prompt: string) => prompt.replace(/\s*\(answer with only the (missing word|verb)\)\s*$/i, '').replace(/^[^:]*:\s*/, '');
 /** Amendment F: a run folder with GROUPS.json ({"groups":["TASK"]}) runs only those groups' learners (same ids, seeds and outcomes), one cell per arm. */
 let GROUP_FILTER: Group[] | null = null;
-const dirArg = (d: string) => { const r = path.resolve(d); const gf = path.join(r, 'GROUPS.json'); if (existsSync(gf)) { const g = JSON.parse(readFileSync(gf, 'utf8')); GROUP_FILTER = g.groups; LRN = undefined; if (g.p2Extra && !ENV_OF.P2.includes(g.p2Extra)) ENV_OF.P2 = `${ENV_OF.P2},${g.p2Extra}`; } /* amendment G: p2Extra (kidsPack) on the ON arm */ return r; };
+/** Amendment K (planner2e re-check): GROUPS.json may also list "learners" (ids) and "arms" (e.g. ["P2"]): only those sessions run, in one cell per arm. */
+let LEARNER_FILTER: number[] | null = null;
+const dirArg = (d: string) => { const r = path.resolve(d); const gf = path.join(r, 'GROUPS.json'); if (existsSync(gf)) { const g = JSON.parse(readFileSync(gf, 'utf8')); GROUP_FILTER = g.groups ?? null; LEARNER_FILTER = g.learners ?? null; if (g.arms) ARMS = g.arms; LRN = undefined; if (g.p2Extra && !ENV_OF.P2.includes(g.p2Extra)) ENV_OF.P2 = `${ENV_OF.P2},${g.p2Extra}`; } /* amendment G: p2Extra (kidsPack) on the ON arm */ return r; };
 
 // ---------------------------------------------------------------------------------------------------------- python bridge (esl6_forget.py, esl6_outcomes.py; unchanged)
 const PY = `
@@ -169,7 +171,7 @@ function buildLearners(): Learner[] {
   return out;
 }
 let LRN: Learner[] | undefined;
-const LEARNERS = () => (LRN ??= buildLearners().filter((l) => !GROUP_FILTER || GROUP_FILTER.includes(l.group)));
+const LEARNERS = () => (LRN ??= buildLearners().filter((l) => (!GROUP_FILTER || GROUP_FILTER.includes(l.group)) && (!LEARNER_FILTER || LEARNER_FILTER.includes(l.idx))));
 const L_OF = (idx: number): Learner => LEARNERS().find((l) => l.idx === idx)!;
 const seedOf = (idx: number, rep: number) => `${NS}|L${idx}|rep${rep}`;
 /** TTT "mostly known" start: no wrong belief (error 0.05 per probed item), every used correct belief at 1 (known, not secure: after F1 the recall floor
@@ -204,7 +206,7 @@ const opener = (l: Learner): Turn => {
   return { session: 1, learner: text, production: { kind: 'none', text: '' } };
 };
 // Cells: arm x 3 parts (learner id mod 3) = 6 cells per round of 16 sessions (4 per group).
-const cells = () => ARMS.flatMap((arm) => Array.from({ length: GROUP_FILTER ? 1 : CELLS_PER_ARM }, (_, p) => ({ id: `${arm}_${p + 1}`, arm, keys: LEARNERS().filter((l) => GROUP_FILTER || l.idx % CELLS_PER_ARM === p).map((l) => keyOf({ learnerIdx: l.idx, arm, rep: 1 })) })));
+const cells = () => ARMS.flatMap((arm) => Array.from({ length: LEARNER_FILTER ? Math.ceil(LEARNERS().length / 14) : GROUP_FILTER ? 1 : CELLS_PER_ARM }, (_, p) => ({ id: `${arm}_${p + 1}`, arm, keys: LEARNERS().filter((l, i) => (LEARNER_FILTER ? Math.floor(i / 14) === p : GROUP_FILTER || l.idx % CELLS_PER_ARM === p)).map((l) => keyOf({ learnerIdx: l.idx, arm, rep: 1 })) })));
 const caseId = (f: string, round: number) => `c${sha(`${NS}|${f}|${round}`).slice(0, 10)}`;
 
 // ---------------------------------------------------------------------------------------------------------- engine glue
@@ -263,14 +265,15 @@ function langCtx(s: Sess, po: PlanOut = planOf(s)) {
   process.env.ENARA_ENGINE_V2 = ENV_OF[s.arm];
   const l = L_OF(s.learnerIdx); const lesson0 = lessonOf(l.outcome); const st = sessionTurns(s); const message = st[st.length - 1].learner;
   const hist = history(st.slice(0, -1)); const lesson = { title: lesson0.title, spec: lesson0.spec };
-  const signals0 = detectTurnSignals(message, hist, lesson as never);
+  const signals0 = detectTurnSignals(message, hist, lesson as never, undefined, { child: trustedOf(l).band === 'child' }); // planner2d: a child's empty answer is a try
   const moves0 = selectLanguageMoves({ band: levelBand(l.level), targetLanguage: 'English', lessonStatus: 'structured', signals: signals0, masteryStatus: l.status });
   const record = engineV2('reviewOpen') || engineV2('fadeKnown') ? esl5Record(s.rec) : undefined;
   const adjusted = esl5Adjust({ signals: signals0, moves: moves0, record, history: hist, lessonId: LESSON_ID });
   const quickCheck = po.quickCheck && engineV2('planner2');
   const signals = adjusted.signals;
   const ladStep = !quickCheck && engineV2('planner2') && engineV2('kidsPack') && po.lesson?.shape === 'LAD' && ['listen', 'do', 'chant'].includes(String(po.stage)) && ladContentFor(l.outcome, lesson0.title); // planner2k fix 1
-  const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : ladStep ? adjusted.moves.filter((m) => !LAD_STEP_DROPPED.has(m.id)) : adjusted.moves;
+  const taskStep = !quickCheck && !ladStep && engineV2('planner2') && po.lesson?.shape === 'TASK' && ['repeat', 'done'].includes(String(po.stage)); // planner2e fix E (as tutor.controller)
+  const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : ladStep ? adjusted.moves.filter((m) => !LAD_STEP_DROPPED.has(m.id)) : taskStep ? adjusted.moves.filter((m) => !TASK_STEP_DROPPED.has(m.id)) : adjusted.moves;
   const learner = deriveLearnerContext({ courseLevel: l.level, courseLanguages: ['English'], adultSchool: false, trustedAgeBand: trustedOf(l), learnerMessages: [message], objectiveStatus: l.status });
   const research = closingOn() || engineV2('hints') ? researchSignals(hist, signals, lesson0.spec as never) : undefined;
   const planPrimary = po.plan.primary; process.env.ENARA_ENGINE_V2 = ENV_OF[s.arm];
@@ -278,8 +281,8 @@ function langCtx(s: Sess, po: PlanOut = planOf(s)) {
   const profile = summarizeProfile(s.rec.entries, nowOf(s));
   const base = { version: 'ltc-v1', learner, lesson: { status: 'structured', lessonId: LESSON_ID, title: lesson0.title, spec: lesson0.spec }, signals, moves, ...(profile.length ? { history: profile } : {}), ...(research ? { research } : {}), ...(planPrimary ? { planPrimary } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(record ? { record } : {}) } as never;
   const prompt = renderLanguageContextPrompt(base);
-  const tail = quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : '';
-  return { ...(base as object), ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt } as never as LanguageTeachingContext;
+  const tail = quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
+  return { ...(base as object), ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), ...(taskStep ? { taskStep: true } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt } as never as LanguageTeachingContext;
 }
 const dlg = (s: Sess) => sessionTurns(s).map((t) => `STUDENT: ${t.learner}${t.tutor !== undefined ? `\nTUTOR: ${t.tutor}` : ''}`).join('\n');
 function enginePart(s: Sess): string { const po = planOf(s); return `${po.text}\n\n${langCtx(s, po).prompt}`; }
@@ -423,8 +426,8 @@ function walk(dir: string, out: string[] = []) { if (!existsSync(dir) || existsS
 function overlapCheck(studyDir: string) {
   const own = path.resolve(studyDir);
   // amendment D: PLN2b re-checks the SAME 48 learners and seeds as PLN2 by design, so PLN2's own run folder is not a clash for it (nothing else is exempt).
-  const reuse = /^agent_sim_pln2[bckf]/.test(path.basename(own)) ? path.resolve(ROOT, 'reports/exp4/agent_sim_pln2') : null; // amendment F: pln2c reuses pln2 and pln2b
-  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && /^agent_sim_pln2([bckf]\d?)?$/.test(path.relative(path.join(ROOT, 'reports/exp4'), path.resolve(f)).split(path.sep)[0])));
+  const reuse = /^agent_sim_pln2[bckfg]/.test(path.basename(own)) ? path.resolve(ROOT, 'reports/exp4/agent_sim_pln2') : null; // amendment F: pln2c reuses pln2 and pln2b
+  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && /^agent_sim_pln2([bckfg]\d?)?$/.test(path.relative(path.join(ROOT, 'reports/exp4'), path.resolve(f)).split(path.sep)[0])));
   const ids = new Set<number>(); const seeds = new Set<string>();
   for (const f of files) { const t = readFileSync(f, 'utf8'); for (const m of t.matchAll(/"learnerIdx":\s*(\d+)/g)) ids.add(Number(m[1])); for (const m of t.matchAll(/"seed":\s*"([^"]+)"/g)) seeds.add(m[1]); }
   // ids defined in code (ESL1 0-17, ESL2 0-35, ESL3 100-159, ESL3 validation 200-211, ESL4 300-407, ESL5 500-619, ESL6 700-991, teach2 1100-1799 reserved)
@@ -682,7 +685,7 @@ async function main() {
     const dir = dirArg(a1); const cases: { id: string; text: string }[] = []; const key: Record<string, any> = {}; const again: { id: string; text: string }[] = []; const akey: Record<string, any> = {};
     for (const s of allSessions(dir)) {
       if (s.turns.filter((t) => t.tutor !== undefined).length < ROUNDS) throw new Error(`${keyOf(s)}: session not finished (${ROUNDS} tutor turns)`);
-      const id = fitCaseId(keyOf(s)); const text = fitCaseText(s, /agent_sim_pln2f/.test(dir) ? fitItemsE : fitItems); /* amendment J: anchored 9-12 items in the final run */ cases.push({ id, text }); key[id] = { session: keyOf(s), arm: s.arm, group: s.group, learner: s.learnerIdx };
+      const id = fitCaseId(keyOf(s)); const text = fitCaseText(s, /agent_sim_pln2[fg]/.test(dir) ? fitItemsE : fitItems); /* amendment J: anchored 9-12 items in the final run */ cases.push({ id, text }); key[id] = { session: keyOf(s), arm: s.arm, group: s.group, learner: s.learnerIdx };
       if (rand(`${NS}-fitagree`, id) < FIT_AGREE_SHARE) { const gid = `g${id.slice(1)}`; again.push({ id: gid, text }); akey[gid] = { ...key[id], of: id }; }
     }
     for (const [sub, cs, k, tag] of [['fit', cases, key, 'fit'], ['fitagree', again, akey, 'fag']] as const) {

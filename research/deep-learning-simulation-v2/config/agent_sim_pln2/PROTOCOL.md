@@ -38,12 +38,12 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | File | SHA-256 |
 |---|---|
 | `backend/src/services/engineV2.ts` | `ac1124a7bd7eacfbc63b6c3e88f45b8cce05354932f9e262063ee4d039656950` |
-| `backend/src/services/lessonPlanner.ts` | `599a541e742030475b1b04b9c446b378b997cd9b610ad457bd2e12a2654cf7da` |
+| `backend/src/services/lessonPlanner.ts` | `92120d7efd04065d7bd3fadc592de184df347efa3d0a36429cc24778ca9793ba` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
 | `backend/src/services/learningContext.ts` | `a012b90eb88d26c3891921694848219f5a37922b1552e9638f46c10fd0113d6d` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
-| `backend/src/services/languageTeachingContext.ts` | `4d67993f5148756b48e2cc386c0641b6d657ea2c848b012e5a934af13e280a99` |
-| `backend/src/services/languageTurnPipeline.ts` | `2673ec40c37eec5a66ee364b5d0d65054d809bd2f38ff13f48b6843f93dfd9b1` |
+| `backend/src/services/languageTeachingContext.ts` | `7cb9da95d8d71385a5a09dc5353ef0eeedc0fc2ca32aa540a8f4aed116f47123` |
+| `backend/src/services/languageTurnPipeline.ts` | `36544d0651b59f4b2b157b627435ba1ca309862d513735b66cbae363b78c700c` |
 | `backend/src/services/languageLearningState.ts` | `d6ad94373485734fe2cd8b52a849a4af1c7b0055c3566d4bb72425b4837a2927` |
 | `backend/src/services/learnerLanguageProfile.ts` | `78e783f1d129339aa84e45fc6d49a3a2090ff09fe4f103793fb21ad936f56ec4` |
 | `backend/src/services/strandLog.ts` | `0e45c79426e1b6321f8f40f282d4d502f86accb0e338882bd8f21fff88a05553` |
@@ -65,7 +65,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `6800aa097e3e64e86dcf99480a171cd563d5329a1b2777ff6a3257d979957d83` |
+| `src/offline/pln2Study.ts` (this runner) | `214b6956c86656c651ed25edcd98a2b4ae88c226e7eafe256e7e3ba596dd8d6f` |
 | `src/offline/pln2_analyze.py` (this analysis) | `5e4501439d1f9a68de91cc13d71cb61d12d6c8131ac5db4d9b50997ef45b555c` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
@@ -249,3 +249,27 @@ Recorded before any PLN2f run.
    - fit agreement measured in this run (10% sample, rule ≥ 85%).
 5. **Small batches:** 6 tutor cells of 16 and 2 judge batches per round, committed after each step. A usage-limit stop resumes from the last commit (`RESUME.md` in the run folder).
 6. **Estimate:** 42 Sonnet + about 31 Opus.
+
+## Amendment K (20 Nov 2026, owner "open fixes 1-4, then one small re-check"): planner2e and PLN2g
+Recorded before any PLN2g run.
+1. **Code (planner2-v6, all behind `planner2`, or the ESL5 / rule-bank switches for the pair check):**
+   - pair check: a "wrong" example that is acceptable English is removed from the reply (`pairCheck.ts`);
+   - `PAIR_RULE` in the prompt;
+   - rule bank rb-v2 (13 pairs rewritten, Opus-confirmed);
+   - fixes A, C, D and E from `docs/tutor/PLANNER2D_FIXES.md`;
+   - an answered item is never named again;
+   - a child's empty answer counts as a failed try (planner2d).
+2. **Harness:** `GROUPS.json` may list `learners` and `arms`. Cells hold at most 14 sessions. `langCtx` passes the child flag and the task-step override, as `tutor.controller` does. The run-folder regex includes `pln2g`.
+3. **PLN2g re-check:**
+   - learners: the 27 affected learners only (2035; the item-repeat sessions; the sessions with a lower teacher score; the planner-on sessions with a false "wrong" pair);
+   - arm: planner ON only. Same seeds, 7 rounds, immediate and 7-day delayed tests.
+   - Compared descriptively with the same learners' ON sessions in PLN2f. Not a pass/fail verdict.
+   - Measures:
+     - 2035 stuck or not;
+     - false "wrong" pairs in final replies (code check, plus one Opus check);
+     - two tasks in one reply;
+     - answered items named again;
+     - the "teacher would accept" fit item;
+     - the delayed test.
+4. **Estimate:** 14 Sonnet tutors, 7 Opus judges, 3 Opus fit judges and 1 Opus pair check: about 25 agent runs.
+5. §3 hashes refreshed.
