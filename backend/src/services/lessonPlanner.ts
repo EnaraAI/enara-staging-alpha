@@ -11,7 +11,7 @@
 import { planWithTrace, type MethodPick, type MethodRule, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { STRATEGY_BY_ID, validateComposition } from './strategyRegistry';
 
-export const PLANNER_VERSION = 'planner2-v4';
+export const PLANNER_VERSION = 'planner2-v5';
 
 export type LessonShape = 'PPP' | 'TTT' | 'TASK' | 'LAD';
 export type Stage =

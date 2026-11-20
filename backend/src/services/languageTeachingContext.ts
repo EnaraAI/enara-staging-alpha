@@ -316,6 +316,8 @@ export interface TurnSignals {
   genuineFailedAttempts?: number;
   // planner2c (PLN2c): the learner sent again a free answer (no course key, e.g. a task sentence) that was already graded wrong; it counts as a failed try.
   repeatWrong?: number;
+  // planner2d: a child's empty answer to the open item (nothing in the gap); for a child it counts as a failed try.
+  emptyAnswer?: boolean;
   // reviewOpen (ESL5): the recall error types the previous reply opened with (read back from its stored evidence).
   prevReview?: string[];
   // fadeKnown (ESL5): criteria of this turn's item that the record shows as known (faded: no rule line, quick check), or whose quick check is being answered now.
@@ -956,7 +958,7 @@ const META_REQUEST = /\b(know|word|words|say|mean|meaning|help|explain|example|e
 // r4: the learner asks for an exercise or the next item (only when it isn't an answer).
 const EXERCISE_REQUEST = /\b(exercise|practice question|quiz me|test me)\b|\b(give me|can i have|i want|let'?s (do|try)|another|one more|next)\b[^.?!]{0,30}\b(exercise|question|task|item|one)\b|تمرين|سؤال/i;
 
-export function detectTurnSignals(message: string, history: Turn[], lesson?: { title?: string; spec?: LanguageSpec }, scope?: string): TurnSignals {
+export function detectTurnSignals(message: string, history: Turn[], lesson?: { title?: string; spec?: LanguageSpec }, scope?: string, opts: { child?: boolean } = {}): TurnSignals {
   const text = message.trim();
   const learner = [...history.filter((h) => h.role === 'user').map((h) => h.content), text].slice(-3);
   const lastAssistant = [...history].reverse().find((h) => h.role === 'assistant')?.content.trim() ?? '';
@@ -1007,7 +1009,10 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
     if ((lastStored as { ownSentence?: string } | null | undefined)?.ownSentence === 'asked' && inScope(lastStored, scope) && learnerResponse === 'answer') sig.ownSentence = 'feedback';
     else if (turnNo >= OWN_SENTENCE_FROM && !tags.includes('asked') && (sig.answeringCheck || sig.unpromptedSentence)) sig.ownSentence = 'ask';
   }
-  if ((engineV2('releaseAfterTwo') || engineV2('feedbackLadder')) && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope);
+  // planner2d: for a child (trusted age band), an empty answer to the open item counts as a failed try, so the answer comes after two.
+  const countEmpty = engineV2('planner2') && Boolean(opts.child);
+  if ((engineV2('releaseAfterTwo') || engineV2('feedbackLadder')) && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope, countEmpty);
+  if (countEmpty && sig.learning?.activeItem && emptyAnswer(text, sig.activeLessonItem)) sig.emptyAnswer = true;
   if (engineV2('planner2') && !sig.keyVerdict) {
     const r = repeatedWrongAnswers(text, history, scope);
     if (r >= 2) { sig.repeatWrong = r; sig.genuineFailedAttempts = Math.max(sig.genuineFailedAttempts ?? 0, r); }
@@ -1024,8 +1029,20 @@ function genuineAttempt(text: string, prevTutor: string, item: LessonItem | unde
   if (n.split(' ').length < 3) return true;
   return !prevTutor.split(/\n+|(?<=[.!?:])\s+/).map((line) => norm(line.replace(/_+/g, ' '))).some((l) => l.split(' ').length >= 3 && (l === n || l.endsWith(` ${n}`) || n.endsWith(` ${l}`)));
 }
-/** releaseAfterTwo: genuine failed attempts on the open item, counted from the stored verdicts of earlier replies, plus this message if it is a genuine answer the key does not accept. */
-export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<TurnSignals, 'learning' | 'learnerResponse' | 'keyVerdict' | 'activeLessonItem'>, items: LessonItem[], scope?: string): number {
+/** planner2d: an empty answer to the open item: nothing at all, only gap marks or punctuation ("___", "?", "..."), a note that the gap is left empty,
+ *  or the item copied back with the gap still open. "I don't know" is not empty (it is its own move). */
+const EMPTY_NOTE = /^\(?\s*(?:empty|blank|nothing|no (?:word|answer)|(?:i )?(?:leave|left) it (?:empty|blank)\b[^)]*)\s*\)?\s*\.?$/i;
+export function emptyAnswer(text: string, item?: LessonItem): boolean {
+  const t = text.trim();
+  if (!t || /^[\s_.\-\u2013\u2014?!\u2026]*$/.test(t) || EMPTY_NOTE.test(t)) return true;
+  if (!item || !/_{2,}/.test(t)) return false;
+  const k = (x: string) => x.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const body = k(item.prompt.replace(/^[^:"]{0,40}:\s*/, ''));
+  return body.length > 0 && (k(t) === body || body.endsWith(` ${k(t)}`) || k(t).endsWith(` ${body}`));
+}
+/** releaseAfterTwo: genuine failed attempts on the open item, counted from the stored verdicts of earlier replies, plus this message if it is a genuine answer the key does not accept.
+ *  countEmpty (planner2d, children only): an empty answer on the open item counts as a failed try too. */
+export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<TurnSignals, 'learning' | 'learnerResponse' | 'keyVerdict' | 'activeLessonItem'>, items: LessonItem[], scope?: string, countEmpty = false): number {
   const target = s.learning?.activeItem?.id;
   if (!target) return 0;
   let active: string | undefined; let prevTutor = ''; let n = 0;
@@ -1043,14 +1060,14 @@ export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<Tur
     const verdict = lt?.assessment?.verdict;
     const item = items.find((x) => `lesson:${x.id}` === active);
     const kind = classifyLearnerResponse(h.content, taskInvitation(prevTutor) ?? 'instruction');
-    if (isFailure(verdict) && genuineAttempt(h.content, prevTutor, item, kind)) n += 1;
+    if ((isFailure(verdict) && genuineAttempt(h.content, prevTutor, item, kind)) || (countEmpty && !isSuccess(verdict) && emptyAnswer(h.content, item))) n += 1;
     // ESL5 fix 2: attempts count on ONE task only. A success on it, or a reply that set a different task (the answer was released with a new item,
     // the own-sentence task was set or answered, the reviewOpen closing item was set), starts the count again, even when the stored open item
     // was not moved on (a reply without a marker keeps the old item).
     if (isSuccess(verdict) || lt?.answerReleased || lt?.ownSentence || (lt?.closingAsk === 'added' && engineV2('reviewOpen'))) n = 0;
   }
   const ok = s.keyVerdict === 'CORRECT' || s.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
-  if (!ok && genuineAttempt(text, prevTutor, s.activeLessonItem, s.learnerResponse ?? 'no_pending_task')) n += 1;
+  if (!ok && (genuineAttempt(text, prevTutor, s.activeLessonItem, s.learnerResponse ?? 'no_pending_task') || (countEmpty && emptyAnswer(text, s.activeLessonItem)))) n += 1;
   return n;
 }
 /** planner2c: how many times in a row the learner has sent this same message, each earlier copy graded wrong by the reply after it (this one
@@ -1087,13 +1104,31 @@ const LIVE_RULE: Record<string, string> = {
 /** liveError (ESL5, framework §3 explicit correction tied to this learner's own error; §9 expected L1 errors): the rule line, the contrast and the next item target the error type in their latest message. */
 export const LIVE_ERROR_LINE = (code: string) => `${LIVE_RULE[code] ?? ''} This takes the place of any rule line for the lesson's next sub-rule in this reply. Never write the answer to an open lesson exercise.`;
 
+/** planner2d: lesson items already shown in this session: named by a stored reply (open item, assessment item) or whose prompt appears in a tutor reply. */
+export function shownLessonItems(history: Turn[], items: LessonItem[], scope?: string): Set<string> {
+  const k = (x: string) => x.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const bodies = items.map((i) => ({ id: i.id, body: k(i.prompt.replace(/^[^:"]{0,40}:\s*/, '')) })).filter((b) => b.body.split(' ').length >= 2);
+  const out = new Set<string>();
+  for (const h of history) {
+    if (h.role !== 'assistant') continue;
+    const lt = inScope(h.languageTurn, scope) ? h.languageTurn as (StoredLearningFields & { activeItem?: { lessonItemId?: string } | null }) | null | undefined : undefined;
+    if (lt?.activeItem?.lessonItemId) out.add(lt.activeItem.lessonItemId);
+    if (lt?.assessment?.item) out.add(lt.assessment.item);
+    const text = ` ${k(h.content)} `;
+    for (const b of bodies) if (text.includes(` ${b.body} `)) out.add(b.id);
+  }
+  return out;
+}
 // r4: structured learning state, lesson items and the hint ceiling for this turn.
 function r4Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, scope?: string): Partial<TurnSignals> {
   const learning = deriveLearningState(history, scope);
   const items = lesson?.spec?.items ?? [];
   const activeLessonItem = learning.activeItem?.lessonItemId ? items.find((i) => i.id === learning.activeItem!.lessonItemId) : undefined;
   const unsatisfied = items.filter((i) => !learning.satisfiedLessonItems.includes(i.id));
-  const nextLessonItem = unsatisfied.find((i) => i.id !== activeLessonItem?.id);
+  // planner2d (PLN2f item repeats): the next item is one not yet shown in this session. An item shown before but never credited (for example a
+  // right answer the key did not list, or one left after a wrong try) is not offered again as "next"; with none left, the tutor writes a new one.
+  const shown = engineV2('planner2') ? shownLessonItems(history, items, scope) : new Set<string>();
+  const nextLessonItem = unsatisfied.find((i) => i.id !== activeLessonItem?.id && !shown.has(i.id));
   const exerciseRequest = learnerResponse !== 'answer' && learnerResponse !== 'answer_request' && EXERCISE_REQUEST.test(text);
   // Asked for an exercise: the open lesson item if one is still unanswered, else the next one.
   const presentLessonItem = exerciseRequest ? (activeLessonItem && unsatisfied.includes(activeLessonItem) ? activeLessonItem : nextLessonItem) : undefined;
@@ -1246,7 +1281,7 @@ export function selectLanguageMoves(input: {
   // open item the answer is given with its reason and a right/wrong pair, then a new item on the same point. Never earlier: any other answer move
   // becomes a hint until then (the leak guards keep hiding the open item's answer, see guardedItems). A hints-only policy never releases.
   if (engineV2('releaseAfterTwo') && !input.hintsOnly) {
-    const engaged = s.answeringCheck || s.dontKnow || s.answerRequest || s.hintRequest || s.whyAfterAttempt || (s.repeatWrong ?? 0) >= 2;
+    const engaged = s.answeringCheck || s.dontKnow || s.answerRequest || s.hintRequest || s.whyAfterAttempt || (s.repeatWrong ?? 0) >= 2 || Boolean(s.emptyAnswer);
     if ((s.genuineFailedAttempts ?? 0) >= releaseAfter() && engaged) {
       for (let k = moves.length - 1; k >= 0; k -= 1) if (['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning'].includes(moves[k].id)) moves.splice(k, 1);
       moves.unshift({ id: 'answer_with_reasoning', reasons: ['release_after_two_genuine_attempts'], ledger: ['LTC-D6'] });
@@ -2248,7 +2283,7 @@ export async function buildLanguageTeachingContext(params: {
     const chapter = (curriculum.chapters ?? []).find((c) => c.id === params.lessonId);
     const lesson = deriveLessonContext(chapter as never, curriculum.courseName || curriculum.name);
     const scope = languageStateScope({ institutionId: params.institutionId, studentId: params.studentId, sessionId: params.sessionId, courseId: params.courseId, curriculumId: params.curriculumId, lessonId: lesson.lessonId ?? params.lessonId });
-    const signals0 = detectTurnSignals(params.message, params.history, lesson.status === 'none' ? undefined : { title: lesson.title, spec: lesson.spec }, scope);
+    const signals0 = detectTurnSignals(params.message, params.history, lesson.status === 'none' ? undefined : { title: lesson.title, spec: lesson.spec }, scope, { child: learner.ageBand.status === 'known' && learner.ageBand.value === 'child' });
     const moves0 = selectLanguageMoves({
       band: learner.proficiency.band,
       targetLanguage: learner.targetLanguage.value,
