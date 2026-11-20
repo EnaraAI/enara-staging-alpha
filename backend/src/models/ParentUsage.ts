@@ -7,7 +7,7 @@ import { Schema, model, Document } from 'mongoose';
 // content, no names, no addresses. Kept 13 months (TTL on `at`, D10).
 //   kind login:   a parent signed in (any method) or resumed a device session
 //   kind screen:  home, progress, activity, controls, report, account
-//   kind feature: share_report, controls_changed, link_child, guardian_role
+//   kind feature: share_report, controls_changed, link_child, guardian_role, learner_signals
 // studentId is set for learner-scoped events (PDPL erasure deletes them).
 //
 // parent_usage_daily: the nightly rollup, one row per school and Cairo day:

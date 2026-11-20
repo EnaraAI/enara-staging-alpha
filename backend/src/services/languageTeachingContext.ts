@@ -113,9 +113,9 @@ export interface TrustedAgeBand {
 //      input or benchmark labels. Only exact enum values count; an invalid
 //      student value falls through to a valid class value. A malformed
 //      adultLearners is never treated as true.
-//   kidsBand (TRACK 2, owner decision 4), only when none of the above is set:
-//   5. a staff-entered birth date (Student.birthDate): under 13 child, 13-17 teen, 18+ adult (same age rule as the parents portal);
-//   6. the student is on the Enara Kids interface (Student.uiMode 'kids') -> child.
+//   Birth date: one rule for the LMS (ENROLLMENT_AGE_FROM_BIRTHDATE) and the tutor (kidsBand / planner2): bandFromBirthDate
+//   (under 13 child, 13-17 teen, 18+ adult), checked after the student's own band and before the class band.
+//   kidsBand / planner2 only, when nothing else is set: the student is on the Enara Kids interface (Student.uiMode 'kids') -> child.
 // Fourth argument (integration of the LMS and tutor lines): either the LMS Q8
 // birth-date band (ENROLLMENT_AGE_FROM_BIRTHDATE, a LearnerAgeBand string, checked
 // before the class band) or the tutor `extra` object; the tutor `extra` can also be
@@ -125,18 +125,17 @@ export function resolveTrustedAgeBand(learningSettings: unknown, studentBand?: u
   const fourthIsExtra = !!birthDateBandOrExtra && typeof birthDateBandOrExtra === 'object' && !(birthDateBandOrExtra instanceof Date);
   const birthDateBand = fourthIsExtra ? undefined : birthDateBandOrExtra;
   const extra: TrustedAgeBandExtra = fourthIsExtra ? (birthDateBandOrExtra as TrustedAgeBandExtra) : extraArg;
+  // One birth-date rule (PR #33 risk 1): the tutor switches use the LMS rule (bandFromBirthDate) in the LMS position, before the class band.
+  const fromBirth = isLearnerAgeBand(birthDateBand) ? birthDateBand
+    : (engineV2('kidsBand') || engineV2('planner2')) ? bandFromBirthDate(extra.birthDate ?? undefined, extra.now ?? new Date()) : undefined;
   const raw = learningSettings && typeof learningSettings === 'object' ? (learningSettings as Record<string, unknown>).adultLearners : undefined;
   if (raw === true) return { band: 'adult', status: 'known', source: 'school_setting_adult_learners' };
   if (isLearnerAgeBand(studentBand)) return { band: studentBand, status: 'known', source: 'student_age_band' };
   // Q8: the student's own age from their birth date (only when
   // ENROLLMENT_AGE_FROM_BIRTHDATE is on; callers pass undefined otherwise).
-  if (isLearnerAgeBand(birthDateBand)) return { band: birthDateBand, status: 'known', source: 'student_birth_date' };
+  if (fromBirth) return { band: fromBirth, status: 'known', source: 'student_birth_date' };
   if (isLearnerAgeBand(classBand)) return { band: classBand, status: 'known', source: 'class_age_band' };
-  if (engineV2('kidsBand') || engineV2('planner2')) {
-    const age = ageFromBirthDate(extra.birthDate, extra.now ?? new Date());
-    if (age !== undefined) return { band: age < 13 ? 'child' : age < 18 ? 'teen' : 'adult', status: 'known', source: 'student_birth_date' };
-    if (extra.uiMode === 'kids') return { band: 'child', status: 'known', source: 'kids_mode' };
-  }
+  if ((engineV2('kidsBand') || engineV2('planner2')) && extra.uiMode === 'kids') return { band: 'child', status: 'known', source: 'kids_mode' };
   const malformed = raw !== undefined && raw !== null && typeof raw !== 'boolean';
   return { band: 'unknown', status: 'unknown', source: malformed ? 'invalid_school_setting' : 'no_trusted_learner_age_source' };
 }
@@ -166,6 +165,8 @@ export function pickGroupBand(groupIds: string[], bandOf: (groupId: string) => u
 
 // Server-side load of the inputs, all scoped to the session's institution:
 // the student must belong to it, and the class is the student's own batch in it.
+/** Is the birth-date band used (LMS switch or a tutor switch)? The admin age-band screen and the tutor use the same answer. */
+export const birthDateBandOn = (): boolean => engineV2('kidsBand') || engineV2('planner2') || getConfig().enrollment.ageFromBirthDate;
 /** Whole years on `now` from a staff-entered birth date; undefined for a missing, invalid or future date (or an age over 120). */
 export function ageFromBirthDate(birthDate: Date | string | null | undefined, now: Date): number | undefined {
   if (!birthDate) return undefined;

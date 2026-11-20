@@ -254,6 +254,7 @@ router.get('/learners/:studentId/controls', h(async (req, res) => { res.json(svc
 // planner2 learner signals: what the parent is asked to fill in (birth date when the age is unknown; a child's goal).
 router.get('/learners/:studentId/signals', h(async (req, res) => {
   const ctx = await learner()(req);
+  await track(req, ctx, 'feature', 'learner_signals');
   res.json(await requestsFor(ctx.student.id));
 }));
 router.put('/learners/:studentId/signals', h(async (req, res) => {
@@ -262,6 +263,7 @@ router.put('/learners/:studentId/signals', h(async (req, res) => {
   const out: Record<string, unknown> = { id: ctx.student.id };
   if ('birthDate' in body) out.birthDate = (await setBirthDate(ctx.student.id, body.birthDate === null ? null : parseBirthDate(body.birthDate), 'parent', { id: uid(req), role: 'parent' })).birthDateSet;
   if ('goal' in body) out.goal = (await setGoal(ctx.student.id, body.goal === null ? null : parseGoal(body.goal), 'parent', { id: uid(req), role: 'parent' })).goal;
+  await track(req, ctx, 'feature', 'learner_signals');
   res.json(out);
 }));
 router.put('/learners/:studentId/controls', h(async (req, res) => {
