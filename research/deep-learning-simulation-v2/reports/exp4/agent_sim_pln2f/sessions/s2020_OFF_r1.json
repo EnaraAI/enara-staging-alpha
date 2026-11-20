@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -529,7 +529,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood start: \"He has\" fits a feature, and your sentence has a capital letter and a full stop.\n\nHere is how \"is\" works. My coach is young. He is strict.\nRule: use \"is\" with a word that tells what a person is like.\n\nRight: \"Our neighbour is friendly.\"\nWrong: \"Our neighbour friendly.\"\n\nNow, about \"hair short black\": tell me in your own words what you were thinking when you chose that word order.\n\nLEARNER'S LAST MESSAGE:\nI think adjectives follow the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for explaining your idea. In English, a describing word comes before the noun it describes. So the order is: describing words first, then the noun.\n\nRight: \"My teacher has a big blue bag.\"\nWrong: \"My teacher has a bag big blue.\"\n\nNow try a new one on your own. Write one sentence about your best friend's shoes. Use two describing words."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood start: \"He has\" fits a feature, and your sentence has a capital letter and a full stop.\n\nHere is how \"is\" works. My coach is young. He is strict.\nRule: use \"is\" with a word that tells what a person is like.\n\nRight: \"Our neighbour is friendly.\"\nWrong: \"Our neighbour friendly.\"\n\nNow, about \"hair short black\": tell me in your own words what you were thinking when you chose that word order.\n\nLEARNER'S LAST MESSAGE:\nI think adjectives follow the noun.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for explaining your idea. In English, a describing word comes before the noun it describes. So the order is: describing words first, then the noun.\n\nRight: \"My teacher has a big blue bag.\"\nWrong: \"My teacher has a bag big blue.\"\n\nNow try a new one on your own. Write one sentence about your best friend's shoes. Use two describing words.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "In English, a describing word comes before the noun it describes."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: My teacher has a big blue bag. Wrong: My teacher has a bag big blue."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My best friend has new black shoes.",
+    "errors": {
+     "W1": "My best friend has shoes new black."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My best friend has new black shoes.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My best friend has new black shoes.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

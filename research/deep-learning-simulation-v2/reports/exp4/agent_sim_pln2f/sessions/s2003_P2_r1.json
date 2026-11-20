@@ -657,7 +657,96 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou have the right idea about the past: \"finished\" is a correct past form. But after \"did\", the main verb stays in its simple form, because \"did\" already shows the past.\n\nSo the question is: \"Did you finish the report yesterday?\"\n\nRight: \"Did she call the client?\" Wrong: \"Did she called the client?\"\n\nNow your turn, with new words. Write one question with did to ask a colleague about their lunch yesterday.\n\nLEARNER'S LAST MESSAGE:\nYou ate a sandwich yesterday?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nGoal: ask a clear question about a finished action with did.\n\n\"ate\" is a correct past form, and a sandwich fits a question about lunch. Now look at the first word of the model \"Did you send the email yesterday?\" and compare it with the first word of your question.\n\nCheck that, then write your lunch question again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou have the right idea about the past: \"finished\" is a correct past form. But after \"did\", the main verb stays in its simple form, because \"did\" already shows the past.\n\nSo the question is: \"Did you finish the report yesterday?\"\n\nRight: \"Did she call the client?\" Wrong: \"Did she called the client?\"\n\nNow your turn, with new words. Write one question with did to ask a colleague about their lunch yesterday.\n\nLEARNER'S LAST MESSAGE:\nYou ate a sandwich yesterday?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nGoal: ask a clear question about a finished action with did.\n\n\"ate\" is a correct past form, and a sandwich fits a question about lunch. Now look at the first word of the model \"Did you send the email yesterday?\" and compare it with the first word of your question.\n\nCheck that, then write your lunch question again.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you eat a sandwich yesterday?",
+    "errors": {
+     "W1": "Did you ate a sandwich yesterday?",
+     "W2": "You ate a sandwich yesterday?"
+    }
+   },
+   "applied": [],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Did you eat a sandwich yesterday?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Did you eat a sandwich yesterday?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

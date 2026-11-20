@@ -15,7 +15,7 @@
   "s": {
    "W1": 1,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -549,7 +549,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLet's fix it together. The answer is \"I'd like some tea, please.\" We use \"some\" here because tea is something we do not count, and \"any\" does not fit a polite order like this.\n\nRight: \"I'd like some soup, please.\"\nWrong: \"I'd like any soup, please.\"\n\nNow try one on your own. You want water at a café. Write your polite order with \"I'd like\".\n\nLEARNER'S LAST MESSAGE:\nI'd like some water, please.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"I'd like some water, please.\" is right. It is polite, and \"some\" fits \"water\".\n\nNow write one sentence about a person you know. Use \"Can I have …, please?\" or \"I'd like …\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nLet's fix it together. The answer is \"I'd like some tea, please.\" We use \"some\" here because tea is something we do not count, and \"any\" does not fit a polite order like this.\n\nRight: \"I'd like some soup, please.\"\nWrong: \"I'd like any soup, please.\"\n\nNow try one on your own. You want water at a café. Write your polite order with \"I'd like\".\n\nLEARNER'S LAST MESSAGE:\nI'd like some water, please.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"I'd like some water, please.\" is right. It is polite, and \"some\" fits \"water\".\n\nNow write one sentence about a person you know. Use \"Can I have …, please?\" or \"I'd like …\".",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, I'd like some water, please. is right. ... some fits water."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I'd like some juice, please.",
+    "errors": {
+     "W1": "I'd like any juice, please."
+    }
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I'd like some juice, please.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I'd like some juice, please.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
