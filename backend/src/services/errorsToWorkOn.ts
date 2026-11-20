@@ -91,12 +91,55 @@ export function prioritize<T extends Pick<IErrorToWorkOn, 'objectiveId' | 'occur
     .slice(0, limit);
 }
 
+// spacedReview (LIT_REVIEW_GAP_PLAN 3.1, owner "go" 20 Nov 2026; Kim & Webb 2022): reviews at growing intervals, and an error closes only
+// after an UNASSISTED right answer at least SPACED_CLOSE_DAYS after the last wrong one; one more check SPACED_FINAL_DAYS after closing.
+// Every outcome reaching applyOutcome is unassisted: released assessment answers, Moodle quiz answers, and tutor answers counted only
+// with no hint on the item (independentSuccessItem; recordOutcomeForError checks hintLevel 0).
+export const SPACED_DAYS = [1, 3, 7, 21] as const;
+export const SPACED_CLOSE_DAYS = 2;
+export const SPACED_FINAL_DAYS = 21;
+const DAY = 86_400_000;
+export const spacedReviewOn = (): boolean => engineV2('spacedReview');
+/** The schedule after a wrong answer (also when an error is first recorded): the first review one day later. */
+export function scheduleWrong(e: Pick<Mutable, 'lastWrongAt' | 'nextReviewAt' | 'reviewStep'>, at: Date): void {
+  e.lastWrongAt = at; e.reviewStep = 0; e.nextReviewAt = new Date(at.getTime() + SPACED_DAYS[0] * DAY);
+}
+function applySpaced(e: Mutable, o: Outcome): boolean {
+  if (!o.right) {
+    e.rightStreak = 0;
+    scheduleWrong(e, o.at);
+    if (e.status === 'resolved') { e.statusHistory.push({ at: o.at, by: o.by, from: 'resolved', to: 'open', reason: 'wrong_again' }); e.status = 'open'; e.resolvedAt = undefined; e.finalCheckAt = undefined; }
+    return true;
+  }
+  e.rightStreak += 1;
+  const lastWrong = new Date(e.lastWrongAt ?? e.lastSeenAt).getTime();
+  if (e.status === 'open') {
+    if (o.at.getTime() - lastWrong >= SPACED_CLOSE_DAYS * DAY) {
+      e.status = 'resolved'; e.resolvedAt = o.at; e.nextReviewAt = new Date(o.at.getTime() + SPACED_FINAL_DAYS * DAY);
+      e.statusHistory.push({ at: o.at, by: o.by, from: 'open', to: 'resolved', reason: 'unassisted_right_after_delay' });
+    } else {
+      // Right too soon after the wrong one: the next review moves one step further out, the error stays open.
+      e.reviewStep = Math.min((e.reviewStep ?? 0) + 1, SPACED_DAYS.length - 1); e.nextReviewAt = new Date(o.at.getTime() + SPACED_DAYS[e.reviewStep] * DAY);
+    }
+  } else if (e.status === 'resolved' && e.nextReviewAt && o.at.getTime() >= new Date(e.nextReviewAt).getTime()) {
+    e.finalCheckAt = o.at; e.nextReviewAt = undefined;
+    e.statusHistory.push({ at: o.at, by: o.by, from: 'resolved', to: 'resolved', reason: 'final_check_passed' });
+  }
+  return true;
+}
+/** spacedReview: is this row due for the tutor now? Open errors when their review date has come; closed ones at their final check. */
+export function reviewDue(e: Pick<IErrorToWorkOn, 'status' | 'nextReviewAt'>, now: Date): boolean {
+  if (e.status === 'open') return !e.nextReviewAt || new Date(e.nextReviewAt).getTime() <= now.getTime();
+  return e.status === 'resolved' && Boolean(e.nextReviewAt) && new Date(e.nextReviewAt!).getTime() <= now.getTime();
+}
+
 export type Outcome = { right: boolean; key: string; at: Date; by?: string };
-type Mutable = Pick<IErrorToWorkOn, 'status' | 'rightStreak' | 'countedKeys' | 'lastSeenAt' | 'occurrences' | 'statusHistory' | 'resolvedAt'>;
+type Mutable = Pick<IErrorToWorkOn, 'status' | 'rightStreak' | 'countedKeys' | 'lastSeenAt' | 'occurrences' | 'statusHistory' | 'resolvedAt' | 'lastWrongAt' | 'nextReviewAt' | 'reviewStep' | 'finalCheckAt'>;
 /** One later outcome on the error's point. Counts once per key (session or attempt), only after the error was last seen. Returns true if changed. */
 export function applyOutcome(e: Mutable, o: Outcome): boolean {
   if (e.status === 'dismissed' || e.countedKeys.includes(o.key) || o.at.getTime() <= new Date(e.lastSeenAt).getTime()) return false;
   e.countedKeys.push(o.key);
+  if (spacedReviewOn()) return applySpaced(e, o);
   if (o.right) {
     e.rightStreak += 1;
     if (e.status === 'open' && e.rightStreak >= WORK_ON_RESOLVE_STREAK) { e.status = 'resolved'; e.resolvedAt = o.at; e.statusHistory.push({ at: o.at, by: o.by, from: 'open', to: 'resolved', reason: 'two_independent_rights' }); }
@@ -108,8 +151,13 @@ export function applyOutcome(e: Mutable, o: Outcome): boolean {
 }
 
 /** Plain-words brief lines for the tutor (codes and the school's own label; never question text). */
-export function briefLines(items: { code?: string; title?: string; errorCode: string; errorLabel?: string; occurrences: number }[]): string[] {
+export function briefLines(items: { code?: string; title?: string; errorCode: string; errorLabel?: string; occurrences: number; status?: string }[]): string[] {
   if (!items.length) return [];
+  if (spacedReviewOn()) return [
+    '- Reviews due (errors from earlier work, at spaced intervals; open with these, one at a time, before the lesson):',
+    ...items.map((e, i) => `  ${i + 1}. ${e.code ? `${e.code} ` : ''}"${(e.title ?? 'this point').replace(/["<>]/g, '')}": ${(e.errorLabel ?? e.errorCode.replace(/_/g, ' ')).replace(/["<>]/g, '')}${e.status === 'resolved' ? ' (final check: it was fixed earlier)' : e.occurrences >= 2 ? ` (seen ${e.occurrences} times)` : ''}.`),
+    '- For each: give ONE new practice item you write yourself on that point and let them answer it on their own first: no rule, hint or example before their try (this is a memory check). After their try: if right, confirm it in a few words; if wrong, say the rule in one plain sentence and give one more new item. Never use, quote or rebuild the questions of their assessment. In the hidden assess line of a reply that sets one of these items, add focus=E1, E2 or E3 (its number above).',
+  ];
   return [
     '- Errors to work on (from the learner\'s released assessments; open with these, one at a time, before the lesson):',
     ...items.map((e, i) => `  ${i + 1}. ${e.code ? `${e.code} ` : ''}"${(e.title ?? 'this point').replace(/["<>]/g, '')}": ${(e.errorLabel ?? e.errorCode.replace(/_/g, ' ')).replace(/["<>]/g, '')}${e.occurrences >= 2 ? ` (seen ${e.occurrences} times)` : ''}.`),
@@ -165,7 +213,7 @@ export async function syncErrors(studentId: string, institutionId?: string): Pro
               if (when > row.lastSeenAt) row.lastSeenAt = when;
               await row.save();
             } else {
-              await ErrorToWorkOn.create({ id: `ewo_${randomUUID()}`, institutionId, studentId, objectiveId, courseId: courseOf.get(objectiveId), curriculumId: asmt?.curriculumId, errorCode, ...(errorLabel ? { errorLabel } : {}), sources: [src], occurrences: 1, firstSeenAt: when, lastSeenAt: when, status: 'open', rightStreak: 0, countedKeys: [], statusHistory: [{ at: when, by: 'system', to: 'open', reason: 'released_assessment' }] });
+              await ErrorToWorkOn.create({ id: `ewo_${randomUUID()}`, institutionId, studentId, objectiveId, courseId: courseOf.get(objectiveId), curriculumId: asmt?.curriculumId, errorCode, ...(errorLabel ? { errorLabel } : {}), sources: [src], occurrences: 1, firstSeenAt: when, lastSeenAt: when, status: 'open', rightStreak: 0, countedKeys: [], statusHistory: [{ at: when, by: 'system', to: 'open', reason: 'released_assessment' }], ...(spacedReviewOn() ? { lastWrongAt: when, reviewStep: 0, nextReviewAt: new Date(when.getTime() + SPACED_DAYS[0] * DAY) } : {}) });
             }
           } else {
             for (const e of open) if (applyOutcome(e, { right: true, key: `attempt:${at.id}`, at: when, by: 'system' })) await e.save();
@@ -201,7 +249,7 @@ export async function recordMoodleAnswers(p: { studentId: string; institutionId:
           if (p.at > row.lastSeenAt) row.lastSeenAt = p.at;
           await row.save();
         } else {
-          await ErrorToWorkOn.create({ id: `ewo_${randomUUID()}`, institutionId: p.institutionId, studentId: p.studentId, objectiveId: a.objectiveId, courseId: p.courseId, curriculumId: p.curriculumId, errorCode: MOODLE_WRONG, sources: [src], occurrences: 1, firstSeenAt: p.at, lastSeenAt: p.at, status: 'open', rightStreak: 0, countedKeys: [], statusHistory: [{ at: p.at, by: 'system', to: 'open', reason: 'moodle_quiz' }] });
+          await ErrorToWorkOn.create({ id: `ewo_${randomUUID()}`, institutionId: p.institutionId, studentId: p.studentId, objectiveId: a.objectiveId, courseId: p.courseId, curriculumId: p.curriculumId, errorCode: MOODLE_WRONG, sources: [src], occurrences: 1, firstSeenAt: p.at, lastSeenAt: p.at, status: 'open', rightStreak: 0, countedKeys: [], statusHistory: [{ at: p.at, by: 'system', to: 'open', reason: 'moodle_quiz' }], ...(spacedReviewOn() ? { lastWrongAt: p.at, reviewStep: 0, nextReviewAt: new Date(p.at.getTime() + SPACED_DAYS[0] * DAY) } : {}) });
         }
       } else {
         out.right += 1;
@@ -215,10 +263,12 @@ export async function recordMoodleAnswers(p: { studentId: string; institutionId:
 }
 
 /** Open errors the gate allows now (released AND over for this learner), optionally for one course. */
-export async function eligibleErrors(studentId: string, opts: { institutionId?: string; courseId?: string; now?: Date } = {}) {
+export async function eligibleErrors(studentId: string, opts: { institutionId?: string; courseId?: string; now?: Date; ignoreDue?: boolean } = {}) {
   const { AssessmentAttempt } = await import('../models/AssessmentAttempt');
   const { Assignment } = await import('../models/Assignment');
-  const rows = await ErrorToWorkOn.find({ studentId, status: 'open', ...(opts.courseId ? { courseId: opts.courseId } : {}) }).lean();
+  const spaced = spacedReviewOn(); const nowE = opts.now ?? new Date();
+  const rows = (await ErrorToWorkOn.find({ studentId, status: spaced ? { $in: ['open', 'resolved'] } : 'open', ...(opts.courseId ? { courseId: opts.courseId } : {}) }).lean())
+    .filter((r) => (!spaced ? true : opts.ignoreDue ? r.status === 'open' : reviewDue(r, nowE)));
   const asgIds = [...new Set(rows.flatMap((r) => r.sources.map((s) => s.assignmentId)).filter(Boolean))] as string[];
   const [asgs, mine] = await Promise.all([
     Assignment.find({ id: { $in: asgIds } }).select('id state dueAt closesAt latePolicy maxAttempts').lean(),
@@ -250,7 +300,7 @@ export async function errorsForTutor(p: { studentId: string; institutionId?: str
     const qIds = top.flatMap((r) => r.sources.map((s) => s.questionId));
     const qTexts = (await Assessment.find({ id: { $in: [...new Set(top.flatMap((r) => r.sources.map((s) => s.assessmentId)))] } }).select('questions.id questions.text').lean())
       .flatMap((a) => (a.questions ?? []).filter((q: { id: string }) => qIds.includes(q.id)).map((q: { text?: string }) => q.text ?? '')).filter(Boolean);
-    const items = top.map((r) => ({ id: r.id, objectiveId: r.objectiveId, code: objOf.get(r.objectiveId)?.code as string | undefined, title: objOf.get(r.objectiveId)?.title as string | undefined, errorCode: r.errorCode, errorLabel: r.errorLabel, occurrences: r.occurrences }));
+    const items = top.map((r) => ({ id: r.id, objectiveId: r.objectiveId, code: objOf.get(r.objectiveId)?.code as string | undefined, title: objOf.get(r.objectiveId)?.title as string | undefined, errorCode: r.errorCode, errorLabel: r.errorLabel, occurrences: r.occurrences, status: r.status }));
     return { items, lines: briefLines(items), guardTexts: qTexts };
   } catch (error) {
     logger.warn('errors_to_work_on_tutor_failed', { error: serializeError(error) });
@@ -284,7 +334,7 @@ export async function recordOutcomeForError(p: { errorId: string; studentId: str
 export async function listForStudent(studentId: string, institutionId?: string) {
   await syncErrors(studentId, institutionId);
   const rows = await ErrorToWorkOn.find({ studentId }).sort({ lastSeenAt: -1 }).limit(200).lean();
-  const eligible = new Set((await eligibleErrors(studentId, { institutionId })).map((r) => r.id));
+  const eligible = new Set((await eligibleErrors(studentId, { institutionId, ignoreDue: true })).map((r) => r.id));
   const { LearningObjective } = await import('../models/LearningObjective');
   const objOf = new Map((await LearningObjective.find({ id: { $in: rows.map((r) => r.objectiveId) } }).select('id code title').lean()).map((o) => [o.id, o]));
   return rows.map((r) => ({
@@ -298,6 +348,7 @@ export async function listForStudent(studentId: string, institutionId?: string) 
     status: r.status,
     rightStreak: r.rightStreak,
     waitingForRelease: r.status === 'open' && !eligible.has(r.id),
+    ...(spacedReviewOn() ? { nextReviewAt: r.nextReviewAt ?? null, finalCheckAt: r.finalCheckAt ?? null } : {}),
     sources: r.sources.map((s) => ({ assessmentId: s.assessmentId, assignmentId: s.assignmentId ?? null, at: s.at })),
   }));
 }

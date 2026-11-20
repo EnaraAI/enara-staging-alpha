@@ -48,9 +48,10 @@
 //  moodleQuiz     - errors to work on from Moodle's own quizzes (integrations/lms/core/moodleQuiz.ts; needs workOn; per school: a read-only token and its own switch)
 //  workOnTrusted  - LIT_REVIEW_GAP_PLAN 3.4: only grades from validated paths (choice items, teacher-set scores, gap items under graderV2) create errors to work on
 //  oneTaskMethod  - LIT_REVIEW_GAP_PLAN 3.5: every teaching method asks for one thing per reply (no 'deeper question' next to a task)
+//  spacedReview   - LIT_REVIEW_GAP_PLAN 3.1: errors to work on come back after 1, 3, 7, 21 days; one closes only after an unassisted right answer 2+ days after the last wrong; one more check 21 days after closing
 //  whatWorks      - learner memory phase 4: per-learner view of methods followed by an independent success (teachers only; the planner does not use it)
 //  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
-export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2' | 'ruleBank' | 'exampleGuard' | 'feedbackLadder' | 'methodSelect' | 'kidsBand' | 'planner2' | 'kidsPack' | 'workOn' | 'sessionMemory' | 'learnerProfile' | 'whatWorks' | 'moodleQuiz' | 'workOnTrusted' | 'oneTaskMethod';
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2' | 'ruleBank' | 'exampleGuard' | 'feedbackLadder' | 'methodSelect' | 'kidsBand' | 'planner2' | 'kidsPack' | 'workOn' | 'sessionMemory' | 'learnerProfile' | 'whatWorks' | 'moodleQuiz' | 'workOnTrusted' | 'oneTaskMethod' | 'spacedReview';
 const ESL5: EngineV2Feature[] = ['liveError', 'releaseAfterTwo', 'reviewOpen', 'fadeKnown', 'ownSentence'];
 export const TEACH2: EngineV2Feature[] = ['ruleBank', 'exampleGuard', 'feedbackLadder', 'methodSelect', 'kidsBand'];
 export const engineV2 = (feature: EngineV2Feature): boolean => {
@@ -59,7 +60,7 @@ export const engineV2 = (feature: EngineV2Feature): boolean => {
   if (feature === 'arbitration' && v.includes('levelExplicit')) return true; // levelExplicit always runs with arbitration
   if (v.includes('esl5') && ESL5.includes(feature)) return true; // the esl5 bundle (never turned on by "all")
   if (v.includes('teach2') && TEACH2.includes(feature)) return true; // the track-2 bundle (never turned on by "all")
-  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', 'planner2', 'kidsPack', 'workOn', 'sessionMemory', 'learnerProfile', 'whatWorks', 'moodleQuiz', 'workOnTrusted', 'oneTaskMethod', ...ESL5, ...TEACH2].includes(feature));
+  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', 'planner2', 'kidsPack', 'workOn', 'sessionMemory', 'learnerProfile', 'whatWorks', 'moodleQuiz', 'workOnTrusted', 'oneTaskMethod', 'spacedReview', ...ESL5, ...TEACH2].includes(feature));
 };
 
 /** True when `arbitration` is on only because `levelExplicit` forced it (recorded in the turn evidence). */
