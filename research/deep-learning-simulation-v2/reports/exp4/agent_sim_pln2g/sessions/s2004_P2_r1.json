@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 4,
+   "C1": 5,
    "C2": 0
   },
   "start": {
@@ -1029,7 +1029,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour form \"is going to visit\" is right: \"is going to\" comes before the base verb, and \"next week\" gives the time.\n\nNew situation, a short role-play. Your teacher asks: \"What are your friends going to do after the exam?\" Answer in one or two sentences about them, and say when.\n\nLEARNER'S LAST MESSAGE:\nMy friends are going to play football after the exam.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My friends are going to play football after the exam.\" is correct: \"are going to\" comes before the base verb \"play\", and \"after the exam\" gives the time.\n\nNew situation, a little harder. A colleague asks about two people you know. Write two sentences: one about a family member and one about a neighbour. Say what each person is going to do, and when."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 4.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour form \"is going to visit\" is right: \"is going to\" comes before the base verb, and \"next week\" gives the time.\n\nNew situation, a short role-play. Your teacher asks: \"What are your friends going to do after the exam?\" Answer in one or two sentences about them, and say when.\n\nLEARNER'S LAST MESSAGE:\nMy friends are going to play football after the exam.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My friends are going to play football after the exam.\" is correct: \"are going to\" comes before the base verb \"play\", and \"after the exam\" gives the time.\n\nNew situation, a little harder. A colleague asks about two people you know. Write two sentences: one about a family member and one about a neighbour. Say what each person is going to do, and when.",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"My friends are going to play football after the exam.\" is correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"My friends are going to play football after the exam.\" is correct"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister is going to visit us on Friday.",
+    "errors": {
+     "W1": "My sister going to visit us on Friday."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 5,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister is going to visit us on Friday.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister is going to visit us on Friday.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

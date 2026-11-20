@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 0,
    "C2": 0
@@ -1015,7 +1015,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 0: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot yet. You wrote \"A\".\nLook: I have a hat. The hat is red.\nRule: use \"the\" when you name the same thing again.\nExample: I see a pig. The pig is big. Pig is big.\nTry again. Write a or the: We have a garden. ___ garden is small.\n\nLEARNER'S LAST MESSAGE:\nA\nFACT: the last learner message contained the error of W1 (uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\")).\n\nTUTOR TURN TO JUDGE:\nLook: I see a cat. The cat is small. The answer is \"The\", because you name the same thing again.\nRule: use \"the\" for the second time.\nExample: I have a pen. The pen is blue. Pen is blue.\nNow you: Write a or the: I see a bird. ___ bird is red."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 0: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNot yet. You wrote \"A\".\nLook: I have a hat. The hat is red.\nRule: use \"the\" when you name the same thing again.\nExample: I see a pig. The pig is big. Pig is big.\nTry again. Write a or the: We have a garden. ___ garden is small.\n\nLEARNER'S LAST MESSAGE:\nA\nFACT: the last learner message contained the error of W1 (uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\")).\n\nTUTOR TURN TO JUDGE:\nLook: I see a cat. The cat is small. The answer is \"The\", because you name the same thing again.\nRule: use \"the\" for the second time.\nExample: I have a pen. The pen is blue. Pen is blue.\nNow you: Write a or the: I see a bird. ___ bird is red.",
+   "stateBefore": {
+    "form": "the",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"The\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The answer is \"The\", because you name the same thing again. Rule: use \"the\" for the second time."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": "A"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "the",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "The",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "The",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
