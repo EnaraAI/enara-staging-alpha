@@ -14,11 +14,11 @@
   "s": {
    "W1": 1,
    "W2": 0,
-   "C1": 0,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -548,7 +548,105 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 0: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour answer repeats the question. It does not give a day. Also, I forgot to show you a message. Here it is:\n\"Ben brings the ball on Monday. We meet in room 4. The game is on Friday.\"\nRead the whole question first. Then find your answer in the message.\nRead the message. What day is the game?\n\nLEARNER'S LAST MESSAGE:\nFriday\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, Friday fits the question. It is the day of the game.\nNow one new message, on your own:\n\"Hi Lina! The film is on Saturday, not on Sunday. Tom brings the bag at 6:00. The film starts at 6:30.\"\nRead the whole question first. What time does the film start?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 0: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour answer repeats the question. It does not give a day. Also, I forgot to show you a message. Here it is:\n\"Ben brings the ball on Monday. We meet in room 4. The game is on Friday.\"\nRead the whole question first. Then find your answer in the message.\nRead the message. What day is the game?\n\nLEARNER'S LAST MESSAGE:\nFriday\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, Friday fits the question. It is the day of the game.\nNow one new message, on your own:\n\"Hi Lina! The film is on Saturday, not on Sunday. Tom brings the bag at 6:00. The film starts at 6:30.\"\nRead the whole question first. What time does the film start?",
+   "stateBefore": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, Friday fits the question."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, Friday fits the question."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "6:30",
+    "errors": {
+     "W1": "6:00"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "6:30",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "6:30",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

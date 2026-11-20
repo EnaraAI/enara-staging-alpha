@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 1,
    "C1": 3,
    "C2": 0
@@ -296,7 +296,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 3: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 1.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, that is polite and correct! \"Could I ... please?\" is a good way to ask. Next one. You did not answer your aunt's phone call. Say sorry and give a reason.\n\nLEARNER'S LAST MESSAGE:\nSorry.\nFACT: the last learner message contained the error of W1 (makes a bare order or \"I want\" request (\"Tell me the time of the bus.\")).\n\nTUTOR TURN TO JUDGE:\nGood, you said sorry! But we also need a reason. Hint: use \"I'm sorry ... because ...\". For example: I'm sorry I missed your call because I was at the doctor's. Try again: say sorry to your aunt and give a reason."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 3: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 1.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, that is polite and correct! \"Could I ... please?\" is a good way to ask. Next one. You did not answer your aunt's phone call. Say sorry and give a reason.\n\nLEARNER'S LAST MESSAGE:\nSorry.\nFACT: the last learner message contained the error of W1 (makes a bare order or \"I want\" request (\"Tell me the time of the bus.\")).\n\nTUTOR TURN TO JUDGE:\nGood, you said sorry! But we also need a reason. Hint: use \"I'm sorry ... because ...\". For example: I'm sorry I missed your call because I was at the doctor's. Try again: say sorry to your aunt and give a reason.",
+   "stateBefore": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "But we also need a reason. Hint: use \"I'm sorry ... because ...\"."
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "For example: I'm sorry I missed your call because I was at the doctor's."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I'm sorry I missed your call because I was busy.",
+    "errors": {
+     "W1": "Sorry."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I'm sorry I missed your call because I was busy.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I'm sorry I missed your call because I was busy.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

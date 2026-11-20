@@ -553,7 +553,113 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 0: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 0.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou used all the words. Now think about the order. The one who does the action comes first. Try again.\nPut in order: \"eats / the cat / a fish\"\n\nLEARNER'S LAST MESSAGE:\nEats the cat a fish.\nFACT: the last learner message contained the error of W1 (puts the verb before the subject (\"Plays Ahmed football.\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"The cat eats a fish.\" The cat does the action, so it comes first.\nRight: \"The boy reads a book.\" Wrong: \"Reads the boy a book.\"\nNow one on your own. Put in order: \"sings / the bird / a song\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 0: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 0.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou used all the words. Now think about the order. The one who does the action comes first. Try again.\nPut in order: \"eats / the cat / a fish\"\n\nLEARNER'S LAST MESSAGE:\nEats the cat a fish.\nFACT: the last learner message contained the error of W1 (puts the verb before the subject (\"Plays Ahmed football.\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"The cat eats a fish.\" The cat does the action, so it comes first.\nRight: \"The boy reads a book.\" Wrong: \"Reads the boy a book.\"\nNow one on your own. Put in order: \"sings / the bird / a song\"",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"The cat eats a fish.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The cat does the action, so it comes first."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"The boy reads a book.\" Wrong: \"Reads the boy a book.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The bird sings a song.",
+    "errors": {
+     "W1": "Sings the bird a song."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "The bird sings a song.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "The bird sings a song.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

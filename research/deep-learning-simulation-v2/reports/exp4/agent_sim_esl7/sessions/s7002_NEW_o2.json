@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 0,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -554,7 +554,105 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 0: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe first day is not always the answer. Read the whole question, then pick the day that fits it. Example: \"Sam comes on Monday. The party is on Friday.\" Question: \"What day is the party?\" Example: Friday.\nSorry, the message was missing. Here it is: \"Practice is on Wednesday. The game is on Saturday.\" What day is the game?\n\nLEARNER'S LAST MESSAGE:\nSaturday\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"Saturday\" is right: it answers the whole question.\nNow one alone. Read the message: \"The shop opens on Monday. The sale is on Friday. Bring 2 bags.\" Which day is the sale?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 0: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe first day is not always the answer. Read the whole question, then pick the day that fits it. Example: \"Sam comes on Monday. The party is on Friday.\" Question: \"What day is the party?\" Example: Friday.\nSorry, the message was missing. Here it is: \"Practice is on Wednesday. The game is on Saturday.\" What day is the game?\n\nLEARNER'S LAST MESSAGE:\nSaturday\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"Saturday\" is right: it answers the whole question.\nNow one alone. Read the message: \"The shop opens on Monday. The sale is on Friday. Bring 2 bags.\" Which day is the sale?",
+   "stateBefore": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"Saturday\" is right: it answers the whole question."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"Saturday\" is right"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Friday",
+    "errors": {
+     "W1": "Monday"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Friday",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "Friday",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -566,7 +566,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 2: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"Can I have a coffee, please?\" is polite and has please.\nAnother case: at school I want a pen. \"Give me a pen.\" is a bare command, so I ask: \"Can I have a pen, please?\"\nRule: ask with a question like \"Can I have ..., please?\", not with \"Give me\".\nExample: \"Can I have an apple, please?\"\nNow you try. You are thirsty in a cafe. Ask for a tea politely.\n\nLEARNER'S LAST MESSAGE:\nCan I have a tea, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that request is polite and it has \"please\".\nNew situation, on your own. You are in a library. You want to borrow a dictionary. Ask the librarian politely."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-FN-polite-requests (polite requests). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a bare imperative or \"I want\" is a normal request, as in Arabic a'tini / ana 'ayiz. Its error: makes a request with a bare imperative or \"I want\" (\"Give me the key.\" / \"I want a cup of tea.\").\nC1 (correct) strength 2: a request uses Can I have ... / I would like ..., please. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nCorrect: \"Can I have a coffee, please?\" is polite and has please.\nAnother case: at school I want a pen. \"Give me a pen.\" is a bare command, so I ask: \"Can I have a pen, please?\"\nRule: ask with a question like \"Can I have ..., please?\", not with \"Give me\".\nExample: \"Can I have an apple, please?\"\nNow you try. You are thirsty in a cafe. Ask for a tea politely.\n\nLEARNER'S LAST MESSAGE:\nCan I have a tea, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that request is polite and it has \"please\".\nNew situation, on your own. You are in a library. You want to borrow a dictionary. Ask the librarian politely.",
+   "stateBefore": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, that request is polite and it has 'please'."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Can I have a tea, please?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Can I borrow a dictionary, please?",
+    "errors": {
+     "W1": "Give me a dictionary."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "polite",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Can I borrow a dictionary, please?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Can I borrow a dictionary, please?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
