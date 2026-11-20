@@ -1823,3 +1823,15 @@ export const fetchLmsPickerItems = (secret: string) => pickerCall<{ items: LmsPi
 /** due: optional local date-time "YYYY-MM-DDTHH:mm" in the school's time zone (Phase 2b). */
 export const submitLmsPicker = (secret: string, items: { type: string; id: string; due?: string }[]) =>
   pickerCall<{ returnUrl: string; jwt: string }>(secret, 'POST', '/submit', { items });
+
+// Errors to work on from Moodle's own quizzes (tutor track): the school admin's settings for one LMS connection. 404 while the switch is off.
+export interface MoodleQuizSettingsView { switchOn: boolean; hasToken: boolean; enabled: boolean; lastCheck: { at: string; ok: boolean; code: string | null } | null; lastRun: { at: string; quizzes?: number; attempts?: number; wrong?: number; right?: number; skipped?: number; errors?: number } | null; check?: { ok: boolean; code: string; quizzes?: number } | null }
+export interface MoodleQuizView { quizId: string; courseExternalId: string; name: string; closesAt: string | null; maxAttempts: number; reviewAfterClose: boolean | null; objectiveId: string | null; slotObjectives: { slot: number; objectiveId: string }[] }
+const mq = (platformId: string) => `/api/lms/platforms/${encodeURIComponent(platformId)}/moodle-quiz`;
+export const fetchMoodleQuizSettings = (platformId: string) => request<MoodleQuizSettingsView>('GET', mq(platformId));
+export const saveMoodleQuizToken = (platformId: string, token: string | null) => request<MoodleQuizSettingsView>('PUT', `${mq(platformId)}/token`, { token });
+export const setMoodleQuizEnabled = (platformId: string, enabled: boolean) => request<MoodleQuizSettingsView>('PUT', mq(platformId), { enabled });
+export const fetchMoodleQuizzes = (platformId: string) => request<{ quizzes: MoodleQuizView[] }>('GET', `${mq(platformId)}/quizzes`);
+export const mapMoodleQuiz = (platformId: string, q: { quizId: string; courseExternalId: string; quizName?: string; objectiveId: string | null }) =>
+  request<{ ok: boolean }>('PUT', `${mq(platformId)}/quizzes/${encodeURIComponent(q.quizId)}`, { courseExternalId: q.courseExternalId, quizName: q.quizName, objectiveId: q.objectiveId });
+export const runMoodleQuizImport = (platformId: string) => request<{ quizzes: number; attempts: number; wrong: number; right: number; skipped: number; errors: number }>('POST', `${mq(platformId)}/run`, {});

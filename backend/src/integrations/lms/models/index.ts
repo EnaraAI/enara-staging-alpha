@@ -11,11 +11,13 @@ import { LmsAccessToken, LmsOidcState, LmsToolKey } from './security';
 import { LmsDeepLinkSession, LmsHandoffCode, LmsLaunchToken } from './session';
 import { LmsMicDaily } from './telemetry';
 import { LmsSuppressedIdentity } from './suppression';
+import { LmsMoodleQuizMap, LmsMoodleQuizSeen, LmsMoodleQuizSettings } from './moodleQuiz';
 
 export * from './audit';
 export * from './context';
 export * from './email';
 export * from './google';
+export * from './moodleQuiz';
 export * from './onboarding';
 export * from './outbox';
 export * from './platform';
@@ -72,5 +74,9 @@ export const LMS_ONBOARDING_MODELS = [LmsOnboarding, LmsConnectionCheck] as cons
 // (idempotency), the once-per-window claims and counters, the teachers' opt-ins.
 export const LMS_EMAIL_MODELS = [LmsEmailLog, LmsEmailClaim, LmsEmailOptIn] as const;
 
+// Added with errors to work on from Moodle's own quizzes (migration 2026-11-30-lms-moodle-quiz): the read-only token and switch per
+// connection, the quiz-to-objective maps, the attempts already imported.
+export const LMS_MOODLE_QUIZ_MODELS = [LmsMoodleQuizSettings, LmsMoodleQuizMap, LmsMoodleQuizSeen] as const;
+
 /** Every LMS collection, for the cleanup script and the tests. */
-export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS, ...LMS_P0_MODELS, ...LMS_MIC_MODELS, ...LMS_PHASE1B_MODELS, ...LMS_ONBOARDING_MODELS, ...LMS_EMAIL_MODELS] as const;
+export const ALL_LMS_MODELS = [...LMS_MODELS, ...LMS_PHASE1A_MODELS, ...LMS_PHASE2_MODELS, ...LMS_P0_MODELS, ...LMS_MIC_MODELS, ...LMS_PHASE1B_MODELS, ...LMS_ONBOARDING_MODELS, ...LMS_EMAIL_MODELS, ...LMS_MOODLE_QUIZ_MODELS] as const;

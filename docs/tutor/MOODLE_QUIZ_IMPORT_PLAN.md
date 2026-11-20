@@ -1,6 +1,6 @@
-# Errors to work on from Moodle's own quizzes: plan v2 (waiting for Mohamed)
+# Errors to work on from Moodle's own quizzes: plan v2 (built; see MOODLE_QUIZ_IMPORT_NOTES.md)
 
-Status: **plan only**. v1 had a wrong assumption, corrected here.
+Status: **built** (owner: "You build it", 20 Nov 2026). v1 had a wrong assumption, corrected here.
 
 ## Correction to v1
 - **No token today.** v1 said "use the connection's existing web-service token". There is none.

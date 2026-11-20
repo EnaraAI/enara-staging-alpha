@@ -30,6 +30,7 @@ import {
   updateLmsSeats,
 } from '../services/apiService';
 import { LmsProblems } from './LmsProblems';
+import { MoodleQuizCard } from '../components/MoodleQuizCard';
 
 // "LMS connections" (Phase 1a): register an LMS by hand (LTI 1.3), see its
 // status, deployments and launches, and the school's seats. A school admin's
@@ -417,6 +418,7 @@ export const LmsConnections: React.FC = () => {
                   </button>
                 )}
               </div>
+              {p.status === 'active' && <MoodleQuizCard platformId={p.id} />}
             </div>
           ))}
         </div>

@@ -152,6 +152,41 @@ export async function syncErrors(studentId: string, institutionId?: string): Pro
   }
 }
 
+/** Moodle's own quizzes (MOODLE_QUIZ_IMPORT_PLAN v2): one finished, gated Moodle attempt as right/wrong answers per ENARA objective.
+ *  Moodle gives right/wrong per question, not the error type, so a wrong answer is error code MOODLE_WRONG. Same resolve/reopen rules
+ *  as ENARA attempts. Ids only (attempt key, quiz key, slot). Idempotent per (attempt, slot). Never throws; returns what it wrote. */
+export const MOODLE_WRONG = 'moodle_wrong';
+export async function recordMoodleAnswers(p: { studentId: string; institutionId: string; courseId?: string; curriculumId?: string; attemptKey: string; quizKey: string; at: Date; answers: { objectiveId: string; slot: number; right: boolean }[] }): Promise<{ wrong: number; right: number }> {
+  const out = { wrong: 0, right: 0 };
+  if (!workOnOn()) return out;
+  try {
+    for (const a of p.answers) {
+      const open = await ErrorToWorkOn.find({ studentId: p.studentId, objectiveId: a.objectiveId, status: { $ne: 'dismissed' } });
+      const key = `attempt:${p.attemptKey}`;
+      if (!a.right) {
+        out.wrong += 1;
+        const src = { kind: 'moodle_quiz_attempt' as const, attemptId: p.attemptKey, assessmentId: p.quizKey, questionId: `slot:${a.slot}`, at: p.at };
+        const row = open.find((e) => e.errorCode === MOODLE_WRONG);
+        for (const e of open.filter((x) => x !== row)) if (applyOutcome(e, { right: false, key, at: p.at, by: 'system' })) await e.save();
+        if (row) {
+          if (!row.sources.some((s) => s.attemptId === p.attemptKey && s.questionId === src.questionId)) { row.sources.push(src); row.occurrences += 1; }
+          applyOutcome(row, { right: false, key, at: new Date(p.at.getTime() + 1), by: 'system' });
+          if (p.at > row.lastSeenAt) row.lastSeenAt = p.at;
+          await row.save();
+        } else {
+          await ErrorToWorkOn.create({ id: `ewo_${randomUUID()}`, institutionId: p.institutionId, studentId: p.studentId, objectiveId: a.objectiveId, courseId: p.courseId, curriculumId: p.curriculumId, errorCode: MOODLE_WRONG, sources: [src], occurrences: 1, firstSeenAt: p.at, lastSeenAt: p.at, status: 'open', rightStreak: 0, countedKeys: [], statusHistory: [{ at: p.at, by: 'system', to: 'open', reason: 'moodle_quiz' }] });
+        }
+      } else {
+        out.right += 1;
+        for (const e of open) if (applyOutcome(e, { right: true, key, at: p.at, by: 'system' })) await e.save();
+      }
+    }
+  } catch (error) {
+    logger.warn('errors_to_work_on_moodle_failed', { error: serializeError(error) });
+  }
+  return out;
+}
+
 /** Open errors the gate allows now (released AND over for this learner), optionally for one course. */
 export async function eligibleErrors(studentId: string, opts: { institutionId?: string; courseId?: string; now?: Date } = {}) {
   const { AssessmentAttempt } = await import('../models/AssessmentAttempt');
@@ -169,7 +204,8 @@ export async function eligibleErrors(studentId: string, opts: { institutionId?: 
     const att = mine.find((m) => m.id === attemptId);
     return Boolean(att && assignmentId && gateOpen({ attempt: att, assignment: asgOf.get(assignmentId), attemptsUsed: tries.filter((t) => t.status === 'submitted').length, attemptInProgress: tries.some((t) => t.status === 'in-progress'), now }));
   };
-  return rows.filter((r) => r.sources.some((s) => s.kind === 'practice_attempt' || ok(s.attemptId, s.assignmentId)));
+  // Moodle quiz errors are imported only after their own gate (closed or no attempts left, review allowed, finished): usable at once.
+  return rows.filter((r) => r.sources.some((s) => s.kind === 'practice_attempt' || s.kind === 'moodle_quiz_attempt' || ok(s.attemptId, s.assignmentId)));
 }
 
 /** The tutor's list for a session: synced, gated, prioritised, with objective titles and (server-side only) the source question texts for the guard. */

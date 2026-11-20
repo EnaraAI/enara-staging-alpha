@@ -17,6 +17,10 @@
 //   activities --course=SHORT the LTI activities of a course (id, cmid, name, typeid, intro)
 //   grade --course=SHORT --activity=NAME|--cmid=ID --user=U   the gradebook value
 //   set-grade --course=SHORT --activity=NAME --user=U --grade=G   a teacher's edit in the gradebook (overridden)
+//   quiz-ws                   errors from Moodle quizzes: web services on (REST), a read-only service with the 3 quiz
+//                             read functions and a token for it (throwaway Docker site; the token is fake test data)
+//   quiz-setup --course=SHORT --name=N --user=U --answer=True|False   a 1-question true/false quiz (1 attempt, review allowed),
+//                             and U's finished attempt with that answer (the right answer is True)
 //   version                   Moodle release
 
 define('CLI_SCRIPT', true);
@@ -116,6 +120,52 @@ function grade_item_for($course, $lti) {
 }
 
 switch ($cmd) {
+    case 'quiz-ws':
+        // Tutor track, errors from Moodle quizzes (MOODLE_QUIZ_IMPORT_PLAN v2): what a school's Moodle admin does by hand.
+        set_config('enablewebservices', 1);
+        $protocols = array_filter(explode(',', (string) get_config('core', 'webserviceprotocols')));
+        if (!in_array('rest', $protocols)) { $protocols[] = 'rest'; set_config('webserviceprotocols', implode(',', $protocols)); }
+        $service = $DB->get_record('external_services', ['shortname' => 'enara_quiz_read']);
+        if (!$service) {
+            $id = $DB->insert_record('external_services', (object) ['name' => 'ENARA quiz results (read-only)', 'shortname' => 'enara_quiz_read', 'enabled' => 1, 'restrictedusers' => 0, 'downloadfiles' => 0, 'uploadfiles' => 0, 'timecreated' => time(), 'component' => null]);
+            $service = $DB->get_record('external_services', ['id' => $id], '*', MUST_EXIST);
+        }
+        foreach (['mod_quiz_get_quizzes_by_courses', 'mod_quiz_get_user_attempts', 'mod_quiz_get_attempt_review'] as $fn) {
+            if (!$DB->record_exists('external_services_functions', ['externalserviceid' => $service->id, 'functionname' => $fn])) {
+                $DB->insert_record('external_services_functions', (object) ['externalserviceid' => $service->id, 'functionname' => $fn]);
+            }
+        }
+        $token = \core_external\util::generate_token(EXTERNAL_TOKEN_PERMANENT, $service, get_admin()->id, context_system::instance());
+        out(['service' => (int) $service->id, 'token' => $token]);
+
+    case 'quiz-setup':
+        require_once($CFG->libdir . '/testing/generator/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+        $course = course_by_short(opt($opts, 'course'));
+        $name = opt($opts, 'name');
+        $student = user_by_name(opt($opts, 'user'));
+        $answer = opt($opts, 'answer', 'False');
+        $gen = new testing_data_generator();
+        $quiz = $DB->get_record('quiz', ['course' => $course->id, 'name' => $name]);
+        if (!$quiz) {
+            $quiz = $gen->get_plugin_generator('mod_quiz')->create_instance(['course' => $course->id, 'name' => $name, 'attempts' => 1, 'grade' => 10, 'sumgrades' => 1]);
+            $qgen = $gen->get_plugin_generator('core_question');
+            $cat = $qgen->create_question_category(['contextid' => context_course::instance($course->id)->id]);
+            $q = $qgen->create_question('truefalse', null, ['category' => $cat->id]);
+            quiz_add_quiz_question($q->id, $quiz);
+            $quiz = $DB->get_record('quiz', ['id' => $quiz->id], '*', MUST_EXIST);
+        }
+        $existing = $DB->get_records('quiz_attempts', ['quiz' => $quiz->id, 'userid' => $student->id, 'state' => 'finished']);
+        if (!$existing) {
+            \core\session\manager::set_user($student);
+            $qz = $gen->get_plugin_generator('mod_quiz');
+            $attempt = $qz->create_attempt($quiz->id, $student->id);
+            $qz->submit_responses($attempt->id, [1 => $answer], false, true);
+            \core\session\manager::set_user(get_admin());
+        }
+        $att = $DB->get_records('quiz_attempts', ['quiz' => $quiz->id, 'userid' => $student->id], 'id DESC', 'id, state');
+        out(['quiz' => (int) $quiz->id, 'course' => (int) $course->id, 'user' => (int) $student->id, 'attempts' => array_values(array_map(fn($a) => ['id' => (int) $a->id, 'state' => $a->state], $att))]);
+
     case 'version':
         out(['release' => $CFG->release, 'version' => $CFG->version]);
 

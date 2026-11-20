@@ -21,6 +21,7 @@ import { rosterTriggerOn, scheduledRosterSync } from '../integrations/lms/core/r
 import { checkLmsResults } from '../integrations/lms/core/lmsResults';
 import { recheckFailedConnections } from '../integrations/lms/core/connectionCheck';
 import { lmsFlags } from '../integrations/lms/core/flags';
+import { moodleQuizOn, scheduledMoodleQuizImport } from '../integrations/lms/core/moodleQuiz';
 import { gradeLedgerOn } from '../services/gradeLedger';
 import { runLmsEmailDaily } from '../integrations/lms/core/lmsEmailDaily';
 import { lmsEmailsActive } from '../integrations/lms/core/lmsEmail';
@@ -89,6 +90,11 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     // LMS roster sync, nightly (plan §5 e, Phase 4). Skipped unless roster sync is
     // on. It gets what is left of a 50 s window (at most 20 s), so the whole run
     // stays under the 60 s function limit; courses not reached go first next night.
+    // Errors to work on from Moodle's own quizzes (switch moodleQuiz; only connections whose school saved a token and switched it on).
+    if (moodleQuizOn()) {
+      const budgetMs = Math.min(10_000, 45_000 - (Date.now() - startedAt));
+      await run('lmsMoodleQuiz', async () => (budgetMs < 3_000 ? { skipped: 'no_time' } : scheduledMoodleQuizImport({ budgetMs })));
+    }
     if (rosterTriggerOn('daily')) {
       const budgetMs = Math.min(20_000, 50_000 - (Date.now() - startedAt));
       await run('lmsRoster', async () => (budgetMs < 5_000 ? { skipped: 'no_time' } : scheduledRosterSync({ trigger: 'nightly', budgetMs })));
