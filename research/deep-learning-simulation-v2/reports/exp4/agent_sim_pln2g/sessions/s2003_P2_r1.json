@@ -15,7 +15,7 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 2,
    "C2": 1
   },
@@ -1176,7 +1176,109 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 2: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 1: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nIn \"You enjoyed the concert?\", the word \"enjoyed\" is a correct past form of a regular verb, and the concert is the right topic for your friend.\n\nBefore we change anything, please tell me in your own words: why did you choose to start your question with \"You enjoyed\"?\n\nLEARNER'S LAST MESSAGE:\nI think: after did the main verb is in the base form.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour idea is right: after \"did\" the main verb stays in the base form. But \"You enjoyed the concert?\" does not use \"did\" yet, and it still has the past form \"enjoyed\".\n\nThe question for your task is \"Did you enjoy the concert?\" It starts with \"Did\", then the subject, then the base verb, because \"did\" already shows the past.\n\nRight: \"Did she watch the match?\"\nWrong: \"Did she watched the match?\"\n\nNew item, on your own: a colleague visited a museum on Sunday. Write one question with did to ask her about it."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 2: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 1: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nIn \"You enjoyed the concert?\", the word \"enjoyed\" is a correct past form of a regular verb, and the concert is the right topic for your friend.\n\nBefore we change anything, please tell me in your own words: why did you choose to start your question with \"You enjoyed\"?\n\nLEARNER'S LAST MESSAGE:\nI think: after did the main verb is in the base form.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nYour idea is right: after \"did\" the main verb stays in the base form. But \"You enjoyed the concert?\" does not use \"did\" yet, and it still has the past form \"enjoyed\".\n\nThe question for your task is \"Did you enjoy the concert?\" It starts with \"Did\", then the subject, then the base verb, because \"did\" already shows the past.\n\nRight: \"Did she watch the match?\"\nWrong: \"Did she watched the match?\"\n\nNew item, on your own: a colleague visited a museum on Sunday. Write one question with did to ask her about it.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 2,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "after \"did\" the main verb stays in the base form"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"Did she watch the match?\" Wrong: \"Did she watched the match?\""
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "\"You enjoyed the concert?\" does not use \"did\" yet ... The question for your task is \"Did you enjoy the concert?\""
+    },
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The question for your task is \"Did you enjoy the concert?\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you visit the museum on Sunday?",
+    "errors": {
+     "W1": "Did you visited the museum on Sunday?",
+     "W2": "You visited the museum on Sunday?"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1",
+    "R2:W2",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1193,5 +1295,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 2,
+   "C2": 1
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

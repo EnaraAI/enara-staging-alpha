@@ -547,6 +547,99 @@
   "rejected": []
  },
  {
+  "learner": 2000,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TASK",
+  "level": "B1",
+  "outcome": "EN-F-A2-GR-third-person-s",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "formative_feedback",
+   "supporting": [],
+   "shape": "TASK",
+   "shapeRule": "S3",
+   "methodRule": "FALLBACK",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "bad",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 4,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 3,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Task-based because B1 or above, partly secure or better, with a real-life goal; main method Formative Assessment & Feedback Loops because: Do the task, then feedback on one or two language errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 57,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "My manager reads emails after the meeting.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"My manager reads emails after the meeting.\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"My manager reads emails after the meeting.\" is correct"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2003,
   "rep": 1,
   "arm": "P2",
@@ -1048,6 +1141,110 @@
   },
   "events": [],
   "applied": [],
+  "rejected": []
+ },
+ {
+  "learner": 2003,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TASK",
+  "level": "B1",
+  "outcome": "EN-F-A2-GR-past-questions-did",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "formative_feedback",
+   "supporting": [],
+   "shape": "TASK",
+   "shapeRule": "S3",
+   "methodRule": "FALLBACK",
+   "stage": "focus",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "bad",
+     "bad",
+     "bad",
+     "ok",
+     "bad",
+     "none"
+    ],
+    "tries": 5,
+    "right": 1,
+    "ownSentenceDone": false,
+    "triesAfterTest": 4,
+    "rightAfterTest": 1,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 1,
+    "opened": true
+   },
+   "explanation": "Task-based because B1 or above, partly secure or better, with a real-life goal; main method Formative Assessment & Feedback Loops because: Do the task, then feedback on one or two language errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "PARTIALLY_CORRECT",
+  "moves": [
+   "answer_with_reasoning",
+   "comprehension_check"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": true,
+  "qcTeachWords": false,
+  "ev5": {
+   "answerReleased": true
+  },
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 94,
+  "production": {
+   "kind": "rule",
+   "text": "I think: after did the main verb is in the base form."
+  },
+  "events": [
+   {
+    "rule": "R1",
+    "belief": "W1",
+    "quote": "after \"did\" the main verb stays in the base form"
+   },
+   {
+    "rule": "R2",
+    "belief": "W1",
+    "quote": "Right: \"Did she watch the match?\" Wrong: \"Did she watched the match?\""
+   },
+   {
+    "rule": "R2",
+    "belief": "W2",
+    "quote": "\"You enjoyed the concert?\" does not use \"did\" yet ... The question for your task is \"Did you enjoy the concert?\""
+   },
+   {
+    "rule": "R5",
+    "belief": "W2",
+    "quote": "The question for your task is \"Did you enjoy the concert?\""
+   }
+  ],
+  "applied": [
+   "R1:W1",
+   "R2:W1",
+   "R2:W2",
+   "R5"
+  ],
   "rejected": []
  },
  {
@@ -1578,6 +1775,99 @@
   "rejected": []
  },
  {
+  "learner": 2004,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TASK",
+  "level": "B1",
+  "outcome": "EN-F-A2-GR-going-to",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "formative_feedback",
+   "supporting": [],
+   "shape": "TASK",
+   "shapeRule": "S3",
+   "methodRule": "FALLBACK",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 5,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 4,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 3,
+    "opened": true
+   },
+   "explanation": "Task-based because B1 or above, partly secure or better, with a real-life goal; main method Formative Assessment & Feedback Loops because: Do the task, then feedback on one or two language errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 76,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "My sister is going to visit us on Friday.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"My sister is going to visit us on Friday.\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"My sister is going to visit us on Friday.\" is correct"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2005,
   "rep": 1,
   "arm": "P2",
@@ -2059,6 +2349,103 @@
     "rule": "R1",
     "belief": "W1",
     "quote": "chairs can be counted, so \"many\" fits"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1",
+   "R1:W1"
+  ],
+  "rejected": []
+ },
+ {
+  "learner": 2005,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TASK",
+  "level": "B1",
+  "outcome": "EN-F-A2-GR-much-many",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "formative_feedback",
+   "supporting": [],
+   "shape": "TASK",
+   "shapeRule": "S3",
+   "methodRule": "FALLBACK",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "none",
+     "none",
+     "bad",
+     "ok",
+     "none",
+     "none"
+    ],
+    "tries": 2,
+    "right": 1,
+    "ownSentenceDone": false,
+    "triesAfterTest": 1,
+    "rightAfterTest": 1,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 1,
+    "opened": true
+   },
+   "explanation": "Task-based because B1 or above, partly secure or better, with a real-life goal; main method Formative Assessment & Feedback Loops because: Do the task, then feedback on one or two language errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "NOT_EVALUATED",
+  "moves": [],
+  "strand": null,
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 57,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "How much rice do we have?",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"How much rice do we have?\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"How much rice do we have?\" is correct"
+   },
+   {
+    "rule": "R1",
+    "belief": "W1",
+    "quote": "rice cannot be counted, so \"much\" fits"
    }
   ],
   "applied": [
@@ -2567,6 +2954,99 @@
   "rejected": []
  },
  {
+  "learner": 2007,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TASK",
+  "level": "B1",
+  "outcome": "EN-F-A2-GR-some-any",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "formative_feedback",
+   "supporting": [],
+   "shape": "TASK",
+   "shapeRule": "S3",
+   "methodRule": "FALLBACK",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "bad",
+     "bad",
+     "ok",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 3,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 3,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 3,
+    "opened": true
+   },
+   "explanation": "Task-based because B1 or above, partly secure or better, with a real-life goal; main method Formative Assessment & Feedback Loops because: Do the task, then feedback on one or two language errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 82,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "We would like two sandwiches and some juice, please.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"We would like two sandwiches and some juice, please.\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"We would like two sandwiches and some juice, please.\" is correct"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2008,
   "rep": 1,
   "arm": "P2",
@@ -3058,6 +3538,105 @@
     "rule": "R1",
     "belief": "W1",
     "quote": "\"because\" gives the reason in the same sentence"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1",
+   "R1:W1"
+  ],
+  "rejected": []
+ },
+ {
+  "learner": 2008,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TASK",
+  "level": "B1",
+  "outcome": "EN-F-A2-GR-conjunctions",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "formative_feedback",
+   "supporting": [],
+   "shape": "TASK",
+   "shapeRule": "S3",
+   "methodRule": "FALLBACK",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 5,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 4,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 3,
+    "opened": true
+   },
+   "explanation": "Task-based because B1 or above, partly secure or better, with a real-life goal; main method Formative Assessment & Feedback Loops because: Do the task, then feedback on one or two language errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 55,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "My city is big, but it is not noisy.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"My city is big, but it is not noisy.\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"My city is big, but it is not noisy.\" is correct"
+   },
+   {
+    "rule": "R1",
+    "belief": "W1",
+    "quote": "\"but\" joins two ideas that contrast"
    }
   ],
   "applied": [
@@ -3601,6 +4180,99 @@
   "rejected": []
  },
  {
+  "learner": 2009,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TASK",
+  "level": "B1",
+  "outcome": "EN-F-A2-GR-past-simple-regular",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "formative_feedback",
+   "supporting": [],
+   "shape": "TASK",
+   "shapeRule": "S3",
+   "methodRule": "FALLBACK",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "ok",
+     "bad",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 4,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 3,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Task-based because B1 or above, partly secure or better, with a real-life goal; main method Formative Assessment & Feedback Loops because: Do the task, then feedback on one or two language errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 48,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "Yesterday evening I ate pizza.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"Yesterday evening I ate pizza.\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"Yesterday evening I ate pizza.\" is correct"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2011,
   "rep": 1,
   "arm": "P2",
@@ -4091,6 +4763,99 @@
   ],
   "applied": [
    "R3:C1"
+  ],
+  "rejected": []
+ },
+ {
+  "learner": 2011,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TASK",
+  "level": "B1",
+  "outcome": "EN-F-A2-GR-past-simple-irregular",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "formative_feedback",
+   "supporting": [],
+   "shape": "TASK",
+   "shapeRule": "S3",
+   "methodRule": "FALLBACK",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "bad",
+     "ok",
+     "ok",
+     "bad",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 3,
+    "ownSentenceDone": false,
+    "triesAfterTest": 4,
+    "rightAfterTest": 3,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Task-based because B1 or above, partly secure or better, with a real-life goal; main method Formative Assessment & Feedback Loops because: Do the task, then feedback on one or two language errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 54,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "Last Sunday I ate eggs in the morning.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"Last Sunday I ate eggs in the morning.\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"Last Sunday I ate eggs in the morning.\" is correct"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
   ],
   "rejected": []
  },
@@ -4625,6 +5390,102 @@
   "rejected": []
  },
  {
+  "learner": 2012,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TTT",
+  "level": "A2",
+  "outcome": "EN-F-A2-VO-jobs-workplaces",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "think_aloud"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S5",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "practise",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 0
+    },
+    "events": [
+     "none",
+     "bad",
+     "bad",
+     "bad",
+     "bad",
+     "bad",
+     "none"
+    ],
+    "tries": 0,
+    "right": 0,
+    "ownSentenceDone": true,
+    "triesAfterTest": 0,
+    "rightAfterTest": 0,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 0,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because new to the form, or no quick check yet; main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": "unknown",
+  "verdict": "AMBIGUOUS",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 50,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "A shop assistant works in a supermarket.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"A shop assistant works in a supermarket.\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"A shop assistant works in a supermarket.\" is correct"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2016,
   "rep": 1,
   "arm": "P2",
@@ -5115,6 +5976,87 @@
    "probes": [
     "W1"
    ]
+  },
+  "events": [],
+  "applied": [],
+  "rejected": []
+ },
+ {
+  "learner": 2016,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TTT",
+  "level": "A2",
+  "outcome": "EN-F-A2-VO-clothes-shopping",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "think_aloud"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S5",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "check",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "none",
+     "bad",
+     "bad",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 4,
+    "right": 2,
+    "ownSentenceDone": false,
+    "triesAfterTest": 3,
+    "rightAfterTest": 2,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because new to the form, or no quick check yet; main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "NOT_EVALUATED",
+  "moves": [
+   "short_explanation",
+   "comprehensible_model",
+   "comprehension_check"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 47,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "How much is my brother's phone?",
+   "probes": []
   },
   "events": [],
   "applied": [],
@@ -5685,6 +6627,90 @@
   "rejected": []
  },
  {
+  "learner": 2018,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TTT",
+  "level": "A2",
+  "outcome": "EN-F-A2-VO-weather",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "think_aloud"
+   ],
+   "shape": "TTT",
+   "shapeRule": "S4",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "ok",
+     "bad",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 4,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 3,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Test, teach, test because the quick check showed at least 2 of 3 known; main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "PARTIALLY_CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": true,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 55,
+  "production": {
+   "kind": "sentence",
+   "correct": false,
+   "fired": "W2",
+   "text": "We can't play because it is rany.",
+   "probes": [
+    "W1",
+    "W2"
+   ]
+  },
+  "events": [],
+  "applied": [],
+  "rejected": []
+ },
+ {
   "learner": 2021,
   "rep": 1,
   "arm": "P2",
@@ -6225,6 +7251,102 @@
   "rejected": []
  },
  {
+  "learner": 2021,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TTT",
+  "level": "A2",
+  "outcome": "EN-F-A2-GR-conjunctions",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "think_aloud"
+   ],
+   "shape": "TTT",
+   "shapeRule": "S4",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 5,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 4,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 3,
+    "opened": true
+   },
+   "explanation": "Test, teach, test because the quick check showed at least 2 of 3 known; main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 46,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "After school I go home and I eat lunch.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"After school I go home and I eat lunch.\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"After school I go home and I eat lunch.\" is correct"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2022,
   "rep": 1,
   "arm": "P2",
@@ -6735,6 +7857,102 @@
   ],
   "applied": [
    "R3:C1"
+  ],
+  "rejected": []
+ },
+ {
+  "learner": 2022,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TTT",
+  "level": "A2",
+  "outcome": "EN-F-A2-GR-some-any",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "think_aloud"
+   ],
+   "shape": "TTT",
+   "shapeRule": "S4",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "ok",
+     "bad",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 4,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 3,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Test, teach, test because the quick check showed at least 2 of 3 known; main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 55,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "I would like an egg and some rice, please.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"I would like an egg and some rice, please.\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"I would like an egg and some rice, please.\" is correct"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
   ],
   "rejected": []
  },
@@ -7272,6 +8490,102 @@
     "rule": "R4",
     "belief": "C1",
     "quote": "\"Can I have a tea, please?\" is correct"
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
+  "rejected": []
+ },
+ {
+  "learner": 2023,
+  "rep": 1,
+  "arm": "P2",
+  "group": "TTT",
+  "level": "A2",
+  "outcome": "EN-F-A2-FN-polite-requests",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "think_aloud"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S5",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": false,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "bad",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 4,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 4,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 3,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because new to the form, or no quick check yet; main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 63,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "Can I have a glass of water and a menu, please?",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "\"Can I have a glass of water and a menu, please?\" is correct"
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "\"Can I have a glass of water and a menu, please?\" is correct"
    }
   ],
   "applied": [
@@ -7846,6 +9160,108 @@
   "rejected": []
  },
  {
+  "learner": 2026,
+  "rep": 1,
+  "arm": "P2",
+  "group": "LAD",
+  "level": "Pre-A1",
+  "outcome": "EN-F-A1-GR-capitals-full-stops",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "ok"
+    ],
+    "tries": 6,
+    "right": 6,
+    "ownSentenceDone": true,
+    "triesAfterTest": 5,
+    "rightAfterTest": 5,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 3,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {
+   "fadeCheck": [
+    1,
+    3
+   ]
+  },
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 37,
+  "production": {
+   "kind": "blank",
+   "correct": true,
+   "text": "We live in London.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "Yes, \"We live in London.\" is right."
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "Yes, \"We live in London.\" is right."
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2027,
   "rep": 1,
   "arm": "P2",
@@ -8334,6 +9750,103 @@
   },
   "events": [],
   "applied": [],
+  "rejected": []
+ },
+ {
+  "learner": 2027,
+  "rep": 1,
+  "arm": "P2",
+  "group": "LAD",
+  "level": "A1",
+  "outcome": "EN-F-A1-VO-family",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "bad",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 4,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 3,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 34,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "This is my brother. He is tall.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "Yes, \"This is my brother. He is tall.\" is right."
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "Yes, \"This is my brother. He is tall.\" is right."
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
   "rejected": []
  },
  {
@@ -8875,6 +10388,118 @@
   "rejected": []
  },
  {
+  "learner": 2028,
+  "rep": 1,
+  "arm": "P2",
+  "group": "LAD",
+  "level": "A1",
+  "outcome": "EN-F-A1-VO-home-rooms",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "practise",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "bad",
+     "bad",
+     "bad",
+     "bad",
+     "ok"
+    ],
+    "tries": 6,
+    "right": 2,
+    "ownSentenceDone": false,
+    "triesAfterTest": 5,
+    "rightAfterTest": 1,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 0,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {
+   "ownSentence": "asked"
+  },
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 37,
+  "production": {
+   "kind": "blank",
+   "correct": true,
+   "text": "bedroom",
+   "probes": [
+    "W1",
+    "W2"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "Yes, \"bedroom\" is right. You spelled it well this time"
+   },
+   {
+    "rule": "R3",
+    "belief": "C2",
+    "quote": "Yes, \"bedroom\" is right."
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "Yes, \"bedroom\" is right."
+   },
+   {
+    "rule": "R4",
+    "belief": "C2",
+    "quote": "Yes, \"bedroom\" is right."
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R3:C2",
+   "R4:C1",
+   "R4:C2"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2029,
   "rep": 1,
   "arm": "P2",
@@ -9357,6 +10982,91 @@
    "kind": "sentence",
    "correct": true,
    "text": "I like rice.",
+   "probes": []
+  },
+  "events": [],
+  "applied": [],
+  "rejected": []
+ },
+ {
+  "learner": 2029,
+  "rep": 1,
+  "arm": "P2",
+  "group": "LAD",
+  "level": "Pre-A1",
+  "outcome": "EN-F-A1-VO-food-drink",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "bad",
+     "none"
+    ],
+    "tries": 4,
+    "right": 4,
+    "ownSentenceDone": true,
+    "triesAfterTest": 3,
+    "rightAfterTest": 3,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": "unknown",
+  "verdict": "AMBIGUOUS",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {
+   "fadeCheck": [
+    1
+   ]
+  },
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 33,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "I like rice and fish.",
    "probes": []
   },
   "events": [],
@@ -9863,6 +11573,106 @@
   "rejected": []
  },
  {
+  "learner": 2030,
+  "rep": 1,
+  "arm": "P2",
+  "group": "LAD",
+  "level": "A1",
+  "outcome": "EN-F-A1-VO-numbers-time",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "practise",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "bad",
+     "bad",
+     "bad",
+     "ok",
+     "none"
+    ],
+    "tries": 4,
+    "right": 2,
+    "ownSentenceDone": false,
+    "triesAfterTest": 3,
+    "rightAfterTest": 1,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 1,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {
+   "ownSentence": "feedback"
+  },
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 30,
+  "production": {
+   "kind": "sentence",
+   "correct": false,
+   "fired": "W1",
+   "text": "My brother moved his lesson to vive o'clock.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R2",
+    "belief": "W1",
+    "quote": "Small slip: \"vive\" needs the letters of \"five\"."
+   },
+   {
+    "rule": "R5",
+    "belief": "W1",
+    "quote": "\"vive\" needs the letters of \"five\""
+   }
+  ],
+  "applied": [
+   "R2:W1",
+   "R5"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2031,
   "rep": 1,
   "arm": "P2",
@@ -10361,6 +12171,103 @@
   "applied": [
    "R5",
    "R1:W1"
+  ],
+  "rejected": []
+ },
+ {
+  "learner": 2031,
+  "rep": 1,
+  "arm": "P2",
+  "group": "LAD",
+  "level": "A1",
+  "outcome": "EN-F-A1-GR-article-the",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "practise",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "ok",
+     "bad",
+     "bad",
+     "none"
+    ],
+    "tries": 5,
+    "right": 3,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 2,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 1,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 27,
+  "production": {
+   "kind": "blank",
+   "correct": true,
+   "text": "The",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "Yes, \"The\" is right."
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "Yes, \"The\" is right."
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
   ],
   "rejected": []
  },
@@ -10867,6 +12774,94 @@
    "R3:C1",
    "R4:C1"
   ],
+  "rejected": []
+ },
+ {
+  "learner": 2033,
+  "rep": 1,
+  "arm": "P2",
+  "group": "LAD",
+  "level": "A1",
+  "outcome": "EN-F-A1-VO-classroom-objects",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "bad",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 4,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 4,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 3,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": "unknown",
+  "verdict": "PARTIALLY_CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {
+   "fadeCheck": [
+    1
+   ]
+  },
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 38,
+  "production": {
+   "kind": "blank",
+   "correct": false,
+   "fired": "W1",
+   "text": "poard",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [],
+  "applied": [],
   "rejected": []
  },
  {
@@ -11392,6 +13387,103 @@
   },
   "events": [],
   "applied": [],
+  "rejected": []
+ },
+ {
+  "learner": 2034,
+  "rep": 1,
+  "arm": "P2",
+  "group": "LAD",
+  "level": "A1",
+  "outcome": "EN-F-A1-GR-can-ability",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "done",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 5,
+    "ownSentenceDone": true,
+    "triesAfterTest": 4,
+    "rightAfterTest": 4,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 3,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 38,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "A cat can't fly.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "Yes, \"A cat can't fly.\" is right."
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "Yes, \"A cat can't fly.\" is right."
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
   "rejected": []
  },
  {
@@ -11935,6 +14027,105 @@
   "rejected": []
  },
  {
+  "learner": 2035,
+  "rep": 1,
+  "arm": "P2",
+  "group": "LAD",
+  "level": "Pre-A1",
+  "outcome": "EN-F-A1-GR-copula-be",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "practise",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "bad",
+     "bad",
+     "ok",
+     "bad",
+     "bad",
+     "none"
+    ],
+    "tries": 5,
+    "right": 1,
+    "ownSentenceDone": false,
+    "triesAfterTest": 4,
+    "rightAfterTest": 1,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 1,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {
+   "ownSentence": "asked"
+  },
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 26,
+  "production": {
+   "kind": "blank",
+   "correct": true,
+   "text": "are",
+   "probes": [
+    "W2"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C2",
+    "quote": "Yes, \"are\" is right for \"We\"."
+   },
+   {
+    "rule": "R4",
+    "belief": "C2",
+    "quote": "Yes, \"are\" is right for \"We\"."
+   }
+  ],
+  "applied": [
+   "R3:C2",
+   "R4:C2"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2037,
   "rep": 1,
   "arm": "P2",
@@ -12464,6 +14655,93 @@
   "rejected": []
  },
  {
+  "learner": 2037,
+  "rep": 1,
+  "arm": "P2",
+  "group": "KIDPPP",
+  "level": "A2",
+  "outcome": "EN-F-A2-VO-jobs-workplaces",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "practise",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "bad",
+     "ok",
+     "bad",
+     "bad",
+     "ok",
+     "none"
+    ],
+    "tries": 3,
+    "right": 2,
+    "ownSentenceDone": true,
+    "triesAfterTest": 2,
+    "rightAfterTest": 2,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 1,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": "unknown",
+  "verdict": "NOT_EVALUATED",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": true,
+  "ev5": {},
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 28,
+  "production": {
+   "kind": "rule",
+   "text": "I think: each job and workplace word is spelled with its vowels (doctor, teacher, hospital)."
+  },
+  "events": [
+   {
+    "rule": "R6",
+    "belief": "W1",
+    "quote": "The rule is not about spelling. It is about the job and the place where the job happens."
+   }
+  ],
+  "applied": [
+   "R6"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2040,
   "rep": 1,
   "arm": "P2",
@@ -12968,6 +15246,106 @@
   "rejected": []
  },
  {
+  "learner": 2040,
+  "rep": 1,
+  "arm": "P2",
+  "group": "KIDPPP",
+  "level": "A1",
+  "outcome": "EN-F-A1-VO-classroom-objects",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "check",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 0,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "bad",
+     "bad",
+     "bad",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 2,
+    "ownSentenceDone": false,
+    "triesAfterTest": 4,
+    "rightAfterTest": 2,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "PARTIALLY_CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {
+   "ownSentence": "feedback"
+  },
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 26,
+  "production": {
+   "kind": "sentence",
+   "correct": false,
+   "fired": "W1",
+   "text": "My sister has a bencil.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R2",
+    "belief": "W1",
+    "quote": "it is \"pencil\", with p first, not b."
+   },
+   {
+    "rule": "R5",
+    "belief": "W1",
+    "quote": "Small fix: it is \"pencil\""
+   }
+  ],
+  "applied": [
+   "R2:W1",
+   "R5"
+  ],
+  "rejected": []
+ },
+ {
   "learner": 2044,
   "rep": 1,
   "arm": "P2",
@@ -13452,6 +15830,106 @@
   },
   "events": [],
   "applied": [],
+  "rejected": []
+ },
+ {
+  "learner": 2044,
+  "rep": 1,
+  "arm": "P2",
+  "group": "KIDPPP",
+  "level": "A1",
+  "outcome": "EN-F-A1-VO-numbers-time",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "check",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "bad",
+     "bad",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 4,
+    "right": 3,
+    "ownSentenceDone": false,
+    "triesAfterTest": 3,
+    "rightAfterTest": 2,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {
+   "ownSentence": "feedback"
+  },
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 24,
+  "production": {
+   "kind": "sentence",
+   "correct": false,
+   "fired": "W1",
+   "text": "My brother moved his lesson to vive o'clock.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R2",
+    "belief": "W1",
+    "quote": "Small slip: write \"five\", not \"vive\"."
+   },
+   {
+    "rule": "R5",
+    "belief": "W1",
+    "quote": "write \"five\""
+   }
+  ],
+  "applied": [
+   "R2:W1",
+   "R5"
+  ],
   "rejected": []
  },
  {
@@ -13986,6 +16464,105 @@
     "rule": "R4",
     "belief": "C1",
     "quote": "Yes, \"thinner\" is right."
+   }
+  ],
+  "applied": [
+   "R3:C1",
+   "R4:C1"
+  ],
+  "rejected": []
+ },
+ {
+  "learner": 2045,
+  "rep": 1,
+  "arm": "P2",
+  "group": "KIDPPP",
+  "level": "A2",
+  "outcome": "EN-F-A2-GR-comparatives",
+  "turn": 7,
+  "planner": {
+   "arm": "P2",
+   "primary": "worked_example",
+   "supporting": [
+    "scaffolding",
+    "narrative_contextual"
+   ],
+   "shape": "PPP",
+   "shapeRule": "S2c",
+   "methodRule": "M7b_PROCEDURAL",
+   "stage": "check",
+   "quickCheck": false,
+   "childSupports": true,
+   "l1Diagnoses": 0,
+   "l1Misconception": false,
+   "progress": {
+    "quickCheck": {
+     "right": 1,
+     "of": 1
+    },
+    "events": [
+     "none",
+     "ok",
+     "bad",
+     "bad",
+     "ok",
+     "ok",
+     "none"
+    ],
+    "tries": 5,
+    "right": 3,
+    "ownSentenceDone": false,
+    "triesAfterTest": 4,
+    "rightAfterTest": 2,
+    "learnerTurns": 6,
+    "taskDone": true,
+    "rightAfterTask": 2,
+    "opened": true
+   },
+   "explanation": "Present, practise, produce because a child (9-12, unknown exact age, or under 9 without listen-and-do content); main method Worked Examples because: Procedural or calculation errors."
+  },
+  "promptQuickCheck": false,
+  "diagnosis": null,
+  "verdict": "CORRECT",
+  "moves": [
+   "corrective_feedback_retry",
+   "comprehensible_model"
+  ],
+  "strand": "language_focused",
+  "ruleLine": false,
+  "closingAsk": null,
+  "markerStatus": "ok",
+  "leakRaw": 0,
+  "leakFinal": 0,
+  "earlyLeakRaw": 0,
+  "earlyLeakFinal": 0,
+  "lateAnswerFinal": 0,
+  "answerReleased": false,
+  "qcTeachWords": false,
+  "ev5": {
+   "ownSentence": "feedback"
+  },
+  "twoAsks": false,
+  "twoAsksRaw": false,
+  "words": 24,
+  "production": {
+   "kind": "sentence",
+   "correct": true,
+   "text": "My brother is bigger than my sister.",
+   "probes": [
+    "W1"
+   ]
+  },
+  "events": [
+   {
+    "rule": "R3",
+    "belief": "C1",
+    "quote": "Yes, \"bigger than\" is right."
+   },
+   {
+    "rule": "R4",
+    "belief": "C1",
+    "quote": "Yes, \"bigger than\" is right."
    }
   ],
   "applied": [
