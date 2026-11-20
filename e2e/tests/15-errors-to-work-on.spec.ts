@@ -27,6 +27,9 @@ async function answerWrong(assignmentId: string) {
 
 test('setup: an English objective, a one-question quiz with a labelled wrong option, two assignments (1 try and 2 tries)', async () => {
   const admin = await login('admin.a');
+  // The E2E stack reads class rosters from class_enrollments (multi-class on); the seed links students only through their group, so the
+  // learner is enrolled in English 7A here (as scenario 5 does): teacher.a1 then teaches them and the class assignments reach them.
+  await enaraApi.post(`/api/multi-class/students/${STUDENT_ID}/enrollments`, admin, { scope: 'class', targetId: CLASS }, [200, 201, 409]);
   const o = await enaraApi.post('/api/learning/objectives', admin, { curriculumId: 'LT-CUR-ENG-A', code: `E2E-WORKON-${stamp}`, title: 'Use a and an' });
   ids.objective = (o.objective ?? o).id;
   await enaraApi.post(`/api/learning/objectives/${ids.objective}/approve`, admin, {});
