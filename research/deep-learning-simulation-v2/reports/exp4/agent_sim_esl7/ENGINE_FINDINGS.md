@@ -14,3 +14,10 @@
 ## Round 9
 10. **"Ask for a freer task / free sentence" and "do not ask for another own sentence this session" in the same prompt** (BASE s7054, s7060, s7070, s7035, s7071).
 11. **A2 email items cut mid-word by the 300-character cap**, so the date sentence is lost and the item cannot be answered (s7062 m1, s7068 m2; both engine arms). This is the product limit in amendment D.
+
+## Round 11 (session-2 openers)
+12. **Important: NEW's "Reviews due: open with a review item, no rule first" (spacedReview) is overridden by the first-time-rule block** ("Present" stage teaching moves). Session 2 restarts at Present, so spaced reviews mostly do not run at the very point they are meant for. In BASE, the "Start here" last-session lines are overridden the same way.
+13. **"Finish the open exercise" (last-session line) without saying which exercise it was.**
+14. **QUICK CHECK block vs a teaching move that asks for a recall item only** (s7011).
+15. **"Use words that appear in no lesson exercise" vs the A1 rule "use only the lesson word list".**
+16. **The under-9 sentence cap leaves no room for a full am/is/are rule or for the greeting and reconnect step.**
