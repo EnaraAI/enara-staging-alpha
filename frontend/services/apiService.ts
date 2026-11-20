@@ -1090,6 +1090,17 @@ export const fetchErrorsToWorkOn = (studentId = 'me') =>
   request<{ errors: ErrorToWorkOnView[] }>('GET', `/api/learning/students/${encodeURIComponent(studentId)}/errors-to-work-on`);
 export const dismissErrorToWorkOn = (id: string, note?: string) =>
   request<{ id: string; status: string }>('PATCH', `/api/learning/errors-to-work-on/${encodeURIComponent(id)}`, { status: 'dismissed', ...(note ? { note } : {}) });
+// Learner memory phases 2-4 (sessionMemory / learnerProfile / whatWorks; each 404 when off).
+export interface SessionSummaryView { sessionId: string; startedAt: string; endedAt: string; objectiveId: string | null; right: number; wrong: number; stuckOn: string | null; stoppedWithOpenItem: boolean; nextStep: 'reteach' | 'finish_item' | 'next_point' }
+export interface LearnerProfileView { studentId: string; firstLanguage: string | null; interests: string[]; accommodations: string[]; options: { firstLanguages: string[]; interests: string[]; accommodations: string[] } }
+export interface StudyHabitsView { activeDays: number; sessions: number; avgMinutesPerActiveDay: number; usualTime: string | null; daysSinceLast: number | null; longestGapDays: number; returnedAfterGap: boolean }
+export interface WhatWorksView { methods: { method: string; sessions: number; withIndependentSuccess: number; rate: number }[]; explanationStylesBeforeSuccess: { style: string; count: number }[]; note: string }
+const LS = (id: string) => `/api/learning/students/${encodeURIComponent(id)}`;
+export const fetchSessionSummaries = (studentId: string) => request<{ sessions: SessionSummaryView[] }>('GET', `${LS(studentId)}/session-summaries`);
+export const fetchMemoryProfile = (studentId: string) => request<LearnerProfileView>('GET', `${LS(studentId)}/profile`);
+export const updateMemoryProfile = (studentId: string, patch: Partial<Pick<LearnerProfileView, 'firstLanguage' | 'interests' | 'accommodations'>>) => request<LearnerProfileView>('PUT', `${LS(studentId)}/profile`, patch);
+export const fetchStudyHabits = (studentId: string) => request<{ habits: StudyHabitsView | null }>('GET', `${LS(studentId)}/study-habits`);
+export const fetchWhatWorks = (studentId: string) => request<WhatWorksView>('GET', `${LS(studentId)}/what-works`);
 export const fetchMisconceptions = (studentId = 'me') =>
   request<{ misconceptions: any[] }>('GET', `/api/learning/students/${encodeURIComponent(studentId)}/misconceptions`);
 

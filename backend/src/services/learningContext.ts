@@ -20,6 +20,7 @@ import { applicationGapFrom, examContextFor } from './assessmentEvidenceContext'
 import { isAdultSchool, isFeatureEnabled, isShadowMode } from './featureFlags';
 import { engineV2 } from './engineV2';
 import { errorsForTutor } from './errorsToWorkOn';
+import { learnerBrief, memoryLines } from './learnerMemory';
 import { PEDAGOGY_PLAN_VERSION, selectTeachingPlan, belowB1, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { REGISTRY_VERSION, STRATEGY_BY_ID } from './strategyRegistry';
 
@@ -193,7 +194,13 @@ export async function buildObjectiveContext(params: {
       ? await errorsForTutor({ studentId: params.studentId, institutionId: params.institutionId, courseId: objective.courseId ? String(objective.courseId) : undefined,
         child: (input.ageBand ?? (await loadTrustedAgeBand({ institutionId: params.institutionId, studentId: params.studentId, learningSettings: params.institutionId ? (await Institution.findOne({ id: params.institutionId }).select('learningSettings').lean() as { learningSettings?: unknown } | null)?.learningSettings : undefined })).band) === 'child' })
       : null;
-    if (workOn && !(params.history ?? []).some((t) => t.role === 'assistant')) input.reviewOpening = true; // the review opener (S1 / M3) at the session start
+    const firstTurn = !(params.history ?? []).some((t) => t.role === 'assistant');
+    if (workOn && firstTurn) input.reviewOpening = true; // the review opener (S1 / M3) at the session start
+    // Learner memory phases 2-3 (sessionMemory / learnerProfile; off: nothing): last session, profile effects, a long break.
+    const memory = engineV2('sessionMemory') || engineV2('learnerProfile')
+      ? await memoryLines({ studentId: params.studentId, sessionId: params.tutorSessionId, courseId: objective.courseId ? String(objective.courseId) : undefined, firstTurn })
+      : { lines: [] as string[], reviewOpening: false };
+    if (memory.reviewOpening && firstTurn) input.reviewOpening = true;
     // planner2: lesson shape first, then the main method inside it (lessonPlanner.ts). Off: ped-v2 unchanged.
     let lesson: LessonPlan | undefined;
     let progress: StageProgress | undefined;
@@ -287,7 +294,7 @@ export async function buildObjectiveContext(params: {
         : '- No assessed answers on it yet.',
       ...weak.map((w) => `- Prerequisite not secure yet: ${w.code} "${w.title}".`),
       ...misconceptions.map((m) => `- Possible misconception (${m.status === 'confirmed' ? 'confirmed by a teacher' : 'not confirmed'}): ${m.description}`),
-      ...(workOn?.lines ?? []),
+      ...(engineV2('sessionMemory') ? learnerBrief([workOn?.lines ?? [], memory.lines]) : [...(workOn?.lines ?? []), ...memory.lines]),
       ...(quickCheckActive(lesson) ? [QUICK_CHECK_PLAN_LINE] : planLines(plan, target && target.id !== objective.id ? `${target.code} "${target.title}"` : undefined, status, params.compact)),
       ...(lesson ? shapeLines(lesson, progress ? stageNow(lesson, progress) : undefined) : []),
       // kidsPack: the listen-and-do content for this stage (code picks it; the model says it).

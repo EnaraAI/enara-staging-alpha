@@ -4,6 +4,7 @@ import { cairoDate, parentsApi, type LearnerChip } from '../api';
 import { ErrorBox, Icon, Loading, SampleBadge, useP } from '../ui';
 import { useLive } from '../useLive';
 import { ClassFilter } from '../shared';
+import { MemoryCard } from './MemoryCard';
 
 export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void }> = ({ learner, refreshKey, onFetched }) => {
   const { t, n, lang } = useP();
@@ -112,6 +113,8 @@ export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
         <div className="pp-card"><div className="pp-row"><p className="pp-eyebrow">{t.strengths}</p><SampleBadge show={d.strengths.mock} /></div>{d.strengths.strengths.map((s, i) => <p key={i} style={{ fontSize: 14, lineHeight: '20px' }}>{bi(s, lang)}</p>)}</div>
         <div className="pp-card"><p className="pp-eyebrow">{t.focusNext}</p>{d.strengths.focusAreas.map((s, i) => <p key={i} style={{ fontSize: 14, lineHeight: '20px' }}>{bi(s, lang)}</p>)}</div>
       </section>
+
+      <MemoryCard studentId={learner.studentId} canEdit={learner.role !== 'view'} />
 
       <section className="pp-card" aria-labelledby="pp-results">
         <div className="pp-row"><h2 className="pp-h2" id="pp-results">{t.assessments}</h2><span className="pp-meta">{t.lessonsDone(n(d.lessonsCompleted.count))}</span></div>

@@ -112,6 +112,8 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     if (parentSettingsEnabled()) await run('parentUsage', () => runParentUsageRollup());
     // Parents P4: the weekly summary (one email per parent), once Sunday 18:00 Cairo has passed; at most 10 s.
     if (parentEmailsEnabled()) await run('parentWeekly', () => runWeeklySummaries({ budgetMs: Math.max(2_000, Math.min(10_000, 58_000 - (Date.now() - startedAt))) }));
+    // Learner memory phase 3 (learnerProfile switch): yesterday's study habits per learner.
+    if ((await import('../services/learnerMemory')).learnerProfileOn()) await run('studyHabits', async () => (await import('../services/learnerMemory')).runHabitsRollup());
     await run('reminders', () => sendReminders({}));
     if (new Date().getUTCDay() === 1) await run('weekly', () => sendWeeklySummaries());
     logger.info('cron_daily', { ...results, failed });

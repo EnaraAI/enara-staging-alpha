@@ -25,15 +25,20 @@ describe('pair check: a "wrong" example must be wrong English', () => {
       ['My sister likes rice but she does not like soup.', 'My sister likes rice but she likes soup.', 'negation_swap'],
       ['Ali is late because he missed the train.', 'Ali is late.', 'shorter_not_wrong'],
       ['I wear a coat.', 'I wear a coat.', 'same'],
+      // planner2f (owner): never a misspelling as an example, not even as the wrong one
+      ['Today is hotter than yesterday.', 'Today is hoter than yesterday.', 'misspelling_shown'],
+      ['The robot has a blue pen.', 'The robot has a blue ben.', 'misspelling_shown'],
+      ['This is a pen.', 'This is a pne.', 'misspelling_shown'],
+      ['A vet works in an animal clinic.', 'A vt works in an animal clinic.', 'misspelling_shown'],
     ];
     for (const [r, w, why] of cases) expect([r, w, pairProblem(r, w)]).toEqual([r, w, why]);
   });
   it('passes real form errors', () => {
     const ok: [string, string][] = [
       ['He works late on Fridays.', 'He work late on Fridays.'], ['She always eats fruit.', 'She eats always fruit.'], ['Did she call the client?', 'Did she called the client?'],
-      ['How much milk do we need?', 'How many milk do we need?'], ['Today is hotter than yesterday.', 'Today is hoter than yesterday.'], ['We saw a film.', 'We seed a film.'],
+      ['How much milk do we need?', 'How many milk do we need?'], ['We saw a film.', 'We seed a film.'],
       ['I swam in the lake.', 'I swimmed in the lake.'], ['Birds fly.', 'birds fly.'], ['Mia and I play.', 'Mia and i play.'], ['This is my father.', 'This is father.'],
-      ['The robot has a blue pen.', 'The robot has a blue ben.'], ['It is stormy.', 'It is storm.'], ['an apple', 'a apple'], ['My bag is heavy.', 'My bag heavy.'],
+      ['It is stormy.', 'It is storm.'], ['an apple', 'a apple'], ['My bag is heavy.', 'My bag heavy.'],
       ['I have a big dog.', 'I have a dog big.'], ['Our neighbours are watching TV.', 'Our neighbours watching TV.'],
     ];
     for (const [r, w] of ok) expect([r, w, pairProblem(r, w)]).toEqual([r, w, null]);

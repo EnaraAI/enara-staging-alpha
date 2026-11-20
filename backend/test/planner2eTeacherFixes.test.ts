@@ -21,6 +21,9 @@ describe('planner2e: teacher-score fixes', () => {
   it('D: child supports accept a correct word outside the lesson list', () => {
     const lp = { shape: 'PPP', stages: ['present', 'practise', 'produce', 'check', 'done'], startStage: 'present', childSupports: true, plan: { primary: 'direct_instruction', supporting: [] } } as never;
     expect(shapeLines(lp, 'practise').join('\n')).toMatch(/Accept any correct word or sentence that fits, even one that is not in the lesson list/);
+    // planner2f fix 1 (PLN2g): accept and move on; no "the lesson word is ..." after a right answer.
+    expect(shapeLines(lp, 'practise').join('\n')).toMatch(/say it is right and move on\. Do not add the lesson word after a right answer/);
+    expect(shapeLines(lp, 'practise').join('\n')).not.toMatch(/then show the lesson word/);
   });
   it('E: after language focus the task-based lesson repeats the task (no gap-fill drill)', () => {
     expect(stageMachine('TASK', ['none', 'bad', 'bad', 'ok'] as never)).toBe('repeat');

@@ -266,6 +266,33 @@ router.put('/learners/:studentId/signals', h(async (req, res) => {
   await track(req, ctx, 'feature', 'learner_signals');
   res.json(out);
 }));
+// Learner memory: a parent sees their child's errors to work on (workOn) in plain words, and chooses up to 5 interests (learnerProfile). 404 when off.
+router.get('/learners/:studentId/errors-to-work-on', h(async (req, res) => {
+  const { workOnOn, listForStudent } = await import('../services/errorsToWorkOn');
+  if (!workOnOn()) throw new AppError('Not found', 404, 'NOT_FOUND');
+  const ctx = await learner()(req);
+  await track(req, ctx, 'feature', 'errors_to_work_on');
+  const rows = await listForStudent(ctx.student.id, ctx.link.institutionId);
+  res.json({ errors: rows.filter((r) => r.status !== 'dismissed').map((r) => ({ objective: r.objective.title, error: r.error, status: r.status === 'open' && r.waitingForRelease ? 'waiting' : r.status, since: r.firstSeenAt })) });
+}));
+router.get('/learners/:studentId/interests', h(async (req, res) => {
+  const { learnerProfileOn, getProfile } = await import('../services/learnerMemory');
+  if (!learnerProfileOn()) throw new AppError('Not found', 404, 'NOT_FOUND');
+  const ctx = await learner()(req);
+  const p = await getProfile(ctx.student.id);
+  res.json({ interests: p.interests, options: p.options.interests });
+}));
+router.put('/learners/:studentId/interests', h(async (req, res) => {
+  const { learnerProfileOn, parseInterests, setProfileField } = await import('../services/learnerMemory');
+  if (!learnerProfileOn()) throw new AppError('Not found', 404, 'NOT_FOUND');
+  const ctx = await learner('change_controls')(req);
+  const body = ensurePlainObject(req.body);
+  const v = body.interests === null ? [] : parseInterests(body.interests);
+  if (!v) throw new AppError('interests: up to 5 of the listed codes', 400, 'VALIDATION_ERROR');
+  const p = await setProfileField(ctx.student.id, ctx.link.institutionId, 'interests', v, { id: uid(req), role: 'parent' });
+  await track(req, ctx, 'feature', 'learner_signals');
+  res.json({ interests: p.interests });
+}));
 router.put('/learners/:studentId/controls', h(async (req, res) => {
   const ctx = await learner('change_controls')(req);
   const out = await svc.updateControls(ctx, ensurePlainObject(req.body));

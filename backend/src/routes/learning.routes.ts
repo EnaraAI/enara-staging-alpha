@@ -13,6 +13,7 @@ import {
 } from '../controllers/learningDiagnostics.controller';
 import { listStudentMisconceptions, updateMisconception } from '../controllers/learningMisconceptions.controller';
 import { listErrorsToWorkOn, updateErrorToWorkOn } from '../controllers/errorsToWorkOn.controller';
+import { getLearnerProfile, getStudyHabits, getWhatWorks, listSessionSummaries, updateLearnerProfile } from '../controllers/learnerMemory.controller';
 import {
   cancelIntervention,
   completeIntervention,
@@ -118,6 +119,12 @@ router.patch('/misconceptions/:id', ...misconceptions, updateMisconception);
 // Learner memory phase 1 (ENARA_ENGINE_V2 workOn; 404 when off).
 router.get('/students/:studentId/errors-to-work-on', anyRole, listErrorsToWorkOn);
 router.patch('/errors-to-work-on/:id', anyRole, updateErrorToWorkOn);
+// Learner memory phases 2-4 (sessionMemory / learnerProfile / whatWorks; 404 when off).
+router.get('/students/:studentId/session-summaries', anyRole, listSessionSummaries);
+router.get('/students/:studentId/profile', anyRole, getLearnerProfile);
+router.put('/students/:studentId/profile', anyRole, updateLearnerProfile);
+router.get('/students/:studentId/study-habits', anyRole, getStudyHabits);
+router.get('/students/:studentId/what-works', anyRole, getWhatWorks);
 
 const pedagogy = [anyRole, requireFeature('learning_intelligence_enabled'), requireFeature('adaptive_pedagogy_enabled')];
 router.get('/strategies', requireRole('teacher', 'admin', 'enara-admin'), requireFeature('learning_intelligence_enabled'), listStrategies);

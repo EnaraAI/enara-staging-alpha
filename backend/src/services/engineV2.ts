@@ -41,8 +41,13 @@
 //                 table, skipping methods with no stage in the shape or outside the approved age/level gates; named-only, NOT part of "all"
 //  workOn       - learner memory phase 1 (errorsToWorkOn.ts): errors from released assessments open the next tutor session (gated: closed and released only);
 //                 teachers see the list; named-only, NOT part of "all"
+//  sessionMemory  - learner memory phase 2 (learnerMemory.ts): session summaries, the "last session" opening line, no lesson item repeated across
+//                 sessions on the same lesson, the per-turn learner brief; named-only, NOT part of "all"
+//  learnerProfile - learner memory phase 3: first language, interests, accommodations (fixed codes; only their effect reaches the model) and the
+//                 nightly study-habits rollup (a learner back after 7+ days gets a short review first); named-only, NOT part of "all"
+//  whatWorks      - learner memory phase 4: per-learner view of methods followed by an independent success (teachers only; the planner does not use it)
 //  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
-export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2' | 'ruleBank' | 'exampleGuard' | 'feedbackLadder' | 'methodSelect' | 'kidsBand' | 'planner2' | 'kidsPack' | 'workOn';
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2' | 'ruleBank' | 'exampleGuard' | 'feedbackLadder' | 'methodSelect' | 'kidsBand' | 'planner2' | 'kidsPack' | 'workOn' | 'sessionMemory' | 'learnerProfile' | 'whatWorks';
 const ESL5: EngineV2Feature[] = ['liveError', 'releaseAfterTwo', 'reviewOpen', 'fadeKnown', 'ownSentence'];
 export const TEACH2: EngineV2Feature[] = ['ruleBank', 'exampleGuard', 'feedbackLadder', 'methodSelect', 'kidsBand'];
 export const engineV2 = (feature: EngineV2Feature): boolean => {
@@ -51,7 +56,7 @@ export const engineV2 = (feature: EngineV2Feature): boolean => {
   if (feature === 'arbitration' && v.includes('levelExplicit')) return true; // levelExplicit always runs with arbitration
   if (v.includes('esl5') && ESL5.includes(feature)) return true; // the esl5 bundle (never turned on by "all")
   if (v.includes('teach2') && TEACH2.includes(feature)) return true; // the track-2 bundle (never turned on by "all")
-  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', 'planner2', 'kidsPack', 'workOn', ...ESL5, ...TEACH2].includes(feature));
+  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', 'planner2', 'kidsPack', 'workOn', 'sessionMemory', 'learnerProfile', 'whatWorks', ...ESL5, ...TEACH2].includes(feature));
 };
 
 /** True when `arbitration` is on only because `levelExplicit` forced it (recorded in the turn evidence). */

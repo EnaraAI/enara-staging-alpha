@@ -22,8 +22,8 @@ export function withEnv<T>(env: string, f: () => T): T {
 }
 
 /** Builds the language context the way buildLanguageTeachingContext does, without the database. */
-export function build(msg: string, hist: HistoryTurn[], o: { level?: string; masteryStatus?: string; history?: string[]; record?: Esl5Record; child?: boolean } = {}): LanguageTeachingContext {
-  const signals0 = detectTurnSignals(msg, hist, LESSON, undefined, { child: o.child });
+export function build(msg: string, hist: HistoryTurn[], o: { level?: string; masteryStatus?: string; history?: string[]; record?: Esl5Record; child?: boolean; priorAnswered?: string[] } = {}): LanguageTeachingContext {
+  const signals0 = detectTurnSignals(msg, hist, LESSON, undefined, { child: o.child, priorAnswered: o.priorAnswered });
   const band = levelBand(o.level ?? 'A1');
   const moves0 = selectLanguageMoves({ band, targetLanguage: 'English', lessonStatus: 'structured', signals: signals0, masteryStatus: o.masteryStatus });
   const { signals, moves } = esl5Adjust({ signals: signals0, moves: moves0, record: o.record, history: hist, lessonId: 'lsn' });
