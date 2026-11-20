@@ -27,6 +27,12 @@ export interface IErrorToWorkOn extends Document {
   /** Session / attempt keys already counted (so one session counts once). */
   countedKeys: string[];
   resolvedAt?: Date;
+  /** spacedReview (LIT_REVIEW_GAP_PLAN 3.1): the last wrong answer, the next review date and the step in SPACED_DAYS (1, 3, 7, 21 days). */
+  lastWrongAt?: Date;
+  nextReviewAt?: Date;
+  reviewStep?: number;
+  /** spacedReview: the 21-day check after closing was passed. */
+  finalCheckAt?: Date;
   statusHistory: { at: Date; by?: string; from?: string; to: string; reason?: string }[];
 }
 
@@ -49,6 +55,10 @@ const schema = new Schema<IErrorToWorkOn>(
     rightStreak: { type: Number, default: 0 },
     countedKeys: { type: [String], default: [] },
     resolvedAt: Date,
+    lastWrongAt: Date,
+    nextReviewAt: Date,
+    reviewStep: Number,
+    finalCheckAt: Date,
     statusHistory: { type: [{ at: Date, by: String, from: String, to: String, reason: String }], default: [] },
   },
   { timestamps: true },
