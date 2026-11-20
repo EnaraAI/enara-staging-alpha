@@ -570,7 +570,102 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-numbers-time (numbers and time words). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: f and v are the same. Its error: writes v for f or f for v in a number (\"fivteen\").\nW2 (wrong) strength 1: Arabic sa'a means both hour and clock. Its error: uses clock for hour (\"one clock long\" for one hour).\nC1 (correct) strength 0: numbers keep their English consonants (fifteen, five with f then v). Independent correct productions so far: 0.\nC2 (correct) strength 0: English time phrases: an hour is a length of time, a clock is a thing. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, the film is at seven. Good reading! Just one small spelling slip: s-e-v-e-n.\nNow try one on your own.\nA: Is the party at two? B: No, at three. A: Sorry, at four? B: Yes!\nWhat time is the party?\n\nLEARNER'S LAST MESSAGE:\nvour\nFACT: the last learner message contained the error of W1 (writes v for f or f for v in a number (\"fivteen\")).\n\nTUTOR TURN TO JUDGE:\nYes, the party is at four. Just one small spelling slip: f-o-u-r.\n\nNow write one sentence about a person you know. Use a time that changed."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-numbers-time (numbers and time words). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: f and v are the same. Its error: writes v for f or f for v in a number (\"fivteen\").\nW2 (wrong) strength 1: Arabic sa'a means both hour and clock. Its error: uses clock for hour (\"one clock long\" for one hour).\nC1 (correct) strength 0: numbers keep their English consonants (fifteen, five with f then v). Independent correct productions so far: 0.\nC2 (correct) strength 0: English time phrases: an hour is a length of time, a clock is a thing. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, the film is at seven. Good reading! Just one small spelling slip: s-e-v-e-n.\nNow try one on your own.\nA: Is the party at two? B: No, at three. A: Sorry, at four? B: Yes!\nWhat time is the party?\n\nLEARNER'S LAST MESSAGE:\nvour\nFACT: the last learner message contained the error of W1 (writes v for f or f for v in a number (\"fivteen\")).\n\nTUTOR TURN TO JUDGE:\nYes, the party is at four. Just one small spelling slip: f-o-u-r.\n\nNow write one sentence about a person you know. Use a time that changed.",
+   "stateBefore": {
+    "form": "numtime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "Just one small spelling slip: f-o-u-r."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother's class was at five, but now it is at six.",
+    "errors": {
+     "W1": "My brother's class was at vive, but now it is at six."
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "numtime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother's class was at vive, but now it is at six.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My brother's class was at vive, but now it is at six.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
