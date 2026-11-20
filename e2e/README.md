@@ -24,7 +24,9 @@ Scenarios (`tests/`, run in order, one worker): 1 registration + launches + prev
 8 step 2 onboarding, timed (Test School C: "New school" → invite → one-link
 registration → connection check → status page → first launches; under 15 minutes), 9 Phase 8 activities
 (tutor, live avatar, diagnostic: no grade column, the "not set up" message
-without any AI call, the teacher overview, mic blocked → new tab).
+without any AI call, the teacher overview, mic blocked → new tab)), …, 15 learner memory "errors to work on" (a released wrong answer is recorded; it waits while
+an attempt is left; ready once the assessment is over; teacher list, learner list without sources, other school
+blocked, teacher dismiss; ENARA_ENGINE_V2 as on lms-test, AI paused).
 
 ## CI
 
