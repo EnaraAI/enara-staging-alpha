@@ -324,6 +324,8 @@ export const QUICK_CHECK_MAX_TURNS = 1;
 export const TASK_TURNS = 3;
 /** TASK: this many wrong learner messages in a row inside the task end it early and go to the language focus (planner2c). */
 export const TASK_BAD_RUN = 2;
+/** LAD (planner2k): the do step gives this many one-action commands, then the chant (a child's tap or point cannot be graded by code); the check stays evidence-based. */
+export const LAD_DO_TURNS = 3;
 type HistoryLike = { role: string; content?: string; languageTurn?: unknown };
 const sameText = (a?: string, b?: string) => { const n = (x?: string) => (x ?? '').toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim(); return Boolean(n(a)) && n(a) === n(b); };
 /** Progress in this lesson from the stored language-turn evidence (code-graded verdicts; never the model's own claim). */
@@ -429,19 +431,20 @@ export function stageMachine(shape: LessonShape, ev: Ev[]): Stage {
     return st;
   }
   const L = shape === 'LAD';
-  let st: Stage = L ? 'listen' : 'present'; let streak = 0; let need = 2;
+  let st: Stage = L ? 'listen' : 'present'; let streak = 0; let need = 2; let doTurns = 0;
   for (let k = 1; k < ev.length; k++) {
     const e = ev[k];
     if (st === 'done') continue;
-    if (st === 'present' || st === 'listen') st = L ? 'do' : 'practise';
+    if (st === 'present' || st === 'listen') { st = L ? 'do' : 'practise'; doTurns = 0; }
     else if (st === 'produce' || st === 'chant') { st = 'check'; continue; }
     else if (st === 'check') {
       if (e === 'ok') st = 'done';
-      else if (e === 'bad') { st = L ? 'do' : 'practise'; need = 1; streak = 0; }
+      else if (e === 'bad') { st = L ? 'do' : 'practise'; need = 1; streak = 0; doTurns = 0; }
       continue;
     }
     if (e === 'ok') streak++; else if (e === 'bad') streak = 0;
-    if (streak >= need) { st = need === 1 ? 'check' : L ? 'chant' : 'produce'; streak = 0; }
+    if (L && st === 'do') doTurns++;
+    if (streak >= need || (L && st === 'do' && doTurns >= (need === 1 ? 2 : LAD_DO_TURNS))) { st = need === 1 ? 'check' : L ? 'chant' : 'produce'; streak = 0; doTurns = 0; }
   }
   return st;
 }

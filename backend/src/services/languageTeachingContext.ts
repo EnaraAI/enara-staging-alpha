@@ -335,6 +335,8 @@ export interface LanguageTeachingContext {
   teach2?: Teach2Context;
   // planner2: this turn is inside the lesson's opening quick check.
   quickCheck?: boolean;
+  // planner2k: this reply is a listen-and-do step; the step replaces the lesson exercise.
+  ladStep?: boolean;
   prompt: string;
 }
 export interface Teach2Context {
@@ -2149,6 +2151,9 @@ export async function currentKeyVerdict(params: { institutionId?: string; curric
   }
 }
 
+/** planner2k: in a listen-and-do step (listen, do, chant) with kids-pack content, the step replaces the lesson exercise: these moves are dropped. */
+export const LAD_STEP_DROPPED = new Set<MoveId>(['present_lesson_item', 'independent_practice', 'general_practice', 'comprehension_check', 'distinct_example', 'restate_task']);
+export const LAD_STEP_LINE = 'LISTEN AND DO (set by the system): this reply is ONLY the listen-and-do step in the learning focus above (the story, ONE instruction, or the chant), in at most 3 short sentences. Do not give a lesson exercise, a fill-in item, a rule or a right/wrong pair in this reply. This overrides any instruction above to give an exercise or an item.';
 /** planner2 quick check: moves that teach or correct, removed in the quick-check reply. */
 export const QUICK_CHECK_DROPPED = new Set<MoveId>(['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'l1_support', 'activate_prior_knowledge']);
 export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this opening reply gives ONE short exercise from the lesson to see what the learner already knows. Do not teach, explain, hint or give any answer in this reply: a short greeting, then the exercise. The teaching starts in your next reply. This overrides any instruction above to explain, model or give an answer.';
@@ -2174,6 +2179,8 @@ export async function buildLanguageTeachingContext(params: {
   objectiveCode?: string;
   // planner2: this turn is inside the 3-item quick check that opens the lesson (no teaching, no correction).
   quickCheck?: boolean;
+  // planner2k: this turn is a listen-and-do step (listen, do or chant) with kids-pack content: the step replaces the exercise.
+  ladStep?: boolean;
 }): Promise<LanguageTeachingContext | null> {
   try {
     if (!params.curriculumId) return null;
@@ -2211,7 +2218,8 @@ export async function buildLanguageTeachingContext(params: {
     const quickCheck = Boolean(params.quickCheck) && engineV2('planner2');
     const signals = adjusted.signals;
     // planner2 quick check: only presenting and recording; every teaching or correcting move is dropped for these 3 items.
-    const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : adjusted.moves;
+    const ladStep = Boolean(params.ladStep) && engineV2('planner2') && engineV2('kidsPack') && !quickCheck;
+    const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : ladStep ? adjusted.moves.filter((m) => !LAD_STEP_DROPPED.has(m.id)) : adjusted.moves;
     const base0 = lengthTarget(learner.ageBand, learner.proficiency.value);
     // r2: a clarification-only turn is one short question, so a tighter target.
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
@@ -2225,9 +2233,10 @@ export async function buildLanguageTeachingContext(params: {
     const { explicit, ruleFirst } = quickCheck ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
     const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}), ...(teach2 ? { teach2 } : {}) } as const;
     const parts0 = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
-    const parts = parts0 && quickCheck ? { ...parts0, dynamic: `${parts0.dynamic}\n\n${QUICK_CHECK_LINE}` } : parts0;
+    const tail = quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : '';
+    const parts = parts0 && tail ? { ...parts0, dynamic: `${parts0.dynamic}\n\n${tail}` } : parts0;
     const prompt = renderLanguageContextPrompt(base);
-    return { ...base, ...(quickCheck ? { quickCheck: true } : {}), ...(parts ? { parts } : {}), prompt: quickCheck ? `${prompt}\n\n${QUICK_CHECK_LINE}` : prompt };
+    return { ...base, ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), ...(parts ? { parts } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt };
   } catch (error) {
     logger.warn('language_context_failed', { error: serializeError(error) });
     return null;

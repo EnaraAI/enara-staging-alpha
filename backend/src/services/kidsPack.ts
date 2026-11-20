@@ -99,7 +99,7 @@ export function ladLines(lesson: LadLesson | undefined, stage: Stage, step = 0):
     case 'listen':
       return [head, `- Stage Listen: tell this story slowly, line by line, then ask the child to listen for the word "${pick(lesson.words)}":`, ...lesson.story.map((l) => `  ${l}`)];
     case 'do':
-      return [head, `- Stage Do: give this one instruction and wait (the child taps, points or says it): "${pick(lesson.commands)}"`, '- If the child does it, praise the effort and give the next one; if not, say the word again slowly and show the picture.'];
+      return [head, `- Stage Do: give this one instruction and wait (the child taps, points or says it): "${pick(lesson.commands)}"`, '- If the child does it, praise the effort. If not, give a hint (show the picture, or say only the first sound); say the whole word only after two tries.'];
     case 'chant':
       return [head, '- Stage Chant: say this chant together, two lines at a time:', ...lesson.chant.map((l) => `  ${l}`)];
     default:

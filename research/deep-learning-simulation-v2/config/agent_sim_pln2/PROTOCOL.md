@@ -38,11 +38,11 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | File | SHA-256 |
 |---|---|
 | `backend/src/services/engineV2.ts` | `ac1124a7bd7eacfbc63b6c3e88f45b8cce05354932f9e262063ee4d039656950` |
-| `backend/src/services/lessonPlanner.ts` | `e29a427ecbf4cf240dcfa80ef6a30258ead418132f455532ded70def16fb4118` |
+| `backend/src/services/lessonPlanner.ts` | `0b8bacafc5b1fd1510cf43996a2235e317cc100dbf86f56f93eab7c2736591cb` |
 | `backend/src/services/pedagogyPolicy.ts` | `f80072642fc070293e30c9b7b3a6d1f9ce7a291aa6f764146cae852fcf3f4ac4` |
-| `backend/src/services/learningContext.ts` | `02b00250d5f341a406d3b232de30c29b47f7e2c51626e109014b6217f9cf3be6` |
+| `backend/src/services/learningContext.ts` | `a012b90eb88d26c3891921694848219f5a37922b1552e9638f46c10fd0113d6d` |
 | `backend/src/services/strategyRegistry.ts` | `e78af1986f6f0e1c4f70f6ebbae2473e48801edcbeb013ea654c8a3b4fc4cb21` |
-| `backend/src/services/languageTeachingContext.ts` | `9ba5debb1b772847a46b8b05a0463e8b7796cb21a25dd6898773451307c67655` |
+| `backend/src/services/languageTeachingContext.ts` | `4d67993f5148756b48e2cc386c0641b6d657ea2c848b012e5a934af13e280a99` |
 | `backend/src/services/languageTurnPipeline.ts` | `2673ec40c37eec5a66ee364b5d0d65054d809bd2f38ff13f48b6843f93dfd9b1` |
 | `backend/src/services/languageLearningState.ts` | `d6ad94373485734fe2cd8b52a849a4af1c7b0055c3566d4bb72425b4837a2927` |
 | `backend/src/services/learnerLanguageProfile.ts` | `78e783f1d129339aa84e45fc6d49a3a2090ff09fe4f103793fb21ad936f56ec4` |
@@ -65,7 +65,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `4f4d907d4e9fbca99ca837494dbcf4fae9e32f188292e261dc8fd4dce107ff13` |
+| `src/offline/pln2Study.ts` (this runner) | `e73052943243b3abbbfaeab1b4a5bba4ff44bb725d02f2345936fe34323bb7e0` |
 | `src/offline/pln2_analyze.py` (this analysis) | `5e4501439d1f9a68de91cc13d71cb61d12d6c8131ac5db4d9b50997ef45b555c` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
@@ -179,7 +179,7 @@ Recorded before any new agent run. The PLN2b results, transcripts and main fit t
 1. **planner2c task rule** (`lessonPlanner.ts`, PLANNER_VERSION planner2-v3): two wrong learner messages in a row inside the task end the task early → language focus (TASK_BAD_RUN = 2). Cause: PLN2b stuck learner s2001 (the same wrong sentence three times while the task ran for 3 messages). Test in `planner2.test.ts`. Not re-simulated in this amendment.
 2. **9–12 fit items with 0/1/2 anchors** (`KIDPPP_E` in `pln2Study.ts`): counts for long sentences (> 12 words), messages with two or more instructions, effort praise; game/story across turns; the present → practise → produce steps. Other groups' items unchanged.
 3. **Fit-agreement re-run only:** the same 12 sessions as `fitagree/`, judged blind twice with the anchored items by two new Opus agents (`fitE/`, batches `fitE_a_j01`, `fitE_b_j01`; new case ids per side). Agreement = identical item scores between the two (`FIT_AGREEMENT_E.json`); the rule stays ≥ 85%. Two agent runs.
-4. Hashes after this amendment: `lessonPlanner.ts` `e29a427ecbf4cf240dcfa80ef6a30258ead418132f455532ded70def16fb4118`; `pln2Study.ts` `aa59f5d29b8ddc893023c64862461b62e8784fdd0716bf1208f37de42174b65d`.
+4. Hashes after this amendment: `lessonPlanner.ts` `0b8bacafc5b1fd1510cf43996a2235e317cc100dbf86f56f93eab7c2736591cb`; `pln2Study.ts` `aa59f5d29b8ddc893023c64862461b62e8784fdd0716bf1208f37de42174b65d`.
 
 ## Amendment F (19 Nov 2026, owner decision "proceed"): PLN2c, adults-only re-check of planner2c
 Recorded before any PLN2c agent run. Why adults only: the planner2c change (amendment E.1) touches only the TASK stage machine. The other three groups' plans and stages are unchanged (`planner2.test.ts` goldens unchanged), so their PLN2b results stand.
@@ -218,3 +218,20 @@ Recorded before any PLN2k tutor run. Branch `claude/tutor-kids-pack`, with plann
 4. **Overlap check:** the PLN2-family folders (pln2, pln2b, pln2c, pln2k) are exempt from each other.
 5. **Estimate:** 2 content runs (writer, reviewer) + 14 Sonnet tutors + about 11 Opus (7 judges, 1 agreement, 2 fit, 1 fit agreement; the recheck is folded in).
 6. **Before round 1:** the review marked 5 of 9 lessons "fix", and all 16 suggestions were applied. The dry run's prompt check also caught one story line that was the exact answer to a test item (lad-21: "My birthday is in February."). It was reworded to "I have a birthday in February." The checker shows 29 lessons OK. Tests: 133 pass, including the A1-lesson mapping test (linkOnly lessons match by outcome id only). A full scripted dry run passed. §3 hashes refreshed for this branch (kids pack changes to engineV2, learningContext, languageTeachingContext and the runner). Task files: `tasks_k/`.
+
+## Amendment I (20 Nov 2026, owner "do the fixes"): fixes from the PLN2k result
+Code only. No agent run.
+1. **The listen-and-do step replaces the exercise.** When the shape is listen-and-do, a kids lesson exists and the stage is listen, do or chant:
+   - the language context drops the exercise moves (`LAD_STEP_DROPPED`: present item, independent and general practice, comprehension check, distinct example, restate task);
+   - it adds `LAD_STEP_LINE`, an override like the quick check;
+   - `tutor.controller` passes `ladStep` from `lessonStage.ladContent`.
+   - The check stage keeps one exercise. The do step now moves on after `LAD_DO_TURNS` = 3 commands, because a tap or point can't be graded by code, or earlier after 2 right in a row. The check stays evidence-based: wrong → do (2 commands) → check.
+2. **The do-step hint follows the answer rule:** "give a hint (show the picture, or say only the first sound); say the whole word only after two tries."
+3. **Leak detector:**
+   - (a) a reply that repeats the learner's own sentence is not a leak;
+   - (b) for a rewrite item whose answer differs from its prompt only by capitals and full stops, showing the prompt is not a leak; only the exact capitalised answer counts.
+   - Re-scored by code (`releak`), with the old values kept as `*V1`:
+     - PLN2k: 10 → 4 leak replies (OFF 1, ON 3; still a fail);
+     - PLN2b: 14 → 8 (OFF 5, ON 3; ok);
+     - PLN2c: 1 → 1.
+4. **Tests:** 143 pass (planner2, kidsPack, repeat-wrong, ESL5 release and off-parity). The dry run shows the override in all 12 ON prompts and in none of the OFF prompts. §3 hashes refreshed.

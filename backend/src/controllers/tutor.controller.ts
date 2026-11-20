@@ -316,6 +316,8 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     objectiveId: turn.plan?.teaching.objectiveId,
     objectiveCode: turn.plan?.objectiveCode,
     ...(turn.plan?.lessonStage?.quickCheck ? { quickCheck: true } : {}),
+    // planner2k: a listen-and-do step (listen, do, chant) with kids-pack content replaces the lesson exercise.
+    ...(turn.plan?.lessonStage?.ladContent && ['listen', 'do', 'chant'].includes(turn.plan.lessonStage.stage) ? { ladStep: true } : {}),
   }, 'chat'))?.context ?? null;
   if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language) {
     turn.orchestrator = {

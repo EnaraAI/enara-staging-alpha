@@ -56,7 +56,7 @@ export interface ObjectiveContext {
   // TRACK 2: the objective's code (an outcome id such as EN-F-A2-GR-some-any selects the rule-bank entry). Not stored.
   objectiveCode?: string;
   // planner2: the lesson shape and this turn's stage (code-set); quickCheck = inside the opening 3-item check.
-  lessonStage?: { shape: string; stage: string; quickCheck: boolean };
+  lessonStage?: { shape: string; stage: string; quickCheck: boolean; ladContent?: boolean };
 }
 
 export type Channel = 'chat' | 'stream' | 'voice' | 'intervention';
@@ -301,7 +301,7 @@ export async function buildObjectiveContext(params: {
       registryVersion: plan.registryVersion,
       ...(lesson ? { lessonShape: lesson.shape, shapeRule: lesson.shapeRule, methodRule: lesson.methodRule, plannerVersion: lesson.plannerVersion, explanation: lesson.explanation } : {}),
     };
-    const lessonStage = lesson ? { shape: lesson.shape, stage: progress ? stageNow(lesson, progress) : lesson.startStage, quickCheck: lesson.shapeRule === 'S4q' } : undefined;
+    const lessonStage = lesson ? { shape: lesson.shape, stage: progress ? stageNow(lesson, progress) : lesson.startStage, quickCheck: lesson.shapeRule === 'S4q', ...(lesson.shape === 'LAD' && ladContentFor(objective.code ? String(objective.code) : undefined, objective.title) ? { ladContent: true } : {}) } : undefined;
     return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching, ...(lessonStage ? { lessonStage } : {}), ...(objective.code ? { objectiveCode: String(objective.code) } : {}) };
   } catch (error) {
     logger.warn('learning_context_failed', { error: serializeError(error) });

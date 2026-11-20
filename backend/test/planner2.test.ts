@@ -564,3 +564,31 @@ describe('planner2b: rule statements fade only on evidence', () => {
     expect(withEnv('planner2', () => m.rulesToIntroduce(hist, { ...sig, keyVerdict: 'CORRECT' }, spec))).toBeUndefined();
   });
 });
+
+describe('planner2k fixes (PLN2k report)', () => {
+  it('fix 1: the listen-and-do do step moves on after 3 commands (a tap cannot be graded); the check stays evidence-based', async () => {
+    const { stageMachine, LAD_DO_TURNS } = await import('../src/services/lessonPlanner');
+    const o = 'none' as const;
+    expect(LAD_DO_TURNS).toBe(3);
+    expect(stageMachine('LAD', [o, 'none'])).toBe('do');
+    expect(stageMachine('LAD', [o, 'none', 'none'])).toBe('do');
+    expect(stageMachine('LAD', [o, 'none', 'none', 'none'])).toBe('chant'); // 3 commands given, ungraded
+    expect(stageMachine('LAD', [o, 'none', 'none', 'none', 'none'])).toBe('check');
+    expect(stageMachine('LAD', [o, 'none', 'none', 'none', 'none', 'ok'])).toBe('done');
+    expect(stageMachine('LAD', [o, 'none', 'none', 'none', 'none', 'bad'])).toBe('do'); // a wrong check goes back to doing
+    expect(stageMachine('LAD', [o, 'none', 'none', 'none', 'none', 'bad', 'none', 'none'])).toBe('check'); // then 2 commands -> check again
+    expect(stageMachine('LAD', [o, 'ok', 'ok'])).toBe('chant'); // 2 right in a row still moves on early
+    expect(stageMachine('PPP', [o, 'none', 'none', 'none', 'none'])).toBe('practise'); // PPP unchanged: practise needs evidence
+  });
+  it('fix 1: the listen-and-do step line overrides the exercise; fix 2: the do hint gives the word only after two tries', async () => {
+    const { LAD_STEP_LINE, LAD_STEP_DROPPED } = await import('../src/services/languageTeachingContext');
+    expect(LAD_STEP_LINE).toMatch(/overrides any instruction above to give an exercise/);
+    expect(LAD_STEP_LINE).toMatch(/Do not give a lesson exercise/);
+    expect(LAD_STEP_DROPPED.has('present_lesson_item')).toBe(true);
+    expect(LAD_STEP_DROPPED.has('corrective_feedback_retry')).toBe(false); // feedback on a graded answer stays
+    const { ladLines } = await import('../src/services/kidsPack');
+    const lines = ladLines({ id: 'x', outcomeIds: [], topic: 't', words: ['egg'], story: ['a', 'b', 'c', 'd'], chant: ['a', 'b', 'c', 'd'], commands: ['Point to the egg.'] }, 'do', 0).join('\n');
+    expect(lines).toMatch(/only after two tries/);
+    expect(lines).not.toMatch(/say the word again slowly/);
+  });
+});

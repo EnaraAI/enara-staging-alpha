@@ -23,7 +23,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import path from 'path';
 import {
   detectTurnSignals, deriveLearnerContext, levelBand, renderLanguageContextPrompt, selectLanguageMoves, researchSignals, closingOn, ruleFirstDecision, explicitFirst, hasTwoAsks,
-  esl5Adjust, knownKey, independentSuccessItem, QUICK_CHECK_DROPPED, QUICK_CHECK_LINE, type LanguageTeachingContext, type TrustedAgeBand,
+  esl5Adjust, knownKey, independentSuccessItem, QUICK_CHECK_DROPPED, QUICK_CHECK_LINE, LAD_STEP_DROPPED, LAD_STEP_LINE, type LanguageTeachingContext, type TrustedAgeBand,
 } from '../../../../backend/src/services/languageTeachingContext';
 import { stripAssessmentMarkers, isFailure, L1_TRANSFER_CODES } from '../../../../backend/src/services/languageLearningState';
 import { applyReplyGuards, arbitratePedagogy, completeLanguageTurn } from '../../../../backend/src/services/languageTurnPipeline';
@@ -269,7 +269,8 @@ function langCtx(s: Sess, po: PlanOut = planOf(s)) {
   const adjusted = esl5Adjust({ signals: signals0, moves: moves0, record, history: hist, lessonId: LESSON_ID });
   const quickCheck = po.quickCheck && engineV2('planner2');
   const signals = adjusted.signals;
-  const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : adjusted.moves;
+  const ladStep = !quickCheck && engineV2('planner2') && engineV2('kidsPack') && po.lesson?.shape === 'LAD' && ['listen', 'do', 'chant'].includes(String(po.stage)) && ladContentFor(l.outcome, lesson0.title); // planner2k fix 1
+  const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : ladStep ? adjusted.moves.filter((m) => !LAD_STEP_DROPPED.has(m.id)) : adjusted.moves;
   const learner = deriveLearnerContext({ courseLevel: l.level, courseLanguages: ['English'], adultSchool: false, trustedAgeBand: trustedOf(l), learnerMessages: [message], objectiveStatus: l.status });
   const research = closingOn() || engineV2('hints') ? researchSignals(hist, signals, lesson0.spec as never) : undefined;
   const planPrimary = po.plan.primary; process.env.ENARA_ENGINE_V2 = ENV_OF[s.arm];
@@ -277,7 +278,8 @@ function langCtx(s: Sess, po: PlanOut = planOf(s)) {
   const profile = summarizeProfile(s.rec.entries, nowOf(s));
   const base = { version: 'ltc-v1', learner, lesson: { status: 'structured', lessonId: LESSON_ID, title: lesson0.title, spec: lesson0.spec }, signals, moves, ...(profile.length ? { history: profile } : {}), ...(research ? { research } : {}), ...(planPrimary ? { planPrimary } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(record ? { record } : {}) } as never;
   const prompt = renderLanguageContextPrompt(base);
-  return { ...(base as object), ...(quickCheck ? { quickCheck: true } : {}), prompt: quickCheck ? `${prompt}\n\n${QUICK_CHECK_LINE}` : prompt } as never as LanguageTeachingContext;
+  const tail = quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : '';
+  return { ...(base as object), ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt } as never as LanguageTeachingContext;
 }
 const dlg = (s: Sess) => sessionTurns(s).map((t) => `STUDENT: ${t.learner}${t.tutor !== undefined ? `\nTUTOR: ${t.tutor}` : ''}`).join('\n');
 function enginePart(s: Sess): string { const po = planOf(s); return `${po.text}\n\n${langCtx(s, po).prompt}`; }
@@ -294,12 +296,16 @@ function itemLedger(s: Sess) {
 }
 function answersIn(s: Sess, text: string, skip: (id: string) => boolean): string[] {
   const items = lessonOf(s.outcome).spec.items; const nt = ` ${norm(text)} `; const out: string[] = [];
-  for (const it of items) { if (skip(it.id)) continue; const core = coreOf(it.prompt); for (const a of it.acceptedAnswers ?? []) { const nf = norm(core.includes('___') ? core.replace('___', a) : a); if ((nf.length >= 8 && nt.includes(` ${nf} `)) || new RegExp(`\\b(the answer is|answer:|correct answer is)\\s*["'“]?${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(text)) { out.push(it.id); break; } } }
+  for (const it of items) { if (skip(it.id)) continue; const core = coreOf(it.prompt); for (const a of it.acceptedAnswers ?? []) { const nf = norm(core.includes('___') ? core.replace('___', a) : a);
+    // Fix 3: a rewrite item whose answer differs from its prompt only by capitals and full stops ("my brother likes tea") is shown, not leaked, when the prompt is shown: only the exact capitalised answer counts.
+    if (!core.includes('___') && nf === norm(core)) { if (text.includes(a.trim())) { out.push(it.id); break; } continue; } if ((nf.length >= 8 && nt.includes(` ${nf} `)) || new RegExp(`\\b(the answer is|answer:|correct answer is)\\s*["'“]?${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(text)) { out.push(it.id); break; } } }
   return out;
 }
-function leakIn(s: Sess, text: string): number { const g = itemLedger(s); const tried = new Set(g.tried); if (g.active) tried.add(g.active); return answersIn(s, text, (id) => tried.has(id)).length; }
-function earlyLeakIn(s: Sess, text: string): { early: number; late: number } {
-  const g = itemLedger(s); const hit = answersIn(s, text, (id) => g.solved.has(id));
+/** Fix 3 (PLN2k): a reply that repeats the learner's own sentence back is not a leak: the learner's latest message is removed from the reply before matching. */
+function withoutEcho(s: Sess, text: string): string { const st = sessionTurns(s); const own = String(st[st.length - 1]?.learner ?? '').trim().replace(/[.!?]+$/, ''); if (own.split(/\s+/).length < 3) return text; const re = new RegExp(own.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'), 'gi'); return text.replace(re, ' '); }
+function leakIn(s: Sess, text0: string): number { const text = withoutEcho(s, text0); const g = itemLedger(s); const tried = new Set(g.tried); if (g.active) tried.add(g.active); return answersIn(s, text, (id) => tried.has(id)).length; }
+function earlyLeakIn(s: Sess, text0: string): { early: number; late: number } {
+  const text = withoutEcho(s, text0); const g = itemLedger(s); const hit = answersIn(s, text, (id) => g.solved.has(id));
   return { early: hit.filter((id) => (g.fails[id] ?? 0) < 2).length, late: hit.filter((id) => (g.fails[id] ?? 0) >= 2).length };
 }
 /** Descriptive quick-check heuristic (not the compliance measure): teaching, hint or correction words in a quick-check reply. */
@@ -711,6 +717,22 @@ async function main() {
     for (const [sess, sides] of Object.entries(bySess)) { const g = Object.values(key).find((k: any) => k.session === sess).group as Group; for (const x of fitItemsE(g)) { const d = Math.abs(sides.a.items[x.key].score - sides.b.items[x.key].score); n++; if (!d) same++; if (d <= 1) within1++; const pg = (perGroup[g] ??= { n: 0, same: 0 }); pg.n++; if (!d) pg.same++; const pi = (perItem[`${g}:${x.key}`] ??= { n: 0, same: 0 }); pi.n++; if (!d) pi.same++; } }
     const res = { _label: 'SIMULATION ONLY', amendment: 'E', cases: Object.keys(bySess).length, itemScores: n, exact: same, agreement: +(same / n).toFixed(4), within1: +(within1 / n).toFixed(4), perGroup, perItem, rule: 'exact agreement on rubric item scores >= 0.85', pass: same / n >= 0.85 };
     write(path.join(dir, 'FIT_AGREEMENT_E.json'), res); console.log(JSON.stringify({ ...res, perItem: undefined }));
+  } else if (cmd === 'releak') {
+    // Fix 3 (PLN2k): recompute the leak counts of every stored reply with the echo rule (code only; the old values stay as leakFinalV1/earlyLeakFinalV1).
+    const dir = dirArg(a1); let before = 0; let after = 0;
+    for (const f of sessionFiles(dir)) {
+      const s = load(dir, f.replace(/\.json$/, ''));
+      s.turns.forEach((t, k) => {
+        if (t.tutor === undefined) return;
+        const at: Sess = { ...s, turns: [...s.turns.slice(0, k), { ...t, tutor: undefined }] } as Sess;
+        const old = (t.earlyLeakFinal as number | undefined) ?? 0; before += old > 0 ? 1 : 0;
+        if (t.leakFinalV1 === undefined) { t.leakFinalV1 = t.leakFinal ?? 0; t.earlyLeakFinalV1 = old; }
+        const el = earlyLeakIn(at, t.tutor); t.leakFinal = leakIn(at, t.tutor); t.earlyLeakFinal = el.early; t.lateAnswerFinal = el.late;
+        after += el.early > 0 ? 1 : 0;
+      });
+      save(dir, s);
+    }
+    console.log('early-leak replies before', before, 'after', after);
   } else if (cmd === 'status') {
     const dir = dirArg(a1); const c: Record<string, number> = {};
     for (const s of allSessions(dir)) { const k = `${s.turns.filter((t) => t.tutor !== undefined).length} replies / ${s.turns.filter((t) => t.events).length} judged${s.stateDelayed ? ' / f1-7' : ''}`; c[k] = (c[k] ?? 0) + 1; }

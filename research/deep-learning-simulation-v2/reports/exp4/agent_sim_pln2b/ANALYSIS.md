@@ -13,7 +13,7 @@ Verdict (pre-registered pass rules): **NOT PASSED**
 | KIDPPP | 12 | 0.917 | 0.917 | 0.000 | [0.000, 0.000] | 0 / 12 / 0 |
 | ALL | 48 | 0.859 | 0.875 | 0.016 | [-0.031, 0.068] | 5 / 39 / 4 |
 
-Guards (amendment D): stuck runs OFF 0 / P2 1 -> FAIL; independent correct answers (fix A: first try, new item, answer not shown) OFF 177 / P2 166 of 231 / 225 first tries -> FAIL (old measure OFF 8 / P2 15); early answer leaks OFF 8 / P2 6 -> ok
+Guards (amendment D): stuck runs OFF 0 / P2 1 -> FAIL; independent correct answers (fix A: first try, new item, answer not shown) OFF 180 / P2 169 of 231 / 225 first tries -> FAIL (old measure OFF 8 / P2 15); early answer leaks OFF 5 / P2 3 -> ok
 
 ### Immediate test, primary items
 
@@ -67,12 +67,12 @@ No-harm rule: overall CI lower bound -0.031 > -0.05 and no group mean below -0.0
 | TASK | P2 | 84 | 0 | 0 | 1 | 1 | 52.369 |
 | TTT | OFF | 84 | 0 | 0 | 0 | 0 | 45.024 |
 | TTT | P2 | 84 | 0 | 0 | 0 | 0 | 41.631 |
-| LAD | OFF | 84 | 0 | 5 | 0 | 0 | 30.691 |
-| LAD | P2 | 84 | 0 | 5 | 1 | 0 | 34.262 |
+| LAD | OFF | 84 | 0 | 2 | 0 | 0 | 30.691 |
+| LAD | P2 | 84 | 0 | 2 | 1 | 0 | 34.262 |
 | KIDPPP | OFF | 84 | 0 | 3 | 1 | 0 | 34.262 |
 | KIDPPP | P2 | 84 | 0 | 1 | 0 | 0 | 37.119 |
-| ALL | OFF | 336 | 0 | 8 | 1 | 0 | 40.188 |
-| ALL | P2 | 336 | 0 | 6 | 2 | 1 | 41.345 |
+| ALL | OFF | 336 | 0 | 5 | 1 | 0 | 40.188 |
+| ALL | P2 | 336 | 0 | 3 | 2 | 1 | 41.345 |
 
 ### Fit scores (mean 0-2) by rubric item
 

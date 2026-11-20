@@ -10,7 +10,7 @@ Verdict (pre-registered pass rules): **NOT PASSED**
 | LAD | 12 | 0.812 | 0.854 | 0.042 | [0.000, 0.125] | 1 / 11 / 0 |
 | ALL | 12 | 0.812 | 0.854 | 0.042 | [0.000, 0.125] | 1 / 11 / 0 |
 
-Guards (amendment D): stuck runs OFF 0 / P2 0 -> ok; independent correct answers (fix A: first try, new item, answer not shown) OFF 33 / P2 35 of 55 / 55 first tries -> ok (old measure OFF 0 / P2 0); early answer leaks OFF 4 / P2 6 -> FAIL
+Guards (amendment D): stuck runs OFF 0 / P2 0 -> ok; independent correct answers (fix A: first try, new item, answer not shown) OFF 36 / P2 38 of 55 / 55 first tries -> ok (old measure OFF 0 / P2 0); early answer leaks OFF 1 / P2 3 -> FAIL
 
 ### Immediate test, primary items
 
@@ -48,10 +48,10 @@ No-harm rule: overall CI lower bound 0.000 > -0.05 and no group mean below -0.05
 
 | Group | Arm | turns | two asks | early-leak turns | answers after 2 fails | stuck runs | mean words |
 |---|---|---|---|---|---|---|---|
-| LAD | OFF | 84 | 0 | 4 | 0 | 0 | 28.583 |
-| LAD | P2 | 84 | 0 | 6 | 1 | 0 | 26.929 |
-| ALL | OFF | 84 | 0 | 4 | 0 | 0 | 28.583 |
-| ALL | P2 | 84 | 0 | 6 | 1 | 0 | 26.929 |
+| LAD | OFF | 84 | 0 | 1 | 0 | 0 | 28.583 |
+| LAD | P2 | 84 | 0 | 3 | 1 | 0 | 26.929 |
+| ALL | OFF | 84 | 0 | 1 | 0 | 0 | 28.583 |
+| ALL | P2 | 84 | 0 | 3 | 1 | 0 | 26.929 |
 
 ### Fit scores (mean 0-2) by rubric item
 
