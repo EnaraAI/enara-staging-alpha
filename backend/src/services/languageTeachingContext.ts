@@ -1038,7 +1038,9 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
   if ((engineV2('releaseAfterTwo') || engineV2('feedbackLadder')) && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope, countEmpty);
   if (countEmpty && sig.learning?.activeItem && emptyAnswer(text, sig.activeLessonItem)) sig.emptyAnswer = true;
   if (engineV2('spellingPattern') && !(sig.keyVerdict === 'CORRECT' || sig.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION')) {
-    const slip = spellingSlip(text, [...(lesson?.spec?.vocabulary ?? []), ...(lesson?.spec?.items ?? []).flatMap((i) => i.acceptedAnswers ?? [])].flatMap((x) => String(x).split(/[\s/;,]+/)));
+    const sp = lesson?.spec;
+    const known = [lesson?.title ?? '', ...(sp?.objectives ?? []), ...(sp?.successCriteria ?? []), ...(sp?.grammar ?? []), ...(sp?.functions ?? []), ...(sp?.skills ?? []), ...(sp?.examples ?? [])]; // not item prompts: error-correction items hold misspellings on purpose
+    const slip = spellingSlip(text, [...(sp?.vocabulary ?? []), ...(sp?.items ?? []).flatMap((i) => i.acceptedAnswers ?? [])].flatMap((x) => String(x).split(/[\s/;,]+/)), known);
     if (slip) sig.spellingSlip = slip;
   }
   if (engineV2('l1Lexical')) { const t = lexicalTransfer(text); if (t) sig.lexicalL1 = t; }

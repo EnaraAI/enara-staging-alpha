@@ -17,6 +17,9 @@ describe('spellingPattern: "biger" gets the doubling pattern on another word, ne
   it('finds a near miss of a lesson word ("mather" for "mother")', () => {
     expect(spellingSlip('last summer we went to alexandria and my uncle lives there and we swam', ['liked', 'visited', 'because'])).toBeNull(); // ESL7 round 2: "lives" is a word, not a slip of "liked"
     expect(spellingSlip('This is my mather.', ['mother', 'father'])).toMatchObject({ kind: 'letters', wrong: 'mather', right: 'mother' });
+    // ESL7 round 6: a word the lesson itself uses is never a slip ("object" next to the lesson word "subject")
+    expect(spellingSlip('Hi! Can we learn word order (subject + verb + object) today?', ['subject', 'verb'], ['Word order (subject + verb + object)'])).toBeNull();
+    expect(spellingSlip('My fathr is a teacher.', ['father'], ['Family words'])).toMatchObject({ kind: 'letters', wrong: 'fathr', right: 'father' });
   });
   it('the line shows another word split to show the pattern, never "biger", never the item answer', () => {
     const line = spellingPatternLine(spellingSlip('biger')!, ['hotter']);
