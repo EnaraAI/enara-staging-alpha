@@ -48,9 +48,10 @@
    "firstSeenAt": "2027-05-03T08:30:00.000Z",
    "lastSeenAt": "2027-05-03T08:30:00.000Z",
    "status": "open",
-   "rightStreak": 0,
+   "rightStreak": 1,
    "countedKeys": [
-    "attempt:pre-7031"
+    "attempt:pre-7031",
+    "session:s7031_BASE_o1_S1"
    ],
    "statusHistory": [
     {
@@ -91,13 +92,28 @@
  "rec": {
   "entries": [],
   "liveErrors": {},
-  "knownPoints": {}
+  "knownPoints": {
+   "lsn-EN-F-A1-GR-capitals-full-stops:1": 1,
+   "lsn-EN-F-A1-GR-capitals-full-stops:3": 1
+  }
  },
  "log": [
   {
    "at": "2027-05-03T08:30:00.000Z",
    "event": "pre-test released",
    "rows": 2
+  },
+  {
+   "track": "s7031_BASE_o1",
+   "turn": 2,
+   "events": [
+    {
+     "row": "ewo_25a0c76a134a",
+     "right": true,
+     "at": "2027-05-03T09:02:00.000Z",
+     "via": "objective"
+    }
+   ]
   }
  ]
 }

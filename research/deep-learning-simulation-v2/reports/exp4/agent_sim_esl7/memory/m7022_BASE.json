@@ -43,9 +43,10 @@
    "firstSeenAt": "2027-05-03T08:30:00.000Z",
    "lastSeenAt": "2027-05-03T08:30:00.000Z",
    "status": "open",
-   "rightStreak": 0,
+   "rightStreak": 1,
    "countedKeys": [
-    "attempt:pre-7022"
+    "attempt:pre-7022",
+    "session:s7022_BASE_o1_S1"
    ],
    "statusHistory": [
     {
@@ -108,13 +109,27 @@
  "rec": {
   "entries": [],
   "liveErrors": {},
-  "knownPoints": {}
+  "knownPoints": {
+   "lsn-EN-F-A1-VO-home-rooms:1": 1
+  }
  },
  "log": [
   {
    "at": "2027-05-03T08:30:00.000Z",
    "event": "pre-test released",
    "rows": 2
+  },
+  {
+   "track": "s7022_BASE_o1",
+   "turn": 2,
+   "events": [
+    {
+     "row": "ewo_ba44ca549b7c",
+     "right": true,
+     "at": "2027-05-03T09:02:00.000Z",
+     "via": "objective"
+    }
+   ]
   }
  ]
 }

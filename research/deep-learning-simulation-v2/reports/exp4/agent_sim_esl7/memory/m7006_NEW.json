@@ -33,9 +33,10 @@
    "firstSeenAt": "2027-05-03T08:30:00.000Z",
    "lastSeenAt": "2027-05-03T08:30:00.000Z",
    "status": "open",
-   "rightStreak": 0,
+   "rightStreak": 1,
    "countedKeys": [
-    "attempt:pre-7006"
+    "attempt:pre-7006",
+    "session:s7006_NEW_o1_S1"
    ],
    "statusHistory": [
     {
@@ -46,20 +47,34 @@
     }
    ],
    "lastWrongAt": "2027-05-03T08:30:00.001Z",
-   "reviewStep": 0,
-   "nextReviewAt": "2027-05-04T08:30:00.001Z"
+   "reviewStep": 1,
+   "nextReviewAt": "2027-05-06T09:02:00.000Z"
   }
  ],
  "rec": {
   "entries": [],
   "liveErrors": {},
-  "knownPoints": {}
+  "knownPoints": {
+   "lsn-EN-F-A1-VO-days-months:1": 1
+  }
  },
  "log": [
   {
    "at": "2027-05-03T08:30:00.000Z",
    "event": "pre-test released",
    "rows": 1
+  },
+  {
+   "track": "s7006_NEW_o1",
+   "turn": 2,
+   "events": [
+    {
+     "row": "ewo_02fd8413c506",
+     "right": true,
+     "at": "2027-05-03T09:02:00.000Z",
+     "via": "objective"
+    }
+   ]
   }
  ]
 }
