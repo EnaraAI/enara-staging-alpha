@@ -50,9 +50,13 @@
 //  oneTaskMethod  - LIT_REVIEW_GAP_PLAN 3.5: every teaching method asks for one thing per reply (no 'deeper question' next to a task)
 //  spacedReview   - LIT_REVIEW_GAP_PLAN 3.1: errors to work on come back after 1, 3, 7, 21 days; one closes only after an unassisted right answer 2+ days after the last wrong; one more check 21 days after closing
 //  ruleOnWrong    - LIT_REVIEW_GAP_PLAN 3.2: after a wrong first try on a new item, the reply states the rule again in one line before the retry
+//  switchMove     - LIT_REVIEW_GAP_PLAN 3.3: the same error code twice in a session changes the main method (contrast -> smaller steps -> worked example)
+//  spellingPattern- LIT_REVIEW_GAP_PLAN 3.6: a spelling error gets the right spelling split to show the pattern on another word (never the misspelling)
+//  l1Lexical      - LIT_REVIEW_GAP_PLAN 3.7: known Arabic-transfer word swaps ("my woman" for "my wife") are named with the right English word, in English only
+//  childShort     - owner decision 2: under 9 at most 3 sentences of at most 12 words plus one task (code trim); 9-12 the kids-pack length table
 //  whatWorks      - learner memory phase 4: per-learner view of methods followed by an independent success (teachers only; the planner does not use it)
 //  arbitration - one order of authority between the teaching-plan layer (23 methods: HOW to explain) and the language engine (WHAT may be revealed and when); named-only, NOT part of "all"
-export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2' | 'ruleBank' | 'exampleGuard' | 'feedbackLadder' | 'methodSelect' | 'kidsBand' | 'planner2' | 'kidsPack' | 'workOn' | 'sessionMemory' | 'learnerProfile' | 'whatWorks' | 'moodleQuiz' | 'workOnTrusted' | 'oneTaskMethod' | 'spacedReview' | 'ruleOnWrong';
+export type EngineV2Feature = 'wrongAnswer' | 'belief' | 'memory' | 'cache' | 'arbitration' | 'keyMatch' | 'closing' | 'selfCheck' | 'clarity' | 'hints' | 'ruleFirst' | 'shortRecap' | 'socraticOff' | 'strandLog' | 'levelExplicit' | 'liveError' | 'releaseAfterTwo' | 'reviewOpen' | 'fadeKnown' | 'ownSentence' | 'graderV2' | 'ruleBank' | 'exampleGuard' | 'feedbackLadder' | 'methodSelect' | 'kidsBand' | 'planner2' | 'kidsPack' | 'workOn' | 'sessionMemory' | 'learnerProfile' | 'whatWorks' | 'moodleQuiz' | 'workOnTrusted' | 'oneTaskMethod' | 'spacedReview' | 'ruleOnWrong' | 'switchMove' | 'spellingPattern' | 'l1Lexical' | 'childShort';
 const ESL5: EngineV2Feature[] = ['liveError', 'releaseAfterTwo', 'reviewOpen', 'fadeKnown', 'ownSentence'];
 export const TEACH2: EngineV2Feature[] = ['ruleBank', 'exampleGuard', 'feedbackLadder', 'methodSelect', 'kidsBand'];
 export const engineV2 = (feature: EngineV2Feature): boolean => {
@@ -61,7 +65,7 @@ export const engineV2 = (feature: EngineV2Feature): boolean => {
   if (feature === 'arbitration' && v.includes('levelExplicit')) return true; // levelExplicit always runs with arbitration
   if (v.includes('esl5') && ESL5.includes(feature)) return true; // the esl5 bundle (never turned on by "all")
   if (v.includes('teach2') && TEACH2.includes(feature)) return true; // the track-2 bundle (never turned on by "all")
-  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', 'planner2', 'kidsPack', 'workOn', 'sessionMemory', 'learnerProfile', 'whatWorks', 'moodleQuiz', 'workOnTrusted', 'oneTaskMethod', 'spacedReview', 'ruleOnWrong', ...ESL5, ...TEACH2].includes(feature));
+  return v.includes(feature) || (v.includes('all') && !['arbitration', 'keyMatch', 'closing', 'selfCheck', 'clarity', 'hints', 'ruleFirst', 'shortRecap', 'socraticOff', 'strandLog', 'levelExplicit', 'graderV2', 'planner2', 'kidsPack', 'workOn', 'sessionMemory', 'learnerProfile', 'whatWorks', 'moodleQuiz', 'workOnTrusted', 'oneTaskMethod', 'spacedReview', 'ruleOnWrong', 'switchMove', 'spellingPattern', 'l1Lexical', 'childShort', ...ESL5, ...TEACH2].includes(feature));
 };
 
 /** True when `arbitration` is on only because `levelExplicit` forced it (recorded in the turn evidence). */

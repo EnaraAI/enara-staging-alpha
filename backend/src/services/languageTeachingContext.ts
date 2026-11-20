@@ -9,6 +9,7 @@ import { bandFromBirthDate, isLearnerAgeBand, LEARNER_AGE_BANDS, type LearnerAge
 import { readsFromEnrollments, studentGroupIds } from './enrollmentReads';
 import { Assessment as AssessmentModel } from '../models/Assessment';
 import { PAIR_RULE } from './pairCheck';
+import { lexicalL1Line, lexicalTransfer, spellingPatternLine, spellingSlip, type SpellingSlip } from './tutorWritingFixes';
 import { priorAnsweredItems } from './learnerMemory';
 import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
 import { graderV2On } from './graderV2';
@@ -92,6 +93,8 @@ export interface LanguageLearnerContext {
   // placement result (LTC-D1).
   proficiency: Fact<string> & { band: LevelBand };
   ageBand: Fact<AgeBand>;
+  /** childShort: whole years (birth date), only for a child; never written into the prompt. */
+  ageYears?: number;
   // From the existing evidence model, passed through unchanged.
   objectiveStatus?: Fact<string>;
 }
@@ -104,6 +107,8 @@ export interface TrustedAgeBand {
   band: AgeBand;
   status: 'known' | 'unknown';
   source: AgeBandSource;
+  /** childShort: whole years from a staff-entered birth date, when there is one (never shown to the model). */
+  years?: number;
 }
 
 // One authoritative resolver (Option B, approved 9 Nov 2026). Precedence:
@@ -123,7 +128,7 @@ export interface TrustedAgeBand {
 // before the class band) or the tutor `extra` object; the tutor `extra` can also be
 // passed as the fifth argument together with the LMS band.
 export type TrustedAgeBandExtra = { birthDate?: Date | string | null; uiMode?: string | null; now?: Date };
-export function resolveTrustedAgeBand(learningSettings: unknown, studentBand?: unknown, classBand?: unknown, birthDateBandOrExtra?: unknown, extraArg: TrustedAgeBandExtra = {}): TrustedAgeBand {
+export function resolveTrustedAgeBand0(learningSettings: unknown, studentBand?: unknown, classBand?: unknown, birthDateBandOrExtra?: unknown, extraArg: TrustedAgeBandExtra = {}): TrustedAgeBand {
   const fourthIsExtra = !!birthDateBandOrExtra && typeof birthDateBandOrExtra === 'object' && !(birthDateBandOrExtra instanceof Date);
   const birthDateBand = fourthIsExtra ? undefined : birthDateBandOrExtra;
   const extra: TrustedAgeBandExtra = fourthIsExtra ? (birthDateBandOrExtra as TrustedAgeBandExtra) : extraArg;
@@ -140,6 +145,14 @@ export function resolveTrustedAgeBand(learningSettings: unknown, studentBand?: u
   if ((engineV2('kidsBand') || engineV2('planner2')) && extra.uiMode === 'kids') return { band: 'child', status: 'known', source: 'kids_mode' };
   const malformed = raw !== undefined && raw !== null && typeof raw !== 'boolean';
   return { band: 'unknown', status: 'unknown', source: malformed ? 'invalid_school_setting' : 'no_trusted_learner_age_source' };
+}
+
+export function resolveTrustedAgeBand(learningSettings: unknown, studentBand?: unknown, classBand?: unknown, birthDateBandOrExtra?: unknown, extraArg: TrustedAgeBandExtra = {}): TrustedAgeBand {
+  const r = resolveTrustedAgeBand0(learningSettings, studentBand, classBand, birthDateBandOrExtra, extraArg);
+  const fourthIsExtra = !!birthDateBandOrExtra && typeof birthDateBandOrExtra === 'object' && !(birthDateBandOrExtra instanceof Date);
+  const extra: TrustedAgeBandExtra = fourthIsExtra ? (birthDateBandOrExtra as TrustedAgeBandExtra) : extraArg;
+  const years = engineV2('childShort') && r.band === 'child' ? ageFromBirthDate(extra.birthDate ?? undefined, extra.now ?? new Date()) : undefined;
+  return years !== undefined ? { ...r, years } : r;
 }
 
 /**
@@ -314,6 +327,9 @@ export interface TurnSignals {
   // liveError (ESL5): an expected L1 error type (article_omitted / copula_omitted) in the learner's latest message; and the error type the
   // previous tutor reply targeted (read back from its stored evidence). Set only when the switch is on.
   liveError?: Diagnosis;
+  /** spellingPattern / l1Lexical (LIT_REVIEW_GAP_PLAN 3.6, 3.7). */
+  spellingSlip?: SpellingSlip;
+  lexicalL1?: { evidence: string; right: string; why: string };
   liveTarget?: string;
   // releaseAfterTwo (ESL5): genuine failed attempts on the open item, this message included (empty, "I don't know" and copies of the prompt don't count).
   genuineFailedAttempts?: number;
@@ -564,6 +580,7 @@ export function deriveLearnerContext(input: {
     ? { status: 'known', value: trusted.band, source: trusted.source }
     : { status: 'unknown', value: 'unknown', source: trusted.source };
   return {
+    ...(trusted.years !== undefined ? { ageYears: trusted.years } : {}),
     targetLanguage: target,
     supportLanguage,
     proficiency,
@@ -1020,6 +1037,11 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
   const countEmpty = engineV2('planner2') && Boolean(opts.child);
   if ((engineV2('releaseAfterTwo') || engineV2('feedbackLadder')) && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope, countEmpty);
   if (countEmpty && sig.learning?.activeItem && emptyAnswer(text, sig.activeLessonItem)) sig.emptyAnswer = true;
+  if (engineV2('spellingPattern') && !(sig.keyVerdict === 'CORRECT' || sig.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION')) {
+    const slip = spellingSlip(text, [...(lesson?.spec?.vocabulary ?? []), ...(lesson?.spec?.items ?? []).flatMap((i) => i.acceptedAnswers ?? [])].flatMap((x) => String(x).split(/[\s/;,]+/)));
+    if (slip) sig.spellingSlip = slip;
+  }
+  if (engineV2('l1Lexical')) { const t = lexicalTransfer(text); if (t) sig.lexicalL1 = t; }
   if (engineV2('planner2') && !sig.keyVerdict) {
     const r = repeatedWrongAnswers(text, history, scope);
     if (r >= 2) { sig.repeatWrong = r; sig.genuineFailedAttempts = Math.max(sig.genuineFailedAttempts ?? 0, r); }
@@ -1436,10 +1458,16 @@ const LENGTH: Record<AgeBand, Record<string, [number, number]>> = {
 // that allowed 45-70 words at A1 (6-9 sentences at the 8-word child sentence limit).
 export const KIDS_PACK_CHILD_LENGTH: Record<string, [number, number]> = { prea1: [20, 35], a1: [30, 50], a2: [40, 65], b1: [55, 85], b2: [70, 100], c1: [80, 110], c2: [80, 110], none: [30, 50] };
 
-export function lengthTarget(ageBand: Fact<AgeBand>, level?: string): LengthTarget {
+/** childShort (owner decision 2, 20 Nov 2026): under 9, at most 3 sentences of at most 12 words plus one task (about 25-40 words). */
+export const UNDER9_LENGTH: [number, number] = [25, 40];
+export const CHILD_SHORT_LINE = 'This child is under 9: at most 3 sentences, each of at most 12 words, plus one task. No lists.';
+export const under9 = (years?: number): boolean => engineV2('childShort') && typeof years === 'number' && years < 9;
+export function lengthTarget(ageBand: Fact<AgeBand>, level?: string, years?: number): LengthTarget {
   const age: AgeBand = ageBand.status === 'known' && ageBand.value ? ageBand.value : 'unknown';
   const step = cefrStep(level) ?? 'none';
-  const row = age === 'child' && engineV2('kidsPack') ? KIDS_PACK_CHILD_LENGTH : LENGTH[age];
+  if (age === 'child' && under9(years)) return { targetWords: UNDER9_LENGTH[0], maxWords: UNDER9_LENGTH[1], basis: `child_under9:${step}` };
+  // childShort: ages 9-12 (and a child of unknown exact age) get the kids-pack table.
+  const row = age === 'child' && (engineV2('kidsPack') || engineV2('childShort')) ? KIDS_PACK_CHILD_LENGTH : LENGTH[age];
   const [targetWords, maxWords] = row[step] ?? row.none;
   return { targetWords, maxWords, basis: `${age === 'unknown' ? 'age_unknown' : age}:${step}` };
 }
@@ -1922,6 +1950,8 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     if (ruleOnWrongDue(ctx, stage)) out.push(`- ${RULE_ON_WRONG_LINE}`);
     if (!researchAblated('hint_ladder')) out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? ''), explicit: Boolean(engineV2('levelExplicit') && ctx.explicitFirst) })}`, `- ${SUPPORT_PRECEDENCE}`);
   }
+  if (s.spellingSlip) out.push(`- ${spellingPatternLine(s.spellingSlip, [...(s.activeLessonItem?.acceptedAnswers ?? []), ...(s.nextLessonItem?.acceptedAnswers ?? [])])}`);
+  if (s.lexicalL1) out.push(`- ${lexicalL1Line(s.lexicalL1)}`);
   if (engineV2('clarity') && s.activeLessonItem && needsClarity(s, supportStage(s))) out.push(`- ${CLARITY_LINE}`);
   if (engineV2('arbitration') && ctx.planPrimary) {
     out.push(`- ${ARBITRATION_LINE}`);
@@ -1982,7 +2012,7 @@ export const lengthStyleLine = (len: LengthTarget): string =>
  *  (facts, lesson spec, level rules, grounding, marker instruction); the per-turn parts (criteria shown, history lines, moves, state, length) come last. */
 export function renderLanguageContextParts(ctx: Omit<LanguageTeachingContext, 'prompt'>): { stable: string; dynamic: string } {
   const { learner: l, lesson } = ctx;
-  const len = ctx.length ?? lengthTarget(l.ageBand, l.proficiency.value);
+  const len = ctx.length ?? lengthTarget(l.ageBand, l.proficiency.value, l.ageYears);
   const band: AgeBand = l.ageBand.status === 'known' && l.ageBand.value ? l.ageBand.value : 'unknown';
   const step = cefrStep(l.proficiency.value);
   const stable = [
@@ -2002,6 +2032,7 @@ export function renderLanguageContextParts(ctx: Omit<LanguageTeachingContext, 'p
     ...(pairsAsked() ? [PAIR_RULE] : []),
     ...(engineV2('planner2') && clockLesson(lesson.spec) ? [CLOCK_TIMES_LINE] : []),
     ...(engineV2('planner2') ? [OWN_QUESTION_LINE, NO_PRAISE_ON_ERROR_LINE, ...(band === 'child' ? [CHILD_EXPLAIN_LINE] : [])] : []),
+    ...(band === 'child' && under9(l.ageYears) ? [CHILD_SHORT_LINE] : []),
     assessmentInstruction(),
   ].join('\n');
   const dynamic = [
@@ -2029,7 +2060,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
     ...(l.objectiveStatus ? [factLine('Objective status (assessed evidence)', l.objectiveStatus)] : []),
   ];
   lines.push(...lessonBlock(ctx, true));
-  const len = ctx.length ?? lengthTarget(l.ageBand, l.proficiency.value);
+  const len = ctx.length ?? lengthTarget(l.ageBand, l.proficiency.value, l.ageYears);
   const band: AgeBand = l.ageBand.status === 'known' && l.ageBand.value ? l.ageBand.value : 'unknown';
   const step = cefrStep(l.proficiency.value);
   lines.push(
@@ -2047,6 +2078,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
     ...(pairsAsked() ? [PAIR_RULE] : []),
     ...(engineV2('planner2') && clockLesson(lesson.spec) ? [CLOCK_TIMES_LINE] : []),
     ...(engineV2('planner2') ? [OWN_QUESTION_LINE, NO_PRAISE_ON_ERROR_LINE, ...(band === 'child' ? [CHILD_EXPLAIN_LINE] : [])] : []),
+    ...(band === 'child' && under9(l.ageYears) ? [CHILD_SHORT_LINE] : []),
     assessmentInstruction(),
     '</language_teaching_context>',
   );
@@ -2233,7 +2265,7 @@ export function finalizeLanguageTurn(
 
   // Fix 3: beginner load telemetry (log-only).
   if (['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? '')) {
-    const len = ctx.length ?? lengthTarget(ctx.learner.ageBand, ctx.learner.proficiency.value);
+    const len = ctx.length ?? lengthTarget(ctx.learner.ageBand, ctx.learner.proficiency.value, ctx.learner.ageYears);
     for (const f of loadOverBudget(reply, len.maxWords)) flags.push(`load_${f}`);
   }
   if (!/arabic/i.test(ctx.learner.targetLanguage?.value ?? '') && arabicInReply(reply)) flags.push('arabic_in_reply');
@@ -2354,7 +2386,7 @@ export async function buildLanguageTeachingContext(params: {
     const ladStep = Boolean(params.ladStep) && engineV2('planner2') && engineV2('kidsPack') && !quickCheck;
     const taskStep = Boolean(params.taskStep) && engineV2('planner2') && !quickCheck && !ladStep;
     const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : ladStep ? adjusted.moves.filter((m) => !LAD_STEP_DROPPED.has(m.id)) : taskStep ? adjusted.moves.filter((m) => !TASK_STEP_DROPPED.has(m.id)) : adjusted.moves;
-    const base0 = lengthTarget(learner.ageBand, learner.proficiency.value);
+    const base0 = lengthTarget(learner.ageBand, learner.proficiency.value, learner.ageYears);
     // r2: a clarification-only turn is one short question, so a tighter target.
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
     const length = clarifyOnly ? { targetWords: Math.min(base0.targetWords, 40), maxWords: Math.min(base0.maxWords, 60), basis: `${base0.basis}:clarify` } : base0;
