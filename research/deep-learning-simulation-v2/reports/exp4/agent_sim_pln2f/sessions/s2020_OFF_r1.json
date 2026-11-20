@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -680,7 +680,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you for explaining your idea. In English, a describing word comes before the noun it describes. So the order is: describing words first, then the noun.\n\nRight: \"My teacher has a big blue bag.\"\nWrong: \"My teacher has a bag big blue.\"\n\nNow try a new one on your own. Write one sentence about your best friend's shoes. Use two describing words.\n\nLEARNER'S LAST MESSAGE:\nMy best friend has new black shoes.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My best friend has new black shoes.\" is correct. The describing words come before \"shoes\", and the sentence has a capital letter and a full stop.\n\nNew task, on your own. Write one sentence about what your teacher is like. Use \"is\" and one describing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 1: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you for explaining your idea. In English, a describing word comes before the noun it describes. So the order is: describing words first, then the noun.\n\nRight: \"My teacher has a big blue bag.\"\nWrong: \"My teacher has a bag big blue.\"\n\nNow try a new one on your own. Write one sentence about your best friend's shoes. Use two describing words.\n\nLEARNER'S LAST MESSAGE:\nMy best friend has new black shoes.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\n\"My best friend has new black shoes.\" is correct. The describing words come before \"shoes\", and the sentence has a capital letter and a full stop.\n\nNew task, on your own. Write one sentence about what your teacher is like. Use \"is\" and one describing word.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"My best friend has new black shoes.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My best friend has new black shoes."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "My teacher is kind.",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My teacher is kind.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My teacher is kind.",
+    "probes": []
+   }
   }
  ],
  "assess": {

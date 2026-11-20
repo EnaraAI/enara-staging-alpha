@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 2,
    "C2": 0
@@ -806,7 +806,112 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 2: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe time part, \"at work\", is clear, and \"usually\" is a good choice for this sentence. Now look at where \"usually\" sits in \"I check usually my email at work.\" Compare it with the place of \"always\" in your sentence \"I always drink tea in the morning.\" Check the word next to it. Then try the sentence again.\n\nLEARNER'S LAST MESSAGE:\nI check usually my email at work.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nThe sentence still has \"usually\" after \"check\". The correct sentence is \"I usually check my email at work.\" The adverb goes before the main verb, here \"check\".\n\nRight: They never watch TV at night. Wrong: They watch never TV at night.\n\nNow try a new one on your own. Write one sentence about what you do at the weekend, using \"sometimes\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 2: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe time part, \"at work\", is clear, and \"usually\" is a good choice for this sentence. Now look at where \"usually\" sits in \"I check usually my email at work.\" Compare it with the place of \"always\" in your sentence \"I always drink tea in the morning.\" Check the word next to it. Then try the sentence again.\n\nLEARNER'S LAST MESSAGE:\nI check usually my email at work.\nFACT: the last learner message contained the error of W1 (puts the frequency adverb after the main verb (\"I go always to school by bus.\")).\n\nTUTOR TURN TO JUDGE:\nThe sentence still has \"usually\" after \"check\". The correct sentence is \"I usually check my email at work.\" The adverb goes before the main verb, here \"check\".\n\nRight: They never watch TV at night. Wrong: They watch never TV at night.\n\nNow try a new one on your own. Write one sentence about what you do at the weekend, using \"sometimes\".",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The correct sentence is \"I usually check my email at work.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The adverb goes before the main verb, here \"check\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: They never watch TV at night. Wrong: They watch never TV at night."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I sometimes play football at the weekend.",
+    "errors": {
+     "W1": "I play sometimes football at the weekend."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I play sometimes football at the weekend.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "I play sometimes football at the weekend.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

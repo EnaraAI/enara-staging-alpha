@@ -19,7 +19,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -720,7 +720,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 3: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My aunt works in a hospital.\" is right. A hospital is a good place for that job, and you used \"works in\".\n\nNow a new one.\n\nComplete: \"A pilot works at an ___.\"\n\nLEARNER'S LAST MESSAGE:\nairport\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"airport\" is right. Nice match for a pilot.\n\nLast one, on your own.\n\nComplete: \"My friend is a chef. She works in a ___ where people sit and eat.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 3: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My aunt works in a hospital.\" is right. A hospital is a good place for that job, and you used \"works in\".\n\nNow a new one.\n\nComplete: \"A pilot works at an ___.\"\n\nLEARNER'S LAST MESSAGE:\nairport\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"airport\" is right. Nice match for a pilot.\n\nLast one, on your own.\n\nComplete: \"My friend is a chef. She works in a ___ where people sit and eat.\"",
+   "stateBefore": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"airport\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "airport"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "restaurant",
+    "errors": {
+     "W1": "restarant"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "restaurant",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "restaurant",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 0,
    "C1": 2,
    "C2": 0
@@ -667,7 +667,111 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 2: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Last weekend I visit my grandmother.\" tells me about a real weekend, and the topic is clear. One part needs a check.\n\nLook at the verb \"visit\" and at \"Last weekend\". Check the end of the verb. Then write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nLast weekend I visit my grandmother.\nFACT: the last learner message contained the error of W1 (leaves the verb in the present form with a past time word (\"Yesterday I play football.\")).\n\nTUTOR TURN TO JUDGE:\nLet me show the answer directly. The sentence is \"Last weekend I visited my grandmother.\" We add -ed to \"visit\" because the action is finished.\n\nRight: She cooked dinner yesterday.\nWrong: She cook dinner yesterday.\n\nNow one on your own, in a new situation. Write one sentence about what you did at work on Monday morning. Use the verb \"open\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 2: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Last weekend I visit my grandmother.\" tells me about a real weekend, and the topic is clear. One part needs a check.\n\nLook at the verb \"visit\" and at \"Last weekend\". Check the end of the verb. Then write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nLast weekend I visit my grandmother.\nFACT: the last learner message contained the error of W1 (leaves the verb in the present form with a past time word (\"Yesterday I play football.\")).\n\nTUTOR TURN TO JUDGE:\nLet me show the answer directly. The sentence is \"Last weekend I visited my grandmother.\" We add -ed to \"visit\" because the action is finished.\n\nRight: She cooked dinner yesterday.\nWrong: She cook dinner yesterday.\n\nNow one on your own, in a new situation. Write one sentence about what you did at work on Monday morning. Use the verb \"open\".",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The sentence is \"Last weekend I visited my grandmother.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "We add -ed to \"visit\" because the action is finished."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: She cooked dinner yesterday. Wrong: She cook dinner yesterday."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "On Monday morning I opened the office.",
+    "errors": {
+     "W1": "On Monday morning I open the office."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "On Monday morning I opened the office.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "On Monday morning I opened the office.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

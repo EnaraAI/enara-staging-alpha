@@ -15,7 +15,7 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
@@ -856,7 +856,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 1: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try! You used \"can\" in your sentence. Look at \"can cooks\". After \"can\", the verb has no -s, so it is \"can cook\".\n\nPlease write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy sister can cook rice.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! \"My sister can cook rice.\" is right. You wrote \"cook\" with no -s. Good fixing!\n\nNow you try, on your own. Write the missing word: My friend can ___ (sing) well."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 1: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try! You used \"can\" in your sentence. Look at \"can cooks\". After \"can\", the verb has no -s, so it is \"can cook\".\n\nPlease write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy sister can cook rice.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! \"My sister can cook rice.\" is right. You wrote \"cook\" with no -s. Good fixing!\n\nNow you try, on your own. Write the missing word: My friend can ___ (sing) well.",
+   "stateBefore": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes! \"My sister can cook rice.\" is right."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "sing",
+    "errors": {
+     "W1": "sings"
+    }
+   },
+   "applied": [
+    "R3:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "sing",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "sing",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
