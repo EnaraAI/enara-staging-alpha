@@ -329,6 +329,12 @@ export async function buildObjectiveContext(params: {
 // The plan as tutor instructions: the primary method's full instructions; one
 // line per supporting / reinforcement method; readiness for differentiation; the
 // rule that resolves conflicts between methods (the primary's rules win).
+// oneTaskMethod (LIT_REVIEW_GAP_PLAN 3.5): the language engine sets one task per reply; method texts that ask for a second thing conflict with it.
+export const ONE_TASK_METHOD_LINE = 'Whatever this method says, ask for only one thing per reply: one question or one task.';
+export function oneTaskMethodText(text: string): string {
+  if (!engineV2('oneTaskMethod')) return text;
+  return `${text.replace('Follow a correct answer with a deeper question.', 'After a correct answer, give one new item that goes one step further.')} ${ONE_TASK_METHOD_LINE}`;
+}
 export function planLines(plan: TeachingPlan, prerequisite: string | undefined, status: string, compact?: boolean): string[] {
   const p = STRATEGY_BY_ID.get(plan.primary)!;
   const brief = (id: string) => {
@@ -336,7 +342,7 @@ export function planLines(plan: TeachingPlan, prerequisite: string | undefined, 
     return compact ? `${m.name}` : `${m.name}: ${m.description}`;
   };
   return [
-    `- Teaching method: ${p.name}${prerequisite ? ` on ${prerequisite} first` : ''}. ${compact ? p.description : p.promptInstructions}`,
+    `- Teaching method: ${p.name}${prerequisite ? ` on ${prerequisite} first` : ''}. ${oneTaskMethodText(compact ? p.description : p.promptInstructions)}`,
     ...(plan.supporting.length ? [`- Also use: ${plan.supporting.map(brief).join(' ')}`] : []),
     ...(plan.reinforcement ? [`- To reinforce: ${brief(plan.reinforcement)}`] : []),
     `- Readiness (adjust silently, never tell the student): ${READINESS[status] ?? READINESS.not_assessed}.`,
