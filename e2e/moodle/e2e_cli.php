@@ -139,32 +139,56 @@ switch ($cmd) {
         out(['service' => (int) $service->id, 'token' => $token]);
 
     case 'quiz-setup':
-        // The data generators, loaded the way Moodle's own CLI course generator does (admin/tool/generator).
-        require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
+        // Core APIs only (no test data generators: they need PHPUnit, which a normal Moodle site does not have).
+        require_once($CFG->dirroot . '/course/modlib.php');
         require_once($CFG->dirroot . '/mod/quiz/locallib.php');
-        try {
+        require_once($CFG->libdir . '/questionlib.php');
         $course = course_by_short(opt($opts, 'course'));
         $name = opt($opts, 'name');
         $student = user_by_name(opt($opts, 'user'));
-        $answer = opt($opts, 'answer', 'False');
-        $gen = phpunit_util::get_data_generator();
-        $quiz = $DB->get_record('quiz', ['course' => $course->id, 'name' => $name]);
-        if (!$quiz) {
-            $quiz = $gen->get_plugin_generator('mod_quiz')->create_instance(['course' => $course->id, 'name' => $name, 'attempts' => 1, 'grade' => 10, 'sumgrades' => 1]);
-            $qgen = $gen->get_plugin_generator('core_question');
-            $cat = $qgen->create_question_category(['contextid' => context_course::instance($course->id)->id]);
-            $q = $qgen->create_question('truefalse', null, ['category' => $cat->id]);
-            quiz_add_quiz_question($q->id, $quiz);
-            $quiz = $DB->get_record('quiz', ['id' => $quiz->id], '*', MUST_EXIST);
-        }
-        $existing = $DB->get_records('quiz_attempts', ['quiz' => $quiz->id, 'userid' => $student->id, 'state' => 'finished']);
-        if (!$existing) {
-            \core\session\manager::set_user($student);
-            $qz = $gen->get_plugin_generator('mod_quiz');
-            $attempt = $qz->create_attempt($quiz->id, $student->id);
-            $qz->submit_responses($attempt->id, [1 => $answer], false, true);
-            \core\session\manager::set_user(get_admin());
-        }
+        $answer = opt($opts, 'answer', 'False') === 'True' ? '1' : '0';
+        try {
+            $quiz = $DB->get_record('quiz', ['course' => $course->id, 'name' => $name]);
+            if (!$quiz) {
+                // The quiz form's settings: 1 attempt; every review option on (as Moodle's own test defaults).
+                $mi = ['course' => $course->id, 'name' => $name, 'intro' => 'ENARA E2E (fake data).', 'introformat' => FORMAT_MOODLE,
+                    'modulename' => 'quiz', 'module' => $DB->get_field('modules', 'id', ['name' => 'quiz'], MUST_EXIST),
+                    'section' => 0, 'visible' => 1, 'visibleoncoursepage' => 1, 'cmidnumber' => '', 'groupmode' => 0, 'groupingid' => 0,
+                    'availability' => null, 'completion' => 0, 'completionview' => 0, 'completionexpected' => 0, 'completionpassgrade' => 0,
+                    'timeopen' => 0, 'timeclose' => 0, 'preferredbehaviour' => 'deferredfeedback', 'attempts' => 1, 'attemptonlast' => 0,
+                    'grademethod' => QUIZ_GRADEHIGHEST, 'decimalpoints' => 2, 'questiondecimalpoints' => -1, 'questionsperpage' => 1,
+                    'shuffleanswers' => 1, 'sumgrades' => 0, 'grade' => 10, 'timelimit' => 0, 'overduehandling' => 'autosubmit', 'graceperiod' => 86400,
+                    'quizpassword' => '', 'subnet' => '', 'browsersecurity' => '', 'delay1' => 0, 'delay2' => 0, 'showuserpicture' => 0,
+                    'showblocks' => 0, 'navmethod' => QUIZ_NAVMETHOD_FREE];
+                foreach (['attempt', 'correctness', 'maxmarks', 'marks', 'specificfeedback', 'generalfeedback', 'rightanswer', 'overallfeedback'] as $o) {
+                    foreach (['during', 'immediately', 'open', 'closed'] as $w) $mi[$o . $w] = ($o === 'overallfeedback' && $w === 'during') ? 0 : 1;
+                }
+                $mi = add_moduleinfo((object) $mi, $course);
+                $quiz = $DB->get_record('quiz', ['id' => $mi->instance], '*', MUST_EXIST);
+                $cat = question_make_default_categories([context_course::instance($course->id)]);
+                $form = (object) ['category' => $cat->id, 'name' => 'ENARA E2E true/false', 'qtype' => 'truefalse',
+                    'questiontext' => ['text' => 'ENARA E2E: the sky is blue on a clear day.', 'format' => FORMAT_HTML], 'defaultmark' => 1,
+                    'generalfeedback' => ['text' => '', 'format' => FORMAT_HTML], 'correctanswer' => '1',
+                    'feedbacktrue' => ['text' => '', 'format' => FORMAT_HTML], 'feedbackfalse' => ['text' => '', 'format' => FORMAT_HTML],
+                    'penalty' => 1, 'status' => \core_question\local\bank\question_version_status::QUESTION_STATUS_READY];
+                $q = (object) ['category' => $cat->id, 'qtype' => 'truefalse', 'createdby' => get_admin()->id];
+                $q = question_bank::get_qtype('truefalse')->save_question($q, $form);
+                quiz_add_quiz_question($q->id, $quiz);
+                \mod_quiz\quiz_settings::create($quiz->id)->get_grade_calculator()->recompute_quiz_sumgrades();
+                $quiz = $DB->get_record('quiz', ['id' => $quiz->id], '*', MUST_EXIST);
+            }
+            if (!$DB->record_exists('quiz_attempts', ['quiz' => $quiz->id, 'userid' => $student->id, 'state' => 'finished'])) {
+                // The student's attempt, as a browser would send it: start, answer slot 1, submit.
+                \core\session\manager::set_user($student);
+                $quizobj = \mod_quiz\quiz_settings::create($quiz->id, $student->id);
+                $attempt = quiz_prepare_and_start_new_attempt($quizobj, 1, null);
+                $attemptobj = \mod_quiz\quiz_attempt::create($attempt->id);
+                $qa = $attemptobj->get_question_attempt(1);
+                $post = [$qa->get_control_field_name('sequencecheck') => (string) $qa->get_sequence_check_count(), $qa->get_flag_field_name() => '0', $qa->get_qt_field_name('answer') => $answer];
+                $attemptobj->process_submitted_actions(time(), false, $post);
+                \mod_quiz\quiz_attempt::create($attempt->id)->process_finish(time(), false);
+                \core\session\manager::set_user(get_admin());
+            }
         } catch (\Throwable $e) {
             // Shown in the scenario's failure message (the E2E summary keeps only the first line of a failed command).
             out(['error' => get_class($e) . ': ' . substr($e->getMessage(), 0, 300) . ' @ ' . basename($e->getFile()) . ':' . $e->getLine() . (property_exists($e, 'debuginfo') && $e->debuginfo ? ' | ' . substr((string) $e->debuginfo, 0, 300) : '')]);
