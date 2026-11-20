@@ -21,8 +21,8 @@ export const WORK_ON_RESOLVE_STREAK = 2;
 export const PRACTICE_KINDS = new Set(['practice', 'formative', 'retention_check']);
 
 // ------------------------------------------------------------------------------------------------ pure parts (unit-tested)
-type Q = { id: string; objectiveIds?: string[]; options?: string[]; distractors?: { option: string; category: string; description: string }[]; text?: string };
-type A = { questionId: string; isCorrect?: boolean; points?: number; maxPoints?: number; studentAnswer?: unknown };
+type Q = { id: string; type?: string; correctAnswer?: unknown; objectiveIds?: string[]; options?: string[]; distractors?: { option: string; category: string; description: string }[]; text?: string };
+type A = { questionId: string; isCorrect?: boolean; points?: number | null; maxPoints?: number; studentAnswer?: unknown; method?: string };
 const slug = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 60) || 'unknown';
 
 /** Was this graded answer wrong? A partly right answer (some points, not all) counts as wrong for the list. */
@@ -30,6 +30,31 @@ export function answerWrong(a: A): boolean {
   if (typeof a.points === 'number' && typeof a.maxPoints === 'number' && a.maxPoints > 0) return a.points < a.maxPoints;
   return a.isCorrect === false;
 }
+// workOnTrusted (LIT_REVIEW_GAP_PLAN 3.4): the live grader on lms-test (graderV2 off) agreed with the reference on 60.4% of controlled items
+// (validation round 2); graderV2 on gap and choice items 95.1% (round 8); error correction by rules 83.3% (round 11). So a wrong answer
+// becomes an error to work on only when its score comes from a path that is right often enough:
+//  - a person set or accepted the score (method teacher / ai_proposal);
+//  - a choice item (multiple-choice, true-false) scored by rule;
+//  - a gap item ("___") scored by rule under graderV2, when the answer is short (at most 3 words: a whole sentence typed into the gap
+//    was a false reject in round 8) and is not a contraction of the key ("'d" for "would", round 8).
+// Not trusted: error correction and other free short answers scored by rule, and AI-scored open answers.
+export const workOnTrustedOn = (): boolean => engineV2('workOnTrusted');
+const CONTRACTIONS: Record<string, string[]> = { "'d": ['would', 'had'], "'s": ['is', 'has'], "'re": ['are'], "'m": ['am'], "'ll": ['will'], "'ve": ['have'], "n't": ['not'] };
+const norm1 = (v: unknown) => String(v ?? '').toLowerCase().replace(/[’]/g, "'").replace(/[.!?,]+$/g, '').trim();
+export function trustedWrong(q: Pick<Q, 'type' | 'text' | 'correctAnswer'> | undefined, a: Pick<A, 'method' | 'studentAnswer'>, opts: { graderV2: boolean }): boolean {
+  if (a.method === 'teacher' || a.method === 'ai_proposal') return true;
+  if (!q) return false;
+  if ((q.type === 'multiple-choice' || q.type === 'true-false') && (a.method === 'rule' || a.method === undefined)) return true;
+  if (q.type === 'short-answer' && a.method === 'rule' && opts.graderV2 && /_{2,}/.test(q.text ?? '')) {
+    const ans = norm1(a.studentAnswer);
+    if (!ans || ans.split(/\s+/).length > 3) return false;
+    const keys = (Array.isArray(q.correctAnswer) ? q.correctAnswer : [q.correctAnswer]).map(norm1);
+    if (Object.entries(CONTRACTIONS).some(([c, full]) => ans.endsWith(c) && keys.some((k) => full.some((f) => k === f || k.endsWith(` ${f}`))))) return false;
+    return true;
+  }
+  return false;
+}
+
 /** The error type of a wrong answer: the chosen option's distractor category (school item authoring), else 'unknown'. Never the answer text. */
 export function errorOf(q: Q, a: A): { errorCode: string; errorLabel?: string } {
   const chosen = typeof a.studentAnswer === 'number' && q.options ? q.options[a.studentAnswer] : typeof a.studentAnswer === 'string' ? a.studentAnswer : undefined;
@@ -115,7 +140,7 @@ export async function syncErrors(studentId: string, institutionId?: string): Pro
     const attempts = await AssessmentAttempt.find({ studentId, id: { $nin: sync.attemptIds }, $or: [{ gradingStatus: 'released', assignmentId: { $exists: true } }, { assignmentId: { $exists: false }, status: 'submitted' }] })
       .select('id assessmentId assignmentId answers releasedAt submittedAt').sort({ submittedAt: 1 }).limit(50).lean();
     if (!attempts.length) return;
-    const assessments = new Map((await Assessment.find({ id: { $in: [...new Set(attempts.map((a) => a.assessmentId))] } }).select('id curriculumId assessmentKind questions.id questions.objectiveIds questions.options questions.distractors').lean()).map((a) => [a.id, a]));
+    const assessments = new Map((await Assessment.find({ id: { $in: [...new Set(attempts.map((a) => a.assessmentId))] } }).select('id curriculumId assessmentKind questions.id questions.type questions.text questions.correctAnswer questions.objectiveIds questions.options questions.distractors').lean()).map((a) => [a.id, a]));
     const objIds = [...new Set([...assessments.values()].flatMap((a) => (a.questions ?? []).flatMap((q: Q) => q.objectiveIds ?? [])))];
     const courseOf = new Map((await LearningObjective.find({ id: { $in: objIds } }).select('id courseId').lean()).map((o) => [o.id, o.courseId as string | undefined]));
     for (const at of attempts) {
@@ -126,6 +151,8 @@ export async function syncErrors(studentId: string, institutionId?: string): Pro
       for (const ans of (at.answers ?? []) as A[]) {
         const q = qs.get(ans.questionId);
         for (const objectiveId of q?.objectiveIds ?? []) {
+          // workOnTrusted: a wrong grade from an unvalidated path neither creates an error nor reopens one.
+          if (answerWrong(ans) && workOnTrustedOn() && !trustedWrong(q, ans, { graderV2: engineV2('graderV2') })) continue;
           const open = await ErrorToWorkOn.find({ studentId, objectiveId, status: { $ne: 'dismissed' } });
           if (answerWrong(ans)) {
             const { errorCode, errorLabel } = errorOf(q!, ans);
