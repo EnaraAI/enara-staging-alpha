@@ -52,6 +52,7 @@ Each run compares **OFF** (today's tutor) with **ON** (the planner) on the same 
 | Combined planner2c (PLN2c adults + PLN2b others) | 48 | planner2c | **+0.010 [−0.037, +0.063]** | **PASSED** |
 | PLN2k | 12 under-9 | kids pack, first try | +0.042 [0.000, +0.125] | NOT PASSED: listen-and-do was not delivered (7/84 replies) |
 | PLN2k2 | 12 under-9 | kids pack with fixes | **−0.125 [−0.271, 0.000]** | NOT PASSED: delivered (51/84), but the simulated child doesn't learn from it |
+| **PLN2f (final)** | 48 | planner2c + fix B, kidsPack off | **+0.010 [−0.016, +0.042]**; adults +0.062 | **PASSED** in one clean run (see `AGENT_SIM_PLN2F.md`) |
 
 ### By group, for the passing planner (planner2c combined, delayed test)
 
@@ -117,7 +118,8 @@ Each run compares **OFF** (today's tutor) with **ON** (the planner) on the same 
 | PLN2c (stopped + final) | 11 + 28 |
 | PLN2k | 29 |
 | PLN2k2 | 27 |
-| **Total** | **about 275** |
+| PLN2f | 73 |
+| **Total** | **about 348** |
 
 Tutors were Sonnet; judges, reviewers and scorers were Opus.
 

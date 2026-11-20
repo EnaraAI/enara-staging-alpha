@@ -1,0 +1,1047 @@
+{
+ "_label": "SIMULATION ONLY",
+ "complete": true,
+ "missing": [],
+ "verdict": "PASS",
+ "passRules": {
+  "noHarm": {
+   "overallCiLower": -0.0156,
+   "groupDiffs": {
+    "TASK": 0.0625,
+    "TTT": 0.0,
+    "LAD": 0.0,
+    "KIDPPP": -0.0208
+   },
+   "pass": true
+  },
+  "fit": {
+   "ownRubric": {
+    "TASK": {
+     "OFF": 0.6944,
+     "P2": 0.9444,
+     "diff": 0.25,
+     "ci95": [
+      -0.1944,
+      0.6667
+     ],
+     "n": 12
+    },
+    "TTT": {
+     "OFF": 0.8889,
+     "P2": 1.6667,
+     "diff": 0.7778,
+     "ci95": [
+      0.5833,
+      0.9722
+     ],
+     "n": 12
+    },
+    "LAD": {
+     "OFF": 0.3056,
+     "P2": 0.3056,
+     "diff": 0.0,
+     "ci95": [
+      -0.1667,
+      0.1667
+     ],
+     "n": 12
+    },
+    "KIDPPP": {
+     "OFF": 1.1,
+     "P2": 1.1167,
+     "diff": 0.0167,
+     "ci95": [
+      -0.1667,
+      0.2
+     ],
+     "n": 12
+    }
+   },
+   "quickCheckCompliance": 1.0,
+   "pass": true
+  },
+  "judges": {
+   "event": 0.9683,
+   "eventMissing": 0,
+   "fit": 0.8529,
+   "fitWithin1": 1,
+   "pass": true
+  },
+  "guards": {
+   "values": {
+    "OFF": {
+     "stuck": 2,
+     "indepCorrect": 175,
+     "indepCorrectOld": 4,
+     "firstTries": 232,
+     "earlyLeaks": 2
+    },
+    "P2": {
+     "stuck": 1,
+     "indepCorrect": 176,
+     "indepCorrectOld": 11,
+     "firstTries": 231,
+     "earlyLeaks": 2
+    }
+   },
+   "stuckOk": true,
+   "indepOk": true,
+   "leaksOk": true,
+   "pass": true
+  }
+ },
+ "useDelayed": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.8333,
+   "P2": 0.8611,
+   "diff": 0.0278,
+   "ci95": [
+    0.0,
+    0.0833
+   ],
+   "P2_better": 1,
+   "same": 11,
+   "OFF_better": 0
+  },
+  "TTT": {
+   "n": 12,
+   "OFF": 0.9306,
+   "P2": 0.9306,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  },
+  "LAD": {
+   "n": 12,
+   "OFF": 0.625,
+   "P2": 0.7083,
+   "diff": 0.0833,
+   "ci95": [
+    0.0,
+    0.2083
+   ],
+   "P2_better": 2,
+   "same": 10,
+   "OFF_better": 0
+  },
+  "KIDPPP": {
+   "n": 12,
+   "OFF": 0.8472,
+   "P2": 0.8056,
+   "diff": -0.0417,
+   "ci95": [
+    -0.125,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 11,
+   "OFF_better": 1
+  },
+  "ALL": {
+   "n": 48,
+   "OFF": 0.809,
+   "P2": 0.8264,
+   "diff": 0.0174,
+   "ci95": [
+    -0.0208,
+    0.059
+   ],
+   "P2_better": 3,
+   "same": 44,
+   "OFF_better": 1
+  }
+ },
+ "useImmediate": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.9306,
+   "P2": 0.9444,
+   "diff": 0.0139,
+   "ci95": [
+    0.0,
+    0.0417
+   ],
+   "P2_better": 1,
+   "same": 11,
+   "OFF_better": 0
+  },
+  "TTT": {
+   "n": 12,
+   "OFF": 0.9722,
+   "P2": 0.9722,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  },
+  "LAD": {
+   "n": 12,
+   "OFF": 0.7222,
+   "P2": 0.8056,
+   "diff": 0.0833,
+   "ci95": [
+    -0.0556,
+    0.25
+   ],
+   "P2_better": 3,
+   "same": 8,
+   "OFF_better": 1
+  },
+  "KIDPPP": {
+   "n": 12,
+   "OFF": 0.8611,
+   "P2": 0.8194,
+   "diff": -0.0417,
+   "ci95": [
+    -0.1667,
+    0.0417
+   ],
+   "P2_better": 1,
+   "same": 10,
+   "OFF_better": 1
+  },
+  "ALL": {
+   "n": 48,
+   "OFF": 0.8715,
+   "P2": 0.8854,
+   "diff": 0.0139,
+   "ci95": [
+    -0.0347,
+    0.066
+   ],
+   "P2_better": 5,
+   "same": 41,
+   "OFF_better": 2
+  }
+ },
+ "useCheck_TASK_LAD": {
+  "TASK": {
+   "diff": 0.0278,
+   "ok": true
+  },
+  "LAD": {
+   "diff": 0.0833,
+   "ok": true
+  }
+ },
+ "delayedPrimary": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.7917,
+   "P2": 0.8542,
+   "diff": 0.0625,
+   "ci95": [
+    0.0,
+    0.1667
+   ],
+   "P2_better": 2,
+   "same": 10,
+   "OFF_better": 0
+  },
+  "TTT": {
+   "n": 12,
+   "OFF": 0.9375,
+   "P2": 0.9375,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  },
+  "LAD": {
+   "n": 12,
+   "OFF": 0.8125,
+   "P2": 0.8125,
+   "diff": 0.0,
+   "ci95": [
+    -0.0625,
+    0.0625
+   ],
+   "P2_better": 1,
+   "same": 10,
+   "OFF_better": 1
+  },
+  "KIDPPP": {
+   "n": 12,
+   "OFF": 0.9375,
+   "P2": 0.9167,
+   "diff": -0.0208,
+   "ci95": [
+    -0.0625,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 11,
+   "OFF_better": 1
+  },
+  "ALL": {
+   "n": 48,
+   "OFF": 0.8698,
+   "P2": 0.8802,
+   "diff": 0.0104,
+   "ci95": [
+    -0.0156,
+    0.0417
+   ],
+   "P2_better": 3,
+   "same": 43,
+   "OFF_better": 2
+  }
+ },
+ "immediatePrimary": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.9167,
+   "P2": 0.9375,
+   "diff": 0.0208,
+   "ci95": [
+    0.0,
+    0.0625
+   ],
+   "P2_better": 1,
+   "same": 11,
+   "OFF_better": 0
+  },
+  "TTT": {
+   "n": 12,
+   "OFF": 0.9792,
+   "P2": 0.9792,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  },
+  "LAD": {
+   "n": 12,
+   "OFF": 0.8125,
+   "P2": 0.8333,
+   "diff": 0.0208,
+   "ci95": [
+    0.0,
+    0.0625
+   ],
+   "P2_better": 1,
+   "same": 11,
+   "OFF_better": 0
+  },
+  "KIDPPP": {
+   "n": 12,
+   "OFF": 0.9792,
+   "P2": 0.8958,
+   "diff": -0.0833,
+   "ci95": [
+    -0.2083,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 10,
+   "OFF_better": 2
+  },
+  "ALL": {
+   "n": 48,
+   "OFF": 0.9219,
+   "P2": 0.9115,
+   "diff": -0.0104,
+   "ci95": [
+    -0.0469,
+    0.0208
+   ],
+   "P2_better": 2,
+   "same": 44,
+   "OFF_better": 2
+  }
+ },
+ "delayedWholeForm": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.7986,
+   "P2": 0.8542,
+   "diff": 0.0556,
+   "ci95": [
+    0.0,
+    0.1389
+   ],
+   "P2_better": 2,
+   "same": 10,
+   "OFF_better": 0
+  },
+  "TTT": {
+   "n": 12,
+   "OFF": 0.9444,
+   "P2": 0.9444,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  },
+  "LAD": {
+   "n": 12,
+   "OFF": 0.6806,
+   "P2": 0.7222,
+   "diff": 0.0417,
+   "ci95": [
+    -0.0278,
+    0.125
+   ],
+   "P2_better": 2,
+   "same": 9,
+   "OFF_better": 1
+  },
+  "KIDPPP": {
+   "n": 12,
+   "OFF": 0.8472,
+   "P2": 0.8194,
+   "diff": -0.0278,
+   "ci95": [
+    -0.1042,
+    0.0208
+   ],
+   "P2_better": 1,
+   "same": 10,
+   "OFF_better": 1
+  },
+  "ALL": {
+   "n": 48,
+   "OFF": 0.8177,
+   "P2": 0.8351,
+   "diff": 0.0174,
+   "ci95": [
+    -0.0156,
+    0.0503
+   ],
+   "P2_better": 5,
+   "same": 41,
+   "OFF_better": 2
+  }
+ },
+ "pretestPrimary_balance": {
+  "TASK": {
+   "n": 12,
+   "OFF": 0.2708,
+   "P2": 0.2708,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  },
+  "TTT": {
+   "n": 12,
+   "OFF": 0.7917,
+   "P2": 0.7917,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  },
+  "LAD": {
+   "n": 12,
+   "OFF": 0.6042,
+   "P2": 0.6042,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  },
+  "KIDPPP": {
+   "n": 12,
+   "OFF": 0.5,
+   "P2": 0.5,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 12,
+   "OFF_better": 0
+  },
+  "ALL": {
+   "n": 48,
+   "OFF": 0.5417,
+   "P2": 0.5417,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "P2_better": 0,
+   "same": 48,
+   "OFF_better": 0
+  }
+ },
+ "turnStats": {
+  "TASK": {
+   "OFF": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 1,
+    "earlyLeakTurns": 0,
+    "earlyLeaks": 0,
+    "answersAfterTwoFails": 0,
+    "answerReleased": 15,
+    "meanWords": 49.119,
+    "stuckRuns": 0
+   },
+   "P2": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 6,
+    "earlyLeakTurns": 0,
+    "earlyLeaks": 0,
+    "answersAfterTwoFails": 1,
+    "answerReleased": 15,
+    "meanWords": 51.0595,
+    "stuckRuns": 0
+   }
+  },
+  "TTT": {
+   "OFF": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 0,
+    "earlyLeakTurns": 0,
+    "earlyLeaks": 0,
+    "answersAfterTwoFails": 0,
+    "answerReleased": 3,
+    "meanWords": 42.5595,
+    "stuckRuns": 0
+   },
+   "P2": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 0,
+    "earlyLeakTurns": 0,
+    "earlyLeaks": 0,
+    "answersAfterTwoFails": 0,
+    "answerReleased": 5,
+    "meanWords": 42.631,
+    "stuckRuns": 0
+   }
+  },
+  "LAD": {
+   "OFF": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 0,
+    "earlyLeakTurns": 1,
+    "earlyLeaks": 3,
+    "answersAfterTwoFails": 1,
+    "answerReleased": 7,
+    "meanWords": 29.5952,
+    "stuckRuns": 0
+   },
+   "P2": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 2,
+    "earlyLeakTurns": 0,
+    "earlyLeaks": 0,
+    "answersAfterTwoFails": 0,
+    "answerReleased": 8,
+    "meanWords": 31.7619,
+    "stuckRuns": 1
+   }
+  },
+  "KIDPPP": {
+   "OFF": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 0,
+    "earlyLeakTurns": 1,
+    "earlyLeaks": 1,
+    "answersAfterTwoFails": 0,
+    "answerReleased": 4,
+    "meanWords": 32.7619,
+    "stuckRuns": 2
+   },
+   "P2": {
+    "turns": 84,
+    "twoAsks": 0,
+    "twoAsksRaw": 1,
+    "earlyLeakTurns": 2,
+    "earlyLeaks": 2,
+    "answersAfterTwoFails": 0,
+    "answerReleased": 9,
+    "meanWords": 33.881,
+    "stuckRuns": 0
+   }
+  },
+  "ALL": {
+   "OFF": {
+    "turns": 336,
+    "twoAsks": 0,
+    "twoAsksRaw": 1,
+    "earlyLeakTurns": 2,
+    "earlyLeaks": 4,
+    "answersAfterTwoFails": 1,
+    "answerReleased": 29,
+    "meanWords": 38.5089,
+    "stuckRuns": 2
+   },
+   "P2": {
+    "turns": 336,
+    "twoAsks": 0,
+    "twoAsksRaw": 9,
+    "earlyLeakTurns": 2,
+    "earlyLeaks": 2,
+    "answersAfterTwoFails": 1,
+    "answerReleased": 37,
+    "meanWords": 39.8333,
+    "stuckRuns": 1
+   }
+  }
+ },
+ "quickCheck": {
+  "sessions": 12,
+  "compliant": 12,
+  "violations": [],
+  "qcTurns": 12,
+  "qcTurnsWithAnswer": 0,
+  "qcTurnsWithTeachWords": 0,
+  "rate": 1.0,
+  "offTTT_test_first_clean": 0.0
+ },
+ "tttSplit": {
+  "sessions": 12,
+  "resolved": 12,
+  "twoOrMore_TTT": 8,
+  "underTwo_PPP": 4,
+  "stillPending_at_turn5": 0,
+  "learners": {
+   "2012": "1/1 -> TTT",
+   "2013": "1/1 -> TTT",
+   "2014": "0/1 -> PPP",
+   "2015": "1/1 -> TTT",
+   "2016": "0/1 -> PPP",
+   "2017": "0/1 -> PPP",
+   "2018": "1/1 -> TTT",
+   "2019": "1/1 -> TTT",
+   "2020": "1/1 -> TTT",
+   "2021": "1/1 -> TTT",
+   "2022": "1/1 -> TTT",
+   "2023": "0/1 -> PPP"
+  },
+  "predicted": 8
+ },
+ "fit": {
+  "TASK": {
+   "task_goal": {
+    "OFF": 0.4167,
+    "P2": 0.8333,
+    "diff": 0.4167
+   },
+   "feedback_after_task": {
+    "OFF": 0.75,
+    "P2": 1.0833,
+    "diff": 0.3333
+   },
+   "task_repeat": {
+    "OFF": 0.9167,
+    "P2": 0.9167,
+    "diff": 0.0
+   },
+   "age_fit": {
+    "OFF": 2.0,
+    "P2": 2.0,
+    "diff": 0.0
+   },
+   "teacher_accept": {
+    "OFF": 1.5833,
+    "P2": 1.0,
+    "diff": -0.5833
+   },
+   "_ownRubric": {
+    "OFF": 0.6944,
+    "P2": 0.9444,
+    "diff": 0.25,
+    "ci95": [
+     -0.1944,
+     0.6667
+    ],
+    "n": 12
+   }
+  },
+  "TTT": {
+   "test_first_clean": {
+    "OFF": 0.0,
+    "P2": 2.0,
+    "diff": 2.0
+   },
+   "teach_targets_gaps": {
+    "OFF": 1.25,
+    "P2": 1.25,
+    "diff": 0.0
+   },
+   "retest_end": {
+    "OFF": 1.4167,
+    "P2": 1.75,
+    "diff": 0.3333
+   },
+   "age_fit": {
+    "OFF": 2.0,
+    "P2": 2.0,
+    "diff": 0.0
+   },
+   "teacher_accept": {
+    "OFF": 1.3333,
+    "P2": 1.6667,
+    "diff": 0.3333
+   },
+   "_ownRubric": {
+    "OFF": 0.8889,
+    "P2": 1.6667,
+    "diff": 0.7778,
+    "ci95": [
+     0.5833,
+     0.9722
+    ],
+    "n": 12
+   }
+  },
+  "LAD": {
+   "story_chant": {
+    "OFF": 0.0,
+    "P2": 0.0,
+    "diff": 0.0
+   },
+   "listen_do_steps": {
+    "OFF": 0.1667,
+    "P2": 0.0833,
+    "diff": -0.0833
+   },
+   "child_tone": {
+    "OFF": 0.75,
+    "P2": 0.8333,
+    "diff": 0.0833
+   },
+   "age_fit": {
+    "OFF": 1.1667,
+    "P2": 1.0833,
+    "diff": -0.0833
+   },
+   "teacher_accept": {
+    "OFF": 1.1667,
+    "P2": 0.8333,
+    "diff": -0.3333
+   },
+   "_ownRubric": {
+    "OFF": 0.3056,
+    "P2": 0.3056,
+    "diff": 0.0,
+    "ci95": [
+     -0.1667,
+     0.1667
+    ],
+    "n": 12
+   }
+  },
+  "KIDPPP": {
+   "short_sentences": {
+    "OFF": 1.75,
+    "P2": 1.25,
+    "diff": -0.5
+   },
+   "one_instruction": {
+    "OFF": 1.25,
+    "P2": 1.25,
+    "diff": 0.0
+   },
+   "praise_effort": {
+    "OFF": 0.5,
+    "P2": 1.1667,
+    "diff": 0.6667
+   },
+   "game_story": {
+    "OFF": 0.0,
+    "P2": 0.0,
+    "diff": 0.0
+   },
+   "ppp_order": {
+    "OFF": 2.0,
+    "P2": 1.9167,
+    "diff": -0.0833
+   },
+   "age_fit": {
+    "OFF": 1.9167,
+    "P2": 1.75,
+    "diff": -0.1667
+   },
+   "teacher_accept": {
+    "OFF": 1.25,
+    "P2": 1.1667,
+    "diff": -0.0833
+   },
+   "_ownRubric": {
+    "OFF": 1.1,
+    "P2": 1.1167,
+    "diff": 0.0167,
+    "ci95": [
+     -0.1667,
+     0.2
+    ],
+    "n": 12
+   }
+  }
+ },
+ "plannerP2": {
+  "shapeStage": {
+   "TASK": {
+    "TASK/pretask": 12,
+    "TASK/task": 20,
+    "TASK/focus": 24,
+    "TASK/done": 28
+   },
+   "TTT": {
+    "TTT/test/QC": 12,
+    "PPP/present": 6,
+    "PPP/practise": 14,
+    "TTT/retest": 13,
+    "TTT/teach": 12,
+    "TTT/done": 18,
+    "PPP/check": 6,
+    "PPP/done": 3
+   },
+   "LAD": {
+    "PPP/present": 12,
+    "PPP/practise": 36,
+    "PPP/produce": 8,
+    "PPP/check": 15,
+    "PPP/done": 13
+   },
+   "KIDPPP": {
+    "PPP/present": 12,
+    "PPP/practise": 38,
+    "PPP/produce": 5,
+    "PPP/check": 14,
+    "PPP/done": 15
+   }
+  },
+  "shapeByTurn": {
+   "TASK": {
+    "1": {
+     "TASK:S3:pretask": 12
+    },
+    "2": {
+     "TASK:S3:task": 12
+    },
+    "3": {
+     "TASK:S3:focus": 4,
+     "TASK:S3:task": 8
+    },
+    "4": {
+     "TASK:S3:focus": 10,
+     "TASK:S3:done": 2
+    },
+    "5": {
+     "TASK:S3:focus": 7,
+     "TASK:S3:done": 5
+    },
+    "6": {
+     "TASK:S3:done": 11,
+     "TASK:S3:focus": 1
+    },
+    "7": {
+     "TASK:S3:done": 10,
+     "TASK:S3:focus": 2
+    }
+   },
+   "TTT": {
+    "1": {
+     "TTT:S4q:test": 12
+    },
+    "2": {
+     "PPP:S5:present": 6,
+     "TTT:S4:teach": 6
+    },
+    "3": {
+     "PPP:S5:practise": 5,
+     "TTT:S4:retest": 5,
+     "TTT:S4:teach": 2
+    },
+    "4": {
+     "PPP:S5:practise": 5,
+     "TTT:S4:retest": 6,
+     "TTT:S4:teach": 1
+    },
+    "5": {
+     "PPP:S5:practise": 2,
+     "TTT:S4:done": 6,
+     "PPP:S5:check": 3,
+     "TTT:S4:teach": 1
+    },
+    "6": {
+     "TTT:S4:retest": 1,
+     "TTT:S4:done": 6,
+     "PPP:S5:check": 3,
+     "PPP:S5:practise": 1,
+     "TTT:S4:teach": 1
+    },
+    "7": {
+     "TTT:S4:retest": 1,
+     "TTT:S4:done": 6,
+     "PPP:S5:done": 3,
+     "PPP:S5:practise": 1,
+     "TTT:S4:teach": 1
+    }
+   },
+   "LAD": {
+    "1": {
+     "PPP:S2c:present": 12
+    },
+    "2": {
+     "PPP:S2c:practise": 12
+    },
+    "3": {
+     "PPP:S2c:produce": 6,
+     "PPP:S2c:practise": 6
+    },
+    "4": {
+     "PPP:S2c:check": 6,
+     "PPP:S2c:practise": 4,
+     "PPP:S2c:produce": 2
+    },
+    "5": {
+     "PPP:S2c:done": 3,
+     "PPP:S2c:practise": 4,
+     "PPP:S2c:check": 5
+    },
+    "6": {
+     "PPP:S2c:done": 4,
+     "PPP:S2c:practise": 5,
+     "PPP:S2c:check": 3
+    },
+    "7": {
+     "PPP:S2c:done": 6,
+     "PPP:S2c:practise": 5,
+     "PPP:S2c:check": 1
+    }
+   },
+   "KIDPPP": {
+    "1": {
+     "PPP:S2c:present": 12
+    },
+    "2": {
+     "PPP:S2c:practise": 12
+    },
+    "3": {
+     "PPP:S2c:produce": 5,
+     "PPP:S2c:practise": 7
+    },
+    "4": {
+     "PPP:S2c:check": 7,
+     "PPP:S2c:practise": 5
+    },
+    "5": {
+     "PPP:S2c:check": 4,
+     "PPP:S2c:practise": 6,
+     "PPP:S2c:done": 2
+    },
+    "6": {
+     "PPP:S2c:done": 6,
+     "PPP:S2c:practise": 5,
+     "PPP:S2c:check": 1
+    },
+    "7": {
+     "PPP:S2c:done": 7,
+     "PPP:S2c:practise": 3,
+     "PPP:S2c:check": 2
+    }
+   }
+  },
+  "methodRule": {
+   "TASK": {
+    "FALLBACK:formative_feedback": 84
+   },
+   "TTT": {
+    "M7b_PROCEDURAL:worked_example": 84
+   },
+   "LAD": {
+    "M7b_PROCEDURAL:worked_example": 84
+   },
+   "KIDPPP": {
+    "M7b_PROCEDURAL:worked_example": 84
+   }
+  },
+  "shapeMatch": {
+   "TASK": {
+    "turns": 84,
+    "match": 84,
+    "rate": 1.0
+   },
+   "TTT": {
+    "turns": 84,
+    "match": 84,
+    "rate": 1.0
+   },
+   "LAD": {
+    "turns": 84,
+    "match": 84,
+    "rate": 1.0
+   },
+   "KIDPPP": {
+    "turns": 84,
+    "match": 84,
+    "rate": 1.0
+   }
+  },
+  "l1": {
+   "turnsWithL1Misconception": 0,
+   "turnsWithP1Contrast": 0,
+   "arabicTransferDiagnoses": {}
+  }
+ },
+ "offPrimaryMethod": {
+  "TASK": {
+   "worked_example": 84
+  },
+  "TTT": {
+   "worked_example": 84
+  },
+  "LAD": {
+   "worked_example": 84
+  },
+  "KIDPPP": {
+   "worked_example": 84
+  }
+ },
+ "graderRecheck": {
+  "primaryAgreement": 1,
+  "exactAgreement": 1,
+  "freeExactAgreement": 0.9398,
+  "sampled": 266,
+  "pass": true
+ }
+}
