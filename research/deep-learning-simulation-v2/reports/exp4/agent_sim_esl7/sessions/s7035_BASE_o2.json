@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -356,7 +356,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Let's talk about finished actions.\nLook at this example. I cook dinner every day. Yesterday I cooked dinner. I added -ed because the action is finished.\nRule: for a finished action, add -ed to a regular verb.\nRight: \"I cooked dinner yesterday.\" Wrong: \"I cook dinner yesterday.\"\nYour turn. Write the verb in the past: \"Yesterday my sister ___ (clean) her room.\"\n\nLEARNER'S LAST MESSAGE:\ncleaned\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"cleaned\" is right. The action is finished, so the verb takes -ed.\nNow write one or two sentences about what you did last weekend. Use a regular verb in the past."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Let's talk about finished actions.\nLook at this example. I cook dinner every day. Yesterday I cooked dinner. I added -ed because the action is finished.\nRule: for a finished action, add -ed to a regular verb.\nRight: \"I cooked dinner yesterday.\" Wrong: \"I cook dinner yesterday.\"\nYour turn. Write the verb in the past: \"Yesterday my sister ___ (clean) her room.\"\n\nLEARNER'S LAST MESSAGE:\ncleaned\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nCorrect: \"cleaned\" is right. The action is finished, so the verb takes -ed.\nNow write one or two sentences about what you did last weekend. Use a regular verb in the past.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Correct: \"cleaned\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Correct: \"cleaned\" is right."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The action is finished, so the verb takes -ed."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Last weekend I visited my aunt.",
+    "errors": {
+     "W1": "Last weekend I visit my aunt."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Last weekend I visited my aunt.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Last weekend I visited my aunt.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

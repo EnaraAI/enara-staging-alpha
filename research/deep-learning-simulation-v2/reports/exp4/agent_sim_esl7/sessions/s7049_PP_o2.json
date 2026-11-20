@@ -15,11 +15,11 @@
   "s": {
    "W1": 1,
    "W2": 1,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -185,7 +185,108 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 1: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 0.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Yes, let's learn polite messages. We can say \"Could I ... please?\" to ask for something. Example: Could I use your phone, please? Now you try. You are at a guest house. Ask the receptionist for another pillow.\n\nLEARNER'S LAST MESSAGE:\nCould I have another pillow, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that is polite and correct! \"Could I have ... please?\" is a good way to ask. Next one. You did not answer your aunt's phone call. Say sorry and why."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 1: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 0.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Yes, let's learn polite messages. We can say \"Could I ... please?\" to ask for something. Example: Could I use your phone, please? Now you try. You are at a guest house. Ask the receptionist for another pillow.\n\nLEARNER'S LAST MESSAGE:\nCould I have another pillow, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that is polite and correct! \"Could I have ... please?\" is a good way to ask. Next one. You did not answer your aunt's phone call. Say sorry and why.",
+   "stateBefore": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, that is polite and correct!"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, that is polite and correct!"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I'm sorry I did not answer your call, because I was at school.",
+    "errors": {
+     "W1": "Sorry."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Sorry.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "Sorry.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

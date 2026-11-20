@@ -14,11 +14,11 @@
   "s": {
    "W1": 1,
    "W2": 0,
-   "C1": 0,
+   "C1": 2,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -362,7 +362,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 0: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Look: \"Sam brings the cake at 4:00. The party starts at 4:30.\" Question: When does the party start?\nRule: read the whole question first, then find the time that fits.\nRight: \"4:30.\" Wrong: \"4:00.\"\nYour turn. \"Anna opens the shop at 8:00. She closes it at 6:00.\" What time does Anna close the shop?\n\nLEARNER'S LAST MESSAGE:\n6:00\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, 6:00 is right! It fits the whole question.\nHere is a message: \"Mia brings the ball on Monday. The game is on Friday.\"\nRead the message. What day is the game?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 0: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHi! Look: \"Sam brings the cake at 4:00. The party starts at 4:30.\" Question: When does the party start?\nRule: read the whole question first, then find the time that fits.\nRight: \"4:30.\" Wrong: \"4:00.\"\nYour turn. \"Anna opens the shop at 8:00. She closes it at 6:00.\" What time does Anna close the shop?\n\nLEARNER'S LAST MESSAGE:\n6:00\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, 6:00 is right! It fits the whole question.\nHere is a message: \"Mia brings the ball on Monday. The game is on Friday.\"\nRead the message. What day is the game?",
+   "stateBefore": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, 6:00 is right! It fits the whole question."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, 6:00 is right!"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Friday",
+    "errors": {
+     "W1": "Monday"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Friday",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "Friday",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

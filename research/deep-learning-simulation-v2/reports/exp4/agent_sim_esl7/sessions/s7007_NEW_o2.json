@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 3,
+   "W1": 1,
    "W2": 1,
    "C1": 0,
    "C2": 0
@@ -345,7 +345,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 1: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 0: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: am/is/are is needed in a present sentence. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Here is your exercise. Write your answer.\nTutor: What is your favourite animal? Answer with a full sentence.\n\nLEARNER'S LAST MESSAGE:\nThe cat.\nFACT: the last learner message contained the error of W1 (answers with one word or a fragment (\"How old are you?\" -> \"Ten.\")).\n\nTUTOR TURN TO JUDGE:\n\"The cat.\" is not a full sentence yet. Look at this example. Tutor: What colour is the door? Learner: The door is blue.\nRule: answer with a full sentence, not one word, and use is, am or are where needed.\nWrong: \"Blue.\"\nNow you try. Tutor: Where is the bus stop? Answer with a full sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 1: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 0: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 0.\nC2 (correct) strength 0: am/is/are is needed in a present sentence. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Here is your exercise. Write your answer.\nTutor: What is your favourite animal? Answer with a full sentence.\n\nLEARNER'S LAST MESSAGE:\nThe cat.\nFACT: the last learner message contained the error of W1 (answers with one word or a fragment (\"How old are you?\" -> \"Ten.\")).\n\nTUTOR TURN TO JUDGE:\n\"The cat.\" is not a full sentence yet. Look at this example. Tutor: What colour is the door? Learner: The door is blue.\nRule: answer with a full sentence, not one word, and use is, am or are where needed.\nWrong: \"Blue.\"\nNow you try. Tutor: Where is the bus stop? Answer with a full sentence.",
+   "stateBefore": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: answer with a full sentence, not one word"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Learner: The door is blue. ... Wrong: \"Blue.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "The bus stop is near the school.",
+    "errors": {
+     "W1": "Near the school.",
+     "W2": "The bus stop near the school."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "The bus stop is near the school.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "The bus stop is near the school.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

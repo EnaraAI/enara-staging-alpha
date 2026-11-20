@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 1,
    "C1": 0,
    "C2": 0
@@ -189,7 +189,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-WR-simple-sentences (writing short sentences with capitals and full stops). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a text is one long line joined with \"and\", no capitals or full stops. Its error: writes one long line with \"and\" and no capitals or full stops (\"my sister is ten and she has a cat\").\nW2 (wrong) strength 1: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"My sister ten.\").\nC1 (correct) strength 0: each idea is its own sentence with a capital and a full stop. Independent correct productions so far: 0.\nC2 (correct) strength 0: each present sentence has am/is/are (or have/has). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Remember: every sentence starts with a capital letter, I is always a capital, and every sentence ends with a full stop. Example: My teacher is kind. She has short hair. Now you try. Write 3 sentences about your teacher.\n\nLEARNER'S LAST MESSAGE:\nmy teacher is tall and she is nice\nFACT: the last learner message contained the error of W1 (writes one long line with \"and\" and no capitals or full stops (\"my sister is ten and she has a cat\")).\n\nTUTOR TURN TO JUDGE:\nGood, you have two ideas about your teacher. But we need a capital letter at the start, and a full stop at the end of each sentence. Also, try two sentences instead of joining them with \"and\". Hint: My teacher is tall. ... Try again: write it as two sentences."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-WR-simple-sentences (writing short sentences with capitals and full stops). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: a text is one long line joined with \"and\", no capitals or full stops. Its error: writes one long line with \"and\" and no capitals or full stops (\"my sister is ten and she has a cat\").\nW2 (wrong) strength 1: no am/is/are is needed in a present sentence. Its error: leaves out am/is/are (\"My sister ten.\").\nC1 (correct) strength 0: each idea is its own sentence with a capital and a full stop. Independent correct productions so far: 0.\nC2 (correct) strength 0: each present sentence has am/is/are (or have/has). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Remember: every sentence starts with a capital letter, I is always a capital, and every sentence ends with a full stop. Example: My teacher is kind. She has short hair. Now you try. Write 3 sentences about your teacher.\n\nLEARNER'S LAST MESSAGE:\nmy teacher is tall and she is nice\nFACT: the last learner message contained the error of W1 (writes one long line with \"and\" and no capitals or full stops (\"my sister is ten and she has a cat\")).\n\nTUTOR TURN TO JUDGE:\nGood, you have two ideas about your teacher. But we need a capital letter at the start, and a full stop at the end of each sentence. Also, try two sentences instead of joining them with \"and\". Hint: My teacher is tall. ... Try again: write it as two sentences.",
+   "stateBefore": {
+    "form": "wr1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "we need a capital letter at the start, and a full stop at the end of each sentence"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My teacher is tall. She is nice.",
+    "errors": {
+     "W1": "my teacher is tall and she is nice",
+     "W2": "My teacher tall. She nice."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "my teacher is tall and she is nice",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "my teacher is tall and she is nice",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
