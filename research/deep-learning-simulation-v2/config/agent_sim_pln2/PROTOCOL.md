@@ -65,7 +65,7 @@ The learner, its first message, the lesson data, the seeds, the judges, the test
 | `config/agent_sim_pln2/tasks/JUDGE_TASK.md` | `f498b85b6e073f19c2c983cf92d8a5517333bbd8f7fce8f82d061b1340182ab6` |
 | `config/agent_sim_pln2/tasks/FIT_TASK.md` | `492c96d1851d9ae5fe69c5eaf147da4181e7c7a5d0c2a4b8272f4d226d86ee26` |
 | `config/agent_sim_pln2/tasks/RECHECK_TASK.md` | `148099d04d88192cf0e02b8a968baa86afa40ffedb0357d340f208d57524e9ef` |
-| `src/offline/pln2Study.ts` (this runner) | `e73052943243b3abbbfaeab1b4a5bba4ff44bb725d02f2345936fe34323bb7e0` |
+| `src/offline/pln2Study.ts` (this runner) | `aee7d83761a42711461faaeaebdf46d0ab9a5398793c70e096ed59592473e21e` |
 | `src/offline/pln2_analyze.py` (this analysis) | `5e4501439d1f9a68de91cc13d71cb61d12d6c8131ac5db4d9b50997ef45b555c` |
 
 `graderV2.ts` is the round-12 grader (ESL6 amendment A3). The engine files are hashed as they stand in the working tree of this branch at the time of writing.
@@ -235,3 +235,4 @@ Code only. No agent run.
      - PLN2b: 14 → 8 (OFF 5, ON 3; ok);
      - PLN2c: 1 → 1.
 4. **Tests:** 143 pass (planner2, kidsPack, repeat-wrong, ESL5 release and off-parity). The dry run shows the override in all 12 ON prompts and in none of the OFF prompts. §3 hashes refreshed.
+5. **Re-run (owner choice "re-run kids test first"): PLN2k2.** Folder `reports/exp4/agent_sim_pln2k2`, task files `tasks_k2/`. Everything is as in amendment G (same 12 children, arms, rounds, tests, rules and guards; fit agreement from amendment E), with fixes 1–3 above. The overlap check exempts pln2k2 too. Estimate: 14 Sonnet + about 13 Opus.

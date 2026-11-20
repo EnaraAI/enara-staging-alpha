@@ -424,7 +424,7 @@ function overlapCheck(studyDir: string) {
   const own = path.resolve(studyDir);
   // amendment D: PLN2b re-checks the SAME 48 learners and seeds as PLN2 by design, so PLN2's own run folder is not a clash for it (nothing else is exempt).
   const reuse = /^agent_sim_pln2[bck]/.test(path.basename(own)) ? path.resolve(ROOT, 'reports/exp4/agent_sim_pln2') : null; // amendment F: pln2c reuses pln2 and pln2b
-  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && /^agent_sim_pln2[bck]?$/.test(path.relative(path.join(ROOT, 'reports/exp4'), path.resolve(f)).split(path.sep)[0])));
+  const files = [...walk(path.join(ROOT, 'reports/exp4')), ...[1, 2, 3, 4, 5, 6].flatMap((n) => walk(path.join(ROOT, `config/agent_sim_esl${n}`)))].filter((f) => !path.resolve(f).startsWith(own + path.sep) && !(reuse && /^agent_sim_pln2([bck]\d?)?$/.test(path.relative(path.join(ROOT, 'reports/exp4'), path.resolve(f)).split(path.sep)[0])));
   const ids = new Set<number>(); const seeds = new Set<string>();
   for (const f of files) { const t = readFileSync(f, 'utf8'); for (const m of t.matchAll(/"learnerIdx":\s*(\d+)/g)) ids.add(Number(m[1])); for (const m of t.matchAll(/"seed":\s*"([^"]+)"/g)) seeds.add(m[1]); }
   // ids defined in code (ESL1 0-17, ESL2 0-35, ESL3 100-159, ESL3 validation 200-211, ESL4 300-407, ESL5 500-619, ESL6 700-991, teach2 1100-1799 reserved)
