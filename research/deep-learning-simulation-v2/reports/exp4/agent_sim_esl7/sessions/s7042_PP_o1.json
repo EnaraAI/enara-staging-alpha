@@ -14,13 +14,13 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 3,
-   "C2": 2
+   "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 1
+   "C1": 3,
+   "C2": 2
   },
   "start": {
    "W1": 2,
@@ -429,7 +429,122 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 2.\nC2 (correct) strength 2: past events take past verb forms. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood sentence! You used went for the past and because for the reason. It is correct. But your text is short. We need 30-50 words. Add two or three more sentences about your holiday. Use and once and but once. For example, you can say what you did there, or what was not good.\n\nLEARNER'S LAST MESSAGE:\nWe swam in the sea and we ate fish, but the hotel was expensive.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGood sentence! You used and and but in the right places, and your past verbs swam, ate and was are correct. But your text is still a little short. You have about 25 words, and we need 30-50. Add one or two more sentences about your holiday. For example, how did you feel at the end? Use a full stop after each sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 2.\nC2 (correct) strength 2: past events take past verb forms. Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood sentence! You used went for the past and because for the reason. It is correct. But your text is short. We need 30-50 words. Add two or three more sentences about your holiday. Use and once and but once. For example, you can say what you did there, or what was not good.\n\nLEARNER'S LAST MESSAGE:\nWe swam in the sea and we ate fish, but the hotel was expensive.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGood sentence! You used and and but in the right places, and your past verbs swam, ate and was are correct. But your text is still a little short. You have about 25 words, and we need 30-50. Add one or two more sentences about your holiday. For example, how did you feel at the end? Use a full stop after each sentence.",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "You used and and but in the right places"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "your past verbs swam, ate and was are correct"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "We swam in the sea and we ate fish, but the hotel was expensive."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "We swam in the sea and we ate fish, but the hotel was expensive."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "At the end I was happy because I had a good time.",
+    "errors": {
+     "W1": "at the end i was happy and i had a good time and i want to go again",
+     "W2": "At the end I am happy because I have a good time."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "At the end I was happy because I had a good time.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "At the end I was happy because I had a good time.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

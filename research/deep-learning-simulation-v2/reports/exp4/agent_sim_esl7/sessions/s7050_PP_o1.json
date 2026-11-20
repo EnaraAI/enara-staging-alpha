@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 2,
-   "C2": 1
+   "C1": 3,
+   "C2": 2
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -412,7 +412,119 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 2: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 1: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, correct! \"Did you watch a film yesterday?\" uses did + the base verb watch, with no -ed. Well done. Next one. Ask a friend what he ate for lunch yesterday. Start with \"What did you ...\"\n\nLEARNER'S LAST MESSAGE:\nWhat did you eat for lunch yesterday?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, correct! \"What did you eat for lunch yesterday?\" uses did + the base verb eat, and we do not say \"ate\" after did. Well done. Next one. Ask a friend where he went last weekend. Start with \"Where did you ...\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 0: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 2: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 1: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, correct! \"Did you watch a film yesterday?\" uses did + the base verb watch, with no -ed. Well done. Next one. Ask a friend what he ate for lunch yesterday. Start with \"What did you ...\"\n\nLEARNER'S LAST MESSAGE:\nWhat did you eat for lunch yesterday?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, correct! \"What did you eat for lunch yesterday?\" uses did + the base verb eat, and we do not say \"ate\" after did. Well done. Next one. Ask a friend where he went last weekend. Start with \"Where did you ...\"",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "uses did + the base verb eat"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, correct! \"What did you eat for lunch yesterday?\""
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "What did you eat for lunch yesterday?"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "the base verb eat, and we do not say \"ate\" after did"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Where did you go last weekend?",
+    "errors": {
+     "W1": "Where did you went last weekend?"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Where did you go last weekend?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Where did you go last weekend?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -19,7 +19,7 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 2
   },
   "start": {
@@ -803,7 +803,113 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 0: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 2.\nC2 (correct) strength 3: past events take past verb forms. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"We went to the beach and we ate fish.\" joins two ideas well. Example: I like tea, but my brother likes juice. Rule: choose and, but or because by meaning, and do not chain many ands. Example: I woke up and I ate. Then I ran.\nNow try this alone. Join with but or because: We missed the train. We got up late.\n\nLEARNER'S LAST MESSAGE:\nWe missed the train because we got up late.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"because\" fits, because your second idea is the reason. Pick and, but or because by meaning, like picking the right key for a lock.\nNow write one sentence about a person you know, using and, but or because."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 0: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 2.\nC2 (correct) strength 3: past events take past verb forms. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"We went to the beach and we ate fish.\" joins two ideas well. Example: I like tea, but my brother likes juice. Rule: choose and, but or because by meaning, and do not chain many ands. Example: I woke up and I ate. Then I ran.\nNow try this alone. Join with but or because: We missed the train. We got up late.\n\nLEARNER'S LAST MESSAGE:\nWe missed the train because we got up late.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"because\" fits, because your second idea is the reason. Pick and, but or because by meaning, like picking the right key for a lock.\nNow write one sentence about a person you know, using and, but or because.",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"because\" fits, because your second idea is the reason."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"because\" fits"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Pick and, but or because by meaning"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My sister is kind but she is shy.",
+    "errors": {
+     "W1": "my sister is kind and she is shy and she is nice"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My sister is kind but she is shy.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister is kind but she is shy.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

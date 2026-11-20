@@ -19,8 +19,8 @@
    "C2": 3
   },
   "indep": {
-   "C1": 2,
-   "C2": 2
+   "C1": 3,
+   "C2": 3
   },
   "start": {
    "W1": 2,
@@ -806,7 +806,122 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 2.\nC2 (correct) strength 3: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"A boy is running in the park. A girl is reading a book.\" is correct. Both sentences have is before the verb with -ing.\nLook: \"Our neighbour is cooking dinner.\" Rule: use am, is or are before the verb with -ing.\nRight: \"Our neighbour is cooking dinner.\" Wrong: \"Our neighbour cooking dinner.\"\nNow try one on your own. Write one sentence about two people at a bus stop.\n\nLEARNER'S LAST MESSAGE:\nTwo people are waiting at the bus stop.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"Two people are waiting at the bus stop.\" is correct. It has are before waiting.\nNow write one sentence about a person you know. Say what he or she is doing now."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-present-continuous (the present continuous (am/is/are + -ing)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the -ing verb alone is enough. Its error: leaves out am/is/are before -ing (\"He watching TV now.\").\nW2 (wrong) strength 0: the plain present means \"now\". Its error: uses the plain present for now (\"Look! It rains.\").\nC1 (correct) strength 3: an action happening now needs am/is/are before the -ing verb. Independent correct productions so far: 2.\nC2 (correct) strength 3: for an action happening now we use am/is/are + verb-ing, not the plain present. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"A boy is running in the park. A girl is reading a book.\" is correct. Both sentences have is before the verb with -ing.\nLook: \"Our neighbour is cooking dinner.\" Rule: use am, is or are before the verb with -ing.\nRight: \"Our neighbour is cooking dinner.\" Wrong: \"Our neighbour cooking dinner.\"\nNow try one on your own. Write one sentence about two people at a bus stop.\n\nLEARNER'S LAST MESSAGE:\nTwo people are waiting at the bus stop.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"Two people are waiting at the bus stop.\" is correct. It has are before waiting.\nNow write one sentence about a person you know. Say what he or she is doing now.",
+   "stateBefore": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "is correct. It has are before waiting"
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"Two people are waiting at the bus stop.\" is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Two people are waiting at the bus stop."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Two people are waiting at the bus stop."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "My brother is reading a book now.",
+    "errors": {
+     "W1": "My brother reading a book now.",
+     "W2": "My brother reads a book now."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "prescont",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 3
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother is reading a book now.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother is reading a book now.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

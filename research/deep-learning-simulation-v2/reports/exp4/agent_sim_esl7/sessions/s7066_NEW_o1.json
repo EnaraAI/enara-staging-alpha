@@ -736,7 +736,110 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 0: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 1: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 0.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou used \"because\" to give a reason. Last weekend is finished, so the verbs need a past form. Right: Last Sunday I played chess. Wrong: Last Sunday I play chess.\nTry again: write two sentences about last weekend. Use because once.\n\nLEARNER'S LAST MESSAGE:\nLast weekend I stay at home because it is cold.\nFACT: the last learner message contained the error of W2 (uses present verbs for a past event (\"Yesterday it rains. I stay at home.\")).\n\nTUTOR TURN TO JUDGE:\nLast weekend is finished, so both verbs need the past: \"Last weekend I stayed at home because it was cold.\"\nRight: Last Friday I walked to school because it was sunny.\nWrong: Last Friday I walk to school because it is sunny.\nNow write two sentences about last Saturday. Use \"but\" once."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 0: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 1: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 0.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou used \"because\" to give a reason. Last weekend is finished, so the verbs need a past form. Right: Last Sunday I played chess. Wrong: Last Sunday I play chess.\nTry again: write two sentences about last weekend. Use because once.\n\nLEARNER'S LAST MESSAGE:\nLast weekend I stay at home because it is cold.\nFACT: the last learner message contained the error of W2 (uses present verbs for a past event (\"Yesterday it rains. I stay at home.\")).\n\nTUTOR TURN TO JUDGE:\nLast weekend is finished, so both verbs need the past: \"Last weekend I stayed at home because it was cold.\"\nRight: Last Friday I walked to school because it was sunny.\nWrong: Last Friday I walk to school because it is sunny.\nNow write two sentences about last Saturday. Use \"but\" once.",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "\"Last weekend I stayed at home because it was cold.\""
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: Last Friday I walked to school because it was sunny. Wrong: Last Friday I walk to school because it is sunny."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Last Saturday I played football, but I was tired.",
+    "errors": {
+     "W1": "last saturday i played football and i was tired and i went home",
+     "W2": "Last Saturday I play football, but I am tired."
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Last Saturday I played football, but I was tired.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Last Saturday I played football, but I was tired.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

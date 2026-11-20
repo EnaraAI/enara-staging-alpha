@@ -712,7 +712,110 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou chose a describing word for the weather, and that is the right kind of word after \"It is\". But \"cldy\" has some letters missing. Try again and write the whole word: \"The clouds are grey. It is ___ today.\"\n\nLEARNER'S LAST MESSAGE:\ncldy\nFACT: the last learner message contained the error of W2 (leaves out vowels in a weather word (\"sny\", \"windi\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"cloudy\". Your \"cldy\" is the right kind of word, but letters are missing. Grey clouds make the weather cloudy.\nRight: It is windy today.\nWrong: It is wind today.\nNow a new one, on your own. Complete: \"The sun is out. It is ___ today.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou chose a describing word for the weather, and that is the right kind of word after \"It is\". But \"cldy\" has some letters missing. Try again and write the whole word: \"The clouds are grey. It is ___ today.\"\n\nLEARNER'S LAST MESSAGE:\ncldy\nFACT: the last learner message contained the error of W2 (leaves out vowels in a weather word (\"sny\", \"windi\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"cloudy\". Your \"cldy\" is the right kind of word, but letters are missing. Grey clouds make the weather cloudy.\nRight: It is windy today.\nWrong: It is wind today.\nNow a new one, on your own. Complete: \"The sun is out. It is ___ today.\"",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is \"cloudy\"."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: It is windy today. Wrong: It is wind today."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "sunny",
+    "errors": {
+     "W1": "sun",
+     "W2": "sny"
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "sunny",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "sunny",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

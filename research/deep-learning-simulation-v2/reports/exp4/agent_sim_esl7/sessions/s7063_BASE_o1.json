@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 1,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -727,7 +727,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 1: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 0.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you for explaining. In English, a bare order like \"I want\" sounds too direct for a request.\nThe answer is \"Could I have another pillow, please?\" The frame Could I ... please? makes it polite.\nExample: \"Could I open the window, please?\"\nNow try one on your own. You are in a cafe. Ask the waiter for some water.\n\nLEARNER'S LAST MESSAGE:\nCould I have some water, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"Could I have some water, please?\" is a polite request. The frame Could I ... please? fits.\nNow write one sentence to or about a person you know using a polite frame: Can/Could I ... please?, How about ...?, or Excuse me."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 1: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 0.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThank you for explaining. In English, a bare order like \"I want\" sounds too direct for a request.\nThe answer is \"Could I have another pillow, please?\" The frame Could I ... please? makes it polite.\nExample: \"Could I open the window, please?\"\nNow try one on your own. You are in a cafe. Ask the waiter for some water.\n\nLEARNER'S LAST MESSAGE:\nCould I have some water, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"Could I have some water, please?\" is a polite request. The frame Could I ... please? fits.\nNow write one sentence to or about a person you know using a polite frame: Can/Could I ... please?, How about ...?, or Excuse me.",
+   "stateBefore": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"Could I have some water, please?\" is a polite request."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Could I have some water, please?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Can I borrow your pen, please?",
+    "errors": {
+     "W1": "Give me your pen."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Can I borrow your pen, please?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Can I borrow your pen, please?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
