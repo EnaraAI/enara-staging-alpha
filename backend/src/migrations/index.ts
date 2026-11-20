@@ -25,7 +25,7 @@ import { LessonProgress } from '../models/LessonProgress';
 import { PriceCatalogRow } from '../models/PriceCatalog';
 import { UsageLedger } from '../models/UsageLedger';
 import { PRICE_CATALOG, catalogRows } from '../services/priceCatalog';
-import { LMS_MIC_MODELS, LMS_MODELS, LMS_P0_MODELS, LMS_PHASE1A_MODELS, LMS_PHASE1B_MODELS, LMS_ONBOARDING_MODELS, LMS_EMAIL_MODELS, LmsAuditLog, LmsEmailLog, LmsConnectionCheck, LmsOnboarding, LmsRegistrationCode, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsHandoffCode, LmsLaunchToken, LmsMicDaily, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsSuppressedIdentity, LmsToolKey } from '../integrations/lms/models';
+import { LMS_MIC_MODELS, LMS_MODELS, LMS_P0_MODELS, LMS_PHASE1A_MODELS, LMS_PHASE1B_MODELS, LMS_ONBOARDING_MODELS, LMS_EMAIL_MODELS, LMS_MOODLE_QUIZ_MODELS, LmsAuditLog, LmsEmailLog, LmsConnectionCheck, LmsOnboarding, LmsRegistrationCode, LmsContext, LmsDeepLinkSession, LmsGradeSyncJob, LmsHandoffCode, LmsLaunchToken, LmsMicDaily, LmsOrgSettings, LmsPlatform, LmsResourceLink, LmsSuppressedIdentity, LmsToolKey } from '../integrations/lms/models';
 import { ClassEnrollment } from '../models/ClassEnrollment';
 import { ReminderLog } from '../models/ReminderLog';
 import { SignInEvent } from '../models/SignInEvent';
@@ -540,6 +540,13 @@ export const MIGRATIONS: Migration[] = [
     description: 'Parents P5: parent_invites (13-month TTL; the address hidden, with a hash); new collection, nothing removed',
     up: async () => {
       await (ParentInvite as { createIndexes(): Promise<unknown> }).createIndexes();
+    },
+  },
+  {
+    id: '2026-11-30-lms-moodle-quiz',
+    description: "Errors to work on from Moodle's own quizzes: lms_moodle_quiz_settings, lms_moodle_quiz_maps and lms_moodle_quiz_seen indexes (new collections; nothing existing touched)",
+    up: async () => {
+      for (const model of LMS_MOODLE_QUIZ_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
     },
   },
 ];

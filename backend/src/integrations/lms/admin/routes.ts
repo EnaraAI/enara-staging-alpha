@@ -33,6 +33,7 @@ import { requireLti } from '../routes';
 import { onboardingRouter } from './onboardingRoutes';
 import { problemsRouter } from './problemsRoutes';
 import { activityRouter } from './activityRoutes';
+import { moodleQuizRouter } from './moodleQuizRoutes';
 import { pageTargetRequest, resolvePageTarget } from '../core/pageTargets';
 
 // /api/lms (Phase 1a). Inert (the app's normal 404) unless LMS_LTI_ENABLED is
@@ -687,6 +688,9 @@ lmsAdminRouter.use(problemsRouter);
 // ---------------------------------------------------------------- admin
 
 lmsAdminRouter.use(authMiddleware, requireAdmin);
+
+// Errors to work on from Moodle's own quizzes (tutor track; MOODLE_QUIZ_IMPORT_PLAN v2): the read-only token, the switch, the quiz maps.
+lmsAdminRouter.use(moodleQuizRouter);
 
 // Step 2: self-serve school onboarding ("New school", the invite, the school
 // connection status page, the automatic connection check).

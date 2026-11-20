@@ -65,8 +65,9 @@ test('the flags manifest accepts exactly ENARA_ENGINE_V2 (tutor engine, comma li
   assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { ENARA_ENGINE_V2: 'a b' } }] }), /short plain string/);
   // The real manifest: ESL5 setting + planner2c on lms-test; the kids pack stays off.
   // Owner decision (20 Nov): without graderV2, so LMS assignment auto-grading on lms-test stays as it is; learner memory phases 1-4 (workOn, sessionMemory, learnerProfile, whatWorks) on lms-test only.
+  // Owner "You build it" (20 Nov): errors from Moodle quizzes (moodleQuiz); a school must still save a read-only token and switch it on.
   const real = manifestFlags(m).ENARA_ENGINE_V2;
-  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks');
+  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks,moodleQuiz');
   for (const off of ['kidsPack', 'all', 'graderV2']) assert.ok(!real.split(',').includes(off), off);
 });
 
