@@ -1079,6 +1079,10 @@ export function shownLessonItems(history: Turn[], items: LessonItem[], scope?: s
 }
 /** planner2e fix 1: the ESL5 / track-2 / planner switches that ask for right/wrong pairs (lms-test runs esl5 + planner2); with any of them on, the prompt carries PAIR_RULE and replies
  *  go through the pair check (a "wrong" sentence that is acceptable English is removed). All off: exactly as before. */
+/** planner2f (PLN2g: time lessons never taught quarter past / to): a lesson about clock times gets the clock words once, with their clock times. */
+export const CLOCK_TIMES_LINE = 'Clock times in this lesson: teach each clock word once with its time before asking for it: seven o\'clock (7:00), half past seven (7:30), quarter past seven (7:15), quarter to eight (7:45, fifteen minutes BEFORE eight). Practise quarter past and quarter to, not only o\'clock.';
+export const clockLesson = (spec?: { objectives?: string[]; successCriteria?: string[]; vocabulary?: string[] }): boolean =>
+  /\b(quarter (past|to)|half past|o'clock|what time|clock times?|telling (the )?time)\b/i.test([...(spec?.objectives ?? []), ...(spec?.successCriteria ?? []), ...(spec?.vocabulary ?? [])].join(' | '));
 export const pairsAsked = (): boolean => ['releaseAfterTwo', 'liveError', 'ruleBank', 'planner2'].some((f) => engineV2(f as never)); // not clarity/levelExplicit alone: their off-parity tests pin the pre-ESL5 prompt
 // r4: structured learning state, lesson items and the hint ceiling for this turn.
 function r4Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, scope?: string): Partial<TurnSignals> {
@@ -1925,6 +1929,7 @@ export function renderLanguageContextParts(ctx: Omit<LanguageTeachingContext, 'p
     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
     GROUNDING_RULES,
     ...(pairsAsked() ? [PAIR_RULE] : []),
+    ...(engineV2('planner2') && clockLesson(lesson.spec) ? [CLOCK_TIMES_LINE] : []),
     assessmentInstruction(),
   ].join('\n');
   const dynamic = [
@@ -1968,6 +1973,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
     GROUNDING_RULES,
     ...(pairsAsked() ? [PAIR_RULE] : []),
+    ...(engineV2('planner2') && clockLesson(lesson.spec) ? [CLOCK_TIMES_LINE] : []),
     assessmentInstruction(),
     '</language_teaching_context>',
   );
