@@ -8,6 +8,7 @@ import { Student } from '../models/Student';
 import { bandFromBirthDate, isLearnerAgeBand, LEARNER_AGE_BANDS, type LearnerAgeBand } from '../models/learnerAgeBand';
 import { readsFromEnrollments, studentGroupIds } from './enrollmentReads';
 import { Assessment as AssessmentModel } from '../models/Assessment';
+import { PAIR_RULE } from './pairCheck';
 import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
 import { graderV2On } from './graderV2';
 import { engineV2, arbitrationForced } from './engineV2';
@@ -385,6 +386,8 @@ export interface LanguageTeachingContext {
   quickCheck?: boolean;
   // planner2k: this reply is a listen-and-do step; the step replaces the lesson exercise.
   ladStep?: boolean;
+  // planner2e fix E: a task-based lesson's repeat/done stage: the reply sets the task again in a new situation, not a lesson exercise.
+  taskStep?: boolean;
   prompt: string;
 }
 export interface Teach2Context {
@@ -1120,6 +1123,9 @@ export function shownLessonItems(history: Turn[], items: LessonItem[], scope?: s
   }
   return out;
 }
+/** planner2e fix 1: the ESL5 / track-2 / planner switches that ask for right/wrong pairs (lms-test runs esl5 + planner2); with any of them on, the prompt carries PAIR_RULE and replies
+ *  go through the pair check (a "wrong" sentence that is acceptable English is removed). All off: exactly as before. */
+export const pairsAsked = (): boolean => ['releaseAfterTwo', 'liveError', 'ruleBank', 'planner2'].some((f) => engineV2(f as never)); // not clarity/levelExplicit alone: their off-parity tests pin the pre-ESL5 prompt
 // r4: structured learning state, lesson items and the hint ceiling for this turn.
 function r4Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, scope?: string): Partial<TurnSignals> {
   const learning = deriveLearningState(history, scope);
@@ -1132,7 +1138,9 @@ function r4Signals(text: string, history: Turn[], learnerResponse: LearnerRespon
   const nextLessonItem = unsatisfied.find((i) => i.id !== activeLessonItem?.id && !shown.has(i.id));
   const exerciseRequest = learnerResponse !== 'answer' && learnerResponse !== 'answer_request' && EXERCISE_REQUEST.test(text);
   // Asked for an exercise: the open lesson item if one is still unanswered, else the next one.
-  const presentLessonItem = exerciseRequest ? (activeLessonItem && unsatisfied.includes(activeLessonItem) ? activeLessonItem : nextLessonItem) : undefined;
+  // planner2e (owner: never name an item the learner already answered): the open item is presented again only if they have not tried it yet.
+  const openUntried = activeLessonItem && unsatisfied.includes(activeLessonItem) && !(engineV2('planner2') && learning.attemptsOnItem > 0);
+  const presentLessonItem = exerciseRequest ? (openUntried ? activeLessonItem : nextLessonItem) : undefined;
   const attempts = attemptsOnCurrentTask(history, scope);
   const hintLevel = selectHintLevel(learning, {
     answerRequestBeforeAttempt: learnerResponse === 'answer_request' && attempts === 0,
@@ -1753,8 +1761,11 @@ export function ownSentenceNow(ctx: Pick<LanguageTeachingContext, 'signals' | 'm
 /** The lesson point an own sentence should use: the open item's success criterion, else the lesson's first one. */
 const targetPoint = (ctx: Pick<LanguageTeachingContext, 'signals' | 'lesson'>): string => {
   const crit = ctx.lesson.spec?.successCriteria ?? []; const c = ctx.signals.activeLessonItem?.criteria?.[0];
-  return (c && crit[c - 1]) || crit[0] || ctx.lesson.spec?.objectives?.[0] || 'today\'s point';
+  const p = (c && crit[c - 1]) || crit[0] || ctx.lesson.spec?.objectives?.[0] || 'today\'s point';
+  return engineV2('planner2') ? pointPhrase(p) : p;
 };
+/** planner2e fix C (PLN2f: "using Uses and to add an idea"): a success criterion read as the point itself, without its leading verb. */
+export const pointPhrase = (p: string): string => p.trim().replace(/^(?:the learner\s+)?(?:can\s+)?(?:correctly\s+)?(?:uses?|writes?|says?|chooses?|puts?|makes?|forms?|knows?|gives?|names?|spells?|asks?|answers?|describes?|joins?|identif(?:y|ies)|recogni[sz]es?|applies|apply)\s+/i, '').replace(/[\s.]+$/, '') || p;
 export const RELEASED_EXCEPT = 'Apart from the item whose answer is released above, never write the answer to an open lesson exercise.';
 /** Conflict scan (ESL5): another instruction sets this reply's one task, so the levelExplicit/ruleFirst rule line must not add a second one. */
 const ruleTaskElsewhere = (ctx: Omit<LanguageTeachingContext, 'prompt'>): boolean =>
@@ -1959,6 +1970,7 @@ export function renderLanguageContextParts(ctx: Omit<LanguageTeachingContext, 'p
     registerLine(band),
     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
     GROUNDING_RULES,
+    ...(pairsAsked() ? [PAIR_RULE] : []),
     assessmentInstruction(),
   ].join('\n');
   const dynamic = [
@@ -2001,6 +2013,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
     registerLine(band),
     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
     GROUNDING_RULES,
+    ...(pairsAsked() ? [PAIR_RULE] : []),
     assessmentInstruction(),
     '</language_teaching_context>',
   );
@@ -2233,6 +2246,9 @@ export async function currentKeyVerdict(params: { institutionId?: string; curric
 }
 
 /** planner2k: in a listen-and-do step (listen, do, chant) with kids-pack content, the step replaces the lesson exercise: these moves are dropped. */
+/** planner2e fix E (PLN2f teacher score): after language focus, the task-based lesson returns to a real task, not to gap-fill drills. */
+export const TASK_STEP_DROPPED = new Set<MoveId>(['present_lesson_item', 'independent_practice', 'general_practice', 'distinct_example']);
+export const TASK_STEP_LINE = 'TASK AGAIN (set by the system): after the language focus, this reply sets the real-life task again in a NEW situation that needs the fixed form (one short role-play turn with a real goal, as in the task stage), so they use the fix inside the task. This overrides any instruction above to present a lesson exercise or a gap-fill item. If the answer-release instruction above applies, give that first; its one new item is this new task turn.';
 export const LAD_STEP_DROPPED = new Set<MoveId>(['present_lesson_item', 'independent_practice', 'general_practice', 'comprehension_check', 'distinct_example', 'restate_task']);
 export const LAD_STEP_LINE = 'LISTEN AND DO (set by the system): this reply is ONLY the listen-and-do step in the learning focus above (the story, ONE instruction, or the chant), in at most 3 short sentences. Do not give a lesson exercise, a fill-in item, a rule or a right/wrong pair in this reply. This overrides any instruction above to give an exercise or an item.';
 /** planner2 quick check: moves that teach or correct, removed in the quick-check reply. */
@@ -2262,6 +2278,8 @@ export async function buildLanguageTeachingContext(params: {
   quickCheck?: boolean;
   // planner2k: this turn is a listen-and-do step (listen, do or chant) with kids-pack content: the step replaces the exercise.
   ladStep?: boolean;
+  // planner2e fix E: a task-based lesson's repeat/done stage: the reply sets the task again in a new situation, not a lesson exercise.
+  taskStep?: boolean;
 }): Promise<LanguageTeachingContext | null> {
   try {
     if (!params.curriculumId) return null;
@@ -2300,7 +2318,8 @@ export async function buildLanguageTeachingContext(params: {
     const signals = adjusted.signals;
     // planner2 quick check: only presenting and recording; every teaching or correcting move is dropped for these 3 items.
     const ladStep = Boolean(params.ladStep) && engineV2('planner2') && engineV2('kidsPack') && !quickCheck;
-    const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : ladStep ? adjusted.moves.filter((m) => !LAD_STEP_DROPPED.has(m.id)) : adjusted.moves;
+    const taskStep = Boolean(params.taskStep) && engineV2('planner2') && !quickCheck && !ladStep;
+    const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : ladStep ? adjusted.moves.filter((m) => !LAD_STEP_DROPPED.has(m.id)) : taskStep ? adjusted.moves.filter((m) => !TASK_STEP_DROPPED.has(m.id)) : adjusted.moves;
     const base0 = lengthTarget(learner.ageBand, learner.proficiency.value);
     // r2: a clarification-only turn is one short question, so a tighter target.
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
@@ -2314,10 +2333,10 @@ export async function buildLanguageTeachingContext(params: {
     const { explicit, ruleFirst } = quickCheck ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
     const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}), ...(teach2 ? { teach2 } : {}) } as const;
     const parts0 = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
-    const tail = quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : '';
+    const tail = quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
     const parts = parts0 && tail ? { ...parts0, dynamic: `${parts0.dynamic}\n\n${tail}` } : parts0;
     const prompt = renderLanguageContextPrompt(base);
-    return { ...base, ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), ...(parts ? { parts } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt };
+    return { ...base, ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), ...(taskStep ? { taskStep: true } : {}), ...(parts ? { parts } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt };
   } catch (error) {
     logger.warn('language_context_failed', { error: serializeError(error) });
     return null;

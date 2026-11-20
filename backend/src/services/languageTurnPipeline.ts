@@ -4,7 +4,7 @@
 // channel stops using the shared functions or if the policy version differs between them.
 import {
   buildLanguageTeachingContext, finalizeLanguageTurn, guardedItems, independentSuccessItem, turnEvidence, LANGUAGE_CONTEXT_VERSION,
-  isClosingTurn, knownKey, ownSentenceNow, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk, learnerAsks, CLOSING_ASK_SENTENCE,
+  isClosingTurn, knownKey, ownSentenceNow, pairsAsked, askedForRule, askedNewExample, taskInvitation, enforceSingleAsk, learnerAsks, CLOSING_ASK_SENTENCE,
   type LanguageTeachingContext, type LanguageTurnEvidence,
 } from './languageTeachingContext';
 import { recordProfileTurn } from './learnerLanguageProfile';
@@ -12,6 +12,7 @@ import { engineV2 } from './engineV2';
 import { stripPreAttemptModels, stripCopyReadyModels, isSuccess, isFailure, type StrippedReply } from './languageLearningState';
 import { exampleGuardHits, removeGuardHits, ruleLinePostCheck, GUARD_REGEN_REASON, type GuardHit } from './teachingQuality';
 import { ruleBankEntry } from './ruleBank';
+import { removeFalseWrongs } from './pairCheck';
 
 /** TRACK 2 (exampleGuard, plan §2): the guard check on its own (no change to the text), for the one regeneration in the chat path and for the harness. */
 export function exampleGuardCheck(language: LanguageTeachingContext, answer: string, learnerText: string): GuardHit[] {
@@ -45,6 +46,10 @@ export type ClosingAskStatus = 'added' | 'deferred' | 'folded';
 export const CLOSING_FOLD_AFTER = 3;
 const OWN_SENTENCE_SET = /\bwrite one sentence about\b/i;
 /** reviewOpen: the closing item asked when the model set no task at all (new situation, same point; one task). */
+/** planner2e fix A: the reply already sets a task: an invitation, or a "Now you: write ..." / "Join the two sentences ..." style instruction. */
+const TASK_VERBS = 'write|say|make|join|combine|complete|tell|use|choose|answer|type|fill|put|ask|describe|try|spell|read|point|draw|find|order|match|change|correct';
+const TASK_SENTENCE = new RegExp(`(?:^|[.!?:]\\s+|\\n)\\s*(?:(?:now|then|next|ok|okay)[,\\s]+)?(?:(?:you|your turn|try|on your own|now you)\\s*[:,!.]\\s*)?(?:${TASK_VERBS})\\b`, 'i');
+export const setsTask = (text: string): boolean => Boolean(taskInvitation(text)) || TASK_SENTENCE.test(text);
 export const REVIEW_CLOSE_FALLBACK = 'Now write one new sentence about a place you visited, using the same point in this new situation.';
 const FOLDED = /^Rule in one line:/;
 const ruleLineFor = (language: LanguageTeachingContext): string | undefined => {
@@ -65,6 +70,12 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
     if (pc.problems.length) postCheck = pc.problems;
     if (pc.problems.includes('pair_identical') && pc.pair) text = text.replace(new RegExp(`\\bWrong\\s*:\\s*\\**["“]?${pc.pair.wrong.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["”]?\\**\\.?`, 'i'), '').replace(/[ \t]{2,}/g, ' ').trim();
   }
+  // planner2e fix 1: a right/wrong pair whose "wrong" sentence is acceptable English (a meaning, joining-word, pronoun or politeness swap,
+  // a statement question, a shorter sentence) loses that sentence: labelling good English wrong teaches something false.
+  if (pairsAsked()) {
+    const pc = removeFalseWrongs(text);
+    if (pc.removed.length) { text = pc.text; postCheck = [...(postCheck ?? []), ...pc.removed.map((r) => `pair_not_wrong:${r}`)]; }
+  }
   const guarded = stripPreAttemptModels(text, guardedItems(language), learnerText, [...(language.lesson.spec?.vocabulary ?? []), ...(language.lesson.spec?.examples ?? [])]);
   if (guarded.removed.length) { text = guarded.text; removed += guarded.removed.length; }
   const copy = stripCopyReadyModels(text, learnerText);
@@ -79,7 +90,8 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
     if (one.droppedClosing) text = one.text;
     const asks = learnerAsks(text);
     if (asks.length && asks.every((x) => x.kind === 'closing')) text = text.replace(CLOSING_ASK_SENTENCE, '').replace(/\n{3,}/g, '\n\n').trim();
-    if (!learnerAsks(text).length) text = `${text.trimEnd()}\n\n${REVIEW_CLOSE_FALLBACK}`;
+    // planner2e fix A (PLN2f: two tasks in one reply): a task the ask detector misses ("Now you: write ...", "Join the two sentences ...") is still a task.
+    if (!learnerAsks(text).length && !(engineV2('planner2') && setsTask(text))) text = `${text.trimEnd()}\n\n${REVIEW_CLOSE_FALLBACK}`;
     closingAsk = 'added';
   } else if (language.research && isClosingTurn(language.research) && (engineV2('closing') || engineV2('shortRecap'))) {
     const shortRecap = engineV2('shortRecap');
