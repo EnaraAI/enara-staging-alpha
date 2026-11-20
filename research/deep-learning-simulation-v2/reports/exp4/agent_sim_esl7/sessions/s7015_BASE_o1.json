@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2.5,
+   "W1": 1.5,
    "W2": 0,
    "C1": 0,
    "C2": 3
@@ -1663,7 +1663,112 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2.5: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 0: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 3: there is / there are needs is or are after \"there\". Independent correct productions so far: 2.\nItems this learner answered in session 1: \"Complete: \"___ three windows in my room.\"\" | \"Complete: \"___ a big table in the kitchen.\"\" | \"Then try again.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour start \"There are\" is right. One word in \"There are two chair in my kitchen.\" needs a change. Remember: a word for more than one thing usually has a special ending.\n\nPlease write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nThere are two chair in my kitchen.\nFACT: the last learner message contained the error of W1 (keeps the noun singular after a number (\"There are three book.\")).\n\nTUTOR TURN TO JUDGE:\nYour start \"There are\" is right. The word is \"chairs\", with -s, because there are two.\n\nRight: There are two eggs in the bowl.\nWrong: There are two egg in the bowl.\n\nNow try one on your own. Complete with the word book: \"There are three ___ on the table.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2.5: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 0: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 3: there is / there are needs is or are after \"there\". Independent correct productions so far: 2.\nItems this learner answered in session 1: \"Complete: \"___ three windows in my room.\"\" | \"Complete: \"___ a big table in the kitchen.\"\" | \"Then try again.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour start \"There are\" is right. One word in \"There are two chair in my kitchen.\" needs a change. Remember: a word for more than one thing usually has a special ending.\n\nPlease write the sentence again.\n\nLEARNER'S LAST MESSAGE:\nThere are two chair in my kitchen.\nFACT: the last learner message contained the error of W1 (keeps the noun singular after a number (\"There are three book.\")).\n\nTUTOR TURN TO JUDGE:\nYour start \"There are\" is right. The word is \"chairs\", with -s, because there are two.\n\nRight: There are two eggs in the bowl.\nWrong: There are two egg in the bowl.\n\nNow try one on your own. Complete with the word book: \"There are three ___ on the table.\"",
+   "stateBefore": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2.5,
+     "W2": 0,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is \"chairs\", with -s, because there are two."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: There are two eggs in the bowl. Wrong: There are two egg in the bowl."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "books",
+    "errors": {
+     "W1": "book"
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1.5,
+     "W2": 0,
+     "C1": 0,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 2
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "book",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "book",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

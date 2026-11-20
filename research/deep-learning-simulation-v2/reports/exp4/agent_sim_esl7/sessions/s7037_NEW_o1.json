@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 3,
    "W2": 0,
    "C1": 2,
    "C2": 0
@@ -1600,7 +1600,100 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 2: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Yes! Look: \"I have a pen and I have a book.\" Rule: use and to join two ideas that go together. Right: \"I like rain and I like snow.\" Wrong: \"I like rain I like snow.\" Join with and: \"I see a bird. I s\" | \"Join with and: \"I have a cat. I have a dog.\"\" | \"Yes, \"I have a cat and I have a dog.\" joins two ideas with and. Now write one sentence about a person you know, using and.\" | \"Join with but: \"The bus is cheap. It is slow.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, your sentence is right.\nExample: \"Ben is cold because it is windy.\" Rule: put the reason in the same sentence after \"because\".\nWrong: \"Ben is cold. Because it is windy.\"\nWrite one sentence about a person you know using because.\n\nLEARNER'S LAST MESSAGE:\nMy brother is tired and he works a lot.\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\")).\n\nTUTOR TURN TO JUDGE:\nYes, \"and\" joins your two ideas correctly. The task asked for because.\nJoin with because: \"We stay home. It is cold.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-conjunctions (and, but and because). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: clauses are chained with \"and\" whatever the meaning, with no full stop. Its error: chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\").\nC1 (correct) strength 2: join two clauses with and/but/because chosen by meaning, inside one sentence. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Yes! Look: \"I have a pen and I have a book.\" Rule: use and to join two ideas that go together. Right: \"I like rain and I like snow.\" Wrong: \"I like rain I like snow.\" Join with and: \"I see a bird. I s\" | \"Join with and: \"I have a cat. I have a dog.\"\" | \"Yes, \"I have a cat and I have a dog.\" joins two ideas with and. Now write one sentence about a person you know, using and.\" | \"Join with but: \"The bus is cheap. It is slow.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, your sentence is right.\nExample: \"Ben is cold because it is windy.\" Rule: put the reason in the same sentence after \"because\".\nWrong: \"Ben is cold. Because it is windy.\"\nWrite one sentence about a person you know using because.\n\nLEARNER'S LAST MESSAGE:\nMy brother is tired and he works a lot.\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" whatever the meaning (\"I was tired and I went to school and I was happy.\")).\n\nTUTOR TURN TO JUDGE:\nYes, \"and\" joins your two ideas correctly. The task asked for because.\nJoin with because: \"We stay home. It is cold.\"",
+   "stateBefore": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R7",
+     "belief": "W1",
+     "quote": "Yes, 'and' joins your two ideas correctly."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "We stay home because it is cold.",
+    "errors": {
+     "W1": "We stay home and it is cold."
+    }
+   },
+   "applied": [
+    "R7:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "conj",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "We stay home and it is cold.",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W1",
+    "text": "We stay home and it is cold.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

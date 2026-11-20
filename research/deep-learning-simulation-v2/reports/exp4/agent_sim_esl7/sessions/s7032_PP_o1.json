@@ -864,7 +864,102 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2.5: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 1: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 0: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Your turn. Complete: \"This is my brother. ___ is twelve.\"\" | \"Now try a new one. Complete: \"This is my grandmother. ___ is very kind.\"\" | \"Yes, She! Grandmother is a woman, so we use She: \"This is my grandmother. She is very kind.\" Well done. Now your turn. Write two sentences about a person in your family. Start with \"This is my ...\" an\" | \"Good, you used \"This is my ...\" and \"She is kind\" correctly! She is right because a brother's wife is a woman. But check the spelling of the family word. Some letters are missing. Hint: it looks like \"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood! \"He is tall.\" is correct, because brother is a boy. But the spelling of \"brthr\" is not quite right. Hint: it starts with br and has the letters o and e in it: br-o-th-e-r. Try again: write your sentence with the correct word.\n\nLEARNER'S LAST MESSAGE:\nThis is my brthr. He is tall.\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\nLet me show you the spelling. The word is brother: b-r-o-t-h-e-r. It has an o after br, and an e before the last r. So the sentence is: This is my brother. He is tall. Now you try a new one. Write two sentences about your mother or your father: This is my ... and then He is ... or She is ... ."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2.5: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 1: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 0: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Your turn. Complete: \"This is my brother. ___ is twelve.\"\" | \"Now try a new one. Complete: \"This is my grandmother. ___ is very kind.\"\" | \"Yes, She! Grandmother is a woman, so we use She: \"This is my grandmother. She is very kind.\" Well done. Now your turn. Write two sentences about a person in your family. Start with \"This is my ...\" an\" | \"Good, you used \"This is my ...\" and \"She is kind\" correctly! She is right because a brother's wife is a woman. But check the spelling of the family word. Some letters are missing. Hint: it looks like \"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood! \"He is tall.\" is correct, because brother is a boy. But the spelling of \"brthr\" is not quite right. Hint: it starts with br and has the letters o and e in it: br-o-th-e-r. Try again: write your sentence with the correct word.\n\nLEARNER'S LAST MESSAGE:\nThis is my brthr. He is tall.\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\nLet me show you the spelling. The word is brother: b-r-o-t-h-e-r. It has an o after br, and an e before the last r. So the sentence is: This is my brother. He is tall. Now you try a new one. Write two sentences about your mother or your father: This is my ... and then He is ... or She is ... .",
+   "stateBefore": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2.5,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is brother: b-r-o-t-h-e-r."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "This is my mother. She is kind.",
+    "errors": {
+     "W1": "This is my mther. She is kind."
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2.5,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "This is my mther. She is kind.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "This is my mther. She is kind.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

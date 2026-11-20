@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 1,
+   "C1": 2,
    "C2": 0
   },
   "start": {
@@ -1629,7 +1629,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 3: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Write has or have: My friend ___ a funny hat.\" | \"Complete: \"My cousin ___ brown eyes.\" (has / have)\" | \"Now write one sentence about a person you know. Use has with hair or eyes.\" | \"Write two sentences about a famous actor: one about hair or eyes and one about personality.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! \"My friend has long black hair.\" is a complete sentence with has.\n\nNow write one sentence about a person you know. Use has for eyes or another feature.\n\nLEARNER'S LAST MESSAGE:\nMy sister has big brown eyes.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! \"My sister has big brown eyes.\" uses has with eyes. Good work.\n\nNow write one sentence about what your sister is like. Use a describing word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-appearance (describing appearance). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: adjectives follow the noun. Its error: puts appearance adjectives after the noun (\"She has hair long black.\").\nC1 (correct) strength 3: appearance adjectives go before the noun (long black hair). Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Write has or have: My friend ___ a funny hat.\" | \"Complete: \"My cousin ___ brown eyes.\" (has / have)\" | \"Now write one sentence about a person you know. Use has with hair or eyes.\" | \"Write two sentences about a famous actor: one about hair or eyes and one about personality.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! \"My friend has long black hair.\" is a complete sentence with has.\n\nNow write one sentence about a person you know. Use has for eyes or another feature.\n\nLEARNER'S LAST MESSAGE:\nMy sister has big brown eyes.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! \"My sister has big brown eyes.\" uses has with eyes. Good work.\n\nNow write one sentence about what your sister is like. Use a describing word.",
+   "stateBefore": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes! \"My sister has big brown eyes.\" uses has with eyes."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My sister has big brown eyes. (own sentence)"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [],
+    "correct": "My sister is kind.",
+    "errors": {}
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "appear",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My sister is kind.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My sister is kind.",
+    "probes": []
+   }
   }
  ],
  "assess": {

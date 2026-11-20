@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 0.5,
+   "W1": 0,
    "W2": 0,
    "C1": 2,
    "C2": 3
@@ -1735,7 +1735,117 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-a-an (a and an). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0.5: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\nItems this learner answered in session 1: \"Write a or an: She has ___ orange in her bag. (answer with only the missing word)\" | \"Yes, \"an\" is right. Look: \"an egg\" (egg starts with a vowel sound) and \"a pen\" (pen starts with a consonant sound). Rule: use \"an\" before a vowel sound and \"a\" before a consonant sound. Right: \"I have\" | \"Yes, \"a\" is correct before \"doctor\". Now write one sentence about a person you know, using a or an.\" | \"Now write this sentence again with the missing word: My uncle is pilot.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"The\" is right.\n\"I have a bike. The bike is red.\" is right; \"I have a bike. Bike is red.\" is wrong. Use \"the\" for a thing you already mentioned.\nWrite one sentence about a person you know using \"the\" for something already mentioned.\n\nLEARNER'S LAST MESSAGE:\nI have cat. Cat is black.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nEnglish puts a small word (a, an or the) before one countable thing.\nRight: \"He has a hat.\" Wrong: \"He has hat.\"\nWrite this again with the missing word: \"My friend has pen.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-a-an (a and an). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0.5: no a/an is needed before a singular noun. Its error: leaves out a/an (\"She is teacher\").\nW2 (wrong) strength 0: a and an are the same; \"a\" (or \"the\") goes everywhere. Its error: uses \"a\" where \"an\" is needed (\"a apple\").\nC1 (correct) strength 2: a singular countable noun needs a/an (or the). Independent correct productions so far: 1.\nC2 (correct) strength 3: an before a vowel sound, a before a consonant sound. Independent correct productions so far: 3.\nItems this learner answered in session 1: \"Write a or an: She has ___ orange in her bag. (answer with only the missing word)\" | \"Yes, \"an\" is right. Look: \"an egg\" (egg starts with a vowel sound) and \"a pen\" (pen starts with a consonant sound). Rule: use \"an\" before a vowel sound and \"a\" before a consonant sound. Right: \"I have\" | \"Yes, \"a\" is correct before \"doctor\". Now write one sentence about a person you know, using a or an.\" | \"Now write this sentence again with the missing word: My uncle is pilot.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"The\" is right.\n\"I have a bike. The bike is red.\" is right; \"I have a bike. Bike is red.\" is wrong. Use \"the\" for a thing you already mentioned.\nWrite one sentence about a person you know using \"the\" for something already mentioned.\n\nLEARNER'S LAST MESSAGE:\nI have cat. Cat is black.\nFACT: the last learner message contained the error of W1 (leaves out a/an (\"She is teacher\")).\n\nTUTOR TURN TO JUDGE:\nEnglish puts a small word (a, an or the) before one countable thing.\nRight: \"He has a hat.\" Wrong: \"He has hat.\"\nWrite this again with the missing word: \"My friend has pen.\"",
+   "stateBefore": {
+    "form": "aan",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0.5,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true,
+    "sec1": "articles"
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "English puts a small word (a, an or the) before one countable thing."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"He has a hat.\" Wrong: \"He has hat.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "aan",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 3
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true,
+    "sec1": "articles"
+   }
+  },
+  {
+   "session": 2,
+   "learner": "a",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "a",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

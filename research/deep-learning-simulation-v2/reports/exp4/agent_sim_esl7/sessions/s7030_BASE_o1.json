@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 0,
    "C2": 0
@@ -1591,7 +1591,105 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 0: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write a or an: I see ___ ant on the table.\" | \"Write a or the: We have a garden. ___ garden is small.\" | \"Then try the exercise again.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour first sentence is right: \"I see a tree.\" Now look again at \"Tree is big.\" The tree is already in your story. English shows this with a small word.\n\nWrite the second sentence again.\n\nLEARNER'S LAST MESSAGE:\nTree is big.\nFACT: the last learner message contained the error of W1 (uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\")).\n\nTUTOR TURN TO JUDGE:\nYou tried twice, so here is the answer. Use \"The\" before \"tree\": the tree is already in your story.\n\nExample: I see a bird. The bird is small. Bird is small.\n\nNow one on your own. Complete: \"I have a bike. ___ bike is new.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-article-the (the). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: \"the\" goes with general nouns and is left out for known things, as with Arabic al-. Its error: uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\").\nC1 (correct) strength 0: use \"the\" for a thing already mentioned or known to both people (and no \"the\" with general nouns). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write a or an: I see ___ ant on the table.\" | \"Write a or the: We have a garden. ___ garden is small.\" | \"Then try the exercise again.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour first sentence is right: \"I see a tree.\" Now look again at \"Tree is big.\" The tree is already in your story. English shows this with a small word.\n\nWrite the second sentence again.\n\nLEARNER'S LAST MESSAGE:\nTree is big.\nFACT: the last learner message contained the error of W1 (uses \"the\" with a general noun or leaves it out for a known thing (\"The life is hard.\" / \"I saw a film. Film was good.\")).\n\nTUTOR TURN TO JUDGE:\nYou tried twice, so here is the answer. Use \"The\" before \"tree\": the tree is already in your story.\n\nExample: I see a bird. The bird is small. Bird is small.\n\nNow one on your own. Complete: \"I have a bike. ___ bike is new.\"",
+   "stateBefore": {
+    "form": "the",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "You tried twice, so here is the answer. Use 'The' before 'tree'"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Use 'The' before 'tree': the tree is already in your story."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "The",
+    "errors": {
+     "W1": ""
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "the",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "The",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "The",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

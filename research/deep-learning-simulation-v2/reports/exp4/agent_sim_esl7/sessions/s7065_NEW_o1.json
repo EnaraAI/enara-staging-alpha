@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -1683,7 +1683,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 3: many + countable plural, much + uncountable. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now write much or many: \"How ___ pencils are in the box?\"\" | \"\"much\" does not fit here. Some words go with things you can count, and others do not. Right: \"How many chairs are in the room?\" Wrong: \"How much chairs are in the room?\" Try again: \"How ___ pencils ar\" | \"Write much or many: How ___ bottles are there?\" | \"Write one sentence about a person you know using many.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a little\" is right.\n\"We do not have much milk\" is right; \"We do not have many milk\" is wrong. Use \"much\" with things you cannot count.\nWrite one sentence about a person you know using much.\n\nLEARNER'S LAST MESSAGE:\nMy brother does not drink much coffee.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"much coffee\" is right: coffee cannot be counted.\nWrite much or many: \"We do not have ___ bottles.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-much-many (much and many). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: one word (like Arabic kathir) works for both. Its error: uses much with countable plurals or many with uncountable nouns (\"How much books?\" / \"many water\").\nC1 (correct) strength 3: many + countable plural, much + uncountable. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now write much or many: \"How ___ pencils are in the box?\"\" | \"\"much\" does not fit here. Some words go with things you can count, and others do not. Right: \"How many chairs are in the room?\" Wrong: \"How much chairs are in the room?\" Try again: \"How ___ pencils ar\" | \"Write much or many: How ___ bottles are there?\" | \"Write one sentence about a person you know using many.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"a little\" is right.\n\"We do not have much milk\" is right; \"We do not have many milk\" is wrong. Use \"much\" with things you cannot count.\nWrite one sentence about a person you know using much.\n\nLEARNER'S LAST MESSAGE:\nMy brother does not drink much coffee.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"much coffee\" is right: coffee cannot be counted.\nWrite much or many: \"We do not have ___ bottles.\"",
+   "stateBefore": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"much coffee\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My brother does not drink much coffee. (own sentence)"
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"much coffee\" is right: coffee cannot be counted."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "many",
+    "errors": {
+     "W1": "much"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "muchmany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "many",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "many",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
