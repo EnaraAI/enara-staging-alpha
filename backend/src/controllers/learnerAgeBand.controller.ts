@@ -7,7 +7,7 @@ import { Institution } from '../models/Institution';
 import { Student } from '../models/Student';
 import { bandFromBirthDate, isLearnerAgeBand, LEARNER_AGE_BANDS, type LearnerAgeBand } from '../models/learnerAgeBand';
 import { recordAudit } from '../services/auditTrail';
-import { pickGroupBand, resolveTrustedAgeBand } from '../services/languageTeachingContext';
+import { birthDateBandOn, pickGroupBand, resolveTrustedAgeBand } from '../services/languageTeachingContext';
 import { groupIdsByStudent, readsFromEnrollments } from '../services/enrollmentReads';
 
 // Trusted learner age band (Option B). Writes: Workspace Admin ('admin') only.
@@ -53,7 +53,7 @@ export const getAgeBands = asyncHandler(async (req: AuthRequest, res: Response) 
     students: students.map((s) => {
       const group = groups ? pickGroupBand(groups.get(s.id) ?? [], (id) => classBand.get(id)) : null;
       const cls = group ? group.band : s.batchId ? classBand.get(s.batchId) : undefined;
-      const effective = resolveTrustedAgeBand(settings, s.learnerAgeBand, cls, getConfig().enrollment.ageFromBirthDate ? bandFromBirthDate((s as { birthDate?: unknown }).birthDate) : undefined);
+      const effective = resolveTrustedAgeBand(settings, s.learnerAgeBand, cls, birthDateBandOn() ? bandFromBirthDate((s as { birthDate?: unknown }).birthDate) : undefined);
       return {
         id: s.id,
         name: s.name,

@@ -54,10 +54,27 @@ test('the flags manifest accepts PARENT_* switches (Parents P1) and still refuse
   assert.equal(real.PARENT_EMAILS_ENABLED, 'true');
 });
 
+test('the flags manifest accepts exactly ENARA_ENGINE_V2 (tutor engine, comma list) and no other ENARA_* name', () => {
+  const m = manifest();
+  const list = 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,graderV2,planner2';
+  assert.deepEqual(manifestFlags({ ...m, features: [{ name: 't', flags: { ENARA_ENGINE_V2: list } }] }), { ENARA_ENGINE_V2: list });
+  for (const bad of ['ENARA_SECRET', 'ENARA_API_KEY', 'ENARA_ENGINE_V2_TOKEN', 'ENARA_ENGINE_V3', 'ENARA_EC_CHECK', 'ENARA_JWT_SECRET', 'ENARA_DB_URI', 'enara_engine_v2', 'ENARA_']) {
+    assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { [bad]: 'true' } }] }), /not a feature switch/, bad);
+  }
+  assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { ENARA_ENGINE_V2: 'planner2; rm -rf /' } }] }), /short plain string/);
+  assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { ENARA_ENGINE_V2: 'a b' } }] }), /short plain string/);
+  // The real manifest: ESL5 setting + planner2c on lms-test; the kids pack stays off.
+  // Owner decision (20 Nov): without graderV2, so LMS assignment auto-grading on lms-test stays as it is.
+  const real = manifestFlags(m).ENARA_ENGINE_V2;
+  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2');
+  for (const off of ['kidsPack', 'all', 'graderV2']) assert.ok(!real.split(',').includes(off), off);
+});
+
 test('the flags manifest: the current lms-test set, switches only', () => {
   const flags = manifestFlags(manifest());
   for (const k of ['LMS_LTI_ENABLED', 'LMS_GRADE_PASSBACK_ENABLED', 'LMS_ROSTER_SYNC_ENABLED', 'LMS_DEEP_LINKING_ENABLED', 'GRADE_LEDGER_ENABLED', 'MAINTENANCE_ENDPOINTS_ENABLED']) assert.equal(flags[k], 'true', k);
-  assert.ok(Object.values(flags).every((v) => v === 'true'));
+  // Every switch is 'true' except the tutor engine's comma list (ENARA_ENGINE_V2).
+  assert.ok(Object.entries(flags).every(([k, v]) => k === 'ENARA_ENGINE_V2' || v === 'true'));
   const m = manifest();
   for (const bad of ['LMS_KEK', 'MAINTENANCE_TOKEN', 'MAINTENANCE_CI_TOKEN', 'LMS_TOOL_BASE_URL', 'MONGODB_URI', 'JWT_SECRET', 'VERCEL_TOKEN', 'MOODLE_TEST_WS_TOKEN', 'lms_lti_enabled']) {
     assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { [bad]: 'true' } }] }), /not a feature switch/, bad);

@@ -7,9 +7,15 @@ import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
 import { bandFromBirthDate, isLearnerAgeBand, LEARNER_AGE_BANDS, type LearnerAgeBand } from '../models/learnerAgeBand';
 import { readsFromEnrollments, studentGroupIds } from './enrollmentReads';
+import { Assessment as AssessmentModel } from '../models/Assessment';
 import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
 import { graderV2On } from './graderV2';
 import { engineV2, arbitrationForced } from './engineV2';
+import { RULE_BANK, ruleBankEntry, type RuleBankEntry } from './ruleBank';
+import {
+  BAND_REGISTER, CONTRAST_EXAMPLE_LINE, confirmedSentences, FEEDBACK_LADDER_LINE, LADDER_RELEASE_AFTER, criterionFor, feedbackRung, pickModel, poolFromBankItems, poolFromLessonItems, ruleBankLine, vocabLine,
+  type BankItemLike, type FeedbackRung, type PoolItem,
+} from './teachingQuality';
 import { logger, serializeError } from '../utils/logging';
 import {
   contrastPairClaimMismatch,
@@ -91,7 +97,7 @@ export interface LanguageLearnerContext {
 // r3: coarse age band. Only resolveTrustedAgeBand() produces it, from server-side
 // records; never from grade, CEFR, writing, names, client input or benchmark labels.
 export type AgeBand = 'child' | 'teen' | 'adult' | 'unknown';
-export type AgeBandSource = 'school_setting_adult_learners' | 'student_age_band' | 'student_birth_date' | 'class_age_band' | 'no_trusted_learner_age_source' | 'invalid_school_setting';
+export type AgeBandSource = 'school_setting_adult_learners' | 'student_age_band' | 'student_birth_date' | 'class_age_band' | 'kids_mode' | 'no_trusted_learner_age_source' | 'invalid_school_setting';
 export interface TrustedAgeBand {
   band: AgeBand;
   status: 'known' | 'unknown';
@@ -107,14 +113,29 @@ export interface TrustedAgeBand {
 //      input or benchmark labels. Only exact enum values count; an invalid
 //      student value falls through to a valid class value. A malformed
 //      adultLearners is never treated as true.
-export function resolveTrustedAgeBand(learningSettings: unknown, studentBand?: unknown, classBand?: unknown, birthDateBand?: unknown): TrustedAgeBand {
+//   Birth date: one rule for the LMS (ENROLLMENT_AGE_FROM_BIRTHDATE) and the tutor (kidsBand / planner2): bandFromBirthDate
+//   (under 13 child, 13-17 teen, 18+ adult), checked after the student's own band and before the class band.
+//   kidsBand / planner2 only, when nothing else is set: the student is on the Enara Kids interface (Student.uiMode 'kids') -> child.
+// Fourth argument (integration of the LMS and tutor lines): either the LMS Q8
+// birth-date band (ENROLLMENT_AGE_FROM_BIRTHDATE, a LearnerAgeBand string, checked
+// before the class band) or the tutor `extra` object; the tutor `extra` can also be
+// passed as the fifth argument together with the LMS band.
+export type TrustedAgeBandExtra = { birthDate?: Date | string | null; uiMode?: string | null; now?: Date };
+export function resolveTrustedAgeBand(learningSettings: unknown, studentBand?: unknown, classBand?: unknown, birthDateBandOrExtra?: unknown, extraArg: TrustedAgeBandExtra = {}): TrustedAgeBand {
+  const fourthIsExtra = !!birthDateBandOrExtra && typeof birthDateBandOrExtra === 'object' && !(birthDateBandOrExtra instanceof Date);
+  const birthDateBand = fourthIsExtra ? undefined : birthDateBandOrExtra;
+  const extra: TrustedAgeBandExtra = fourthIsExtra ? (birthDateBandOrExtra as TrustedAgeBandExtra) : extraArg;
+  // One birth-date rule (PR #33 risk 1): the tutor switches use the LMS rule (bandFromBirthDate) in the LMS position, before the class band.
+  const fromBirth = isLearnerAgeBand(birthDateBand) ? birthDateBand
+    : (engineV2('kidsBand') || engineV2('planner2')) ? bandFromBirthDate(extra.birthDate ?? undefined, extra.now ?? new Date()) : undefined;
   const raw = learningSettings && typeof learningSettings === 'object' ? (learningSettings as Record<string, unknown>).adultLearners : undefined;
   if (raw === true) return { band: 'adult', status: 'known', source: 'school_setting_adult_learners' };
   if (isLearnerAgeBand(studentBand)) return { band: studentBand, status: 'known', source: 'student_age_band' };
   // Q8: the student's own age from their birth date (only when
   // ENROLLMENT_AGE_FROM_BIRTHDATE is on; callers pass undefined otherwise).
-  if (isLearnerAgeBand(birthDateBand)) return { band: birthDateBand, status: 'known', source: 'student_birth_date' };
+  if (fromBirth) return { band: fromBirth, status: 'known', source: 'student_birth_date' };
   if (isLearnerAgeBand(classBand)) return { band: classBand, status: 'known', source: 'class_age_band' };
+  if ((engineV2('kidsBand') || engineV2('planner2')) && extra.uiMode === 'kids') return { band: 'child', status: 'known', source: 'kids_mode' };
   const malformed = raw !== undefined && raw !== null && typeof raw !== 'boolean';
   return { band: 'unknown', status: 'unknown', source: malformed ? 'invalid_school_setting' : 'no_trusted_learner_age_source' };
 }
@@ -144,23 +165,36 @@ export function pickGroupBand(groupIds: string[], bandOf: (groupId: string) => u
 
 // Server-side load of the inputs, all scoped to the session's institution:
 // the student must belong to it, and the class is the student's own batch in it.
+/** Is the birth-date band used (LMS switch or a tutor switch)? The admin age-band screen and the tutor use the same answer. */
+export const birthDateBandOn = (): boolean => engineV2('kidsBand') || engineV2('planner2') || getConfig().enrollment.ageFromBirthDate;
+/** Whole years on `now` from a staff-entered birth date; undefined for a missing, invalid or future date (or an age over 120). */
+export function ageFromBirthDate(birthDate: Date | string | null | undefined, now: Date): number | undefined {
+  if (!birthDate) return undefined;
+  const bd = new Date(birthDate);
+  if (Number.isNaN(bd.getTime()) || bd.getTime() > now.getTime()) return undefined;
+  let age = now.getUTCFullYear() - bd.getUTCFullYear();
+  const m = now.getUTCMonth() - bd.getUTCMonth();
+  if (m < 0 || (m === 0 && now.getUTCDate() < bd.getUTCDate())) age -= 1;
+  return age >= 0 && age <= 120 ? age : undefined;
+}
 export async function loadTrustedAgeBand(params: { institutionId?: string; studentId?: string; learningSettings?: unknown }): Promise<TrustedAgeBand> {
   if (!params.institutionId) return resolveTrustedAgeBand(params.learningSettings);
   const student = params.studentId
-    ? await Student.findOne({ id: params.studentId, institutionId: params.institutionId }).select('+learnerAgeBand +birthDate batchId').lean()
+    ? await Student.findOne({ id: params.studentId, institutionId: params.institutionId }).select(engineV2('kidsBand') || engineV2('planner2') ? '+learnerAgeBand +birthDate batchId uiMode' : '+learnerAgeBand +birthDate batchId').lean()
     : null;
+  const tutorExtra: TrustedAgeBandExtra = { birthDate: (student as { birthDate?: Date } | null)?.birthDate, uiMode: (student as { uiMode?: string } | null)?.uiMode };
   const birthDateBand = getConfig().enrollment.ageFromBirthDate ? bandFromBirthDate((student as { birthDate?: unknown } | null)?.birthDate) : undefined;
   if (readsFromEnrollments('profile_context')) {
     // The student's groups from class_enrollments, in this school only.
     const groupIds = student ? await studentGroupIds({ id: params.studentId!, institutionId: params.institutionId }, 'profile_context') : [];
     const batches = groupIds.length ? await Batch.find({ id: { $in: groupIds }, institutionId: params.institutionId }).select('+learnerAgeBand id').lean() : [];
     const bandOf = new Map(batches.map((b) => [b.id, b.learnerAgeBand]));
-    return resolveTrustedAgeBand(params.learningSettings, student?.learnerAgeBand, pickGroupBand(groupIds, (id) => bandOf.get(id)).band, birthDateBand);
+    return resolveTrustedAgeBand(params.learningSettings, student?.learnerAgeBand, pickGroupBand(groupIds, (id) => bandOf.get(id)).band, birthDateBand, tutorExtra);
   }
   const batch = student?.batchId
     ? await Batch.findOne({ id: student.batchId, institutionId: params.institutionId }).select('+learnerAgeBand').lean()
     : null;
-  return resolveTrustedAgeBand(params.learningSettings, student?.learnerAgeBand, batch?.learnerAgeBand, birthDateBand);
+  return resolveTrustedAgeBand(params.learningSettings, student?.learnerAgeBand, batch?.learnerAgeBand, birthDateBand, tutorExtra);
 }
 
 export interface LanguageSpec {
@@ -281,6 +315,10 @@ export interface TurnSignals {
   liveTarget?: string;
   // releaseAfterTwo (ESL5): genuine failed attempts on the open item, this message included (empty, "I don't know" and copies of the prompt don't count).
   genuineFailedAttempts?: number;
+  // planner2c (PLN2c): the learner sent again a free answer (no course key, e.g. a task sentence) that was already graded wrong; it counts as a failed try.
+  repeatWrong?: number;
+  // planner2d: a child's empty answer to the open item (nothing in the gap); for a child it counts as a failed try.
+  emptyAnswer?: boolean;
   // reviewOpen (ESL5): the recall error types the previous reply opened with (read back from its stored evidence).
   prevReview?: string[];
   // fadeKnown (ESL5): criteria of this turn's item that the record shows as known (faded: no rule line, quick check), or whose quick check is being answered now.
@@ -340,7 +378,26 @@ export interface LanguageTeachingContext {
   planPrimary?: string;
   // ESL5 (reviewOpen, fadeKnown): ENARA's own stored learner record (error types still live, independent successes per point). Loaded only when one of those switches is on.
   record?: Esl5Record;
+  // TRACK 2 (ruleBank / exampleGuard / feedbackLadder / methodSelect): the rule-bank entry, the worked example chosen for this reply, the corrective-feedback
+  // rung, interleaving and the under-13 frame; and the server-side pool of items the learner will solve (NEVER rendered into the prompt).
+  teach2?: Teach2Context;
+  // planner2: this turn is inside the lesson's opening quick check.
+  quickCheck?: boolean;
+  // planner2k: this reply is a listen-and-do step; the step replaces the lesson exercise.
+  ladStep?: boolean;
   prompt: string;
+}
+export interface Teach2Context {
+  entryId?: string;
+  template?: 'grammar' | 'vocab';
+  model?: { form: string; sentence: string };
+  pool: PoolItem[];
+  rung?: FeedbackRung;
+  interleave?: { form: string; note: string; item: string };
+  kidsFrame?: boolean;
+  openTask?: boolean;
+  /** completed sentences of lesson items already solved (a confirmation may restate them) */
+  confirmed?: string[];
 }
 
 export interface LengthTarget {
@@ -418,6 +475,12 @@ export interface LanguageTurnEvidence {
   fadeFailed?: number[];
   // ownSentence (ESL5, tag only): 'asked' when this reply set the session's own-sentence task, 'feedback' when it gave feedback on it.
   ownSentence?: 'asked' | 'feedback';
+  // TRACK 2 (tags only, no learner text): rule-bank entry and template, the worked example's form, the feedback rung, interleaving, the under-13 frame;
+  // example-guard hits on the model's draft (and whether a regeneration cleared them), and post-check problems.
+  teach2?: { rule?: string; template?: 'grammar' | 'vocab'; model?: string; rung?: FeedbackRung; interleave?: true; kidsFrame?: true };
+  exampleGuardHits?: number;
+  exampleGuardRegenerated?: boolean;
+  postCheck?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -896,7 +959,7 @@ const META_REQUEST = /\b(know|word|words|say|mean|meaning|help|explain|example|e
 // r4: the learner asks for an exercise or the next item (only when it isn't an answer).
 const EXERCISE_REQUEST = /\b(exercise|practice question|quiz me|test me)\b|\b(give me|can i have|i want|let'?s (do|try)|another|one more|next)\b[^.?!]{0,30}\b(exercise|question|task|item|one)\b|تمرين|سؤال/i;
 
-export function detectTurnSignals(message: string, history: Turn[], lesson?: { title?: string; spec?: LanguageSpec }, scope?: string): TurnSignals {
+export function detectTurnSignals(message: string, history: Turn[], lesson?: { title?: string; spec?: LanguageSpec }, scope?: string, opts: { child?: boolean } = {}): TurnSignals {
   const text = message.trim();
   const learner = [...history.filter((h) => h.role === 'user').map((h) => h.content), text].slice(-3);
   const lastAssistant = [...history].reverse().find((h) => h.role === 'assistant')?.content.trim() ?? '';
@@ -947,7 +1010,14 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
     if ((lastStored as { ownSentence?: string } | null | undefined)?.ownSentence === 'asked' && inScope(lastStored, scope) && learnerResponse === 'answer') sig.ownSentence = 'feedback';
     else if (turnNo >= OWN_SENTENCE_FROM && !tags.includes('asked') && (sig.answeringCheck || sig.unpromptedSentence)) sig.ownSentence = 'ask';
   }
-  if (engineV2('releaseAfterTwo') && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope);
+  // planner2d: for a child (trusted age band), an empty answer to the open item counts as a failed try, so the answer comes after two.
+  const countEmpty = engineV2('planner2') && Boolean(opts.child);
+  if ((engineV2('releaseAfterTwo') || engineV2('feedbackLadder')) && sig.learning?.activeItem) sig.genuineFailedAttempts = genuineFailedAttempts(text, history, sig, lesson?.spec?.items ?? [], scope, countEmpty);
+  if (countEmpty && sig.learning?.activeItem && emptyAnswer(text, sig.activeLessonItem)) sig.emptyAnswer = true;
+  if (engineV2('planner2') && !sig.keyVerdict) {
+    const r = repeatedWrongAnswers(text, history, scope);
+    if (r >= 2) { sig.repeatWrong = r; sig.genuineFailedAttempts = Math.max(sig.genuineFailedAttempts ?? 0, r); }
+  }
   return sig;
 }
 
@@ -960,8 +1030,20 @@ function genuineAttempt(text: string, prevTutor: string, item: LessonItem | unde
   if (n.split(' ').length < 3) return true;
   return !prevTutor.split(/\n+|(?<=[.!?:])\s+/).map((line) => norm(line.replace(/_+/g, ' '))).some((l) => l.split(' ').length >= 3 && (l === n || l.endsWith(` ${n}`) || n.endsWith(` ${l}`)));
 }
-/** releaseAfterTwo: genuine failed attempts on the open item, counted from the stored verdicts of earlier replies, plus this message if it is a genuine answer the key does not accept. */
-export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<TurnSignals, 'learning' | 'learnerResponse' | 'keyVerdict' | 'activeLessonItem'>, items: LessonItem[], scope?: string): number {
+/** planner2d: an empty answer to the open item: nothing at all, only gap marks or punctuation ("___", "?", "..."), a note that the gap is left empty,
+ *  or the item copied back with the gap still open. "I don't know" is not empty (it is its own move). */
+const EMPTY_NOTE = /^\(?\s*(?:empty|blank|nothing|no (?:word|answer)|(?:i )?(?:leave|left) it (?:empty|blank)\b[^)]*)\s*\)?\s*\.?$/i;
+export function emptyAnswer(text: string, item?: LessonItem): boolean {
+  const t = text.trim();
+  if (!t || /^[\s_.\-\u2013\u2014?!\u2026]*$/.test(t) || EMPTY_NOTE.test(t)) return true;
+  if (!item || !/_{2,}/.test(t)) return false;
+  const k = (x: string) => x.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const body = k(item.prompt.replace(/^[^:"]{0,40}:\s*/, ''));
+  return body.length > 0 && (k(t) === body || body.endsWith(` ${k(t)}`) || k(t).endsWith(` ${body}`));
+}
+/** releaseAfterTwo: genuine failed attempts on the open item, counted from the stored verdicts of earlier replies, plus this message if it is a genuine answer the key does not accept.
+ *  countEmpty (planner2d, children only): an empty answer on the open item counts as a failed try too. */
+export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<TurnSignals, 'learning' | 'learnerResponse' | 'keyVerdict' | 'activeLessonItem'>, items: LessonItem[], scope?: string, countEmpty = false): number {
   const target = s.learning?.activeItem?.id;
   if (!target) return 0;
   let active: string | undefined; let prevTutor = ''; let n = 0;
@@ -979,18 +1061,34 @@ export function genuineFailedAttempts(text: string, history: Turn[], s: Pick<Tur
     const verdict = lt?.assessment?.verdict;
     const item = items.find((x) => `lesson:${x.id}` === active);
     const kind = classifyLearnerResponse(h.content, taskInvitation(prevTutor) ?? 'instruction');
-    if (isFailure(verdict) && genuineAttempt(h.content, prevTutor, item, kind)) n += 1;
+    if ((isFailure(verdict) && genuineAttempt(h.content, prevTutor, item, kind)) || (countEmpty && !isSuccess(verdict) && emptyAnswer(h.content, item))) n += 1;
     // ESL5 fix 2: attempts count on ONE task only. A success on it, or a reply that set a different task (the answer was released with a new item,
     // the own-sentence task was set or answered, the reviewOpen closing item was set), starts the count again, even when the stored open item
     // was not moved on (a reply without a marker keeps the old item).
     if (isSuccess(verdict) || lt?.answerReleased || lt?.ownSentence || (lt?.closingAsk === 'added' && engineV2('reviewOpen'))) n = 0;
   }
   const ok = s.keyVerdict === 'CORRECT' || s.keyVerdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
-  if (!ok && genuineAttempt(text, prevTutor, s.activeLessonItem, s.learnerResponse ?? 'no_pending_task')) n += 1;
+  if (!ok && (genuineAttempt(text, prevTutor, s.activeLessonItem, s.learnerResponse ?? 'no_pending_task') || (countEmpty && emptyAnswer(text, s.activeLessonItem)))) n += 1;
   return n;
+}
+/** planner2c: how many times in a row the learner has sent this same message, each earlier copy graded wrong by the reply after it (this one
+ *  included). A free answer (no course key) is graded only after the reply, so a repeat is the code's evidence of a failed try now. 0: not a repeat. */
+export function repeatedWrongAnswers(text: string, history: Turn[], scope?: string): number {
+  const same = (a: string) => norm(a) !== '' && norm(a) === norm(text);
+  let n = 1;
+  for (let i = history.length - 1; i >= 0; i -= 1) {
+    if (history[i].role !== 'user') continue;
+    const next = history.slice(i + 1).find((x) => x.role === 'assistant');
+    const lt = next && inScope(next.languageTurn, scope) ? next.languageTurn : undefined;
+    if (!same(history[i].content) || !isFailure(lt?.assessment?.verdict)) break;
+    n += 1;
+  }
+  return n >= 2 ? n : 0;
 }
 /** releaseAfterTwo: the reply after two genuine failed attempts gives the answer (never earlier). */
 export const RELEASE_AFTER = 2;
+/** feedbackLadder (TRACK 2, M3): the answer is released only after two failed PROMPTS (the 3rd genuine failed attempt). */
+export const releaseAfter = (): number => (engineV2('feedbackLadder') ? LADDER_RELEASE_AFTER : RELEASE_AFTER);
 export const RELEASE_TEXT = 'They have now made two real attempts on this item and it is still not right. If this answer is right after all, just confirm it and give the next item. Otherwise stop hinting: (1) state the answer to this item with a one-line reason; (2) give one right/wrong pair on the same point as plain sentences (right: ..., wrong: ...); (3) then give ONE new item on the same point, with different words, for them to do without help. Do not ask them to retry this item.';
 // ownSentence (ESL5, framework §5: focus on form inside the learner's own meaningful sentence; §6: pushed output).
 /** The second half of a session starts at the learner's 3rd message: the closing assumes a 5-message session (RESEARCH_CLOSING_TURN), and 3 = ceil(5/2). */
@@ -1007,13 +1105,31 @@ const LIVE_RULE: Record<string, string> = {
 /** liveError (ESL5, framework §3 explicit correction tied to this learner's own error; §9 expected L1 errors): the rule line, the contrast and the next item target the error type in their latest message. */
 export const LIVE_ERROR_LINE = (code: string) => `${LIVE_RULE[code] ?? ''} This takes the place of any rule line for the lesson's next sub-rule in this reply. Never write the answer to an open lesson exercise.`;
 
+/** planner2d: lesson items already shown in this session: named by a stored reply (open item, assessment item) or whose prompt appears in a tutor reply. */
+export function shownLessonItems(history: Turn[], items: LessonItem[], scope?: string): Set<string> {
+  const k = (x: string) => x.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const bodies = items.map((i) => ({ id: i.id, body: k(i.prompt.replace(/^[^:"]{0,40}:\s*/, '')) })).filter((b) => b.body.split(' ').length >= 2);
+  const out = new Set<string>();
+  for (const h of history) {
+    if (h.role !== 'assistant') continue;
+    const lt = inScope(h.languageTurn, scope) ? h.languageTurn as (StoredLearningFields & { activeItem?: { lessonItemId?: string } | null }) | null | undefined : undefined;
+    if (lt?.activeItem?.lessonItemId) out.add(lt.activeItem.lessonItemId);
+    if (lt?.assessment?.item) out.add(lt.assessment.item);
+    const text = ` ${k(h.content)} `;
+    for (const b of bodies) if (text.includes(` ${b.body} `)) out.add(b.id);
+  }
+  return out;
+}
 // r4: structured learning state, lesson items and the hint ceiling for this turn.
 function r4Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, scope?: string): Partial<TurnSignals> {
   const learning = deriveLearningState(history, scope);
   const items = lesson?.spec?.items ?? [];
   const activeLessonItem = learning.activeItem?.lessonItemId ? items.find((i) => i.id === learning.activeItem!.lessonItemId) : undefined;
   const unsatisfied = items.filter((i) => !learning.satisfiedLessonItems.includes(i.id));
-  const nextLessonItem = unsatisfied.find((i) => i.id !== activeLessonItem?.id);
+  // planner2d (PLN2f item repeats): the next item is one not yet shown in this session. An item shown before but never credited (for example a
+  // right answer the key did not list, or one left after a wrong try) is not offered again as "next"; with none left, the tutor writes a new one.
+  const shown = engineV2('planner2') ? shownLessonItems(history, items, scope) : new Set<string>();
+  const nextLessonItem = unsatisfied.find((i) => i.id !== activeLessonItem?.id && !shown.has(i.id));
   const exerciseRequest = learnerResponse !== 'answer' && learnerResponse !== 'answer_request' && EXERCISE_REQUEST.test(text);
   // Asked for an exercise: the open lesson item if one is still unanswered, else the next one.
   const presentLessonItem = exerciseRequest ? (activeLessonItem && unsatisfied.includes(activeLessonItem) ? activeLessonItem : nextLessonItem) : undefined;
@@ -1166,8 +1282,8 @@ export function selectLanguageMoves(input: {
   // open item the answer is given with its reason and a right/wrong pair, then a new item on the same point. Never earlier: any other answer move
   // becomes a hint until then (the leak guards keep hiding the open item's answer, see guardedItems). A hints-only policy never releases.
   if (engineV2('releaseAfterTwo') && !input.hintsOnly) {
-    const engaged = s.answeringCheck || s.dontKnow || s.answerRequest || s.hintRequest || s.whyAfterAttempt;
-    if ((s.genuineFailedAttempts ?? 0) >= RELEASE_AFTER && engaged) {
+    const engaged = s.answeringCheck || s.dontKnow || s.answerRequest || s.hintRequest || s.whyAfterAttempt || (s.repeatWrong ?? 0) >= 2 || Boolean(s.emptyAnswer);
+    if ((s.genuineFailedAttempts ?? 0) >= releaseAfter() && engaged) {
       for (let k = moves.length - 1; k >= 0; k -= 1) if (['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning'].includes(moves[k].id)) moves.splice(k, 1);
       moves.unshift({ id: 'answer_with_reasoning', reasons: ['release_after_two_genuine_attempts'], ledger: ['LTC-D6'] });
     } else {
@@ -1290,10 +1406,15 @@ const LENGTH: Record<AgeBand, Record<string, [number, number]>> = {
   adult: { prea1: [60, 100], a1: [70, 110], a2: [90, 140], b1: [120, 180], b2: [140, 210], c1: [160, 240], c2: [160, 240], none: [90, 140] },
 };
 
+// kidsPack: child replies sized for young learners (about 3-6 short sentences at A1, fewer at Pre-A1), replacing the child row
+// that allowed 45-70 words at A1 (6-9 sentences at the 8-word child sentence limit).
+export const KIDS_PACK_CHILD_LENGTH: Record<string, [number, number]> = { prea1: [20, 35], a1: [30, 50], a2: [40, 65], b1: [55, 85], b2: [70, 100], c1: [80, 110], c2: [80, 110], none: [30, 50] };
+
 export function lengthTarget(ageBand: Fact<AgeBand>, level?: string): LengthTarget {
   const age: AgeBand = ageBand.status === 'known' && ageBand.value ? ageBand.value : 'unknown';
   const step = cefrStep(level) ?? 'none';
-  const [targetWords, maxWords] = LENGTH[age][step] ?? LENGTH[age].none;
+  const row = age === 'child' && engineV2('kidsPack') ? KIDS_PACK_CHILD_LENGTH : LENGTH[age];
+  const [targetWords, maxWords] = row[step] ?? row.none;
   return { targetWords, maxWords, basis: `${age === 'unknown' ? 'age_unknown' : age}:${step}` };
 }
 
@@ -1343,7 +1464,23 @@ export const askedNewExample = (t: string) => /\bone (?:new |more )?example (?:o
 export const SHORT_RECAP = 'This is the point to close the lesson unit. This overrides the "next task" instructions above: (1) answer any question they asked in their last message in one or two sentences, giving the reason as a clue only for an open exercise they have not attempted; (2) state the rule in ONE plain line of 20 words or fewer; (3) end by asking: "Now write one new example of your own." Do not set a new exercise this turn and never write a completed answer to an open exercise.';
 export const EXAMPLE_CHECK = 'They have just written their own example. If it follows the rule, confirm it in one line starting "Remember:" and then give the next task. If it is wrong or incomplete, correct only the wrong part in one short sentence and ask for one more example (no new exercise yet).';
 // v2 (ruleFirst): which rules (success criteria) the focus item needs that this session has not introduced yet.
-export function rulesToIntroduce(history: { role: string; languageTurn?: unknown }[], s: { presentLessonItem?: { criteria?: number[] }; activeLessonItem?: { criteria?: number[] }; answeringCheck?: boolean; hintRequest?: boolean; dontKnow?: boolean; whyAfterAttempt?: boolean; learning?: { criteria?: Record<string, unknown> } }, spec: { successCriteria?: string[] } | undefined, opts: { beforeFirstTry?: boolean } = {}): { criteria: number[]; texts: string[] } | undefined {
+type GradedTurn = { role: string; languageTurn?: unknown };
+const verdictOf = (t: GradedTurn) => (t.role === 'assistant' ? ((t.languageTurn as { assessment?: { verdict?: string } } | null | undefined)?.assessment?.verdict) : undefined);
+const isOk = (v?: string | null) => v === 'CORRECT' || v === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
+const isBad = (v?: string | null) => v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
+/** planner2b: right answers in a row at the end of this session (stored verdicts, then this turn's code grade). */
+export function sessionRightStreak(history: GradedTurn[], current?: string | null): number {
+  const vs = [...history.map(verdictOf), current].filter((v) => isOk(v) || isBad(v));
+  let n = 0;
+  for (let k = vs.length - 1; k >= 0 && isOk(vs[k]); k--) n++;
+  return n;
+}
+/** planner2b: the latest graded answer of this session was wrong. */
+export function lastGradedWrong(history: GradedTurn[], current?: string | null): boolean {
+  const vs = [...history.map(verdictOf), current].filter((v) => isOk(v) || isBad(v));
+  return vs.length > 0 && isBad(vs[vs.length - 1]);
+}
+export function rulesToIntroduce(history: { role: string; languageTurn?: unknown }[], s: { keyVerdict?: string | null; presentLessonItem?: { criteria?: number[] }; activeLessonItem?: { criteria?: number[] }; answeringCheck?: boolean; hintRequest?: boolean; dontKnow?: boolean; whyAfterAttempt?: boolean; learning?: { criteria?: Record<string, unknown> } }, spec: { successCriteria?: string[] } | undefined, opts: { beforeFirstTry?: boolean } = {}): { criteria: number[]; texts: string[] } | undefined {
   // First exposure = the reply to the learner's first attempt, request for a hint, "I don't know" or "why" on an item (never the turn that only presents the exercise: their first try stays unassisted).
   // levelExplicit (explicit-first learners) also counts the reply that presents the exercise: the rule comes before the first try.
   const presenting = Boolean(opts.beforeFirstTry && s.presentLessonItem && !s.answeringCheck);
@@ -1351,6 +1488,8 @@ export function rulesToIntroduce(history: { role: string; languageTurn?: unknown
   const item = s.activeLessonItem ?? s.presentLessonItem; const crit = spec?.successCriteria ?? [];
   if (!item?.criteria?.length || !crit.length) return undefined;
   const done = new Set<number>(); for (const h of history) for (const c of ((h.languageTurn as { rulesIntroduced?: number[] } | null | undefined)?.rulesIntroduced ?? [])) done.add(c);
+  // planner2b: after an error the rule is stated again (an error sends the lesson back to teaching); it is not "done" once said.
+  if (engineV2('planner2') && lastGradedWrong(history, s.keyVerdict)) done.clear();
   // levelExplicit decides per form: a criterion the learner has already shown in this session needs no rule statement.
   const shown = opts.beforeFirstTry ? new Set(Object.keys(s.learning?.criteria ?? {}).map(Number)) : new Set<number>();
   const todo = item.criteria.filter((c) => c >= 1 && c <= crit.length && !done.has(c) && !shown.has(c)).slice(0, 2);
@@ -1371,9 +1510,9 @@ export const RULE_LINE_TASK_BELOW = '(3) the task for this reply is the one set 
 const ruleFirstLine0 = (rf: { texts: string[] }, planPrimary?: string, hasNext?: boolean) =>
   `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). In this reply, inside the teaching method above: (1) state the rule in ONE plain sentence of 20 words or fewer, no grammar jargon, ${RULE_STYLE[planPrimary ?? ''] ?? 'through the right/wrong pair (say what makes the wrong one wrong)'}; (2) give one right example and one wrong example as plain sentences (not a list), made of words that appear in no lesson exercise; (3) ask them to apply the rule to a new item${hasNext ? ' (if their answer was right, present the next lesson item given below exactly as written; otherwise one short new item)' : ': one short new item you write'} made of words that appear in no lesson exercise. For this reply only this replaces the "no rule, no reminder and no example before their first try" rule, and the hint-level limits on stating the rule. Never write the answer to the exercise you are asking about or any part of it, never show its target form, never model on the learner's own answer.`;
 /** The explicit-first decision and the rule to state this turn (levelExplicit and ruleFirst). Pure: used by buildLanguageTeachingContext and by the tests. */
-export function ruleFirstDecision(i: { band: LevelBand; masteryStatus?: string; history: { role: string; languageTurn?: unknown }[]; signals: Parameters<typeof rulesToIntroduce>[1]; spec: { successCriteria?: string[] } | undefined; moves?: { id: string }[]; record?: Esl5Record; lessonId?: string }): { explicit?: boolean; ruleFirst?: { criteria: number[]; texts: string[] } } {
+export function ruleFirstDecision(i: { band: LevelBand; masteryStatus?: string; history: { role: string; languageTurn?: unknown }[]; signals: Parameters<typeof rulesToIntroduce>[1]; spec: { successCriteria?: string[] } | undefined; moves?: { id: string }[]; record?: Esl5Record; lessonId?: string; entry?: RuleBankEntry }): { explicit?: boolean; ruleFirst?: { criteria: number[]; texts: string[] } } {
   const explicit = engineV2('levelExplicit') ? explicitFirst(i.band, i.masteryStatus) : undefined;
-  const d = ruleFirstDecision0(i, explicit);
+  const d = bankTexts(ruleFirstDecision0(i, explicit), i.spec, i.entry);
   // ESL5 fix 3 (reviewOpen): in a later session, rules already introduced in an earlier session are recalled, not re-stated: the recall opening has no
   // rule line at all, and a later rule line keeps only rules the record does not show as introduced. A failed recall gets the rule next (REVIEW_RECALL_FAIL).
   if (!engineV2('reviewOpen') || !d.ruleFirst || !i.record) return d;
@@ -1391,9 +1530,26 @@ function ruleFirstDecision0(i: Parameters<typeof ruleFirstDecision>[0], explicit
   // levelExplicit: the rule line also fires on the first explanation turn (a short explanation before any exercise), once: the first success criterion, only if no rule was introduced yet this session.
   if (explicit && !ruleFirst && i.moves?.some((m) => m.id === 'short_explanation') && (i.spec?.successCriteria?.length ?? 0) > 0) {
     const anyDone = i.history.some((h) => ((h.languageTurn as { rulesIntroduced?: number[] } | null | undefined)?.rulesIntroduced ?? []).length > 0);
-    if (!anyDone) ruleFirst = { criteria: [1], texts: [i.spec!.successCriteria![0]] };
+    // ruleBank (TRACK 2, §3.2): the criterion that matches the outcome, never a blind "criterion 1".
+    const c = engineV2('ruleBank') && i.entry ? criterionFor(i.spec?.successCriteria, i.entry) ?? 1 : 1;
+    if (!anyDone) ruleFirst = { criteria: [c], texts: [i.spec!.successCriteria![c - 1]] };
   }
   return { ...(explicit !== undefined ? { explicit } : {}), ...(ruleFirst ? { ruleFirst } : {}) };
+}
+/** ruleBank (TRACK 2, owner decision 1): the rule text comes only from the checked rule bank. Each criterion's text is replaced by the bank rule of the
+ *  outcome it belongs to (the lesson's own outcome when its keywords match best, otherwise the best-matching bank entry). */
+export function bankEntryForCriterion(text: string, preferred?: RuleBankEntry): RuleBankEntry | undefined {
+  const score = (e: RuleBankEntry) => e.keywords.reduce((n, k) => n + (` ${text.toLowerCase()} `.includes(k.toLowerCase()) ? 1 : 0), 0);
+  const own = preferred ? score(preferred) : 0;
+  let best = preferred; let top = own;
+  for (const e of RULE_BANK) { const s = score(e); if (s > top) { top = s; best = e; } }
+  return top > 0 ? best : preferred;
+}
+function bankTexts<T extends { ruleFirst?: { criteria: number[]; texts: string[] } }>(d: T, spec: { successCriteria?: string[] } | undefined, entry?: RuleBankEntry): T {
+  if (!engineV2('ruleBank') || !entry || !d.ruleFirst) return d;
+  const crit = spec?.successCriteria ?? [];
+  const texts = [...new Set(d.ruleFirst.criteria.map((c) => bankEntryForCriterion(crit[c - 1] ?? '', entry)?.rule ?? entry.rule))];
+  return { ...d, ruleFirst: { criteria: d.ruleFirst.criteria, texts } };
 }
 /** levelExplicit, the reply that presents the exercise to an explicit-first learner: the rule first, then the item for the first try. Replaces the "no rule before the first try" rule for this reply only. */
 export const ruleBeforeFirstTryLine = (rf: { texts: string[] }, planPrimary?: string) =>
@@ -1537,7 +1693,12 @@ export function esl5Adjust(i: { signals: TurnSignals; moves: SelectedMove[]; rec
     const { presentLessonItem: _skip, ...rest } = signals;
     signals = rest; moves = moves.filter((m) => m.id !== 'present_lesson_item');
   }
-  if (engineV2('fadeKnown')) { const fade = fadeDecision(signals, i.record, i.history ?? [], i.lessonId, i.scope); if (fade) signals = { ...signals, fade }; }
+  if (engineV2('fadeKnown')) {
+    const fade = fadeDecision(signals, i.record, i.history ?? [], i.lessonId, i.scope);
+    // planner2b: support fades only after the form is right twice in a row in THIS session (never on the record or a count alone).
+    const ok = !engineV2('planner2') || sessionRightStreak(i.history ?? [], signals.keyVerdict) >= 2;
+    if (fade && ok) signals = { ...signals, fade };
+  }
   return { signals, moves };
 }
 // fadeKnown (ESL5, framework §2: explicit instruction for novices, faded for learners who already know the point).
@@ -1600,6 +1761,66 @@ const ruleTaskElsewhere = (ctx: Omit<LanguageTeachingContext, 'prompt'>): boolea
   releasing(ctx) || ownSentenceNow(ctx) === 'ask' || Boolean((engineV2('reviewOpen') || engineV2('levelExplicit')) && ctx.research && isClosingTurn(ctx.research) && closingOn());
 /** releaseAfterTwo: this reply gives the answer after two genuine failed attempts. */
 export const releasing = (ctx: Pick<LanguageTeachingContext, 'moves'>): boolean => engineV2('releaseAfterTwo') && ctx.moves.some((m) => m.reasons.includes('release_after_two_genuine_attempts'));
+// ---------------------------------------------------------------------------------------------------------------- TRACK 2 prompt lines
+const teachEntry = (ctx: Pick<LanguageTeachingContext, 'teach2'>): RuleBankEntry | undefined => (engineV2('ruleBank') ? ruleBankEntry(ctx.teach2?.entryId) : undefined);
+const qt = (x: string) => `"${x.replace(/["<>]/g, '')}"`;
+/** ruleBank: the levelExplicit / ruleFirst rule line, with points (1)-(2) taken from the checked rule bank (grammar pair or the vocabulary template). */
+export function bankify(line: string, ctx: Pick<LanguageTeachingContext, 'teach2'>): string {
+  const e = teachEntry(ctx);
+  if (!e) return line;
+  const m = ctx.teach2?.model;
+  const worked = m ? `worked example (its answer differs from the exercise's answer, so the exercise stays theirs): ${qt(m.sentence)}` : 'no other worked example of the exercise\'s pattern in this reply';
+  const body = e.kind === 'vocab'
+    ? `(1) this is a word-learning point, so use the vocabulary template, not a grammar right/wrong pair: the meaning from a clue, worked once (clue ${qt(e.clue!.clue)} gives ${qt(e.clue!.word)}), then the spelling of that word, then its use in a short frame${m ? ` such as ${qt(m.sentence)}` : ''} (the result must be a word from the set, never the clue repeated); (2) the only right/wrong contrast you may show is the real confusion: Right: ${qt(e.confusion!.right)} Wrong: ${qt(e.confusion!.wrong)};`
+    : `(1) say this rule from the checked rule bank in ONE plain sentence (you may shorten it, never change it): ${qt(e.rule)}; (2) show exactly this right/wrong pair and say what makes the wrong one wrong: Right: ${qt(e.right)} Wrong: ${qt(e.wrong)}; ${worked};`;
+  return line.replace(/\(1\) state the rule[\s\S]*?\(2\)[\s\S]*?(?=\(3\))/, `${body} `);
+}
+const SUCCESS_VERDICT = /^CORRECT/;
+/** Successes on the point in this session (the stored verdicts of earlier replies, plus this message's key verdict). */
+export function successesThisSession(history: { role: string; languageTurn?: unknown }[], keyVerdict?: string | null): number {
+  let n = 0;
+  for (const h of history) if (h.role === 'assistant' && SUCCESS_VERDICT.test(String((h.languageTurn as { assessment?: { verdict?: string } } | null | undefined)?.assessment?.verdict ?? ''))) n += 1;
+  return n + (SUCCESS_VERDICT.test(String(keyVerdict ?? '')) ? 1 : 0);
+}
+export const INTERLEAVE_LINE = (x: { form: string; note: string; item: string }) => `They have now got this form right twice in this session (interleaving): if this answer is right too, the next item mixes it with a form it is often confused with (${x.note}). Use this item, exactly as written: ${qt(x.item)}. Then go back to the lesson's own items.`;
+export const KIDS_FRAME_LINE = 'This learner is under 13 (teaching plan support: narrative or game): you may wrap the task in ONE short story or game line (for example "Help the robot fix its sentence"); the exercise, its wording and the focus on the form stay exactly the same, and the frame never replaces the rule or the feedback.';
+export const BANK_REFERENCE = (e: RuleBankEntry) => e.kind === 'vocab'
+  ? `If you explain the word point in this reply, use the checked rule bank: ${qt(e.rule)} The only right/wrong contrast you may show is ${qt(e.confusion!.right)} versus ${qt(e.confusion!.wrong)}; a worked example's result must be a word from the set.`
+  : `If you state the rule in this reply, use only the checked rule bank: ${qt(e.rule)} (right/wrong pair, if you need one: Right: ${qt(e.right)} Wrong: ${qt(e.wrong)}). Never invent a different rule.`;
+function teach2Lines(ctx: Omit<LanguageTeachingContext, 'prompt'>, bankRuleLine: boolean): string[] {
+  const t2 = ctx.teach2; const s = ctx.signals; const out: string[] = [];
+  if (!t2) return out;
+  const e = teachEntry(ctx);
+  if (e && !bankRuleLine) out.push(`- ${BANK_REFERENCE(e)}`);
+  if (engineV2('exampleGuard') && ctx.lesson.status === 'structured') out.push(`- ${CONTRAST_EXAMPLE_LINE}`);
+  if (engineV2('feedbackLadder') && t2.rung && (s.answeringCheck || s.unpromptedSentence) && !releasing(ctx)) out.push(`- ${FEEDBACK_LADDER_LINE[t2.rung]}`);
+  if (engineV2('methodSelect') && t2.interleave && s.answeringCheck) out.push(`- ${INTERLEAVE_LINE(t2.interleave)}`);
+  if (engineV2('methodSelect') && t2.kidsFrame) out.push(`- ${KIDS_FRAME_LINE}`);
+  return out;
+}
+/** TRACK 2: the per-turn teaching-quality state. Pure: production (buildLanguageTeachingContext) and the offline harness call the same function. */
+export function buildTeach2(ctx: Pick<LanguageTeachingContext, 'signals' | 'lesson' | 'moves' | 'learner'>, opts: { objectiveId?: string; assessmentItems?: BankItemLike[]; history?: { role: string; languageTurn?: unknown }[] }): Teach2Context | undefined {
+  if (!(engineV2('ruleBank') || engineV2('exampleGuard') || engineV2('feedbackLadder') || engineV2('methodSelect'))) return undefined;
+  const s = ctx.signals;
+  const entry = ruleBankEntry(opts.objectiveId);
+  const bank = opts.assessmentItems ?? [];
+  const openTF = bank.find((b) => b.targetForm)?.targetForm;
+  const pool = engineV2('exampleGuard') || engineV2('ruleBank') ? [...poolFromLessonItems(guardedItems(ctx), openTF), ...poolFromBankItems(bank)] : [];
+  const task = [s.presentLessonItem, s.nextLessonItem, s.activeLessonItem].filter(Boolean) as LessonItem[];
+  const openKeys = task.flatMap((i) => i.acceptedAnswers ?? []);
+  const model = entry ? pickModel(entry, pool, openKeys) : undefined;
+  const rung = engineV2('feedbackLadder') && (s.answeringCheck || s.unpromptedSentence) ? feedbackRung(s.genuineFailedAttempts ?? 0) : undefined;
+  const interleave = engineV2('methodSelect') && entry?.confusable && successesThisSession(opts.history ?? [], s.keyVerdict) >= 2 ? { form: entry.confusable.form, note: entry.confusable.note, item: entry.confusable.item } : undefined;
+  const kidsFrame = engineV2('methodSelect') && ctx.learner.ageBand.status === 'known' && ctx.learner.ageBand.value === 'child';
+  const openTask = task.some((i) => !(i.acceptedAnswers ?? []).length);
+  const guarded = new Set(guardedItems(ctx).map((i) => i.id));
+  // plus the rule bank's own sentences, which are checked offline against the outcome's whole pool (test/teach2.test.ts)
+  const confirmed = [...confirmedSentences((ctx.lesson.spec?.items ?? []).filter((i) => !guarded.has(i.id))), ...(entry ? [entry.rule, entry.right, ...entry.models.map((m) => m.sentence)].map((x) => x.toLowerCase().replace(/[^\p{L}\p{N}\s']/gu, ' ').replace(/\s+/g, ' ').trim()) : [])];
+  return { ...(entry ? { entryId: entry.id, template: entry.kind === 'vocab' ? 'vocab' as const : 'grammar' as const } : {}), ...(model ? { model: { form: model.form, sentence: model.sentence } } : {}), pool, ...(rung ? { rung } : {}), ...(interleave ? { interleave } : {}), ...(kidsFrame ? { kidsFrame: true } : {}), ...(openTask ? { openTask: true } : {}), ...(confirmed.length ? { confirmed } : {}) };
+}
+/** kidsBand (TRACK 2, §5): the band register with sentence-length limits and effort-not-ability praise; the r1 register otherwise. */
+export const registerLine = (band: AgeBand): string => (engineV2('kidsBand') && band !== 'unknown' ? BAND_REGISTER[band] : AGE_REGISTER[band]);
+
 function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   const s = ctx.signals;
   const L = s.learning;
@@ -1615,9 +1836,10 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (supportStage(s) === 'summarise') out.push(`- ${RULE_SUMMARY}`);
   if (s.ruleStatement && !researchAblated('rule_check')) out.push(`- ${RULE_CHECK}`);
   if (s.exampleStatement && engineV2('shortRecap')) out.push(`- ${EXAMPLE_CHECK}`);
+  let bankRuleLine = false;
   if (ctx.ruleFirst?.criteria.length) {
-    if (ruleBeforeFirstTryOn(ctx)) out.push(`- ${ruleBeforeFirstTryLine(ctx.ruleFirst, ctx.planPrimary)}`);
-    else if (engineV2('ruleFirst') || (engineV2('levelExplicit') && ctx.explicitFirst)) out.push(`- ${ruleFirstLine(ctx.ruleFirst, ctx.planPrimary, Boolean(s.nextLessonItem), ruleTaskElsewhere(ctx))}`);
+    if (ruleBeforeFirstTryOn(ctx)) { out.push(`- ${bankify(ruleBeforeFirstTryLine(ctx.ruleFirst, ctx.planPrimary), ctx)}`); bankRuleLine = Boolean(teachEntry(ctx)); }
+    else if (engineV2('ruleFirst') || (engineV2('levelExplicit') && ctx.explicitFirst)) { out.push(`- ${bankify(ruleFirstLine(ctx.ruleFirst, ctx.planPrimary, Boolean(s.nextLessonItem), ruleTaskElsewhere(ctx)), ctx)}`); bankRuleLine = Boolean(teachEntry(ctx)); }
   }
   if (fadedNow(s).length) out.push(`- ${FADE_LINE(fadedNow(s).map((c) => ctx.lesson.spec?.successCriteria?.[c - 1] ?? `point ${c}`))}`);
   if (engineV2('fadeKnown') && s.fade?.checkAnswered.length && !fadedNow(s).length) out.push(`- ${FADE_RETURN_LINE}`);
@@ -1663,8 +1885,14 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (engineV2('clarity') && s.activeLessonItem && needsClarity(s, supportStage(s))) out.push(`- ${CLARITY_LINE}`);
   if (engineV2('arbitration') && ctx.planPrimary) {
     out.push(`- ${ARBITRATION_LINE}`);
-    if (EXPLICIT_METHODS.includes(ctx.planPrimary) && ctx.moves.some((m) => m.id === 'present_lesson_item') && !ruleBeforeFirstTryOn(ctx) && !fadedNow(s).length) out.push(`- ${EXPLICIT_FIRST_LINE}`); // levelExplicit's own rule line replaces it
+    if (EXPLICIT_METHODS.includes(ctx.planPrimary) && ctx.moves.some((m) => m.id === 'present_lesson_item') && !ruleBeforeFirstTryOn(ctx) && !fadedNow(s).length) {
+      out.push(`- ${EXPLICIT_FIRST_LINE}`); // levelExplicit's own rule line replaces it
+      // ruleBank (TRACK 2): the two-sentence rule and the modelled example come from the checked rule bank (A1/A2 in Appendix A: invented rules).
+      const e = teachEntry(ctx);
+      if (e && !bankRuleLine) { out.push(`- ${e.kind === 'vocab' ? vocabLine(e, ctx.teach2?.model) : ruleBankLine(e, ctx.teach2?.model, { openTask: ctx.teach2?.openTask })}`); bankRuleLine = true; }
+    }
   }
+  out.push(...teach2Lines(ctx, bankRuleLine));
   if (ctx.research) {
     const r = ctx.research;
     if (r.stuck && researchImproved('strategy')) out.push(`- ${STRATEGY_SHIFT}`);
@@ -1728,7 +1956,7 @@ export function renderLanguageContextParts(ctx: Omit<LanguageTeachingContext, 'p
     ...(step && REGISTER[step] ? [`Level: ${REGISTER[step]}`] : []),
     ...(step && LOAD_BUDGET[step] ? [LOAD_BUDGET[step]] : []),
     ...(!/arabic/i.test(l.targetLanguage?.value ?? '') ? [ENGLISH_ONLY_RULE] : []),
-    AGE_REGISTER[band],
+    registerLine(band),
     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
     GROUNDING_RULES,
     assessmentInstruction(),
@@ -1770,7 +1998,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
     ...(step && REGISTER[step] ? [`Level: ${REGISTER[step]}`] : []),
     ...(step && LOAD_BUDGET[step] ? [LOAD_BUDGET[step]] : []),
     ...(!/arabic/i.test(l.targetLanguage?.value ?? '') ? [ENGLISH_ONLY_RULE] : []),
-    AGE_REGISTER[band],
+    registerLine(band),
     'Always: respond to what they actually wrote; feedback is about the work, never the person; keep it short and encouraging. This is a text chat (reading and writing): don\'t present it as listening or speaking practice.',
     GROUNDING_RULES,
     assessmentInstruction(),
@@ -1841,6 +2069,9 @@ export function turnEvidence(ctx: LanguageTeachingContext, objectiveId?: string)
     activeItemBefore: ctx.signals.learning?.activeItem ?? null,
     ...(ctx.signals.keyVerdict ? { keyVerdict: ctx.signals.keyVerdict } : {}),
     ...(ctx.signals.presentLessonItem ? { presentedLessonItemId: ctx.signals.presentLessonItem.id } : {}),
+    ...(ctx.teach2 && (ctx.teach2.entryId || ctx.teach2.rung || ctx.teach2.interleave || ctx.teach2.kidsFrame) ? { teach2: {
+      ...(ctx.teach2.entryId ? { rule: ctx.teach2.entryId, template: ctx.teach2.template } : {}), ...(ctx.teach2.model ? { model: ctx.teach2.model.form } : {}),
+      ...(ctx.teach2.rung ? { rung: ctx.teach2.rung } : {}), ...(ctx.teach2.interleave ? { interleave: true as const } : {}), ...(ctx.teach2.kidsFrame ? { kidsFrame: true as const } : {}) } } : {}),
   };
 }
 
@@ -1985,6 +2216,29 @@ export function languageStateScope(p: { institutionId?: string; studentId?: stri
   return createHash('sha256').update(key).digest('hex').slice(0, 24);
 }
 
+/** planner2 (amendment C): the code grade of the learner's message in THIS turn (the same keyVerdict the language engine computes),
+ *  so the planner can decide the lesson shape on the quick-check answer now instead of one reply later. Null when not gradable. */
+export async function currentKeyVerdict(params: { institutionId?: string; curriculumId?: string; lessonId?: string; message: string; history: Turn[] }): Promise<string | null> {
+  try {
+    if (!params.curriculumId) return null;
+    const curriculum = await Curriculum.findOne({ id: params.curriculumId, ...(params.institutionId ? { institutionId: params.institutionId } : {}) }).select('type courseName name chapters').lean();
+    if (!curriculum || !isLanguageCourse(curriculum.type)) return null;
+    const chapter = (curriculum.chapters ?? []).find((c) => c.id === params.lessonId);
+    const lesson = deriveLessonContext(chapter as never, curriculum.courseName || curriculum.name);
+    if (lesson.status === 'none') return null;
+    return detectTurnSignals(params.message, params.history, { title: lesson.title, spec: lesson.spec }).keyVerdict ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** planner2k: in a listen-and-do step (listen, do, chant) with kids-pack content, the step replaces the lesson exercise: these moves are dropped. */
+export const LAD_STEP_DROPPED = new Set<MoveId>(['present_lesson_item', 'independent_practice', 'general_practice', 'comprehension_check', 'distinct_example', 'restate_task']);
+export const LAD_STEP_LINE = 'LISTEN AND DO (set by the system): this reply is ONLY the listen-and-do step in the learning focus above (the story, ONE instruction, or the chant), in at most 3 short sentences. Do not give a lesson exercise, a fill-in item, a rule or a right/wrong pair in this reply. This overrides any instruction above to give an exercise or an item.';
+/** planner2 quick check: moves that teach or correct, removed in the quick-check reply. */
+export const QUICK_CHECK_DROPPED = new Set<MoveId>(['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'l1_support', 'activate_prior_knowledge']);
+export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this opening reply gives ONE short exercise from the lesson to see what the learner already knows. Do not teach, explain, hint or give any answer in this reply: a short greeting, then the exercise. The teaching starts in your next reply. This overrides any instruction above to explain, model or give an answer.';
+
 export async function buildLanguageTeachingContext(params: {
   institutionId?: string;
   curriculumId?: string;
@@ -2001,6 +2255,13 @@ export async function buildLanguageTeachingContext(params: {
   masteryStatus?: string;
   // v2 (arbitration): the primary method of the teaching plan for this turn (ped-v2), if one is active.
   planPrimary?: string;
+  // TRACK 2: the objective of this turn's plan (its id or code selects the rule-bank entry and the assessment items of the guard pool).
+  objectiveId?: string;
+  objectiveCode?: string;
+  // planner2: this turn is inside the 3-item quick check that opens the lesson (no teaching, no correction).
+  quickCheck?: boolean;
+  // planner2k: this turn is a listen-and-do step (listen, do or chant) with kids-pack content: the step replaces the exercise.
+  ladStep?: boolean;
 }): Promise<LanguageTeachingContext | null> {
   try {
     if (!params.curriculumId) return null;
@@ -2023,7 +2284,7 @@ export async function buildLanguageTeachingContext(params: {
     const chapter = (curriculum.chapters ?? []).find((c) => c.id === params.lessonId);
     const lesson = deriveLessonContext(chapter as never, curriculum.courseName || curriculum.name);
     const scope = languageStateScope({ institutionId: params.institutionId, studentId: params.studentId, sessionId: params.sessionId, courseId: params.courseId, curriculumId: params.curriculumId, lessonId: lesson.lessonId ?? params.lessonId });
-    const signals0 = detectTurnSignals(params.message, params.history, lesson.status === 'none' ? undefined : { title: lesson.title, spec: lesson.spec }, scope);
+    const signals0 = detectTurnSignals(params.message, params.history, lesson.status === 'none' ? undefined : { title: lesson.title, spec: lesson.spec }, scope, { child: learner.ageBand.status === 'known' && learner.ageBand.value === 'child' });
     const moves0 = selectLanguageMoves({
       band: learner.proficiency.band,
       targetLanguage: learner.targetLanguage.value,
@@ -2034,7 +2295,12 @@ export async function buildLanguageTeachingContext(params: {
     });
     // ESL5 (reviewOpen, fadeKnown): ENARA's own stored learner record, read only when one of those switches is on.
     const record = engineV2('reviewOpen') || engineV2('fadeKnown') ? (await loadEsl5Record(params.institutionId, params.studentId)) ?? undefined : undefined;
-    const { signals, moves } = esl5Adjust({ signals: signals0, moves: moves0, record, history: params.history, lessonId: lesson.lessonId, scope });
+    const adjusted = esl5Adjust({ signals: signals0, moves: moves0, record, history: params.history, lessonId: lesson.lessonId, scope });
+    const quickCheck = Boolean(params.quickCheck) && engineV2('planner2');
+    const signals = adjusted.signals;
+    // planner2 quick check: only presenting and recording; every teaching or correcting move is dropped for these 3 items.
+    const ladStep = Boolean(params.ladStep) && engineV2('planner2') && engineV2('kidsPack') && !quickCheck;
+    const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : ladStep ? adjusted.moves.filter((m) => !LAD_STEP_DROPPED.has(m.id)) : adjusted.moves;
     const base0 = lengthTarget(learner.ageBand, learner.proficiency.value);
     // r2: a clarification-only turn is one short question, so a tighter target.
     const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
@@ -2043,13 +2309,38 @@ export async function buildLanguageTeachingContext(params: {
     const research = closingOn() || engineV2('hints') || researchImproved('strategy') || researchImproved('coverage') ? researchSignals(params.history, signals, lesson.spec) : undefined;
     const prevTurn = [...params.history].reverse().find((h) => h.role === 'assistant')?.languageTurn as { moves?: string[] } | null | undefined;
     // levelExplicit: decided per learner and objective; explicit-first learners get the rule before their first try (rulesToIntroduce, once per rule per session).
-    const { explicit, ruleFirst } = ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId });
-    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}) } as const;
-    const parts = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
-    return { ...base, ...(parts ? { parts } : {}), prompt: renderLanguageContextPrompt(base) };
+    const outcomeId = ruleBankEntry(params.objectiveCode) ? params.objectiveCode : params.objectiveId;
+    const teach2 = buildTeach2({ signals, lesson, moves, learner }, { objectiveId: outcomeId, history: params.history, assessmentItems: engineV2('exampleGuard') || engineV2('ruleBank') ? await loadObjectiveItems(params.institutionId, [params.objectiveId, params.objectiveCode, outcomeId]) : [] });
+    const { explicit, ruleFirst } = quickCheck ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
+    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}), ...(teach2 ? { teach2 } : {}) } as const;
+    const parts0 = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
+    const tail = quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : '';
+    const parts = parts0 && tail ? { ...parts0, dynamic: `${parts0.dynamic}\n\n${tail}` } : parts0;
+    const prompt = renderLanguageContextPrompt(base);
+    return { ...base, ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), ...(parts ? { parts } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt };
   } catch (error) {
     logger.warn('language_context_failed', { error: serializeError(error) });
     return null;
+  }
+}
+
+/** TRACK 2 (exampleGuard pool, server-side only): the assessment and quick-check questions of the school that give evidence for this objective. */
+export async function loadObjectiveItems(institutionId: string | undefined, objectiveIds: (string | undefined)[]): Promise<BankItemLike[]> {
+  const ids = [...new Set(objectiveIds.filter(Boolean))] as string[];
+  if (!institutionId || !ids.length) return [];
+  try {
+    const docs = await AssessmentModel.find({ institutionId, $or: [{ 'questions.objectiveIds': { $in: ids } }, { objectiveIds: { $in: ids } }] }).select('questions objectiveIds').limit(50).lean();
+    const out: BankItemLike[] = [];
+    for (const d of docs as { questions?: { id: string; type?: string; text?: string; correctAnswer?: unknown; acceptedAnswers?: string[]; matchingNote?: string; targetForm?: string; scoring?: string; objectiveIds?: string[] }[]; objectiveIds?: string[] }[]) {
+      for (const q of d.questions ?? []) {
+        if (!(q.objectiveIds ?? d.objectiveIds ?? []).some((x) => ids.includes(x))) continue;
+        out.push({ id: q.id, type: q.type, prompt: String(q.text ?? ''), ...(q.correctAnswer !== undefined && q.correctAnswer !== null ? { answerKey: String(q.correctAnswer) } : {}), acceptedAnswers: q.acceptedAnswers, matchingNote: q.matchingNote, targetForm: q.targetForm, scoring: q.scoring });
+      }
+    }
+    return out.slice(0, 500);
+  } catch (error) {
+    logger.warn('objective_items_failed', { error: serializeError(error) });
+    return [];
   }
 }
 

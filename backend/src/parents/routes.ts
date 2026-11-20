@@ -27,6 +27,7 @@ import { createDeviceSession } from './deviceSession';
 import { isCodeOnlyEmail, previewStartCode, startWithCode } from './codeSignup';
 import { revokeDeviceSession, useDeviceSession } from './deviceSession';
 import { recordParentLogin, recordUsage, type Feature, type Screen } from './usage';
+import { parseBirthDate, parseGoal, requestsFor, setBirthDate, setGoal } from '../services/learnerSignals';
 
 // /api/parents/* — the Parents Portal API. Every learner endpoint goes through
 // svc.requireLearner (active link + role check, policy.ts). Real-time: each
@@ -250,6 +251,21 @@ router.post('/learners/:studentId/report/share', h(async (req, res) => {
   res.status(result.ok ? 200 : 502).json(result);
 }));
 router.get('/learners/:studentId/controls', h(async (req, res) => { res.json(svc.controlsOf(await screen('controls')(req))); }));
+// planner2 learner signals: what the parent is asked to fill in (birth date when the age is unknown; a child's goal).
+router.get('/learners/:studentId/signals', h(async (req, res) => {
+  const ctx = await learner()(req);
+  await track(req, ctx, 'feature', 'learner_signals');
+  res.json(await requestsFor(ctx.student.id));
+}));
+router.put('/learners/:studentId/signals', h(async (req, res) => {
+  const ctx = await learner('change_controls')(req);
+  const body = ensurePlainObject(req.body);
+  const out: Record<string, unknown> = { id: ctx.student.id };
+  if ('birthDate' in body) out.birthDate = (await setBirthDate(ctx.student.id, body.birthDate === null ? null : parseBirthDate(body.birthDate), 'parent', { id: uid(req), role: 'parent' })).birthDateSet;
+  if ('goal' in body) out.goal = (await setGoal(ctx.student.id, body.goal === null ? null : parseGoal(body.goal), 'parent', { id: uid(req), role: 'parent' })).goal;
+  await track(req, ctx, 'feature', 'learner_signals');
+  res.json(out);
+}));
 router.put('/learners/:studentId/controls', h(async (req, res) => {
   const ctx = await learner('change_controls')(req);
   const out = await svc.updateControls(ctx, ensurePlainObject(req.body));

@@ -4,7 +4,7 @@
 # test password is generated per run (e2e/scripts/gen-env.sh). Fake data only;
 # nothing here calls lms-test.enara.app or test.enara.app.
 #
-# Runs on pull requests from LMS and Parents branches (claude/lms-*, claude/parents-*) and by hand
+# Runs on pull requests from LMS, Parents and tutor-into-LMS branches (claude/lms-*, claude/parents-*, claude/tutor-lms*) and by hand
 # (workflow_dispatch; GitHub offers "Run workflow" only once this file is on
 # the default branch, until then re-run the latest PR run). No schedule, no push.
 name: lms-e2e
@@ -25,7 +25,7 @@ concurrency:
 jobs:
   e2e:
     name: e2e (${{ matrix.moodle }})
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'claude/lms') || startsWith(github.head_ref, 'claude/parents')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'claude/lms') || startsWith(github.head_ref, 'claude/parents') || startsWith(github.head_ref, 'claude/tutor-lms')
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:

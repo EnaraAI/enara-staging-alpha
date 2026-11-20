@@ -1,5 +1,5 @@
 {
-  "$comment": "Feature switches each feature needs on lms-test.enara.app (Vercel project enara-lms-test, Production). Before every deploy the pipeline (deploy/lms-test/cli.mjs apply-flags) creates the ones that are missing and corrects the ones that differ, as plain variables. It never removes a variable and never touches a Sensitive one. Only switch names are allowed here (LMS_*, ENROLLMENT_*, GRADE_LEDGER_*, MAINTENANCE_ENDPOINTS_*, MOODLE_TEST_WS_*, PARENT_*; nothing that looks like a key, token, password or address). A feature PR adds its own entry. test.enara.app is frozen: this file is for lms-test only. docs/lms/CONTINUOUS_DELIVERY.md",
+  "$comment": "Feature switches each feature needs on lms-test.enara.app (Vercel project enara-lms-test, Production). Before every deploy the pipeline (deploy/lms-test/cli.mjs apply-flags) creates the ones that are missing and corrects the ones that differ, as plain variables. It never removes a variable and never touches a Sensitive one. Only switch names are allowed here (LMS_*, ENROLLMENT_*, GRADE_LEDGER_*, MAINTENANCE_ENDPOINTS_*, MOODLE_TEST_WS_*, PARENT_*, and exactly ENARA_ENGINE_V2 for the tutor engine; nothing that looks like a key, token, password or address). A feature PR adds its own entry. test.enara.app is frozen: this file is for lms-test only. docs/lms/CONTINUOUS_DELIVERY.md",
   "project": { "name": "enara-lms-test", "id": "prj_tuRpwEJLz1dEQOj6RSEk2xUpqtIn", "target": "production" },
   "features": [
     { "name": "LMS Phase 1a: LTI 1.3 launch", "docs": "docs/lms/PHASE_1A_NOTES.md", "flags": { "LMS_LTI_ENABLED": "true" } },
@@ -18,6 +18,7 @@
     { "name": "Parents P3: results reach parents only after the teacher releases them (school setting, default after release)", "docs": "docs/parents/P3_NOTES.md", "flags": { "PARENT_GRADES_AFTER_REVIEW_ENABLED": "true" } },
     { "name": "Parents P4: the approved parent emails (link confirmed / ended, new results, weekly summary, invite) and the two parent email buttons, through the email safety path (test inbox on lms-test)", "docs": "docs/parents/P4_NOTES.md", "flags": { "PARENT_EMAILS_ENABLED": "true" } },
     { "name": "Parents P5: CSV invitations (one email per parent address; each school turns CSV invites on itself)", "docs": "docs/parents/P5_NOTES.md", "flags": { "PARENT_CSV_INVITES_ENABLED": "true" } },
+    { "name": "Tutor engine: ESL5 setting + planner2c (lesson shapes, evidence-based stages); kids pack stays off", "docs": "docs/tutor/PLANNER2_FULL_REPORT.md", "flags": { "ENARA_ENGINE_V2": "wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2" } },
     { "name": "Test-site maintenance routes (migrations and the deploy health check)", "docs": "docs/lms/CONTINUOUS_DELIVERY.md", "flags": { "MAINTENANCE_ENDPOINTS_ENABLED": "true" } }
   ],
   "notManaged": {
