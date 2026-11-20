@@ -8,7 +8,7 @@ import { addDays, cairoDay } from './time';
 // Parents P1: usage events (IDs and dates only, 13 months, D10) and their
 // nightly rollup. Writing never blocks or fails a parent request.
 export const SCREENS = ['home', 'progress', 'activity', 'controls', 'report', 'account'] as const;
-export const FEATURES = ['share_report', 'controls_changed', 'link_child', 'guardian_role', 'learner_signals'] as const;
+export const FEATURES = ['share_report', 'controls_changed', 'link_child', 'guardian_role', 'learner_signals', 'errors_to_work_on'] as const;
 export type Screen = (typeof SCREENS)[number];
 export type Feature = (typeof FEATURES)[number];
 

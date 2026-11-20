@@ -57,7 +57,7 @@ secret-looking names such as `PARENT_TOKEN_SECRET`, `PARENT_API_KEY`, `PARENT_IN
 - **Usage** (`parents/usage.ts`, `parent_usage_events`): one row per parent, school, (child), day and event
   name, with a count; IDs and dates only; TTL 13 months (D10). Logins (any sign-in by a parent through the
   sign-in log, and device resumes), screens (home, progress, activity, controls, report, account), features
-  (share_report, controls_changed, link_child, guardian_role, learner_signals). Nightly rollup in `/api/cron/daily`
+  (share_report, controls_changed, link_child, guardian_role, learner_signals, errors_to_work_on). Nightly rollup in `/api/cron/daily`
   (`parent_usage_daily`: per school and Cairo day: active parents, logins, linked parents, screens, features;
   13 months). The cards read live counts. PDPL: student erasure deletes the student's usage events
   (`studentErasure` list); `deleteParentUsage` removes a parent's (used by the P2 merge).

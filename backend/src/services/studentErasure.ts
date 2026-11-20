@@ -34,6 +34,7 @@ import { StudentClassChoice } from '../models/StudentClassChoice';
 import { StudentCredit } from '../models/StudentCredit';
 import { StudentMisconception } from '../models/StudentMisconception';
 import { ErrorToWorkOn, ErrorToWorkOnSync } from '../models/ErrorToWorkOn';
+import { LearnerProfile, SessionSummary, StudyHabitDaily } from '../models/LearnerMemory';
 import { MasteryHistory, StudentObjectiveMastery } from '../models/StudentObjectiveMastery';
 import { StudyPlan } from '../models/StudyPlan';
 import { TeachingEpisode } from '../models/TeachingEpisode';
@@ -77,6 +78,9 @@ const DELETE_BY_STUDENT_ID: [string, Model<any>][] = [ // eslint-disable-line @t
   ['class_enrollments', ClassEnrollment],
   ['errors_to_work_on', ErrorToWorkOn], // learner memory phase 1
   ['errors_to_work_on_sync', ErrorToWorkOnSync],
+  ['session_summaries', SessionSummary], // learner memory phases 2-3
+  ['learner_profiles', LearnerProfile],
+  ['study_habit_daily', StudyHabitDaily],
   ['parent_learner_links', ParentLearnerLink],
   ['parent_link_codes', ParentLinkCode],
   ['parent_usage_events', ParentUsageEvent],

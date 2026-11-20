@@ -9,6 +9,7 @@ import { bandFromBirthDate, isLearnerAgeBand, LEARNER_AGE_BANDS, type LearnerAge
 import { readsFromEnrollments, studentGroupIds } from './enrollmentReads';
 import { Assessment as AssessmentModel } from '../models/Assessment';
 import { PAIR_RULE } from './pairCheck';
+import { priorAnsweredItems } from './learnerMemory';
 import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
 import { graderV2On } from './graderV2';
 import { engineV2, arbitrationForced } from './engineV2';
@@ -962,7 +963,7 @@ const META_REQUEST = /\b(know|word|words|say|mean|meaning|help|explain|example|e
 // r4: the learner asks for an exercise or the next item (only when it isn't an answer).
 const EXERCISE_REQUEST = /\b(exercise|practice question|quiz me|test me)\b|\b(give me|can i have|i want|let'?s (do|try)|another|one more|next)\b[^.?!]{0,30}\b(exercise|question|task|item|one)\b|تمرين|سؤال/i;
 
-export function detectTurnSignals(message: string, history: Turn[], lesson?: { title?: string; spec?: LanguageSpec }, scope?: string, opts: { child?: boolean } = {}): TurnSignals {
+export function detectTurnSignals(message: string, history: Turn[], lesson?: { title?: string; spec?: LanguageSpec }, scope?: string, opts: { child?: boolean; priorAnswered?: string[] } = {}): TurnSignals {
   const text = message.trim();
   const learner = [...history.filter((h) => h.role === 'user').map((h) => h.content), text].slice(-3);
   const lastAssistant = [...history].reverse().find((h) => h.role === 'assistant')?.content.trim() ?? '';
@@ -996,7 +997,7 @@ export function detectTurnSignals(message: string, history: Turn[], lesson?: { t
     exampleRequest: learnerResponse === 'example_request',
     offTopic,
     ...r2Signals(text, history, learnerResponse, lesson, firstTurn, offTopic),
-    ...r4Signals(text, history, learnerResponse, lesson, scope),
+    ...r4Signals(text, history, learnerResponse, lesson, scope, opts.priorAnswered),
   };
   if (engineV2('liveError')) {
     // liveError (ESL5): only the learner's own sentence is read (an answer, or a first unprompted sentence), never a question or request.
@@ -1127,7 +1128,7 @@ export function shownLessonItems(history: Turn[], items: LessonItem[], scope?: s
  *  go through the pair check (a "wrong" sentence that is acceptable English is removed). All off: exactly as before. */
 export const pairsAsked = (): boolean => ['releaseAfterTwo', 'liveError', 'ruleBank', 'planner2'].some((f) => engineV2(f as never)); // not clarity/levelExplicit alone: their off-parity tests pin the pre-ESL5 prompt
 // r4: structured learning state, lesson items and the hint ceiling for this turn.
-function r4Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, scope?: string): Partial<TurnSignals> {
+function r4Signals(text: string, history: Turn[], learnerResponse: LearnerResponseKind, lesson: { title?: string; spec?: LanguageSpec } | undefined, scope?: string, priorAnswered: string[] = []): Partial<TurnSignals> {
   const learning = deriveLearningState(history, scope);
   const items = lesson?.spec?.items ?? [];
   const activeLessonItem = learning.activeItem?.lessonItemId ? items.find((i) => i.id === learning.activeItem!.lessonItemId) : undefined;
@@ -1135,6 +1136,8 @@ function r4Signals(text: string, history: Turn[], learnerResponse: LearnerRespon
   // planner2d (PLN2f item repeats): the next item is one not yet shown in this session. An item shown before but never credited (for example a
   // right answer the key did not list, or one left after a wrong try) is not offered again as "next"; with none left, the tutor writes a new one.
   const shown = engineV2('planner2') ? shownLessonItems(history, items, scope) : new Set<string>();
+  // Learner memory phase 2 (sessionMemory): items answered in earlier sessions on this lesson are never offered again as "next".
+  if (engineV2('sessionMemory')) for (const id of priorAnswered) shown.add(id);
   const nextLessonItem = unsatisfied.find((i) => i.id !== activeLessonItem?.id && !shown.has(i.id));
   const exerciseRequest = learnerResponse !== 'answer' && learnerResponse !== 'answer_request' && EXERCISE_REQUEST.test(text);
   // Asked for an exercise: the open lesson item if one is still unanswered, else the next one.
@@ -2302,7 +2305,8 @@ export async function buildLanguageTeachingContext(params: {
     const chapter = (curriculum.chapters ?? []).find((c) => c.id === params.lessonId);
     const lesson = deriveLessonContext(chapter as never, curriculum.courseName || curriculum.name);
     const scope = languageStateScope({ institutionId: params.institutionId, studentId: params.studentId, sessionId: params.sessionId, courseId: params.courseId, curriculumId: params.curriculumId, lessonId: lesson.lessonId ?? params.lessonId });
-    const signals0 = detectTurnSignals(params.message, params.history, lesson.status === 'none' ? undefined : { title: lesson.title, spec: lesson.spec }, scope, { child: learner.ageBand.status === 'known' && learner.ageBand.value === 'child' });
+    const priorAnswered = engineV2('sessionMemory') && params.studentId ? await priorAnsweredItems(params.studentId, lesson.lessonId ?? params.lessonId) : [];
+    const signals0 = detectTurnSignals(params.message, params.history, lesson.status === 'none' ? undefined : { title: lesson.title, spec: lesson.spec }, scope, { child: learner.ageBand.status === 'known' && learner.ageBand.value === 'child', priorAnswered });
     const moves0 = selectLanguageMoves({
       band: learner.proficiency.band,
       targetLanguage: learner.targetLanguage.value,
