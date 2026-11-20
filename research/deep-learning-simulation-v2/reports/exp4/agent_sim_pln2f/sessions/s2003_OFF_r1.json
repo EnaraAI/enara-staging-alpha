@@ -15,7 +15,7 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 1,
    "C2": 0
   },
@@ -983,7 +983,103 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nIn \"You ate lunch yesterday?\" the word \"ate\" is a correct past form for a finished action. That part is right.\n\nThe start of your question is different from a did-question, so let us look at a new example. Here is a pair:\nRight: Did they open the shop?\nWrong: They opened the shop?\n\nCompare how the two questions begin and where the verb goes. Then write your lunch question again, with the verb \"eat\".\n\nLEARNER'S LAST MESSAGE:\nYou ate lunch yesterday?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nYour \"ate\" is a correct past form, but the question needs a different start. Let me show it: \"Did you eat lunch yesterday?\" The word \"did\" already shows the past, so the main verb stays in the base form, \"eat\".\n\nRight: Did he call the manager?\nWrong: He called the manager?\n\nNow one new question on your own. Ask a colleague about their weekend. Use did and the verb \"see\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nIn \"You ate lunch yesterday?\" the word \"ate\" is a correct past form for a finished action. That part is right.\n\nThe start of your question is different from a did-question, so let us look at a new example. Here is a pair:\nRight: Did they open the shop?\nWrong: They opened the shop?\n\nCompare how the two questions begin and where the verb goes. Then write your lunch question again, with the verb \"eat\".\n\nLEARNER'S LAST MESSAGE:\nYou ate lunch yesterday?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nYour \"ate\" is a correct past form, but the question needs a different start. Let me show it: \"Did you eat lunch yesterday?\" The word \"did\" already shows the past, so the main verb stays in the base form, \"eat\".\n\nRight: Did he call the manager?\nWrong: He called the manager?\n\nNow one new question on your own. Ask a colleague about their weekend. Use did and the verb \"see\".",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "Let me show it: \"Did you eat lunch yesterday?\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The word \"did\" already shows the past, so the main verb stays in the base form"
+    },
+    {
+     "rule": "R2",
+     "belief": "W2",
+     "quote": "Right: Did he call the manager? Wrong: He called the manager?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you see a film at the weekend?",
+    "errors": {
+     "W1": "Did you saw a film at the weekend?",
+     "W2": "You saw a film at the weekend?"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1000,5 +1096,35 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W2",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 1,
+   "W2": 2,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }

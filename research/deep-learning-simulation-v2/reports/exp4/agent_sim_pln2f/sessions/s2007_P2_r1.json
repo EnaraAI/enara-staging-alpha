@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -1154,7 +1154,93 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 3: some in positive statements, any in negatives and questions. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Can I have a burger\" works, and \"please\" makes the request polite. Before I comment on the soup part, I want to understand your idea.\n\nIn one short sentence: why did you choose \"any\" before \"soup\"?\n\nLEARNER'S LAST MESSAGE:\nI think: some in positive statements, any in negatives and questions.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for explaining. Your rule is true for many sentences, and \"Can I have a burger\" is a good polite start.\n\nBut when we order or ask for something with \"Can I have\" or \"I'd like\", we use \"some\" with things we cannot count. So the sentence needs \"some soup\".\n\nRight: Can I have some rice, please? Wrong: Can I have any rice, please?\n\nNow one on your own. At a snack bar, write one polite sentence to order a sandwich and some juice. Use \"I'd like\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 3: some in positive statements, any in negatives and questions. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"Can I have a burger\" works, and \"please\" makes the request polite. Before I comment on the soup part, I want to understand your idea.\n\nIn one short sentence: why did you choose \"any\" before \"soup\"?\n\nLEARNER'S LAST MESSAGE:\nI think: some in positive statements, any in negatives and questions.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThank you for explaining. Your rule is true for many sentences, and \"Can I have a burger\" is a good polite start.\n\nBut when we order or ask for something with \"Can I have\" or \"I'd like\", we use \"some\" with things we cannot count. So the sentence needs \"some soup\".\n\nRight: Can I have some rice, please? Wrong: Can I have any rice, please?\n\nNow one on your own. At a snack bar, write one polite sentence to order a sandwich and some juice. Use \"I'd like\".",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "when we order or ask for something with \"Can I have\" or \"I'd like\", we use \"some\" with things we cannot count"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: Can I have some rice, please? Wrong: Can I have any rice, please?"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I'd like a sandwich and some juice, please.",
+    "errors": {
+     "W1": "I'd like a sandwich and any juice, please."
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
   }
  ],
  "assess": {
@@ -1171,5 +1257,34 @@
    "ecRewrite": 0,
    "ecRewriteMax": 2
   }
+ },
+ "stateEnd": {
+  "form": "someany",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
  }
 }
