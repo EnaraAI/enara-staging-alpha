@@ -14,7 +14,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 2,
    "C1": 1,
    "C2": 0
@@ -159,7 +159,109 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHi! Can we learn he, she and it with -s today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi! Let's look at he, she and it. My dog runs in the park. After he, she or it, the verb ends in -s.\n\nRight: She sings at school. Wrong: She sing at school.\n\nYour turn. Write the verb: Tom ___ (eat) lunch at one."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-third-person-s (he, she and it with -s). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the verb does not change after he/she/it. Its error: leaves the verb unchanged after he/she/it (\"She like tea\").\nW2 (wrong) strength 2: -s goes on every verb and -es/-ies are not needed. Its error: adds -s wrongly or misspells -es/-ies (\"She watchs TV\", \"I plays\").\nC1 (correct) strength 1: add -s/-es after he/she/it. Independent correct productions so far: 0.\nC2 (correct) strength 0: -es after sh/ch/s/x/o, -ies after consonant + y, no -s after I/you/we/they. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHi! Can we learn he, she and it with -s today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi! Let's look at he, she and it. My dog runs in the park. After he, she or it, the verb ends in -s.\n\nRight: She sings at school. Wrong: She sing at school.\n\nYour turn. Write the verb: Tom ___ (eat) lunch at one.",
+   "stateBefore": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After he, she or it, the verb ends in -s."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: She sings at school. Wrong: She sing at school."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "eats",
+    "errors": {
+     "W1": "eat"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "s3",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false,
+    "sec1": "thirdS"
+   }
+  },
+  {
+   "session": 1,
+   "learner": "eats",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "eats",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

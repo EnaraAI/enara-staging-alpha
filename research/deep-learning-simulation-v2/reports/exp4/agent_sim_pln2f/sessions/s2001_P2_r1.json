@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -143,7 +143,100 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! I have an English exam soon. Can we practise always, usually, sometimes and never?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! Yes, we can. Our goal today is to describe a daily routine with always, usually, sometimes and never.\n\nQuick reminder: these words go before the main verb, and the verb after he, she or it ends in -s.\n\nHere is a model sentence for this setting: My neighbour always walks to work.\n\nYour task: write three sentences about a normal weekday in your life. Use a different adverb in each sentence, and describe one thing you do in the morning, one at work or school, and one in the evening. Send them when you are ready."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! I have an English exam soon. Can we practise always, usually, sometimes and never?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! Yes, we can. Our goal today is to describe a daily routine with always, usually, sometimes and never.\n\nQuick reminder: these words go before the main verb, and the verb after he, she or it ends in -s.\n\nHere is a model sentence for this setting: My neighbour always walks to work.\n\nYour task: write three sentences about a normal weekday in your life. Use a different adverb in each sentence, and describe one thing you do in the morning, one at work or school, and one in the evening. Send them when you are ready.",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "these words go before the main verb"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I always drink tea in the morning.",
+    "errors": {
+     "W1": "I drink always tea in the morning."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I drink always tea in the morning.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "I drink always tea in the morning.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

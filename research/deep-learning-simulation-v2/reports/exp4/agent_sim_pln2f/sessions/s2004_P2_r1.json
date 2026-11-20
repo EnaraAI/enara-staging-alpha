@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -143,7 +143,99 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! I have an English exam soon. Can we practise going to for plans?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! Yes, let's do that. Our goal today is to talk about plans with going to.\n\nQuick reminder: we use am, is or are, then going to, then the base verb. A time word such as tomorrow or next week makes the plan clear.\n\nHere is a model sentence: She is going to cook dinner for her friends on Friday.\n\nYour task: write three sentences about your own plans for this weekend or next week. Use going to and a time expression in each sentence. Send them when you are ready."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 1: a plan is am/is/are + going to + base verb. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello! I have an English exam soon. Can we practise going to for plans?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHello! Yes, let's do that. Our goal today is to talk about plans with going to.\n\nQuick reminder: we use am, is or are, then going to, then the base verb. A time word such as tomorrow or next week makes the plan clear.\n\nHere is a model sentence: She is going to cook dinner for her friends on Friday.\n\nYour task: write three sentences about your own plans for this weekend or next week. Use going to and a time expression in each sentence. Send them when you are ready.",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Quick reminder: we use am, is or are, then going to, then the base verb."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I am going to visit my aunt next weekend.",
+    "errors": {
+     "W1": "I going to visit my aunt next weekend."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "I am going to visit my aunt next weekend.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I am going to visit my aunt next weekend.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
