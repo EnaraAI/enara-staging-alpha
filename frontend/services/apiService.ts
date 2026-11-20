@@ -1081,6 +1081,15 @@ export const answerDiagnostic = (id: string, assessmentId: string, questionId: s
   request<DiagnosticView>('POST', `/api/learning/diagnostics/${encodeURIComponent(id)}/answer`, { assessmentId, questionId, answer });
 export const completeDiagnostic = (id: string) => request<DiagnosticView>('POST', `/api/learning/diagnostics/${encodeURIComponent(id)}/complete`);
 export const fetchDiagnosticReport = (id: string) => request<any>('GET', `/api/learning/diagnostics/${encodeURIComponent(id)}/report`);
+// Learner memory phase 1 (ENARA_ENGINE_V2 workOn): a learner's errors to work on (404 when the switch is off).
+export interface ErrorToWorkOnView {
+  id: string; objective: { id: string; code: string | null; title: string | null }; error: string; errorCode: string; occurrences: number;
+  firstSeenAt: string; lastSeenAt: string; status: 'open' | 'resolved' | 'dismissed'; rightStreak: number; waitingForRelease: boolean;
+}
+export const fetchErrorsToWorkOn = (studentId = 'me') =>
+  request<{ errors: ErrorToWorkOnView[] }>('GET', `/api/learning/students/${encodeURIComponent(studentId)}/errors-to-work-on`);
+export const dismissErrorToWorkOn = (id: string, note?: string) =>
+  request<{ id: string; status: string }>('PATCH', `/api/learning/errors-to-work-on/${encodeURIComponent(id)}`, { status: 'dismissed', ...(note ? { note } : {}) });
 export const fetchMisconceptions = (studentId = 'me') =>
   request<{ misconceptions: any[] }>('GET', `/api/learning/students/${encodeURIComponent(studentId)}/misconceptions`);
 

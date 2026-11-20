@@ -4,8 +4,9 @@ import { assignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { isFeatureEnabled, isShadowMode } from '../services/featureFlags';
 import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSource } from '../services/curriculumRetrieval';
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
-import { currentKeyVerdict, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
+import { currentKeyVerdict, independentSuccessItem, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
 import { engineV2 } from '../services/engineV2';
+import { recordTutorOutcome, removeExamItems } from '../services/errorsToWorkOn';
 import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
 import {
@@ -322,6 +323,8 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     ...(turn.plan?.lessonStage?.quickCheck ? { quickCheck: true } : {}),
     // planner2k: a listen-and-do step (listen, do, chant) with kids-pack content replaces the lesson exercise.
     ...(turn.plan?.lessonStage?.ladContent && ['listen', 'do', 'chant'].includes(turn.plan.lessonStage.stage) ? { ladStep: true } : {}),
+    // planner2e fix E: the task-based lesson's repeat/done stage sets the task again (not a gap-fill item).
+    ...(turn.plan?.lessonStage?.shape === 'TASK' && ['repeat', 'done'].includes(turn.plan.lessonStage.stage) ? { taskStep: true } : {}),
   }, 'chat'))?.context ?? null;
   if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language) {
     turn.orchestrator = {
@@ -405,11 +408,23 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
     if (g.removed || g.text !== aiResult.answer) { aiResult = { ...aiResult, answer: g.text }; preAttemptRemoved = g.removed; }
     closingAsk = g.closingAsk;
   }
+  // workOn (learner memory phase 1): never the learner's own assessment questions in a tutor reply (the brief's errors; server-side texts).
+  if (reply && turn.plan?.workOn?.guardTexts.length) {
+    const ex = removeExamItems(aiResult.answer, turn.plan.workOn.guardTexts);
+    if (ex.removed) { aiResult = { ...aiResult, answer: ex.text }; preAttemptRemoved += ex.removed; }
+  }
   const citations = citationsIn(aiResult.answer, turn.sources);
   const assistantId = generateMessageId();
   const languageTurn = turn.language && reply
     ? await completeLanguageTurn({ language: turn.language, objectiveId: turn.plan?.teaching.objectiveId, reply: aiResult.answer, learnerText: turn.text, messageId: assistantId, marker: turn.languageMarker, removed: preAttemptRemoved, closingAsk, institutionId: turn.session.institutionId as string, studentId: turn.studentId, guardHits: turn.guardHits, regenerated: turn.guardRegenerated, postCheck })
     : undefined;
+  // workOn: a graded answer on an objective with errors to work on counts once per session (independent right, or wrong).
+  if (languageTurn && turn.language && engineV2('workOn')) {
+    const verdict = (languageTurn as { assessment?: { verdict?: string } }).assessment?.verdict;
+    const right = Boolean(verdict && independentSuccessItem(turn.language, { assessment: { verdict } }));
+    const wrong = turn.language.signals.answeringCheck && (verdict === 'INCORRECT' || verdict === 'PARTIALLY_CORRECT');
+    if (right || wrong) await recordTutorOutcome({ studentId: turn.session.studentId, objectiveId: turn.plan?.teaching.objectiveId, sessionId: turn.session.id, right });
+  }
   const assistantMessage = {
     id: assistantId,
     role: 'ai' as const,

@@ -12,6 +12,7 @@ import {
   startDiagnostic,
 } from '../controllers/learningDiagnostics.controller';
 import { listStudentMisconceptions, updateMisconception } from '../controllers/learningMisconceptions.controller';
+import { listErrorsToWorkOn, updateErrorToWorkOn } from '../controllers/errorsToWorkOn.controller';
 import {
   cancelIntervention,
   completeIntervention,
@@ -114,6 +115,9 @@ router.get('/students/:studentId/diagnostics', anyRole, ...diagnostics, listStud
 const misconceptions = [anyRole, requireFeature('learning_intelligence_enabled'), requireFeature('misconception_detection_enabled')];
 router.get('/students/:studentId/misconceptions', ...misconceptions, listStudentMisconceptions);
 router.patch('/misconceptions/:id', ...misconceptions, updateMisconception);
+// Learner memory phase 1 (ENARA_ENGINE_V2 workOn; 404 when off).
+router.get('/students/:studentId/errors-to-work-on', anyRole, listErrorsToWorkOn);
+router.patch('/errors-to-work-on/:id', anyRole, updateErrorToWorkOn);
 
 const pedagogy = [anyRole, requireFeature('learning_intelligence_enabled'), requireFeature('adaptive_pedagogy_enabled')];
 router.get('/strategies', requireRole('teacher', 'admin', 'enara-admin'), requireFeature('learning_intelligence_enabled'), listStrategies);

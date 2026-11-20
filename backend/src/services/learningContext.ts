@@ -19,6 +19,7 @@ import { logger, serializeError } from '../utils/logging';
 import { applicationGapFrom, examContextFor } from './assessmentEvidenceContext';
 import { isAdultSchool, isFeatureEnabled, isShadowMode } from './featureFlags';
 import { engineV2 } from './engineV2';
+import { errorsForTutor } from './errorsToWorkOn';
 import { PEDAGOGY_PLAN_VERSION, selectTeachingPlan, belowB1, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { REGISTRY_VERSION, STRATEGY_BY_ID } from './strategyRegistry';
 
@@ -57,6 +58,8 @@ export interface ObjectiveContext {
   objectiveCode?: string;
   // planner2: the lesson shape and this turn's stage (code-set); quickCheck = inside the opening 3-item check.
   lessonStage?: { shape: string; stage: string; quickCheck: boolean; ladContent?: boolean };
+  /** workOn: the errors in this turn's brief and, server-side only, their assessment question texts (the reply guard removes them). Not stored. */
+  workOn?: { errorIds: string[]; objectiveIds: string[]; guardTexts: string[] };
 }
 
 export type Channel = 'chat' | 'stream' | 'voice' | 'intervention';
@@ -185,6 +188,12 @@ export async function buildObjectiveContext(params: {
         ? await StudentObjectiveMastery.countDocuments({ studentId: params.studentId, objectiveId: { $in: relatedObjectives.map((o) => o.id) }, masteryStatus: { $in: [...MET] } })
         : 0,
     };
+    // workOn (learner memory phase 1): errors from released assessments open the session (gated in errorsToWorkOn.ts). Off: nothing.
+    const workOn = engineV2('workOn')
+      ? await errorsForTutor({ studentId: params.studentId, institutionId: params.institutionId, courseId: objective.courseId ? String(objective.courseId) : undefined,
+        child: (input.ageBand ?? (await loadTrustedAgeBand({ institutionId: params.institutionId, studentId: params.studentId, learningSettings: params.institutionId ? (await Institution.findOne({ id: params.institutionId }).select('learningSettings').lean() as { learningSettings?: unknown } | null)?.learningSettings : undefined })).band) === 'child' })
+      : null;
+    if (workOn && !(params.history ?? []).some((t) => t.role === 'assistant')) input.reviewOpening = true; // the review opener (S1 / M3) at the session start
     // planner2: lesson shape first, then the main method inside it (lessonPlanner.ts). Off: ped-v2 unchanged.
     let lesson: LessonPlan | undefined;
     let progress: StageProgress | undefined;
@@ -278,6 +287,7 @@ export async function buildObjectiveContext(params: {
         : '- No assessed answers on it yet.',
       ...weak.map((w) => `- Prerequisite not secure yet: ${w.code} "${w.title}".`),
       ...misconceptions.map((m) => `- Possible misconception (${m.status === 'confirmed' ? 'confirmed by a teacher' : 'not confirmed'}): ${m.description}`),
+      ...(workOn?.lines ?? []),
       ...(quickCheckActive(lesson) ? [QUICK_CHECK_PLAN_LINE] : planLines(plan, target && target.id !== objective.id ? `${target.code} "${target.title}"` : undefined, status, params.compact)),
       ...(lesson ? shapeLines(lesson, progress ? stageNow(lesson, progress) : undefined) : []),
       // kidsPack: the listen-and-do content for this stage (code picks it; the model says it).
@@ -302,7 +312,7 @@ export async function buildObjectiveContext(params: {
       ...(lesson ? { lessonShape: lesson.shape, shapeRule: lesson.shapeRule, methodRule: lesson.methodRule, plannerVersion: lesson.plannerVersion, explanation: lesson.explanation } : {}),
     };
     const lessonStage = lesson ? { shape: lesson.shape, stage: progress ? stageNow(lesson, progress) : lesson.startStage, quickCheck: lesson.shapeRule === 'S4q', ...(lesson.shape === 'LAD' && ladContentFor(objective.code ? String(objective.code) : undefined, objective.title) ? { ladContent: true } : {}) } : undefined;
-    return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching, ...(lessonStage ? { lessonStage } : {}), ...(objective.code ? { objectiveCode: String(objective.code) } : {}) };
+    return { decision: { ...plan, id }, masteryStatus: status, prompt: lines.join('\n'), teaching, ...(workOn ? { workOn: { errorIds: workOn.items.map((i) => i.id), objectiveIds: workOn.items.map((i) => i.objectiveId), guardTexts: workOn.guardTexts } } : {}), ...(lessonStage ? { lessonStage } : {}), ...(objective.code ? { objectiveCode: String(objective.code) } : {}) };
   } catch (error) {
     logger.warn('learning_context_failed', { error: serializeError(error) });
     return null;
