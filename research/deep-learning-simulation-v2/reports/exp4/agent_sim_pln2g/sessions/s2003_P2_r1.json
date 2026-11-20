@@ -657,7 +657,104 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe idea that the main verb keeps the past form after \"did\" is not correct. After \"did\", the main verb goes back to its base form, because \"did\" already shows the past.\n\nSo the question for your task is \"Did you visit the client?\"\n\nRight: \"Did she call the manager?\"\nWrong: \"Did she called the manager?\"\n\nNew item, on your own: write one question with did to ask a colleague about her lunch with a client on Monday.\n\nLEARNER'S LAST MESSAGE:\nYou had lunch with the client on Monday?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nIn \"You had lunch with the client on Monday?\", the past form \"had\" is correct.\n\nThe part to check is the first word of your question. Let us take a smaller step with a different example.\n\nExample: \"Did he open the door?\"\n\nCompare how each question begins and what follows the first two words. Then write your question about the lunch again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe idea that the main verb keeps the past form after \"did\" is not correct. After \"did\", the main verb goes back to its base form, because \"did\" already shows the past.\n\nSo the question for your task is \"Did you visit the client?\"\n\nRight: \"Did she call the manager?\"\nWrong: \"Did she called the manager?\"\n\nNew item, on your own: write one question with did to ask a colleague about her lunch with a client on Monday.\n\nLEARNER'S LAST MESSAGE:\nYou had lunch with the client on Monday?\nFACT: the last learner message contained the error of W2 (makes a question without did (\"You went to school?\" / \"Went you to school?\")).\n\nTUTOR TURN TO JUDGE:\nIn \"You had lunch with the client on Monday?\", the past form \"had\" is correct.\n\nThe part to check is the first word of your question. Let us take a smaller step with a different example.\n\nExample: \"Did he open the door?\"\n\nCompare how each question begins and what follows the first two words. Then write your question about the lunch again.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R6",
+     "belief": "W1",
+     "quote": "the past form \"had\" is correct"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you have lunch with the client on Monday?",
+    "errors": {
+     "W1": "Did you had lunch with the client on Monday?",
+     "W2": "You had lunch with the client on Monday?"
+    }
+   },
+   "applied": [
+    "R6"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W2",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 1,
+     "W2": 2,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Did you have lunch with the client on Monday?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Did you have lunch with the client on Monday?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
