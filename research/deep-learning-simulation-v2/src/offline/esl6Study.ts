@@ -1,5 +1,5 @@
 // SIMULATION ONLY. NO API. ESL stage-6 CONFIRMATORY runner (pre-registered: config/agent_sim_esl6/PROTOCOL.md). Built from esl5Study.ts (same P+ baseline, same
-// engine glue, same cells/judge/agreement/rating/fidelity mechanics) with: 192 NEW learners (180 explicit-first, ids 700-879, 6 per outcome; 12 B2, ids 880-891),
+// engine glue, same cells/judge/agreement/rating/fidelity mechanics) with: 282 NEW learners (270 explicit-first, ids 700-969, 9 per outcome; 12 B2, ids 980-991),
 // 30 A1-A2 form outcomes (lessons: esl6Fixtures.ts; beliefs: LEARNING_RULES §1b via esl6_outcomes.py), arm LE = ESL5 LE + graderV2 with the production
 // [[assess ...]] parser (stripAssessmentMarkers -> completeLanguageTurn/finalizeLanguageTurn), forgetting rule F1 v2 between sessions and before the delayed test
 // (esl6_forget.py, called through one python3 process per command), and the outcome assessment (pre / immediate / delayed, Latin-square forms) answered
@@ -72,8 +72,16 @@ const REPS = [1, 2] as const;
 const BASE = 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog';
 // LE = ESL5 LE (A0 + levelExplicit + esl5 bundle) with graderV2 appended (DECISIONS 3). shortRecap is not used.
 export const ENV_OF: Record<Arm, string> = { PP: '', LE: `${BASE},levelExplicit,esl5,graderV2` };
+// DECISIONS 11 (option C, 2026-11-17): the primary outcome uses only these item types (positions 1-4 of each form,
+// minus the 6 rewrite items of 2 outcomes); error correction (5-6) and rewrite are secondary.
+const PRIMARY_TYPES = new Set(['gap_fill', 'controlled_gap_fill', 'multiple_choice', 'controlled_choice']);
 const GRADER_ENV = 'graderV2';                          // assessment scoring (DECISIONS 1): deterministic path, model path off
-const TURNS_PER_SESSION = 5; const ROUNDS = 2 * TURNS_PER_SESSION; const DAY = 86_400_000; const T0 = Date.parse('2027-03-01T09:00:00Z');
+// Amendment A1 (2026-11-19, before round 1; PROTOCOL §6, DEVIATIONS 4): ONE session of 5 turns. Session-2 code paths are kept but never reached;
+// the state at the end of teaching is stored in stateEndS2 (field name kept) and in stateAfterS1.
+const SESSIONS = 1; const AGREE_ROUNDS = [3, 5];
+// Deviation 14 (2026-11-19, user decision, before any round-3 judging): judge and agreement batches hold 72 cases from round 3 on (36 in rounds 1-2, as run).
+const JUDGE_PER = (round: number) => (round >= 3 ? 72 : 36);
+const TURNS_PER_SESSION = 5; const ROUNDS = SESSIONS * TURNS_PER_SESSION; const DAY = 86_400_000; const T0 = Date.parse('2027-03-01T09:00:00Z');
 const GAP_DAYS = 2; const DELAY_DAYS = 7;
 const LESSON_ID = 'lsn';                                // ESL5 stand-in (b), kept
 const NS = 'esl6';
@@ -128,9 +136,11 @@ function buildLearners(): Learner[] {
   const out: Learner[] = []; const O = outcomes();
   OUTCOME_IDS.forEach((oid, b) => {
     const two = O[oid].ws.length === 2; const a1 = /^EN-F-A1-/.test(oid);
-    for (let p = 0; p < 6; p++) out.push({ idx: 700 + 6 * b + p, outcome: oid, band: a1 && p < 3 ? 'A1' : 'A2', status: p < 3 ? 'not_assessed' : 'emerging', primary: two && [2, 4, 5].includes(p) ? 'W2' : 'W1', seq: SEQS[p % 3] });
+    // DECISIONS 14 (n = 270): blocks of 9. Positions 0-5 are the original block of 6 unchanged; the 3 added learners
+    // (6-8) are A2, statuses not_assessed/emerging/emerging, primary belief W2/W1/W1, one per form sequence.
+    for (let p = 0; p < 9; p++) out.push({ idx: 700 + 9 * b + p, outcome: oid, band: a1 && p < 3 ? 'A1' : 'A2', status: p < 3 || p === 6 ? 'not_assessed' : 'emerging', primary: two && [2, 4, 5, 6].includes(p) ? 'W2' : 'W1', seq: SEQS[p % 3] });
   });
-  B2_OUTCOMES.forEach((oid, i) => out.push({ idx: 880 + i, outcome: oid, band: 'B2', status: 'proficient', primary: 'W1', seq: SEQS[i % 3] }));
+  B2_OUTCOMES.forEach((oid, i) => out.push({ idx: 980 + i, outcome: oid, band: 'B2', status: 'proficient', primary: 'W1', seq: SEQS[i % 3] }));
   return out;
 }
 let LRN: Learner[] | undefined;
@@ -142,7 +152,7 @@ const seedOf = (idx: number, rep: number) => `${NS}|L${idx}|rep${rep}`;
 interface LangTurn { assessment?: any; activeItem?: any; hintLevel?: number; rulesIntroduced?: number[]; closingAsk?: string; [k: string]: unknown }
 interface Turn { session: 1 | 2; learner: string; production: Production; tutor?: string; raw?: string; ev5?: Record<string, unknown>; lang?: LangTurn; judgeInput?: string; [k: string]: unknown }
 interface Rec { entries: any[]; liveErrors: Record<string, { seen: number; lastCorrect?: boolean }>; knownPoints: Record<string, number> }
-interface AssessSummary { form: string; points: number; max: number; pct: number; free: number; items1to4: number; nulls: number }
+interface AssessSummary { form: string; points: number; max: number; pct: number; free: number; items1to4: number; nulls: number; primary: number; primaryMax: number; ecRewrite: number; ecRewriteMax: number }
 interface Sess { arm: Arm; rep: number; learnerIdx: number; outcome: string; seed: string; state: KState; start: KState; rec: Rec; turns: Turn[]; stateAfterS1?: KState; recAfterS1?: Rec; stateS2Start?: KState; stateEndS2?: KState; stateDelayed?: KState; assess?: Partial<Record<Time, AssessSummary>> }
 const keyOf = (s: { learnerIdx: number; arm: Arm; rep: number }) => `s${s.learnerIdx}_${s.arm}_r${s.rep}`;
 const sf = (dir: string, key: string) => path.join(dir, 'sessions', `${key}.json`);
@@ -445,7 +455,7 @@ async function main() {
       cases.push({ id: caseId(f, round), text: cur.judgeInput }); km[caseId(f, round)] = f.replace(/\.json$/, '');
     }
     write(keymap, km);
-    const files = writeJudgeBatches(path.join(dir, 'judge'), `r${round}`, cases, 36, NS); write(path.join(dir, 'judge', `r${round}_FILES.json`), files);
+    const files = writeJudgeBatches(path.join(dir, 'judge'), `r${round}`, cases, JUDGE_PER(round), NS); write(path.join(dir, 'judge', `r${round}_FILES.json`), files);
     console.log('judge cases', cases.length, files.map((x) => x.batch).join(' '));
   } else if (cmd === 'japply') {
     const dir = dirArg(a1); const round = Number(a2); const files = JSON.parse(readFileSync(path.join(dir, 'judge', `r${round}_FILES.json`), 'utf8')); const km = JSON.parse(readFileSync(path.join(dir, 'judge', `r${round}_KEY.json`), 'utf8'));
@@ -456,15 +466,15 @@ async function main() {
     let rej = 0;
     todo.forEach(({ s, cur, j }, i) => {
       const r = res[i]; Object.assign(cur, { stateBefore: s.state, events: j.events ?? [], retrieval: (j as any).retrieval ?? [], next_task: j.next_task, applied: r.applied, rejected: r.rejected, stateAfter: r.state }); s.state = r.state; rej += r.rejected.length;
-      if (round === TURNS_PER_SESSION) { s.stateAfterS1 = r.state; s.recAfterS1 = JSON.parse(JSON.stringify(s.rec)); s.turns.push(opener(L_OF(s.learnerIdx), 2)); }
-      else if (round === ROUNDS) s.stateEndS2 = r.state;
+      if (round === ROUNDS) { s.stateEndS2 = r.state; if (SESSIONS === 1) { s.stateAfterS1 = r.state; s.recAfterS1 = JSON.parse(JSON.stringify(s.rec)); } }
+      else if (round === TURNS_PER_SESSION) { s.stateAfterS1 = r.state; s.recAfterS1 = JSON.parse(JSON.stringify(s.rec)); s.turns.push(opener(L_OF(s.learnerIdx), 2)); }
       else { const p = learnerReply(s.state, j.next_task as NextTask, s.seed, round + 1); s.turns.push({ session: cur.session, learner: p.text, production: p }); }
       save(dir, s);
     });
     console.log('applied', todo.length, 'rejected events', rej);
   } else if (cmd === 'f1') {
     // F1 v2 (LEARNING_RULES §6, F1_PARAMS.json): 2 days after session 1 (before any session-2 judging), 7 days after session 2 (delayed test state).
-    const dir = dirArg(a1); const days = Number(a2); if (days !== GAP_DAYS && days !== DELAY_DAYS) throw new Error('f1 days must be 2 or 7');
+    const dir = dirArg(a1); const days = Number(a2); if (days !== GAP_DAYS && days !== DELAY_DAYS) throw new Error('f1 days must be 2 or 7'); if (days === GAP_DAYS && SESSIONS === 1) throw new Error('one-session design (amendment A1): no 2-day gap');
     const todo: Sess[] = [];
     for (const f of sessionFiles(dir)) { const s = load(dir, f.replace(/\.json$/, '')); if (days === GAP_DAYS && s.stateAfterS1 && !s.stateS2Start) todo.push(s); if (days === DELAY_DAYS && s.stateEndS2 && !s.stateDelayed) todo.push(s); }
     const notReady = sessionFiles(dir).length - todo.length - sessionFiles(dir).filter((f) => { const s = load(dir, f.replace(/\.json$/, '')); return days === GAP_DAYS ? s.stateS2Start : s.stateDelayed; }).length;
@@ -477,14 +487,16 @@ async function main() {
     const map = IBM(); const wrong = WRONG(); const rows: any[] = []; let nulls = 0;
     for (const f of sessionFiles(dir)) {
       const s = load(dir, f.replace(/\.json$/, '')); const l = L_OF(s.learnerIdx);
-      const k = time === 'pre' ? s.start : time === 'imm' ? s.stateEndS2 : s.stateDelayed; if (!k) throw new Error(`${f}: no state for ${time} (imm needs round 10 judged; del needs f1 7)`);
-      const form = l.seq[time]; const items = bank().forms.get(l.outcome)![form]; let pts = 0; let free = 0; let c14 = 0; let nul = 0;
+      const k = time === 'pre' ? s.start : time === 'imm' ? s.stateEndS2 : s.stateDelayed; if (!k) throw new Error(`${f}: no state for ${time} (imm needs round ${ROUNDS} judged; del needs f1 7)`);
+      const form = l.seq[time]; const items = bank().forms.get(l.outcome)![form]; let pts = 0; let free = 0; let c14 = 0; let nul = 0; let prim = 0; let primMax = 0; let ecr = 0; let ecrMax = 0;
       for (const it of items) {
         const a = answerItem(k, s.seed, time, it.id, map, wrong); const sc = scoreAnswer(it.id, a.answer); const p = sc.points ?? 0; if (sc.points === null) { nul++; nulls++; }
         pts += p; const pos = map[it.id].position; if (pos >= 7) free += p; if (pos <= 4 && p === sc.max) c14++;
+        // DECISIONS 11: primary = gap-fill and choice items; error correction and rewrite are secondary.
+        if (PRIMARY_TYPES.has(it.type)) { prim += p; primMax += sc.max; } else if (it.type === 'error_correction' || it.type === 'rewrite') { ecr += p; ecrMax += sc.max; }
         rows.push({ answerId: `a${sha(`${NS}|ans|${keyOf(s)}|${time}|${it.id}`).slice(0, 12)}`, session: keyOf(s), learner: s.learnerIdx, arm: s.arm, rep: s.rep, time, form, itemId: it.id, position: pos, scoring: it.scoring, probes: map[it.id].probes, fired: a.fired, answer: a.answer, points: sc.points, max: sc.max });
       }
-      s.assess = { ...(s.assess ?? {}), [time]: { form, points: pts, max: 12, pct: pts / 12, free, items1to4: c14, nulls: nul } }; save(dir, s);
+      s.assess = { ...(s.assess ?? {}), [time]: { form, points: pts, max: 12, pct: pts / 12, free, items1to4: c14, nulls: nul, primary: prim, primaryMax: primMax, ecRewrite: ecr, ecRewriteMax: ecrMax } }; save(dir, s);
     }
     write(path.join(dir, `ASSESS_${time}.json`), rows); console.log(`assess ${time}: answers ${rows.length}, sessions ${rows.length / 9}, grader null ${nulls}`);
   } else if (cmd === 'post') {
@@ -514,10 +526,10 @@ async function main() {
     }
     const out = a2 ? path.resolve(a2) : path.join(dir, 'TAGS.json'); write(out, rows); write(path.join(path.dirname(out), 'STUCK.json'), stuck); console.log('turn rows', rows.length, 'stuck runs', stuck.length);
   } else if (cmd === 'agreeprep') {
-    const dir = dirArg(a1); const round = Number(a2); const km = JSON.parse(readFileSync(path.join(dir, 'judge', `r${round}_KEY.json`), 'utf8')); const cases: { id: string; text: string }[] = []; const key: Record<string, string> = {};
+    const dir = dirArg(a1); const round = Number(a2); if (!AGREE_ROUNDS.includes(round)) throw new Error(`agreement rounds are ${AGREE_ROUNDS.join(' and ')}`); const km = JSON.parse(readFileSync(path.join(dir, 'judge', `r${round}_KEY.json`), 'utf8')); const cases: { id: string; text: string }[] = []; const key: Record<string, string> = {};
     for (const [cid, sk] of Object.entries(km) as [string, string][]) { if (rand(`${NS}-agree`, cid) >= 0.2) continue; const s = load(dir, sk); const t = s.turns[round - 1]; if (!t.judgeInput) continue; const aid = `a${cid.slice(1)}`; cases.push({ id: aid, text: t.judgeInput }); key[aid] = `${sk}|${round}|${cid}`; }
     mkdirSync(path.join(dir, 'agree'), { recursive: true });
-    const files = writeJudgeBatches(path.join(dir, 'agree'), `ag${round}`, cases, 36, `${NS}-agree`); write(path.join(dir, 'agree', `ag${round}_FILES.json`), files); write(path.join(dir, 'agree', `ag${round}_KEY.json`), key);
+    const files = writeJudgeBatches(path.join(dir, 'agree'), `ag${round}`, cases, JUDGE_PER(round), `${NS}-agree`); write(path.join(dir, 'agree', `ag${round}_FILES.json`), files); write(path.join(dir, 'agree', `ag${round}_KEY.json`), key);
     console.log('agreement cases', cases.length, files.map((x) => x.batch).join(' '));
   } else if (cmd === 'agreescore') {
     const dir = dirArg(a1); const res: any = { _label: 'SIMULATION ONLY', rounds: {}, sessions: { 1: { cases: 0, same: 0 }, 2: { cases: 0, same: 0 } }, cases: 0, same: 0, missing: 0, comparedOn: 'strengths, independent counts and counted retrievals after applying each judge\'s events (esl6_forget.comparable)' };
@@ -532,16 +544,23 @@ async function main() {
     }
     for (const k of [1, 2]) res.sessions[k].agreement = res.sessions[k].cases ? +(res.sessions[k].same / res.sessions[k].cases).toFixed(4) : null;
     res.agreement = res.cases ? +(res.same / res.cases).toFixed(4) : null;
-    res.pass = res.missing === 0 && res.agreement !== null && res.agreement >= 0.85 && res.sessions[2].agreement !== null && res.sessions[2].agreement >= 0.85;
+    // Amendment A1: one session, so the session-2 guard becomes the later agreement round (round 5, which includes the closing turn).
+    const lateR = AGREE_ROUNDS[AGREE_ROUNDS.length - 1]; res.lateRound = lateR; res.late = res.rounds[lateR]?.agreement ?? null;
+    res.pass = res.missing === 0 && res.agreement !== null && res.agreement >= 0.85 && (SESSIONS === 1 ? res.late !== null && res.late >= 0.85 : res.sessions[2].agreement !== null && res.sessions[2].agreement >= 0.85);
     write(path.join(dir, 'JUDGE_AGREEMENT.json'), res); console.log(JSON.stringify(res));
   } else if (cmd === 'recheckprep') {
     // DECISIONS 2 / PROTOCOL §10.5: 10% of all scored answers (all times, arms, learners, items), rand('esl6-recheck', answerId) < 0.1; 3 independent scorers,
     // rubric + item only, blind to arm, learner, time and grader score; each scorer gets its own order; 40 answers per batch.
     const dir = dirArg(a1); const all = TIMES.flatMap((t) => { const p = path.join(dir, `ASSESS_${t}.json`); if (!existsSync(p)) throw new Error(`missing ${p}`); return JSON.parse(readFileSync(p, 'utf8')) as any[]; });
     const sample = all.filter((r) => rand(`${NS}-recheck`, r.answerId) < 0.1); const key: Record<string, any> = {};
+    // Amendment A2 (2026-11-19, before round 1; PROTOCOL §10.5, DEVIATIONS 5): answers are deterministic strings and the grader is deterministic, so
+    // every sampled answer with the same (item, answer string) is scored ONCE per scorer, under a unique id u<hash>. The guard is still computed over
+    // every sampled answer (each takes its pair's scores), exactly as before; agreement over distinct pairs is also reported.
+    const uidOf = (r: any) => `u${sha(`${NS}-recheck-pair|${r.itemId}|${r.answer}`).slice(0, 12)}`;
+    const uniq = [...new Map(sample.map((r) => [uidOf(r), { ...r, answerId: uidOf(r) }] as const)).values()];
     for (const sc of ['s1', 's2', 's3']) {
       const d = path.join(dir, 'recheck', sc); mkdirSync(d, { recursive: true });
-      const order = [...sample].sort((x, y) => (sha(`${NS}-recheck|${sc}|${x.answerId}`) < sha(`${NS}-recheck|${sc}|${y.answerId}`) ? -1 : 1));
+      const order = [...uniq].sort((x, y) => (sha(`${NS}-recheck|${sc}|${x.answerId}`) < sha(`${NS}-recheck|${sc}|${y.answerId}`) ? -1 : 1));
       const files: { batch: string; ids: string[] }[] = [];
       for (let b = 0; b * 40 < order.length; b++) {
         const batch = `rc${String(b + 1).padStart(2, '0')}`; const chunk = order.slice(b * 40, b * 40 + 40);
@@ -550,17 +569,21 @@ async function main() {
       }
       write(path.join(d, 'FILES.json'), files);
     }
-    for (const r of sample) key[r.answerId] = { itemId: r.itemId, scoring: r.scoring, grader: r.points ?? 0, graderNull: r.points === null, max: r.max };
-    write(path.join(dir, 'recheck', 'KEY.json'), key); console.log('recheck answers', sample.length, 'of', all.length, 'batches per scorer', Math.ceil(sample.length / 40));
+    for (const r of sample) key[r.answerId] = { itemId: r.itemId, scoring: r.scoring, grader: r.points ?? 0, graderNull: r.points === null, max: r.max, uid: uidOf(r) };
+    write(path.join(dir, 'recheck', 'KEY.json'), key); console.log('recheck answers', sample.length, 'of', all.length, 'distinct item+answer pairs', uniq.length, 'batches per scorer', Math.ceil(uniq.length / 40));
   } else if (cmd === 'recheckscore') {
     const dir = dirArg(a1); const key = JSON.parse(readFileSync(path.join(dir, 'recheck', 'KEY.json'), 'utf8')) as Record<string, any>; const got: Record<string, Record<string, number>> = {}; const missing: string[] = [];
     for (const sc of ['s1', 's2', 's3']) { const files = JSON.parse(readFileSync(path.join(dir, 'recheck', sc, 'FILES.json'), 'utf8')) as { batch: string; ids: string[] }[]; for (const f of files) { const p = path.join(dir, 'recheck', sc, `${f.batch}.json`); if (!existsSync(p)) { missing.push(`${sc}/${f.batch}`); continue; } const d = JSON.parse(readFileSync(p, 'utf8')); for (const id of f.ids) { const v = d.scores?.[id]; if (typeof v !== 'number') missing.push(`${sc}/${f.batch}:${id}`); else (got[id] ??= {})[sc] = v; } } }
     const ref = (v: number[]) => { const c: Record<number, number> = {}; v.forEach((x) => (c[x] = (c[x] ?? 0) + 1)); const m = Object.entries(c).find(([, n]) => n >= 2); return m ? Number(m[0]) : [...v].sort((a, b) => a - b)[1]; };
-    const ex: { g: number; r: number }[] = []; const tf: { g: number; r: number }[] = [];
-    for (const [id, k] of Object.entries(key)) { const v = got[id]; if (!v || Object.keys(v).length !== 3) continue; const r = ref([v.s1, v.s2, v.s3]); (k.scoring === 'exact' ? ex : tf).push({ g: k.grader, r }); }
+    const ex: { g: number; r: number }[] = []; const tf: { g: number; r: number }[] = []; const prim: { g: number; r: number }[] = [];
+    const seenU = new Set<string>(); const primU: { g: number; r: number }[] = [];
+    for (const [id, k] of Object.entries(key)) { const v = got[k.uid ?? id]; if (!v || Object.keys(v).length !== 3) continue; const r = ref([v.s1, v.s2, v.s3]); if (k.uid && !seenU.has(k.uid)) { seenU.add(k.uid); if (k.scoring === 'exact' && PRIMARY_TYPES.has(bank().items.get(k.itemId)?.type ?? '')) primU.push({ g: k.grader, r }); } (k.scoring === 'exact' ? ex : tf).push({ g: k.grader, r }); if (k.scoring === 'exact' && PRIMARY_TYPES.has(bank().items.get(k.itemId)?.type ?? '')) prim.push({ g: k.grader, r }); }
     const qwk = (xs: { g: number; r: number }[]) => { const K = 3; const O = Array.from({ length: K }, () => Array(K).fill(0)); xs.forEach(({ g, r }) => O[g][r]++); const n = xs.length; if (!n) return null; const hg = O.map((row) => row.reduce((a, b) => a + b, 0)); const hr = [0, 1, 2].map((j) => O.reduce((a, row) => a + row[j], 0)); let num = 0; let den = 0; for (let i = 0; i < K; i++) for (let j = 0; j < K; j++) { const w = (i - j) ** 2 / (K - 1) ** 2; num += w * O[i][j]; den += w * hg[i] * hr[j] / n; } return den === 0 ? 1 : +(1 - num / den).toFixed(4); };
-    const exact = ex.length ? +(ex.filter((x) => x.g === x.r).length / ex.length).toFixed(4) : null; const q = qwk(tf);
-    const res = { _label: 'SIMULATION ONLY', sampled: Object.keys(key).length, exactItems: ex.length, exactAgreement: exact, freeItems: tf.length, qwk: q, missing, pass: !missing.length && exact !== null && exact >= 0.95 && q !== null && q >= 0.8 };
+    const agree = (xs: { g: number; r: number }[]) => (xs.length ? +(xs.filter((x) => x.g === x.r).length / xs.length).toFixed(4) : null);
+    const exact = agree(ex); const primary = agree(prim); const q = qwk(tf);
+    // DECISIONS 9 + 11: the guard is >=95% exact agreement on PRIMARY items only (gap-fill and choice items);
+    // all-exact agreement (incl. error correction) and free-item QWK are reported, not guards.
+    const res = { _label: 'SIMULATION ONLY', sampled: Object.keys(key).length, primaryItems: prim.length, primaryAgreement: primary, distinctPairs: seenU.size, primaryDistinctPairs: primU.length, primaryAgreementDistinctPairs: agree(primU), exactItems: ex.length, exactAgreement: exact, freeItems: tf.length, qwk: q, missing, guard: 'primary (gap-fill/choice) exact agreement >= 0.95', pass: !missing.length && primary !== null && primary >= 0.95 };
     write(path.join(dir, 'GRADER_RECHECK.json'), res); console.log(JSON.stringify({ ...res, missing: missing.length }));
   } else if (cmd === 'rateprep') {
     const dir = dirArg(a1); const out = path.resolve(a2 ?? path.join(dir, 'rate')); mkdirSync(out, { recursive: true }); const labels = ['V', 'W']; const key: Record<string, any> = {};
@@ -569,7 +592,7 @@ async function main() {
       const id = `rt${String(n + 1).padStart(2, '0')}`; let t = `Batch ${id}. Rate every case as described in the rater instructions (two tutors per case) and write the JSON to the file named in your task.\n`; key[id] = {};
       for (const l of order.slice(n * 10, n * 10 + 10)) {
         const arms = [...ARMS].sort((a, b) => (sha(`${NS}ra|${l.idx}|${a}`) < sha(`${NS}ra|${l.idx}|${b}`) ? -1 : 1)); const cid = `c${sha(`${NS}case|${l.idx}`).slice(0, 6)}`; key[id][cid] = { studentIdx: l.idx, labels: Object.fromEntries(arms.map((a, k) => [labels[k], a])) };
-        t += `\n\n=========== CASE ${cid} ===========\nLearner: English learner in Egypt (first language Arabic). Lesson topic: ${lessonOf(l.outcome).title}. Two short lessons, two days apart.\n`;
+        t += `\n\n=========== CASE ${cid} ===========\nLearner: English learner in Egypt (first language Arabic). Lesson topic: ${lessonOf(l.outcome).title}. ${SESSIONS === 1 ? 'One short lesson.' : 'Two short lessons, two days apart.'}\n`;
         arms.forEach((a, k) => { const s = load(dir, `s${l.idx}_${a}_r1`); t += `\n----- TUTOR ${labels[k]} -----\n${s.turns.map((x) => `${x.session === 2 && s.turns.find((y) => y.session === 2) === x ? '(two days later)\n' : ''}STUDENT: ${x.learner}\nTUTOR: ${x.tutor ?? ''}`).join('\n')}\n`; });
       }
       writeFileSync(path.join(out, `${id}.md`), t);
@@ -622,7 +645,8 @@ async function main() {
   } else if (cmd === 'dryscore') {
     // scripted recheck scorers: scorers 1 and 2 copy the grader, scorer 3 copies it except on 1 answer in 20 (exercises majority + QWK)
     const dir = dirArg(a1); needDry(dir); const all = new Map(TIMES.flatMap((t) => (JSON.parse(readFileSync(path.join(dir, `ASSESS_${t}.json`), 'utf8')) as any[]).map((r) => [r.answerId, r] as const)));
-    for (const sc of ['s1', 's2', 's3']) { const files = JSON.parse(readFileSync(path.join(dir, 'recheck', sc, 'FILES.json'), 'utf8')) as { batch: string; ids: string[] }[]; for (const f of files) write(path.join(dir, 'recheck', sc, `${f.batch}.json`), { batch: f.batch, scores: Object.fromEntries(f.ids.map((id) => { const r = all.get(id)!; const g = r.points ?? 0; return [id, sc === 's3' && rand('dryscore', id) < 0.05 ? (g === 0 ? 1 : 0) : g]; })) }); }
+    const byU = new Map(Object.values(JSON.parse(readFileSync(path.join(dir, 'recheck', 'KEY.json'), 'utf8')) as any[]).map((k) => [k.uid, { points: k.grader }] as const)); // amendment A2 ids
+    for (const sc of ['s1', 's2', 's3']) { const files = JSON.parse(readFileSync(path.join(dir, 'recheck', sc, 'FILES.json'), 'utf8')) as { batch: string; ids: string[] }[]; for (const f of files) write(path.join(dir, 'recheck', sc, `${f.batch}.json`), { batch: f.batch, scores: Object.fromEntries(f.ids.map((id) => { const r = all.get(id) ?? byU.get(id)!; const g = r.points ?? 0; return [id, sc === 's3' && rand('dryscore', id) < 0.05 ? (g === 0 ? 1 : 0) : g]; })) }); }
     console.log('dry scorer files written');
   } else {
     console.log('commands: hashcheck | answercheck | overlap | init | tprompts | promptcheck | tapply | status | jprep | japply | f1 | assess | post | tags | agreeprep | agreescore | recheckprep | recheckscore | rateprep | fidprep');

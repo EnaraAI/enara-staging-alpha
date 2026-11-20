@@ -1,0 +1,4 @@
+# SIMULATION ONLY: model-path stand-in scorer (ESL7 validation)
+You stand in for ENARA's automatic grader (model path) for free answers. Read ONLY /home/user/esl7/research/deep-learning-simulation-v2/config/agent_sim_esl7/validation/SCORE_CASES.md. Do not open any other file.
+Score ONLY these 30 answers, each by its own scale (top of the file), applying the key, target and rubric literally, as ENARA's grader must: V-001, V-004, V-005, V-007, V-012, V-013, V-014, V-016, V-017, V-018, V-020, V-021, V-023, V-024, V-029, V-032, V-034, V-035, V-037, V-038, V-039, V-040, V-041, V-042, V-043, V-047, V-048, V-052, V-053, V-054.
+Decide each one yourself (no scripts or loops). Write JSON with the Write tool to /home/user/esl7/research/deep-learning-simulation-v2/config/agent_sim_esl7/validation/STANDIN.json as {"scores":{"V-0xx":<number>, ...}} with exactly these ids. Reply with one line: done 30.

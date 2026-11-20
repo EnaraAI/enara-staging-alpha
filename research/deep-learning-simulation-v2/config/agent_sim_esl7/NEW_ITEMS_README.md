@@ -1,0 +1,10 @@
+# ESL7 new course-outcome items (SIMULATION ONLY, DRAFT)
+- Built: 6 item banks `data/assessments/outcomes/EN-C-*.json` (forms A = pre + 4-week, B = immediate, C = 1-week), `NEW_LEARNING_RULES.md` (rows 34-39), `ITEM_BELIEF_MAP_NEW.json`, `WRONG_ANSWERS_NEW.json`, `LESSONS_NEW.json` (6 lessons, 3 items each), `src/offline/esl7_outcomes_new.py` (6 validation-case entries).
+- Counts: 66 items = RD 2 x 3 forms x 5 (multiple_choice + gap_fill, exact) + WR 2 x 3 x 1 (writing_task, rubric_0_3, max 6) + FN 2 x 3 x 5 (free_production, target_form_0_1_2). Every item probes at least one wrong belief and is in both maps.
+- Text lengths: A1 reading 49-54 words; A2 reading 102-104 words; A2 model answers 33-40 words.
+- Checks (scratch script): all JSON parses, planned counts per form, every id in both maps with matching probes, no sentence of 3+ words repeats across forms, lessons and esl7_outcomes_new.py (fixed instruction lines excluded).
+- Unmet / changed: (1) writing rubrics have 2 criteria (task, language) as briefed; the outcome criteria list 3 (A1: task, form, mechanics) and 4 (A2: task, grammar, linking, mechanics), merged into "language". (2) A2 writing tasks are all past events; routines and plans appear only in the lesson. (3) A2 function forms test request, apology, suggestion and 2 x ask-for-information; "give information" is not tested separately. (4) A1 function adds one "ask the tutor" item per form (the outcome says ask and answer).
+- New error codes `keyword_matching` (reading, not an Arabic-L1 transfer error) and `fragment_answer` (A1 function) are not in framework section 9; `request_directness` is widened to a bare "Sorry" with no reason, as briefed.
+- Reading items have one wrong belief only; the listed L1 types of the reading outcomes (article_def_misuse, spelling_vowel) cannot change a choice or a copied word, so they are not seeded.
+- In reading, every key is the 2nd entity of its type in the text by design (keyword-matching probe); a real test would vary key position.
+- Vocabulary levels were checked from memory, not against the EVP lists.
