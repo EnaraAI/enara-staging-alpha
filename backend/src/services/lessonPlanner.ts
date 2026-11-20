@@ -11,7 +11,7 @@
 import { planWithTrace, type MethodPick, type MethodRule, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { STRATEGY_BY_ID, validateComposition } from './strategyRegistry';
 
-export const PLANNER_VERSION = 'planner2-v6';
+export const PLANNER_VERSION = 'planner2-v7';
 
 export type LessonShape = 'PPP' | 'TTT' | 'TASK' | 'LAD';
 export type Stage =
@@ -474,7 +474,7 @@ export function shapeLines(lp: LessonPlan, stage?: Stage): string[] {
       ? `- This turn's stage: ${STAGE_WORDS[stage]}. Stay in this stage; the system moves the stage on.`
       : `- Start with: ${STAGE_WORDS[lp.startStage]}; go on to the next stage only after the learner succeeds.`,
     '- Never ask the learner their age or birth date.',
-    ...(lp.childSupports ? ['- Child learner: very short sentences, one instruction at a time, praise effort, a small game or story frame. Accept any correct word or sentence that fits, even one that is not in the lesson list (for example "wife" for a family word); say it is right, then show the lesson word.'] : []),
+    ...(lp.childSupports ? ['- Child learner: very short sentences, one instruction at a time, praise effort, a small game or story frame. Accept any correct word or sentence that fits, even one that is not in the lesson list (for example "wife" for a family word): say it is right and move on. Do not add the lesson word after a right answer.'] : []),
     ...(lp.plan.supporting.includes('elaborative_interrogation') ? ['- If you ask "why", the learner may answer in Arabic.'] : []),
     ...(lp.methodRule === 'P1_L1_CONTRAST' ? ['- Contrast the English form with how Arabic says it, in one short line.'] : []),
   ];
