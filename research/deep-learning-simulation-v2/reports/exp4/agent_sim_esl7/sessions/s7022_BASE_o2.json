@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1.5,
+   "W1": 0,
    "W2": 0,
    "C1": 0,
    "C2": 0
@@ -1086,7 +1086,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1.5: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 0: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Rewrite correctly: \"my brother likes tea\"\" | \"Rewrite correctly: \"my brother likes tea\"\" | \"Look at the first letter and the last mark in the pair. Then try again: Rewrite correctly: \"my brother likes tea\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise capital letters and full stops again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi! Look at this: \"the train is fast.\" The first word needs a capital letter, so I write: \"The train is fast.\" Rule: every sentence starts with a capital letter. Right: \"The train is fast.\" Wrong: \"the train is fast.\" Now you try. Write this sentence again: \"my friend is kind.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-capitals-full-stops (capital letters and full stops). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1.5: a text is one long line joined with \"and\", no full stops or capitals. Its error: writes one long line with \"and\", no capitals or full stops (\"my name is ali and i live in cairo and i like football\").\nC1 (correct) strength 0: a sentence starts with a capital, \"I\" is always capital, it ends with a full stop. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Rewrite correctly: \"my brother likes tea\"\" | \"Rewrite correctly: \"my brother likes tea\"\" | \"Look at the first letter and the last mark in the pair. Then try again: Rewrite correctly: \"my brother likes tea\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHello again! Can we practise capital letters and full stops again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nHi! Look at this: \"the train is fast.\" The first word needs a capital letter, so I write: \"The train is fast.\" Rule: every sentence starts with a capital letter. Right: \"The train is fast.\" Wrong: \"the train is fast.\" Now you try. Write this sentence again: \"my friend is kind.\"",
+   "stateBefore": {
+    "form": "caps",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1.5,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: every sentence starts with a capital letter."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"The train is fast.\" Wrong: \"the train is fast.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My friend is kind.",
+    "errors": {
+     "W1": "my friend is kind"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "caps",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My friend is kind.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "My friend is kind.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
