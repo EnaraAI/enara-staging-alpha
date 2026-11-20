@@ -152,13 +152,27 @@ const itemErrorProb = (k: KState, w: 'W1' | 'W2', floorOn = k.afterF1) => Math.m
 // ---------------------------------------------------------------------------------------------------------- lessons (ESL6 + LESSONS_NEW.json)
 type Lesson = Pick<Esl6Lesson, 'outcomeId' | 'title' | 'objective' | 'spec'>;
 let LNEW: Record<string, Lesson> | undefined;
+// Amendment D: the engine sends only an item's prompt to the model, so a reading or dialogue text must be inside the prompt,
+// as a course author would write it. LESSONS_NEW.json kept it in a separate "material" field (rounds 1-7: not shown in BASE/NEW).
+function withMaterial(it: any) {
+  if (!it?.material) return it;
+  // Question first, then the text: the engine caps an item prompt at 300 characters (cleanItems), so a long text loses its end, not the question.
+  const prompt = `${String(it.prompt).trim()} Text: "${String(it.material).trim()}"`.slice(0, 300); // the live cap (cleanItems), applied here because the harness builds lessons directly
+  const { material: _m, ...rest } = it; return { ...rest, prompt, question: it.prompt }; // question: the original line, for the harness's own item matching
+}
+
 function lessonsNew(): Record<string, Lesson> {
   if (LNEW) return LNEW;
   const p = path.join(CFG, 'LESSONS_NEW.json'); if (!existsSync(p)) return (LNEW = {});
   const d = JSON.parse(readFileSync(p, 'utf8')); const list: any[] = Array.isArray(d) ? d : Array.isArray(d.lessons) ? d.lessons : Object.values(d.lessons ?? d);
-  return (LNEW = Object.fromEntries(list.map((l) => [l.outcomeId, { outcomeId: l.outcomeId, title: l.title, objective: l.objective ?? l.spec?.objectives?.[0] ?? l.title, spec: { objectives: [], successCriteria: [], vocabulary: [], grammar: [], functions: [], skills: [], examples: [], items: [], ...l.spec } }])));
+  return (LNEW = Object.fromEntries(list.map((l) => [l.outcomeId, { outcomeId: l.outcomeId, title: l.title, objective: l.objective ?? l.spec?.objectives?.[0] ?? l.title, spec: { objectives: [], successCriteria: [], vocabulary: [], grammar: [], functions: [], skills: [], examples: [], items: [], ...l.spec, items: (l.spec?.items ?? []).map(withMaterial) } }])));
 }
-const lessonOf = (oid: string): Lesson => { const l = LESSONS6[oid] ?? lessonsNew()[oid]; if (!l) throw new Error(`no lesson for ${oid}`); return l; };
+const L6M: Record<string, Lesson> = {};
+const lessonOf = (oid: string): Lesson => {
+  const six = LESSONS6[oid];
+  if (six) return (L6M[oid] ??= { ...six, spec: { ...six.spec, items: (six.spec?.items ?? []).map(withMaterial) } } as Lesson);
+  const l = lessonsNew()[oid]; if (!l) throw new Error(`no lesson for ${oid}`); return l;
+};
 const lessonIdOf = (oid: string) => `lsn-${oid}`;    // one lesson id per outcome (ESL5 record keys and sessionMemory "answered items" stay per outcome)
 
 // ---------------------------------------------------------------------------------------------------------- error codes (LEARNING_RULES 1b, NEW_LEARNING_RULES; fallback outcomes.json l1ErrorTypes)
@@ -314,7 +328,7 @@ const nowOf = (s: Sess) => new Date(T0 + sessDay(s, s.turns[s.turns.length - 1].
 /** Trusted age band as loadTrustedAgeBand resolves it: children from the staff birth date (so childShort gets the years), others from the staff-set band. */
 const trustedOf = (l: Learner, now: Date): TrustedAgeBand => (l.birthDate ? resolveTrustedAgeBand(undefined, undefined, undefined, { birthDate: l.birthDate, now }) : resolveTrustedAgeBand(undefined, l.ageBand));
 const sessionTurns = (s: Sess) => { const cur = s.turns[s.turns.length - 1].session; return s.turns.filter((t) => t.session === cur); };
-const shownItem = (tutor: string, oid: string) => [...lessonOf(oid).spec.items].reverse().find((it) => norm(tutor).includes(norm(coreOf(it.prompt)).slice(0, 30)));
+const shownItem = (tutor: string, oid: string) => [...lessonOf(oid).spec.items].reverse().find((it) => norm(tutor).includes(norm(coreOf((it as { question?: string }).question ?? it.prompt)).slice(0, 30)));
 function history(turns: Turn[]) {
   const hist: any[] = [];
   for (const t of turns) { hist.push({ role: 'user', content: t.learner }); if (t.tutor === undefined) break; hist.push({ role: 'assistant', content: t.tutor, languageTurn: { ...(t.lang ?? {}), ...(t.ev5 ?? {}) } }); }

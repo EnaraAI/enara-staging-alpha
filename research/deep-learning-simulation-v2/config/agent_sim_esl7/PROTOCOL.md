@@ -148,3 +148,23 @@ The harness has no database, so it runs the deployed pure functions on records i
 - The fix: words the lesson itself uses (title, objectives, success criteria, grammar, functions, skills, examples) are never slips. It is the same commit as on the fix PR (`501dcf8b` on `claude/tutor-lms-slipfix`) and applies from round 7.
 - A check over all NEW learner messages up to round 6 found this as the only false flag; the other 12 flags were real slips.
 - Round 6: two NEW_1 replies (s7018, s7024) labelled a correct sentence with a different meaning "Wrong answer". They were kept as tutor slips.
+
+## Amendment D (20 Nov 2026, after round 7, before round 8)
+**Harness bug (lesson data).**
+- Some lesson items kept their reading or dialogue text in a separate `material` field. The engine sends only an item's `prompt` to the model, so in BASE and NEW the text was never shown. P+ (lesson data in the prompt) saw it. Tutor agents in both engine arms reported this in round 7.
+- Items affected: `EN-C-A1-RD-very-short-texts` r1–r3, `EN-C-A2-RD-short-everyday-texts` m1–m3, and `EN-F-A1-VO-numbers-time` p1–p2.
+- Learners: 4 learners per arm on each of the 3 outcomes, in rounds 1–7.
+- The same field was in the ESL6 fixtures, so ESL6's engine arms had the same gap on `EN-F-A1-VO-numbers-time`.
+
+**The fix, from round 8:**
+- The text is written into the item prompt after the question (`<question> Text: "<text>"`), as a course author would have to.
+- It is cut at 300 characters, the engine's live cap on an item prompt (`cleanItems` in `languageTeachingContext.ts`). The harness builds lessons directly, so the cap is applied here.
+- The A1 items (about 280 characters) fit. The A2 email items (450–520 characters) lose the end of the email in BASE and NEW, as they would live.
+
+**Product finding (reported, not changed):**
+- On the live engine, a reading item cannot carry a text longer than about 300 characters with its question.
+- A2 reading lessons need a passage field, or a higher cap for item text.
+
+**Analysis:**
+- The 3 outcomes are reported with a flag.
+- The primary comparison (§8) is also run without them, as a sensitivity check.
