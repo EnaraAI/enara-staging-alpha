@@ -13,14 +13,14 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 1,
-   "C1": 1,
-   "C2": 0
+   "C1": 3,
+   "C2": 2
   },
   "indep": {
-   "C1": 0,
-   "C2": 0
+   "C1": 1,
+   "C2": 1
   },
   "start": {
    "W1": 2,
@@ -545,7 +545,131 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 1: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 0.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! \"but\" fits, because being sleepy and wanting to play are different ideas. Now try: Write 30-50 words about your last holiday. Use and, but and because.\n\nLEARNER'S LAST MESSAGE:\nLast summer I went to Alexandria. It was hot, but we swam because the sea was cool.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGood: your text uses but and because.\nExample: We went to the zoo. We saw a lion. Rule: end each idea with a full stop. Wrong: We went to the zoo and we saw a lion and we ate.\nNow write one sentence about a person you know, using and, but or because."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 1: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 0.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes! \"but\" fits, because being sleepy and wanting to play are different ideas. Now try: Write 30-50 words about your last holiday. Use and, but and because.\n\nLEARNER'S LAST MESSAGE:\nLast summer I went to Alexandria. It was hot, but we swam because the sea was cool.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGood: your text uses but and because.\nExample: We went to the zoo. We saw a lion. Rule: end each idea with a full stop. Wrong: We went to the zoo and we saw a lion and we ate.\nNow write one sentence about a person you know, using and, but or because.",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Good: your text uses but and because."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Good: your text uses but and because."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "It was hot, but we swam because the sea was cool."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Last summer I went to Alexandria."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: end each idea with a full stop."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "We went to the zoo. We saw a lion. ... Wrong: We went to the zoo and we saw a lion and we ate."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother is tall but he is not strong.",
+    "errors": {
+     "W1": "my brother is tall and he is not strong and he plays football"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "My brother is tall but he is not strong.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother is tall but he is not strong.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

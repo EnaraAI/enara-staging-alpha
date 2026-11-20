@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 1,
    "C1": 1,
    "C2": 0
@@ -289,7 +289,111 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, you have the right idea! But \"rain\" is a noun here. After \"It is\" we need a weather adjective. Hint: look at the vocabulary list. Which word ends with -y and means there is rain? Try again: \"Take an umbrella. It is ___ today.\"\n\nLEARNER'S LAST MESSAGE:\nrain\nFACT: the last learner message contained the error of W1 (uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. We need a weather adjective after \"It is\". The word is rainy: it is the adjective from rain. So the sentence is: Take an umbrella. It is rainy today. Now try a new one. Complete the sentence: \"My hat flew away! It is very ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 0: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood try, you have the right idea! But \"rain\" is a noun here. After \"It is\" we need a weather adjective. Hint: look at the vocabulary list. Which word ends with -y and means there is rain? Try again: \"Take an umbrella. It is ___ today.\"\n\nLEARNER'S LAST MESSAGE:\nrain\nFACT: the last learner message contained the error of W1 (uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. We need a weather adjective after \"It is\". The word is rainy: it is the adjective from rain. So the sentence is: Take an umbrella. It is rainy today. Now try a new one. Complete the sentence: \"My hat flew away! It is very ___.\"",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "So the sentence is: Take an umbrella. It is rainy today."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "We need a weather adjective after \"It is\"."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "windy",
+    "errors": {
+     "W1": "wind",
+     "W2": "windi"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "windi",
+   "production": {
+    "kind": "blank",
+    "correct": false,
+    "fired": "W2",
+    "text": "windi",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

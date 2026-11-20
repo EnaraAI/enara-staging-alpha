@@ -16,11 +16,11 @@
    "W1": 0,
    "W2": 1,
    "C1": 3,
-   "C2": 0
+   "C2": 2
   },
   "indep": {
-   "C1": 1,
-   "C2": 0
+   "C1": 2,
+   "C2": 1
   },
   "start": {
    "W1": 2,
@@ -304,7 +304,123 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 1.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, that is right! \"Because\" gives the reason: we got up late, so we missed the train. And you used the past verbs correctly.\n\nNow a bigger task. Write 30-50 words about your last holiday. Use and, but and because.\n\nLEARNER'S LAST MESSAGE:\nLast summer I went to Dubai because my aunt lives there.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGood sentence! You used went for the past and because for the reason. It is correct. But your text is short. We need 30-50 words. Add two or three more sentences about your holiday. Use and once and but once."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 1: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 1.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, that is right! \"Because\" gives the reason: we got up late, so we missed the train. And you used the past verbs correctly.\n\nNow a bigger task. Write 30-50 words about your last holiday. Use and, but and because.\n\nLEARNER'S LAST MESSAGE:\nLast summer I went to Dubai because my aunt lives there.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGood sentence! You used went for the past and because for the reason. It is correct. But your text is short. We need 30-50 words. Add two or three more sentences about your holiday. Use and once and but once.",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "You used went for the past and because for the reason. It is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "You used went for the past"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Last summer I went to Dubai because my aunt lives there."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "Last summer I went to Dubai because my aunt lives there."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "We swam in the sea and we ate fish, but it was very hot.",
+    "errors": {
+     "W1": "we swam in the sea and we ate fish and it was very hot and we went home",
+     "W2": "We swim in the sea and we eat fish, but it is very hot."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "We swim in the sea and we eat fish, but it is very hot.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "We swim in the sea and we eat fish, but it is very hot.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

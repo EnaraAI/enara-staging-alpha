@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -561,7 +561,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 0: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 1: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 0.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour verbs \"went\" and \"swam\" are past forms, and that is right. But \"and\" joins every idea, and there are no full stops.\nLook: \"On Friday we played games. We were happy.\" Rule: use past forms like played and were for things that already happened.\nRight: \"Yesterday I walked home.\" Wrong: \"Yesterday I walk home.\"\nNow try this. Write two sentences about last night. End each one with a full stop.\n\nLEARNER'S LAST MESSAGE:\nlast night i watched tv and i went to bed at ten\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\")).\n\nTUTOR TURN TO JUDGE:\nYour verbs \"watched\" and \"went\" are past forms. But the text is still one chain with \"and\", with no capital letters or full stops.\nLook at a different pair. Right: \"I did my homework. I played chess.\" Wrong: \"i did my homework and i played chess\"\nNow write your last night sentences again as two sentences."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 0: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 1: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 0.\nC2 (correct) strength 0: past events take past verb forms. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour verbs \"went\" and \"swam\" are past forms, and that is right. But \"and\" joins every idea, and there are no full stops.\nLook: \"On Friday we played games. We were happy.\" Rule: use past forms like played and were for things that already happened.\nRight: \"Yesterday I walked home.\" Wrong: \"Yesterday I walk home.\"\nNow try this. Write two sentences about last night. End each one with a full stop.\n\nLEARNER'S LAST MESSAGE:\nlast night i watched tv and i went to bed at ten\nFACT: the last learner message contained the error of W1 (chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\")).\n\nTUTOR TURN TO JUDGE:\nYour verbs \"watched\" and \"went\" are past forms. But the text is still one chain with \"and\", with no capital letters or full stops.\nLook at a different pair. Right: \"I did my homework. I played chess.\" Wrong: \"i did my homework and i played chess\"\nNow write your last night sentences again as two sentences.",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"I did my homework. I played chess.\" Wrong: \"i did my homework and i played chess\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Last night I watched TV. I went to bed at ten.",
+    "errors": {
+     "W1": "last night i watched tv and i went to bed at ten",
+     "W2": "Last night I watch TV. I go to bed at ten."
+    }
+   },
+   "applied": [
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Last night I watch TV. I go to bed at ten.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "Last night I watch TV. I go to bed at ten.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

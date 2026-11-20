@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 0,
    "C2": 0
@@ -545,7 +545,111 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 0: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote the same sentence as the exercise, so nothing has changed yet. Something in it needs a change. Think about the rule for the verb after can.\nWrite the sentence again with the change.\n\nLEARNER'S LAST MESSAGE:\nShe can swims.\nFACT: the last learner message contained the error of W1 (adds -s to the verb after can (\"She can swims.\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"She can swim.\" After can, the verb has no s.\nRight: \"He can jump.\" Wrong: \"He can jumps.\"\nNow try one on your own. Correct this sentence: \"Ben can sings.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 0: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYou wrote the same sentence as the exercise, so nothing has changed yet. Something in it needs a change. Think about the rule for the verb after can.\nWrite the sentence again with the change.\n\nLEARNER'S LAST MESSAGE:\nShe can swims.\nFACT: the last learner message contained the error of W1 (adds -s to the verb after can (\"She can swims.\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"She can swim.\" After can, the verb has no s.\nRight: \"He can jump.\" Wrong: \"He can jumps.\"\nNow try one on your own. Correct this sentence: \"Ben can sings.\"",
+   "stateBefore": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"She can swim.\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After can, the verb has no s."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"He can jump.\" Wrong: \"He can jumps.\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Ben can sing.",
+    "errors": {
+     "W1": "Ben can sings."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "Ben can sing.",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "Ben can sing.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
