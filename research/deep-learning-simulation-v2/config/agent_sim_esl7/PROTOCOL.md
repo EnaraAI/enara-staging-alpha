@@ -127,3 +127,13 @@ The harness has no database, so it runs the deployed pure functions on records i
    - 20 rounds × (9 tutor cells + 3 judge batches);
    - plus about 18 fit batches, scoring batches and 1 agreement batch;
    - **about 270 agent runs.**
+
+## Amendment B (20 Nov 2026, after round 2, before round 3)
+**Engine bug fix during the run.**
+- `spellingPattern` flagged the real word "lives" as a spelling slip of the lesson word "liked" (NEW, s7066, round 2). The tutor did not act on it.
+- The fix: a real word in any form is never a slip. It is the same commit as on PR #48 (`2cfe24f4`) and applies from round 3.
+- Rounds 1–2 ran with the bug, in NEW only.
+
+**Other notes from rounds 1–2:**
+- One BASE tutor agent (BASE_1, round 2) said it skimmed the repeated instruction lines and did not open with the errors-to-work-on brief. The replies were kept, and later tutor tasks were told to read every line.
+- One BASE prompt said "partly right" for a correct polite request (s7040, s7046). The tutor marked it CORRECT.
