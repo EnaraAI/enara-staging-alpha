@@ -225,6 +225,11 @@ export async function buildObjectiveContext(params: {
         if (!input.misconceptions.some((m) => m.category === 'l1_transfer')) input.misconceptions = [{ id: `l1-session-${objective.id}`, category: 'l1_transfer', status: 'suspected' }, ...input.misconceptions];
         if (params.record) await recordL1Transfer({ institutionId: params.institutionId, studentId: params.studentId, objectiveId: objective.id, codes: l1 });
       }
+      // switchMove: the session's most repeated error code (codes only).
+      const codes = (params.history ?? []).flatMap((t) => { const lt = t.role === 'assistant' ? (t.languageTurn as { diagnosis?: string; liveError?: string } | null | undefined) : undefined; const c = lt?.diagnosis ?? lt?.liveError; return c ? [c] : []; });
+      const tally = new Map<string, number>(); for (const c of codes) tally.set(c, (tally.get(c) ?? 0) + 1);
+      const top = [...tally.entries()].sort((x, y) => y[1] - x[1])[0];
+      if (top && top[1] >= 2) signals.repeatedError = { code: top[0], count: top[1] };
       progress = params.history ? progressFromHistory(params.history, { verdict: params.currentVerdict, message: params.currentMessage }) : undefined;
       const opener = reviewOpener(signals, input);
       lesson = planLesson(input, { ...signals, ...quickCheckSignals(signals, progress, opener) });

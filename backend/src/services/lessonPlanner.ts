@@ -8,6 +8,7 @@
 // Pure: no AI call, no database. Every decision carries the shape row, the method row, the skipped choices and a plain sentence.
 // Behind ENARA_ENGINE_V2=planner2; off = ped-v2 unchanged.
 
+import { engineV2 } from './engineV2';
 import { planWithTrace, type MethodPick, type MethodRule, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { STRATEGY_BY_ID, validateComposition } from './strategyRegistry';
 
@@ -70,6 +71,8 @@ export interface PlannerSignals {
   reviewDue?: boolean;
   /** planner2b: listen-and-do content (kids pack lesson) exists for this objective; LAD runs only then. */
   ladContent?: boolean;
+  /** switchMove (LIT_REVIEW_GAP_PLAN 3.3): how often this session's most repeated error code was seen (2+ = the same error repeats). */
+  repeatedError?: { code: string; count: number };
 }
 
 // ---------------------------------------------------------------------------
@@ -246,6 +249,8 @@ export interface LessonPlan {
   explanation: string;
 }
 
+/** switchMove: the methods tried in turn when one error keeps coming back. */
+export const SWITCH_ORDER = ['analogy', 'scaffolding', 'worked_example'];
 export function planLesson(input: PlanInput, s: PlannerSignals): LessonPlan {
   const mastery = input.masteryStatus ?? 'not_assessed';
   const row = chooseShape(s, mastery);
@@ -262,6 +267,17 @@ export function planLesson(input: PlanInput, s: PlannerSignals): LessonPlan {
   );
   const plan = { ...traced.plan, supporting: [...traced.plan.supporting], modifiers: [...traced.plan.modifiers], reasonCodes: [...traced.plan.reasonCodes] };
 
+  // switchMove (LIT_REVIEW_GAP_PLAN 3.3, owner "go" 20 Nov 2026): the same error code seen twice or more in this session changes the main
+  // method each further time (contrast -> smaller steps -> worked example), instead of repeating the move that did not work.
+  if (engineV2('switchMove') && s.repeatedError && s.repeatedError.count >= 2) {
+    const order = SWITCH_ORDER.filter((id) => allowedMain(id, shape, s, teacher));
+    const pick = order.length ? order[(s.repeatedError.count - 2) % order.length] : undefined;
+    if (pick && pick !== plan.primary) {
+      plan.supporting = plan.supporting.filter((id) => id !== pick);
+      plan.primary = pick;
+      plan.reasonCodes.push(`SWITCH_MOVE:${s.repeatedError.code}:${s.repeatedError.count}`);
+    }
+  }
   // ★ age and level gates on supporting and reinforcement methods
   const dropped: string[] = [];
   plan.supporting = plan.supporting.filter((id) => methodGateOk(id, s, teacher) || (dropped.push(id), false));

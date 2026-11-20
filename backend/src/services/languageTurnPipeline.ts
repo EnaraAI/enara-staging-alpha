@@ -13,6 +13,7 @@ import { stripPreAttemptModels, stripCopyReadyModels, isSuccess, isFailure, type
 import { exampleGuardHits, removeGuardHits, ruleLinePostCheck, GUARD_REGEN_REASON, type GuardHit } from './teachingQuality';
 import { ruleBankEntry } from './ruleBank';
 import { removeFalseWrongs } from './pairCheck';
+import { under9 } from './languageTeachingContext';
 
 /** TRACK 2 (exampleGuard, plan §2): the guard check on its own (no change to the text), for the one regeneration in the chat path and for the harness. */
 export function exampleGuardCheck(language: LanguageTeachingContext, answer: string, learnerText: string): GuardHit[] {
@@ -69,6 +70,23 @@ export function removeMixedPraise(text: string): { text: string; removed: number
   return { text: removed ? out : text, removed };
 }
 
+// childShort (owner decision 2, 20 Nov 2026): a reply to a child under 9 keeps the feedback line, at most two more short sentences
+// (12 words or fewer) and the task (its instruction and item line); everything else is cut.
+const words = (t: string) => t.split(/\s+/).filter(Boolean).length;
+export function trimChildReply(text: string): { text: string; removed: number } {
+  const parts = text.split(/(?<=[.!?])\s+|\n+/).map((x) => x.trim()).filter(Boolean);
+  if (parts.length <= 4) return { text, removed: 0 };
+  const isTask = (x: string) => setsTask(x) || /_{2,}/.test(x);
+  let start = parts.findIndex((x, k) => k > 0 && isTask(x));
+  if (start < 0) start = parts.length - 1;
+  const task = parts.slice(start, start + 2);
+  const middle = parts.slice(1, start).filter((x) => words(x) <= 12).slice(0, 2);
+  const kept = [parts[0], ...middle];
+  const out = `${kept.join(' ')}\n\n${task.join('\n')}`;
+  const removed = parts.length - kept.length - task.length;
+  return removed > 0 ? { text: out, removed } : { text, removed: 0 };
+}
+
 export function applyReplyGuards(language: LanguageTeachingContext, answer: string, learnerText: string): { text: string; removed: number; closingAsk?: ClosingAskStatus; guardHits?: number; postCheck?: string[] } {
   let text = answer; let removed = 0; let closingAsk: ClosingAskStatus | undefined; let guardHits = 0; let postCheck: string[] | undefined;
   // TRACK 2 (exampleGuard): a modelled sentence that completes an item the learner will solve is removed (the fallback after the one regeneration).
@@ -85,6 +103,10 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
   if (pairsAsked()) {
     const pc = removeFalseWrongs(text);
     if (pc.removed.length) { text = pc.text; postCheck = [...(postCheck ?? []), ...pc.removed.map((r) => `pair_not_wrong:${r}`)]; }
+  }
+  if (language.learner?.ageBand?.value === 'child' && under9(language.learner?.ageYears)) {
+    const ct = trimChildReply(text);
+    if (ct.removed) { text = ct.text; postCheck = [...(postCheck ?? []), 'child_trim'] ; }
   }
   // planner2g (PLN2h, learner 2006: "... biger than my old office." Good. Now check ...): a bare praise sentence in a reply that then points to an
   // error is removed (a mixed message); effort praise ("Good try") and praise in a reply with no error cue stay.
