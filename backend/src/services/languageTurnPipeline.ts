@@ -46,6 +46,10 @@ export type ClosingAskStatus = 'added' | 'deferred' | 'folded';
 export const CLOSING_FOLD_AFTER = 3;
 const OWN_SENTENCE_SET = /\bwrite one sentence about\b/i;
 /** reviewOpen: the closing item asked when the model set no task at all (new situation, same point; one task). */
+/** planner2e fix A: the reply already sets a task: an invitation, or a "Now you: write ..." / "Join the two sentences ..." style instruction. */
+const TASK_VERBS = 'write|say|make|join|combine|complete|tell|use|choose|answer|type|fill|put|ask|describe|try|spell|read|point|draw|find|order|match|change|correct';
+const TASK_SENTENCE = new RegExp(`(?:^|[.!?:]\\s+|\\n)\\s*(?:(?:now|then|next|ok|okay)[,\\s]+)?(?:(?:you|your turn|try|on your own|now you)\\s*[:,!.]\\s*)?(?:${TASK_VERBS})\\b`, 'i');
+export const setsTask = (text: string): boolean => Boolean(taskInvitation(text)) || TASK_SENTENCE.test(text);
 export const REVIEW_CLOSE_FALLBACK = 'Now write one new sentence about a place you visited, using the same point in this new situation.';
 const FOLDED = /^Rule in one line:/;
 const ruleLineFor = (language: LanguageTeachingContext): string | undefined => {
@@ -86,7 +90,8 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
     if (one.droppedClosing) text = one.text;
     const asks = learnerAsks(text);
     if (asks.length && asks.every((x) => x.kind === 'closing')) text = text.replace(CLOSING_ASK_SENTENCE, '').replace(/\n{3,}/g, '\n\n').trim();
-    if (!learnerAsks(text).length) text = `${text.trimEnd()}\n\n${REVIEW_CLOSE_FALLBACK}`;
+    // planner2e fix A (PLN2f: two tasks in one reply): a task the ask detector misses ("Now you: write ...", "Join the two sentences ...") is still a task.
+    if (!learnerAsks(text).length && !(engineV2('planner2') && setsTask(text))) text = `${text.trimEnd()}\n\n${REVIEW_CLOSE_FALLBACK}`;
     closingAsk = 'added';
   } else if (language.research && isClosingTurn(language.research) && (engineV2('closing') || engineV2('shortRecap'))) {
     const shortRecap = engineV2('shortRecap');
