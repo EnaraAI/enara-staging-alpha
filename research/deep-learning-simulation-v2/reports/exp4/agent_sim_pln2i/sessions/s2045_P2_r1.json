@@ -13,7 +13,7 @@
    "W1"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
    "C1": 3,
    "C2": 0
@@ -1000,7 +1000,105 @@
    "twoAsks": false,
    "twoAsksRaw": false,
    "qcTeachWords": true,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 3: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe -er ending in \"thiner\" is right. The problem is in the letters before -er.\n\nLook at \"smaller\" and \"hotter\" from our lesson. One of them has a double letter before -er. Look at the last letters of \"thin\" again.\n\nTry this one again: \"A bag is ___ (thin) than a book.\"\n\nLEARNER'S LAST MESSAGE:\nthiner\nFACT: the last learner message contained the error of W1 (spells the comparative by sound (\"biger\", \"hapier\", \"nicr\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"thinner\". \"Thin\" ends with one vowel and one consonant, so we double the last letter before -er.\n\nRight: \"The sun is hotter than the moon.\"\nWrong: \"The sun is more hot than the moon.\"\n\nNow try a new one on your own:\nComplete: \"The film is ___ (sad) than the book.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-comparatives (comparatives (-er, more ... than)). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the comparative is written by sound, vowels dropped or changed. Its error: spells the comparative by sound (\"biger\", \"hapier\", \"nicr\").\nC1 (correct) strength 3: short adjective + -er with its spelling rules (double the consonant, y -> ier), long adjective with more, then than. Independent correct productions so far: 1.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThe -er ending in \"thiner\" is right. The problem is in the letters before -er.\n\nLook at \"smaller\" and \"hotter\" from our lesson. One of them has a double letter before -er. Look at the last letters of \"thin\" again.\n\nTry this one again: \"A bag is ___ (thin) than a book.\"\n\nLEARNER'S LAST MESSAGE:\nthiner\nFACT: the last learner message contained the error of W1 (spells the comparative by sound (\"biger\", \"hapier\", \"nicr\")).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"thinner\". \"Thin\" ends with one vowel and one consonant, so we double the last letter before -er.\n\nRight: \"The sun is hotter than the moon.\"\nWrong: \"The sun is more hot than the moon.\"\n\nNow try a new one on your own:\nComplete: \"The film is ___ (sad) than the book.\"",
+   "stateBefore": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is \"thinner\"."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "\"Thin\" ends with one vowel and one consonant, so we double the last letter before -er."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "sadder",
+    "errors": {
+     "W1": "sader"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "comp",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 1,
+   "learner": "sadder",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "sadder",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
