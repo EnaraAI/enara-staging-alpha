@@ -13,14 +13,14 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 0,
-   "C1": 2,
-   "C2": 3
+   "C1": 1.95,
+   "C2": 1.95
   },
   "indep": {
-   "C1": 1,
-   "C2": 2
+   "C1": 2,
+   "C2": 3
   },
   "start": {
    "W1": 3,
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "fn1",
@@ -988,7 +988,115 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 0: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 2: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 1.\nC2 (correct) strength 3: am/is/are is needed in a present sentence. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My friend is tall.\" is a full sentence, and it has is.\nNow try this one.\nTutor: Who is your best teacher? Answer with a full sentence.\n\nLEARNER'S LAST MESSAGE:\nMy best teacher is Mr Ali.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My best teacher is Mr Ali.\" is a full sentence, and it has is.\nNow one new item, on your own.\nWrite the sentence again with the missing word: \"My sister thirsty.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 0: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 2: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 1.\nC2 (correct) strength 3: am/is/are is needed in a present sentence. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My friend is tall.\" is a full sentence, and it has is.\nNow try this one.\nTutor: Who is your best teacher? Answer with a full sentence.\n\nLEARNER'S LAST MESSAGE:\nMy best teacher is Mr Ali.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My best teacher is Mr Ali.\" is a full sentence, and it has is.\nNow one new item, on your own.\nWrite the sentence again with the missing word: \"My sister thirsty.\"",
+   "stateBefore": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 2,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 2
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My best teacher is Mr Ali.\" is a full sentence, and it has is."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"My best teacher is Mr Ali.\" is a full sentence, and it has is."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My best teacher is Mr Ali."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "My best teacher is Mr Ali."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "is",
+    "errors": {
+     "W2": ""
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise answering personal questions with a full sentence again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -1002,5 +1110,95 @@
    "fullItems": 1,
    "nulls": 1
   }
+ },
+ "stateAfterS1": {
+  "form": "fn1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 3
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "fn1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 1.95
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 3
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "fn1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 1.95
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 3
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

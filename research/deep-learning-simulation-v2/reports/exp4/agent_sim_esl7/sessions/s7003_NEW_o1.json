@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 0,
+   "W1": 1.5,
    "W2": 0,
-   "C1": 1,
+   "C1": 1.95,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -31,7 +31,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "can",
@@ -892,7 +892,101 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 1: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Tom can cook.\" is right.\nNow write one sentence about a person you know using can + base verb.\n\nLEARNER'S LAST MESSAGE:\nMy sister can swim.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My sister can swim.\" uses can + base verb correctly.\nNew situation. Correct this sentence: \"My brother can plays the guitar.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 1: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Tom can cook.\" is right.\nNow write one sentence about a person you know using can + base verb.\n\nLEARNER'S LAST MESSAGE:\nMy sister can swim.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My sister can swim.\" uses can + base verb correctly.\nNew situation. Correct this sentence: \"My brother can plays the guitar.\"",
+   "stateBefore": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My sister can swim.\" uses can + base verb correctly."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My sister can swim."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother can play the guitar.",
+    "errors": {
+     "W1": "My brother can plays the guitar."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise can again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -906,5 +1000,92 @@
    "fullItems": 6,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "can",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "can",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1.5,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "can",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1.5,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

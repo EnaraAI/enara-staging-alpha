@@ -12,7 +12,7 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1.5,
    "W2": 0,
    "C1": 1,
    "C2": 0
@@ -31,7 +31,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "someany",
@@ -445,7 +445,107 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, you used a polite sentence with \"Can I have ..., please?\" But the word \"any\" is not right here. Hint: juice is uncountable, like water. Which word do we use with uncountable things at the cafe, a or some? Try again: Can I have ___ juice, please?\n\nLEARNER'S LAST MESSAGE:\nany\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. Juice is uncountable, like water and rice, so we use some. The word any is not right here. So the correct sentence is: Can I have some juice, please? Now try a new one. Write a polite sentence with I'd like and a food from our list. Use a or some."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-some-any (some and any). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 2: some (or any) fits every sentence. Its error: uses some in a negative or question, or any in a positive statement (\"I don't have some money.\").\nC1 (correct) strength 1: some in positive statements, any in negatives and questions. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, you used a polite sentence with \"Can I have ..., please?\" But the word \"any\" is not right here. Hint: juice is uncountable, like water. Which word do we use with uncountable things at the cafe, a or some? Try again: Can I have ___ juice, please?\n\nLEARNER'S LAST MESSAGE:\nany\nFACT: the last learner message contained the error of W1 (uses some in a negative or question, or any in a positive statement (\"I don't have some money.\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. Juice is uncountable, like water and rice, so we use some. The word any is not right here. So the correct sentence is: Can I have some juice, please? Now try a new one. Write a polite sentence with I'd like and a food from our list. Use a or some.",
+   "stateBefore": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "So the correct sentence is: Can I have some juice, please?"
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "The word any is not right here. So the correct sentence is: Can I have some juice, please?"
+    },
+    {
+     "rule": "R6",
+     "belief": "W1",
+     "quote": "Juice is uncountable, like water and rice, so we use some."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I'd like some rice, please.",
+    "errors": {
+     "W1": "I'd like any rice, please."
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W1",
+    "R6"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "someany",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hi again! Can we practise some and any again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -459,5 +559,92 @@
    "fullItems": 5,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "someany",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "someany",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1.5,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "someany",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1.5,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

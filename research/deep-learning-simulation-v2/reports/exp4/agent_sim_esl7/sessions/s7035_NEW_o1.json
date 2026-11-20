@@ -15,8 +15,8 @@
   "s": {
    "W1": 1,
    "W2": 1,
-   "C1": 3,
-   "C2": 3
+   "C1": 1.95,
+   "C2": 1.95
   },
   "indep": {
    "C1": 1,
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "weather",
@@ -940,7 +940,99 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 1.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"sunny\" is the right weather word after \"It is\".\nComplete: \"My hat flew away! It is very ___.\"\n\nLEARNER'S LAST MESSAGE:\nwind\nFACT: the last learner message contained the error of W1 (uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\")).\n\nTUTOR TURN TO JUDGE:\nAfter \"It is\", use a describing word for the weather, not the name of a thing. Example: \"It is very cold.\"\nTry again: \"My hat flew away! It is very ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 1.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 1.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"sunny\" is the right weather word after \"It is\".\nComplete: \"My hat flew away! It is very ___.\"\n\nLEARNER'S LAST MESSAGE:\nwind\nFACT: the last learner message contained the error of W1 (uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\")).\n\nTUTOR TURN TO JUDGE:\nAfter \"It is\", use a describing word for the weather, not the name of a thing. Example: \"It is very cold.\"\nTry again: \"My hat flew away! It is very ___.\"",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After \"It is\", use a describing word for the weather, not the name of a thing."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "windy",
+    "errors": {
+     "W1": "wind",
+     "W2": "windi"
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise weather words again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -954,5 +1046,95 @@
    "fullItems": 2,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 1,
+   "C1": 1.95,
+   "C2": 1.95
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 1,
+   "C1": 1.95,
+   "C2": 1.95
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 1
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 3,
+   "W1": 2.5,
    "W2": 1,
    "C1": 0,
    "C2": 0
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "thereis",
@@ -461,7 +461,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 1: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 0: there is / there are needs is or are after \"there\". Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, you used \"There are\" correctly, and your sentence is nearly right! But one word needs a small change. \"Two\" means more than one, so look at the word \"bed\". Hint: what do we add to the end of a noun for more than one? Try the sentence again.\n\nLEARNER'S LAST MESSAGE:\nThere are two bed in my room.\nFACT: the last learner message contained the error of W1 (keeps the noun singular after a number (\"There are three book.\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. Two means more than one, so the noun needs -s at the end: bed becomes beds. So the correct sentence is: There are two beds in my room. Compare: There is a bed. There are two beds. Now try a new one. Write a sentence about your classroom. Use There are and the word chairs or books."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 1: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 0: there is / there are needs is or are after \"there\". Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, you used \"There are\" correctly, and your sentence is nearly right! But one word needs a small change. \"Two\" means more than one, so look at the word \"bed\". Hint: what do we add to the end of a noun for more than one? Try the sentence again.\n\nLEARNER'S LAST MESSAGE:\nThere are two bed in my room.\nFACT: the last learner message contained the error of W1 (keeps the noun singular after a number (\"There are three book.\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. Two means more than one, so the noun needs -s at the end: bed becomes beds. So the correct sentence is: There are two beds in my room. Compare: There is a bed. There are two beds. Now try a new one. Write a sentence about your classroom. Use There are and the word chairs or books.",
+   "stateBefore": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "So the correct sentence is: There are two beds in my room."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Two means more than one, so the noun needs -s at the end"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "There are ten chairs in my classroom.",
+    "errors": {
+     "W1": "There are ten chair in my classroom.",
+     "W2": "There ten chairs in my classroom."
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise there is and there are again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -475,5 +573,95 @@
    "fullItems": 3,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "thereis",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "thereis",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 2.5,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "thereis",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 2.5,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

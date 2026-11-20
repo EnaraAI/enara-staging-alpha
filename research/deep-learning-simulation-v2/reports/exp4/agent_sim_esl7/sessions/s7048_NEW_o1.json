@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 0,
+   "W1": 1,
    "W2": 0,
-   "C1": 2,
+   "C1": 1.95,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -31,7 +31,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "rd2",
@@ -895,7 +895,101 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-RD-short-everyday-texts (finding the main idea and details in a short text). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the first sentence is the main idea, and the first detail of the asked type is the answer. Its error: takes the first sentence as the main idea or gives the first detail of the asked type (\"to say hello\" for an email that invites a friend).\nC1 (correct) strength 2: the main idea is what the whole text is for, and a detail answer fits all the words of the question. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, we use the whole email. Example: \"Thanks, Sam! My dog is sick today.\" The main idea is the sick dog, not the thanks.\nNow choose a, b or c: what is the email mostly about?\n\nLEARNER'S LAST MESSAGE:\nthe option that says what the whole email is for\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThe answer is b: the whole email is about moving. Example: \"Hi! Our dog is lost\" means a lost dog.\nRead: \"Hello! Our class goes to the zoo.\" What is it mostly about?"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-RD-short-everyday-texts (finding the main idea and details in a short text). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: the first sentence is the main idea, and the first detail of the asked type is the answer. Its error: takes the first sentence as the main idea or gives the first detail of the asked type (\"to say hello\" for an email that invites a friend).\nC1 (correct) strength 2: the main idea is what the whole text is for, and a detail answer fits all the words of the question. Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, we use the whole email. Example: \"Thanks, Sam! My dog is sick today.\" The main idea is the sick dog, not the thanks.\nNow choose a, b or c: what is the email mostly about?\n\nLEARNER'S LAST MESSAGE:\nthe option that says what the whole email is for\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nThe answer is b: the whole email is about moving. Example: \"Hi! Our dog is lost\" means a lost dog.\nRead: \"Hello! Our class goes to the zoo.\" What is it mostly about?",
+   "stateBefore": {
+    "form": "rd2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "the option that says what the whole email is for"
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The answer is b: the whole email is about moving."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "a class trip to the zoo",
+    "errors": {
+     "W1": "to say hello"
+    }
+   },
+   "applied": [
+    "R4:C1",
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hi again! Can we practise finding the main idea and details in a short text again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -909,5 +1003,92 @@
    "fullItems": 2,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "rd2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "rd2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "rd2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

@@ -15,12 +15,12 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 3,
-   "C2": 3
+   "C1": 1.95,
+   "C2": 1.95
   },
   "indep": {
-   "C1": 3,
-   "C2": 2
+   "C1": 4,
+   "C2": 3
   },
   "start": {
    "W1": 2,
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "wr2",
@@ -554,7 +554,115 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 0: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 3.\nC2 (correct) strength 3: past events take past verb forms. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood sentence! You used and and but in the right places, and your past verbs swam, ate and was are correct. But your text is still a little short. You have about 25 words, and we need 30-50. Add one or two more sentences about your holiday. For example, how did you feel at the end? Use a full stop after each sentence.\n\nLEARNER'S LAST MESSAGE:\nAt the end I was happy because I had a good time.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGood sentence! You used was for the past and because for a reason. Now your text has about 37 words, so it is the right length. Well done. Next one. Write 30-50 words about your plans for next weekend. Use and, but and because, and put a full stop after each sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-WR-linked-short-text (linking sentences with and, but and because). Learner level A2. First language Arabic.\nSession 1.\nW1 (wrong) strength 0: clauses are chained with \"and\" whatever the meaning, with no full stops. Its error: chains clauses with \"and\" and no full stops (\"yesterday it rained and i stayed home and i was sad\").\nW2 (wrong) strength 0: a time word shows the past, so verbs stay in the present. Its error: uses present verbs for a past event (\"Yesterday it rains. I stay at home.\").\nC1 (correct) strength 3: clauses are linked with and, but or because chosen by meaning, inside full sentences. Independent correct productions so far: 3.\nC2 (correct) strength 3: past events take past verb forms. Independent correct productions so far: 2.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood sentence! You used and and but in the right places, and your past verbs swam, ate and was are correct. But your text is still a little short. You have about 25 words, and we need 30-50. Add one or two more sentences about your holiday. For example, how did you feel at the end? Use a full stop after each sentence.\n\nLEARNER'S LAST MESSAGE:\nAt the end I was happy because I had a good time.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nGood sentence! You used was for the past and because for a reason. Now your text has about 37 words, so it is the right length. Well done. Next one. Write 30-50 words about your plans for next weekend. Use and, but and because, and put a full stop after each sentence.",
+   "stateBefore": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 2
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "You used was for the past and because for a reason."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "You used was for the past and because for a reason."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "At the end I was happy because I had a good time."
+    },
+    {
+     "rule": "R4",
+     "belief": "C2",
+     "quote": "At the end I was happy because I had a good time."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Next Saturday I will visit my aunt because it is her birthday.",
+    "errors": {
+     "W1": "next saturday i will visit my aunt and it is her birthday and we will eat cake"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "R4:C1",
+    "R4:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "wr2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 3
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise linking sentences with and, but and because again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -574,5 +682,95 @@
     }
    ]
   }
+ },
+ "stateAfterS1": {
+  "form": "wr2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 4,
+   "C2": 3
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "wr2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 1.95
+  },
+  "indep": {
+   "C1": 4,
+   "C2": 3
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "wr2",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1.95,
+   "C2": 1.95
+  },
+  "indep": {
+   "C1": 4,
+   "C2": 3
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

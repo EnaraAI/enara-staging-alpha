@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 3,
+   "W1": 2.5,
    "W2": 1,
    "C1": 0,
    "C2": 0
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "family",
@@ -466,7 +466,103 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 1: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 0: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, you used \"This is my ...\" and \"She is kind\" correctly! She is right because a brother's wife is a woman. But check the spelling of the family word. Some letters are missing. Hint: it looks like br_th_r, and the missing letters are o and e. Try again: write the first sentence.\n\nLEARNER'S LAST MESSAGE:\nThis is my brthr's wife.\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. The word is brother: b-r-o-t-h-e-r. You wrote brthr, so the letters o and e are missing. So the sentence is: This is my brother's wife. She is kind. Now try a new one. Write two sentences about another person in your family, for example your sister. Start with This is my ... and then use She is ..."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-family (family words). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 3: vowels can be left out or swapped. Its error: leaves out or swaps vowels in a family word (\"brthr\", \"mather\").\nW2 (wrong) strength 1: one Arabic word gives one English word for both meanings. Its error: uses a word-for-word Arabic meaning (\"His woman is a teacher.\" for wife).\nC1 (correct) strength 0: each family word is spelled with all its vowels (brother, mother). Independent correct productions so far: 0.\nC2 (correct) strength 0: each family member has its own English word (wife, husband, aunt). Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood, you used \"This is my ...\" and \"She is kind\" correctly! She is right because a brother's wife is a woman. But check the spelling of the family word. Some letters are missing. Hint: it looks like br_th_r, and the missing letters are o and e. Try again: write the first sentence.\n\nLEARNER'S LAST MESSAGE:\nThis is my brthr's wife.\nFACT: the last learner message contained the error of W1 (leaves out or swaps vowels in a family word (\"brthr\", \"mather\")).\n\nTUTOR TURN TO JUDGE:\nLet's look at it together. The word is brother: b-r-o-t-h-e-r. You wrote brthr, so the letters o and e are missing. So the sentence is: This is my brother's wife. She is kind. Now try a new one. Write two sentences about another person in your family, for example your sister. Start with This is my ... and then use She is ...",
+   "stateBefore": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is brother: b-r-o-t-h-e-r."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "You wrote brthr, so the letters o and e are missing. So the sentence is: This is my brother's wife."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "This is my sister. She is kind.",
+    "errors": {
+     "W1": "This is my sistr. She is kind."
+    }
+   },
+   "applied": [
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "family",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hi again! Can we practise family words again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -480,5 +576,95 @@
    "fullItems": 3,
    "nulls": 0
   }
+ },
+ "stateAfterS1": {
+  "form": "family",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "family",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 2.5,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "family",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 2.5,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }

@@ -13,13 +13,13 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
-   "W2": 0,
-   "C1": 1,
-   "C2": 1
+   "W1": 2,
+   "W2": 0.5,
+   "C1": 1.95,
+   "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -32,7 +32,7 @@
    "C1": [],
    "C2": []
   },
-  "afterF1": false
+  "afterF1": true
  },
  "start": {
   "form": "fn1",
@@ -928,7 +928,105 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 0: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 1: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 0.\nC2 (correct) strength 1: am/is/are is needed in a present sentence. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My name is Ali.\" is a full sentence.\nNow try one on your own. Tutor: Where do you live? Answer with a full sentence.\n\nLEARNER'S LAST MESSAGE:\nI live in Cairo.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"I live in Cairo.\" is a full sentence.\nNow one on your own.\nTutor: Are you thirsty? Answer with a full sentence."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-FN-basic-interaction (answering personal questions with a full sentence). Learner level A1. First language Arabic.\nSession 1.\nW1 (wrong) strength 1: one word or a fragment is a full answer. Its error: answers with one word or a fragment (\"How old are you?\" -> \"Ten.\").\nW2 (wrong) strength 0: no am/is/are is needed. Its error: leaves out am/is/are (\"I ten years old.\").\nC1 (correct) strength 1: a personal question is answered (or asked) with a full simple sentence: subject + verb. Independent correct productions so far: 0.\nC2 (correct) strength 1: am/is/are is needed in a present sentence. Independent correct productions so far: 0.\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My name is Ali.\" is a full sentence.\nNow try one on your own. Tutor: Where do you live? Answer with a full sentence.\n\nLEARNER'S LAST MESSAGE:\nI live in Cairo.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"I live in Cairo.\" is a full sentence.\nNow one on your own.\nTutor: Are you thirsty? Answer with a full sentence.",
+   "stateBefore": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 1,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"I live in Cairo.\" is a full sentence."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "I live in Cairo."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Yes, I am thirsty.",
+    "errors": {
+     "W1": "Yes.",
+     "W2": "Yes, I thirsty."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": false
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Hello again! Can we practise answering personal questions with a full sentence again today?",
+   "production": {
+    "kind": "none",
+    "text": ""
+   }
   }
  ],
  "assess": {
@@ -942,5 +1040,95 @@
    "fullItems": 1,
    "nulls": 1
   }
+ },
+ "stateAfterS1": {
+  "form": "fn1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 1,
+   "W2": 0,
+   "C1": 3,
+   "C2": 1
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": false
+ },
+ "stateWk1": {
+  "form": "fn1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 2,
+   "W2": 0.5,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateS2Start": {
+  "form": "fn1",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 2,
+   "W2": 0.5,
+   "C1": 1.95,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
  }
 }
