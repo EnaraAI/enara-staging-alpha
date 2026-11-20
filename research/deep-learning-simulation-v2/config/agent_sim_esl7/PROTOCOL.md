@@ -168,3 +168,4 @@ The harness has no database, so it runs the deployed pure functions on records i
 **Analysis:**
 - The 3 outcomes are reported with a flag.
 - The primary comparison (§8) is also run without them, as a sensitivity check.
+- **Correction to amendment D (after round 11).** The 300-character cap was applied to the shared lesson data, so P+ also saw the cut A2 emails in rounds 8–11. That affects `EN-C-A2-RD-short-everyday-texts`, 4 P+ learners; the A1 items are under 300 characters. From round 12 the cap applies to BASE and NEW only, and P+ reads the full text again. That outcome is already flagged.

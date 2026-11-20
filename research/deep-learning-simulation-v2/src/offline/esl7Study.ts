@@ -157,8 +157,8 @@ let LNEW: Record<string, Lesson> | undefined;
 function withMaterial(it: any) {
   if (!it?.material) return it;
   // Question first, then the text: the engine caps an item prompt at 300 characters (cleanItems), so a long text loses its end, not the question.
-  const prompt = `${String(it.prompt).trim()} Text: "${String(it.material).trim()}"`.slice(0, 300); // the live cap (cleanItems), applied here because the harness builds lessons directly
-  const { material: _m, ...rest } = it; return { ...rest, prompt, question: it.prompt }; // question: the original line, for the harness's own item matching
+  const full = `${String(it.prompt).trim()} Text: "${String(it.material).trim()}"`; const prompt = full.slice(0, 300); // the live cap (cleanItems), applied here because the harness builds lessons directly
+  const { material: _m, ...rest } = it; return { ...rest, prompt, question: it.prompt, fullPrompt: full }; // fullPrompt: P+ reads lesson data directly, with no engine cap // question: the original line, for the harness's own item matching
 }
 
 function lessonsNew(): Record<string, Lesson> {
@@ -400,7 +400,7 @@ function tutorPrompt(dir: string, s: Sess): string {
   if (s.arm === 'PP') {
     // ESL6 P+ (unchanged): lesson data plus this session's conversation; a new chat each session. Reading lessons: the item's text is shown with it.
     const L = lessonOf(s.outcome); const sp = L.spec;
-    return `${PPLUS}\n\nLearner level: ${l.level} (CEFR)\n\nLesson: ${L.title}. ${L.objective}\nObjectives: ${sp.objectives.join('; ')}\nSuccess criteria: ${sp.successCriteria.join('; ')}\nVocabulary: ${sp.vocabulary.join(', ')}\nGrammar: ${sp.grammar.join('; ')}\nExamples: ${sp.examples.join(' / ')}\n\nPractice exercises you may use:\n${sp.items.map((i: any, k: number) => `${k + 1}. ${i.prompt}${i.material ? ` Text: "${i.material}"` : ''}`).join('\n')}\n\nCONVERSATION SO FAR:\n${dlg(s)}\n\nWrite the tutor's next reply only.`;
+    return `${PPLUS}\n\nLearner level: ${l.level} (CEFR)\n\nLesson: ${L.title}. ${L.objective}\nObjectives: ${sp.objectives.join('; ')}\nSuccess criteria: ${sp.successCriteria.join('; ')}\nVocabulary: ${sp.vocabulary.join(', ')}\nGrammar: ${sp.grammar.join('; ')}\nExamples: ${sp.examples.join(' / ')}\n\nPractice exercises you may use:\n${sp.items.map((i: any, k: number) => `${k + 1}. ${i.fullPrompt ?? i.prompt}${i.material ? ` Text: "${i.material}"` : ''}`).join('\n')}\n\nCONVERSATION SO FAR:\n${dlg(s)}\n\nWrite the tutor's next reply only.`;
   }
   return `You are the ENARA English tutor. Follow these teaching instructions exactly for this turn (they decide what you may reveal and what to do next).\n\n${enginePart(dir, s)}\n\nCONVERSATION SO FAR:\n${dlg(s)}\n\nWrite the tutor's next reply only.`;
 }
