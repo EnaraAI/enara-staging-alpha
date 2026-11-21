@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { meteredMessage } from './aiGateway';
 import { textTokenBound } from './priceCatalog';
 import { getConfig } from '../config/env';
+import { deepseekClient, deepseekReady, tutorModel } from './llmProvider';
 import { logger } from '../utils/logging';
 import { parseVisualSpec, renderVisualSpec, VISUAL_SPEC_FORMAT } from './visualSpec';
 
@@ -25,6 +26,10 @@ const LAYOUT_RULES = `Layout rules (follow all of them):
 - Equations and numbers are left-to-right even in Arabic: wrap them in <span dir="ltr"> in HTML and <tspan direction="ltr" unicode-bidi="embed"> in SVG.`;
 
 let client: Anthropic | undefined;
+// Tutor provider switch (lms-test, owner 21 Nov 2026): the live avatar's visuals follow the tutor to DeepSeek when it is switched on.
+let dsClient: Anthropic | undefined;
+const visualClient = (): Anthropic => (deepseekReady() ? (dsClient ??= deepseekClient(40_000)) : (client ??= new Anthropic({ apiKey: getConfig().anthropicApiKey!, timeout: 40_000, maxRetries: 0 })));
+const visualModel = (): string => (deepseekReady() ? tutorModel()! : getConfig().anthropicVisualModel);
 
 export function sanitizeVisualHtml(value: string): string {
   // The page renders this in a fully sandboxed iframe; this is a second layer.
@@ -89,7 +94,6 @@ export async function generateVisualAid(params: {
 }): Promise<string | null> {
   const config = getConfig();
   if (!config.anthropicApiKey) return null;
-  client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 40_000, maxRetries: 0 });
   // Fast path: a short description built into the page here. A full page is
   // written only when the description can't be used.
   const described = await describeVisual(params);
@@ -121,8 +125,8 @@ async function describeVisual(params: Parameters<typeof generateVisualAid>[0]): 
   const config = getConfig();
   try {
     const bound = { inputTokens: textTokenBound(question, answer, context, VISUAL_SPEC_FORMAT) + 1500, outputTokens: 3000 };
-    const response = await meteredMessage({ feature, modelName: config.anthropicVisualModel, bound }, () => client!.messages.create({
-      model: config.anthropicVisualModel,
+    const response = await meteredMessage({ feature, modelName: visualModel(), bound }, () => visualClient().messages.create({
+      model: visualModel(),
       max_tokens: 3000,
       output_config: { effort: 'low' },
       messages: [
@@ -154,8 +158,8 @@ async function writeVisualPage(params: Parameters<typeof generateVisualAid>[0]):
   try {
     // Bound: the variable parts plus 4,000 tokens for the fixed instructions.
     const bound = { inputTokens: textTokenBound(question, answer, context, LAYOUT_RULES) + 4000, outputTokens: 12_000 };
-    const response = await meteredMessage({ feature, modelName: config.anthropicVisualModel, bound }, () => client!.messages.create({
-      model: config.anthropicVisualModel,
+    const response = await meteredMessage({ feature, modelName: visualModel(), bound }, () => visualClient().messages.create({
+      model: visualModel(),
       max_tokens: 12_000,
       output_config: { effort: 'low' },
       messages: [
