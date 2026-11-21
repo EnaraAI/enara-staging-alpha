@@ -1,3 +1,4 @@
+import { deepseekPrices } from './llmProvider';
 // Versioned price catalogue for AI provider usage (4Level1 plan, P0a).
 // The code is the source of truth so pricing stays synchronous on hot paths;
 // migration 2026-10-28-price-catalog-v1 stores the same rows in the
@@ -45,6 +46,9 @@ export const PRICE_CATALOG: readonly PriceCatalogVersion[] = [
       ...tokens('claude-opus-5-5', 4, 20, 0.2),
       ...tokens('claude-sonnet-5-5', 2, 10, 0.2),
       ...tokens('claude-haiku-5-5', 0.1, 0.5, 0.01),
+      // Tutor provider switch (llmProvider.ts): the DeepSeek model named in TUTOR_LLM_MODEL, at TUTOR_LLM_PRICE_IN/_OUT (USD per million
+      // tokens; until set, a cautious upper-bound estimate). Listed under the gateway's 'anthropic' path, the model name says DeepSeek.
+      ...(process.env.TUTOR_LLM_MODEL?.trim() ? tokens(process.env.TUTOR_LLM_MODEL.trim(), deepseekPrices().input, deepseekPrices().output, 0) : []),
       // ElevenLabs speech (Flash, approximate). Any voice model.
       { provider: 'elevenlabs', model: '*', unit: 'tts_character', usdPerUnitBlock: 0.08, unitBlock: 1000, source: 'list_estimate' },
     ],

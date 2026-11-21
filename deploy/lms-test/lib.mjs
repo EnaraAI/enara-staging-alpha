@@ -74,12 +74,21 @@ export function deploymentProblems(dep) {
 const FLAG_NAME = /^(LMS|ENROLLMENT|GRADE_LEDGER|MAINTENANCE_ENDPOINTS|MOODLE_TEST_WS|PARENT)_[A-Z0-9_]{1,60}$/;
 // Tutor engine (owner-approved): exactly this one name, not an ENARA_ prefix. Its value is a
 // comma list of engine switches (backend/src/services/engineV2.ts); FLAG_VALUE still applies.
-const EXTRA_FLAG_NAMES = ['ENARA_ENGINE_V2'];
+const EXTRA_FLAG_NAMES = ['ENARA_ENGINE_V2', 'TUTOR_LLM_PROVIDER', 'TUTOR_LLM_MODEL', 'TUTOR_LLM_ENDPOINT', 'TUTOR_LLM_PRICE_IN', 'TUTOR_LLM_PRICE_OUT'];
+// Tutor provider switch (owner, 21 Nov 2026): exact values only. The endpoint is the one approved Modal address (not a secret; the key
+// TUTOR_LLM_API_KEY is Sensitive and set by hand, never here). TUTOR_LLM_ENDPOINT is allowed despite 'URL'-like content, by name only.
+const TUTOR_LLM_VALUES = {
+  TUTOR_LLM_PROVIDER: /^(anthropic|deepseek)$/,
+  TUTOR_LLM_MODEL: /^[A-Za-z0-9._\/-]{1,120}$/,
+  TUTOR_LLM_ENDPOINT: /^https:\/\/enaraai--[a-z0-9-]+\.[a-z0-9-]+\.modal\.direct\/v1$/,
+  TUTOR_LLM_PRICE_IN: /^\d{1,3}(\.\d{1,4})?$/,
+  TUTOR_LLM_PRICE_OUT: /^\d{1,3}(\.\d{1,4})?$/,
+};
 const FORBIDDEN_IN_NAME = /(KEY|KEK|SECRET|TOKEN|PASSWORD|URI|URL|DSN|CREDENTIAL|PRIVATE)/;
 const FLAG_VALUE = /^[A-Za-z0-9_,.:-]{0,200}$/;
 // ENARA_ENGINE_V2 is a comma list of switch names only (no other characters); it may be longer than other flags.
 const ENGINE_FLAG_VALUE = /^[A-Za-z0-9]+(,[A-Za-z0-9]+){0,40}$/;
-const flagValueOk = (key, value) => (key === 'ENARA_ENGINE_V2' ? value.length <= 1000 && ENGINE_FLAG_VALUE.test(value) : FLAG_VALUE.test(value));
+const flagValueOk = (key, value) => (key === 'ENARA_ENGINE_V2' ? value.length <= 1000 && ENGINE_FLAG_VALUE.test(value) : key in TUTOR_LLM_VALUES ? TUTOR_LLM_VALUES[key].test(value) : FLAG_VALUE.test(value));
 
 /**
  * Reads deploy/lms-test.flags.json: every feature's flags, merged. Refuses a
@@ -95,7 +104,7 @@ export function manifestFlags(manifest) {
   for (const feature of manifest.features ?? []) {
     if (!feature?.name || typeof feature.flags !== 'object') throw new Error('each feature needs a name and flags');
     for (const [key, value] of Object.entries(feature.flags)) {
-      if (!(FLAG_NAME.test(key) || EXTRA_FLAG_NAMES.includes(key)) || FORBIDDEN_IN_NAME.test(key)) throw new GuardError(`${key} is not a feature switch the pipeline may set`);
+      if (!(FLAG_NAME.test(key) || EXTRA_FLAG_NAMES.includes(key)) || (FORBIDDEN_IN_NAME.test(key) && !(key in TUTOR_LLM_VALUES))) throw new GuardError(`${key} is not a feature switch the pipeline may set`);
       if (typeof value !== 'string' || !flagValueOk(key, value)) throw new GuardError(`${key}: the value must be a short plain string`);
       if (key in out && out[key] !== value) throw new Error(`${key}: "${from[key]}" wants ${out[key]}, "${feature.name}" wants ${value}`);
       out[key] = value;

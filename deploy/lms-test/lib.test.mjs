@@ -90,7 +90,7 @@ test('the flags manifest: the current lms-test set, switches only', () => {
   const flags = manifestFlags(manifest());
   for (const k of ['LMS_LTI_ENABLED', 'LMS_GRADE_PASSBACK_ENABLED', 'LMS_ROSTER_SYNC_ENABLED', 'LMS_DEEP_LINKING_ENABLED', 'GRADE_LEDGER_ENABLED', 'MAINTENANCE_ENDPOINTS_ENABLED']) assert.equal(flags[k], 'true', k);
   // Every switch is 'true' except the tutor engine's comma list (ENARA_ENGINE_V2).
-  assert.ok(Object.entries(flags).every(([k, v]) => k === 'ENARA_ENGINE_V2' || v === 'true'));
+  assert.ok(Object.entries(flags).every(([k, v]) => k === 'ENARA_ENGINE_V2' || k.startsWith('TUTOR_LLM_') || v === 'true'));
   const m = manifest();
   for (const bad of ['LMS_KEK', 'MAINTENANCE_TOKEN', 'MAINTENANCE_CI_TOKEN', 'LMS_TOOL_BASE_URL', 'MONGODB_URI', 'JWT_SECRET', 'VERCEL_TOKEN', 'MOODLE_TEST_WS_TOKEN', 'lms_lti_enabled']) {
     assert.throws(() => manifestFlags({ ...m, features: [{ name: 'x', flags: { [bad]: 'true' } }] }), /not a feature switch/, bad);
@@ -133,4 +133,13 @@ test('result line and PR comment', () => {
   assert.equal(healthFailure({ ok: false, steps: [{ name: 'ready', ok: true }, { name: 'lti_launch', ok: false, code: 'http_401_invalid_signature' }] }), 'health check failed at lti_launch (http_401_invalid_signature)');
   assert.equal(healthFailure({ ok: true, steps: [] }), null);
   assert.equal(healthFailure(null), 'health check gave no answer');
+});
+
+test('tutor provider switch: exact names and values only; the API key can never be set from the manifest', () => {
+  const m = (flags) => ({ project: { name: 'enara-lms-test', id: 'prj_tuRpwEJLz1dEQOj6RSEk2xUpqtIn', target: 'production' }, features: [{ name: 'x', flags }] });
+  const ok = { TUTOR_LLM_PROVIDER: 'deepseek', TUTOR_LLM_MODEL: 'deepseek-ai/DeepSeek-V4.1-Flash', TUTOR_LLM_ENDPOINT: 'https://enaraai--ep-deepseek-v4-1-flash-1017-server.us-west.modal.direct/v1', TUTOR_LLM_PRICE_IN: '0.07', TUTOR_LLM_PRICE_OUT: '0.28' };
+  assert.deepEqual(manifestFlags(m(ok)), ok);
+  assert.throws(() => manifestFlags(m({ TUTOR_LLM_PROVIDER: 'openai' })), /short plain string/);
+  assert.throws(() => manifestFlags(m({ TUTOR_LLM_ENDPOINT: 'https://evil.example.com/v1' })), /short plain string/);
+  assert.throws(() => manifestFlags(m({ TUTOR_LLM_API_KEY: 'x' })), /not a feature switch/);
 });

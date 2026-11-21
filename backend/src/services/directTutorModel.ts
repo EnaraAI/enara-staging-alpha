@@ -1,3 +1,4 @@
+import { deepseekClient, deepseekReady, tutorModel } from './llmProvider';
 import { clientFor, fallbackKey, fallbackModel, modelFallbackOn, hasFallback, shouldFallBack, withFallback } from './modelFallback';
 import { IDENTITY_RULE } from '../utils/vendorNeutral';
 import Anthropic from '@anthropic-ai/sdk';
@@ -28,6 +29,8 @@ const PLAN_GUIDANCE = 'Teach with the teaching method given in the learning focu
 
 let client: Anthropic | undefined;
 function getClient(apiKey: string): Anthropic {
+  // Tutor provider switch (llmProvider.ts): DeepSeek on lms-test while the Anthropic key is replaced; same call shape.
+  if (deepseekReady()) return deepseekClient(50_000);
   // One client per warm instance. Fit within the 60 s serverless limit: one
   // retry, made (and metered) by the gateway rather than the SDK.
   client ??= new Anthropic({ apiKey, timeout: 25_000, maxRetries: 0 });
@@ -297,9 +300,11 @@ export async function queryDirectTutorModel(
 
   try {
     const { body, materialsCount, bound } = await buildTutorRequest(params);
+    const anthropicModel = body.model;
+    if (deepseekReady()) (body as { model: string }).model = tutorModel()!;
     const feature = params.mode === 'voice' ? 'tutor_voice' : 'tutor_chat';
     // modelFallback: one more try with the fallback key and/or model after an auth, rate-limit or server failure (metered like any attempt).
-    const fbBody = { ...body, model: fallbackModel() ?? body.model };
+    const fbBody = { ...body, model: fallbackModel() ?? anthropicModel }; // a fallback always goes to Anthropic
     const response = await withFallback(
       () => meteredMessage({ feature, modelName: body.model, maxAttempts: 2, bound }, () => getClient(config.anthropicApiKey!).beta.messages.create(body)),
       () => meteredMessage({ feature, modelName: fbBody.model, maxAttempts: 1, bound }, () => clientFor(fallbackKey() ?? config.anthropicApiKey!, 25_000).beta.messages.create(fbBody)),
@@ -337,6 +342,8 @@ export async function* streamDirectTutorModel(params: TutorRequestParams, status
   const feature = params.mode === 'voice' ? 'tutor_voice' : 'tutor_chat';
   try {
     const { body, bound, materialsCount } = await buildTutorRequest(params);
+    const anthropicModel = body.model;
+    if (deepseekReady()) (body as { model: string }).model = tutorModel()!;
     status.contextFound = (params.curriculum ? 1 : 0) + materialsCount;
     const client = getClient(config.anthropicApiKey);
     // The gateway logs ai_calls and meters each attempt; a consumer that stops
@@ -354,7 +361,7 @@ export async function* streamDirectTutorModel(params: TutorRequestParams, status
       // modelFallback: only before any text reached the learner (otherwise the reply would be mixed from two calls).
       if (sent || !modelFallbackOn() || !hasFallback() || !shouldFallBack(error)) throw error;
       logger.warn('tutor_model_fallback', { stream: true, status: (error as { status?: number }).status ?? null, fallbackKey: Boolean(fallbackKey()), fallbackModel: Boolean(fallbackModel()) });
-      const fbBody = { ...body, model: fallbackModel() ?? body.model };
+      const fbBody = { ...body, model: fallbackModel() ?? anthropicModel }; // a fallback always goes to Anthropic
       for await (const event of meteredStream({ feature, modelName: fbBody.model, maxAttempts: 1, bound }, () => clientFor(fallbackKey() ?? config.anthropicApiKey!, 25_000).beta.messages.stream(fbBody), out)) {
         if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') yield event.delta.text;
       }
