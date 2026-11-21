@@ -6,7 +6,7 @@ import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSo
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
 import { currentKeyVerdict, independentSuccessItem, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
 import { engineV2 } from '../services/engineV2';
-import { recordOutcomeForError, recordTutorOutcome, removeExamItems } from '../services/errorsToWorkOn';
+import { recordOutcomeForError, recordTutorOutcome, adaptiveSpacingOn, removeExamItems } from '../services/errorsToWorkOn';
 import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
 import {
@@ -429,11 +429,16 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
     const verdict = (languageTurn as { assessment?: { verdict?: string } }).assessment?.verdict;
     const right = Boolean(verdict && independentSuccessItem(turn.language, { assessment: { verdict } }));
     const wrong = turn.language.signals.answeringCheck && (verdict === 'INCORRECT' || verdict === 'PARTIALLY_CORRECT');
-    if (right || wrong) await recordTutorOutcome({ studentId: turn.session.studentId, objectiveId: turn.plan?.teaching.objectiveId, sessionId: turn.session.id, right });
+    // adaptiveSpacing: an independent right on the first try is an easy right (the next review moves further out).
+    const firstTry = !((turn.language.signals as { genuineFailedAttempts?: number }).genuineFailedAttempts ?? 0);
+    if (right || wrong) await recordTutorOutcome({ studentId: turn.session.studentId, objectiveId: turn.plan?.teaching.objectiveId, sessionId: turn.session.id, right, ...(right && firstTry ? { quality: 'easy' as const } : {}) });
     // An answer to the practice item the previous reply set for a listed error (any objective): right with no hint, or wrong.
     if (turn.prevWorkOn && turn.language.signals.answeringCheck && verdict && verdict !== 'NOT_EVALUATED' && verdict !== 'AMBIGUOUS') {
       const ok = verdict === 'CORRECT' || verdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
-      await recordOutcomeForError({ errorId: turn.prevWorkOn.errorId, studentId: turn.session.studentId, sessionId: turn.session.id, right: ok && turn.prevWorkOn.hintLevel === 0 && !((languageTurn as { hintLevel?: number }).hintLevel ?? 0) });
+      const hinted = turn.prevWorkOn.hintLevel !== 0 || Boolean((languageTurn as { hintLevel?: number }).hintLevel ?? 0);
+      // adaptiveSpacing: a right answer after a hint keeps the review step (before: counted as wrong); unassisted first-try right = easy.
+      const assisted = ok && hinted && adaptiveSpacingOn();
+      await recordOutcomeForError({ errorId: turn.prevWorkOn.errorId, studentId: turn.session.studentId, sessionId: turn.session.id, right: assisted || (ok && !hinted), ...(assisted ? { quality: 'assisted' as const } : ok && !hinted && firstTry ? { quality: 'easy' as const } : {}) });
     }
     // This reply set a practice item for a listed error: remember which one, for the learner's next answer.
     const focus = (turn.languageMarker?.assessment as { focus?: number } | null | undefined)?.focus;
