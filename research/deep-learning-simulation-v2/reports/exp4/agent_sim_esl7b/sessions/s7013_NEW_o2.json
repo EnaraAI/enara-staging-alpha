@@ -15,11 +15,11 @@
   "s": {
    "W1": 0,
    "W2": 1,
-   "C1": 1.2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -29,7 +29,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -1319,7 +1321,112 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 1.2: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 2.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Put in order: \"paints / Mia / a picture\"\" | \"Try again: Put in order: \"paints / Mia / a picture\"\" | \"Now one alone. Put in order: \"feeds / Leo / the dog\"\" | \"Write one sentence about a person you know. Say who, then the action, then the thing.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Let's start with a quick one.\nPut in order: \"reads / Mia / a book\"\n\nLEARNER'S LAST MESSAGE:\nMia reads a book.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! \"Mia reads a book.\" is in the right order. Good work!\nPut in order: \"plays / Sam / chess / on Mondays\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-word-order-svo (word order (subject + verb + object)). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the verb can come first, as in Arabic. Its error: puts the verb before the subject (\"Plays Ahmed football.\").\nW2 (wrong) strength 1: the adjective comes after the noun. Its error: puts the adjective after the noun (\"I have a car red.\").\nC1 (correct) strength 1.2: a statement starts with the subject, then the verb, then the object. Independent correct productions so far: 2.\nC2 (correct) strength 0: an adjective comes before its noun. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Put in order: \"paints / Mia / a picture\"\" | \"Try again: Put in order: \"paints / Mia / a picture\"\" | \"Now one alone. Put in order: \"feeds / Leo / the dog\"\" | \"Write one sentence about a person you know. Say who, then the action, then the thing.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Let's start with a quick one.\nPut in order: \"reads / Mia / a book\"\n\nLEARNER'S LAST MESSAGE:\nMia reads a book.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes! \"Mia reads a book.\" is in the right order. Good work!\nPut in order: \"plays / Sam / chess / on Mondays\"",
+   "stateBefore": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes! \"Mia reads a book.\" is in the right order."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "\"Mia reads a book.\" is in the right order."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Sam plays chess on Mondays.",
+    "errors": {
+     "W1": "Plays Sam chess on Mondays."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "svo",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Sam plays chess on Mondays.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Sam plays chess on Mondays.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
