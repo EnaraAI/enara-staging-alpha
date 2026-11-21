@@ -201,6 +201,8 @@ export async function buildObjectiveContext(params: {
       ? await memoryLines({ studentId: params.studentId, sessionId: params.tutorSessionId, courseId: objective.courseId ? String(objective.courseId) : undefined, firstTurn })
       : { lines: [] as string[], reviewOpening: false };
     if (memory.reviewOpening && firstTurn) input.reviewOpening = true;
+    // reviewFirst (REVIEW_FIRST_PLAN): with spaced reviews due, the session opens with them, so the last session's "Start here" step waits.
+    if (engineV2('reviewFirst') && engineV2('spacedReview') && firstTurn && workOn?.items.length) memory.lines = memory.lines.map((l) => l.replace(/ Start here: [^.]*\./, ''));
     // planner2: lesson shape first, then the main method inside it (lessonPlanner.ts). Off: ped-v2 unchanged.
     let lesson: LessonPlan | undefined;
     let progress: StageProgress | undefined;
