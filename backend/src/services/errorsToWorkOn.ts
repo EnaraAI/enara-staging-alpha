@@ -111,6 +111,11 @@ function applySpaced(e: Mutable, o: Outcome): boolean {
     if (e.status === 'resolved') { e.statusHistory.push({ at: o.at, by: o.by, from: 'resolved', to: 'open', reason: 'wrong_again' }); e.status = 'open'; e.resolvedAt = undefined; e.finalCheckAt = undefined; }
     return true;
   }
+  // adaptiveSpacing (NEXT_PLAN item 4): a right answer after a hint keeps the current step (the review comes back at the same gap) and never closes.
+  if (adaptiveSpacingOn() && o.quality === 'assisted') {
+    if (e.status === 'open') e.nextReviewAt = new Date(o.at.getTime() + SPACED_DAYS[Math.min(e.reviewStep ?? 0, SPACED_DAYS.length - 1)] * DAY);
+    return true;
+  }
   e.rightStreak += 1;
   const lastWrong = new Date(e.lastWrongAt ?? e.lastSeenAt).getTime();
   if (e.status === 'open') {
@@ -119,7 +124,9 @@ function applySpaced(e: Mutable, o: Outcome): boolean {
       e.statusHistory.push({ at: o.at, by: o.by, from: 'open', to: 'resolved', reason: 'unassisted_right_after_delay' });
     } else {
       // Right too soon after the wrong one: the next review moves one step further out, the error stays open.
-      e.reviewStep = Math.min((e.reviewStep ?? 0) + 1, SPACED_DAYS.length - 1); e.nextReviewAt = new Date(o.at.getTime() + SPACED_DAYS[e.reviewStep] * DAY);
+      // adaptiveSpacing: an easy right (unassisted, first try) skips one more step (1 -> 7 days, 3 -> 21 days).
+      const jump = adaptiveSpacingOn() && o.quality === 'easy' ? 2 : 1;
+      e.reviewStep = Math.min((e.reviewStep ?? 0) + jump, SPACED_DAYS.length - 1); e.nextReviewAt = new Date(o.at.getTime() + SPACED_DAYS[e.reviewStep] * DAY);
     }
   } else if (e.status === 'resolved' && e.nextReviewAt && o.at.getTime() >= new Date(e.nextReviewAt).getTime()) {
     e.finalCheckAt = o.at; e.nextReviewAt = undefined;
@@ -133,7 +140,10 @@ export function reviewDue(e: Pick<IErrorToWorkOn, 'status' | 'nextReviewAt'>, no
   return e.status === 'resolved' && Boolean(e.nextReviewAt) && new Date(e.nextReviewAt!).getTime() <= now.getTime();
 }
 
-export type Outcome = { right: boolean; key: string; at: Date; by?: string };
+export type Outcome = { right: boolean; key: string; at: Date; by?: string; quality?: OutcomeQuality };
+/** adaptiveSpacing: how a right answer came. easy = unassisted on the first try; assisted = right only after a hint (never closes an error). */
+export type OutcomeQuality = 'easy' | 'assisted';
+export const adaptiveSpacingOn = (): boolean => spacedReviewOn() && engineV2('adaptiveSpacing');
 type Mutable = Pick<IErrorToWorkOn, 'status' | 'rightStreak' | 'countedKeys' | 'lastSeenAt' | 'occurrences' | 'statusHistory' | 'resolvedAt' | 'lastWrongAt' | 'nextReviewAt' | 'reviewStep' | 'finalCheckAt'>;
 /** One later outcome on the error's point. Counts once per key (session or attempt), only after the error was last seen. Returns true if changed. */
 export function applyOutcome(e: Mutable, o: Outcome): boolean {
@@ -216,7 +226,7 @@ export async function syncErrors(studentId: string, institutionId?: string): Pro
               await ErrorToWorkOn.create({ id: `ewo_${randomUUID()}`, institutionId, studentId, objectiveId, courseId: courseOf.get(objectiveId), curriculumId: asmt?.curriculumId, errorCode, ...(errorLabel ? { errorLabel } : {}), sources: [src], occurrences: 1, firstSeenAt: when, lastSeenAt: when, status: 'open', rightStreak: 0, countedKeys: [], statusHistory: [{ at: when, by: 'system', to: 'open', reason: 'released_assessment' }], ...(spacedReviewOn() ? { lastWrongAt: when, reviewStep: 0, nextReviewAt: new Date(when.getTime() + SPACED_DAYS[0] * DAY) } : {}) });
             }
           } else {
-            for (const e of open) if (applyOutcome(e, { right: true, key: `attempt:${at.id}`, at: when, by: 'system' })) await e.save();
+            for (const e of open) if (applyOutcome(e, { right: true, key: `attempt:${at.id}`, at: when, by: 'system', quality: 'easy' })) await e.save();
           }
         }
       }
@@ -253,7 +263,7 @@ export async function recordMoodleAnswers(p: { studentId: string; institutionId:
         }
       } else {
         out.right += 1;
-        for (const e of open) if (applyOutcome(e, { right: true, key, at: p.at, by: 'system' })) await e.save();
+        for (const e of open) if (applyOutcome(e, { right: true, key, at: p.at, by: 'system', quality: 'easy' })) await e.save();
       }
     }
   } catch (error) {
@@ -309,22 +319,22 @@ export async function errorsForTutor(p: { studentId: string; institutionId?: str
 }
 
 /** A tutor turn on an objective with open errors: an independent right, or a wrong answer, in this session (counted once per session). */
-export async function recordTutorOutcome(p: { studentId: string; objectiveId?: string; sessionId: string; right: boolean; at?: Date }): Promise<void> {
+export async function recordTutorOutcome(p: { studentId: string; objectiveId?: string; sessionId: string; right: boolean; at?: Date; quality?: OutcomeQuality }): Promise<void> {
   if (!workOnOn() || !p.objectiveId) return;
   try {
     const rows = await ErrorToWorkOn.find({ studentId: p.studentId, objectiveId: p.objectiveId, status: { $ne: 'dismissed' } });
-    for (const e of rows) if (applyOutcome(e, { right: p.right, key: `session:${p.sessionId}`, at: p.at ?? new Date(), by: 'tutor' })) await e.save();
+    for (const e of rows) if (applyOutcome(e, { right: p.right, key: `session:${p.sessionId}`, at: p.at ?? new Date(), by: 'tutor', ...(p.quality ? { quality: p.quality } : {}) })) await e.save();
   } catch (error) {
     logger.warn('errors_to_work_on_outcome_failed', { error: serializeError(error) });
   }
 }
 
 /** A tutor answer to a practice item set for one listed error (the reply named it with focus=EN): counted on that error, once per session. */
-export async function recordOutcomeForError(p: { errorId: string; studentId: string; sessionId: string; right: boolean; at?: Date }): Promise<void> {
+export async function recordOutcomeForError(p: { errorId: string; studentId: string; sessionId: string; right: boolean; at?: Date; quality?: OutcomeQuality }): Promise<void> {
   if (!workOnOn()) return;
   try {
     const e = await ErrorToWorkOn.findOne({ id: p.errorId, studentId: p.studentId });
-    if (e && applyOutcome(e, { right: p.right, key: `session:${p.sessionId}`, at: p.at ?? new Date(), by: 'tutor' })) await e.save();
+    if (e && applyOutcome(e, { right: p.right, key: `session:${p.sessionId}`, at: p.at ?? new Date(), by: 'tutor', ...(p.quality ? { quality: p.quality } : {}) })) await e.save();
   } catch (error) {
     logger.warn('errors_to_work_on_outcome_failed', { error: serializeError(error) });
   }
