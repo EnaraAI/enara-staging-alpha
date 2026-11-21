@@ -3,7 +3,7 @@
 // - llmCompare(req): one Anthropic-style request (system, messages, max_tokens) sent through the provider adapter, for the quality check.
 // The key comes from the server's own TUTOR_LLM_API_KEY and is never returned or logged. Inputs are fake learner turns from our research
 // files; outputs are numbers and model text only.
-import { deepseekClient, tutorModel } from '../services/llmProvider';
+import { REASONING_OFF, deepseekClient, reasoningModeUsed, tutorModel } from '../services/llmProvider';
 
 const BASE = () => (process.env.TUTOR_LLM_ENDPOINT?.trim() || '').replace(/\/+$/, '');
 const KEY = () => process.env.TUTOR_LLM_API_KEY?.trim() || '';
@@ -21,6 +21,16 @@ export async function llmCheck(): Promise<Record<string, unknown>> {
   if (!auth) return { ok: false, authTries };
   const model = tutorModel() ?? (models as { id: string }[])?.[0]?.id;
   if (!process.env.TUTOR_LLM_MODEL && model) process.env.TUTOR_LLM_MODEL = model; // for this check only (the setting itself is set by the deploy manifest)
+  // How each "reasoning off" spelling behaves (status, reply length, reasoning length): numbers only.
+  const probes: Record<string, unknown>[] = [];
+  for (const extra of REASONING_OFF) {
+    const t = Date.now();
+    const r = await fetch(`${BASE()}/chat/completions`, { method: 'POST', headers: { ...tries.find(([n]) => n === auth)![1], 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(55_000),
+      body: JSON.stringify({ model, max_tokens: 120, messages: [{ role: 'user', content: 'Say hello in five words.' }], ...extra }) }).catch(() => null);
+    const j = r?.ok ? (await r.json().catch(() => ({}))) as { choices?: { message?: { content?: string | null; reasoning_content?: string | null }; finish_reason?: string }[] } : {};
+    const m = j.choices?.[0];
+    probes.push({ variant: Object.keys(extra)[0] ?? 'default', status: r?.status ?? 0, ms: Date.now() - t, replyChars: m?.message?.content?.length ?? 0, reasoningChars: m?.message?.reasoning_content?.length ?? 0, finish: m?.finish_reason });
+  }
   const c = deepseekClient(55_000);
   const body = { model: model!, max_tokens: 120, temperature: 0.4, system: 'You are a patient English tutor for a 10-year-old. Reply in at most 2 short sentences, then ask ONE question.', messages: [{ role: 'user' as const, content: 'I goed to the park yesterday.' }] };
   const timed = async () => { const t = Date.now(); const r = await c.messages.create(body as never) as unknown as { content: { text: string }[]; usage: unknown; stop_reason: string }; return { ms: Date.now() - t, text: r.content[0]?.text ?? '', usage: r.usage, stop: r.stop_reason }; };
@@ -28,7 +38,7 @@ export async function llmCheck(): Promise<Record<string, unknown>> {
   const t0 = Date.now(); let firstToken: number | null = null; let streamed = '';
   const s = c.messages.stream(body as never) as unknown as AsyncIterable<{ type: string; delta?: { type: string; text?: string } }>;
   for await (const e of s) if (e.type === 'content_block_delta' && e.delta?.text) { if (firstToken === null) firstToken = Date.now() - t0; streamed += e.delta.text; }
-  return { ok: true, auth, models, model, first: { ms: first.ms, stop: first.stop, usage: first.usage, text: first.text.slice(0, 200) },
+  return { ok: true, auth, models, model, probes, reasoningMode: reasoningModeUsed(), first: { ms: first.ms, stop: first.stop, usage: first.usage, text: first.text.slice(0, 200) },
     warmMs: warm.map((w) => w.ms), stream: { totalMs: Date.now() - t0, firstTokenMs: firstToken, text: streamed.slice(0, 200) } };
 }
 
