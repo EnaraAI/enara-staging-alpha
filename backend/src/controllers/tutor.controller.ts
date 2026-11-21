@@ -8,6 +8,7 @@ import { currentKeyVerdict, independentSuccessItem, type LanguageTeachingContext
 import { engineV2 } from '../services/engineV2';
 import { kidsAudioVisualOn, pictureChoices } from '../services/kidsPictures';
 import { kidsSpeakingInfo } from '../services/kidsSpeaking';
+import { MISSING_MARKER_NOTE, hasTrustedMarker, needsRepair } from '../services/repairOnce';
 import { OUT_OF_SCOPE_LINE, outOfScopeTurn } from '../services/groundedRefusal';
 import { asksToExplainAgain, retrieveWithRewrite, reusePassages } from '../services/retrievalBoost';
 import { gradeAllSubjectsOn, practiceOutcome, practiceTurnFrom, SUBJECT_GRADE_LINE } from '../services/subjectPractice';
@@ -190,6 +191,8 @@ interface TutorTurn {
   subjectGrading?: boolean;
   // groundedRefusal: a subject question the course materials do not cover.
   outOfScope?: boolean;
+  // repairOnce: one regeneration was made because the hidden grading line was missing.
+  repaired?: boolean;
   /** workOn: the error the previous reply set a practice item for (its hidden line named it), and that reply's hint level. */
   prevWorkOn?: { errorId: string; hintLevel: number };
   turnLockId?: string;
@@ -487,6 +490,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
       ...(languageTurn ? { languageTurn } : {}),
       ...(practiceTurn ? { practiceTurn } : {}),
       ...(turn.outOfScope && reply ? { outOfScope: true } : {}),
+      ...(turn.repaired ? { repaired: true } : {}),
       // kidsAudioVisual: picture choices named in the trusted hidden line (under 9 only; the prompt line is given only then).
       ...(kidsAudioVisualOn() && reply && pictureChoices((turn.languageMarker?.assessment as { pics?: string[] } | null | undefined)?.pics) ? { pics: pictureChoices((turn.languageMarker?.assessment as { pics?: string[] } | null | undefined)?.pics) } : {}),
     },
@@ -541,6 +545,16 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
           const stripped2 = stripAssessmentMarkers(again.answer);
           if (stripped2.text && !exampleGuardCheck(turn.language, stripped2.text, turn.text).length) { turn.languageMarker = stripped2; reply = { ...again, answer: stripped2.text }; }
         }
+      }
+    }
+    // repairOnce: a graded turn whose reply has no trusted hidden line gets ONE regeneration with the reason; otherwise the first draft stays.
+    if (reply && needsRepair({ gradedTurn: Boolean(turn.language || turn.subjectGrading), marker: turn.languageMarker, alreadyRegenerated: Boolean(turn.guardRegenerated), text: reply.answer })) {
+      turn.repaired = true;
+      const again = await queryDirectTutorModel({ ...params, pedagogy: [params.pedagogy, MISSING_MARKER_NOTE].filter(Boolean).join('\n\n') });
+      if (again) {
+        const stripped2 = stripAssessmentMarkers(again.answer);
+        const safe = !turn.language || !exampleGuardCheck(turn.language, stripped2.text, turn.text).length;
+        if (stripped2.text && hasTrustedMarker(stripped2) && safe) { turn.languageMarker = stripped2; reply = { ...again, answer: stripped2.text }; }
       }
     }
   }
