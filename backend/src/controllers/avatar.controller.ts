@@ -2,7 +2,7 @@ import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
 import { resolveSessionClassId } from '../services/sessionClass';
 import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { SentenceSplitter } from '../services/sentenceSplitter';
-import { avatarSpeakingOn, isWavClip, LATENCY_KEEP, MAX_CLIP_BYTES, pronunciationReady, PRONUNCIATION_NOTE_LINE, SPEAKING_PRACTICE_LINE } from '../services/avatarSpeaking';
+import { avatarSpeakingOn, avatarSpeakingUsesAnamVoice, isWavClip, LATENCY_KEEP, MAX_CLIP_BYTES, pronunciationReady, PRONUNCIATION_NOTE_LINE, SPEAKING_PRACTICE_LINE } from '../services/avatarSpeaking';
 import { assessPronunciation } from '../services/pronunciation';
 import { ageFromBirthDate } from '../services/languageTeachingContext';
 import { Student } from '../models/Student';
@@ -285,7 +285,8 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
   const sessionId = `av-${randomUUID()}`;
   const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: face?.avatarId || 'anam-default', ...(requireAnam().reserveUsd ? { boundUsd: requireAnam().reserveUsd } : {}) }, `avatar:${sessionId}`, 48 * 60 * 60 * 1000);
   // ENARA's own voice when it works, else the video tutor's voice and listening.
-  const serverVoice = await isElevenLabsVoiceUsable();
+  // avatarSpeaking (owner go 21 Nov 2026): the avatar uses Anam's own speech-to-text and voice; ElevenLabs is not used for it.
+  const serverVoice = avatarSpeakingUsesAnamVoice() ? false : await isElevenLabsVoiceUsable();
   let sessionToken: string;
   try {
     sessionToken = await createAnamSessionToken(language, face?.avatarId, { serverVoice, gender: face?.gender });

@@ -1,5 +1,5 @@
 // avatarSpeaking (NEXT_PLAN item 5, owner go 21 Nov 2026): speaking and pronunciation practice through the live avatar. The learner speaks
-// (ElevenLabs real-time transcription, as today); the tutor answers and gives short feedback on the target form; for an adult learner, a short
+// (Anam's built-in speech-to-text and voice, see avatarSpeakingUsesAnamVoice); the tutor answers and gives short feedback on the target form; for an adult learner, a short
 // clip of the sentence can be scored for pronunciation (Azure, pronunciation.ts) and the next reply gives one tip. Audio is never stored:
 // scored, then dropped; only the two-word focus and a one-line summary are kept on the call (deleted with it). Minors: no pronunciation
 // clips until the legal review and parent consent; their spoken tutor works as before.
@@ -7,6 +7,9 @@ import { engineV2 } from './engineV2';
 import { pronunciationStatus } from './pronunciation';
 
 export const avatarSpeakingOn = (): boolean => engineV2('avatarSpeaking');
+/** With avatarSpeaking on, the live avatar listens and speaks with Anam's built-in speech-to-text and voice (owner, 21 Nov 2026), even when
+ *  an ElevenLabs key is set. Audio is never stored either way. */
+export const avatarSpeakingUsesAnamVoice = (): boolean => avatarSpeakingOn();
 export const MAX_CLIP_BYTES = 16000 * 2 * 15 + 44;   // 15 s of 16 kHz mono 16-bit WAV
 export const LATENCY_KEEP = 50;
 /** Pronunciation clips only for a learner known to be 18 or older (no minors before consent). */
