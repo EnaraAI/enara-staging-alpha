@@ -8,7 +8,7 @@ Tutor track, lms-test only. test.enara.app untouched.
 | #58 | Avatar uses **Anam's own speech-to-text and voice**. ElevenLabs is not used for the avatar. Pronunciation scores stay off. Nothing about Azure changed. | Live |
 | #59 | **Children's speaking on:** microphone in the kids tutor chat, plus the "Talk live" avatar call. Internal switch `kidsSpeaking` only; no teacher or parent toggles. Audio never stored. GO_LIVE_CHECKLIST #12 added (parent consent + legal review before the first real school). | Live |
 | #60 | Test-only, read-only readout of cost and latency per avatar call (numbers only) | Live |
-| #61 | **Our own pictures replace OpenMoji.** Credit line removed. | E2E running |
+| #61 | **Our own pictures replace OpenMoji.** Credit line removed. | Live |
 
 Also: `AI_PAUSED=false` on lms-test (your "Turn AI on"). The $25 spend cap is still set.
 
