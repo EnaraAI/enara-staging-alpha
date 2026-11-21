@@ -8,6 +8,7 @@ import { currentKeyVerdict, independentSuccessItem, type LanguageTeachingContext
 import { engineV2 } from '../services/engineV2';
 import { kidsAudioVisualOn, pictureChoices } from '../services/kidsPictures';
 import { kidsSpeakingInfo } from '../services/kidsSpeaking';
+import { OUT_OF_SCOPE_LINE, outOfScopeTurn } from '../services/groundedRefusal';
 import { asksToExplainAgain, retrieveWithRewrite, reusePassages } from '../services/retrievalBoost';
 import { gradeAllSubjectsOn, practiceOutcome, practiceTurnFrom, SUBJECT_GRADE_LINE } from '../services/subjectPractice';
 import { recordOutcomeForError, recordTutorOutcome, adaptiveSpacingOn, removeExamItems } from '../services/errorsToWorkOn';
@@ -187,6 +188,8 @@ interface TutorTurn {
   languageMarker?: StrippedReply;
   // gradeAllSubjects: a non-language turn whose reply carries the hidden grading line.
   subjectGrading?: boolean;
+  // groundedRefusal: a subject question the course materials do not cover.
+  outOfScope?: boolean;
   /** workOn: the error the previous reply set a practice item for (its hidden line named it), and that reply's hint level. */
   prevWorkOn?: { errorId: string; hintLevel: number };
   turnLockId?: string;
@@ -366,12 +369,15 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
           objectiveId: session.objectiveId,
         }).catch(() => ({ sources: [] as RetrievedSource[] }))).sources
       : [];
+    // groundedRefusal: no passage for a learner question in a course that has materials -> say so, flag the turn.
+    const prevAskedPractice = ['NEW_ITEM', 'SAME_ITEM'].includes(String(([...earlier].reverse().find((m) => m.role === 'ai')?.meta as { practiceTurn?: { next?: string } } | undefined)?.practiceTurn?.next ?? ''));
+    turn.outOfScope = await outOfScopeTurn({ language: Boolean(turn.language), answeringPractice: prevAskedPractice, text: turn.text, sourcesFound: turn.sources.length, institutionId: session.institutionId, curriculumId: session.curriculumId }).catch(() => false);
     return {
       query: enrichedQuery,
       history,
       teachingMethod: method,
       curriculum,
-      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
+      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined, turn.outOfScope ? OUT_OF_SCOPE_LINE : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
       planActive: Boolean(turn.plan),
       sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
       ...(engineV2('cache') && turn.language?.parts ? { languageContextStable: turn.language.parts.stable, languageContextDynamic: turn.language.parts.dynamic } : { languageContext: turn.language?.prompt }),
@@ -480,6 +486,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
       // Recorded only for a model reply (the moves were actually given to it).
       ...(languageTurn ? { languageTurn } : {}),
       ...(practiceTurn ? { practiceTurn } : {}),
+      ...(turn.outOfScope && reply ? { outOfScope: true } : {}),
       // kidsAudioVisual: picture choices named in the trusted hidden line (under 9 only; the prompt line is given only then).
       ...(kidsAudioVisualOn() && reply && pictureChoices((turn.languageMarker?.assessment as { pics?: string[] } | null | undefined)?.pics) ? { pics: pictureChoices((turn.languageMarker?.assessment as { pics?: string[] } | null | undefined)?.pics) } : {}),
     },

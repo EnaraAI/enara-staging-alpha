@@ -48,6 +48,8 @@ export interface ITutorMessageDoc extends Document {
     // observation, never mastery (services/languageTeachingContext.ts).
     languageTurn?: LanguageTurnEvidence;
     // gradeAllSubjects: the hidden grading line of a non-language subject turn.
+    // groundedRefusal: the course materials did not cover this question.
+    outOfScope?: boolean;
     practiceTurn?: { assessment: { verdict: string }; answeringCheck: boolean; objectiveId?: string; lessonId?: string; next?: string };
   };
 }
@@ -91,6 +93,7 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
         },
         default: undefined,
       },
+      outOfScope: Boolean,
       practiceTurn: {
         type: { assessment: { type: { verdict: String, _id: false } }, answeringCheck: Boolean, objectiveId: String, lessonId: String, next: String, _id: false },
         default: undefined,
