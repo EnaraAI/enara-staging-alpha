@@ -15,3 +15,4 @@ Status as of 19 Nov 2026. Owner: Mohamed unless noted.
 | 9 | Build the styling into the app instead of loading the Tailwind CDN at runtime | LMS track | Open |
 | 10 | Revoke the Vercel "Protection Bypass for Automation" secret on `enara-lms-test` | Mohamed | Open |
 | 11 | Tutor and avatar on lms-test: `ANAM_API_KEY`, then "turn on AI on lms-test" ($25 cap already set) | Mohamed | Open |
+| 12 | Children's speaking and voice processing need parent consent and the legal review before the first real school. (On for lms-test only: internal switch `kidsSpeaking`; audio is never stored.) | Mohamed + legal review | Open |

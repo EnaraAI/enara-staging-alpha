@@ -7,6 +7,7 @@ import { buildTeachingContext, type ObjectiveContext } from '../services/learnin
 import { currentKeyVerdict, independentSuccessItem, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
 import { engineV2 } from '../services/engineV2';
 import { kidsAudioVisualOn, pictureChoices } from '../services/kidsPictures';
+import { kidsSpeakingInfo } from '../services/kidsSpeaking';
 import { recordOutcomeForError, recordTutorOutcome, adaptiveSpacingOn, removeExamItems } from '../services/errorsToWorkOn';
 import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
@@ -606,4 +607,9 @@ export const listDueReviews = asyncHandler(async (req: AuthRequest, res: Respons
   const { loadDueReviews } = await import('../services/learnerLanguageProfile');
   const due = await loadDueReviews(req.user.institutionId, req.user.studentId);
   res.json({ due: due.slice(0, 10).map((d) => ({ kind: d.kind, label: d.label, dueSince: d.dueSince ?? null })) });
+});
+
+// kidsSpeaking: whether the kids app shows the chat microphone and the live call (environment switch; no user setting).
+export const getTutorSpeaking = asyncHandler(async (_req: AuthRequest, res: Response) => {
+  res.json(kidsSpeakingInfo());
 });

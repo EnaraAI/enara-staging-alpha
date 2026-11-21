@@ -38,6 +38,7 @@ import {
   sendTutorMessage,
   streamTutorMessage,
   listDueReviews,
+  getTutorSpeaking,
 } from '../controllers/tutor.controller';
 import {
   tutorVisualize,
@@ -119,6 +120,7 @@ router.get('/results/analytics', getResultsAnalytics);
 router.get('/results/:id', getMyResult);
 
 router.get('/tutor/reviews/due', listDueReviews);
+router.get('/tutor/speaking', getTutorSpeaking);
 router.get('/tutor/sessions', listTutorSessions);
 router.post('/tutor/sessions', createTutorSession);
 router.delete('/tutor/sessions', clearTutorSessions);

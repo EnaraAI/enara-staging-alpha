@@ -8,6 +8,9 @@ import type { Lang } from './enaraKids';
 import * as api from '../services/apiService';
 import { toast } from '../services/toastService';
 import { SpeakingExam } from '../components/SpeakingExam';
+import { LiveAvatarModal } from '../components/enara/LiveAvatarModal';
+import { MicProblemNotice, useMicGate } from '../components/MicCheck';
+import { classifySpeechRecognitionError, isInFrame } from '../services/micCheck';
 import * as D from './kidsData';
 import { kidsTabForLmsPage, showOldAssessmentsTab } from '../services/roleRouting';
 
@@ -680,6 +683,16 @@ function TutorDrawer({ ctx, tutor, onClose }: { ctx: Ctx; tutor: Tutor; onClose:
   const [sessions, setSessions] = useState<any[]>([]);
   const [thinking, setThinking] = useState(false);
   const sentPrompt = useRef(false);
+  // kidsSpeaking (environment switch, no user setting): the chat microphone and the live call. Audio is never stored: the microphone
+  // uses the browser's speech recognition and only the text is sent; the live call keeps only the transcript.
+  const [speaking, setSpeaking] = useState<{ microphone: boolean; liveCall: boolean }>({ microphone: false, liveCall: false });
+  const [listening, setListening] = useState(false);
+  const [liveOpen, setLiveOpen] = useState(false);
+  const recognition = useRef<any>(null);
+  const mic = useMicGate('tutor_voice');
+  const micRef = useRef(mic);
+  micRef.current = mic;
+  useEffect(() => { api.getTutorSpeaking().then(setSpeaking, () => undefined); }, []);
 
   useEffect(() => {
     api.listTutorSessions().then(s => setSessions(D.chatSessions(s)), () => undefined);
@@ -708,14 +721,39 @@ function TutorDrawer({ ctx, tutor, onClose }: { ctx: Ctx; tutor: Tutor; onClose:
     if (tutor.prompt && !sentPrompt.current) { sentPrompt.current = true; send(tutor.prompt); }
   }, [tutor.prompt, send]);
 
+  const sendRef = useRef(send);
+  sendRef.current = send;
+  useEffect(() => {
+    if (!speaking.microphone) return;
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+    const r = new SR();
+    r.continuous = false; r.interimResults = false; r.lang = 'en-US';
+    r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript || '').trim(); setListening(false); if (t) sendRef.current(t); };
+    r.onerror = (e: any) => { setListening(false); const problem = classifySpeechRecognitionError(String(e.error ?? ''), isInFrame()); if (problem) micRef.current.fail(problem); };
+    r.onend = () => setListening(false);
+    recognition.current = r;
+    return () => { try { r.abort(); } catch { /* already stopped */ } };
+  }, [speaking.microphone]);
+  const toggleMic = useCallback(async () => {
+    const r = recognition.current;
+    if (!r) return;
+    if (listening) { r.stop(); setListening(false); return; }
+    if ((await mic.check()) !== 'ok') return;
+    try { r.start(); setListening(true); } catch { setListening(false); }
+  }, [listening, mic]);
+
   return (
     <div className="ek-drawer" dir={D.isArabic(ctx.lang) ? 'rtl' : 'ltr'}>
       <div className="ek-drawer__scrim" onClick={onClose} />
       <div className="ek-drawer__panel" role="dialog" aria-modal="true" aria-label={ctx.T('Enara, your tutor', 'إنارة، معلّمتك')}>
         <K.TutorScreen lang={ctx.lang} messages={messages} thinking={thinking} sessions={sessions} onSend={send} onClose={onClose}
-          onReadAloud={ctx.speak} onMic={false} onClearAll={false}
+          onReadAloud={ctx.speak} onMic={speaking.microphone && recognition.current ? toggleMic : false} listening={listening} onClearAll={false}
+          onLive={speaking.liveCall ? () => setLiveOpen(true) : undefined}
           onOpenSession={(sid: string) => { setSessionId(sid); api.getTutorSession(sid).then((s: any) => setMessages(D.chatMessages(s.messages)), () => undefined); }} />
+        {mic.problem && <MicProblemNotice problem={mic.problem} feature="tutor_voice" />}
       </div>
+      {speaking.liveCall && <LiveAvatarModal isOpen={liveOpen} onClose={() => setLiveOpen(false)} isStudent courseId={tutor.courseId} lessonId={tutor.lessonId} lessonTitle={ctx.T('Talk with Enara', 'تحدّث مع إنارة')} subject="English" />}
     </div>
   );
 }
