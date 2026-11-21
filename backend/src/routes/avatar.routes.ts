@@ -12,6 +12,7 @@ import {
   startAvatarSession,
   streamAvatarAnswer,
   switchAvatarLanguage,
+  submitAvatarPronunciation,
 } from '../controllers/avatar.controller';
 
 const router = Router();
@@ -28,6 +29,7 @@ router.post('/session/:id/language', switchAvatarLanguage);
 router.post('/session/:id/fallback', avatarFallback);
 router.post('/session/:id/heartbeat', avatarHeartbeat);
 router.post('/session/:id/stt-token', createAvatarSttToken);
+router.post('/session/:id/pronunciation', submitAvatarPronunciation);
 router.post('/speak', speakAvatarText);
 router.delete('/session/:id', endAvatarSession);
 router.get('/artifact/:id', getAvatarArtifact);

@@ -14,6 +14,7 @@ import {
 import { toast } from '../../services/toastService';
 import { FaceGallery } from './FaceGallery';
 import { AvatarVoice, SentenceSplitter, type VoiceLanguage } from '../../services/avatarVoice';
+import { UtteranceRecorder, base64 } from '../../services/utteranceRecorder';
 import { markRelayDown, relayBase } from '../../services/relay';
 import { notCaughtLine } from '../../services/voiceText';
 import { WebAudioSink } from '../../services/webAudioSink';
@@ -46,6 +47,8 @@ type AvatarSessionResponse = {
   fallback_reason?: string | null;
   // 'server' (older servers: 'elevenlabs'): ENARA listens and speaks, the video is only the face.
   speech?: 'server' | 'avatar' | 'anam' | 'elevenlabs';
+  // avatarSpeaking: record each finished sentence as a short clip for pronunciation feedback (adults only; the server decides).
+  pronunciation?: boolean;
 };
 
 const MIC_PERMISSION_DENIED_REASON = 'CONNECTION_CLOSED_CODE_MICROPHONE_PERMISSION_DENIED';
@@ -127,6 +130,9 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const reconnectsRef = useRef<number[]>([]);
   const speechModeRef = useRef<'anam' | 'elevenlabs'>('anam');
   const voiceRef = useRef<AvatarVoice | null>(null);
+  // avatarSpeaking: the last seconds of the microphone, and when the current sentence started (first live text).
+  const clipRecorderRef = useRef<UtteranceRecorder | null>(null);
+  const hearingSinceRef = useRef<number | null>(null);
   const voiceHistoryRef = useRef<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const voiceTurnRef = useRef(0);
   const [myTutor, setMyTutor] = useState<{ current: TutorFace | null; chosen: boolean; options: TutorFaceChoice[] } | null>(null);
@@ -181,6 +187,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     heartbeatRef.current = null;
     voiceRef.current?.stop();
     voiceRef.current = null;
+    clipRecorderRef.current?.stop();
+    clipRecorderRef.current = null;
     const client = anamClientRef.current;
     anamClientRef.current = null;
     if (!client) return;
@@ -453,6 +461,12 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     const voice = new AvatarVoice(sessionIdRef.current, sink, {
       onUtterance: (text, language) => {
         lastHeardLanguageRef.current = language;
+        // avatarSpeaking: one English sentence as a short clip for pronunciation feedback (fire and forget; never blocks the answer).
+        const rec = clipRecorderRef.current; const since = hearingSinceRef.current; hearingSinceRef.current = null;
+        if (rec && language === 'english' && sessionIdRef.current) {
+          const clip = rec.lastClip(since ? (Date.now() - since) / 1000 + 0.6 : 4);
+          if (clip) void avatarFetch(`/session/${sessionIdRef.current}/pronunciation`, { method: 'POST', body: { audio: base64(clip), reference_text: text } }).catch(() => {});
+        }
         void answerSpokenTurn(text, language);
       },
       // Misheard as another language: ask again in the call's language, at
@@ -465,7 +479,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         void voiceRef.current.finishTurn();
       },
       // The student is talking: no nudge.
-      onHearing: () => clearSilenceTimer(),
+      onHearing: () => { clearSilenceTimer(); hearingSinceRef.current ??= Date.now(); },
       onInterrupt: interrupt,
       onVoiceUnavailable: () => switchToAvatarVoice(),
       onError: (message) => setError(message),
@@ -704,6 +718,11 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         reconnectsRef.current = [];
       }
       startPolling(data.session_id);
+      // avatarSpeaking: the server says when pronunciation clips may be recorded (adult learner, provider ready).
+      if (data.pronunciation && !clipRecorderRef.current) {
+        const rec = new UtteranceRecorder();
+        rec.start().then(() => { clipRecorderRef.current = rec; }, () => rec.stop());
+      }
 
       if ((data.provider === 'video' || data.provider === 'anam') && data.session_token) {
         setProvider('anam');
