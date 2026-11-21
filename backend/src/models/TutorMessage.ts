@@ -47,6 +47,8 @@ export interface ITutorMessageDoc extends Document {
     // Language courses (ltc-v1): moves used and turn signals. Low-confidence
     // observation, never mastery (services/languageTeachingContext.ts).
     languageTurn?: LanguageTurnEvidence;
+    // gradeAllSubjects: the hidden grading line of a non-language subject turn.
+    practiceTurn?: { assessment: { verdict: string }; answeringCheck: boolean; objectiveId?: string; lessonId?: string; next?: string };
   };
 }
 
@@ -87,6 +89,10 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           explanation: String,
           _id: false,
         },
+        default: undefined,
+      },
+      practiceTurn: {
+        type: { assessment: { type: { verdict: String, _id: false } }, answeringCheck: Boolean, objectiveId: String, lessonId: String, next: String, _id: false },
         default: undefined,
       },
       languageTurn: {

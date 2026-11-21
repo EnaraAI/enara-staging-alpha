@@ -8,6 +8,7 @@ import { currentKeyVerdict, independentSuccessItem, type LanguageTeachingContext
 import { engineV2 } from '../services/engineV2';
 import { kidsAudioVisualOn, pictureChoices } from '../services/kidsPictures';
 import { kidsSpeakingInfo } from '../services/kidsSpeaking';
+import { gradeAllSubjectsOn, practiceOutcome, practiceTurnFrom, SUBJECT_GRADE_LINE } from '../services/subjectPractice';
 import { recordOutcomeForError, recordTutorOutcome, adaptiveSpacingOn, removeExamItems } from '../services/errorsToWorkOn';
 import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
@@ -183,6 +184,8 @@ interface TutorTurn {
   // r4: the hidden assessment read from the model's reply (stripped before display/storage).
   // r4.1: plus how many markers were removed but not trusted (POST-02).
   languageMarker?: StrippedReply;
+  // gradeAllSubjects: a non-language turn whose reply carries the hidden grading line.
+  subjectGrading?: boolean;
   /** workOn: the error the previous reply set a practice item for (its hidden line named it), and that reply's hint level. */
   prevWorkOn?: { errorId: string; hintLevel: number };
   turnLockId?: string;
@@ -343,6 +346,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
       teaching_method: method,
     };
   }
+  turn.subjectGrading = !turn.language && gradeAllSubjectsOn();
   turn.directParams = async () => {
     // Course passages for this question (school-scoped), with citations.
     turn.sources = (await isFeatureEnabled(session.institutionId, 'learning_intelligence_enabled')) && !(await isShadowMode(session.institutionId))
@@ -359,7 +363,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
       history,
       teachingMethod: method,
       curriculum,
-      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
+      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
       planActive: Boolean(turn.plan),
       sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
       ...(engineV2('cache') && turn.language?.parts ? { languageContextStable: turn.language.parts.stable, languageContextDynamic: turn.language.parts.dynamic } : { languageContext: turn.language?.prompt }),
@@ -447,6 +451,11 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
     const errorId = focus ? turn.plan?.workOn?.errorIds[focus - 1] : undefined;
     if (errorId) (languageTurn as { workOnErrorId?: string }).workOnErrorId = errorId;
   }
+  // gradeAllSubjects: the trusted hidden line of a non-language reply becomes a stored practice record (session summary) and, with workOn,
+  // a right/wrong on the lesson objective (errors to work on, spaced review), as for English lessons.
+  const practiceTurn = turn.subjectGrading && reply ? practiceTurnFrom(turn.languageMarker, { objectiveId: turn.plan?.teaching.objectiveId ?? turn.session.objectiveId, lessonId: turn.session.lessonId }) : undefined;
+  const practice = practiceOutcome(practiceTurn);
+  if (practice && engineV2('workOn')) await recordTutorOutcome({ studentId: turn.session.studentId, objectiveId: practiceTurn?.objectiveId, sessionId: turn.session.id, right: practice === 'right' });
   const assistantMessage = {
     id: assistantId,
     role: 'ai' as const,
@@ -462,6 +471,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
       ...(turn.plan && reply ? { teaching: turn.plan.teaching } : {}),
       // Recorded only for a model reply (the moves were actually given to it).
       ...(languageTurn ? { languageTurn } : {}),
+      ...(practiceTurn ? { practiceTurn } : {}),
       // kidsAudioVisual: picture choices named in the trusted hidden line (under 9 only; the prompt line is given only then).
       ...(kidsAudioVisualOn() && reply && pictureChoices((turn.languageMarker?.assessment as { pics?: string[] } | null | undefined)?.pics) ? { pics: pictureChoices((turn.languageMarker?.assessment as { pics?: string[] } | null | undefined)?.pics) } : {}),
     },
@@ -500,7 +510,7 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
     const params = await turn.directParams();
     reply = await queryDirectTutorModel(params);
     // r4: the hidden assessment line is read and removed before anything is stored or sent.
-    if (reply && turn.language) {
+    if (reply && (turn.language || turn.subjectGrading)) {
       const stripped = stripAssessmentMarkers(reply.answer);
       turn.languageMarker = stripped;
       reply = stripped.text ? { ...reply, answer: stripped.text } : null;
@@ -561,7 +571,7 @@ export const streamTutorMessage = asyncHandler(async (req: AuthRequest, res: Res
       let answer = '';
       // r4: hidden assessment markers are held back and removed as the text streams
       // (a marker split across chunks never reaches the student).
-      const filter = turn.language ? new AssessmentMarkerFilter() : null;
+      const filter = turn.language || turn.subjectGrading ? new AssessmentMarkerFilter() : null;
       for await (const delta of streamDirectTutorModel(params, status)) {
         if (!open) break; // the student left: stop generating (metered as cancelled)
         const visible = filter ? filter.push(delta) : delta;

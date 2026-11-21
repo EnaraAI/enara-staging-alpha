@@ -18,9 +18,10 @@ export const whatWorksOn = (): boolean => engineV2('whatWorks');
 type Verdict = string | undefined;
 const ok = (v: Verdict) => v === 'CORRECT' || v === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
 const bad = (v: Verdict) => v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
-export interface MsgLike { role: string; timestamp: Date | string; meta?: { languageTurn?: Record<string, unknown> | null; teaching?: { objectiveId?: string; primary?: string } } }
+export interface MsgLike { role: string; timestamp: Date | string; meta?: { languageTurn?: Record<string, unknown> | null; practiceTurn?: Record<string, unknown> | null; teaching?: { objectiveId?: string; primary?: string } } }
 type LT = { assessment?: { verdict?: string; item?: string }; activeItem?: { lessonItemId?: string } | null; answeringCheck?: boolean; diagnosis?: string; hintLevel?: number; lessonId?: string; objectiveId?: string };
-const ltOf = (m: MsgLike) => (m.meta?.languageTurn ?? undefined) as LT | undefined;
+// gradeAllSubjects: a non-language subject turn stores the same shape as practiceTurn (verdict, answeringCheck, objective, lesson).
+const ltOf = (m: MsgLike) => (m.meta?.languageTurn ?? m.meta?.practiceTurn ?? undefined) as LT | undefined;
 
 // ------------------------------------------------------------------------------------------------ phase 2: pure parts
 /** A session's summary from its stored turns (code only). */
