@@ -252,7 +252,12 @@ async function diagnose() {
   for (const l of lines) {
     let msg = l;
     try { const j = JSON.parse(l); msg = `[${Object.keys(j).slice(0, 8).join(',')}] ${j.level ?? ''} ${j.requestPath ?? ''} ${j.message ?? j.text ?? ''}`; } catch {}
-    if (shown < 60) { console.log(`LOG ${want.test(msg) ? '*' : ' '} ${mask(msg).replace(/\s+/g, ' ').slice(0, 600)}`); shown += 1; }
+    if (shown < 60 && want.test(msg)) {
+      let inner = null;
+      try { const j = JSON.parse(l); inner = JSON.parse(j.message); } catch {}
+      const pick = inner ? Object.fromEntries(Object.entries(inner).filter(([k]) => /message|feature|model|status|error|code|latency|stop|type|name/i.test(k))) : null;
+      console.log(`LOG * ${mask(pick ? JSON.stringify(pick) : msg).replace(/\s+/g, ' ').slice(0, 1500)}`); shown += 1;
+    }
   }
 }
 
