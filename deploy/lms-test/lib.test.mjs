@@ -60,7 +60,8 @@ test('ENARA_ENGINE_V2 may be a longer comma list of switch names, but nothing el
   assert.ok(manifestFlags(m(Array.from({ length: 30 }, (_, i) => `switchName${i}`).join(','))).ENARA_ENGINE_V2.length > 200);
   assert.throws(() => manifestFlags(m('a, b')), /short plain string/);
   assert.throws(() => manifestFlags(m('a:b')), /short plain string/);
-  assert.throws(() => manifestFlags(m('x'.repeat(401))), /short plain string/);
+  assert.ok(manifestFlags(m('x'.repeat(401))).ENARA_ENGINE_V2.length === 401); // raised to 1000 (21 Nov: the tutor switch list passed 400)
+  assert.throws(() => manifestFlags(m('x'.repeat(1001))), /short plain string/);
   assert.throws(() => manifestFlags({ ...m('a'), features: [{ name: 'y', flags: { LMS_X_ENABLED: 'a'.repeat(201) } }] }), /short plain string/);
 });
 
@@ -80,8 +81,8 @@ test('the flags manifest accepts exactly ENARA_ENGINE_V2 (tutor engine, comma li
   // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): workOnTrusted,oneTaskMethod on after its PR passed E2E.
   // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): spacedReview on after its PR passed E2E.
   // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): ruleOnWrong on after its PR passed E2E.
-  // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): switchMove,spellingPattern,l1Lexical,childShort,reviewFirst,childRule,adaptiveSpacing,mixedReview,realChat,kidsAudioVisual,avatarSpeaking,kidsSpeaking on after its PR passed E2E.
-  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks,moodleQuiz,workOnTrusted,oneTaskMethod,spacedReview,ruleOnWrong,switchMove,spellingPattern,l1Lexical,childShort,reviewFirst,childRule,adaptiveSpacing,mixedReview,realChat,kidsAudioVisual,avatarSpeaking,kidsSpeaking');
+  // Owner "go" for LIT_REVIEW_GAP_PLAN (20 Nov): switchMove,spellingPattern,l1Lexical,childShort,reviewFirst,childRule,adaptiveSpacing,mixedReview,realChat,kidsAudioVisual,avatarSpeaking,kidsSpeaking,modelFallback,gradeAllSubjects,ragRewrite,ragReuse,groundedRefusal,topicMemory,methodFromEvidence,repairOnce,injectionCheck on after its PR passed E2E.
+  assert.equal(real, 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks,moodleQuiz,workOnTrusted,oneTaskMethod,spacedReview,ruleOnWrong,switchMove,spellingPattern,l1Lexical,childShort,reviewFirst,childRule,adaptiveSpacing,mixedReview,realChat,kidsAudioVisual,avatarSpeaking,kidsSpeaking,modelFallback,gradeAllSubjects,ragRewrite,ragReuse,groundedRefusal,topicMemory,methodFromEvidence,repairOnce,injectionCheck');
   for (const off of ['kidsPack', 'all', 'graderV2']) assert.ok(!real.split(',').includes(off), off);
 });
 

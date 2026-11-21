@@ -1,0 +1,35 @@
+# Subject test set (ARCH_ADOPTION_PLAN item F): the tutor's real course retrieval on fixed, fake maths / science / Arabic passages and
+# questions, in a throwaway Mongo container. Informational (not a merge gate). No secrets: keyword baseline only; the ragRewrite step needs
+# a model key and runs on a trusted computer (backend/eval/README.md).
+name: tutor subject eval
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ['backend/src/services/curriculumRetrieval.ts', 'backend/src/services/retrievalBoost.ts', 'backend/src/services/textSearch.ts', 'backend/eval/**', 'backend/src/scripts/subjectEval.ts']
+permissions:
+  contents: read
+jobs:
+  eval:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mongo:
+        image: mongo:7
+        ports: ['27017:27017']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+        working-directory: backend
+      - name: Retrieval on the subject test set
+        working-directory: backend
+        env:
+          MONGODB_URI: mongodb://localhost:27017/enara_subject_eval
+          NODE_ENV: test
+          JWT_SECRET: eval-jwt-secret-32-characters-minimum-x
+          INGEST_HMAC_SECRET: eval-hmac-secret-32-characters-minimum-x
+          CORS_ALLOWED_ORIGINS: http://localhost:5173
+        run: npm run eval:subjects

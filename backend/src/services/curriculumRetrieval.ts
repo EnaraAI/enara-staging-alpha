@@ -181,6 +181,8 @@ async function refreshStaleTerms(scope: Record<string, unknown>) {
 // The passage filter every retrieval uses: one school and curriculum,
 // narrowed to uploadIds if given, and to documents cleared by the safety gate
 // where the school requires it. null: nothing in scope.
+/** The same scope retrieval uses (school, curriculum, document-safety gate), for reading passages by id (ragReuse). */
+export const retrievalScope = (params: { institutionId?: string; curriculumId?: string; uploadIds?: string[] }) => passageScope(params);
 async function passageScope(params: { institutionId?: string; curriculumId?: string; uploadIds?: string[] }) {
   if (!params.institutionId || !params.curriculumId) return null;
   let allowed: string[] | undefined = params.uploadIds ? [...new Set(params.uploadIds)] : undefined;

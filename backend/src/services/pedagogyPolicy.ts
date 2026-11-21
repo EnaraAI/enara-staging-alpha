@@ -133,6 +133,8 @@ export interface PlanInput {
   // a vocabulary outcome (form, meaning and use, M6).
   ageBand?: 'child' | 'teen' | 'adult' | 'unknown';
   reviewOpening?: boolean;
+  // methodFromEvidence: the main method this learner has clearly succeeded after before (learnerMemory.bestMethod).
+  evidenceMethod?: string;
   formRightTwice?: boolean;
   vocabulary?: boolean;
 }
@@ -257,6 +259,14 @@ export const METHOD_RULES: MethodRule[] = [
     id: 'M7c_MISREAD',
     pick: ({ input }) => (input.misconceptions.some((m) => m.category === 'misinterpretation' || m.category === 'incomplete_reasoning')
       ? { primary: 'error_analysis', supporting: ['think_aloud'], reasons: ['MISINTERPRETATION'], gap: 'Misreads the task or reasoning is incomplete.' } : undefined),
+  },
+  {
+    // methodFromEvidence (ARCH_ADOPTION_PLAN G): no teacher choice, prerequisite gap, review, switch or diagnosed error applies (those rows come
+    // first), and this learner has clearly succeeded after one method before: use it, unless it is unusable, level-gated or already tried here
+    // without improvement.
+    id: 'M7d_WHAT_WORKED',
+    pick: ({ input, usable, levelGated }) => (engineV2('methodFromEvidence') && input.evidenceMethod && usable(input.evidenceMethod) && !levelGated(input.evidenceMethod) && !input.triedWithoutImprovement.includes(input.evidenceMethod)
+      ? { primary: input.evidenceMethod, reasons: ['WHAT_WORKED_FOR_LEARNER'], gap: 'This learner has often succeeded on their own after this approach.' } : undefined),
   },
   {
     // M2: an A1-A2 novice with no diagnosed error gets explicit instruction (Norris & Ortega 2000; Spada & Tomita 2010); a vocabulary outcome is

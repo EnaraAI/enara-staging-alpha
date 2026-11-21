@@ -1,4 +1,5 @@
 import { waitUntil } from '@vercel/functions';
+import { retryWaitMs } from './modelFallback';
 import { randomUUID } from 'crypto';
 import mongoose from 'mongoose';
 import { AppError } from '../middleware/errorHandler';
@@ -207,7 +208,7 @@ export async function meteredMessage<T extends MessageResponse>(meta: GatewayMet
       recordAiCall({ feature: meta.feature, modelName: meta.modelName, status: 'error', startedAt, errorCode, institutionId: meta.institutionId });
       await finishAttempt(ticket, { operationKey, attempt, meta, modelName: meta.modelName, status: 'error', errorCode });
       if (i + 1 < maxAttempts && isRetryable(error)) {
-        await wait(retryDelayMs);
+        await wait(retryWaitMs(retryDelayMs, i));
         continue;
       }
       throw error;
@@ -268,7 +269,7 @@ export async function* meteredStream<E, F extends MessageResponse>(
       recordAiCall({ feature: meta.feature, modelName: meta.modelName, status: 'error', startedAt, errorCode, institutionId: meta.institutionId });
       await finishAttempt(ticket, { operationKey, attempt, meta, modelName: meta.modelName, status: 'error', errorCode });
       if (!emitted && i + 1 < maxAttempts && isRetryable(error)) {
-        await wait(retryDelayMs);
+        await wait(retryWaitMs(retryDelayMs, i));
         continue;
       }
       throw error;
@@ -303,7 +304,7 @@ export async function meteredSpeech<T>(meta: GatewayMeta, characters: number, ca
     } catch (error) {
       await finishAttempt(ticket, { operationKey, attempt, meta: m, modelName: m.modelName, status: 'error', errorCode: errorCodeOf(error) });
       if (i + 1 < maxAttempts && isRetryable(error)) {
-        await wait(retryDelayMs);
+        await wait(retryWaitMs(retryDelayMs, i));
         continue;
       }
       throw error;

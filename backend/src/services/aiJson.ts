@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { clientFor, fallbackKey, fallbackModel, hasFallback, modelFallbackOn, shouldFallBack } from './modelFallback';
 import { getConfig } from '../config/env';
 import { AppError } from '../middleware/errorHandler';
 import { logger } from '../utils/logging';
@@ -78,7 +79,16 @@ export async function askForJson<T>(params: {
             messages: [{ role: 'user', content: params.user }],
           }),
         op,
-      );
+      ).catch(async (error) => {
+        // modelFallback (not under a spending guard: the guard reserved one request): one more try with the fallback key and/or model.
+        if (guard || !modelFallbackOn() || !hasFallback() || !shouldFallBack(error)) throw error;
+        const fbModel = fallbackModel() ?? model;
+        return meteredMessage(
+          { feature: params.feature, modelName: fbModel, institutionId: params.institutionId, refs: params.refs, maxAttempts: 1, bound: { inputTokens: textTokenBound(params.system, params.user), outputTokens: params.maxTokens } },
+          () => clientFor(fallbackKey() ?? config.anthropicApiKey!, 55_000).messages.create({ model: fbModel, max_tokens: params.maxTokens, output_config: { effort: 'low' }, system: params.system, messages: [{ role: 'user', content: params.user }] }),
+          op,
+        );
+      });
     } catch (error) {
       if (ticket !== undefined) guard?.settle(ticket, null);
       throw error;
