@@ -1795,7 +1795,7 @@ export function reviewCloseLine(ctx: Omit<LanguageTeachingContext, 'prompt'>): s
   if (releasing(ctx)) return REVIEW_CLOSE_RELEASE_LINE(code);
   const s = ctx.signals;
   const openTask = Boolean(s.learning?.activeItem) && (s.answeringCheck || s.hintRequest || s.dontKnow || s.answerRequest || s.whyAfterAttempt) && !(s.keyVerdict && isSuccess(s.keyVerdict));
-  return `${REVIEW_CLOSE_LINE(code)}${REVIEW_CLOSE_ONE_TRY}${openTask ? ` ${REVIEW_CLOSE_HOLD}` : ''}`;
+  return `${REVIEW_CLOSE_LINE(code)}${REVIEW_CLOSE_ONE_TRY}${openTask ? ` ${REVIEW_CLOSE_HOLD}` : mixedReviewOn() ? MIXED_ITEM_CLAUSE : ''}`;
 }
 /** reviewOpen: the error type the closing item targets (this session's live error first, then the record). */
 export const reviewCloseCode = (ctx: Pick<LanguageTeachingContext, 'signals' | 'record'>): string | undefined => ctx.signals.liveError?.code ?? ctx.signals.liveTarget ?? ctx.record?.live[0];
@@ -2326,6 +2326,9 @@ export const LAD_STEP_DROPPED = new Set<MoveId>(['present_lesson_item', 'indepen
 export const LAD_STEP_LINE = 'LISTEN AND DO (set by the system): this reply is ONLY the listen-and-do step in the learning focus above (the story, ONE instruction, or the chant), in at most 3 short sentences. Do not give a lesson exercise, a fill-in item, a rule or a right/wrong pair in this reply. This overrides any instruction above to give an exercise or an item.';
 /** planner2 quick check: moves that teach or correct, removed in the quick-check reply. */
 export const QUICK_CHECK_DROPPED = new Set<MoveId>(['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'l1_support', 'activate_prior_knowledge']);
+/** mixedReview (NEXT_PLAN item 2): a review item mixes the reviewed point with another known point, so the learner must decide which rule applies. */
+export const MIXED_ITEM_CLAUSE = ' Make this item a MIXED one: it needs the reviewed point AND one other point they know (today\'s lesson point, or a form often confused with it) in the same item, for example two gaps that need different forms, or a choice between the two forms, so they must decide which rule fits. Still one task, and no rule or hint before their try.';
+export const mixedReviewOn = (): boolean => engineV2('mixedReview') && engineV2('spacedReview');
 /** reviewFirst: which review reply this is (1 or 2), or undefined once the reviews are done. The first min(due, 2) replies of a session are reviews. */
 export function reviewFirstStep(history: { role: string }[], reviewsDue: number | undefined): number | undefined {
   if (!engineV2('reviewFirst') || !engineV2('spacedReview') || !reviewsDue || reviewsDue < 1) return undefined;
@@ -2339,7 +2342,7 @@ export function reviewFirstAdjust(i: { signals: TurnSignals; moves: SelectedMove
   const { presentLessonItem: _skip, ...rest } = i.signals;
   return { signals: rest as TurnSignals, moves: i.moves.filter((m) => m.id !== 'present_lesson_item'), step };
 }
-export const REVIEW_FIRST_LINE = (step: number, due: number) => `REVIEW FIRST (set by the system): this reply is review ${step} of ${Math.min(due, 2)} from the "Reviews due" list (review E${step}). ${step === 1 ? 'A short greeting, then ' : 'Respond to their last answer as the "Reviews due" lines say (if wrong: the rule in one plain sentence), then '}ONE new practice item you write yourself on review E${step}, and let them answer it on their own first: no rule, hint or example before their try. No lesson exercise and no new rule of today's lesson in this reply: the lesson starts after the reviews. Add focus=E${step} in the hidden assess line. This overrides any instruction above to state today's rule first, to present a lesson exercise, or to start with the last session's next step.`;
+export const REVIEW_FIRST_LINE = (step: number, due: number) => `REVIEW FIRST (set by the system): this reply is review ${step} of ${Math.min(due, 2)} from the "Reviews due" list (review E${step}). ${step === 1 ? 'A short greeting, then ' : 'Respond to their last answer as the "Reviews due" lines say (if wrong: the rule in one plain sentence), then '}ONE new practice item you write yourself on review E${step}, and let them answer it on their own first: no rule, hint or example before their try. No lesson exercise and no new rule of today's lesson in this reply: the lesson starts after the reviews. Add focus=E${step} in the hidden assess line. This overrides any instruction above to state today's rule first, to present a lesson exercise, or to start with the last session's next step.${mixedReviewOn() ? MIXED_ITEM_CLAUSE : ''}`;
 export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this opening reply gives ONE short exercise from the lesson to see what the learner already knows. Do not teach, explain, hint or give any answer in this reply: a short greeting, then the exercise. The teaching starts in your next reply. This overrides any instruction above to explain, model or give an answer.';
 
 export async function buildLanguageTeachingContext(params: {
