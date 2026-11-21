@@ -22,7 +22,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import path from 'path';
 import {
   detectTurnSignals, deriveLearnerContext, levelBand, renderLanguageContextPrompt, selectLanguageMoves, researchSignals, closingOn, ruleFirstDecision, explicitFirst, hasTwoAsks,
-  esl5Adjust, knownKey, independentSuccessItem, lengthTarget, resolveTrustedAgeBand, ageFromBirthDate, LANGUAGE_CONTEXT_VERSION,
+  esl5Adjust, reviewFirstAdjust, REVIEW_FIRST_LINE, knownKey, independentSuccessItem, lengthTarget, resolveTrustedAgeBand, ageFromBirthDate, LANGUAGE_CONTEXT_VERSION,
   QUICK_CHECK_DROPPED, QUICK_CHECK_LINE, LAD_STEP_DROPPED, LAD_STEP_LINE, TASK_STEP_DROPPED, TASK_STEP_LINE, type LanguageTeachingContext, type TrustedAgeBand,
 } from '../../../../backend/src/services/languageTeachingContext';
 import { stripAssessmentMarkers, isFailure, L1_TRANSFER_CODES } from '../../../../backend/src/services/languageLearningState';
@@ -72,8 +72,10 @@ function readJudge<T = { events: JudgeEvent[]; next_task: NextTask; retrieval?: 
 type Arm = 'BASE' | 'NEW' | 'PP';
 type Time = 'pre' | 'imm' | 'wk1' | 'wk4';
 type AgeGroup = 'u9' | '9-12' | 'teen' | 'adult';
-const ARMS: Arm[] = ['BASE', 'NEW', 'PP'];
-const ENGINE_ARMS: Arm[] = ['BASE', 'NEW'];
+// ESL7b (REVIEW_FIRST_PLAN; config/agent_sim_esl7b/PROTOCOL.md): ESL7B=1 runs only the NEW arm, with reviewFirst added, from the saved round-10 state.
+const ESL7B = process.env.ESL7B === '1';
+const ARMS: Arm[] = ESL7B ? ['NEW'] : ['BASE', 'NEW', 'PP'];
+const ENGINE_ARMS: Arm[] = ESL7B ? ['NEW'] : ['BASE', 'NEW'];
 const TIMES: Time[] = ['pre', 'imm', 'wk1', 'wk4'];
 const FORM_OF: Record<Time, 'A' | 'B' | 'C'> = { pre: 'A', imm: 'B', wk1: 'C', wk4: 'A' };
 const ROOT = path.join(__dirname, '../..');            // research/deep-learning-simulation-v2
@@ -85,7 +87,7 @@ const PPLUS_FILE = path.join(ROOT, 'config/agent_sim_esl4/PPLUS_PROMPT.txt');
 const PPLUS_SHA = 'e373018e76243b1c6817dc1bdcbd8f60d3aff0cbf54d90312bbdd13cb7655472';
 const PPLUS = readFileSync(PPLUS_FILE, 'utf8').trim();
 const BASE_ENV = 'wrongAnswer,closing,selfCheck,clarity,hints,strandLog,levelExplicit,esl5,planner2,workOn,sessionMemory,learnerProfile,whatWorks';
-export const ENV_OF: Record<Arm, string> = { BASE: BASE_ENV, NEW: `${BASE_ENV},workOnTrusted,oneTaskMethod,spacedReview,ruleOnWrong,switchMove,spellingPattern,l1Lexical,childShort`, PP: '' };
+export const ENV_OF: Record<Arm, string> = { BASE: BASE_ENV, NEW: `${BASE_ENV},workOnTrusted,oneTaskMethod,spacedReview,ruleOnWrong,switchMove,spellingPattern,l1Lexical,childShort${process.env.ESL7B === '1' ? ',reviewFirst' : ''}`, PP: '' };
 const GRADER_ENV = 'graderV2';                          // test scoring, every arm (deterministic path; model path never called)
 const TURNS = 5; const ROUNDS = 20; const DAY = 86_400_000; const T0 = Date.parse('2027-05-03T09:00:00Z');
 /** Track (outcome 1 / 2) -> days of its session 1 and session 2 (PROTOCOL §4). */
@@ -341,6 +343,8 @@ function planOf(dir: string, s: Sess, mem: Mem): PlanOut {
   const input = planInput(l, oid);
   const brief = briefFor(dir, s, mem, now); process.env.ENARA_ENGINE_V2 = ENV_OF[s.arm];
   if (brief.reviewOpening) input.reviewOpening = true;
+  // reviewFirst: with reviews due at the session start, the last session's "Start here" step waits (learningContext.ts, the same rule).
+  if (engineV2('reviewFirst') && engineV2('spacedReview') && brief.items.length && !sessionTurns(s).some((t) => t.tutor !== undefined)) brief.lines = brief.lines.map((x) => x.replace(/ Start here: [^.]*\./, ''));
   const head = ['Learning focus for this conversation (from the school\'s learning records; use it, don\'t recite it):', `- Target objective: ${oid} "${lz.objective}". Status: ${STATUS_WORDS[l.status]}.`];
   const tail = ['- Assessment integrity: never give the answers to the student\'s assessment or quick-check questions. If they paste one, teach the method with a different example.', '- When they seem ready, suggest a quick check to confirm (practice with you does not count as proof of understanding).'];
   const wrap = (lines: string[]) => arbitratePedagogy(lines.join('\n'), true) ?? lines.join('\n');
@@ -373,11 +377,14 @@ function langCtx(s: Sess, mem: Mem, po: PlanOut) {
   const signals0 = detectTurnSignals(message, hist, lesson as never, undefined, { child: learner.ageBand.status === 'known' && learner.ageBand.value === 'child', priorAnswered: priorAnswered(s) });
   const moves0 = selectLanguageMoves({ band: learner.proficiency.band, targetLanguage: 'English', lessonStatus: 'structured', signals: signals0, masteryStatus: l.status });
   const record = engineV2('reviewOpen') || engineV2('fadeKnown') ? esl5Record(mem.rec) : undefined;
-  const adjusted = esl5Adjust({ signals: signals0, moves: moves0, record, history: hist, lessonId });
-  const quickCheck = po.quickCheck && engineV2('planner2');
+  const adjusted0 = esl5Adjust({ signals: signals0, moves: moves0, record, history: hist, lessonId });
+  // reviewFirst (deployed in buildLanguageTeachingContext): the due reviews in this turn's brief open the session.
+  const rf = reviewFirstAdjust({ signals: adjusted0.signals, moves: adjusted0.moves, history: hist, reviewsDue: po.brief.items.length });
+  const reviewStep = rf.step; const adjusted = { signals: rf.signals, moves: rf.moves };
+  const quickCheck = po.quickCheck && engineV2('planner2') && !reviewStep;
   const signals = adjusted.signals;
-  const ladStep = !quickCheck && engineV2('planner2') && engineV2('kidsPack') && po.lesson?.shape === 'LAD' && ['listen', 'do', 'chant'].includes(String(po.stage)) && ladContentFor(s.outcome, lesson0.title);
-  const taskStep = !quickCheck && !ladStep && engineV2('planner2') && po.lesson?.shape === 'TASK' && ['repeat', 'done'].includes(String(po.stage));
+  const ladStep = !quickCheck && !reviewStep && engineV2('planner2') && engineV2('kidsPack') && po.lesson?.shape === 'LAD' && ['listen', 'do', 'chant'].includes(String(po.stage)) && ladContentFor(s.outcome, lesson0.title);
+  const taskStep = !quickCheck && !ladStep && !reviewStep && engineV2('planner2') && po.lesson?.shape === 'TASK' && ['repeat', 'done'].includes(String(po.stage));
   const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : ladStep ? adjusted.moves.filter((m) => !LAD_STEP_DROPPED.has(m.id)) : taskStep ? adjusted.moves.filter((m) => !TASK_STEP_DROPPED.has(m.id)) : adjusted.moves;
   const base0 = lengthTarget(learner.ageBand, learner.proficiency.value, learner.ageYears);
   const clarifyOnly = moves.some((m) => m.id === 'clarify_goal') && !moves.some((m) => ['short_explanation', 'comprehension_check', 'redirect_to_lesson'].includes(m.id));
@@ -385,11 +392,11 @@ function langCtx(s: Sess, mem: Mem, po: PlanOut) {
   const research = closingOn() || engineV2('hints') ? researchSignals(hist, signals, lesson0.spec as never) : undefined;
   const prevTurn = [...hist].reverse().find((h) => h.role === 'assistant')?.languageTurn as { moves?: string[] } | undefined;
   const planPrimary = po.plan.primary; process.env.ENARA_ENGINE_V2 = ENV_OF[s.arm];
-  const { explicit, ruleFirst } = quickCheck ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: l.status, history: hist, signals, spec: lesson0.spec as never, moves, record, lessonId } as never);
+  const { explicit, ruleFirst } = quickCheck || reviewStep ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: l.status, history: hist, signals, spec: lesson0.spec as never, moves, record, lessonId } as never);
   const profile = summarizeProfile(mem.rec.entries, now);
   const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson: { status: 'structured', lessonId, title: lesson0.title, spec: lesson0.spec }, signals, moves, length, ...(profile.length ? { history: profile } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(planPrimary ? { planPrimary } : {}), ...(record ? { record } : {}) } as never;
   const prompt = renderLanguageContextPrompt(base);
-  const tail = quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
+  const tail = reviewStep ? REVIEW_FIRST_LINE(reviewStep, po.brief.items.length) : quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
   return { ...(base as object), ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), ...(taskStep ? { taskStep: true } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt } as never as LanguageTeachingContext;
 }
 const dlg = (s: Sess) => sessionTurns(s).map((t) => `STUDENT: ${t.learner}${t.tutor !== undefined ? `\nTUTOR: ${t.tutor}` : ''}`).join('\n');
