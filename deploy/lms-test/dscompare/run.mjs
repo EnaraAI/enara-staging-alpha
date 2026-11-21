@@ -24,7 +24,8 @@ const shape = (t) => {
   }
   return { system: sys.trim(), messages: msgs };
 };
-const arms = { D: (t) => shape(t), E: (t) => { const x = shape(t); return { ...x, system: `${x.system}\n\n${REMIND}` }; } };
+// Run 5 (after #66): the real request shape; the adapter now adds the reminder itself.
+const arms = { F: (t) => shape(t) };
 for (const [arm, mk] of Object.entries(arms)) for (const t of turns) {
   const r = await fetch(`${SITE}/api/maintenance/llm-compare`, { method: 'POST', headers: H, body: JSON.stringify({ ...mk(t), max_tokens: 900 }), signal: AbortSignal.timeout(120_000) }).then((x) => x.json()).catch((e) => ({ ok: false, reason: String(e) }));
   results.push({ arm, id: t.id, ageGroup: t.ageGroup, kind: t.kind, learner: t.learner, claude: t.claude, deepseek: r.text ?? null, ms: r.ms, usage: r.usage, stop: r.stop, ok: r.ok, reason: r.reason });
