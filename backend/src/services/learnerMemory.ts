@@ -14,11 +14,31 @@ export const BRIEF_MAX_LINES = 8;
 export const sessionMemoryOn = (): boolean => engineV2('sessionMemory');
 export const learnerProfileOn = (): boolean => engineV2('learnerProfile');
 export const whatWorksOn = (): boolean => engineV2('whatWorks');
+// topicMemory (owner go 21 Nov 2026, ARCH_ADOPTION_PLAN E, ARCHITECTURE.md §8 episodic memory): the summary also keeps WHAT the session
+// worked from (cited course passages: file and page) and how many questions the materials did not cover, so the "last time" line works
+// for every subject. Written by code from stored citations only (never model text).
+export const topicMemoryOn = (): boolean => engineV2('topicMemory');
+export const TOPICS_MAX = 3;
+/** The session's topics: the most cited passages (file and page), most cited first. */
+export function sessionTopics(msgs: MsgLike[]): { topics: string[]; outOfScope: number } {
+  const count = new Map<string, number>(); let outOfScope = 0;
+  for (const m of msgs) {
+    if (m.role === 'user') continue;
+    if (m.meta?.outOfScope) outOfScope += 1;
+    for (const c of m.meta?.citations ?? []) {
+      const name = String(c.fileName ?? '').replace(/["<>\n]/g, '').trim().slice(0, 80);
+      if (!name) continue;
+      const k = `${name}${typeof c.page === 'number' ? ` p.${c.page}` : ''}`;
+      count.set(k, (count.get(k) ?? 0) + 1);
+    }
+  }
+  return { topics: [...count.entries()].sort((a, b) => b[1] - a[1]).slice(0, TOPICS_MAX).map(([k]) => k), outOfScope };
+}
 
 type Verdict = string | undefined;
 const ok = (v: Verdict) => v === 'CORRECT' || v === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
 const bad = (v: Verdict) => v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
-export interface MsgLike { role: string; timestamp: Date | string; meta?: { languageTurn?: Record<string, unknown> | null; practiceTurn?: Record<string, unknown> | null; teaching?: { objectiveId?: string; primary?: string } } }
+export interface MsgLike { role: string; timestamp: Date | string; meta?: { languageTurn?: Record<string, unknown> | null; practiceTurn?: Record<string, unknown> | null; citations?: { fileName?: string; page?: number | null }[]; outOfScope?: boolean; teaching?: { objectiveId?: string; primary?: string } } }
 type LT = { assessment?: { verdict?: string; item?: string }; activeItem?: { lessonItemId?: string } | null; answeringCheck?: boolean; diagnosis?: string; hintLevel?: number; lessonId?: string; objectiveId?: string };
 // gradeAllSubjects: a non-language subject turn stores the same shape as practiceTurn (verdict, answeringCheck, objective, lesson).
 const ltOf = (m: MsgLike) => (m.meta?.languageTurn ?? m.meta?.practiceTurn ?? undefined) as LT | undefined;
@@ -51,15 +71,16 @@ export function summarizeTurns(msgs: MsgLike[]): Omit<ISessionSummary, keyof imp
     lessonId: last('lessonId'), objectiveId: ai.map((m) => m.meta?.teaching?.objectiveId).filter(Boolean).at(-1) ?? last('objectiveId'),
     startedAt: new Date(ts[0]), endedAt: new Date(ts[ts.length - 1]), learnerTurns: msgs.filter((m) => m.role === 'user').length,
     right, wrong, answeredItemIds: [...answered], ...(stuckOn ? { stuckOn } : {}), stoppedWithOpenItem, nextStep,
+    ...(topicMemoryOn() ? (({ topics, outOfScope }) => ({ ...(topics.length ? { topics } : {}), ...(outOfScope ? { outOfScope } : {}) }))(sessionTopics(msgs)) : {}),
   };
 }
 const NEXT_WORDS = { reteach: 'reteach the point simply, then one easy item', finish_item: 'finish the exercise that was left open', next_point: 'a one-item recall check, then the next point' } as const;
 const daysAgo = (d: Date, now: Date) => Math.max(0, Math.round((now.getTime() - d.getTime()) / 86_400_000));
 /** The opening line about the last session (plain words, codes only). */
-export function lastSessionLine(s: Pick<ISessionSummary, 'endedAt' | 'right' | 'wrong' | 'stuckOn' | 'stoppedWithOpenItem' | 'nextStep'>, objectiveTitle: string | undefined, now: Date, label?: (code: string) => string): string {
+export function lastSessionLine(s: Pick<ISessionSummary, 'endedAt' | 'right' | 'wrong' | 'stuckOn' | 'stoppedWithOpenItem' | 'nextStep'> & { topics?: string[]; outOfScope?: number }, objectiveTitle: string | undefined, now: Date, label?: (code: string) => string): string {
   const ago = daysAgo(new Date(s.endedAt), now);
   const when = ago === 0 ? 'earlier today' : ago === 1 ? 'yesterday' : `${ago} days ago`;
-  return `- Last session (${when}${objectiveTitle ? `, "${objectiveTitle.replace(/["<>]/g, '')}"` : ''}): ${s.right} right, ${s.wrong} wrong${s.stuckOn ? `; stuck on ${label ? label(s.stuckOn) : s.stuckOn.replace(/_/g, ' ')}` : ''}${s.stoppedWithOpenItem ? '; it stopped with an exercise left open' : ''}. Start here: ${NEXT_WORDS[s.nextStep]}.`;
+  return `- Last session (${when}${objectiveTitle ? `, "${objectiveTitle.replace(/["<>]/g, '')}"` : ''}): ${s.right} right, ${s.wrong} wrong${s.stuckOn ? `; stuck on ${label ? label(s.stuckOn) : s.stuckOn.replace(/_/g, ' ')}` : ''}${s.stoppedWithOpenItem ? '; it stopped with an exercise left open' : ''}${s.topics?.length ? `; worked from ${s.topics.map((t) => `"${t}"`).join(', ')}` : ''}${s.outOfScope ? `; ${s.outOfScope} question(s) were not in the course materials` : ''}. Start here: ${NEXT_WORDS[s.nextStep]}.`;
 }
 /** The per-turn learner brief: a heading and at most BRIEF_MAX_LINES lines, in priority order (errors, last session, profile, habits). */
 export function learnerBrief(sections: string[][]): string[] {

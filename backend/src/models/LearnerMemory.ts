@@ -25,6 +25,9 @@ export interface ISessionSummary extends Document {
   /** Where it stopped: an exercise left open, or none. */
   stoppedWithOpenItem: boolean;
   nextStep: 'reteach' | 'finish_item' | 'next_point';
+  /** topicMemory: the course passages the session worked from (file and page, at most 3), and how many questions were not in the materials. */
+  topics?: string[];
+  outOfScope?: number;
   version: string;
 }
 const summarySchema = new Schema<ISessionSummary>({
@@ -43,6 +46,8 @@ const summarySchema = new Schema<ISessionSummary>({
   stuckOn: String,
   stoppedWithOpenItem: { type: Boolean, default: false },
   nextStep: { type: String, enum: ['reteach', 'finish_item', 'next_point'], required: true },
+  topics: { type: [String], default: undefined },
+  outOfScope: Number,
   version: { type: String, required: true },
 }, { timestamps: true });
 summarySchema.index({ studentId: 1, endedAt: -1 });
