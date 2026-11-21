@@ -19,7 +19,7 @@ Tutor track, lms-test only. test.enara.app stayed frozen, and no key was shown o
 | #67 | DeepSeek improvements (grade first, code answer checks, examples, reply checks, tuning), switched off; avatar visuals on DeepSeek; 100-turn test route | Live |
 | #68 | Teacher assistant, data assistant, class summaries, reminders, next steps and objective drafts follow DeepSeek | Live |
 | #69 | Fixes from the first test (must say "not in your materials"; no false "answer given away"; spelling slip ≠ right); improvements **switched on** | Live |
-| #70 | Vowel marks and short words are not spelling slips (from reading the second test's replies) | Running its tests |
+| #70 | Vowel marks and short words are not spelling slips (from reading the second test's replies) | Live |
 
 ## The test
 - **100 fake turns:**
