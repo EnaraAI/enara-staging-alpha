@@ -12,7 +12,19 @@ const turns = JSON.parse(readFileSync(new URL('./turns.json', import.meta.url), 
 // the prompt, C = as the system message.
 const REMIND = 'Rules for this reply, most important first:\n1. Your reply MUST start with the hidden line [[assess verdict=... relevance=... next=...]] in exactly the format described above. Never leave it out.\n2. Reply to the STUDENT\'s LAST message in the conversation: judge that answer first (right, partly right or wrong; a spelling slip is an error), then give exactly ONE task.\n3. Keep to the length limits for this learner. No stories, lists or worked examples unless the instructions above ask for one now.';
 const results = [];
-const arms = { B: (t) => ({ messages: [{ role: 'user', content: `${t.prompt}\n\n${REMIND}` }] }), C: (t) => ({ system: REMIND, messages: [{ role: 'user', content: t.prompt }] }) };
+// Run 4: the real request shape (instructions as the system prompt, the conversation as real turns). D = as is; E = the reminder at the
+// end of the system prompt.
+const shape = (t) => {
+  const [sys, conv = ''] = t.prompt.split('CONVERSATION SO FAR:');
+  const msgs = [];
+  for (const line of conv.replace(/\n*Write the tutor's next reply only\.\s*$/, '').trim().split('\n')) {
+    const m = line.match(/^(STUDENT|TUTOR): ?(.*)$/);
+    if (m) msgs.push({ role: m[1] === 'STUDENT' ? 'user' : 'assistant', content: m[2] });
+    else if (msgs.length) msgs[msgs.length - 1].content += `\n${line}`;
+  }
+  return { system: sys.trim(), messages: msgs };
+};
+const arms = { D: (t) => shape(t), E: (t) => { const x = shape(t); return { ...x, system: `${x.system}\n\n${REMIND}` }; } };
 for (const [arm, mk] of Object.entries(arms)) for (const t of turns) {
   const r = await fetch(`${SITE}/api/maintenance/llm-compare`, { method: 'POST', headers: H, body: JSON.stringify({ ...mk(t), max_tokens: 900 }), signal: AbortSignal.timeout(120_000) }).then((x) => x.json()).catch((e) => ({ ok: false, reason: String(e) }));
   results.push({ arm, id: t.id, ageGroup: t.ageGroup, kind: t.kind, learner: t.learner, claude: t.claude, deepseek: r.text ?? null, ms: r.ms, usage: r.usage, stop: r.stop, ok: r.ok, reason: r.reason });
