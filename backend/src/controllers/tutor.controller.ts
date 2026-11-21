@@ -329,6 +329,8 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     ...(turn.plan?.lessonStage?.ladContent && ['listen', 'do', 'chant'].includes(turn.plan.lessonStage.stage) ? { ladStep: true } : {}),
     // planner2e fix E: the task-based lesson's repeat/done stage sets the task again (not a gap-fill item).
     ...(turn.plan?.lessonStage?.shape === 'TASK' && ['repeat', 'done'].includes(turn.plan.lessonStage.stage) ? { taskStep: true } : {}),
+    // reviewFirst: the spaced reviews due in this turn's brief open the session (REVIEW_FIRST_PLAN).
+    ...(turn.plan?.workOn?.errorIds.length ? { reviewsDue: turn.plan.workOn.errorIds.length } : {}),
   }, 'chat'))?.context ?? null;
   if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language) {
     turn.orchestrator = {
