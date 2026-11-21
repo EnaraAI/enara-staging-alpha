@@ -121,3 +121,12 @@ describe('DeepSeek match: fixes after the 100-turn test', () => {
   });
 });
 
+describe('DeepSeek match: spelling check limits (second 100-turn test)', () => {
+  it('vowel marks and short function words are not spelling slips', () => {
+    expect(spellingNote('الكتاب', 'الكتابَ')).toBeNull();
+    expect(spellingNote('in', 'on')).toBeNull();
+    expect(spellingNote('is', 'as')).toBeNull();
+    expect(spellingNote('leef', 'leaf')).toBe('the third letter: "e" should be "a"');
+  });
+});
+
