@@ -125,8 +125,10 @@ async function calls(audioDir) {
   for (const id of ids) {
     const call = byId[id];
     const sentences = call.sentences.map((text, n) => ({ text, b64: readFileSync(join(audioDir, id, `s${n}.wav`)).toString('base64') }));
+    // Google Chrome, not Playwright's Chromium: Chromium builds have no H.264 for WebRTC, which the avatar video may need.
     const browser = await chromium.launch({
       headless: true,
+      channel: process.env.AVC_BROWSER_CHANNEL || 'chrome',
       args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', `--use-file-for-fake-audio-capture=${join(audioDir, id, 'call.wav')}`, '--autoplay-policy=no-user-gesture-required'],
     });
     let result;
@@ -145,14 +147,19 @@ async function calls(audioDir) {
         const host = new URL(ws.url()).host;
         consoleLines.push(`ws open ${host}`);
         ws.on('framereceived', (f) => { const t = typeof f.payload === 'string' ? f.payload : '<bin>'; if (consoleLines.length < 400 && !/"(answer|offer|candidate|iceCandidate)"|sdp/i.test(t.slice(0, 300))) consoleLines.push(`ws< ${mask(t)}`); });
-        ws.on('framesent', (f) => { const t = typeof f.payload === 'string' ? f.payload : '<bin>'; if (consoleLines.length < 400 && !/sdp|candidate/i.test(t.slice(0, 300))) consoleLines.push(`ws> ${mask(t).slice(0, 160)}`); });
+        ws.on('framesent', (f) => {
+          const t = typeof f.payload === 'string' ? f.payload : '<bin>';
+          if (consoleLines.length >= 400) return;
+          if (/sdp/i.test(t)) consoleLines.push(`ws> sdp codecs ${[...new Set([...t.matchAll(/rtpmap:\d+ ([A-Za-z0-9-]+)\//g)].map((m) => m[1]))].join(',')}`);
+          else if (!/candidate/i.test(t.slice(0, 300))) consoleLines.push(`ws> ${mask(t).slice(0, 160)}`);
+        });
         ws.on('close', () => consoleLines.push(`ws close ${host}`));
       });
       page.on('response', async (r) => {
         const u = new URL(r.url());
         if (!/anam\.ai$/.test(u.host)) return;
         let body = '';
-        if (r.status() >= 400) body = await r.text().catch(() => '');
+        if (r.status() >= 400 || /engine\/session/.test(u.pathname)) body = await r.text().catch(() => '');
         consoleLines.push(`http ${r.request().method()} ${u.host}${u.pathname.slice(0, 80)} ${r.status()} ${mask(body).slice(0, 300)}`);
       });
       page.on('requestfailed', (r) => { if (consoleLines.length < 400) consoleLines.push(`requestfailed ${new URL(r.url()).host}${new URL(r.url()).pathname.slice(0, 80)} ${r.failure()?.errorText ?? ''}`); });

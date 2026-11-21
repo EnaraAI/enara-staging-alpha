@@ -52,7 +52,7 @@ jobs:
         run: |
           npm init -y >/dev/null
           npm i --no-save --no-audit --no-fund playwright@1.49.1 @anam-ai/js-sdk@4.29.1
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chrome
       - name: Calls
         env:
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
