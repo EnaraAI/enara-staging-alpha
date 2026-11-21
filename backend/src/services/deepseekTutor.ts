@@ -68,6 +68,9 @@ const nth = (i: number) => ORD[i] ?? `${i + 1}th`;
 export function spellingNote(learner: string, expected: string): string | null {
   const a = learner.trim().toLowerCase().replace(/[.!?؟,،]+$/, ''); const b = expected.trim().toLowerCase().replace(/[.!?؟,،]+$/, '');
   if (!a || !b || a === b || /\s/.test(b) || /\s/.test(a)) return null;
+  const bare = (x: string) => x.replace(/[\u064B-\u0652\u0640]/g, ''); // vowel marks are not spelling
+  if (bare(a) === bare(b)) return null;
+  if ([...bare(b)].length < 4) return null; // short words ("in"/"on", "is"/"as") are a word choice, not a spelling slip
   if (isArabic(b)) {
     if (foldArabic(a) === foldArabic(b)) return `only the spelling of a hamza, taa marbuta or alef differs: the right spelling is "${expected.trim()}"`;
   }
