@@ -211,6 +211,19 @@ async function calls(audioDir) {
     if (result.errors?.some((e) => /^session_start_http_|unexpected_speech_mode/.test(e))) { console.log('STOP: the call could not start in Anam mode; not trying the rest.'); break; }
     await new Promise((r) => setTimeout(r, 3000));
   }
+  // Server-side numbers (PR #60, read only): latency, Anam seconds, LLM tokens and cost per call.
+  const avIds = results.map((r) => r.sessionId).filter(Boolean);
+  if (avIds.length) {
+    await new Promise((r) => setTimeout(r, 5000));
+    const r = await site(`/api/maintenance/avatar-usage?ids=${avIds.join(',')}`, { headers: { Authorization: maint() } });
+    const j = await r.json().catch(() => null);
+    writeFileSync(join(OUT, 'avatar-usage.json'), JSON.stringify(j, null, 1));
+    console.log(`AVUSAGE_STATUS ${r.status}`);
+    for (const c of j?.calls ?? []) {
+      const rid = results.find((x) => x.sessionId === c.id)?.id;
+      console.log(`AVUSAGE ${JSON.stringify({ call: rid, found: c.found, speech: c.speech, createdAt: c.createdAt, endedAt: c.endedAt, basis: c.usageEndBasis, latencyMs: c.latencyMs, providerSessions: c.providerSessions, ledger: c.ledger, llm: c.llm })}`);
+    }
+  }
   const usageAfter = await usageToday(get);
   writeFileSync(join(OUT, 'usage.json'), JSON.stringify({ usageBefore, usageAfter, course }, null, 1));
   console.log(`USAGE ${JSON.stringify({ usageBefore, usageAfter })}`);
