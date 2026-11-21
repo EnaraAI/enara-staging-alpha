@@ -1881,6 +1881,11 @@ export function buildTeach2(ctx: Pick<LanguageTeachingContext, 'signals' | 'less
 export const registerLine = (band: AgeBand): string => (engineV2('kidsBand') && band !== 'unknown' ? BAND_REGISTER[band] : AGE_REGISTER[band]);
 
 /** ruleOnWrong (LIT_REVIEW_GAP_PLAN 3.2, owner "go" 20 Nov 2026). The key can only confirm a right answer, so the line is conditional on the model's own check. */
+/** childRule (NEXT_PLAN step 0): the child under 9 gets rule lines that fit childShort's 3 sentences of at most 12 words plus one task. */
+export const childRuleOn = (ctx: Pick<LanguageTeachingContext, 'learner'>): boolean =>
+  engineV2('childRule') && ctx.learner.ageBand.status === 'known' && ctx.learner.ageBand.value === 'child' && under9(ctx.learner.ageYears);
+export const CHILD_RULE_LINE = (rf: { texts: string[] }) => `First time this lesson's rule comes up (${rf.texts.map((t) => `"${t.replace(/["<>]/g, '')}"`).join('; ')}). This child is under 9, so the reply is exactly, in this order: (1) a few words of greeting or feedback; (2) the rule in ONE sentence of at most 10 words, with no grammar words; (3) ONE right example sentence of at most 8 words, made of words that appear in no lesson exercise, and NO wrong example; (4) the task. This replaces the "no rule before their first try" rule and any longer rule instruction above for this reply. Never write the answer to the exercise you are asking about or any part of it.`;
+export const CHILD_RULE_ON_WRONG_LINE = 'If their answer to this item is wrong (their first try on it): say the rule again in ONE sentence of at most 10 words (no wrong example, no list), then ask them to try the same item again. Never give its answer. If their answer is right, ignore this line.';
 export const RULE_ON_WRONG_LINE = 'If their answer to this item is wrong (their first try on it): first state the rule once more in ONE plain line, with one short right/wrong pair in other words that shows their kind of error, then ask them to try the same item again. Never give its answer. For this reply this replaces the hint-level limit on stating the rule. If their answer is right, ignore this line.';
 export function ruleOnWrongDue(ctx: Omit<LanguageTeachingContext, 'prompt'>, stage: ReturnType<typeof supportStage>): boolean {
   const s = ctx.signals;
@@ -1907,8 +1912,8 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
   if (s.exampleStatement && engineV2('shortRecap')) out.push(`- ${EXAMPLE_CHECK}`);
   let bankRuleLine = false;
   if (ctx.ruleFirst?.criteria.length) {
-    if (ruleBeforeFirstTryOn(ctx)) { out.push(`- ${bankify(ruleBeforeFirstTryLine(ctx.ruleFirst, ctx.planPrimary), ctx)}`); bankRuleLine = Boolean(teachEntry(ctx)); }
-    else if (engineV2('ruleFirst') || (engineV2('levelExplicit') && ctx.explicitFirst)) { out.push(`- ${bankify(ruleFirstLine(ctx.ruleFirst, ctx.planPrimary, Boolean(s.nextLessonItem), ruleTaskElsewhere(ctx)), ctx)}`); bankRuleLine = Boolean(teachEntry(ctx)); }
+    if (ruleBeforeFirstTryOn(ctx)) { out.push(`- ${childRuleOn(ctx) ? CHILD_RULE_LINE(ctx.ruleFirst) : bankify(ruleBeforeFirstTryLine(ctx.ruleFirst, ctx.planPrimary), ctx)}`); bankRuleLine = Boolean(teachEntry(ctx)); }
+    else if (engineV2('ruleFirst') || (engineV2('levelExplicit') && ctx.explicitFirst)) { out.push(`- ${childRuleOn(ctx) ? CHILD_RULE_LINE(ctx.ruleFirst) : bankify(ruleFirstLine(ctx.ruleFirst, ctx.planPrimary, Boolean(s.nextLessonItem), ruleTaskElsewhere(ctx)), ctx)}`); bankRuleLine = Boolean(teachEntry(ctx)); }
   }
   if (fadedNow(s).length) out.push(`- ${FADE_LINE(fadedNow(s).map((c) => ctx.lesson.spec?.successCriteria?.[c - 1] ?? `point ${c}`))}`);
   if (engineV2('fadeKnown') && s.fade?.checkAnswered.length && !fadedNow(s).length) out.push(`- ${FADE_RETURN_LINE}`);
@@ -1950,7 +1955,7 @@ function stateLines(ctx: Omit<LanguageTeachingContext, 'prompt'>): string[] {
     if (stage === 'teach_rule' && !researchAblated('teach_rule') && !releasing(ctx)) out.push(`- ${engineV2('wrongAnswer') ? TEACH_RULE_V2 : TEACH_RULE}`);
     else if (stage !== 'teach_rule' && s.whyAfterAttempt) out.push(`- ${WHY_AFTER_ATTEMPT}`);
     // ruleOnWrong (LIT_REVIEW_GAP_PLAN 3.2; ESL6: ENARA stated rules far less often than P+ and fell behind): a wrong FIRST try on a new item gets the rule again.
-    if (ruleOnWrongDue(ctx, stage)) out.push(`- ${RULE_ON_WRONG_LINE}`);
+    if (ruleOnWrongDue(ctx, stage)) out.push(`- ${childRuleOn(ctx) ? CHILD_RULE_ON_WRONG_LINE : RULE_ON_WRONG_LINE}`);
     if (!researchAblated('hint_ladder')) out.push(`- ${hintInstruction(level, { kind: itemKind(s.activeLessonItem, ctx.lesson.spec?.vocabulary), binary: isBinaryItem(s.activeLessonItem), beginner: ['prea1', 'a1'].includes(cefrStep(ctx.learner.proficiency.value) ?? ''), explicit: Boolean(engineV2('levelExplicit') && ctx.explicitFirst) })}`, `- ${SUPPORT_PRECEDENCE}`);
   }
   if (s.spellingSlip) out.push(`- ${spellingPatternLine(s.spellingSlip, [...(s.activeLessonItem?.acceptedAnswers ?? []), ...(s.nextLessonItem?.acceptedAnswers ?? [])])}`);
