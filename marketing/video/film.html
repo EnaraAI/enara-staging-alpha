@@ -86,13 +86,14 @@ S.s00_hook = { build(r) {
   const tc = r.querySelector('.teacher'); tc.style.transform = `scale(${back(seg(t, 1.8, 0.7))})`;
 } };
 S.s01_intro = { build(r) {
-  r.innerHTML = `<div style="position:absolute;left:0;right:0;top:${V ? 620 : 300}px;text-align:center">
-    <div class="mark" style="font-size:${V ? 190 : 210}px;font-weight:800;letter-spacing:.06em">${'ENARA'.split('').map((c) => `<span class="L" style="display:inline-block">${c}</span>`).join('')}</div>
+  r.innerHTML = `<div style="position:absolute;left:0;right:0;top:${V ? 520 : 170}px;text-align:center">
+    <div class="mark" style="display:flex;justify-content:center"><img class="logo" src="assets/logo-full.svg" style="width:${V ? 720 : 620}px;height:auto"></div>
     <div class="line" style="height:6px;width:0;margin:18px auto 34px;border-radius:3px;background:linear-gradient(90deg,#0056D2,#f59f0a)"></div>
     <div class="tl" style="font-size:${V ? 54 : 58}px;font-weight:700;color:#cfe0ff;padding:0 60px">${words('The AI infrastructure for schools')}</div>
     <div class="sub3" style="margin-top:46px;display:flex;gap:18px;justify-content:center;flex-wrap:wrap;padding:0 60px">${['Personal teaching', 'Fair assessment', 'Clear insight', 'Plugs into your systems'].map((x) => `<span class="pill">${x}</span>`).join('')}</div></div>`;
 }, update(r, t) {
-  r.querySelectorAll('.L').forEach((l, i) => { const p = back(seg(t, 0.15 + i * 0.09, 0.7)); l.style.opacity = clamp(seg(t, 0.15 + i * 0.09, 0.3)); l.style.transform = `translateY(${(1 - p) * 120}px) rotate(${(1 - p) * 12}deg)`; });
+  { const lg = r.querySelector('.logo'); const p = back(seg(t, 0.15, 1.0)); const w = eio(seg(t, 0.15, 1.1));
+    lg.style.opacity = clamp(seg(t, 0.15, 0.4)); lg.style.transform = `scale(${0.82 + 0.18 * p})`; lg.style.filter = `blur(${(1 - eo(seg(t, 0.15, 0.8))) * 12}px)`; lg.style.clipPath = `inset(0 ${(1 - w) * 100}% 0 0)`; }
   r.querySelector('.line').style.width = `${eo(seg(t, 0.9, 1)) * (V ? 700 : 900)}px`;
   kin(r.querySelector('.tl'), t, 1.3, 0.12);
   r.querySelectorAll('.sub3 .pill').forEach((p, i) => { const q = eo(seg(t, 3.4 + i * 0.5, 0.6)); p.style.opacity = q; p.style.transform = `translateY(${(1 - q) * 24}px)`; });
@@ -183,7 +184,7 @@ S.s08_moodle = { build(r) {
   const y = V ? 640 : 360;
   r.innerHTML = `${layerHead(6, 'Works with Moodle.')}
   <div class="card lp" style="left:${V ? 90 : 820}px;top:${y}px;width:${V ? 380 : 400}px;height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"><div style="font-size:24px;color:#cfe0ff">Your LMS</div><div style="font-size:52px;font-weight:800">Moodle</div></div>
-  <div class="card rp" style="left:${V ? 610 : 1400}px;top:${y}px;width:${V ? 380 : 400}px;height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"><div style="font-size:24px;color:#cfe0ff">AI infrastructure</div><div style="font-size:52px;font-weight:800">ENARA</div></div>
+  <div class="card rp" style="left:${V ? 610 : 1400}px;top:${y}px;width:${V ? 380 : 400}px;height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"><div style="font-size:24px;color:#cfe0ff">AI infrastructure</div><img src="assets/logo-full.svg" style="width:${V ? 250 : 270}px;height:auto"></div>
   <svg class="lk" style="position:absolute;left:${V ? 470 : 1220}px;top:${y + 150}px" width="${V ? 140 : 180}" height="40"><line x1="0" y1="20" x2="${V ? 140 : 180}" y2="20" stroke="#f59f0a" stroke-width="6" stroke-linecap="round" stroke-dasharray="14 12"/></svg>
   <div class="tags" style="position:absolute;left:${V ? 90 : 820}px;top:${y + 380}px;display:flex;gap:16px;flex-wrap:wrap;width:${V ? 900 : 980}px"><span class="pill tg">Activities inside your courses</span><span class="pill tg">Class lists in sync</span><span class="pill tg">One sign-in</span></div>`;
 }, update(r, t) {
@@ -201,11 +202,11 @@ S.s09_apps = { build(r) {
   r.innerHTML = V ? `${layerHead(7, 'An app for every role.')}
    ${dev('a1', 90, 480, 430, 300, 'Students', lines(4))}${dev('a2', 560, 480, 430, 300, 'Young children', `<div style="display:grid;grid-template-columns:repeat(2,84px);gap:12px">${kid}</div>`)}
    ${dev('a3', 90, 820, 430, 300, 'Teachers', lines(4))}${dev('a4', 560, 820, 430, 300, 'School leaders', lines(3))}
-   ${dev('a5', 300, 1160, 480, 380, 'Parents', `<div style="font-size:26px;font-weight:700">This week</div>${lines(3)}<div style="font-family:NotoAr;font-size:26px;direction:rtl">هذا الأسبوع</div>`)}`
+   ${dev('a5', 90, 1160, 900, 300, 'Parents', `<div style="font-size:26px;font-weight:700">This week</div>${lines(3)}<div style="font-family:NotoAr;font-size:26px;direction:rtl">هذا الأسبوع</div>`)}`
   : `${layerHead(7, 'An app for every role.')}
    ${dev('a1', 820, 220, 520, 300, 'Students', lines(4))}${dev('a2', 1380, 220, 400, 300, 'Young children', `<div style="display:grid;grid-template-columns:repeat(4,72px);gap:10px">${kid.replace(/84px/g, '72px').replace(/70/g, '58')}</div>`)}
    ${dev('a3', 820, 560, 380, 300, 'Teachers', lines(4))}${dev('a4', 1230, 560, 300, 300, 'School leaders', lines(3))}
-   ${dev('a5', 1560, 520, 260, 420, 'Parents', `<div style="font-size:22px;font-weight:700">This week</div>${lines(3)}<div style="font-family:NotoAr;font-size:22px;direction:rtl">هذا الأسبوع</div>`)}`;
+   ${dev('a5', 1560, 560, 260, 300, 'Parents', `<div style="font-size:22px;font-weight:700">This week</div>${lines(3)}<div style="font-family:NotoAr;font-size:22px;direction:rtl">هذا الأسبوع</div>`)}`;
 }, update(r, t) {
   kin(r.querySelector('.head'), t);
   const at = [0.7, 2.6, 4.6, 5.8, 7.2];
@@ -240,13 +241,13 @@ S.s12_soon = { build(r) {
   ['.s1', '.s2'].forEach((s, i) => { const e = r.querySelector(s); const p = eo(seg(t, 0.6 + i * 0.6, 0.6)); e.style.opacity = p * 0.9; e.style.transform = `translateY(${(1 - p) * 40}px)`; });
 } };
 S.s13_cta = { build(r) {
-  r.innerHTML = `<div style="position:absolute;left:0;right:0;top:${V ? 640 : 280}px;text-align:center">
-   <div class="mk2" style="font-size:${V ? 170 : 180}px;font-weight:800;letter-spacing:.06em">ENARA</div>
+  r.innerHTML = `<div style="position:absolute;left:0;right:0;top:${V ? 520 : 150}px;text-align:center">
+   <div class="mk2" style="display:flex;justify-content:center"><img src="assets/logo-full.svg" style="width:${V ? 680 : 560}px;height:auto"></div>
    <div class="tl2" style="font-size:${V ? 50 : 54}px;font-weight:700;color:#cfe0ff;margin-top:10px;padding:0 60px">${words('The AI infrastructure for your school.')}</div>
    <div class="btn" style="display:inline-block;margin-top:56px;padding:26px 60px;border-radius:20px;background:#f59f0a;color:#08172b;font-size:44px;font-weight:800">Book a demo</div>
    <div class="url" style="margin-top:28px;font-size:36px;font-weight:600;color:#8fb4f0">enara.app</div></div>`;
 }, update(r, t) {
-  const m = r.querySelector('.mk2'); const p = back(seg(t, 0.2, 0.9)); m.style.opacity = clamp(seg(t, 0.2, 0.4)); m.style.transform = `scale(${0.8 + 0.2 * p})`; m.style.letterSpacing = `${0.2 - 0.14 * eo(seg(t, 0.2, 1.4))}em`;
+  const m = r.querySelector('.mk2'); const p = back(seg(t, 0.2, 0.9)); m.style.opacity = clamp(seg(t, 0.2, 0.4)); m.style.transform = `scale(${0.8 + 0.2 * p})`; m.style.filter = `blur(${(1 - eo(seg(t, 0.2, 0.8))) * 10}px)`;
   kin(r.querySelector('.tl2'), t, 1.0, 0.1);
   const b = r.querySelector('.btn'); const q = back(seg(t, 3.0, 0.7)); b.style.opacity = clamp(seg(t, 3.0, 0.3)); b.style.transform = `scale(${0.7 + 0.3 * q})`; b.style.boxShadow = `0 0 ${40 + 20 * Math.sin(t * 3)}px rgba(245,159,10,${0.5 * seg(t, 3.4, 0.6)})`;
   r.querySelector('.url').style.opacity = eo(seg(t, 3.8, 0.6));
