@@ -1,0 +1,29 @@
+# One-off (owner, 21 Nov 2026): DeepSeek endpoint check and the 20-turn comparison, run against lms-test (its server holds the provider key).
+# Results are pushed to claude/tutor-lms-dscompare-results. No secrets in the output.
+name: lms-test deepseek compare
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/dscompare/**', '.github/workflows/lms-test-copy-keys.yml']
+permissions:
+  contents: write
+jobs:
+  compare:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check and compare (lms-test)
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node deploy/lms-test/dscompare/run.mjs
+      - name: Publish results
+        run: |
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-dscompare-results
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "deepseek compare ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-dscompare-results
