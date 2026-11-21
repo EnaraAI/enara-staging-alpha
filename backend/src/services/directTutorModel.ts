@@ -1,3 +1,4 @@
+import { clientFor, fallbackKey, fallbackModel, modelFallbackOn, hasFallback, shouldFallBack, withFallback } from './modelFallback';
 import { IDENTITY_RULE } from '../utils/vendorNeutral';
 import Anthropic from '@anthropic-ai/sdk';
 import path from 'path';
@@ -297,7 +298,13 @@ export async function queryDirectTutorModel(
   try {
     const { body, materialsCount, bound } = await buildTutorRequest(params);
     const feature = params.mode === 'voice' ? 'tutor_voice' : 'tutor_chat';
-    const response = await meteredMessage({ feature, modelName: body.model, maxAttempts: 2, bound }, () => getClient(config.anthropicApiKey!).beta.messages.create(body));
+    // modelFallback: one more try with the fallback key and/or model after an auth, rate-limit or server failure (metered like any attempt).
+    const fbBody = { ...body, model: fallbackModel() ?? body.model };
+    const response = await withFallback(
+      () => meteredMessage({ feature, modelName: body.model, maxAttempts: 2, bound }, () => getClient(config.anthropicApiKey!).beta.messages.create(body)),
+      () => meteredMessage({ feature, modelName: fbBody.model, maxAttempts: 1, bound }, () => clientFor(fallbackKey() ?? config.anthropicApiKey!, 25_000).beta.messages.create(fbBody)),
+      (status) => logger.warn('tutor_model_fallback', { status: status ?? null, fallbackKey: Boolean(fallbackKey()), fallbackModel: Boolean(fallbackModel()) }),
+    );
 
     if (response.stop_reason === 'refusal') {
       logger.warn('direct_tutor_model_refused', { category: response.stop_details?.category ?? null });
@@ -335,9 +342,21 @@ export async function* streamDirectTutorModel(params: TutorRequestParams, status
     // The gateway logs ai_calls and meters each attempt; a consumer that stops
     // reading early aborts the stream.
     const out: { final?: Anthropic.Beta.BetaMessage } = {};
-    for await (const event of meteredStream({ feature, modelName: body.model, maxAttempts: 2, bound }, () => client.beta.messages.stream(body), out)) {
-      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-        yield event.delta.text;
+    let sent = false;
+    try {
+      for await (const event of meteredStream({ feature, modelName: body.model, maxAttempts: 2, bound }, () => client.beta.messages.stream(body), out)) {
+        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+          sent = true;
+          yield event.delta.text;
+        }
+      }
+    } catch (error) {
+      // modelFallback: only before any text reached the learner (otherwise the reply would be mixed from two calls).
+      if (sent || !modelFallbackOn() || !hasFallback() || !shouldFallBack(error)) throw error;
+      logger.warn('tutor_model_fallback', { stream: true, status: (error as { status?: number }).status ?? null, fallbackKey: Boolean(fallbackKey()), fallbackModel: Boolean(fallbackModel()) });
+      const fbBody = { ...body, model: fallbackModel() ?? body.model };
+      for await (const event of meteredStream({ feature, modelName: fbBody.model, maxAttempts: 1, bound }, () => clientFor(fallbackKey() ?? config.anthropicApiKey!, 25_000).beta.messages.stream(fbBody), out)) {
+        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') yield event.delta.text;
       }
     }
     status.model = out.final?.model;

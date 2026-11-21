@@ -1,4 +1,5 @@
 import { createDownloadUrl, isRemoteUploadStorage, readUpload } from './services/uploadStorage';
+import { fallbackKey, fallbackModel, keyStatus, modelFallbackOn } from './services/modelFallback';
 import { isVideoFileName } from './utils/uploadSecurity';
 import express, { NextFunction, Request, Response } from 'express';
 import cors, { CorsOptions } from 'cors';
@@ -283,6 +284,8 @@ export function createApp() {
         elevenlabs: config.elevenlabs ? 'configured' : 'not_configured',
         anam: config.anam ? 'configured' : 'not_configured',
         aiTestSpendCap: config.aiTestSpend ? 'set' : 'not_set',
+        // modelFallback: a real (free) key check, cached 10 minutes; informational, never part of 'required'.
+        ...(modelFallbackOn() ? { anthropicKey: await keyStatus(config.anthropicApiKey), anthropicFallbackKey: await keyStatus(fallbackKey()), anthropicFallbackModel: fallbackModel() ? 'set' : 'not_set' } : {}),
       },
       required: Object.keys(required),
     });

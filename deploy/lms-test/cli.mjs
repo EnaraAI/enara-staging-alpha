@@ -229,6 +229,16 @@ async function checkSite() {
   const j = await site('/.well-known/jwks.json');
   if (j.status !== 200 || !Array.isArray(j.json?.keys) || !j.json.keys.length) throw new Error(`/.well-known/jwks.json has no key (HTTP ${j.status})`);
   console.log(`site up, mongo ok, ${j.json.keys.length} tool key(s) published`);
+  // modelFallback: /ready reports a real key check (names and states only). A rejected key does not fail the deploy (the site still serves
+  // non-AI pages); it is an ALERT in the step summary and the log, so it is seen the same day.
+  const ready = (await site('/ready')).json?.checks ?? {};
+  for (const k of ['anthropicKey', 'anthropicFallbackKey']) {
+    if (ready[k] === 'rejected' || ready[k] === 'error') {
+      const msg = `ALERT: ${k} on lms-test is ${ready[k]} (tutor replies ${k === 'anthropicKey' ? (ready.anthropicFallbackKey === 'accepted' ? 'use the fallback key' : 'fail') : 'have no working fallback'})`;
+      console.log(`::warning::${msg}`);
+      summary(`\n> **${msg}**\n`);
+    }
+  }
 }
 
 async function report() {
