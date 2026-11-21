@@ -1,0 +1,42 @@
+# One-off (owner, 21 Nov 2026): the DeepSeek-on-Modal token reaches GitHub without ever being committed in clear text.
+# Job: make a throwaway RSA key pair in memory (/dev/shm), push ONLY the public key to claude/tutor-lms-llmkey-pub, wait for the
+# encrypted token (committed to this branch, readable only with the private key), decrypt it in memory, mask it, run the checks and
+# set TUTOR_LLM_API_KEY on enara-lms-test. The private key never leaves this job and is gone when it ends.
+name: lms-test llm key
+on:
+  push:
+    branches: ['claude/tutor-lms-llmkey-run']
+    paths: ['.github/workflows/lms-test-copy-keys.yml', 'deploy/lms-test/llmkey/checks.mjs']
+permissions:
+  contents: write
+jobs:
+  key:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Throwaway key pair; publish the public key only
+        run: |
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out /dev/shm/k.pem 2>/dev/null
+          openssl pkey -in /dev/shm/k.pem -pubout -out /tmp/pub.pem
+          mkdir -p /tmp/pub && cp /tmp/pub.pem /tmp/pub/pub.pem && cd /tmp/pub && git init -q && git checkout -q -b claude/tutor-lms-llmkey-pub
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add pub.pem && git commit -qm "public key for run ${GITHUB_RUN_ID}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-llmkey-pub
+      - name: Wait for the encrypted token, decrypt in memory, checks, set on lms-test
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          for i in $(seq 1 150); do
+            git fetch -q origin claude/tutor-lms-llmkey-run && git show FETCH_HEAD:deploy/lms-test/llmkey/token.enc.b64 > /dev/shm/t.b64 2>/dev/null && break
+            sleep 10
+          done
+          test -s /dev/shm/t.b64 || { echo "no encrypted token arrived"; exit 1; }
+          K=$(base64 -d /dev/shm/t.b64 | openssl pkeyutl -decrypt -inkey /dev/shm/k.pem -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256)
+          echo "::add-mask::$K"
+          rm -f /dev/shm/k.pem /dev/shm/t.b64
+          TUTOR_LLM_API_KEY="$K" node deploy/lms-test/llmkey/checks.mjs
