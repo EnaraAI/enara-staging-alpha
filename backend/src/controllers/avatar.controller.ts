@@ -2,6 +2,10 @@ import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
 import { resolveSessionClassId } from '../services/sessionClass';
 import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { SentenceSplitter } from '../services/sentenceSplitter';
+import { avatarSpeakingOn, isWavClip, LATENCY_KEEP, MAX_CLIP_BYTES, pronunciationReady, PRONUNCIATION_NOTE_LINE, SPEAKING_PRACTICE_LINE } from '../services/avatarSpeaking';
+import { assessPronunciation } from '../services/pronunciation';
+import { ageFromBirthDate } from '../services/languageTeachingContext';
+import { Student } from '../models/Student';
 import { TutorSession } from '../models/TutorSession';
 import { appendTutorMessages, loadTutorMessages } from '../services/tutorMessages';
 import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, LANGUAGE_POLICY_VERSION, type ClosingAskStatus } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
@@ -338,6 +342,8 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
     session_token: sessionToken,
     speech: serverVoice ? 'server' : 'avatar',
     fallback_reason: null,
+    // avatarSpeaking: record short sentence clips for pronunciation feedback (adults only, provider ready).
+    pronunciation: await pronunciationClipsFor(session.studentId),
   });
 });
 
@@ -397,6 +403,31 @@ export const switchAvatarLanguage = asyncHandler(async (req: AuthRequest, res: R
   session.language = language;
   await session.save();
   res.json({ session_token: sessionToken, language });
+});
+
+// avatarSpeaking: one sentence the learner just said (16 kHz mono WAV, at most 15 s) scored for pronunciation against what was heard. Adults
+// only (no minors before consent); the audio is never stored: scored, then dropped. The feedback is kept for the next reply's one tip.
+async function pronunciationClipsFor(studentId?: string): Promise<boolean> {
+  if (!avatarSpeakingOn() || !studentId) return false;
+  const st = await Student.findOne({ id: studentId }).select('birthDate').lean().catch(() => null);
+  return pronunciationReady(ageFromBirthDate((st as { birthDate?: Date } | null)?.birthDate, new Date())).ok;
+}
+export const submitAvatarPronunciation = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const session = await findOwnSession(req);
+  if (!avatarSpeakingOn()) throw new AppError('Not found', 404, 'NOT_FOUND');
+  const student = session.studentId ? await Student.findOne({ id: session.studentId }).select('birthDate').lean() : null;
+  const ready = pronunciationReady(ageFromBirthDate((student as { birthDate?: Date } | null)?.birthDate, new Date()));
+  if (!ready.ok) { res.status(ready.reason === 'provider_unavailable' ? 503 : 403).json({ ok: false, code: ready.reason }); return; }
+  const b = (req.body ?? {}) as { audio?: unknown; reference_text?: unknown };
+  const audio = typeof b.audio === 'string' && b.audio.length <= Math.ceil(MAX_CLIP_BYTES / 3) * 4 ? Buffer.from(b.audio, 'base64') : null;
+  const text = typeof b.reference_text === 'string' ? b.reference_text.trim().slice(0, 300) : '';
+  if (!audio || !isWavClip(audio) || !text) throw new AppError('A short WAV clip and the sentence heard are required', 400, 'BAD_CLIP');
+  const started = Date.now();
+  const { feedback } = await assessPronunciation({ audio, contentType: 'audio/wav; codecs=audio/pcm; samplerate=16000', referenceText: text });
+  const words = feedback.focus.map((f) => f.word).slice(0, 2);
+  await AvatarSession.updateOne({ id: session.id }, { $set: { lastPronunciation: { summary: feedback.summary.slice(0, 200), words, at: new Date() } } });
+  logger.info('avatar_pronunciation', { session: session.id, ms: Date.now() - started, audioSeconds: Math.round(((audio.length - 44) / 32000) * 10) / 10 });
+  res.json({ ok: true, summary: feedback.summary, focus: words });
 });
 
 // Short-lived token the browser uses to stream the microphone to ElevenLabs
@@ -715,6 +746,10 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   };
   if (visualRequested || autoVisual) res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
 
+  // avatarSpeaking (NEXT_PLAN item 5): speaking-practice line, and one pronunciation tip from the learner's last scored sentence (then cleared).
+  const lastPron = avatarSpeakingOn() && languagePrep ? (session as { lastPronunciation?: { summary: string; words: string[] } }).lastPronunciation : undefined;
+  const speakingLines = avatarSpeakingOn() && languagePrep ? `\n\n${SPEAKING_PRACTICE_LINE}${lastPron ? `\n${PRONUNCIATION_NOTE_LINE(lastPron.summary, lastPron.words)}` : ''}` : '';
+  if (lastPron) waitUntil(AvatarSession.updateOne({ id: session.id }, { $unset: { lastPronunciation: 1 } }).then(() => undefined, () => undefined));
   const languageLine = languagePrep
     ? '(Reply only in English.)'
     : spokenLanguage
@@ -765,7 +800,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       learner: learner ? describeSnapshot(learner) : undefined,
       pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
-      ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: languagePrep.parts.dynamic } : { languageContext: languagePrep?.prompt }),
+      ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}` : languagePrep?.prompt }),
     });
     // Language course: buffer the reply so the shared guards and marker handling run BEFORE anything is spoken or shown (same guarantees as the text chat).
     async function* chunks(): AsyncGenerator<string> {
@@ -861,5 +896,10 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     sentences: sentenceNo,
     closedEarly: closed,
   });
+  // avatarSpeaking: keep the last LATENCY_KEEP times to first audio (else first text), for the latency check (p50 <= 1.5 s, p90 <= 2.5 s).
+  const firstMs = firstAudioAt ? firstAudioAt - turnStartedAt : firstTextAt ? firstTextAt - turnStartedAt : undefined;
+  if (avatarSpeakingOn() && firstMs !== undefined && !closed) {
+    waitUntil(AvatarSession.updateOne({ id: session.id }, { $push: { latencyMs: { $each: [firstMs], $slice: -LATENCY_KEEP } } }).then(() => undefined, () => undefined));
+  }
   res.end();
 });

@@ -53,6 +53,9 @@ export interface IAvatarSession extends Document {
   // Deletion time. Unset until usage is finalized, so a call is never deleted
   // before it is metered (see services/avatarUsage.ts).
   retentionExpiresAt?: Date;
+  // avatarSpeaking: the last pronunciation feedback (summary and focus words only; the audio is never stored) and recent reply latencies (ms).
+  lastPronunciation?: { summary: string; words: string[]; at: Date };
+  latencyMs?: number[];
   createdAt: Date;
 }
 
@@ -88,6 +91,8 @@ const avatarSessionSchema = new Schema<IAvatarSession>(
     lastHeartbeatAt: Date,
     providerSessionIds: { type: [String], default: undefined },
     retentionExpiresAt: Date,
+    lastPronunciation: { type: new Schema({ summary: String, words: [String], at: Date }, { _id: false }), default: undefined },
+    latencyMs: { type: [Number], default: undefined },
   },
   { timestamps: true }
 );
