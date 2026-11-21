@@ -56,7 +56,7 @@
 //  avatarSpeaking - NEXT_PLAN item 5: live avatar speaking practice line + one pronunciation tip from the last scored sentence (adults only;
 //                 audio never stored; needs the Azure Speech key, the pronunciation flag and its price); latency kept per call; named-only
 //  kidsAudioVisual - NEXT_PLAN item 1: under 9, the tutor may name 2-4 picture choices (pics= in the hidden line); the kids app shows them
-//                 as tap-able OpenMoji pictures that are read aloud; speaking stays off (legal review); named-only
+//                 as tap-able pictures (ENARA's own set) that are read aloud; speaking stays off (legal review); named-only
 //  realChat       - NEXT_PLAN item 3: after 3 tutor replies, two replies are a short real conversation (children: fixed safe topics; others:
 //                 their interests), errors recast inside the talk, then back to the lesson; named-only
 //  mixedReview    - NEXT_PLAN item 2: with spacedReview, review items (reviewFirst opening, the review brief, the reviewOpen closing item) mix

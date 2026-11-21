@@ -45,7 +45,7 @@ The simulation cannot judge these two, so they are part of the pilot. Children's
 | | |
 |---|---|
 | Measures | Share of picture tasks answered by tap; first-try right rate on picture vs typed tasks; time per task; teacher observation of confusion (a wrong or unclear picture). |
-| Safety | A teacher is present; pictures come only from the reviewed set (OpenMoji, or the drawn set if the owner approves it). |
+| Safety | A teacher is present; pictures come only from ENARA's own reviewed set (drawn for ENARA, blind naming check; OpenMoji removed 21 Nov 2026). |
 
 **`avatarSpeaking` (live avatar): speaking practice; pronunciation tips for adults only.**
 

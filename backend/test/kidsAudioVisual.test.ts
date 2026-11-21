@@ -4,10 +4,23 @@ import { KIDS_PICS_LINE, kidsAudioVisualOn, pictureChoices, pictureIndex } from 
 import { detectTurnSignals, deriveLearnerContext, levelBand, renderLanguageContextPrompt, selectLanguageMoves, type LanguageTeachingContext } from '../src/services/languageTeachingContext';
 
 // kidsAudioVisual (NEXT_PLAN item 1, owner go 21 Nov 2026): under 9, the tutor names 2-4 picture choices in its hidden line; only words with
-// an OpenMoji picture become choices; the choices never mark the right one; speaking stays off.
+// a picture in ENARA's own set become choices; the choices never mark the right one; speaking stays off.
 afterEach(() => { delete process.env.ENARA_ENGINE_V2; });
 
 describe('kidsAudioVisual', () => {
+  it("pictures are ENARA's own set: index and files agree, no OpenMoji files or credit line left", async () => {
+    const { readFileSync, readdirSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const dir = join(__dirname, '../../frontend/public/kids/pics');
+    const idx = JSON.parse(readFileSync(join(dir, 'index.json'), 'utf8')) as { _source: string; words: Record<string, string> };
+    expect(idx._source).toMatch(/ENARA own picture set/);
+    const files = new Set(readdirSync(dir).filter((f) => f.endsWith('.svg')).map((f) => f.replace(/\.svg$/, '')));
+    for (const s of Object.values(idx.words)) expect(files.has(s)).toBe(true);
+    expect([...pictureIndex().entries()]).toEqual(Object.entries(idx.words));
+    expect(readFileSync(join(__dirname, '../../frontend/kids/enaraKids.js'), 'utf8')).not.toMatch(/OpenMoji/);
+    for (const f of files) expect(readFileSync(join(dir, `${f}.svg`), 'utf8')).not.toMatch(/openmoji/i);
+  });
+
   it('the hidden line carries pics=, cleaned (spaces from _ or -, lower case, at most 4)', () => {
     const m = parseAssessmentMarker('[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NEW_ITEM pics=Cat|dog|ice_cream|bus|duck]]');
     expect(m?.pics).toEqual(['cat', 'dog', 'ice cream', 'bus']);
