@@ -2321,6 +2321,20 @@ export const LAD_STEP_DROPPED = new Set<MoveId>(['present_lesson_item', 'indepen
 export const LAD_STEP_LINE = 'LISTEN AND DO (set by the system): this reply is ONLY the listen-and-do step in the learning focus above (the story, ONE instruction, or the chant), in at most 3 short sentences. Do not give a lesson exercise, a fill-in item, a rule or a right/wrong pair in this reply. This overrides any instruction above to give an exercise or an item.';
 /** planner2 quick check: moves that teach or correct, removed in the quick-check reply. */
 export const QUICK_CHECK_DROPPED = new Set<MoveId>(['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'l1_support', 'activate_prior_knowledge']);
+/** reviewFirst: which review reply this is (1 or 2), or undefined once the reviews are done. The first min(due, 2) replies of a session are reviews. */
+export function reviewFirstStep(history: { role: string }[], reviewsDue: number | undefined): number | undefined {
+  if (!engineV2('reviewFirst') || !engineV2('spacedReview') || !reviewsDue || reviewsDue < 1) return undefined;
+  const done = history.filter((h) => h.role === 'assistant').length;
+  return done < Math.min(reviewsDue, 2) ? done + 1 : undefined;
+}
+/** reviewFirst: during a review reply, no lesson item is presented (pure; the identity outside the review replies). */
+export function reviewFirstAdjust(i: { signals: TurnSignals; moves: SelectedMove[]; history: { role: string }[]; reviewsDue?: number }): { signals: TurnSignals; moves: SelectedMove[]; step?: number } {
+  const step = reviewFirstStep(i.history, i.reviewsDue);
+  if (!step) return { signals: i.signals, moves: i.moves };
+  const { presentLessonItem: _skip, ...rest } = i.signals;
+  return { signals: rest as TurnSignals, moves: i.moves.filter((m) => m.id !== 'present_lesson_item'), step };
+}
+export const REVIEW_FIRST_LINE = (step: number, due: number) => `REVIEW FIRST (set by the system): this reply is review ${step} of ${Math.min(due, 2)} from the "Reviews due" list (review E${step}). ${step === 1 ? 'A short greeting, then ' : 'Respond to their last answer as the "Reviews due" lines say (if wrong: the rule in one plain sentence), then '}ONE new practice item you write yourself on review E${step}, and let them answer it on their own first: no rule, hint or example before their try. No lesson exercise and no new rule of today's lesson in this reply: the lesson starts after the reviews. Add focus=E${step} in the hidden assess line. This overrides any instruction above to state today's rule first, to present a lesson exercise, or to start with the last session's next step.`;
 export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this opening reply gives ONE short exercise from the lesson to see what the learner already knows. Do not teach, explain, hint or give any answer in this reply: a short greeting, then the exercise. The teaching starts in your next reply. This overrides any instruction above to explain, model or give an answer.';
 
 export async function buildLanguageTeachingContext(params: {
@@ -2348,6 +2362,8 @@ export async function buildLanguageTeachingContext(params: {
   ladStep?: boolean;
   // planner2e fix E: a task-based lesson's repeat/done stage: the reply sets the task again in a new situation, not a lesson exercise.
   taskStep?: boolean;
+  // reviewFirst: how many spaced reviews are due in this turn's learner brief (errorsToWorkOn, spacedReview); 0 or absent: none.
+  reviewsDue?: number;
 }): Promise<LanguageTeachingContext | null> {
   try {
     if (!params.curriculumId) return null;
@@ -2383,11 +2399,14 @@ export async function buildLanguageTeachingContext(params: {
     // ESL5 (reviewOpen, fadeKnown): ENARA's own stored learner record, read only when one of those switches is on.
     const record = engineV2('reviewOpen') || engineV2('fadeKnown') ? (await loadEsl5Record(params.institutionId, params.studentId)) ?? undefined : undefined;
     const adjusted = esl5Adjust({ signals: signals0, moves: moves0, record, history: params.history, lessonId: lesson.lessonId, scope });
-    const quickCheck = Boolean(params.quickCheck) && engineV2('planner2');
+    // reviewFirst: the session's first one or two replies are the due spaced reviews (REVIEW_FIRST_PLAN): no lesson item, quick check or rule line.
+    const rf = reviewFirstAdjust({ signals: adjusted.signals, moves: adjusted.moves, history: params.history, reviewsDue: params.reviewsDue });
+    const reviewStep = rf.step; adjusted.signals = rf.signals; adjusted.moves = rf.moves;
+    const quickCheck = Boolean(params.quickCheck) && engineV2('planner2') && !reviewStep;
     const signals = adjusted.signals;
     // planner2 quick check: only presenting and recording; every teaching or correcting move is dropped for these 3 items.
-    const ladStep = Boolean(params.ladStep) && engineV2('planner2') && engineV2('kidsPack') && !quickCheck;
-    const taskStep = Boolean(params.taskStep) && engineV2('planner2') && !quickCheck && !ladStep;
+    const ladStep = Boolean(params.ladStep) && engineV2('planner2') && engineV2('kidsPack') && !quickCheck && !reviewStep;
+    const taskStep = Boolean(params.taskStep) && engineV2('planner2') && !quickCheck && !ladStep && !reviewStep;
     const moves = quickCheck ? adjusted.moves.filter((m) => !QUICK_CHECK_DROPPED.has(m.id)) : ladStep ? adjusted.moves.filter((m) => !LAD_STEP_DROPPED.has(m.id)) : taskStep ? adjusted.moves.filter((m) => !TASK_STEP_DROPPED.has(m.id)) : adjusted.moves;
     const base0 = lengthTarget(learner.ageBand, learner.proficiency.value, learner.ageYears);
     // r2: a clarification-only turn is one short question, so a tighter target.
@@ -2399,10 +2418,10 @@ export async function buildLanguageTeachingContext(params: {
     // levelExplicit: decided per learner and objective; explicit-first learners get the rule before their first try (rulesToIntroduce, once per rule per session).
     const outcomeId = ruleBankEntry(params.objectiveCode) ? params.objectiveCode : params.objectiveId;
     const teach2 = buildTeach2({ signals, lesson, moves, learner }, { objectiveId: outcomeId, history: params.history, assessmentItems: engineV2('exampleGuard') || engineV2('ruleBank') ? await loadObjectiveItems(params.institutionId, [params.objectiveId, params.objectiveCode, outcomeId]) : [] });
-    const { explicit, ruleFirst } = quickCheck ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
+    const { explicit, ruleFirst } = quickCheck || reviewStep ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
     const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}), ...(teach2 ? { teach2 } : {}) } as const;
     const parts0 = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
-    const tail = quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
+    const tail = reviewStep ? REVIEW_FIRST_LINE(reviewStep, params.reviewsDue ?? 1) : quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
     const parts = parts0 && tail ? { ...parts0, dynamic: `${parts0.dynamic}\n\n${tail}` } : parts0;
     const prompt = renderLanguageContextPrompt(base);
     return { ...base, ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), ...(taskStep ? { taskStep: true } : {}), ...(parts ? { parts } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt };
