@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { avatarSpeakingOn, isWavClip, latencyStats, MAX_CLIP_BYTES, PRONUNCIATION_NOTE_LINE, pronunciationAllowed, pronunciationReady, SPEAKING_PRACTICE_LINE } from '../src/services/avatarSpeaking';
+import { avatarSpeakingOn, avatarSpeakingUsesAnamVoice, isWavClip, latencyStats, MAX_CLIP_BYTES, PRONUNCIATION_NOTE_LINE, pronunciationAllowed, pronunciationReady, SPEAKING_PRACTICE_LINE } from '../src/services/avatarSpeaking';
 
 // avatarSpeaking (NEXT_PLAN item 5, owner go 21 Nov 2026): speaking practice through the live avatar; pronunciation clips for adults only
 // (no minors before the legal review and consent); audio never stored; latency kept for the p50 <= 1.5 s / p90 <= 2.5 s check.
@@ -15,6 +15,14 @@ Object.assign(process.env, { NODE_ENV: 'test', JWT_SECRET: 'test-jwt-secret-32-c
 delete process.env.AZURE_SPEECH_KEY;
 
 describe('avatarSpeaking', () => {
+  it('the avatar uses Anam built-in speech-to-text and voice when the switch is on (ElevenLabs not used); off: unchanged', () => {
+    expect(avatarSpeakingUsesAnamVoice()).toBe(false);
+    process.env.ENARA_ENGINE_V2 = 'avatarSpeaking';
+    process.env.ELEVENLABS_API_KEY = 'x';
+    expect(avatarSpeakingUsesAnamVoice()).toBe(true);
+    delete process.env.ELEVENLABS_API_KEY;
+  });
+
   it('pronunciation clips: adults only; minors and unknown ages never (legal review first)', () => {
     expect(pronunciationAllowed(18)).toBe(true);
     expect(pronunciationAllowed(35)).toBe(true);
