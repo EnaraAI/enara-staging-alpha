@@ -217,10 +217,50 @@ async function calls(audioDir) {
   console.log(`SUMMARY ${JSON.stringify({ attempt: plan.run.attempt, ran: results.length, ok: results.filter((r) => r.ok).length })}`);
 }
 
+// Diagnose why the model answers fail: read enara-lms-test's own runtime logs (Vercel, read only) while one
+// text tutor turn runs, and print only the model/stream failure lines (status, code, short message; long strings masked).
+async function diagnose() {
+  if (!plan.run.diagnose) { console.log('diagnose: off'); return; }
+  const deps = (await vercel(`/v6/deployments?projectId=${PROJECT_ID}&target=production&limit=1`)).deployments ?? [];
+  const dep = deps[0];
+  if (!dep) throw new Error('no production deployment');
+  const ctl = new AbortController();
+  const lines = [];
+  const reader = (async () => {
+    try {
+      const res = await fetch(`https://api.vercel.com/v1/projects/${PROJECT_ID}/deployments/${dep.uid}/runtime-logs?teamId=${TEAM_ID}`, { headers: { Authorization: `Bearer ${process.env.VERCEL_TOKEN}` }, signal: ctl.signal });
+      console.log(`runtime-logs HTTP ${res.status}`);
+      const dec = new TextDecoder();
+      let buf = '';
+      for await (const chunk of res.body) {
+        buf += dec.decode(chunk, { stream: true });
+        const parts = buf.split('\n'); buf = parts.pop() ?? '';
+        for (const l of parts) if (l.trim()) lines.push(l);
+      }
+    } catch (e) { if (e?.name !== 'AbortError') console.log(`runtime-logs error ${e?.name}`); }
+  })();
+  await new Promise((r) => setTimeout(r, 3000));
+  const token = await learnerToken();
+  console.log(`CHATCHECK ${JSON.stringify(await chatCheck(asLearner(token)))}`);
+  await new Promise((r) => setTimeout(r, 15000));
+  ctl.abort();
+  await reader;
+  const mask = (t) => String(t).replace(/eyJ[\w-]+\.[\w-]+\.[\w-]*/g, '<jwt>').replace(/sk-[A-Za-z0-9_-]+/g, '<key>').replace(/[A-Za-z0-9+/_=-]{40,}/g, '<long>');
+  const want = /direct_tutor_model_failed|avatar_stream_failed|tutor_stream_failed|ai_gateway|usage_ledger|budget|anthropic|model/i;
+  let shown = 0;
+  console.log(`runtime-logs lines ${lines.length}`);
+  for (const l of lines) {
+    let msg = l;
+    try { const j = JSON.parse(l); msg = j.message ?? j.text ?? l; } catch {}
+    if (want.test(msg) && shown < 40) { console.log(`LOG ${mask(msg).slice(0, 500)}`); shown += 1; }
+  }
+}
+
 const [cmd, arg] = process.argv.slice(2);
 try {
   if (cmd === 'preflight') await preflight();
   else if (cmd === 'calls') await calls(arg);
+  else if (cmd === 'diagnose') await diagnose();
   else throw new Error('usage: run.mjs preflight | calls <audioDir>');
 } catch (e) {
   console.log(`FAILED: ${String(e?.message ?? e).slice(0, 300)}`);
