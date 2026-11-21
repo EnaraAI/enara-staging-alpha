@@ -6,6 +6,7 @@ import { citationsIn, retrieveCurriculumSources, sourcesPrompt, type RetrievedSo
 import { buildTeachingContext, type ObjectiveContext } from '../services/learningContext';
 import { currentKeyVerdict, independentSuccessItem, type LanguageTeachingContext, type LanguageTurnEvidence } from '../services/languageTeachingContext';
 import { engineV2 } from '../services/engineV2';
+import { kidsAudioVisualOn, pictureChoices } from '../services/kidsPictures';
 import { recordOutcomeForError, recordTutorOutcome, adaptiveSpacingOn, removeExamItems } from '../services/errorsToWorkOn';
 import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
@@ -460,6 +461,8 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
       ...(turn.plan && reply ? { teaching: turn.plan.teaching } : {}),
       // Recorded only for a model reply (the moves were actually given to it).
       ...(languageTurn ? { languageTurn } : {}),
+      // kidsAudioVisual: picture choices named in the trusted hidden line (under 9 only; the prompt line is given only then).
+      ...(kidsAudioVisualOn() && reply && pictureChoices((turn.languageMarker?.assessment as { pics?: string[] } | null | undefined)?.pics) ? { pics: pictureChoices((turn.languageMarker?.assessment as { pics?: string[] } | null | undefined)?.pics) } : {}),
     },
   };
   const { session } = turn;

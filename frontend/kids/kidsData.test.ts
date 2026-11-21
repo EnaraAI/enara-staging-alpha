@@ -79,3 +79,12 @@ test('lessons carry the uploaded video and the practice quiz (choices by index)'
   assert.equal(v.lesson.files[0].name, 'worksheet.pdf');
   assert.equal(D.lessonView(tree, 'l2')!.lesson.quiz.length, 0);
 });
+
+test('kidsPics (kidsAudioVisual): only well-formed choices from our own picture folder, at most 4; chatMessages carries them', () => {
+  assert.deepEqual(D.kidsPics([{ word: 'cat', src: '/kids/pics/1f408.svg' }, { word: 'x', src: 'https://evil.example/x.svg' }, { word: 'dog', src: '/kids/pics/dog.svg' }, null]),
+    [{ word: 'cat', src: '/kids/pics/1f408.svg' }, { word: 'dog', src: '/kids/pics/dog.svg' }]);
+  assert.deepEqual(D.kidsPics('nope'), []);
+  const m: any = D.chatMessages([{ role: 'ai', text: 'What is it?', meta: { pics: [{ word: 'cat', src: '/kids/pics/cat.svg' }, { word: 'dog', src: '/kids/pics/dog.svg' }] } }]);
+  assert.equal(m[0].from, 'tutor');
+  assert.deepEqual(m[0].pics.map((c: any) => c.word), ['cat', 'dog']);
+});
