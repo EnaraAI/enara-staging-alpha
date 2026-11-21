@@ -211,6 +211,10 @@ export interface ChatMessage {
   imagePrompt?: string;
   // Sanitised HTML/SVG diagram, shown in a sandboxed iframe.
   visualHtml?: string;
+  // The reply is still streaming in (TutorText hides half-written Markdown).
+  streaming?: boolean;
+  // The reply's sources (meta.citations), shown on its [n] chips.
+  citations?: { n: number; fileName?: string; page?: number | null; section?: string }[];
 }
 
 export interface ChatSession {

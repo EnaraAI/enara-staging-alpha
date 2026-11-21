@@ -805,7 +805,8 @@ import React from 'react';
       view === 'chat' ? h('div', { key: 'c', className: 'ek-chat' },
         msgs.map(function (m, i) {
           return h(TutorBubble, { key: i, from: m.from, lang: p.lang, name: false, onReadAloud: m.from === 'tutor' ? (p.onReadAloud ? function () { p.onReadAloud(m.text); } : function () {}) : undefined },
-            h('span', { className: 'ek-chat__text' }, m.text),
+            // p.renderText: the app's tutor-reply renderer (Markdown made simple for children); plain text otherwise.
+            h('span', { className: 'ek-chat__text' }, p.renderText ? p.renderText(m) : m.text),
             m.picture && h('div', { className: 'ek-chat__pic' }, h(FractionPicture, { label: T('A circle cut into quarters and a circle cut in half', 'دائرة مقسومة أرباعًا ودائرة مقسومة نصفين') }), h(Button, { variant: 'ghost', size: 'sm', icon: 'image' }, T('Make it bigger', 'كبّر الصورة'))),
             m.jump && h('div', null, h(Button, { size: 'sm', iconEnd: 'arrowRight', className: 'ek-chat__jump', onClick: m.onJump }, m.jump)),
             // kidsAudioVisual: picture choices (tap = answer, read aloud); the last tutor message only.

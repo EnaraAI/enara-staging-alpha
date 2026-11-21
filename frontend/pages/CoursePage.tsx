@@ -16,6 +16,7 @@ import {
 import { toast } from '../services/toastService';
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageContent } from '../components/MessageContent';
+import { stripMarkdownForSpeech } from '../services/speechText';
 import {
   PlayCircle,
   Lock,
@@ -81,6 +82,7 @@ const toChatMessage = (m: any): ChatMessage => ({
   role: m.role === 'user' ? 'user' : 'ai',
   text: m.text || '',
   timestamp: m.timestamp ? new Date(m.timestamp) : new Date(),
+  ...(Array.isArray(m.meta?.citations) ? { citations: m.meta.citations } : {}),
 });
 
 const errorMessage = (err: unknown, fallback: string) => (err instanceof Error && err.message ? err.message : fallback);
@@ -339,11 +341,12 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
 
     // The reply appears as the tutor writes it (streamed), in one message bubble.
     const replyId = (Date.now() + 1).toString();
-    const showReply = (text: string) => {
+    const showReply = (text: string, streaming = false, citations?: ChatMessage['citations']) => {
       setIsTyping(false);
+      const update = { text, streaming, ...(citations ? { citations } : {}) };
       setChatMessages(prev => prev.some(m => m.id === replyId)
-        ? prev.map(m => (m.id === replyId ? { ...m, text } : m))
-        : [...prev, { id: replyId, role: 'ai', text, timestamp: new Date() }]);
+        ? prev.map(m => (m.id === replyId ? { ...m, ...update } : m))
+        : [...prev, { id: replyId, role: 'ai', timestamp: new Date(), ...update }]);
     };
     try {
       let sessionId = tutorSessionId;
@@ -357,8 +360,8 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
         lessonId: selectedLesson?.id,
         subject: selectedCourse?.subject,
         lessonTitle: selectedLesson?.title,
-      }, showReply);
-      showReply(result.assistantMessage?.text || 'No response received.');
+      }, (soFar) => showReply(soFar, true));
+      showReply(result.assistantMessage?.text || 'No response received.', false, Array.isArray(result.assistantMessage?.meta?.citations) ? result.assistantMessage.meta.citations : undefined);
     } catch (err) {
       const message = errorMessage(err, 'The tutor is unavailable right now.');
       toast.error('AI Tutor error', message);
@@ -377,7 +380,7 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
     }
 
     setIsReadingId(message.id);
-    const audioData = await generateSpeech(message.text);
+    const audioData = await generateSpeech(stripMarkdownForSpeech(message.text));
     
     if (audioData) {
       const decodedData = atob(audioData);
@@ -659,7 +662,7 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
                     msg.role === 'user' ? 'bg-teal-600 text-white' : 'bg-slate-50 text-slate-800 border border-[#e5e7eb]'
                   }`}
                 >
-                  {msg.role === 'user' ? msg.text : <MessageContent text={msg.text} />}
+                  {msg.role === 'user' ? msg.text : <MessageContent text={msg.text} streaming={msg.streaming} citations={msg.citations} />}
                   {msg.visualHtml && (
                     <div className="mt-3 rounded-md overflow-hidden border border-[#e5e7eb] bg-white">
                       <iframe srcDoc={msg.visualHtml} sandbox="" title="Lesson visual" className="w-full h-[420px] border-0" />

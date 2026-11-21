@@ -26,7 +26,9 @@ registration → connection check → status page → first launches; under 15 m
 (tutor, live avatar, diagnostic: no grade column, the "not set up" message
 without any AI call, the teacher overview, mic blocked → new tab)), …, 15 learner memory "errors to work on" (a released wrong answer is recorded; it waits while
 an attempt is left; ready once the assessment is over; teacher list, learner list without sources, other school
-blocked, teacher dismiss; ENARA_ENGINE_V2 as on lms-test, AI paused).
+blocked, teacher dismiss; ENARA_ENGINE_V2 as on lms-test, AI paused), …, 19 tutor reply formatting (the learner's
+tutor chat with a MOCK Markdown reply given by Playwright routes, no AI call: no raw `**` or `#`, maths readable,
+citation chip, model HTML shown as text).
 
 ## CI
 

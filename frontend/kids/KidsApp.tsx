@@ -12,6 +12,8 @@ import { LiveAvatarModal } from '../components/enara/LiveAvatarModal';
 import { MicProblemNotice, useMicGate } from '../components/MicCheck';
 import { classifySpeechRecognitionError, isInFrame } from '../services/micCheck';
 import * as D from './kidsData';
+import { TutorText } from '../components/TutorText';
+import { stripMarkdownForSpeech } from '../services/speechText';
 import { kidsTabForLmsPage, showOldAssessmentsTab } from '../services/roleRouting';
 
 type Tab = 'home' | 'learning' | 'progress' | 'assignments' | 'plan' | 'quizzes' | 'results';
@@ -120,7 +122,8 @@ export default function KidsApp({ tourPending, sharedAssessmentId, sharedCourseI
       const synth = window.speechSynthesis;
       if (!synth) return;
       synth.cancel();
-      const u = new SpeechSynthesisUtterance(text);
+      // Read aloud the words only: no Markdown symbols or citation markers.
+      const u = new SpeechSynthesisUtterance(stripMarkdownForSpeech(text) || text);
       u.lang = lang === 'ar-EG' ? 'ar-EG' : lang === 'ar' ? 'ar-SA' : 'en-GB';
       u.rate = 0.95;
       synth.speak(u);
@@ -563,7 +566,7 @@ function ConversationExam({ ctx, id, work, busy, onExit, onSubmit }: { ctx: Ctx;
       <div className="ek-chat">
         {turns.map((t, i) => (
           <K.TutorBubble key={i} lang={ctx.lang} from={t.role === 'student' ? 'child' : 'tutor'} name={false}
-            onReadAloud={t.role === 'student' ? undefined : () => ctx.speak(t.text)}><span className="ek-chat__text">{t.text}</span></K.TutorBubble>
+            onReadAloud={t.role === 'student' ? undefined : () => ctx.speak(t.text)}><span className="ek-chat__text">{t.role === 'student' ? t.text : <TutorText text={t.text} simple />}</span></K.TutorBubble>
         ))}
         {sending && <div className="ek-thinking" role="status"><span className="ek-dots" aria-hidden="true"><i /><i /><i /></span>{ctx.T('The examiner is listening…', 'الممتحن يستمع…')}</div>}
       </div>
@@ -710,7 +713,7 @@ function TutorDrawer({ ctx, tutor, onClose }: { ctx: Ctx; tutor: Tutor; onClose:
         setSessionId(id);
       }
       const r: any = await api.sendTutorMessage(id!, text, tutor.courseId ? { courseId: tutor.courseId, lessonId: tutor.lessonId } : undefined);
-      setMessages(m => [...m, { from: 'tutor', text: r.assistantMessage?.text || '', ...(r.assistantMessage?.meta?.pics ? { pics: D.kidsPics(r.assistantMessage.meta.pics) } : {}) }]);
+      setMessages(m => [...m, { from: 'tutor', text: r.assistantMessage?.text || '', ...(r.assistantMessage?.meta?.pics ? { pics: D.kidsPics(r.assistantMessage.meta.pics) } : {}), ...(Array.isArray(r.assistantMessage?.meta?.citations) ? { citations: r.assistantMessage.meta.citations } : {}) }]);
     } catch (e) {
       setMessages(m => [...m, { from: 'tutor', text: ctx.T('Sorry, I couldn’t answer just now. Please try again.', 'عذرًا، لم أستطع الإجابة الآن. حاول مرة أخرى.') }]);
       if (!api.isFeatureDisabled(e)) toast.error(ctx.T('Enara isn’t available', 'إنارة غير متاحة'), errText(e));
@@ -748,6 +751,7 @@ function TutorDrawer({ ctx, tutor, onClose }: { ctx: Ctx; tutor: Tutor; onClose:
       <div className="ek-drawer__scrim" onClick={onClose} />
       <div className="ek-drawer__panel" role="dialog" aria-modal="true" aria-label={ctx.T('Enara, your tutor', 'إنارة، معلّمتك')}>
         <K.TutorScreen lang={ctx.lang} messages={messages} thinking={thinking} sessions={sessions} onSend={send} onClose={onClose}
+          renderText={(m: { from: string; text: string; citations?: any[] }) => (m.from === 'tutor' ? <TutorText text={m.text} simple citations={m.citations} /> : m.text)}
           onReadAloud={ctx.speak} onMic={speaking.microphone && recognition.current ? toggleMic : false} listening={listening} onClearAll={false}
           onLive={speaking.liveCall ? () => setLiveOpen(true) : undefined}
           onOpenSession={(sid: string) => { setSessionId(sid); api.getTutorSession(sid).then((s: any) => setMessages(D.chatMessages(s.messages)), () => undefined); }} />

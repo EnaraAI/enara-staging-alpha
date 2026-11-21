@@ -337,7 +337,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
               <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
                 {messages.map((msg, i) => (
                   <div key={`chat-msg-${i}-${msg.timestamp?.getTime() || i}`} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${
+                    <div data-testid={msg.role === 'ai' ? 'tutor-reply' : undefined} className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${
                       msg.role === 'user' 
                         ? 'bg-slate-900 text-white rounded-tr-none shadow-lg' 
                         : 'bg-white text-slate-700 border border-slate-100 rounded-tl-none shadow-sm'
@@ -349,6 +349,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                           text={msg.text} 
                           onNavigate={onNavigate} 
                           onStartAssessment={onStartAssessment} 
+                          citations={msg.citations}
                         />
                       )}
                       {msg.role === 'ai' && msg.citations?.length ? (
@@ -402,6 +403,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                     placeholder="Ask about performance..."
+                    data-testid="tutor-input"
                     className="w-full pl-4 pr-24 py-3 rounded-2xl bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium"
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
