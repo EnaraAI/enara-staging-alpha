@@ -4,7 +4,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 const SITE = 'https://lms-test.enara.app';
 const H = { Authorization: `Bearer ${process.env.LMSTEST_MAINTENANCE_TOKEN}`, 'Content-Type': 'application/json' };
-const ARMS = (process.env.ARMS || 'base,match').split(',');
+const ARMS = (process.env.ARMS || 'match,fast').split(','); // speed test: match (before) vs fast (dsFast), both streamed
 mkdirSync('out', { recursive: true });
 const turns = JSON.parse(readFileSync(new URL('./turns.json', import.meta.url), 'utf8'));
 const CLASS = { CORRECT: 'right', CORRECT_WITH_EQUIVALENT_FORMULATION: 'right', PARTIALLY_CORRECT: 'partial', INCORRECT: 'wrong', NOT_EVALUATED: 'none', AMBIGUOUS: 'none' };
@@ -31,8 +31,8 @@ function score(t, r) {
 const results = [];
 async function one(arm, t) {
   for (let attempt = 1; attempt <= 2; attempt++) {
-    const r = await fetch(`${SITE}/api/maintenance/tutor-eval`, { method: 'POST', headers: H, body: JSON.stringify({ arm, turn: t.turn }), signal: AbortSignal.timeout(170_000) }).then((x) => x.json()).catch((e) => ({ ok: false, reason: String(e) }));
-    if (r.ok || attempt === 2) { const s = r.ok ? score(t, r) : null; results.push({ arm, id: t.id, group: t.group, subject: t.subject, age: t.age, lang: t.lang, query: t.turn.query, task: t.turn.history.at(-1)?.content ?? null, claude: t.claude ?? null, expect: t.expect, ok: r.ok, reason: r.reason, ms: r.ms, raw: r.raw, text: r.text, assessment: r.assessment, repaired: r.repaired, citations: r.citations, usage: r.usage, ...s }); console.log(arm, t.id, r.ok, r.ms, s ? `${s.gradingOk ? 'G' : 'g'} ${s.rulesPassed}/${s.rulesTotal}` : r.reason); return; }
+    const r = await fetch(`${SITE}/api/maintenance/tutor-eval`, { method: 'POST', headers: H, body: JSON.stringify({ arm, turn: t.turn, stream: true }), signal: AbortSignal.timeout(170_000) }).then((x) => x.json()).catch((e) => ({ ok: false, reason: String(e) }));
+    if (r.ok || attempt === 2) { const s = r.ok ? score(t, r) : null; results.push({ arm, id: t.id, group: t.group, subject: t.subject, age: t.age, lang: t.lang, query: t.turn.query, task: t.turn.history.at(-1)?.content ?? null, claude: t.claude ?? null, expect: t.expect, ok: r.ok, reason: r.reason, ms: r.ms, firstVisibleMs: r.firstVisibleMs, wholeMs: r.wholeMs, timings: r.timings, raw: r.raw, text: r.text, assessment: r.assessment, repaired: r.repaired, citations: r.citations, usage: r.usage, ...s }); console.log(arm, t.id, r.ok, r.ms, s ? `${s.gradingOk ? 'G' : 'g'} ${s.rulesPassed}/${s.rulesTotal}` : r.reason); return; }
   }
 }
 const jobs = ARMS.flatMap((a) => turns.map((t) => () => one(a, t)));
@@ -42,7 +42,11 @@ for (const arm of ARMS) {
   const rs = results.filter((r) => r.arm === arm && r.ok);
   const by = (f) => Object.fromEntries([...new Set(rs.map(f))].map((g) => { const x = rs.filter((r) => f(r) === g); return [g, { n: x.length, grading: x.filter((r) => r.gradingOk).length, rules: `${x.reduce((a, r) => a + r.rulesPassed, 0)}/${x.reduce((a, r) => a + r.rulesTotal, 0)}` }]; }));
   const ms = rs.map((r) => r.ms).sort((a, b) => a - b);
-  summary[arm] = { ok: rs.length, failed: results.filter((r) => r.arm === arm && !r.ok).length, marker: rs.filter((r) => r.checks.marker).length, gradingOk: rs.filter((r) => r.gradingOk).length,
+  const med = (xs) => { const v = xs.filter((x) => typeof x === 'number').sort((a, b) => a - b); return v.length ? v[Math.floor(v.length / 2)] : null; };
+  const p90 = (xs) => { const v = xs.filter((x) => typeof x === 'number').sort((a, b) => a - b); return v.length ? v[Math.floor(v.length * 0.9)] : null; };
+  const speed = { firstWordsMedian: med(rs.map((r) => r.firstVisibleMs)), firstWordsP90: p90(rs.map((r) => r.firstVisibleMs)), wholeMedian: med(rs.map((r) => r.wholeMs)), wholeP90: p90(rs.map((r) => r.wholeMs)),
+    gradeMsMedian: med(rs.map((r) => r.timings?.timings?.gradeMs)), skippedGrade: rs.filter((r) => r.timings?.skippedGrade).length, cut: rs.filter((r) => r.timings?.timings?.cut).length, regenerated: rs.filter((r) => (r.timings?.regenerated ?? []).length).length };
+  summary[arm] = { speed, ok: rs.length, failed: results.filter((r) => r.arm === arm && !r.ok).length, marker: rs.filter((r) => r.checks.marker).length, gradingOk: rs.filter((r) => r.gradingOk).length,
     rules: `${rs.reduce((a, r) => a + r.rulesPassed, 0)}/${rs.reduce((a, r) => a + r.rulesTotal, 0)}`, repaired: rs.filter((r) => r.repaired).length,
     msMedian: ms[Math.floor(ms.length / 2)], msP90: ms[Math.floor(ms.length * 0.9)], tokensIn: Math.round(rs.reduce((a, r) => a + (r.usage?.input_tokens ?? 0), 0) / (rs.length || 1)), tokensOut: Math.round(rs.reduce((a, r) => a + (r.usage?.output_tokens ?? 0), 0) / (rs.length || 1)),
     byGroup: by((r) => r.group), byAge: by((r) => r.age), byLang: by((r) => r.lang) };
