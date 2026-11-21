@@ -102,3 +102,22 @@ describe('DeepSeek match: the graded turn', () => {
     expect(r.text.startsWith('[[assess verdict=CORRECT')).toBe(true);
   });
 });
+
+describe('DeepSeek match: fixes after the 100-turn test', () => {
+  it('out of scope must say so first; a question quoted back is not an answer given away; Arabic task words with marks count', () => {
+    expect(replyProblems({ reply: 'Volume = πr²h. What is r?', grade: null, kind: 'outOfScope', band: 'older', learnerText: 'how do i find the volume of a cylinder' })[0]).toMatch(/not in their course materials/);
+    expect(replyProblems({ reply: "This isn't in your course materials. General knowledge: V = πr²h. What is r?", grade: null, kind: 'outOfScope', band: 'older', learnerText: 'how do i find the volume of a cylinder' })).toEqual([]);
+    const g = { verdict: 'INCORRECT', relevance: 'ACTIVE_ITEM', next: 'SAME_ITEM', criteria: [], expected: '0.6' };
+    expect(replyProblems({ reply: 'Not quite. Compare tenths: which is bigger, 0.6 or 0.59?', grade: g, kind: 'practice', band: 'older', learnerText: '0.59', taskText: 'Which is bigger, 0.6 or 0.59?' })).toEqual([]);
+    expect(replyProblems({ reply: 'أحسنت! جرّب الآن معادلة فيها خطوتان: ٢س + ٣ = ١٧', grade: { ...g, verdict: 'CORRECT', next: 'NEW_ITEM', expected: 'س = 7' }, kind: 'practice', band: 'older', learnerText: 'س = ٧' })).toEqual([]);
+  });
+
+  it('a one-word answer with a spelling slip is partly right, never right', async () => {
+    const call: ChatCall = async (q) => q.json
+      ? { text: '{"verdict":"CORRECT_WITH_EQUIVALENT_FORMULATION","relevance":"ACTIVE_ITEM","next":"NEW_ITEM","expected":"المدرسة","answer":"المدرسه"}', finish: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 } }
+      : { text: 'قريب! انتبه لآخر حرف. اكتب الكلمة مرة أخرى.', finish: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 } };
+    const r = await gradedReply({ system: 'HIDDEN GRADING LINE (every reply, any subject): [[assess', messages: [{ role: 'assistant', content: 'أكمل: ذهبتُ إلى ___' }, { role: 'user', content: 'المدرسه' }], maxTokens: 300, parts: { gradeFirst: true, answerCheck: true, examples: false, replyChecks: true, tuning: false }, call });
+    expect(r.meta.grade).toMatchObject({ verdict: 'PARTIALLY_CORRECT', next: 'SAME_ITEM' });
+  });
+});
+

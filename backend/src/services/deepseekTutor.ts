@@ -179,18 +179,18 @@ const norm = (s: string) => foldArabic(westernDigits(s).toLowerCase()).replace(/
 const arabicShare = (s: string) => { const letters = s.match(/\p{L}/gu) ?? []; return letters.length ? letters.filter((c) => isArabic(c)).length / letters.length : 0; };
 const words = (s: string) => s.split(/\s+/).filter(Boolean).length;
 /** Reasons a reply must be written again (empty: fine). */
-export function replyProblems(p: { reply: string; grade: Grade | null; kind: TurnKind; band: AgeBand; learnerText: string }): string[] {
+export function replyProblems(p: { reply: string; grade: Grade | null; kind: TurnKind; band: AgeBand; learnerText: string; taskText?: string }): string[] {
   const out: string[] = [];
   const { reply, grade } = p;
   const exp = grade?.expected ? norm(grade.expected) : '';
   if (grade?.next === 'SAME_ITEM' && exp.length >= 2 && !/^(yes|no|true|false|a|b|c|d|in|on|at)$/.test(exp)) {
     const r = ` ${norm(reply)} `;
-    const learnerSaidIt = ` ${norm(p.learnerText)} `.includes(` ${exp} `);
-    if (r.includes(` ${exp} `) && !learnerSaidIt) out.push('You gave the correct answer away, but they must try again: give a hint that points at the mistake, never the answer.');
+    const alreadyThere = ` ${norm(p.learnerText)} `.includes(` ${exp} `) || ` ${norm(p.taskText ?? '')} `.includes(` ${exp} `); // in their answer or in the question itself
+    if (r.includes(` ${exp} `) && !alreadyThere) out.push('You gave the correct answer away, but they must try again: give a hint that points at the mistake, never the answer.');
   }
   if (grade && (grade.next === 'NEW_ITEM' || grade.next === 'SAME_ITEM')) {
-    const tail = reply.trim().split('\n').filter((l) => l.trim()).slice(-2).join(' ');
-    if (!/[?؟]|_{2,}|…|\.\.\.|:\s*$|\b(write|try|complete|correct|answer|choose|find|work out|calculate|solve|say|tell me|read|fill|name|draw|explain)\b|اكتب|حاول|أجب|اختر|احسب|أكمل|اذكر/i.test(tail)) out.push('End with ONE clear task for them (a question or an instruction).');
+    const tail = foldArabic(reply.trim().split('\n').filter((l) => l.trim()).slice(-2).join(' '));
+    if (!/[?؟]|_{2,}|…|\.\.\.|:\s*$|\b(write|try|complete|correct|answer|choose|find|work out|calculate|solve|say|tell me|read|fill|name|draw|explain)\b|اكتب|حاول|اجب|اختر|احسب|اكمل|اذكر|استخرج|جرب|قل|هل/i.test(tail)) out.push('End with ONE clear task for them (a question or an instruction).');
   }
   if (p.band === 'under9' && words(reply) > 45) out.push('Too long for a child under 9: at most 3 short sentences and one task.');
   else if (p.band === 'child' && words(reply) > 80) out.push('Too long for a child: keep it short, then one task.');
@@ -199,9 +199,11 @@ export function replyProblems(p: { reply: string; grade: Grade | null; kind: Tur
     if (learnerAr > 0.6 && replyAr < 0.3) out.push('The student wrote in Arabic: reply in Arabic.');
     else if (learnerAr < 0.1 && /[a-z]{3}/i.test(p.learnerText) && replyAr > 0.6) out.push('The student wrote in English: reply in English.');
   }
+  if (p.kind === 'outOfScope' && !NOT_COVERED.test(reply.split(/(?<=[.!?؟])\s/)[0] ?? '')) out.push('Start with ONE short sentence saying this is not in their course materials (for example "This isn\'t in your course materials." / "هذا ليس في مواد مقررك."), then a short general-knowledge answer labelled as such.');
   if (p.kind === 'sources' && (!grade || grade.verdict === 'NOT_EVALUATED') && !/\[[0-9٠-٩]{1,2}\]/.test(reply) && !/not (in|cover)|isn'?t in|لا ت(غطي|تناول)|ليس في/i.test(reply)) out.push('You used the course passages: cite each one as [n] right after the sentence that uses it.');
   return out;
 }
+const NOT_COVERED = /not (in|covered|part of)|isn'?t (in|covered)|doesn'?t cover|don'?t cover|aren'?t in|ليس(ت)? (في|من)|لا (ت|ي)(غطي|تناول|شمل)|مش موجود|غير موجود|مش في/i;
 export const regenNote = (reasons: string[]) => `YOUR LAST DRAFT WAS REJECTED. Fix this and change nothing else:\n${reasons.map((r) => `- ${r}`).join('\n')}`;
 
 // ---------------------------------------------------------------------------------------------------------------- the whole graded turn
@@ -215,6 +217,7 @@ export async function gradedReply(p: { system: string; messages: ChatMsg[]; maxT
   const add = (u: { input_tokens: number; output_tokens: number }) => { usage.input_tokens += u.input_tokens; usage.output_tokens += u.output_tokens; };
   const kind = turnKind(p.system); const band = ageBand(p.system);
   const learnerText = [...p.messages].reverse().find((m) => m.role === 'user')?.content ?? '';
+  const taskText = [...p.messages].reverse().find((m) => m.role === 'assistant')?.content ?? '';
   const temperature = p.parts.tuning ? Math.min(p.temperature ?? 0.3, 0.3) : p.temperature;
   let grade: Grade | null = null; let check: CheckResult = {};
   if (p.parts.gradeFirst) {
@@ -223,6 +226,7 @@ export async function gradedReply(p: { system: string; messages: ChatMsg[]; maxT
     grade = readGrade(g.text);
     if (grade && p.parts.answerCheck && grade.relevance === 'ACTIVE_ITEM' && grade.verdict !== 'NOT_EVALUATED') {
       check = answerCheck(grade.answer ?? learnerText, grade.expected);
+      if (!check.verdict && check.note?.startsWith('spelling:') && RIGHT.has(grade.verdict)) check = { ...check, verdict: 'PARTIALLY_CORRECT' }; // the prompt: a spelling error is never "right" as a whole
       if (check.verdict && check.verdict !== grade.verdict && !(check.verdict === 'CORRECT' && grade.verdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION')) {
         grade = { ...grade, verdict: check.verdict, next: check.verdict === 'CORRECT' ? (grade.next === 'SAME_ITEM' ? 'NEW_ITEM' : grade.next) : grade.next === 'NEW_ITEM' ? 'SAME_ITEM' : grade.next };
       }
@@ -238,11 +242,11 @@ export async function gradedReply(p: { system: string; messages: ChatMsg[]; maxT
   let r = await write();
   const regenerated: string[] = [];
   if (p.parts.replyChecks && r.text) {
-    const reasons = replyProblems({ reply: r.text, grade, kind, band, learnerText });
+    const reasons = replyProblems({ reply: r.text, grade, kind, band, learnerText, taskText });
     if (reasons.length) {
       regenerated.push(...reasons);
       const again = await write(regenNote(reasons));
-      if (again.text && replyProblems({ reply: again.text, grade, kind, band, learnerText }).length < reasons.length) r = again;
+      if (again.text && replyProblems({ reply: again.text, grade, kind, band, learnerText, taskText }).length < reasons.length) r = again;
     }
   }
   const text = grade && r.text ? `${markerOf(grade)}\n${r.text}` : r.text;
