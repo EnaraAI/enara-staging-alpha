@@ -815,8 +815,7 @@ import React from 'react';
                   h('button', { type: 'button', className: 'ek-pics__pick', 'aria-label': c.word, onClick: function () { if (p.onReadAloud) p.onReadAloud(c.word); send(c.word); } },
                     h('img', { src: c.src, alt: '', width: 72, height: 72, loading: 'lazy' }), h('span', { className: 'ek-pics__word' }, c.word)),
                   h('button', { type: 'button', className: 'ek-pics__say', 'aria-label': T('Listen: ', 'استمع: ') + c.word, onClick: function () { if (p.onReadAloud) p.onReadAloud(c.word); } }, '\uD83D\uDD0A'));
-              }),
-              h('span', { className: 'ek-pics__credit' }, 'Pictures: OpenMoji (CC BY-SA 4.0)')));
+              })));
         }),
         msgs.length === 0 && h(TutorBubble, { lang: p.lang, name: false }, p.greeting || T('Hi! I’m Enara. What would you like to learn about?', 'مرحبًا! أنا إنارة. ماذا تحب أن تتعلّم؟')),
         (p.thinking === undefined ? !p.onSend : p.thinking) && h('div', { className: 'ek-thinking', role: 'status' }, h('span', { className: 'ek-dots', 'aria-hidden': true }, h('i'), h('i'), h('i')), T('Enara is thinking…', 'إنارة تفكّر…')))

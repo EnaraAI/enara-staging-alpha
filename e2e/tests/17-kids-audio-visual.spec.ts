@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 import { ENARA } from '../lib/env';
 
 // Scenario 17 (NEXT_PLAN item 1, kidsAudioVisual): the picture choices for children under 9. The pictures are served from ENARA's own
-// folder (OpenMoji, CC BY-SA 4.0), every listed picture loads and draws, and the browser can read a word aloud (speechSynthesis). The
-// tutor names the choices in its hidden line; the engine side is covered by unit tests. Speaking (microphone) stays off for children.
+// folder (ENARA's own drawn set since 21 Nov 2026; OpenMoji removed), every listed picture loads and draws, and the browser can read a word aloud (speechSynthesis). The
+// tutor names the choices in its hidden line; the engine side is covered by unit tests. Children's speaking is a separate switch (kidsSpeaking, scenario 18).
 test('picture index and pictures load and draw; read-aloud is available', async ({ page }) => {
   const index = await (await page.request.get(`${ENARA}/kids/pics/index.json`)).json() as { words: Record<string, string> };
   const slugs = Object.values(index.words);
