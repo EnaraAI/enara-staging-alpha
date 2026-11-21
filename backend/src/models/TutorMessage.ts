@@ -52,6 +52,8 @@ export interface ITutorMessageDoc extends Document {
     outOfScope?: boolean;
     // repairOnce: the reply was regenerated once because its hidden grading line was missing.
     repaired?: boolean;
+    // injectionCheck: where text that tries to change the tutor's instructions was found.
+    injection?: 'learner' | 'passage';
     practiceTurn?: { assessment: { verdict: string }; answeringCheck: boolean; objectiveId?: string; lessonId?: string; next?: string };
   };
 }
@@ -97,6 +99,7 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
       },
       outOfScope: Boolean,
       repaired: Boolean,
+      injection: { type: String, enum: ['learner', 'passage'] },
       practiceTurn: {
         type: { assessment: { type: { verdict: String, _id: false } }, answeringCheck: Boolean, objectiveId: String, lessonId: String, next: String, _id: false },
         default: undefined,

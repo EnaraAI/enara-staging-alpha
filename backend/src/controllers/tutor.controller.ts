@@ -8,6 +8,7 @@ import { currentKeyVerdict, independentSuccessItem, type LanguageTeachingContext
 import { engineV2 } from '../services/engineV2';
 import { kidsAudioVisualOn, pictureChoices } from '../services/kidsPictures';
 import { kidsSpeakingInfo } from '../services/kidsSpeaking';
+import { cleanPassage, findInjection, injectionCheckOn, INJECTION_NOTE } from '../services/injectionCheck';
 import { MISSING_MARKER_NOTE, hasTrustedMarker, needsRepair } from '../services/repairOnce';
 import { OUT_OF_SCOPE_LINE, outOfScopeTurn } from '../services/groundedRefusal';
 import { asksToExplainAgain, retrieveWithRewrite, reusePassages } from '../services/retrievalBoost';
@@ -193,6 +194,8 @@ interface TutorTurn {
   outOfScope?: boolean;
   // repairOnce: one regeneration was made because the hidden grading line was missing.
   repaired?: boolean;
+  // injectionCheck: where text that tries to change the tutor's instructions was found.
+  injection?: 'learner' | 'passage';
   /** workOn: the error the previous reply set a practice item for (its hidden line named it), and that reply's hint level. */
   prevWorkOn?: { errorId: string; hintLevel: number };
   turnLockId?: string;
@@ -372,6 +375,13 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
           objectiveId: session.objectiveId,
         }).catch(() => ({ sources: [] as RetrievedSource[] }))).sources
       : [];
+    // injectionCheck: offending sentences in passages are removed; a learner message that tries to change the instructions gets a safety note.
+    if (injectionCheckOn()) {
+      let removed = 0;
+      turn.sources = turn.sources.map((x) => { const c = cleanPassage(x.text); removed += c.removed; return c.removed ? { ...x, text: c.text } : x; });
+      if (findInjection(turn.text)) turn.injection = 'learner';
+      else if (removed) turn.injection = 'passage';
+    }
     // groundedRefusal: no passage for a learner question in a course that has materials -> say so, flag the turn.
     const prevAskedPractice = ['NEW_ITEM', 'SAME_ITEM'].includes(String(([...earlier].reverse().find((m) => m.role === 'ai')?.meta as { practiceTurn?: { next?: string } } | undefined)?.practiceTurn?.next ?? ''));
     turn.outOfScope = await outOfScopeTurn({ language: Boolean(turn.language), answeringPractice: prevAskedPractice, text: turn.text, sourcesFound: turn.sources.length, institutionId: session.institutionId, curriculumId: session.curriculumId }).catch(() => false);
@@ -380,7 +390,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
       history,
       teachingMethod: method,
       curriculum,
-      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined, turn.outOfScope ? OUT_OF_SCOPE_LINE : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
+      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined, turn.outOfScope ? OUT_OF_SCOPE_LINE : undefined, turn.injection === 'learner' ? INJECTION_NOTE : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
       planActive: Boolean(turn.plan),
       sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
       ...(engineV2('cache') && turn.language?.parts ? { languageContextStable: turn.language.parts.stable, languageContextDynamic: turn.language.parts.dynamic } : { languageContext: turn.language?.prompt }),
@@ -491,6 +501,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
       ...(practiceTurn ? { practiceTurn } : {}),
       ...(turn.outOfScope && reply ? { outOfScope: true } : {}),
       ...(turn.repaired ? { repaired: true } : {}),
+      ...(turn.injection ? { injection: turn.injection } : {}),
       // kidsAudioVisual: picture choices named in the trusted hidden line (under 9 only; the prompt line is given only then).
       ...(kidsAudioVisualOn() && reply && pictureChoices((turn.languageMarker?.assessment as { pics?: string[] } | null | undefined)?.pics) ? { pics: pictureChoices((turn.languageMarker?.assessment as { pics?: string[] } | null | undefined)?.pics) } : {}),
     },
