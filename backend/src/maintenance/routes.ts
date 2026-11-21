@@ -11,6 +11,7 @@ import { maintenanceAllowed, maintenanceAuthorised } from './guards';
 import { seedLmsTest } from './lmsTestSeed';
 import { mockLmsRouter } from './mockLms';
 import { runHealthCheck, setupHealthCheck } from './healthCheck';
+import { avatarUsageReport, parseAvatarIds } from './avatarUsageReport';
 
 // Maintenance for the LMS TEST deployment only (lms-test.enara.app): 404 unless
 // switched on AND MONGODB_URI is the test cluster AND a maintenance token is
@@ -277,6 +278,17 @@ router.get('/enrollment-shadow-report', async (req, res, next) => {
   try {
     const n = (v: unknown) => (typeof v === 'string' && Number(v) > 0 ? Number(v) : undefined);
     res.json(await shadowReport({ days: n(req.query.days), requiredCleanDays: n(req.query.required) }));
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Avatar cost and latency test (avatarUsageReport.ts): numbers for up to 30 listed avatar calls. Read only; IDs and numbers only.
+router.get('/avatar-usage', async (req, res, next) => {
+  try {
+    const ids = parseAvatarIds(req.query.ids);
+    if (!ids) { res.status(400).json({ error: 'ids: 1 to 30 avatar call ids (av-<uuid>), comma separated' }); return; }
+    res.json({ calls: await avatarUsageReport(ids) });
   } catch (e) {
     next(e);
   }
