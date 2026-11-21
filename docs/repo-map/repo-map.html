@@ -1,0 +1,67 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}body{margin:0;background:#f6f7fa;font:14px/1.35 Inter,system-ui,sans-serif;color:#13233a}
+.w{width:1600px;padding:28px 32px}h1{margin:0 0 4px;font-size:28px}.sub{color:#566376;margin-bottom:18px}
+.row{display:flex;gap:14px;margin-bottom:14px}.box{background:#fff;border:2px solid #d0d8e2;border-radius:14px;padding:12px 14px;flex:1}
+.box h3{margin:0 0 6px;font-size:15px}.box p{margin:0;color:#3a4a60;font-size:13px}.k{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#eef2f6;border-radius:5px;padding:1px 5px}
+.users .box{border-color:#9b6bd6;background:#f6f1ff}.fe{border-color:#2f6bff!important;background:#eef3ff!important}
+.be{border:2px solid #0b203c;border-radius:16px;padding:14px;background:#fff}.be>h2{margin:0 0 10px;font-size:18px}
+.eng{border-color:#f59f0a!important;background:#fff8ea!important}.ext .box{border-color:#5cb85c;background:#f1faf1}
+.cd{border-color:#e85d4a!important;background:#fff3f1!important}.lab{font-weight:700;font-size:12px;letter-spacing:.06em;color:#566376;text-transform:uppercase;margin:4px 0 6px}
+.arrow{text-align:center;color:#566376;font-size:20px;margin:6px 0 8px}.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.step{background:#fff;border:1.5px solid #e85d4a;border-radius:10px;padding:6px 9px;font-size:12.5px}.flow b{color:#e85d4a}
+.frozen{border-color:#b0b0b0!important;background:#f0f0f0!important;color:#777}
+</style></head><body><div class="w">
+<h1>ENARA staging repo: how it fits together</h1>
+<div class="sub">EnaraAI/enara-staging-alpha · one Vercel project per site: a React app + one Node API function · 21 Nov 2026</div>
+
+<div class="lab">Who uses it</div>
+<div class="row users">
+ <div class="box"><h3>Students (13+)</h3><p>Web app: courses, assignments, AI tutor chat, live avatar call, speaking exams</p></div>
+ <div class="box"><h3>Children (under 13)</h3><p>Kids app: tutor with picture choices (292 own pictures), microphone, "Talk live"</p></div>
+ <div class="box"><h3>Teachers &amp; school admins</h3><p>Curriculum, assessments, grading, classes, analytics, parent codes</p></div>
+ <div class="box"><h3>Parents</h3><p>Parents portal: progress, activity, controls (phone + desktop layout)</p></div>
+ <div class="box"><h3>Moodle (school LMS)</h3><p>Opens ENARA through LTI 1.3: launch, activity picker, grades back, roster</p></div>
+</div>
+<div class="arrow">▼ browser / LTI launch</div>
+
+<div class="row">
+ <div class="box fe"><h3>frontend/  (React + Vite, served as static files)</h3>
+ <p><span class="k">pages/</span> staff and student screens · <span class="k">kids/</span> kids app + <span class="k">public/kids/pics</span> · <span class="k">parents/</span> parents portal · <span class="k">components/enara/LiveAvatarModal</span> live avatar (Anam SDK) · <span class="k">services/apiService.ts</span> calls the API</p></div>
+</div>
+<div class="arrow">▼ /api  (vercel.json → api/index.js, max 60 s)</div>
+
+<div class="be"><h2>backend/  (Node + Express, TypeScript)</h2>
+ <div class="row">
+  <div class="box"><h3>routes/ → controllers/</h3><p>32 route files: auth, me (student), tutor, avatar, assessments, grading, curriculum, learning, analytics, usage, uploads…</p></div>
+  <div class="box"><h3>models/  (65, MongoDB)</h3><p>users, students, classes, curriculums, assessments, attempts, TutorSession, AvatarSession, errors-to-work-on, UsageLedger, AiCall…</p></div>
+  <div class="box"><h3>integrations/lms/</h3><p>LTI 1.3 adapter; core: launch, deep linking, grades (AGS) with outbox, roster (NRPS), grade ledger</p></div>
+  <div class="box"><h3>parents/ · email/ · auth/</h3><p>parent codes &amp; sign-in, approved emails (test inbox on lms-test), JWT auth, roles</p></div>
+ </div>
+ <div class="row">
+  <div class="box eng" style="flex:2.2"><h3>Tutor engine  (services/, the Tutor track)</h3>
+  <p><span class="k">languageTeachingContext.ts</span> builds the prompt (lesson, learner, age, review lines) · <span class="k">languageTurnPipeline.ts</span> one turn: prepare → model → guards (child trim, one task) → grade marker · <span class="k">engineV2.ts</span> named switches from <span class="k">ENARA_ENGINE_V2</span> (planner2, spacedReview, reviewFirst, childRule, realChat, kidsAudioVisual, avatarSpeaking, kidsSpeaking…) · <span class="k">errorsToWorkOn.ts</span> spaced and adaptive review · <span class="k">kidsPictures.ts</span> · <span class="k">avatarSpeaking.ts</span></p></div>
+  <div class="box"><h3>maintenance/  (lms-test only)</h3><p>migrations, seed, mock LMS + deploy health check, avatar-usage readout. 404 elsewhere; needs a token</p></div>
+  <div class="box"><h3>config/ · middleware/</h3><p>env + switches, AI pause and spend cap, rate limits, staging guard</p></div>
+ </div>
+</div>
+<div class="arrow">▼ outside services</div>
+
+<div class="row ext">
+ <div class="box"><h3>MongoDB Atlas</h3><p>one database per site</p></div>
+ <div class="box"><h3>Anthropic (Claude)</h3><p>tutor, grading, teacher tools</p></div>
+ <div class="box"><h3>Anam</h3><p>live avatar video, its own speech-to-text and voice</p></div>
+ <div class="box"><h3>Cloudflare R2</h3><p>uploaded files</p></div>
+ <div class="box"><h3>Resend</h3><p>email</p></div>
+ <div class="box frozen"><h3>ElevenLabs · Azure Speech</h3><p>code present; not used for the avatar / waiting for go</p></div>
+</div>
+
+<div class="lab">How a change reaches the test site</div>
+<div class="box cd"><div class="flow">
+ <span class="step">branch <b>claude/tutor-* · lms-* · parents-*</b></span>→<span class="step">PR into <b>lms-test-live</b></span>→<span class="step"><b>lms-e2e</b>: Moodle 4.5 + Playwright, 18 scenarios (<span class="k">e2e/</span>)</span>→<span class="step">guard: enara-lms-test only</span>→<span class="step">merge</span>→<span class="step">switches from <span class="k">deploy/lms-test.flags.json</span></span>→<span class="step">vercel deploy</span>→<span class="step">migrations</span>→<span class="step">health check (mock LMS)</span>→<span class="step"><b>lms-test.enara.app</b> live · rollback on failure</span>
+ </div></div>
+
+<div class="row" style="margin-top:14px">
+ <div class="box"><h3>Sites</h3><p><b>lms-test.enara.app</b>: all work happens here · <span style="color:#777"><b>test.enara.app</b>: frozen until Mohamed reopens it</span></p></div>
+ <div class="box"><h3>Three parallel tracks</h3><p>Tutor (engine, kids, avatar) · LMS (Moodle, grades, roster) · Parents (portal)</p></div>
+ <div class="box"><h3>Around the code</h3><p><span class="k">docs/</span> plans and reports · <span class="k">research/</span> learner simulations (ESL5–7b) · <span class="k">data/</span> Starters words, outcomes · <span class="k">.github/workflows</span> e2e, deploy, daily</p></div>
+</div>
+</div></body></html>
