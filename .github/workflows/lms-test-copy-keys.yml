@@ -1,0 +1,23 @@
+# One-off (owner "yes", 21 Nov 2026): copies ANAM_* and AZURE_SPEECH_* from the Vercel project behind test.enara.app
+# (read only: test.enara.app stays frozen) to enara-lms-test Production. Values are never printed (deploy/lms-test/copy-keys.mjs).
+name: lms-test copy keys
+on:
+  push:
+    branches: ['claude/tutor-lms-copykeys-run']
+    paths: ['deploy/lms-test/copy-keys.mjs', '.github/workflows/lms-test-copy-keys.yml']
+permissions:
+  contents: read
+jobs:
+  copy:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Copy named keys (values never shown)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: node deploy/lms-test/copy-keys.mjs
