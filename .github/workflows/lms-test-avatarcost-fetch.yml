@@ -1,0 +1,28 @@
+# One-off (owner, 21 Nov 2026: "include the call with Anam"): copy the JSON call records (no audio, no secrets) of the two avatar
+# test runs to the branch claude/tutor-lms-avatarcost-results, so the report can quote the full calls.
+name: lms-test avatar cost fetch
+on:
+  push:
+    branches: ['claude/tutor-lms-avatarcost-run']
+    paths: ['.github/workflows/lms-test-avatarcost-fetch.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  fetch:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: avatarcost-44936304114, path: r1, run-id: 44936304114, github-token: '${{ github.token }}' }
+      - uses: actions/download-artifact@v4
+        with: { name: avatarcost-44936617959, path: r2, run-id: 44936617959, github-token: '${{ github.token }}' }
+      - name: Publish the JSON records
+        run: |
+          mkdir out && for d in r1 r2; do mkdir -p out/$d && find $d -name '*.json' -exec cp {} out/$d/ \; ; done
+          ls -R out
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-avatarcost-results
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "avatar call records ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-avatarcost-results
