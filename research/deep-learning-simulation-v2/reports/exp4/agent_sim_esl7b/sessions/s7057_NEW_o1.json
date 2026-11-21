@@ -12,13 +12,13 @@
    "W1"
   ],
   "s": {
-   "W1": 2,
+   "W1": 1,
    "W2": 0,
-   "C1": 1,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -1369,7 +1369,112 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Look: my sister reads a book. After he, she or it, add -s or -es to the verb. Wrong: My sister read a book. Now you: He ___ (sing) every day.\" | \"Correct the verb: \"She go to bed at ten.\"\" | \"Yes, \"goes\" is right for \"She go to bed at ten.\" Good work! Now write one sentence about a person you know and what he or she does.\" | \"Correct the verb: \"My dad watch TV after dinner.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My sister reads a book at night.\" is right.\nNow write one sentence about a person you know. Use the word \"usually\".\n\nLEARNER'S LAST MESSAGE:\nMy brother usually plays football after school.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My brother usually plays football after school.\" is right. Usually comes before the verb.\nNow write one sentence about a different person you know. Use \"sometimes\" or \"never\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-frequency-adverbs (always, usually, sometimes and never). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: the adverb goes after the verb or at the start/end freely. Its error: puts the frequency adverb after the main verb (\"I go always to school by bus.\").\nC1 (correct) strength 1: always/usually/sometimes/never go before the main verb (after be). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Look: my sister reads a book. After he, she or it, add -s or -es to the verb. Wrong: My sister read a book. Now you: He ___ (sing) every day.\" | \"Correct the verb: \"She go to bed at ten.\"\" | \"Yes, \"goes\" is right for \"She go to bed at ten.\" Good work! Now write one sentence about a person you know and what he or she does.\" | \"Correct the verb: \"My dad watch TV after dinner.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"My sister reads a book at night.\" is right.\nNow write one sentence about a person you know. Use the word \"usually\".\n\nLEARNER'S LAST MESSAGE:\nMy brother usually plays football after school.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"My brother usually plays football after school.\" is right. Usually comes before the verb.\nNow write one sentence about a different person you know. Use \"sometimes\" or \"never\".",
+   "stateBefore": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"My brother usually plays football after school.\" is right."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My brother usually plays football after school."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Usually comes before the verb."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My father sometimes drinks tea.",
+    "errors": {
+     "W1": "My father drinks sometimes tea."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "freq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My father drinks sometimes tea.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My father drinks sometimes tea.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

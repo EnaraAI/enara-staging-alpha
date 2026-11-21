@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 2,
+   "W1": 0,
    "W2": 1,
    "C1": 1,
    "C2": 0
@@ -1368,7 +1368,125 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Complete: \"I ___ (visit) my aunt last weekend.\"\" | \"Now write one or two sentences about what you did last weekend.\" | \"Yes, \"I visited my aunt last weekend.\" is correct. Now write one sentence about a person you know, using a regular verb in the past.\" | \"Now write one question to a friend about last weekend. Use did.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood start: \"Did your friends\" is the right way to begin a question about the past. Now look at the word \"played\" in your sentence. Why did you choose that form? Answer in one short sentence.\n\nLEARNER'S LAST MESSAGE:\nI think the main verb keeps the past form after did.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThanks for explaining your idea. After \"did\", the main verb stays in its base form, because \"did\" already shows the past: \"Did your friends play football on Saturday?\"\nRight: \"Did she watch TV?\" Wrong: \"Did she watched TV?\"\nNow try a new one on your own. Write a question about the past from these words: you / visit / your cousin / yesterday."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Complete: \"I ___ (visit) my aunt last weekend.\"\" | \"Now write one or two sentences about what you did last weekend.\" | \"Yes, \"I visited my aunt last weekend.\" is correct. Now write one sentence about a person you know, using a regular verb in the past.\" | \"Now write one question to a friend about last weekend. Use did.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nGood start: \"Did your friends\" is the right way to begin a question about the past. Now look at the word \"played\" in your sentence. Why did you choose that form? Answer in one short sentence.\n\nLEARNER'S LAST MESSAGE:\nI think the main verb keeps the past form after did.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThanks for explaining your idea. After \"did\", the main verb stays in its base form, because \"did\" already shows the past: \"Did your friends play football on Saturday?\"\nRight: \"Did she watch TV?\" Wrong: \"Did she watched TV?\"\nNow try a new one on your own. Write a question about the past from these words: you / visit / your cousin / yesterday.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "After \"did\", the main verb stays in its base form, because \"did\" already shows the past"
+    },
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "\"Did your friends play football on Saturday?\""
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"Did she watch TV?\" Wrong: \"Did she watched TV?\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did you visit your cousin yesterday?",
+    "errors": {
+     "W1": "Did you visited your cousin yesterday?",
+     "W2": "You visited your cousin yesterday?"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R5",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "You visited your cousin yesterday?",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W2",
+    "text": "You visited your cousin yesterday?",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {

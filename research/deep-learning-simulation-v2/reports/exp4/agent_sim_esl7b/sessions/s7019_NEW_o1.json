@@ -15,8 +15,8 @@
   "s": {
    "W1": 1,
    "W2": 1,
-   "C1": 0,
-   "C2": 0.95
+   "C1": 1,
+   "C2": 1.95
   },
   "indep": {
    "C1": 0,
@@ -1443,7 +1443,114 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 1: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 0.95: there is / there are needs is or are after \"there\". Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Complete: \"___ three windows in my room.\"\" | \"Try a new one: \"___ five apples in the bag.\"\" | \"Now try this one on your own: \"___ a clock on the wall.\"\" | \"Now write one sentence about a person you know using is/are correctly.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"There are four\" is right. Now check the word after the number. After a number, the noun needs a plural ending.\nRight: \"There are two chairs.\" Wrong: \"There are two chair.\"\nPlease write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nThere are four lamps in the room.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"There are four lamps in the room.\" is correct. Now write one sentence about a person you know using is/are correctly."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-there-is-are (there is and there are). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: after a number the noun stays singular. Its error: keeps the noun singular after a number (\"There are three book.\").\nW2 (wrong) strength 1: \"there\" alone is enough, no is/are. Its error: leaves out is/are after there (\"There a cat in the garden.\").\nC1 (correct) strength 0: after a number bigger than one the noun takes plural -s, with there are. Independent correct productions so far: 0.\nC2 (correct) strength 0.95: there is / there are needs is or are after \"there\". Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Complete: \"___ three windows in my room.\"\" | \"Try a new one: \"___ five apples in the bag.\"\" | \"Now try this one on your own: \"___ a clock on the wall.\"\" | \"Now write one sentence about a person you know using is/are correctly.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"There are four\" is right. Now check the word after the number. After a number, the noun needs a plural ending.\nRight: \"There are two chairs.\" Wrong: \"There are two chair.\"\nPlease write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nThere are four lamps in the room.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"There are four lamps in the room.\" is correct. Now write one sentence about a person you know using is/are correctly.",
+   "stateBefore": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0.95
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"There are four lamps in the room.\" is correct."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"There are four lamps in the room.\" is correct."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "There are two cats in my friend's house.",
+    "errors": {
+     "W1": "There are two cat in my friend's house.",
+     "W2": "There two cats in my friend's house."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "thereis",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 1,
+     "C2": 1.95
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 1
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "There are two cats in my friend's house.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "There are two cats in my friend's house.",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
