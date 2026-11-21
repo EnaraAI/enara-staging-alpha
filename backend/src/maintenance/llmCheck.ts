@@ -49,3 +49,49 @@ export async function llmCompare(req: { system?: string; messages: { role: 'user
   const r = await deepseekClient(55_000).messages.create({ model: tutorModel()!, max_tokens: Math.min(req.max_tokens ?? 800, 2000), system: String(req.system ?? '').slice(0, 60_000), messages: req.messages.map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 8000) })) } as never) as unknown as { content: { text: string }[]; usage: unknown; stop_reason: string };
   return { ok: true, ms: Date.now() - t, text: r.content[0]?.text ?? '', usage: r.usage, stop: r.stop_reason };
 }
+
+// DeepSeek match quality check (owner go 21 Nov 2026, docs/tutor/DEEPSEEK_MATCH_PLAN.md step 6): one fake tutor turn through the REAL prompt
+// builder (buildTutorRequest: base instructions, learner line, pedagogy incl. the subject grading line and "not in the materials" line,
+// language context, course passages) and the DeepSeek adapter, with the match parts on ("match") or off ("base", as live before). Then the
+// same reading the tutor uses: the hidden line is parsed and removed, one repair call when it is missing (repairOnce), citations counted.
+// Fake learners and fake course passages only (backend/eval); numbers, model text and the parsed hidden line are returned.
+export type EvalTurn = {
+  history: { role: 'user' | 'assistant'; content: string }[]; query: string; learner?: string; languageContext?: string;
+  sources?: { fileName: string; page?: number; text: string; lessonId?: string }[]; practice?: boolean; outOfScope?: boolean; mode?: 'chat' | 'voice';
+};
+export async function tutorEval(req: { arm?: string; turn?: EvalTurn }) {
+  if (!BASE() || !KEY() || !tutorModel()) return { ok: false, reason: 'provider not configured' };
+  const t = req.turn;
+  if (!t || typeof t.query !== 'string' || !Array.isArray(t.history) || t.history.length > 40) return { ok: false, reason: 'turn: query and history (<= 40)' };
+  const { buildTutorRequest } = await import('../services/directTutorModel');
+  const { SUBJECT_GRADE_LINE } = await import('../services/subjectPractice');
+  const { OUT_OF_SCOPE_LINE } = await import('../services/groundedRefusal');
+  const { MISSING_MARKER_NOTE } = await import('../services/repairOnce');
+  const { stripAssessmentMarkers } = await import('../services/languageLearningState');
+  const { sourcesPrompt, citationsIn } = await import('../services/curriculumRetrieval');
+  const { dsParts } = await import('../services/deepseekTutor');
+  const sources = (t.sources ?? []).slice(0, 8).map((s, i) => ({ n: i + 1, chunkId: `eval-${i + 1}`, text: String(s.text).slice(0, 4000), fileName: String(s.fileName).slice(0, 120), fileUrl: '', page: s.page, lessonId: s.lessonId ?? 'eval', score: 1 }));
+  const pedagogy = [t.practice ? SUBJECT_GRADE_LINE : undefined, t.outOfScope ? OUT_OF_SCOPE_LINE : undefined].filter(Boolean).join('\n\n') || undefined;
+  const params = { query: t.query.slice(0, 4000), history: t.history.map((h) => ({ role: h.role === 'assistant' ? 'assistant' as const : 'user' as const, content: String(h.content).slice(0, 8000) })),
+    teachingMethod: 'socratic' as never, mode: t.mode === 'voice' ? 'voice' as const : 'chat' as const, learner: t.learner?.slice(0, 2000), pedagogy,
+    sourcesPrompt: sources.length ? sourcesPrompt(sources) : undefined, languageContext: t.languageContext?.slice(0, 60_000) };
+  const off = { gradeFirst: false, answerCheck: false, examples: false, replyChecks: false, tuning: false };
+  const client = deepseekClient(55_000, { parts: req.arm === 'match' ? dsParts(true) : off });
+  const ask = async (p: typeof params) => {
+    const { body } = await buildTutorRequest(p);
+    (body as { model: string }).model = tutorModel()!;
+    const r = await client.beta.messages.create(body as never) as unknown as { content: { text: string }[]; usage: { input_tokens: number; output_tokens: number } };
+    return { raw: r.content[0]?.text ?? '', usage: r.usage };
+  };
+  const t0 = Date.now();
+  let a = await ask(params); let s = stripAssessmentMarkers(a.raw); let repaired = false;
+  const usage = { ...a.usage };
+  if (!s.assessment && s.text) { // repairOnce, as the tutor does
+    repaired = true;
+    const b = await ask({ ...params, pedagogy: [params.pedagogy, MISSING_MARKER_NOTE].filter(Boolean).join('\n\n') });
+    usage.input_tokens += b.usage.input_tokens; usage.output_tokens += b.usage.output_tokens;
+    const s2 = stripAssessmentMarkers(b.raw);
+    if (s2.text && s2.assessment) { a = b; s = s2; }
+  }
+  return { ok: true, ms: Date.now() - t0, raw: a.raw, text: s.text, assessment: s.assessment, repaired, citations: citationsIn(s.text, sources).length, usage };
+}
