@@ -193,3 +193,19 @@ describe('DeepSeek speed (dsFast)', () => {
     expect(out.slice(1).join('')).toMatch(/^This isn't in your course materials/);
   });
 });
+
+describe('DeepSeek speed: young learners stay short when streamed', () => {
+  it('stops at a sentence end once the word limit for under-9s is reached', async () => {
+    const call: ChatCall = async (q) => {
+      expect(q.messages.at(-1)!.content).toMatch(/LENGTH: at most 45 words/);
+      for (const d of ['Leaves make food for the plant. ', 'They catch light from the Sun with a green colour called chlorophyll inside them. ', 'Roots take in water from the deep soil and the long stems carry that water all the way up to every single leaf on the tall plant. ', 'What colour are most leaves? ']) if (q.onDelta!(d) === false) break;
+      return { text: '', finish: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 } };
+    };
+    const out: string[] = [];
+    const r = await gradedReply({ system: 'This child is under 9. HIDDEN GRADING LINE (every reply, any subject): [[assess', messages: [{ role: 'user', content: 'what is a leaf for?' }], maxTokens: 300, parts: { gradeFirst: true, answerCheck: true, examples: false, replyChecks: true, tuning: true, fast: true }, call, onText: (t) => out.push(t) });
+    const visible = out.slice(1).join('');
+    expect(visible.split(/\s+/).filter(Boolean).length).toBeLessThanOrEqual(45);
+    expect(visible).not.toMatch(/Try the same task again/);
+    expect(r.meta.timings.cut).toBe(true);
+  });
+});

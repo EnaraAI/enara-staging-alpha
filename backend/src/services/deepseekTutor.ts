@@ -284,7 +284,8 @@ export async function gradedReply(p: { system: string; messages: ChatMsg[]; maxT
       }
     }
   }
-  const extra = [grade ? decisionNote(grade, check) : '', p.parts.examples ? examplesFor(kind, band) : ''].filter(Boolean).join('\n\n');
+  const cap = band === 'under9' ? 45 : band === 'child' ? 80 : 0; // words; a streamed reply can't be shortened afterwards, so say it up front too
+  const extra = [grade ? decisionNote(grade, check) : '', cap ? `LENGTH: at most ${cap} words in the whole reply (a young learner).` : '', p.parts.examples ? examplesFor(kind, band) : ''].filter(Boolean).join('\n\n');
   const build = (note?: string): ChatMsg[] => {
     const n = [extra, note].filter(Boolean).join('\n\n');
     return fast ? [sysMsg, ...withNote(p.messages, n)] : [{ role: 'system', content: n ? `${p.system}\n\n${n}` : p.system }, ...p.messages];
@@ -301,7 +302,7 @@ export async function gradedReply(p: { system: string; messages: ChatMsg[]; maxT
     timings.streamed = true;
     const emit = (t: string) => { if (!t) return; if (timings.firstMs === undefined) timings.firstMs = Date.now() - t0; p.onText!(t); };
     if (marker) p.onText(marker);
-    let buf = ''; let sent = ''; let first = true; let stop = false; let redo: string[] | null = null;
+    let buf = ''; let sent = ''; let first = true; let stop = false; let tooLong = false; let redo: string[] | null = null;
     const r0 = Date.now();
     const leaks = (sentence: string) => p.parts.replyChecks && grade ? problems(`${sentence} ?`).some((x) => x.startsWith('You gave the correct answer away')) : false;
     const flush = (sentence: string): boolean => {
@@ -313,6 +314,7 @@ export async function gradedReply(p: { system: string; messages: ChatMsg[]; maxT
         }
       }
       if (leaks(sentence)) { stop = true; timings.cut = true; regenerated.push('answer given away mid-stream: ended with "try again"'); return false; }
+      if (cap && sent && words(sent + sentence) > cap) { stop = true; timings.cut = true; tooLong = true; return false; } // young learner: stop at a sentence end
       emit(sentence); sent += sentence; return true;
     };
     const r = await p.call({ messages: build(), max_tokens: p.maxTokens, temperature, onDelta: (d) => {
@@ -331,7 +333,7 @@ export async function gradedReply(p: { system: string; messages: ChatMsg[]; maxT
       regenerated.push(...redoNow);
       const g0 = Date.now(); const again = await write(regenNote(redoNow)); timings.regenMs = Date.now() - g0;
       emit(again.text); sent = again.text;
-    } else if (stop) {
+    } else if (stop && !tooLong) {
       const ending = TRY_AGAIN(/[\u0600-\u06FF]/.test(sent + learnerText));
       emit(sent ? ` ${ending}` : ending); sent += sent ? ` ${ending}` : ending;
     }
