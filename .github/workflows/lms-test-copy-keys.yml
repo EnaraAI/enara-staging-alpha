@@ -1,14 +1,13 @@
-# One-off (owner "yes", 21 Nov 2026): copies named keys (21 Nov: ANAM_*, then ELEVENLABS_*) from the Vercel project behind test.enara.app
-# (read only: test.enara.app stays frozen) to enara-lms-test Production. Values are never printed (deploy/lms-test/copy-keys.mjs).
-name: lms-test copy keys
+# One-off (owner "Turn AI on", 21 Nov 2026): AI_PAUSED=false on enara-lms-test Production only (deploy/lms-test/ai-on.mjs).
+name: lms-test ai on
 on:
   push:
-    branches: ['claude/tutor-lms-copykeys-run']
-    paths: ['deploy/lms-test/copy-keys.mjs', '.github/workflows/lms-test-copy-keys.yml']
+    branches: ['claude/tutor-lms-aion-run']
+    paths: ['deploy/lms-test/ai-on.mjs', '.github/workflows/lms-test-copy-keys.yml']
 permissions:
   contents: read
 jobs:
-  copy:
+  aion:
     if: github.repository == 'EnaraAI/enara-staging-alpha'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -17,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Copy named keys (values never shown)
+      - name: Set AI_PAUSED=false (lms-test only)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: node deploy/lms-test/copy-keys.mjs
+        run: node deploy/lms-test/ai-on.mjs
