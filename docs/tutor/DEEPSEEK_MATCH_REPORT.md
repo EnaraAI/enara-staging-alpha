@@ -99,6 +99,39 @@ Tutor track, lms-test only. test.enara.app stayed frozen, and no key was shown o
   - 29 of the 30 test calls are used, and the test is paused.
 - **Bug found:** a refused call still logs about 31 s of avatar time in our cost record. I can fix it if you want.
 
+## The live avatar calls with Anam (tutor on DeepSeek)
+These are synthetic learner voices on lms-test. Anam turns speech into text and speaks the reply; our tutor writes the reply (DeepSeek) and puts a picture on the screen.
+"First words" is the time from the end of the learner's sentence to the tutor's first text. "Voice starts" is the time until the avatar starts speaking. "Server" is the tutor's own time on lms-test.
+
+### Call a01: adult woman (Amy), 74 s
+- **Connected** in 2.5 s. Anam session 71.3 s.
+- **Ended:** ended normally.
+
+| # | Learner said | Anam heard | Tutor (DeepSeek) replied | First words | Voice starts |
+|---|---|---|---|---|---|
+| 1 | I have a cat. | I have a cat. ✓ | Nice sentence! I'm putting it on the screen so we can build on it. "I have a cat" is clear and correct. Now let's stretch it a little. Can you add one more word to describe your cat, like its colour or size? | 1.7 s | 2.7 s |
+| 2 | My sister is ten. | My sister is ten. ✓ | Good sentence, that's correct. Let's use the sentence on screen as your model. "My sister is ten" tells us her age. Can you make one about your cat using the same shape, so "My cat is" and then a describing word? | 1.4 s | 2.3 s |
+| 3 | I like apples. | I like apples. ✓ | Nice one, "I like apples" is correct and clear. I'm still using the sentence on the screen. Now try swapping apples for something you really like. What food would you put after "I like"? | 1.6 s | 2.4 s |
+| 4 | He can swim. | He can swim. ✓ | Good, "He can swim" is a correct sentence. Now let's say what someone cannot do. Using the same shape, can you make a sentence starting with "She can't"? | 1.5 s | 2.0 s |
+
+### Call a02: adult man (Ryan), 37 s
+- **Connected** in 2.3 s. Anam session 35.1 s.
+- **Ended:** Anam closed the connection during the 3rd sentence. This was most likely the usage limit: every later call was refused with that message.
+
+| # | Learner said | Anam heard | Tutor (DeepSeek) replied | First words | Voice starts |
+|---|---|---|---|---|---|
+| 1 | My name is Sara. | My name is Sarah. (Sara → Sarah) | Nice to meet you, Sarah! I'm putting a speaking-practice card on the screen next to me. Let's warm up with one easy question. When you meet someone new, what do you usually say first? | 1.3 s | 2.8 s |
+| 2 | I live in a big house. | I live in a big house. ✓ | Good sentence, Sarah! Now let's build on it. Look at the card on the screen. Can you add one more detail, like who lives in the house with you? | 2.2 s | 3.6 s |
+| 3 | She has a red bag. | — (cut off) | — | — | — |
+
+**Summary of the two calls**
+- **Speech to text:** 6 of 6 sentences heard right. "Sara" was written "Sarah", the same name.
+- **Tutor time on the server:** 1.2, 1.1, 1.2, 1.0, 1.0, 1.3 s.
+- **Timings:** the first words came after 1.3–2.2 s, and the avatar started speaking after 2.0–3.6 s.
+- **Replies:** short and spoken, one task each, and each says whether the sentence was right. The tutor put a picture or practice card on the screen at the start of each call (the avatar visuals, now on DeepSeek).
+- **Model cost of call a01** (72 s): $0.0035 for the replies and $0.0008 for the visual, at the upper-bound price.
+- **Calls a03–a20 and the 5 child-voice calls (c01–c05):** none started. Anam answered "Usage limit reached, please upgrade your plan".
+
 ## How to switch back
 - When you say **"key set"** (a valid `ANTHROPIC_API_KEY`), I'll open one PR that sets `TUTOR_LLM_PROVIDER=anthropic`.
 - Everything listed above then goes back to Claude: tutor, avatar, staff features.
