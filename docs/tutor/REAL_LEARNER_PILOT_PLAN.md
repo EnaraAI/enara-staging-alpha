@@ -36,3 +36,27 @@ Status: **plan only.** It starts only after the legal review and the consents ar
 - Consent forms in English and Arabic.
 - The schools and classes.
 - The allowlist change (about half a day), with its tests and E2E.
+
+## Added 21 Nov 2026 (NEXT_PLAN items 1 and 5): checked only with real learners
+The simulation cannot judge these two, so they are part of the pilot. Children's speaking stays off until the legal review and parent consent.
+
+**`kidsAudioVisual` (under 9): pictures and read-aloud; speaking off.**
+
+| | |
+|---|---|
+| Measures | Share of picture tasks answered by tap; first-try right rate on picture vs typed tasks; time per task; teacher observation of confusion (a wrong or unclear picture). |
+| Safety | A teacher is present; pictures come only from the reviewed set (OpenMoji, or the drawn set if the owner approves it). |
+
+**`avatarSpeaking` (live avatar): speaking practice; pronunciation tips for adults only.**
+
+| | |
+|---|---|
+| Measures | Reply latency (p50 ≤ 1.5 s, p90 ≤ 2.5 s, from the stored times); cost per session (avatar minutes + speech-to-text + pronunciation seconds); learners' use of the tip (the same word said better on the next try, from transcripts and codes); drop-outs during calls. |
+| Minors | No pronunciation clips or speaking practice until the legal review and written parent consent, plus a teacher/parent off switch. |
+| Data | Audio is never stored; only the one-line summary and two focus words, deleted with the call. |
+
+**Before either is in the pilot:**
+- the legal review result (speaking for minors);
+- the Azure Speech key, the pronunciation flag and its price on lms-test;
+- the Anam key on lms-test;
+- the measured cost per session, reported to the owner, who then decides the speaking cost cap.
