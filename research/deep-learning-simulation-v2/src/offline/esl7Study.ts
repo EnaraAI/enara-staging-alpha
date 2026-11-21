@@ -740,6 +740,25 @@ async function main() {
     const round = a3 ? Number(a3) : currentRound(dir); if (round === undefined) { console.log('(no session needs a tutor reply)'); return; } let n = 0;
     for (const key of cell.keys) { const s = load(dir, key); if (pendingRound(s) !== round) continue; console.log(`\n########## SESSION ${key} ##########\n${tutorPrompt(dir, s)}`); n++; }
     console.log(`\n(${n} session(s) need a tutor reply in this cell, round ${round})`);
+  } else if (cmd === 'exportturns') {
+    // DeepSeek comparison (owner, 21 Nov 2026): 20 past NEW-arm tutor turns, 5 per age group (right, wrong and stuck learners), each with the
+    // prompt rebuilt as it was for that turn (conversation up to the learner's message; memory as stored now) and the saved Claude reply.
+    const dir = dirArg(a1); const out: object[] = []; const want: Record<string, number> = { u9: 5, '9-12': 5, teen: 5, adult: 5 }; const kinds = ['right', 'wrong', 'stuck'];
+    const have: Record<string, Record<string, number>> = {};
+    for (const f of sessionFiles(dir).filter((x) => x.includes('_NEW_'))) {
+      const s = load(dir, f.replace(/\.json$/, '')); const g = L_OF(s.learnerIdx).ageGroup as string; if (!want[g]) continue;
+      for (let k = 1; k < s.turns.length && want[g] > 0; k++) {
+        const t = s.turns[k] as any; if (!t.raw || !t.lang) continue;
+        const v = t.lang.assessment?.verdict; const kind = (t.lang.hintLevel ?? 0) > 0 || /don'?t know|not sure|help/i.test(String(t.learner)) ? 'stuck' : v === 'CORRECT' ? 'right' : v === 'INCORRECT' ? 'wrong' : null;
+        if (!kind) continue; const hk = (have[g] ??= {}); const need = kinds.find((x) => !(hk[x] > 0)) ?? kind; if (kind !== need && hk[kind] >= 2) continue;
+        const s2 = { ...s, turns: [...s.turns.slice(0, k), { session: t.session, learner: t.learner, production: t.production }] } as typeof s;
+        let prompt: string; try { prompt = tutorPrompt(dir, s2); } catch { continue; }
+        out.push({ id: `${f.replace(/\.json$/, '')}#${k}`, ageGroup: g, kind, learner: t.learner, prompt, claude: t.raw });
+        hk[kind] = (hk[kind] ?? 0) + 1; want[g] -= 1; k += 3;
+      }
+      if (Object.values(want).every((n) => n <= 0)) break;
+    }
+    write(path.join(dir, 'DEEPSEEK_TURNS.json'), out); console.log(JSON.stringify({ turns: out.length, byGroup: have }));
   } else if (cmd === 'promptcheck') {
     const dir = dirArg(a1); const FORB = forbidden(); const round = currentRound(dir); let n = 0; const bad: string[] = []; const pp: string[] = [];
     for (const s of allSessions(dir)) {
