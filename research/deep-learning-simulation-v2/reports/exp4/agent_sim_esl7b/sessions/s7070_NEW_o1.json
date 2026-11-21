@@ -14,11 +14,11 @@
   "s": {
    "W1": 0,
    "W2": 0,
-   "C1": 1.95,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "start": {
@@ -28,7 +28,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -1257,7 +1259,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1.95: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: \"We ___ (watch) a film last weekend.\"\" | \"Try the same sentence again: \"We ___ (watch) a film last weekend.\"\" | \"Now try one on your own. Complete: \"My sister ___ (clean) her room yesterday.\"\" | \"Now write one sentence about a person you know using -ed for regular verbs.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Quick warm-up first.\nComplete with the past simple of 'help': Last Saturday my brother ___ me with my homework.\n\nLEARNER'S LAST MESSAGE:\nhelped\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"helped\" is right: it is the past form of 'help'. Now write one or two sentences about what you did last weekend. Use verbs with -ed."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-simple-regular (the past simple with -ed). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a time word shows the past, so the verb need not change. Its error: leaves the verb in the present form with a past time word (\"Yesterday I play football.\").\nC1 (correct) strength 1.95: a finished past event takes verb + -ed, even with a time word. Independent correct productions so far: 2.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: \"We ___ (watch) a film last weekend.\"\" | \"Try the same sentence again: \"We ___ (watch) a film last weekend.\"\" | \"Now try one on your own. Complete: \"My sister ___ (clean) her room yesterday.\"\" | \"Now write one sentence about a person you know using -ed for regular verbs.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello again! Quick warm-up first.\nComplete with the past simple of 'help': Last Saturday my brother ___ me with my homework.\n\nLEARNER'S LAST MESSAGE:\nhelped\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"helped\" is right: it is the past form of 'help'. Now write one or two sentences about what you did last weekend. Use verbs with -ed.",
+   "stateBefore": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"helped\" is right: it is the past form of 'help'."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "Yes, \"helped\" is right: it is the past form of 'help'."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Last weekend I visited my grandmother.",
+    "errors": {
+     "W1": "Last weekend I visit my grandmother."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastreg",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Last weekend I visited my grandmother.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Last weekend I visited my grandmother.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

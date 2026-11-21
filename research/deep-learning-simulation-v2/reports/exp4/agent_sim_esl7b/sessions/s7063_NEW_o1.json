@@ -13,9 +13,9 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 1,
-   "C1": 1.95,
+   "C1": 2.95,
    "C2": 0
   },
   "indep": {
@@ -29,7 +29,9 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true
@@ -1262,7 +1264,112 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 1.95: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 1.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"You are at a guest house. Ask the receptionist for another pillow.\" | \"Your message says what you want, but it is a command, not a polite request. Wrong: \"Could I has a menu, please?\" Now you are at a cafe. Ask the waiter for some water.\" | \"Try again: ask the waiter for some water.\" | \"Now try one on your own. You are in class and you need a pen. Ask your friend.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Good to see you again. Let us start with a short writing task.\nYou are at a guest house. Ask the receptionist for another pillow.\n\nLEARNER'S LAST MESSAGE:\nCould I have another pillow, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"Could I have another pillow, please?\" is a polite request.\nExample: you need a pen. You write: \"Could I borrow a pen, please?\" Rule: begin with Could I or Can I, then the verb, then please.\nRight: \"Can I open the window, please?\" Wrong: \"Can open I the window, please?\"\nYou did not answer your aunt's phone call. Say sorry and why."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 1.95: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 1.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"You are at a guest house. Ask the receptionist for another pillow.\" | \"Your message says what you want, but it is a command, not a polite request. Wrong: \"Could I has a menu, please?\" Now you are at a cafe. Ask the waiter for some water.\" | \"Try again: ask the waiter for some water.\" | \"Now try one on your own. You are in class and you need a pen. Ask your friend.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Good to see you again. Let us start with a short writing task.\nYou are at a guest house. Ask the receptionist for another pillow.\n\nLEARNER'S LAST MESSAGE:\nCould I have another pillow, please?\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"Could I have another pillow, please?\" is a polite request.\nExample: you need a pen. You write: \"Could I borrow a pen, please?\" Rule: begin with Could I or Can I, then the verb, then please.\nRight: \"Can I open the window, please?\" Wrong: \"Can open I the window, please?\"\nYou did not answer your aunt's phone call. Say sorry and why.",
+   "stateBefore": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 1.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"Could I have another pillow, please?\" is a polite request."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: begin with Could I or Can I, then the verb, then please."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I'm sorry I did not answer your call. I was at the shop.",
+    "errors": {
+     "W1": "Sorry."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 2.95,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I'm sorry I did not answer your call. I was at the shop.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I'm sorry I did not answer your call. I was at the shop.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

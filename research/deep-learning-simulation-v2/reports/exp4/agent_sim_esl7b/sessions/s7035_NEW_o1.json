@@ -13,7 +13,7 @@
    "W2"
   ],
   "s": {
-   "W1": 1,
+   "W1": 0,
    "W2": 1,
    "C1": 1.95,
    "C2": 1.95
@@ -29,8 +29,12 @@
    "C2": 0
   },
   "retr": {
-   "C1": [],
-   "C2": []
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
   },
   "afterF1": true
  },
@@ -1305,7 +1309,116 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1.95: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 1.\nC2 (correct) strength 1.95: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Complete: \"Take an umbrella. It is ___ today.\"\" | \"\"rain\" is not the right kind of word after \"It is\". Example: the trees move a lot. Think: I describe the weather with a describing word. The word is \"windy\": \"It is windy.\" Rule: after \"It is\", use a \" | \"Yes, \"rainy\" is a describing word that fits the weather. Now write one sentence about a person you know, using a weather word.\" | \"Complete: \"My hat flew away! It is very ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Let's start with a quick check.\nComplete the sentence with the right form of the word in brackets: Look at the sky. It is very ___ (cloud) today.\n\nLEARNER'S LAST MESSAGE:\ncloud\nFACT: the last learner message contained the error of W1 (uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\")).\n\nTUTOR TURN TO JUDGE:\nThe rule: after \"It is\", use the adjective, not the noun. For example, \"It is rainy\", not \"It is rain\".\n\nNow a new check. Write the full word with the missing letter: w_ndy"
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 1: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 1.95: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 1.\nC2 (correct) strength 1.95: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 1.\nItems this learner answered in session 1: \"Complete: \"Take an umbrella. It is ___ today.\"\" | \"\"rain\" is not the right kind of word after \"It is\". Example: the trees move a lot. Think: I describe the weather with a describing word. The word is \"windy\": \"It is windy.\" Rule: after \"It is\", use a \" | \"Yes, \"rainy\" is a describing word that fits the weather. Now write one sentence about a person you know, using a weather word.\" | \"Complete: \"My hat flew away! It is very ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nHello! Let's start with a quick check.\nComplete the sentence with the right form of the word in brackets: Look at the sky. It is very ___ (cloud) today.\n\nLEARNER'S LAST MESSAGE:\ncloud\nFACT: the last learner message contained the error of W1 (uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\")).\n\nTUTOR TURN TO JUDGE:\nThe rule: after \"It is\", use the adjective, not the noun. For example, \"It is rainy\", not \"It is rain\".\n\nNow a new check. Write the full word with the missing letter: w_ndy",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 1,
+     "W2": 1,
+     "C1": 1.95,
+     "C2": 1.95
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The rule: after \"It is\", use the adjective, not the noun."
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "\"It is rainy\", not \"It is rain\"."
+    }
+   ],
+   "retrieval": [
+    "C1",
+    "C2"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W2"
+    ],
+    "correct": "windy",
+    "errors": {
+     "W2": "wndy"
+    }
+   },
+   "applied": [
+    "R1:W1",
+    "R2:W1",
+    "retrieval:C1",
+    "retrieval:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1.95,
+     "C2": 1.95
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 1
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "windy",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "windy",
+    "probes": [
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
