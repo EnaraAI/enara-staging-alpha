@@ -167,6 +167,7 @@ export async function completeLanguageTurn(opts: {
     ...(opts.removed ? { preAttemptModelsRemoved: opts.removed } : {}),
     // ownSentence (ESL5, tag only): the task counts as set only when the reply actually set it; feedback is tagged on the next turn.
     ...(ownSentenceNow(language) === 'ask' && OWN_SENTENCE_SET.test(opts.reply) ? { ownSentence: 'asked' as const } : ownSentenceNow(language) === 'feedback' ? { ownSentence: 'feedback' as const } : {}),
+    ...(language.realChat ? { realChat: language.realChat } : {}),
     ...(opts.closingAsk ? { closingAsk: opts.closingAsk } : {}),
     ...(opts.guardHits ? { exampleGuardHits: opts.guardHits } : {}),
     ...(opts.regenerated !== undefined ? { exampleGuardRegenerated: opts.regenerated } : {}),

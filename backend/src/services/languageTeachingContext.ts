@@ -390,6 +390,8 @@ export interface LanguageTeachingContext {
   prevMoves?: string[];
   // v2 (ruleFirst): rules (success criteria) that this reply must introduce, computed from history; recorded in the turn evidence once the reply is stored.
   ruleFirst?: { criteria: number[]; texts: string[] };
+  // realChat (NEXT_PLAN item 3): this reply is turn 1 or 2 of the session's short real conversation.
+  realChat?: number;
   // v2 (levelExplicit): this learner is explicit-first for this objective (A1-A2 course, or objective record not_assessed/emerging). Set only when the switch is on.
   explicitFirst?: boolean;
   // v2 (arbitration): primary method of the active teaching plan.
@@ -497,6 +499,8 @@ export interface LanguageTurnEvidence {
   fadeFailed?: number[];
   // ownSentence (ESL5, tag only): 'asked' when this reply set the session's own-sentence task, 'feedback' when it gave feedback on it.
   ownSentence?: 'asked' | 'feedback';
+  // realChat (tag only): this reply was conversation turn 1 or 2 of the session's short real chat.
+  realChat?: number;
   // TRACK 2 (tags only, no learner text): rule-bank entry and template, the worked example's form, the feedback rung, interleaving, the under-13 frame;
   // example-guard hits on the model's draft (and whether a regeneration cleared them), and post-check problems.
   teach2?: { rule?: string; template?: 'grammar' | 'vocab'; model?: string; rung?: FeedbackRung; interleave?: true; kidsFrame?: true };
@@ -2326,6 +2330,31 @@ export const LAD_STEP_DROPPED = new Set<MoveId>(['present_lesson_item', 'indepen
 export const LAD_STEP_LINE = 'LISTEN AND DO (set by the system): this reply is ONLY the listen-and-do step in the learning focus above (the story, ONE instruction, or the chant), in at most 3 short sentences. Do not give a lesson exercise, a fill-in item, a rule or a right/wrong pair in this reply. This overrides any instruction above to give an exercise or an item.';
 /** planner2 quick check: moves that teach or correct, removed in the quick-check reply. */
 export const QUICK_CHECK_DROPPED = new Set<MoveId>(['corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'l1_support', 'activate_prior_knowledge']);
+/** realChat (NEXT_PLAN item 3): after the first exercises, two replies are a short real conversation, then back to the lesson. */
+export const REAL_CHAT_FROM = 3;   // tutor replies already given this session before the chat may start
+export const REAL_CHAT_TURNS = 2;
+export const CHILD_CHAT_TOPICS = ['animals', 'food', 'colours', 'toys and games', 'sport', 'school', 'weather and seasons'] as const;
+/** Which chat reply this is (1 or 2), or undefined. Pure: from the stored tags of this session's replies. */
+export function realChatStep(history: { role: string; languageTurn?: unknown }[], s: Pick<TurnSignals, 'answeringCheck' | 'keyVerdict'>): number | undefined {
+  if (!engineV2('realChat')) return undefined;
+  const tutor = history.filter((h) => h.role === 'assistant');
+  const done = tutor.filter((h) => typeof (h.languageTurn as { realChat?: number } | null | undefined)?.realChat === 'number').length;
+  if (done >= REAL_CHAT_TURNS) return undefined;
+  if (done === 1) return 2;
+  if (tutor.length < REAL_CHAT_FROM) return undefined;
+  // Not in the middle of an exercise: start after a right answer or when no answer is open.
+  if (s.answeringCheck && !(s.keyVerdict && isSuccess(s.keyVerdict))) return undefined;
+  return 1;
+}
+export const REAL_CHAT_LINE = (step: number, child: boolean) => {
+  const topics = child
+    ? `Choose ONE topic from this list only: ${CHILD_CHAT_TOPICS.join(', ')}.`
+    : 'Use one of their interests listed above if there is one; otherwise an everyday topic (food, sport, music, films, travel, work or study).';
+  const safety = 'Never ask for personal details (address, phone, school name, photos, other people\'s names) or about private or upsetting matters.';
+  return step === 1
+    ? `REAL CHAT (set by the system), reply 1 of 2: if they just answered, confirm it in a few words. Then start a short, friendly real conversation: ask ONE simple question about a topic. ${topics} ${safety} No exercise in this reply. English only.`
+    : `REAL CHAT (set by the system), reply 2 of 2: answer what they said like a friendly person would, in one or two short sentences. If their message has an error in today's target form, say that part back correctly inside your answer (a recast: no grammar explanation, at most one correction). Then go back to the lesson and present the next lesson exercise. ${safety} English only.`;
+};
 /** mixedReview (NEXT_PLAN item 2): a review item mixes the reviewed point with another known point, so the learner must decide which rule applies. */
 export const MIXED_ITEM_CLAUSE = ' Make this item a MIXED one: it needs the reviewed point AND one other point they know (today\'s lesson point, or a form often confused with it) in the same item, for example two gaps that need different forms, or a choice between the two forms, so they must decide which rule fits. Still one task, and no rule or hint before their try.';
 export const mixedReviewOn = (): boolean => engineV2('mixedReview') && engineV2('spacedReview');
@@ -2410,6 +2439,12 @@ export async function buildLanguageTeachingContext(params: {
     // reviewFirst: the session's first one or two replies are the due spaced reviews (REVIEW_FIRST_PLAN): no lesson item, quick check or rule line.
     const rf = reviewFirstAdjust({ signals: adjusted.signals, moves: adjusted.moves, history: params.history, reviewsDue: params.reviewsDue });
     const reviewStep = rf.step; adjusted.signals = rf.signals; adjusted.moves = rf.moves;
+    // realChat: two conversation replies after the first exercises (not during the reviews, the quick check or a closing turn).
+    const chatStep = reviewStep || params.quickCheck ? undefined : realChatStep(params.history, adjusted.signals);
+    if (chatStep === 1 && adjusted.signals.presentLessonItem) {
+      const { presentLessonItem: _skip2, ...rest2 } = adjusted.signals;
+      adjusted.signals = rest2 as TurnSignals; adjusted.moves = adjusted.moves.filter((m) => m.id !== 'present_lesson_item');
+    }
     const quickCheck = Boolean(params.quickCheck) && engineV2('planner2') && !reviewStep;
     const signals = adjusted.signals;
     // planner2 quick check: only presenting and recording; every teaching or correcting move is dropped for these 3 items.
@@ -2427,9 +2462,9 @@ export async function buildLanguageTeachingContext(params: {
     const outcomeId = ruleBankEntry(params.objectiveCode) ? params.objectiveCode : params.objectiveId;
     const teach2 = buildTeach2({ signals, lesson, moves, learner }, { objectiveId: outcomeId, history: params.history, assessmentItems: engineV2('exampleGuard') || engineV2('ruleBank') ? await loadObjectiveItems(params.institutionId, [params.objectiveId, params.objectiveCode, outcomeId]) : [] });
     const { explicit, ruleFirst } = quickCheck || reviewStep ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
-    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}), ...(teach2 ? { teach2 } : {}) } as const;
+    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(chatStep ? { realChat: chatStep } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}), ...(teach2 ? { teach2 } : {}) } as const;
     const parts0 = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
-    const tail = reviewStep ? REVIEW_FIRST_LINE(reviewStep, params.reviewsDue ?? 1) : quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
+    const tail = reviewStep ? REVIEW_FIRST_LINE(reviewStep, params.reviewsDue ?? 1) : chatStep ? REAL_CHAT_LINE(chatStep, learner.ageBand.status === 'known' && learner.ageBand.value === 'child') : quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
     const parts = parts0 && tail ? { ...parts0, dynamic: `${parts0.dynamic}\n\n${tail}` } : parts0;
     const prompt = renderLanguageContextPrompt(base);
     return { ...base, ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), ...(taskStep ? { taskStep: true } : {}), ...(parts ? { parts } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt };
