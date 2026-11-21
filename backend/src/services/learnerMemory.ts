@@ -251,6 +251,32 @@ export async function habitsFor(studentId: string, now = new Date()): Promise<Ha
 }
 
 // Phase 4: what works (view only).
+// methodFromEvidence (owner go 21 Nov 2026, ARCH_ADOPTION_PLAN G, ARCHITECTURE.md §8 experiential memory): the planner may prefer the main
+// method this learner has most often succeeded after (independent success: right first time, no hint), from their own sessions.
+export const methodFromEvidenceOn = (): boolean => engineV2('methodFromEvidence');
+export const EVIDENCE_MIN_SESSIONS = 3;
+export const EVIDENCE_MARGIN = 0.15;
+/** The method that clearly worked best for this learner: at least 3 sessions with it, and a success rate at least 15 points above
+ *  their overall rate. Undefined when the evidence is thin or no method stands out. Observational, so the margin is deliberately large. */
+export function bestMethod(stats: MethodStat[]): string | undefined {
+  const total = stats.reduce((a, s) => a + s.sessions, 0);
+  if (!total) return undefined;
+  const overall = stats.reduce((a, s) => a + s.withIndependentSuccess, 0) / total;
+  const top = stats.filter((s) => s.sessions >= EVIDENCE_MIN_SESSIONS && s.rate >= overall + EVIDENCE_MARGIN).sort((a, b) => b.rate - a.rate || b.sessions - a.sessions)[0];
+  return top?.method;
+}
+const bestCache = new Map<string, { at: number; v: string | undefined }>();
+/** bestMethod for a learner (their last 90 days), cached 15 minutes per learner; never throws. */
+export async function bestMethodFor(studentId: string, now = new Date()): Promise<string | undefined> {
+  if (!methodFromEvidenceOn()) return undefined;
+  const hit = bestCache.get(studentId);
+  if (hit && now.getTime() - hit.at < 15 * 60_000) return hit.v;
+  let v: string | undefined;
+  try { v = bestMethod((await whatWorksFor(studentId, now)).methods); } catch { v = undefined; }
+  bestCache.set(studentId, { at: now.getTime(), v });
+  return v;
+}
+
 export async function whatWorksFor(studentId: string, now = new Date()) {
   const TutorSession = await sessionsModel();
   const { loadMessagesForSessions } = await import('./tutorMessages');

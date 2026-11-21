@@ -20,7 +20,7 @@ import { applicationGapFrom, examContextFor } from './assessmentEvidenceContext'
 import { isAdultSchool, isFeatureEnabled, isShadowMode } from './featureFlags';
 import { engineV2 } from './engineV2';
 import { errorsForTutor } from './errorsToWorkOn';
-import { learnerBrief, memoryLines } from './learnerMemory';
+import { bestMethodFor, learnerBrief, memoryLines } from './learnerMemory';
 import { PEDAGOGY_PLAN_VERSION, selectTeachingPlan, belowB1, type PlanInput, type TeachingPlan } from './pedagogyPolicy';
 import { REGISTRY_VERSION, STRATEGY_BY_ID } from './strategyRegistry';
 
@@ -189,6 +189,8 @@ export async function buildObjectiveContext(params: {
         ? await StudentObjectiveMastery.countDocuments({ studentId: params.studentId, objectiveId: { $in: relatedObjectives.map((o) => o.id) }, masteryStatus: { $in: [...MET] } })
         : 0,
     };
+    // methodFromEvidence: the method that clearly worked for this learner before (their own sessions; cached; off: nothing).
+    if (engineV2('methodFromEvidence') && params.studentId) { const m = await bestMethodFor(params.studentId); if (m) input.evidenceMethod = m; }
     // workOn (learner memory phase 1): errors from released assessments open the session (gated in errorsToWorkOn.ts). Off: nothing.
     const workOn = engineV2('workOn')
       ? await errorsForTutor({ studentId: params.studentId, institutionId: params.institutionId, courseId: objective.courseId ? String(objective.courseId) : undefined,

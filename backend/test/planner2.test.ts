@@ -210,8 +210,11 @@ describe('coverage', () => {
       { ageBand: 'child', ageYears: 7, level: 'A1', ladContent: true }, { ageBand: 'child', ageYears: 7, level: 'A1' }, { ageBand: 'child', ageYears: 10, level: 'A2' }, { ageBand: 'unknown' }, { ageBand: 'adult', level: 'Pre-A1' },
       { ageBand: 'adult', level: 'B1', goal: 'daily' }, { ageBand: 'adult', level: 'C1', goal: 'exam' },
     ];
-    for (const env of ['', ESL]) withEnv(env, () => {
-      for (const i of inputs) for (const s of sigs) {
+    // methodFromEvidence (ARCH_ADOPTION_PLAN G): a third pass where part of the grid carries a method that worked for the learner.
+    const EV = ['worked_example', 'analogy', 'retrieval_practice', 'socratic_questioning', 'guided_practice'];
+    for (const env of ['', ESL, `${ESL},methodFromEvidence`]) withEnv(env, () => {
+      const set = env.includes('methodFromEvidence') ? inputs.slice(0, 400).map((x, n) => ({ ...x, evidenceMethod: EV[n % EV.length] })) : inputs;
+      for (const i of set) for (const s of sigs) {
         const lp = planLesson(i, s);
         reachedRows.add(lp.methodRule);
         const p = lp.plan.primary;
