@@ -12,7 +12,7 @@ import { seedLmsTest } from './lmsTestSeed';
 import { mockLmsRouter } from './mockLms';
 import { runHealthCheck, setupHealthCheck } from './healthCheck';
 import { avatarUsageReport, parseAvatarIds } from './avatarUsageReport';
-import { llmCheck, llmCompare } from './llmCheck';
+import { llmCheck, llmCompare, tutorEval } from './llmCheck';
 
 // Maintenance for the LMS TEST deployment only (lms-test.enara.app): 404 unless
 // switched on AND MONGODB_URI is the test cluster AND a maintenance token is
@@ -301,6 +301,10 @@ router.get('/llm-check', async (_req, res, next) => {
 });
 router.post('/llm-compare', async (req, res, next) => {
   try { res.json(await llmCompare(req.body ?? {})); } catch (e) { next(e); }
+});
+// DeepSeek match quality check: one fake tutor turn through the real prompt builder and the adapter, match parts on or off.
+router.post('/tutor-eval', async (req, res, next) => {
+  try { res.json(await tutorEval(req.body ?? {})); } catch (e) { next(e); }
 });
 
 export default router;

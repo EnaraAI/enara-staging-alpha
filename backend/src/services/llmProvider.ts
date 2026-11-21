@@ -12,6 +12,7 @@
 // grading) run on the reply exactly as before. Documents sent as PDF blocks cannot be read by this model: they are left out (passages
 // from the school's materials are text and are kept).
 import type Anthropic from '@anthropic-ai/sdk';
+import { type ChatCall, type ChatMsg, type DsParts, dsParts, gradedReply, isGraded } from './deepseekTutor';
 
 export const tutorProvider = (): 'deepseek' | 'anthropic' => (process.env.TUTOR_LLM_PROVIDER?.trim().toLowerCase() === 'deepseek' ? 'deepseek' : 'anthropic');
 export const tutorModel = (): string | undefined => process.env.TUTOR_LLM_MODEL?.trim() || undefined;
@@ -48,9 +49,9 @@ export const reasoningModeUsed = () => Object.keys(REASONING_OFF[reasoningMode])
 // instructions best) lifted valid lines to 18 of 20. Added only when the request asks for the hidden line; repairOnce covers the rest.
 export const DEEPSEEK_REMINDER = 'Rules for this reply, most important first:\n1. Your reply MUST start with the hidden line [[assess verdict=... relevance=... next=...]] in exactly the format described above. Never leave it out.\n2. Reply to the STUDENT\'s LAST message in the conversation: judge that answer first (right, partly right or wrong; a spelling slip is an error), then give exactly ONE task.\n3. Keep to the length limits for this learner. No stories, lists or worked examples unless the instructions above ask for one now.';
 /** Anthropic-style request -> chat-completions request. */
-export function toChat(body: ABody, stream: boolean): Record<string, unknown> {
+export function toChat(body: ABody, stream: boolean, opts: { reminder?: boolean } = {}): Record<string, unknown> {
   const base = textOf(body.system as string | Block[] | undefined);
-  const system = base.includes('[[assess') ? `${base}\n\n${DEEPSEEK_REMINDER}` : base;
+  const system = base.includes('[[assess') && opts.reminder !== false ? `${base}\n\n${DEEPSEEK_REMINDER}` : base;
   const messages = [
     ...(system ? [{ role: 'system', content: system }] : []),
     ...body.messages.map((m) => ({ role: m.role, content: textOf(m.content) })).filter((m) => m.content),
@@ -134,11 +135,57 @@ function streamOf(body: ABody, timeout: number) {
   return { [Symbol.asyncIterator]: () => it, finalMessage: () => finalP, abort: () => ac.abort() };
 }
 
-/** A client with the same call shape as the Anthropic SDK (messages and beta.messages: create, stream). */
-export function deepseekClient(timeout: number) {
+/** One plain chat-completions call for the graded turn (deepseekTutor.ts). Reasoning stays off unless a level is asked for. */
+function chatCall(timeout: number, signal?: AbortSignal): ChatCall {
+  return async (q) => {
+    const payload = () => ({
+      model: tutorModel(), messages: q.messages, max_tokens: q.max_tokens,
+      ...(typeof q.temperature === 'number' ? { temperature: q.temperature } : {}),
+      ...(q.json ? { response_format: { type: 'json_object' } } : {}),
+      ...(q.reasoning && q.reasoning !== 'none' && reasoningMode === 0 ? { reasoning_effort: q.reasoning } : REASONING_OFF[reasoningMode]),
+    });
+    let r: Response;
+    try { r = await post(payload, signal, timeout); } catch (e) {
+      if (!q.json || (e as { status?: number }).status !== 400) throw e;
+      r = await post(() => { const x = payload() as Record<string, unknown>; delete x.response_format; return x; }, signal, timeout); // a server without JSON mode
+    }
+    const m = fromChat((await r.json()) as Parameters<typeof fromChat>[0]);
+    return { text: m.content[0]?.text ?? '', finish: m.stop_reason, usage: { input_tokens: m.usage.input_tokens, output_tokens: m.usage.output_tokens } };
+  };
+}
+const anyPart = (p: DsParts) => p.gradeFirst || p.answerCheck || p.examples || p.replyChecks || p.tuning;
+const gradeReasoning = () => { const v = process.env.TUTOR_LLM_GRADE_REASONING?.trim().toLowerCase(); return v && ['none', 'low', 'high'].includes(v) ? v : 'none'; };
+async function graded(body: ABody, parts: DsParts, timeout: number, signal?: AbortSignal) {
+  const chat = toChat(body, false, { reminder: !parts.gradeFirst }) as { messages: ChatMsg[] };
+  const [sys, ...rest] = chat.messages[0]?.role === 'system' ? chat.messages : [{ role: 'system' as const, content: '' }, ...chat.messages];
+  const r = await gradedReply({ system: sys.content, messages: rest, maxTokens: body.max_tokens, temperature: body.temperature, parts, call: chatCall(timeout, signal), gradeReasoning: gradeReasoning() });
+  return fromChat({ model: tutorModel(), choices: [{ message: { content: r.text }, finish_reason: r.finish === 'max_tokens' ? 'length' : 'stop' }], usage: { prompt_tokens: r.usage.input_tokens, completion_tokens: r.usage.output_tokens } });
+}
+/** A graded turn as a stream: written whole first (it needs its checks), then sent as text deltas in the same event shape. */
+function gradedStream(body: ABody, parts: DsParts, timeout: number) {
+  const ac = new AbortController(); const timer = setTimeout(() => ac.abort(), timeout);
+  const finalP = graded(body, parts, timeout, ac.signal).finally(() => clearTimeout(timer));
+  finalP.catch(() => undefined);
+  async function* events() {
+    const m = await finalP; const text = m.content[0]?.text ?? '';
+    yield { type: 'message_start', message: { ...m, content: [], stop_reason: null } };
+    yield { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } };
+    for (const piece of text.match(/[\s\S]{1,24}(?=\s|$)|[\s\S]{1,24}/g) ?? []) yield { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: piece } };
+    yield { type: 'content_block_stop', index: 0 };
+    yield { type: 'message_delta', delta: { stop_reason: m.stop_reason, stop_sequence: null }, usage: { output_tokens: m.usage.output_tokens } };
+    yield { type: 'message_stop' };
+  }
+  const it = events();
+  return { [Symbol.asyncIterator]: () => it, finalMessage: () => finalP, abort: () => ac.abort() };
+}
+
+/** A client with the same call shape as the Anthropic SDK (messages and beta.messages: create, stream). opts.parts overrides the
+ * DeepSeek-match switches (the maintenance quality check compares with and without them). */
+export function deepseekClient(timeout: number, opts: { parts?: DsParts } = {}) {
+  const partsFor = (body: ABody) => { const p = opts.parts ?? dsParts(); return isGraded(textOf(body.system as string | Block[] | undefined)) && anyPart(p) ? p : null; };
   const messages = {
-    create: async (body: ABody) => fromChat((await (await post(() => toChat(body, false), undefined, timeout)).json()) as Parameters<typeof fromChat>[0]),
-    stream: (body: ABody) => streamOf(body, timeout),
+    create: async (body: ABody) => { const p = partsFor(body); return p ? graded(body, p, timeout) : fromChat((await (await post(() => toChat(body, false), undefined, timeout)).json()) as Parameters<typeof fromChat>[0]); },
+    stream: (body: ABody) => { const p = partsFor(body); return p ? gradedStream(body, p, timeout) : streamOf(body, timeout); },
   };
   return { messages, beta: { messages } } as unknown as Anthropic;
 }

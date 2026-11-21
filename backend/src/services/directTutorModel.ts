@@ -280,7 +280,9 @@ export async function buildTutorRequest(params: TutorRequestParams) {
   // Budget bound: text is at most one token per byte. A PDF has no such bound,
   // so calls carrying one rely on the school's configured ceiling.
   const hasPdf = materials.some((m) => m.type === 'document' && m.source.type === 'base64');
-  const bound = hasPdf ? undefined : { inputTokens: textTokenBound(body.system, body.messages), outputTokens: body.max_tokens, anyModel: true };
+  // DeepSeek match: a graded turn may take up to three calls (grade, reply, one regeneration), so its reservation covers three.
+  const calls = deepseekReady() ? 3 : 1;
+  const bound = hasPdf ? undefined : { inputTokens: calls * textTokenBound(body.system, body.messages), outputTokens: calls * body.max_tokens, anyModel: true };
   return { materialsCount: materials.length, body, bound };
 }
 

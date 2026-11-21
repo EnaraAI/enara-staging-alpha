@@ -74,7 +74,7 @@ export function deploymentProblems(dep) {
 const FLAG_NAME = /^(LMS|ENROLLMENT|GRADE_LEDGER|MAINTENANCE_ENDPOINTS|MOODLE_TEST_WS|PARENT)_[A-Z0-9_]{1,60}$/;
 // Tutor engine (owner-approved): exactly this one name, not an ENARA_ prefix. Its value is a
 // comma list of engine switches (backend/src/services/engineV2.ts); FLAG_VALUE still applies.
-const EXTRA_FLAG_NAMES = ['ENARA_ENGINE_V2', 'TUTOR_LLM_PROVIDER', 'TUTOR_LLM_MODEL', 'TUTOR_LLM_ENDPOINT', 'TUTOR_LLM_PRICE_IN', 'TUTOR_LLM_PRICE_OUT'];
+const EXTRA_FLAG_NAMES = ['ENARA_ENGINE_V2', 'TUTOR_LLM_PROVIDER', 'TUTOR_LLM_MODEL', 'TUTOR_LLM_ENDPOINT', 'TUTOR_LLM_PRICE_IN', 'TUTOR_LLM_PRICE_OUT', 'TUTOR_LLM_GRADE_REASONING'];
 // Tutor provider switch (owner, 21 Nov 2026): exact values only. The endpoint is the one approved Modal address (not a secret; the key
 // TUTOR_LLM_API_KEY is Sensitive and set by hand, never here). TUTOR_LLM_ENDPOINT is allowed despite 'URL'-like content, by name only.
 const TUTOR_LLM_VALUES = {
@@ -83,6 +83,7 @@ const TUTOR_LLM_VALUES = {
   TUTOR_LLM_ENDPOINT: /^https:\/\/enaraai--[a-z0-9-]+\.[a-z0-9-]+\.modal\.direct\/v1$/,
   TUTOR_LLM_PRICE_IN: /^\d{1,3}(\.\d{1,4})?$/,
   TUTOR_LLM_PRICE_OUT: /^\d{1,3}(\.\d{1,4})?$/,
+  TUTOR_LLM_GRADE_REASONING: /^(none|low|high)$/,
 };
 const FORBIDDEN_IN_NAME = /(KEY|KEK|SECRET|TOKEN|PASSWORD|URI|URL|DSN|CREDENTIAL|PRIVATE)/;
 const FLAG_VALUE = /^[A-Za-z0-9_,.:-]{0,200}$/;
