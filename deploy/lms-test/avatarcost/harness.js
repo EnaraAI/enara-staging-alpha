@@ -255,6 +255,7 @@
     }
 
     // --- end cleanly: stop Anam, then our end endpoint (metering)
+    const closedBeforeEnd = closed;
     if (heartbeat) clearInterval(heartbeat);
     if (levelTimer) clearInterval(levelTimer);
     try { await client.stopStreaming(); } catch {}
@@ -266,7 +267,9 @@
     out.closedReason = closed;
     out.userMessages = userMsgs.length;
     try { ctx.close(); } catch {}
-    out.ok = Boolean(ready && out.turns.length === sentences.length && !closed);
+    out.closedBeforeEnd = closedBeforeEnd;
+    out.sorryReplies = out.turns.filter((t) => /couldn't answer that just now/i.test(t.replyText || '')).length;
+    out.ok = Boolean(ready && out.turns.length === sentences.length && !closedBeforeEnd && !out.sorryReplies);
     // Times relative to T0 for the record.
     for (const e of out.events) e.t = Math.round(e.t - T0);
     for (const t of out.turns) { t.startT = Math.round(t.startT - T0); t.endT = Math.round(t.endT - T0); }

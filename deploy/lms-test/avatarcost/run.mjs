@@ -104,6 +104,21 @@ async function pickCourse(get) {
   return info;
 }
 
+// One text tutor turn (same student): shows whether the model answers at all, and the error code if not.
+async function chatCheck(get) {
+  const c = await get('/api/me/tutor/sessions', { method: 'POST', body: JSON.stringify({ title: 'avatarcost check' }) });
+  const cj = await c.json().catch(() => ({}));
+  const sid = cj.id ?? cj.session?.id;
+  if (!sid) return { create: c.status, code: cj.code ?? cj.error?.code ?? null };
+  const r = await get(`/api/me/tutor/sessions/${encodeURIComponent(sid)}/messages/stream`, { method: 'POST', body: JSON.stringify({ text: 'I have a cat.' }), timeoutMs: 60_000 });
+  const text = await r.text().catch(() => '');
+  const events = text.split('\n').filter((l) => l.startsWith('data: ')).map((l) => { try { return JSON.parse(l.slice(6)); } catch { return {}; } });
+  const err = events.find((e) => e.type === 'error');
+  let code = null;
+  if (!r.ok) { try { const j = JSON.parse(text); code = j.code ?? j.error?.code ?? null; } catch {} }
+  return { create: c.status, status: r.status, code, types: [...new Set(events.map((e) => e.type))], tokens: events.filter((e) => e.type === 'token').length, error: err ? { code: err.code, message: String(err.message ?? '').slice(0, 120) } : null, replaced: events.some((e) => e.type === 'replace') };
+}
+
 async function usageToday(get) {
   const r = await get('/api/usage/me/today?features=voice,avatar_session,tutor_voice');
   return r.ok ? r.json().catch(() => null) : { status: r.status };
@@ -119,6 +134,7 @@ async function calls(audioDir) {
   const course = await pickCourse(get);
   console.log(`COURSE ${JSON.stringify(course)}`);
   const usageBefore = await usageToday(get);
+  if (plan.run.chatCheck) console.log(`CHATCHECK ${JSON.stringify(await chatCheck(get))}`);
   const umd = readFileSync(join(process.cwd(), 'node_modules/@anam-ai/js-sdk/dist/umd/anam.js'), 'utf8');
   const harness = readFileSync(join(HERE, 'harness.js'), 'utf8');
   const results = [];
@@ -186,10 +202,10 @@ async function calls(audioDir) {
       result.stored = { status: r.status, user: msgs.filter((m) => m.role === 'user').map((m) => m.text ?? m.content ?? ''), ai: msgs.filter((m) => m.role !== 'user').length };
     }
     result.console = consoleLines;
-    if (!result.ok) { console.log(`EVENTS ${id} ${JSON.stringify(result.events ?? [])} closed=${result.closedReason ?? null}`); for (const l of consoleLines.slice(0, 60)) console.log(`CONSOLE ${id} ${l}`); }
+    if (!result.ok && !result.turns?.length) { console.log(`EVENTS ${id} ${JSON.stringify(result.events ?? [])} closed=${result.closedReason ?? null}`); for (const l of consoleLines.slice(0, 60)) console.log(`CONSOLE ${id} ${l}`); }
     result.id = id; result.group = call.group; result.voice = call.voice;
     results.push(result);
-    const brief = { id, ok: result.ok, speech: result.speech, durationSec: result.durationSec, readyMs: result.readyMs, endStatus: result.endStatus, errors: result.errors, turns: (result.turns ?? []).map((t) => ({ ref: t.text, heard: t.heard, lat: t.replyAudioLatencyMs, ft: t.queries?.[0]?.firstContentMs ?? null })) };
+    const brief = { id, ok: result.ok, sorry: result.sorryReplies, closedBeforeEnd: result.closedBeforeEnd ?? null, speech: result.speech, durationSec: result.durationSec, readyMs: result.readyMs, endStatus: result.endStatus, errors: result.errors, turns: (result.turns ?? []).map((t) => ({ ref: t.text, heard: t.heard, lat: t.replyAudioLatencyMs, ft: t.queries?.[0]?.firstContentMs ?? null, q: t.queries?.[0]?.status ?? null, reply: (t.replyText ?? '').slice(0, 80) })) };
     console.log(`CALL ${JSON.stringify(brief)}`);
     writeFileSync(join(OUT, `call-${id}.json`), JSON.stringify(result, null, 1));
     if (result.errors?.some((e) => /^session_start_http_|unexpected_speech_mode/.test(e))) { console.log('STOP: the call could not start in Anam mode; not trying the rest.'); break; }
