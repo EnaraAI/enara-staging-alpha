@@ -1,0 +1,66 @@
+# One-off measurement (owner's task, 21 Nov 2026): cost, latency and speech-to-text accuracy of live
+# avatar calls on lms-test.enara.app ONLY, with synthetic learner voices (deploy/lms-test/avatarcost).
+# test.enara.app is frozen: never called. The Vercel project is only read (GET). Secrets are never printed.
+# The calls to run are named in deploy/lms-test/avatarcost/plan.json (run.ids); hard cap 30 calls in total.
+name: lms-test avatar cost run
+on:
+  push:
+    branches: ['claude/tutor-lms-avatarcost-run']
+    paths: ['deploy/lms-test/avatarcost/**', '.github/workflows/lms-test-avatarcost.yml']
+permissions:
+  contents: read
+concurrency:
+  group: lms-test-avatarcost
+  cancel-in-progress: false
+jobs:
+  run:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    defaults:
+      run:
+        working-directory: deploy/lms-test/avatarcost
+    env:
+      AVC_OUT: ${{ github.workspace }}/avc-out
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Preflight (AI_PAUSED read only, project guard, /ready)
+        id: pre
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: node run.mjs preflight
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Synthetic learner audio (Piper TTS)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null
+          pip install -q piper-tts==1.8.0
+          mkdir -p voices
+          for m in $(python -c "import json;p=json.load(open('plan.json'));print(' '.join(sorted({v['model'] for v in p['voices'].values()})))"); do
+            b=$(basename "$m")
+            curl -sfL -o "voices/$b.onnx" "https://huggingface.co/rhasspy/piper-voices/resolve/main/$m.onnx"
+            curl -sfL -o "voices/$b.onnx.json" "https://huggingface.co/rhasspy/piper-voices/resolve/main/$m.onnx.json"
+          done
+          python tts.py plan.json voices "$AVC_OUT/audio" $(python -c "import json;print(' '.join(json.load(open('plan.json'))['run']['ids']))")
+      - name: Browser and Anam SDK
+        run: |
+          npm init -y >/dev/null
+          npm i --no-save --no-audit --no-fund playwright@1.49.1 @anam-ai/js-sdk@4.29.1
+          npx playwright install --with-deps chromium
+      - name: Calls
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node run.mjs calls "$AVC_OUT/audio"
+      - name: Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: avatarcost-${{ github.run_id }}
+          path: ${{ github.workspace }}/avc-out
+          retention-days: 14
