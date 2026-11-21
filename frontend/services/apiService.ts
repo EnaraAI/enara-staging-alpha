@@ -894,6 +894,8 @@ export const fetchWeeklySummary = () => request<WeeklySummary>('GET', '/api/anal
 export const fetchMyAnalyticsOverview = () => request('GET', '/api/me/analytics/overview');
 
 // TUTOR (student)
+/** kidsSpeaking (environment switch): may the kids app show the chat microphone and the live call. */
+export const getTutorSpeaking = () => request<{ microphone: boolean; liveCall: boolean }>('GET', '/api/me/tutor/speaking');
 export const listTutorSessions = () => request<any[]>('GET', '/api/me/tutor/sessions');
 export const getTutorSession = (id: string) => request('GET', `/api/me/tutor/sessions/${encodeURIComponent(id)}`);
 export const createTutorSession = (courseId?: string, lessonId?: string, title?: string) =>
