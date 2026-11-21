@@ -35,6 +35,14 @@ const textOf = (c: string | Block[] | undefined): string => {
   if (typeof c === 'string') return c;
   return c.map((b) => (b.type === 'text' ? b.text ?? '' : b.type === 'document' && b.source?.type === 'text' ? b.source.data ?? '' : '')).filter(Boolean).join('\n\n');
 };
+// The model "reasons" by default: its reasoning goes to a separate field and uses the output budget, so short tutor replies came back
+// EMPTY (check on lms-test, 21 Nov). Reasoning is switched off. Servers spell that differently: we send `reasoning_effort: "none"`;
+// if the server refuses the request (400), the next spelling is tried (`chat_template_kwargs.thinking=false`), then neither. Learned once
+// per instance. If the reply still has no text but has reasoning, the reasoning is NOT shown (it is not a reply to the learner).
+export const REASONING_OFF: Record<string, unknown>[] = [{ reasoning_effort: 'none' }, { chat_template_kwargs: { thinking: false, enable_thinking: false } }, {}];
+let reasoningMode = 0;
+export const _resetReasoningMode = () => { reasoningMode = 0; };
+export const reasoningModeUsed = () => Object.keys(REASONING_OFF[reasoningMode])[0] ?? 'default';
 /** Anthropic-style request -> chat-completions request. */
 export function toChat(body: ABody, stream: boolean): Record<string, unknown> {
   const system = textOf(body.system as string | Block[] | undefined);
@@ -47,6 +55,7 @@ export function toChat(body: ABody, stream: boolean): Record<string, unknown> {
     ...(typeof body.temperature === 'number' ? { temperature: body.temperature } : {}),
     ...(body.stop_sequences?.length ? { stop: body.stop_sequences } : {}),
     ...(stream ? { stream: true, stream_options: { include_usage: true } } : {}),
+    ...REASONING_OFF[reasoningMode],
   };
 }
 const STOP: Record<string, string> = { stop: 'end_turn', length: 'max_tokens', content_filter: 'refusal', tool_calls: 'tool_use' };
@@ -68,10 +77,11 @@ function headers(): Record<string, string> {
   const k = key(); const dot = k.indexOf('.');
   return splitAuth && dot > 0 ? { 'Modal-Key': k.slice(0, dot), 'Modal-Secret': k.slice(dot + 1) } : { Authorization: `Bearer ${k}` };
 }
-async function post(payload: unknown, signal?: AbortSignal, timeout = 60_000): Promise<Response> {
-  const go = () => fetch(`${endpoint()}/chat/completions`, { method: 'POST', headers: { ...headers(), 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: signal ?? AbortSignal.timeout(timeout) });
+async function post(payload: () => unknown, signal?: AbortSignal, timeout = 60_000): Promise<Response> {
+  const go = () => fetch(`${endpoint()}/chat/completions`, { method: 'POST', headers: { ...headers(), 'Content-Type': 'application/json' }, body: JSON.stringify(payload()), signal: signal ?? AbortSignal.timeout(timeout) });
   let r = await go();
   if ((r.status === 401 || r.status === 403) && !splitAuth && key().includes('.')) { splitAuth = true; r = await go(); }
+  while (r.status === 400 && reasoningMode < REASONING_OFF.length - 1) { reasoningMode++; r = await go(); }
   if (!r.ok) throw new ProviderError(r.status, `tutor provider HTTP ${r.status}`);
   return r;
 }
@@ -87,7 +97,7 @@ function streamOf(body: ABody, timeout: number) {
   async function* events() {
     let text = ''; let finish = 'stop'; let usage: Usage; let model = tutorModel();
     try {
-      const r = await post(toChat(body, true), ac.signal);
+      const r = await post(() => toChat(body, true), ac.signal);
       yield { type: 'message_start', message: { id: 'deepseek', type: 'message', role: 'assistant', model, content: [], stop_reason: null, usage: usageOf(undefined) } };
       yield { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } };
       const rd = r.body!.getReader(); const dec = new TextDecoder(); let buf = '';
@@ -122,7 +132,7 @@ function streamOf(body: ABody, timeout: number) {
 /** A client with the same call shape as the Anthropic SDK (messages and beta.messages: create, stream). */
 export function deepseekClient(timeout: number) {
   const messages = {
-    create: async (body: ABody) => fromChat((await (await post(toChat(body, false), undefined, timeout)).json()) as Parameters<typeof fromChat>[0]),
+    create: async (body: ABody) => fromChat((await (await post(() => toChat(body, false), undefined, timeout)).json()) as Parameters<typeof fromChat>[0]),
     stream: (body: ABody) => streamOf(body, timeout),
   };
   return { messages, beta: { messages } } as unknown as Anthropic;

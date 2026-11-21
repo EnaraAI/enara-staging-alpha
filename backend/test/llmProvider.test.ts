@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { deepseekClient, deepseekPrices, deepseekReady, fromChat, toChat, tutorProvider } from '../src/services/llmProvider';
+import { _resetReasoningMode, deepseekClient, deepseekPrices, deepseekReady, fromChat, reasoningModeUsed, toChat, tutorProvider } from '../src/services/llmProvider';
 
 // Tutor provider switch (owner, 21 Nov 2026): DeepSeek on Modal (OpenAI-compatible) behind the same call shape as the Anthropic client.
 const ENV = { TUTOR_LLM_PROVIDER: 'deepseek', TUTOR_LLM_ENDPOINT: 'https://example.invalid/v1', TUTOR_LLM_MODEL: 'deepseek-v4.1-flash', TUTOR_LLM_API_KEY: 'wk-abc.ws-def' };
 const setEnv = (e: Record<string, string>) => Object.assign(process.env, e);
-afterEach(() => { for (const k of [...Object.keys(ENV), 'TUTOR_LLM_PRICE_IN', 'TUTOR_LLM_PRICE_OUT']) delete process.env[k]; vi.unstubAllGlobals(); });
+afterEach(() => { for (const k of [...Object.keys(ENV), 'TUTOR_LLM_PRICE_IN', 'TUTOR_LLM_PRICE_OUT']) delete process.env[k]; vi.unstubAllGlobals(); _resetReasoningMode(); });
 const body = { model: 'claude-opus-5-5', max_tokens: 300, temperature: 0.3, system: [{ type: 'text', text: 'You are a tutor.' }, { type: 'text', text: 'Brief.' }],
   messages: [{ role: 'user' as const, content: 'Hi' }, { role: 'assistant' as const, content: [{ type: 'text', text: 'Hello!' }] },
     { role: 'user' as const, content: [{ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: 'JVBERi0' } }, { type: 'text', text: 'What is 2+2?' }] }] };
@@ -73,5 +73,22 @@ describe('tutor LLM provider', () => {
     expect(deepseekPrices()).toEqual({ input: 1, output: 4 });
     setEnv({ TUTOR_LLM_PRICE_IN: '0.07', TUTOR_LLM_PRICE_OUT: '0.28' });
     expect(deepseekPrices()).toEqual({ input: 0.07, output: 0.28 });
+  });
+
+  it('reasoning is switched off (empty replies otherwise); a server that refuses that spelling (400) gets the next one, then none', async () => {
+    setEnv(ENV);
+    expect(toChat(body as never, false)).toMatchObject({ reasoning_effort: 'none' });
+    const sent: Record<string, unknown>[] = [];
+    vi.stubGlobal('fetch', vi.fn(async (_u: string, init: { body: string }) => {
+      const b = JSON.parse(init.body) as Record<string, unknown>; sent.push(b);
+      if ('reasoning_effort' in b) return new Response('bad field', { status: 400 });
+      return new Response(JSON.stringify({ choices: [{ message: { content: 'Four.' }, finish_reason: 'stop' }], usage: { prompt_tokens: 9, completion_tokens: 2 } }), { status: 200 });
+    }));
+    const r = await deepseekClient(5000).messages.create(body as never) as unknown as { content: { text: string }[] };
+    expect(r.content[0].text).toBe('Four.');
+    expect(sent[1]).toMatchObject({ chat_template_kwargs: { thinking: false } });
+    expect(reasoningModeUsed()).toBe('chat_template_kwargs');
+    await deepseekClient(5000).messages.create(body as never);
+    expect(sent).toHaveLength(3); // learned: no second 400
   });
 });
