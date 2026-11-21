@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { _resetReasoningMode, deepseekClient, deepseekPrices, deepseekReady, fromChat, reasoningModeUsed, toChat, tutorProvider } from '../src/services/llmProvider';
+import { DEEPSEEK_REMINDER, _resetReasoningMode, deepseekClient, deepseekPrices, deepseekReady, fromChat, reasoningModeUsed, toChat, tutorProvider } from '../src/services/llmProvider';
 
 // Tutor provider switch (owner, 21 Nov 2026): DeepSeek on Modal (OpenAI-compatible) behind the same call shape as the Anthropic client.
 const ENV = { TUTOR_LLM_PROVIDER: 'deepseek', TUTOR_LLM_ENDPOINT: 'https://example.invalid/v1', TUTOR_LLM_MODEL: 'deepseek-v4.1-flash', TUTOR_LLM_API_KEY: 'wk-abc.ws-def' };
@@ -90,5 +90,14 @@ describe('tutor LLM provider', () => {
     expect(reasoningModeUsed()).toBe('chat_template_kwargs');
     await deepseekClient(5000).messages.create(body as never);
     expect(sent).toHaveLength(3); // learned: no second 400
+  });
+
+  it('adds the rule reminder at the end of the system prompt only when the request asks for the hidden grading line', () => {
+    setEnv(ENV);
+    const plain = toChat(body as never, false) as { messages: { role: string; content: string }[] };
+    expect(plain.messages[0].content).toBe('You are a tutor.\n\nBrief.');
+    const graded = toChat({ ...body, system: 'Start your reply with [[assess verdict=V ...]].' } as never, false) as { messages: { role: string; content: string }[] };
+    expect(graded.messages[0].content.endsWith(DEEPSEEK_REMINDER)).toBe(true);
+    expect(graded.messages[1].role).toBe('user');
   });
 });
