@@ -3,6 +3,7 @@ import { textTokenBound } from './priceCatalog';
 import { getConfig } from '../config/env';
 import { logger } from '../utils/logging';
 import { describeSnapshot, LearnerSnapshot } from './learnerSnapshot';
+import { llmClient, llmModel } from './llmProvider';
 
 // "Your next steps" on the student's home page. The steps come from the
 // student's own data so every button leads somewhere real; Claude only writes
@@ -71,8 +72,8 @@ export async function nextStepsNote(s: LearnerSnapshot, steps: NextStep[]): Prom
     // guard refuses the call before the provider.
     const { meteredMessage } = await import('./aiGateway');
     const response = await meteredMessage(
-      { feature: 'next_steps_note', modelName: config.anthropicVoiceModel, bound: { inputTokens: textTokenBound(content), outputTokens: 300 } },
-      () => client!.messages.create({ model: config.anthropicVoiceModel, max_tokens: 300, output_config: { effort: 'low' }, messages: [{ role: 'user', content }] }),
+      { feature: 'next_steps_note', modelName: llmModel(config.anthropicVoiceModel), bound: { inputTokens: textTokenBound(content), outputTokens: 300 } },
+      () => llmClient(client!, 8_000).messages.create({ model: llmModel(config.anthropicVoiceModel), max_tokens: 300, output_config: { effort: 'low' }, messages: [{ role: 'user', content }] }),
     );
     const note = response.content.map((b) => (b.type === 'text' ? b.text : '')).join('').trim();
     const result = note && response.stop_reason !== 'refusal' ? note : fallbackNote(s, steps);

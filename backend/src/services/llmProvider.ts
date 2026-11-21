@@ -189,3 +189,15 @@ export function deepseekClient(timeout: number, opts: { parts?: DsParts } = {}) 
   };
   return { messages, beta: { messages } } as unknown as Anthropic;
 }
+
+// Owner, 21 Nov 2026: while DeepSeek stands in on lms-test, the other model features follow it too (teacher assistant, staff data assistant,
+// class summaries, reminders, next steps, learning objectives, avatar visuals). Each keeps its own Anthropic client and model otherwise.
+const shared = new Map<number, Anthropic>();
+/** The client for a feature: DeepSeek when switched on and configured, else the feature's own Anthropic client. */
+export function llmClient(anthropic: Anthropic, timeout: number): Anthropic {
+  if (!deepseekReady()) return anthropic;
+  let c = shared.get(timeout); if (!c) { c = deepseekClient(timeout); shared.set(timeout, c); }
+  return c;
+}
+/** The model id for a feature: the DeepSeek model when switched on, else the feature's Anthropic model. */
+export const llmModel = (anthropicModel: string): string => (deepseekReady() ? tutorModel()! : anthropicModel);

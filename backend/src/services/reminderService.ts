@@ -7,6 +7,7 @@ import { logger } from '../utils/logging';
 import { emailLayout, isEmailConfigured, sendEmail } from './emailService';
 import { buildLearnerSnapshot, describeSnapshot, LearnerSnapshot } from './learnerSnapshot';
 import { buildNextSteps } from './nextStepsService';
+import { llmClient, llmModel } from './llmProvider';
 
 // Reminder emails for students who have gone quiet or have review questions
 // piling up, at most once every few days, written from their own progress.
@@ -40,8 +41,8 @@ async function writeReminder(s: LearnerSnapshot, reason: string): Promise<{ subj
   if (!config.anthropicApiKey) return fallback;
   client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 15_000, maxRetries: 0 });
   try {
-    const response = await trackAiCall('reminder_email', config.anthropicVoiceModel, () => client!.messages.create({
-      model: config.anthropicVoiceModel,
+    const response = await trackAiCall('reminder_email', llmModel(config.anthropicVoiceModel), () => llmClient(client!, 15_000).messages.create({
+      model: llmModel(config.anthropicVoiceModel),
       max_tokens: 600,
       output_config: { effort: 'low' },
       messages: [

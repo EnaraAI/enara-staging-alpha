@@ -5,6 +5,7 @@ import { AppError } from '../middleware/errorHandler';
 import { buildOverview } from './analyticsService';
 import { meteredMessage } from './aiGateway';
 import { textTokenBound } from './priceCatalog';
+import { llmClient, llmModel } from './llmProvider';
 
 // The staff "data assistant": answers questions about one school's own data.
 // The data is built here, scoped by the caller's institution, so the browser
@@ -79,12 +80,12 @@ export async function answerDataQuestion(scope: Record<string, unknown>, message
   const messages = [...history.slice(-6), { role: 'user' as const, content: message }].map((m) => ({ ...m, content: redact(m.content) }));
   const response = await meteredMessage(
     {
-      feature: 'staff_assistant', modelName: config.anthropicTutorModel, institutionId, maxAttempts: 2,
+      feature: 'staff_assistant', modelName: llmModel(config.anthropicTutorModel), institutionId, maxAttempts: 2,
       bound: { inputTokens: textTokenBound(system, messages), outputTokens: 2000 },
     },
     () =>
-      client!.messages.create({
-        model: config.anthropicTutorModel,
+      llmClient(client!, 25_000).messages.create({
+        model: llmModel(config.anthropicTutorModel),
         max_tokens: 2000,
         output_config: { effort: 'low' },
         system,
