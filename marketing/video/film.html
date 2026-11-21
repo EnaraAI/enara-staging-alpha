@@ -1,0 +1,284 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:NotoAr;src:url(assets/noto-sans-arabic-arabic-400-normal.woff2)}
+@font-face{font-family:NotoAr;font-weight:700;src:url(assets/noto-sans-arabic-arabic-700-normal.woff2)}
+:root{--navy:#08172b;--navy2:#0d2442;--blue:#0056D2;--blue2:#2a6edc;--sky:#8fb4f0;--amber:#f59f0a;--white:#f6f7fa;--green:#2fbf71;--card:rgba(255,255,255,.06);--line:rgba(143,180,240,.22)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--navy);font-family:Inter,system-ui,sans-serif;color:var(--white)}
+body.v,body.v html{width:1080px;height:1920px}
+#stage{position:absolute;inset:0;overflow:hidden}
+.bg{position:absolute;inset:-20%;}
+.blob{position:absolute;border-radius:50%;filter:blur(120px);opacity:.55}
+.grid{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;opacity:.18;mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%)}
+.scene{position:absolute;inset:0;opacity:0;will-change:opacity,transform}
+.head{position:absolute;left:140px;top:110px;font-weight:800;font-size:64px;letter-spacing:-.02em;line-height:1.05}
+.head .tag{display:block;font-size:22px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:18px}
+.w{display:inline-block;will-change:transform,opacity}
+.card{position:absolute;background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.03));border:1px solid rgba(143,180,240,.28);border-radius:28px;box-shadow:0 30px 80px rgba(0,0,0,.35);backdrop-filter:blur(8px)}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;background:rgba(42,110,220,.18);border:1px solid rgba(143,180,240,.35);font-size:22px;font-weight:600}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--sky)}
+.bubble{position:absolute;padding:20px 26px;border-radius:24px;font-size:26px;line-height:1.35;max-width:620px}
+.me{background:var(--blue);border-bottom-right-radius:6px}
+.ai{background:rgba(255,255,255,.95);color:#0d2442;border-bottom-left-radius:6px}
+.chip{display:inline-flex;gap:8px;align-items:center;margin-top:12px;padding:6px 14px;border-radius:999px;background:#eaf0ff;color:#0056D2;font-size:18px;font-weight:700}
+.bar{position:absolute;height:22px;border-radius:11px;background:rgba(255,255,255,.10);overflow:hidden}
+.bar i{position:absolute;inset:0;width:0;border-radius:11px;background:linear-gradient(90deg,var(--blue2),var(--sky))}
+.rail{position:absolute;left:140px;top:340px;display:flex;flex-direction:column;gap:16px;opacity:0}
+.rail div{display:flex;flex-direction:row-reverse;align-items:center;gap:14px;font-size:22px;font-weight:600;color:rgba(246,247,250,.40);justify-content:flex-end}
+.rail b{width:34px;height:8px;border-radius:4px;background:rgba(143,180,240,.25)}
+.rail .on{color:var(--white)}.rail .on b{background:var(--amber);width:54px}
+#sub{position:absolute;left:50%;bottom:58px;transform:translateX(-50%);max-width:1500px;text-align:center;direction:rtl;font-family:NotoAr,'DejaVu Sans';font-weight:700;font-size:34px;line-height:1.45;padding:10px 26px;border-radius:14px;background:rgba(8,23,43,.62);color:#fff;opacity:0}
+body.v .head{left:80px;top:150px;font-size:76px;max-width:920px}
+body.v .rail{right:auto;left:50%;top:auto;bottom:330px;transform:translateX(-50%);flex-direction:row;gap:10px}
+body.v .rail div span{display:none}
+body.v #sub{bottom:120px;max-width:960px;font-size:44px}
+.icon{width:72px;height:72px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:rgba(42,110,220,.25);border:1px solid rgba(143,180,240,.35)}
+svg{display:block}
+</style></head>
+<body>
+<div id="stage">
+  <div class="bg"><div class="blob" id="b1" style="width:900px;height:900px;background:#0056D2"></div><div class="blob" id="b2" style="width:700px;height:700px;background:#2a6edc"></div><div class="blob" id="b3" style="width:520px;height:520px;background:#f59f0a;opacity:.18"></div></div>
+  <div class="grid"></div>
+  <div id="scenes"></div>
+  <div class="rail" id="rail"></div>
+  <div id="sub"></div>
+</div>
+<script>
+// ENARA school film: deterministic motion graphics. render(t) draws the frame at time t (seconds). No real data, no screenshots.
+const V = location.hash.includes('v');            // vertical 9:16 layout
+if (V) document.body.classList.add('v');
+const W = V ? 1080 : 1920, H = V ? 1920 : 1080;
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const eo = (x) => 1 - Math.pow(1 - clamp(x), 3);           // ease out cubic
+const eio = (x) => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const back = (x) => { x = clamp(x); const c = 1.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const seg = (t, a, d) => clamp((t - a) / d);
+const $ = (h) => { const d = document.createElement('div'); d.innerHTML = h.trim(); return d.firstChild; };
+const words = (s, cls = '') => s.split(' ').map((w) => `<span class="w ${cls}">${w}</span>`).join(' ');
+function kin(el, t, start = 0.1, step = 0.07) { el.querySelectorAll('.w').forEach((w, i) => { const p = back(seg(t, start + i * step, 0.55)); w.style.opacity = clamp(seg(t, start + i * step, 0.3)); w.style.transform = `translateY(${(1 - p) * 40}px)`; }); }
+const LAYERS = ['Content', 'Teaching engine', 'Assessment', 'Learner model', 'Insight', 'Integration', 'Apps for every role', 'Trust & control', 'Reliable delivery'];
+const ICON = {
+  doc: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8fb4f0" stroke-width="1.8" stroke-linecap="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>',
+  chat: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8fb4f0" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+  mic: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8fb4f0" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+  face: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8fb4f0" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/><path d="M8.5 15c2 2 5 2 7 0"/></svg>',
+  shield: '<svg width="220" height="250" viewBox="0 0 24 27"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a6edc"/><stop offset="1" stop-color="#0056D2"/></linearGradient></defs><path d="M12 1 22 5v8c0 7-5 11-10 13C7 24 2 20 2 13V5z" fill="url(#sg)" stroke="#8fb4f0" stroke-width=".6"/><path d="M7.5 13.5l3 3 6-6.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  check: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
+};
+const KIDS = ['cat', 'apple', 'bus', 'duck'];
+
+// ---------------------------------------------------------------------------------------------- scenes
+const S = {};
+S.s00_hook = { build(r) {
+  const n = 30, cols = 10, g = V ? 78 : 88;
+  let dots = ''; for (let i = 0; i < n; i++) dots += `<div class="d" style="position:absolute;width:34px;height:34px;border-radius:50%;left:${(i % cols) * g}px;top:${Math.floor(i / cols) * g}px;background:#8fb4f0"></div>`;
+  r.innerHTML = `<div class="head">${words('More students')}<br>${words('than time.')}</div>
+  <div class="grid30" style="position:absolute;left:${V ? 150 : 980}px;top:${V ? 700 : 340}px;width:${cols * g}px;height:${3 * g}px">${dots}</div>
+  <div class="teacher" style="position:absolute;left:${V ? 495 : 1335}px;top:${V ? 1080 : 690}px;width:54px;height:54px;border-radius:50%;background:#f59f0a;box-shadow:0 0 40px #f59f0a"></div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  const ds = r.querySelectorAll('.d'); const glow = [2, 7, 13, 21], dim = [4, 9, 11, 16, 18, 25, 28];
+  ds.forEach((d, i) => { const p = back(seg(t, 0.4 + (i % 10) * 0.04 + Math.floor(i / 10) * 0.08, 0.6)); d.style.transform = `scale(${p})`;
+    const a = seg(t, 3.2, 1.2), b = seg(t, 5.2, 1.2);
+    if (glow.includes(i)) { d.style.background = `rgb(${143 + 102 * a},${180 + 0 * a},${240 - 230 * a})`; d.style.boxShadow = `0 0 ${30 * a}px #f59f0a`; }
+    else if (dim.includes(i)) d.style.opacity = 1 - 0.75 * b; });
+  const tc = r.querySelector('.teacher'); tc.style.transform = `scale(${back(seg(t, 1.8, 0.7))})`;
+} };
+S.s01_intro = { build(r) {
+  r.innerHTML = `<div style="position:absolute;left:0;right:0;top:${V ? 620 : 300}px;text-align:center">
+    <div class="mark" style="font-size:${V ? 190 : 210}px;font-weight:800;letter-spacing:.06em">${'ENARA'.split('').map((c) => `<span class="L" style="display:inline-block">${c}</span>`).join('')}</div>
+    <div class="line" style="height:6px;width:0;margin:18px auto 34px;border-radius:3px;background:linear-gradient(90deg,#0056D2,#f59f0a)"></div>
+    <div class="tl" style="font-size:${V ? 54 : 58}px;font-weight:700;color:#cfe0ff;padding:0 60px">${words('The AI infrastructure for schools')}</div>
+    <div class="sub3" style="margin-top:46px;display:flex;gap:18px;justify-content:center;flex-wrap:wrap;padding:0 60px">${['Personal teaching', 'Fair assessment', 'Clear insight', 'Plugs into your systems'].map((x) => `<span class="pill">${x}</span>`).join('')}</div></div>`;
+}, update(r, t) {
+  r.querySelectorAll('.L').forEach((l, i) => { const p = back(seg(t, 0.15 + i * 0.09, 0.7)); l.style.opacity = clamp(seg(t, 0.15 + i * 0.09, 0.3)); l.style.transform = `translateY(${(1 - p) * 120}px) rotate(${(1 - p) * 12}deg)`; });
+  r.querySelector('.line').style.width = `${eo(seg(t, 0.9, 1)) * (V ? 700 : 900)}px`;
+  kin(r.querySelector('.tl'), t, 1.3, 0.12);
+  r.querySelectorAll('.sub3 .pill').forEach((p, i) => { const q = eo(seg(t, 3.4 + i * 0.5, 0.6)); p.style.opacity = q; p.style.transform = `translateY(${(1 - q) * 24}px)`; });
+} };
+S.s02_layers = { build(r) {
+  const bars = LAYERS.map((l, i) => `<div class="ly" style="position:absolute;left:0;top:${(8 - i) * (V ? 104 : 72)}px;width:${V ? 860 : 820}px;height:${V ? 86 : 60}px;border-radius:16px;display:flex;align-items:center;padding:0 26px;gap:18px;font-size:${V ? 34 : 26}px;font-weight:700;background:linear-gradient(90deg,rgba(0,86,210,${0.55 + i * 0.04}),rgba(42,110,220,.18));border:1px solid rgba(143,180,240,.35)"><span style="color:#f59f0a;width:34px">${i + 1}</span>${l}</div>`).join('');
+  r.innerHTML = `<div class="head">${words('Built in layers.')}</div><div class="stack" style="position:absolute;left:${V ? 110 : 960}px;top:${V ? 560 : 260}px;perspective:1400px">${bars}</div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  r.querySelectorAll('.ly').forEach((b, i) => { const p = back(seg(t, 0.4 + i * 0.22, 0.6)); b.style.opacity = clamp(seg(t, 0.4 + i * 0.22, 0.3)); b.style.transform = `translateX(${(1 - p) * 200}px) rotateY(${(1 - p) * -25}deg)`; });
+} };
+function layerHead(n, title) { return `<div class="head"><span class="tag">Layer ${n} of 9</span>${words(title)}</div>`; }
+S.s03_content = { build(r) {
+  const docs = [0, 1, 2].map((i) => `<div class="doc card" style="width:150px;height:190px;left:${(V ? 120 : 880) + i * 40}px;top:${(V ? 600 : 300) + i * 30}px;display:flex;align-items:center;justify-content:center">${ICON.doc}</div>`).join('');
+  const lessons = ['Lesson 1 · Fractions', 'Lesson 2 · Decimals', 'Lesson 3 · Percentages'].map((x, i) => `<div class="les card" style="left:${V ? 430 : 1240}px;top:${(V ? 600 : 270) + i * 120}px;width:${V ? 560 : 520}px;height:96px;display:flex;align-items:center;padding:0 28px;font-size:28px;font-weight:600">${x}</div>`).join('');
+  r.innerHTML = `${layerHead(1, 'Your content, organised.')}${docs}
+  <div class="arrow" style="position:absolute;left:${V ? 330 : 1120}px;top:${V ? 700 : 380}px;width:0;height:4px;background:linear-gradient(90deg,#8fb4f0,#f59f0a);border-radius:2px"></div>${lessons}
+  <div class="objs" style="position:absolute;left:${V ? 120 : 880}px;top:${V ? 1020 : 680}px;display:flex;gap:16px;flex-wrap:wrap;width:${V ? 860 : 900}px">
+   <span class="pill ob">Objective · EN</span><span class="pill ob" style="font-family:NotoAr">هدف التعلّم · ع</span><span class="pill ob appr" style="background:rgba(47,191,113,.2);border-color:#2fbf71">${ICON.check} Approved by staff</span></div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  r.querySelectorAll('.doc').forEach((d, i) => { const p = back(seg(t, 0.3 + i * 0.2, 0.6)); d.style.opacity = clamp(seg(t, 0.3 + i * 0.2, 0.3)) * (1 - 0.4 * seg(t, 3, 1)); d.style.transform = `translateY(${(1 - p) * -80}px) rotate(${(i - 1) * 6 * p}deg)`; });
+  r.querySelector('.arrow').style.width = `${eo(seg(t, 1.6, 0.8)) * 100}px`;
+  r.querySelectorAll('.les').forEach((d, i) => { const p = eo(seg(t, 2.1 + i * 0.35, 0.6)); d.style.opacity = p; d.style.transform = `translateX(${(1 - p) * 60}px)`; });
+  r.querySelectorAll('.ob').forEach((d, i) => { const p = back(seg(t, 4.2 + i * 0.6, 0.6)); d.style.opacity = clamp(seg(t, 4.2 + i * 0.6, 0.3)); d.style.transform = `scale(${0.6 + 0.4 * p})`; });
+} };
+S.s04_teaching = { build(r) {
+  const x = V ? 90 : 900, y = V ? 520 : 230;
+  r.innerHTML = `${layerHead(2, 'An AI teaching engine.')}
+  <div class="card" style="left:${x}px;top:${y}px;width:${V ? 900 : 860}px;height:${V ? 880 : 620}px"></div>
+  <div class="bubble me b1" style="right:${V ? 140 : 140}px;top:${y + 50}px">Why do plants need sunlight?</div>
+  <div class="bubble ai b2" style="left:${x + 40}px;top:${y + 160}px">Plants use light to make their own food. That's called photosynthesis.<br><span class="chip">Source · Science Unit 3, p.12</span></div>
+  <div class="bubble ai b3" style="left:${x + 40}px;top:${y + (V ? 420 : 370)}px;background:#fff7e6"><b style="color:#b45309">Hint</b> · What else do plants take in from the air?</div>
+  <div class="modes" style="position:absolute;left:${x + 40}px;top:${y + (V ? 640 : 510)}px;display:flex;gap:18px">
+    <span class="pill md">${ICON.chat.replace('40', '30').replace('40', '30')} Chat</span><span class="pill md">${ICON.mic.replace('40', '30').replace('40', '30')} Voice</span><span class="pill md">${ICON.face.replace('40', '30').replace('40', '30')} Avatar</span></div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  const pop = (sel, a) => { const e = r.querySelector(sel); const p = back(seg(t, a, 0.6)); e.style.opacity = clamp(seg(t, a, 0.25)); e.style.transform = `translateY(${(1 - p) * 30}px) scale(${0.9 + 0.1 * p})`; };
+  pop('.b1', 0.6); pop('.b2', 2.0); pop('.b3', 6.5);
+  r.querySelectorAll('.md').forEach((d, i) => { const p = back(seg(t, 10.5 + i * 0.7, 0.6)); d.style.opacity = clamp(seg(t, 10.5 + i * 0.7, 0.3)); d.style.transform = `scale(${0.7 + 0.3 * p})`; });
+} };
+S.s05_assessment = { build(r) {
+  const x = V ? 100 : 900, y = V ? 520 : 240;
+  const rows = ['Question 1', 'Question 2', 'Question 3', 'Question 4'].map((q, i) => `<div class="qr" style="position:absolute;left:40px;right:40px;top:${40 + i * 92}px;height:72px;border-radius:16px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:26px;font-weight:600">${q}<span class="mk" style="width:40px;height:40px;border-radius:50%;background:#2fbf71;display:flex;align-items:center;justify-content:center">${ICON.check}</span></div>`).join('');
+  r.innerHTML = `${layerHead(3, 'Assessment, built in.')}
+  <div class="card" style="left:${x}px;top:${y}px;width:${V ? 880 : 820}px;height:560px">${rows}
+   <div class="rv pill" style="position:absolute;left:40px;bottom:40px">Teacher review</div>
+   <div class="rel" style="position:absolute;right:40px;bottom:34px;padding:16px 34px;border-radius:16px;background:#f59f0a;color:#08172b;font-size:28px;font-weight:800">Release results</div></div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  r.querySelectorAll('.qr').forEach((q, i) => { const p = eo(seg(t, 0.5 + i * 0.35, 0.5)); q.style.opacity = p; q.style.transform = `translateX(${(1 - p) * 40}px)`; const m = q.querySelector('.mk'); m.style.transform = `scale(${back(seg(t, 3.2 + i * 0.35, 0.5))})`; });
+  const rv = r.querySelector('.rv'); rv.style.opacity = eo(seg(t, 5.5, 0.5));
+  const rel = r.querySelector('.rel'); const a = eo(seg(t, 6.6, 0.5)); const press = seg(t, 8, 0.25) - seg(t, 8.25, 0.25);
+  rel.style.opacity = a; rel.style.transform = `scale(${(0.85 + 0.15 * back(seg(t, 6.6, 0.6))) * (1 - 0.08 * press)})`; rel.style.boxShadow = `0 0 ${50 * seg(t, 8.1, 0.6)}px #f59f0a`;
+} };
+S.s06_learner = { build(r) {
+  const x = V ? 110 : 900, y = V ? 520 : 260;
+  const bars = ['Objective A', 'Objective B', 'Objective C'].map((o, i) => `<div style="position:absolute;left:${x}px;top:${y + i * 80}px;font-size:24px;font-weight:600;color:#cfe0ff">${o}</div><div class="bar mb" style="left:${x + 220}px;top:${y + i * 80 + 4}px;width:${V ? 600 : 560}px"><i></i></div>`).join('');
+  const days = ['Day 1', 'Day 3', 'Day 7'].map((d, i) => `<div class="day" style="position:absolute;left:${x + i * (V ? 300 : 280)}px;top:${y + 330}px;text-align:center;width:200px"><div class="nd" style="width:30px;height:30px;margin:0 auto 12px;border-radius:50%;background:#8fb4f0"></div><div style="font-size:22px;color:#cfe0ff">${d}</div></div>`).join('');
+  r.innerHTML = `${layerHead(4, 'It remembers every learner.')}${bars}
+  <div class="tline" style="position:absolute;left:${x + 100}px;top:${y + 344}px;height:4px;width:0;background:rgba(143,180,240,.5);border-radius:2px"></div>${days}
+  <div class="mist" style="position:absolute;left:${x + 40}px;top:${y + 250}px;padding:10px 20px;border-radius:999px;font-size:22px;font-weight:700;background:#e85d4a">Mistake → review</div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  const target = [0.86, 0.62, 0.4];
+  r.querySelectorAll('.mb i').forEach((b, i) => { b.style.width = `${eo(seg(t, 0.6 + i * 0.3, 1.4)) * target[i] * 100}%`; });
+  r.querySelector('.tline').style.width = `${eo(seg(t, 3.2, 1.4)) * (V ? 600 : 560)}px`;
+  r.querySelectorAll('.day').forEach((d, i) => { d.style.opacity = eo(seg(t, 3.4 + i * 0.5, 0.4)); });
+  const m = r.querySelector('.mist'); const mv = eio(seg(t, 4.8, 4.2)); m.style.opacity = eo(seg(t, 4.4, 0.4));
+  m.style.transform = `translateX(${mv * (V ? 600 : 560)}px)`; const g = seg(t, 8.4, 0.8); m.style.background = `rgb(${232 - 185 * g},${93 + 98 * g},${74 + 39 * g})`; if (g > 0.5) m.textContent = 'Learned ✓';
+} };
+S.s07_insight = { build(r) {
+  const x = V ? 90 : 880, y = V ? 520 : 230;
+  let cells = ''; for (let i = 0; i < 24; i++) cells += `<div class="hc" style="width:52px;height:52px;border-radius:10px;background:#2a6edc"></div>`;
+  r.innerHTML = `${layerHead(5, 'Clear insight for every leader.')}
+  <div class="card" style="left:${x}px;top:${y}px;width:${V ? 900 : 880}px;height:${V ? 980 : 640}px">
+   <svg class="ch" style="position:absolute;left:40px;top:40px" width="${V ? 820 : 500}" height="260" viewBox="0 0 500 260"><path class="ln" d="M10 230 C80 210 120 190 170 170 S260 140 300 110 S400 70 490 40" fill="none" stroke="#8fb4f0" stroke-width="6" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>
+   <div class="bars2" style="position:absolute;left:${V ? 40 : 580}px;top:${V ? 330 : 60}px;display:flex;gap:18px;align-items:flex-end;height:220px">${[0.5, 0.8, 0.65, 0.95].map((h) => `<div class="vb" data-h="${h}" style="width:46px;height:0;border-radius:10px 10px 4px 4px;background:linear-gradient(#f59f0a,#0056D2)"></div>`).join('')}</div>
+   <div class="heat" style="position:absolute;left:40px;top:${V ? 600 : 340}px;display:grid;grid-template-columns:repeat(12,52px);gap:10px">${cells}</div>
+   <div style="position:absolute;left:40px;bottom:30px;display:flex;gap:16px"><span class="pill">Student</span><span class="pill">Class</span><span class="pill">School</span></div></div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  r.querySelector('.ln').style.strokeDashoffset = 1 - eio(seg(t, 0.6, 2.2));
+  r.querySelectorAll('.vb').forEach((b, i) => { b.style.height = `${eo(seg(t, 1.6 + i * 0.25, 1)) * Number(b.dataset.h) * 200}px`; });
+  r.querySelectorAll('.hc').forEach((c, i) => { const p = seg(t, 3 + (i % 12) * 0.08 + Math.floor(i / 12) * 0.2, 0.5); const warm = [3, 8, 15, 20].includes(i); c.style.opacity = 0.2 + 0.8 * p; c.style.background = warm && t > 5.5 ? '#f59f0a' : (i % 3 ? '#2a6edc' : '#0056D2'); });
+} };
+S.s08_moodle = { build(r) {
+  const y = V ? 640 : 360;
+  r.innerHTML = `${layerHead(6, 'Works with Moodle.')}
+  <div class="card lp" style="left:${V ? 90 : 820}px;top:${y}px;width:${V ? 380 : 400}px;height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"><div style="font-size:24px;color:#cfe0ff">Your LMS</div><div style="font-size:52px;font-weight:800">Moodle</div></div>
+  <div class="card rp" style="left:${V ? 610 : 1400}px;top:${y}px;width:${V ? 380 : 400}px;height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"><div style="font-size:24px;color:#cfe0ff">AI infrastructure</div><div style="font-size:52px;font-weight:800">ENARA</div></div>
+  <svg class="lk" style="position:absolute;left:${V ? 470 : 1220}px;top:${y + 150}px" width="${V ? 140 : 180}" height="40"><line x1="0" y1="20" x2="${V ? 140 : 180}" y2="20" stroke="#f59f0a" stroke-width="6" stroke-linecap="round" stroke-dasharray="14 12"/></svg>
+  <div class="tags" style="position:absolute;left:${V ? 90 : 820}px;top:${y + 380}px;display:flex;gap:16px;flex-wrap:wrap;width:${V ? 900 : 980}px"><span class="pill tg">Activities inside your courses</span><span class="pill tg">Class lists in sync</span><span class="pill tg">One sign-in</span></div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  const a = eo(seg(t, 0.4, 0.7)), b = eo(seg(t, 0.8, 0.7));
+  r.querySelector('.lp').style.cssText += `;opacity:${a};transform:translateX(${(1 - a) * -60}px)`;
+  r.querySelector('.rp').style.cssText += `;opacity:${b};transform:translateX(${(1 - b) * 60}px)`;
+  const lk = r.querySelector('.lk line'); lk.style.strokeDashoffset = -t * 80; r.querySelector('.lk').style.opacity = eo(seg(t, 1.4, 0.5));
+  r.querySelectorAll('.tg').forEach((d, i) => { const p = back(seg(t, 2.4 + i * 0.6, 0.6)); d.style.opacity = clamp(seg(t, 2.4 + i * 0.6, 0.3)); d.style.transform = `scale(${0.7 + 0.3 * p})`; });
+} };
+S.s09_apps = { build(r) {
+  const kid = KIDS.map((k) => `<div style="width:84px;height:84px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center"><img src="assets/${k}.svg" width="70" height="70"></div>`).join('');
+  const dev = (cls, x, y, w, h, title, body) => `<div class="card dv ${cls}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;padding:22px"><div style="font-size:20px;font-weight:700;color:#f59f0a;margin-bottom:12px">${title}</div>${body}</div>`;
+  const lines = (n) => Array.from({ length: n }, (_, i) => `<div style="height:14px;border-radius:7px;margin:12px 0;background:rgba(255,255,255,${0.18 - i * 0.03});width:${90 - i * 15}%"></div>`).join('');
+  r.innerHTML = V ? `${layerHead(7, 'An app for every role.')}
+   ${dev('a1', 90, 480, 430, 300, 'Students', lines(4))}${dev('a2', 560, 480, 430, 300, 'Young children', `<div style="display:grid;grid-template-columns:repeat(2,84px);gap:12px">${kid}</div>`)}
+   ${dev('a3', 90, 820, 430, 300, 'Teachers', lines(4))}${dev('a4', 560, 820, 430, 300, 'School leaders', lines(3))}
+   ${dev('a5', 300, 1160, 480, 380, 'Parents', `<div style="font-size:26px;font-weight:700">This week</div>${lines(3)}<div style="font-family:NotoAr;font-size:26px;direction:rtl">هذا الأسبوع</div>`)}`
+  : `${layerHead(7, 'An app for every role.')}
+   ${dev('a1', 820, 220, 520, 300, 'Students', lines(4))}${dev('a2', 1380, 220, 400, 300, 'Young children', `<div style="display:grid;grid-template-columns:repeat(4,72px);gap:10px">${kid.replace(/84px/g, '72px').replace(/70/g, '58')}</div>`)}
+   ${dev('a3', 820, 560, 380, 300, 'Teachers', lines(4))}${dev('a4', 1230, 560, 300, 300, 'School leaders', lines(3))}
+   ${dev('a5', 1560, 520, 260, 420, 'Parents', `<div style="font-size:22px;font-weight:700">This week</div>${lines(3)}<div style="font-family:NotoAr;font-size:22px;direction:rtl">هذا الأسبوع</div>`)}`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  const at = [0.7, 2.6, 4.6, 5.8, 7.2];
+  r.querySelectorAll('.dv').forEach((d, i) => { const p = back(seg(t, at[i], 0.7)); d.style.opacity = clamp(seg(t, at[i], 0.3)); d.style.transform = `translateY(${(1 - p) * 60}px) scale(${0.9 + 0.1 * p})`; });
+} };
+S.s10_trust = { build(r) {
+  const items = ['Separate school data', 'Roles & permissions', 'Clear AI spending limits', 'Voice never stored', 'Guarded against misuse'];
+  r.innerHTML = `${layerHead(8, 'Built on trust.')}
+  <div class="sh" style="position:absolute;left:${V ? 430 : 960}px;top:${V ? 520 : 330}px">${ICON.shield}</div>
+  <div class="its" style="position:absolute;left:${V ? 120 : 1260}px;top:${V ? 860 : 270}px;display:flex;flex-direction:column;gap:20px">${items.map((x) => `<div class="it pill" style="font-size:28px;padding:14px 24px"><span style="width:34px;height:34px;border-radius:50%;background:#2fbf71;display:flex;align-items:center;justify-content:center">${ICON.check}</span>${x}</div>`).join('')}</div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  const sh = r.querySelector('.sh'); const p = back(seg(t, 0.4, 0.9)); sh.style.opacity = clamp(seg(t, 0.4, 0.4)); sh.style.transform = `scale(${0.6 + 0.4 * p})`; sh.style.filter = `drop-shadow(0 0 ${20 + 15 * Math.sin(t * 2)}px rgba(42,110,220,.8))`;
+  const at = [1.6, 3.4, 5.4, 7.6, 9.4];
+  r.querySelectorAll('.it').forEach((d, i) => { const q = eo(seg(t, at[i], 0.6)); d.style.opacity = q; d.style.transform = `translateX(${(1 - q) * 50}px)`; });
+} };
+S.s11_delivery = { build(r) {
+  const st = ['Built', 'Checked end to end', 'Health check', 'Live'];
+  r.innerHTML = `${layerHead(9, 'Reliable by design.')}
+  <div style="position:absolute;left:${V ? 120 : 260}px;top:${V ? 700 : 560}px;display:flex;${V ? 'flex-direction:column;' : ''}gap:${V ? 40 : 30}px;align-items:${V ? 'flex-start' : 'center'}">${st.map((s, i) => `<div class="nd2" style="display:flex;align-items:center;gap:16px"><span class="ring" style="width:64px;height:64px;border-radius:50%;border:4px solid #8fb4f0;display:flex;align-items:center;justify-content:center">${ICON.check}</span><span style="font-size:32px;font-weight:700">${s}</span>${i < 3 && !V ? '<span style="width:110px;height:4px;background:rgba(143,180,240,.4);border-radius:2px;margin-left:14px"></span>' : ''}</div>`).join('')}</div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  r.querySelectorAll('.nd2').forEach((d, i) => { const p = eo(seg(t, 0.5 + i * 0.7, 0.5)); d.style.opacity = p; const ring = d.querySelector('.ring'); const g = seg(t, 0.9 + i * 0.7, 0.4); ring.style.background = g > 0.5 ? '#2fbf71' : 'transparent'; ring.style.borderColor = g > 0.5 ? '#2fbf71' : '#8fb4f0'; ring.querySelector('svg').style.opacity = g; });
+} };
+S.s12_soon = { build(r) {
+  r.innerHTML = `<div class="head">${words('Coming soon')}</div>
+  <div class="sn" style="position:absolute;left:${V ? 120 : 900}px;top:${V ? 620 : 330}px;display:flex;${V ? 'flex-direction:column;' : ''}gap:36px">
+   <div class="card s1" style="position:relative;width:420px;height:260px;border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">${ICON.mic}<div style="font-size:30px;font-weight:700">Pronunciation feedback</div></div>
+   <div class="card s2" style="position:relative;width:420px;height:260px;border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">${ICON.chat}<div style="font-size:30px;font-weight:700;text-align:center">More learning<br>platforms</div></div></div>`;
+}, update(r, t) {
+  kin(r.querySelector('.head'), t);
+  ['.s1', '.s2'].forEach((s, i) => { const e = r.querySelector(s); const p = eo(seg(t, 0.6 + i * 0.6, 0.6)); e.style.opacity = p * 0.9; e.style.transform = `translateY(${(1 - p) * 40}px)`; });
+} };
+S.s13_cta = { build(r) {
+  r.innerHTML = `<div style="position:absolute;left:0;right:0;top:${V ? 640 : 280}px;text-align:center">
+   <div class="mk2" style="font-size:${V ? 170 : 180}px;font-weight:800;letter-spacing:.06em">ENARA</div>
+   <div class="tl2" style="font-size:${V ? 50 : 54}px;font-weight:700;color:#cfe0ff;margin-top:10px;padding:0 60px">${words('The AI infrastructure for your school.')}</div>
+   <div class="btn" style="display:inline-block;margin-top:56px;padding:26px 60px;border-radius:20px;background:#f59f0a;color:#08172b;font-size:44px;font-weight:800">Book a demo</div>
+   <div class="url" style="margin-top:28px;font-size:36px;font-weight:600;color:#8fb4f0">enara.app</div></div>`;
+}, update(r, t) {
+  const m = r.querySelector('.mk2'); const p = back(seg(t, 0.2, 0.9)); m.style.opacity = clamp(seg(t, 0.2, 0.4)); m.style.transform = `scale(${0.8 + 0.2 * p})`; m.style.letterSpacing = `${0.2 - 0.14 * eo(seg(t, 0.2, 1.4))}em`;
+  kin(r.querySelector('.tl2'), t, 1.0, 0.1);
+  const b = r.querySelector('.btn'); const q = back(seg(t, 3.0, 0.7)); b.style.opacity = clamp(seg(t, 3.0, 0.3)); b.style.transform = `scale(${0.7 + 0.3 * q})`; b.style.boxShadow = `0 0 ${40 + 20 * Math.sin(t * 3)}px rgba(245,159,10,${0.5 * seg(t, 3.4, 0.6)})`;
+  r.querySelector('.url').style.opacity = eo(seg(t, 3.8, 0.6));
+} };
+
+// ---------------------------------------------------------------------------------------------- timeline
+let TL = [], SUBS = [];
+const LAYER_OF = { s03_content: 0, s04_teaching: 1, s05_assessment: 2, s06_learner: 3, s07_insight: 4, s08_moodle: 5, s09_apps: 6, s10_trust: 7, s11_delivery: 8 };
+function setup(plan) { // plan: [{id, start, dur}], subs: [{start,end,text}]
+  TL = plan.timeline; SUBS = plan.subs;
+  const host = document.getElementById('scenes');
+  for (const s of TL) { const el = document.createElement('div'); el.className = 'scene'; el.id = 'sc_' + s.id; host.appendChild(el); S[s.id].build(el); s.el = el; }
+  document.getElementById('rail').innerHTML = LAYERS.map((l, i) => `<div data-i="${i}"><span>${l}</span><b></b></div>`).join('');
+}
+function render(t) {
+  const b1 = document.getElementById('b1'), b2 = document.getElementById('b2'), b3 = document.getElementById('b3');
+  b1.style.transform = `translate(${300 + 160 * Math.sin(t * 0.13)}px,${200 + 120 * Math.cos(t * 0.11)}px)`;
+  b2.style.transform = `translate(${W - 200 + 140 * Math.cos(t * 0.09)}px,${H - 100 + 160 * Math.sin(t * 0.12)}px)`;
+  b3.style.transform = `translate(${W * 0.6 + 200 * Math.sin(t * 0.07)}px,${H * 0.2 + 100 * Math.sin(t * 0.1)}px)`;
+  let activeLayer = -1, railVis = 0;
+  for (const s of TL) {
+    const lt = t - s.start, X = 0.45;
+    const inA = seg(lt, -0.05, X), outA = 1 - seg(lt, s.dur - X, X);
+    const a = Math.min(inA, outA);
+    s.el.style.opacity = a;
+    if (a > 0) { s.el.style.transform = `scale(${1.04 - 0.04 * eo(inA)}) translateY(${(1 - outA) * -20}px)`; S[s.id].update(s.el, Math.max(0, lt), s.dur); }
+    if (lt >= 0 && lt < s.dur && s.id in LAYER_OF) { activeLayer = LAYER_OF[s.id]; railVis = Math.min(seg(lt, 0, 0.6), 1 - seg(lt, s.dur - 0.4, 0.4)); }
+  }
+  const rail = document.getElementById('rail'); rail.style.opacity = railVis;
+  rail.querySelectorAll('div').forEach((d) => d.classList.toggle('on', Number(d.dataset.i) === activeLayer));
+  const sub = SUBS.find((x) => t >= x.start && t < x.end); const el = document.getElementById('sub');
+  if (sub) { el.textContent = sub.text; el.style.opacity = Math.min(seg(t, sub.start, 0.15), 1 - seg(t, sub.end - 0.15, 0.15)); } else el.style.opacity = 0;
+}
+window.setup = setup; window.render = render;
+</script></body></html>
