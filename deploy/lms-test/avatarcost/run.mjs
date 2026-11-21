@@ -239,10 +239,10 @@ async function diagnose() {
       }
     } catch (e) { if (e?.name !== 'AbortError') console.log(`runtime-logs error ${e?.name}`); }
   })();
-  await new Promise((r) => setTimeout(r, 3000));
+  await new Promise((r) => setTimeout(r, 6000));
   const token = await learnerToken();
   console.log(`CHATCHECK ${JSON.stringify(await chatCheck(asLearner(token)))}`);
-  await new Promise((r) => setTimeout(r, 25000));
+  await new Promise((r) => setTimeout(r, 45000));
   ctl.abort();
   await reader;
   const mask = (t) => String(t).replace(/eyJ[\w-]+\.[\w-]+\.[\w-]*/g, '<jwt>').replace(/sk-[A-Za-z0-9_-]+/g, '<key>').replace(/[A-Za-z0-9+/_=-]{40,}/g, '<long>');
@@ -251,7 +251,7 @@ async function diagnose() {
   console.log(`runtime-logs lines ${lines.length}`);
   for (const l of lines) {
     let msg = l;
-    try { const j = JSON.parse(l); msg = j.message ?? j.text ?? l; } catch {}
+    try { const j = JSON.parse(l); msg = `[${Object.keys(j).slice(0, 8).join(',')}] ${j.level ?? ''} ${j.requestPath ?? ''} ${j.message ?? j.text ?? ''}`; } catch {}
     if (shown < 60) { console.log(`LOG ${want.test(msg) ? '*' : ' '} ${mask(msg).replace(/\s+/g, ' ').slice(0, 600)}`); shown += 1; }
   }
 }
