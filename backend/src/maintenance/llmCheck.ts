@@ -59,7 +59,7 @@ export type EvalTurn = {
   history: { role: 'user' | 'assistant'; content: string }[]; query: string; learner?: string; languageContext?: string;
   sources?: { fileName: string; page?: number; text: string; lessonId?: string }[]; practice?: boolean; outOfScope?: boolean; mode?: 'chat' | 'voice';
 };
-export async function tutorEval(req: { arm?: string; turn?: EvalTurn }) {
+export async function tutorEval(req: { arm?: string; turn?: EvalTurn; stream?: boolean }) {
   if (!BASE() || !KEY() || !tutorModel()) return { ok: false, reason: 'provider not configured' };
   const t = req.turn;
   if (!t || typeof t.query !== 'string' || !Array.isArray(t.history) || t.history.length > 40) return { ok: false, reason: 'turn: query and history (<= 40)' };
@@ -76,12 +76,21 @@ export async function tutorEval(req: { arm?: string; turn?: EvalTurn }) {
     teachingMethod: 'socratic' as never, mode: t.mode === 'voice' ? 'voice' as const : 'chat' as const, learner: t.learner?.slice(0, 2000), pedagogy,
     sourcesPrompt: sources.length ? sourcesPrompt(sources) : undefined, languageContext: t.languageContext?.slice(0, 60_000) };
   const off = { gradeFirst: false, answerCheck: false, examples: false, replyChecks: false, tuning: false };
-  const client = deepseekClient(55_000, { parts: req.arm === 'match' ? dsParts(true) : off });
+  // arms: base (match parts off), match (on, before the speed work), fast (on + dsFast)
+  const client = deepseekClient(55_000, { parts: req.arm === 'fast' ? dsParts(true) : req.arm === 'match' ? { ...dsParts(true), fast: false } : off });
   const ask = async (p: typeof params) => {
     const { body } = await buildTutorRequest(p);
     (body as { model: string }).model = tutorModel()!;
-    const r = await client.beta.messages.create(body as never) as unknown as { content: { text: string }[]; usage: { input_tokens: number; output_tokens: number } };
-    return { raw: r.content[0]?.text ?? '', usage: r.usage };
+    const t = Date.now();
+    if (req.stream) { // the learner's view: time to the first visible character (after the hidden line)
+      const st = client.beta.messages.stream(body as never) as unknown as AsyncIterable<{ type: string; delta?: { text?: string } }> & { finalMessage(): Promise<{ usage: { input_tokens: number; output_tokens: number }; ds_meta?: unknown }> };
+      let raw = ''; let firstVisibleMs: number | null = null;
+      for await (const e of st) if (e.type === 'content_block_delta' && e.delta?.text) { raw += e.delta.text; if (firstVisibleMs === null && raw.replace(/^\s*\[\[assess\b[^\]]*\]\]\s*/i, '').replace(/^\s*\[\[assess[^\]]*$/i, '').trim()) firstVisibleMs = Date.now() - t; }
+      const f = await st.finalMessage();
+      return { raw, usage: f.usage, firstVisibleMs, wholeMs: Date.now() - t, ds: f.ds_meta };
+    }
+    const r = await client.beta.messages.create(body as never) as unknown as { content: { text: string }[]; usage: { input_tokens: number; output_tokens: number }; ds_meta?: unknown };
+    return { raw: r.content[0]?.text ?? '', usage: r.usage, firstVisibleMs: null as number | null, wholeMs: Date.now() - t, ds: r.ds_meta };
   };
   const t0 = Date.now();
   let a = await ask(params); let s = stripAssessmentMarkers(a.raw); let repaired = false;
@@ -93,5 +102,16 @@ export async function tutorEval(req: { arm?: string; turn?: EvalTurn }) {
     const s2 = stripAssessmentMarkers(b.raw);
     if (s2.text && s2.assessment) { a = b; s = s2; }
   }
-  return { ok: true, ms: Date.now() - t0, raw: a.raw, text: s.text, assessment: s.assessment, repaired, citations: citationsIn(s.text, sources).length, usage };
+  return { ok: true, ms: Date.now() - t0, firstVisibleMs: a.firstVisibleMs, wholeMs: a.wholeMs, timings: a.ds ?? null, raw: a.raw, text: s.text, assessment: s.assessment, repaired, citations: citationsIn(s.text, sources).length, usage };
+}
+
+// Idle-timeout probe (owner, 21 Nov 2026): one tiny request (1 token) and its time. A slow one after a long quiet gap shows the model server
+// had gone idle and had to start again. Numbers only.
+export async function llmPing() {
+  if (!BASE() || !KEY() || !tutorModel()) return { ok: false, reason: 'provider not configured' };
+  const t = Date.now();
+  try {
+    await deepseekClient(300_000).messages.create({ model: tutorModel()!, max_tokens: 1, messages: [{ role: 'user', content: 'hi' }] } as never);
+    return { ok: true, ms: Date.now() - t, at: new Date().toISOString() };
+  } catch (e) { return { ok: false, ms: Date.now() - t, status: (e as { status?: number }).status ?? null, at: new Date().toISOString() }; }
 }

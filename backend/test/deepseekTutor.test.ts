@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageBand, answerCheck, examplesFor, gradedReply, markerOf, parseNumber, readGrade, replyProblems, spellingNote, turnKind, type ChatCall } from '../src/services/deepseekTutor';
+import { NOTE_MARK, ageBand, answerCheck, examplesFor, gradedReply, markerOf, nothingToGrade, parseNumber, readGrade, replyProblems, spellingNote, turnKind, type ChatCall, type ChatMsg } from '../src/services/deepseekTutor';
 import { parseAssessmentMarker } from '../src/services/languageLearningState';
 
 // DeepSeek match (owner go 21 Nov 2026): grade first, code answer checks, examples, reply checks; every subject, English and Arabic.
@@ -130,3 +130,66 @@ describe('DeepSeek match: spelling check limits (second 100-turn test)', () => {
   });
 });
 
+
+describe('DeepSeek speed (dsFast)', () => {
+  const fast = { gradeFirst: true, answerCheck: true, examples: false, replyChecks: true, tuning: true, fast: true };
+  const sys = 'HIDDEN GRADING LINE (every reply, any subject): [[assess';
+  it('nothing to grade: a first message, a greeting, a clear question (unless the task asks them to ask one)', () => {
+    expect(nothingToGrade('hello', '')).toBe(true);
+    expect(nothingToGrade('Hi!', 'What is 2/8 + 3/8?')).toBe(true);
+    expect(nothingToGrade('wait, what does the denominator mean?', 'What is 2/8 + 3/8?')).toBe(true);
+    expect(nothingToGrade('يعني إيه نسبة مئوية أصلاً؟', 'احسب ٢٥٪ من ٤٠.')).toBe(true);
+    expect(nothingToGrade('5/8', 'What is 2/8 + 3/8?')).toBe(false);
+    expect(nothingToGrade('is it 8?', 'What is 4 + 4?')).toBe(false);
+    expect(nothingToGrade('Where are you from?', 'Ask the tutor about his or her home town.')).toBe(false);
+  });
+
+  it('one shared prompt: the system message and conversation are the same in both calls; the notes go after the learner message', async () => {
+    const seen: ChatMsg[][] = [];
+    const call: ChatCall = async (q) => { seen.push(q.messages); return q.json ? { text: '{"verdict":"CORRECT","relevance":"ACTIVE_ITEM","next":"NEW_ITEM","expected":"5/8","answer":"5/8"}', finish: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 } } : { text: 'Yes! Next: what is 1/4 + 2/4?', finish: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 } }; };
+    const msgs: ChatMsg[] = [{ role: 'user', content: 'practise' }, { role: 'assistant', content: 'What is 2/8 + 3/8?' }, { role: 'user', content: '5/8' }];
+    const r = await gradedReply({ system: sys, messages: msgs, maxTokens: 300, parts: fast, call });
+    expect(seen).toHaveLength(2);
+    expect(seen[0][0]).toEqual(seen[1][0]);
+    expect(seen[0].slice(0, 3)).toEqual(seen[1].slice(0, 3));
+    expect(seen[0][3].content.startsWith('5/8\n\n' + NOTE_MARK)).toBe(true);
+    expect(seen[1][3].content).toMatch(/THE GRADING IS ALREADY DONE/);
+    expect(r.meta.timings.gradeMs).toBeGreaterThanOrEqual(0);
+  });
+
+  it('a question needs no grading call', async () => {
+    let calls = 0;
+    const call: ChatCall = async () => { calls += 1; return { text: 'The denominator is the bottom number. Now: what is 2/8 + 3/8?', finish: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 } }; };
+    const r = await gradedReply({ system: sys, messages: [{ role: 'assistant', content: 'What is 2/8 + 3/8?' }, { role: 'user', content: 'what does the denominator mean?' }], maxTokens: 300, parts: fast, call });
+    expect(calls).toBe(1);
+    expect(r.text.startsWith('[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=SAME_ITEM]]')).toBe(true);
+    expect(r.meta.timings.skippedGrade).toBe(true);
+  });
+
+  it('streamed: the hidden line first, then sentence by sentence; a sentence that gives the answer away ends the reply with "try again"', async () => {
+    const call: ChatCall = async (q) => {
+      if (q.json) return { text: '{"verdict":"INCORRECT","relevance":"ACTIVE_ITEM","next":"SAME_ITEM","expected":"oxygen","answer":"carbon dioxide"}', finish: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 } };
+      for (const d of ['Not quite. ', 'That gas goes in. ', 'The answer is oxygen. ', 'Bye.']) if (q.onDelta!(d) === false) break;
+      return { text: '', finish: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 } };
+    };
+    const out: string[] = [];
+    const r = await gradedReply({ system: sys, messages: [{ role: 'assistant', content: 'What gas do plants give out?' }, { role: 'user', content: 'carbon dioxide' }], maxTokens: 300, parts: fast, call, onText: (t) => out.push(t) });
+    expect(out[0]).toMatch(/^\[\[assess verdict=INCORRECT/);
+    expect(out.slice(1).join('')).toBe('Not quite. That gas goes in.  Try the same task again.');
+    expect(r.text).not.toMatch(/oxygen/);
+    expect(r.meta.timings.cut).toBe(true);
+  });
+
+  it('streamed: a first sentence that misses "not in your materials" is rewritten before anything is shown', async () => {
+    let n = 0;
+    const call: ChatCall = async (q) => {
+      n += 1;
+      if (q.onDelta) { q.onDelta('V = πr²h. '); return { text: '', finish: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 } }; }
+      return { text: "This isn't in your course materials. General knowledge: V = πr²h. What is r?", finish: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 } };
+    };
+    const out: string[] = [];
+    await gradedReply({ system: 'NOT IN THE COURSE MATERIALS ... HIDDEN GRADING LINE (every reply, any subject): [[assess', messages: [{ role: 'user', content: 'how do i find the volume of a cylinder?' }], maxTokens: 300, parts: fast, call, onText: (t) => out.push(t) });
+    expect(n).toBe(2);
+    expect(out.slice(1).join('')).toMatch(/^This isn't in your course materials/);
+  });
+});

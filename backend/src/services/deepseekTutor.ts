@@ -13,10 +13,12 @@
 // Every part is a pure function here except gradedReply, which takes the chat call as an argument (tests pass a fake).
 import { engineV2 } from './engineV2';
 
-export type DsParts = { gradeFirst: boolean; answerCheck: boolean; examples: boolean; replyChecks: boolean; tuning: boolean };
+export type DsParts = { gradeFirst: boolean; answerCheck: boolean; examples: boolean; replyChecks: boolean; tuning: boolean; fast?: boolean };
+// dsFast (speed plan, owner go 21 Nov 2026): one shared prompt for both calls (the model server reuses what it read), no grading call when
+// there is nothing to grade, a smaller grading call, and a streamed reply checked sentence by sentence.
 export const dsParts = (all?: boolean): DsParts => ({
   gradeFirst: all ?? engineV2('dsGradeFirst'), answerCheck: all ?? engineV2('dsAnswerCheck'), examples: all ?? engineV2('dsExamples'),
-  replyChecks: all ?? engineV2('dsReplyChecks'), tuning: all ?? engineV2('dsTuning'),
+  replyChecks: all ?? engineV2('dsReplyChecks'), tuning: all ?? engineV2('dsTuning'), fast: all ?? engineV2('dsFast'),
 });
 
 // ---------------------------------------------------------------------------------------------------------------- what kind of turn
@@ -116,6 +118,12 @@ export const GRADE_INSTRUCTION = [
   ' "mistake": "the ONE exact mistake in their answer, in a few words (which part, which letter, which step); empty if right or not an answer"}',
   'A spelling slip, a wrong letter, a wrong unit or a wrong step is a mistake. A question, a greeting or a new topic is NOT_EVALUATED with NO_ACTIVE_ITEM.',
 ].join('\n');
+/** dsFast: the same decision in fewer words, and a short answer (capped at 160 tokens). */
+export const GRADE_INSTRUCTION_SHORT = [
+  'GRADING ONLY - do not reply to the student. Grade the STUDENT\'s message above (the hidden grading line rules) and return ONLY this JSON:',
+  '{"verdict":"CORRECT|CORRECT_WITH_EQUIVALENT_FORMULATION|PARTIALLY_CORRECT|INCORRECT|AMBIGUOUS|NOT_EVALUATED","relevance":"ACTIVE_ITEM|OTHER_ITEM|UNRELATED|NO_ACTIVE_ITEM","next":"NEW_ITEM|SAME_ITEM|NONE","criteria":[],"item":"","focus":"","pics":"","expected":"correct answer, short","answer":"their answer","mistake":"the one exact mistake, few words"}',
+  'Spelling, letter, unit or step errors are mistakes. Not an answer (question, greeting, new topic) = NOT_EVALUATED + NO_ACTIVE_ITEM. Leave unknown fields empty.',
+].join('\n');
 export type Grade = { verdict: string; relevance: string; next: string; criteria: number[]; item?: string; focus?: string; pics?: string; expected?: string; answer?: string; mistake?: string };
 const pick = (allowed: readonly string[], v: unknown, d: string) => { const u = String(v ?? '').trim().toUpperCase(); return allowed.includes(u) ? u : d; };
 /** Lenient JSON read of the grading call; never throws. */
@@ -211,47 +219,139 @@ export const regenNote = (reasons: string[]) => `YOUR LAST DRAFT WAS REJECTED. F
 
 // ---------------------------------------------------------------------------------------------------------------- the whole graded turn
 export type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string };
-export type ChatCall = (p: { messages: ChatMsg[]; max_tokens: number; json?: boolean; reasoning?: string; temperature?: number }) => Promise<{ text: string; finish: string; usage: { input_tokens: number; output_tokens: number } }>;
+type CallOut = { text: string; finish: string; usage: { input_tokens: number; output_tokens: number } };
+export type ChatCall = (p: { messages: ChatMsg[]; max_tokens: number; json?: boolean; reasoning?: string; temperature?: number; onDelta?: (t: string) => boolean | void }) => Promise<CallOut>;
 const stripLeadingMarker = (t: string) => t.replace(/^\s*\[\[assess\b[^\]]*\]\]\s*/i, '').trim();
+export type Timings = { gradeMs?: number; firstMs?: number; replyMs?: number; regenMs?: number; totalMs: number; skippedGrade?: boolean; streamed?: boolean; cut?: boolean };
 
-/** A graded DeepSeek turn: grade (JSON) → code check → reply (with examples) → checks (one regeneration) → hidden line + reply. */
-export async function gradedReply(p: { system: string; messages: ChatMsg[]; maxTokens: number; temperature?: number; parts: DsParts; call: ChatCall; gradeReasoning?: string }): Promise<{ text: string; finish: string; usage: { input_tokens: number; output_tokens: number }; meta: { grade: Grade | null; check: CheckResult; regenerated: string[] } }> {
+// dsFast: extra instructions go AFTER the learner's message (marked as not theirs), so the system prompt and the conversation are the same
+// bytes in the grading call and the reply call. (The chat template moves every system message to the front, which would break that.)
+export const NOTE_MARK = '[NOTE FOR THE TUTOR - added by the system, not written by the student]';
+export function withNote(messages: ChatMsg[], note: string): ChatMsg[] {
+  if (!note) return messages;
+  const out = messages.slice(); const last = out[out.length - 1];
+  if (last?.role === 'user') out[out.length - 1] = { role: 'user', content: `${last.content}\n\n${NOTE_MARK}\n${note}` };
+  else out.push({ role: 'user', content: `${NOTE_MARK}\n${note}` });
+  return out;
+}
+
+// dsFast: turns with nothing to grade get no grading call. Conservative: a first message, a greeting, or a clear question that the last
+// tutor message did not ask for ("ask the tutor ..." makes a question the answer).
+const GREETING = /^\s*(hi|hello|hey|good (morning|afternoon|evening)|thanks|thank you|ok(ay)?|سلام|السلام عليكم|مرحبا|أهلا|اهلا|شكرا)\b[\s!.,؟?]*$/i;
+const QUESTION_START = /^\s*(what|why|how|when|where|who|which|whose|explain|define|describe|tell me|can you|could you|wait)\b|^\s*(ما|ماذا|لماذا|ليه|ازاي|إزاي|كيف|متى|امتى|أين|فين|مين|اشرح|عرف|عرّف|وضح|يعني|هو|هي)\s/i;
+export function nothingToGrade(learnerText: string, taskText: string): boolean {
+  const t = learnerText.trim();
+  if (!taskText.trim()) return true;
+  if (GREETING.test(t)) return true;
+  if (/\bask\b|اسأل/i.test(taskText)) return false;
+  return QUESTION_START.test(t) && /[?؟]\s*$|^\s*(explain|define|describe|tell me|اشرح|عرف|عرّف|وضح)/i.test(t) && t.split(/\s+/).length >= 3;
+}
+
+const SENTENCE_END = /([.!?؟]["'”»)]*\s+|\n+)/;
+const TRY_AGAIN = (arabic: boolean) => (arabic ? 'حاول مرة أخرى.' : 'Try the same task again.');
+
+/** A graded DeepSeek turn: grade (JSON) → code check → reply (with examples) → checks (one regeneration) → hidden line + reply.
+ * With onText (a stream), the hidden line is sent first, then the reply sentence by sentence as each one passes the checks. */
+export async function gradedReply(p: { system: string; messages: ChatMsg[]; maxTokens: number; temperature?: number; parts: DsParts; call: ChatCall; gradeReasoning?: string; onText?: (t: string) => void }): Promise<{ text: string; finish: string; usage: { input_tokens: number; output_tokens: number }; meta: { grade: Grade | null; check: CheckResult; regenerated: string[]; timings: Timings } }> {
+  const t0 = Date.now(); const timings: Timings = { totalMs: 0 };
   const usage = { input_tokens: 0, output_tokens: 0 };
   const add = (u: { input_tokens: number; output_tokens: number }) => { usage.input_tokens += u.input_tokens; usage.output_tokens += u.output_tokens; };
+  const fast = Boolean(p.parts.fast);
   const kind = turnKind(p.system); const band = ageBand(p.system);
   const learnerText = [...p.messages].reverse().find((m) => m.role === 'user')?.content ?? '';
   const taskText = [...p.messages].reverse().find((m) => m.role === 'assistant')?.content ?? '';
   const temperature = p.parts.tuning ? Math.min(p.temperature ?? 0.3, 0.3) : p.temperature;
+  const sysMsg: ChatMsg = { role: 'system', content: p.system };
   let grade: Grade | null = null; let check: CheckResult = {};
   if (p.parts.gradeFirst) {
-    const g = await p.call({ messages: [{ role: 'system', content: `${p.system}\n\n${GRADE_INSTRUCTION}` }, ...p.messages], max_tokens: 400, json: true, reasoning: p.parts.tuning ? p.gradeReasoning : undefined, temperature: 0 });
-    add(g.usage);
-    grade = readGrade(g.text);
-    if (grade && p.parts.answerCheck && grade.relevance === 'ACTIVE_ITEM' && grade.verdict !== 'NOT_EVALUATED') {
-      check = answerCheck(grade.answer ?? learnerText, grade.expected);
-      if (!check.verdict && check.note?.startsWith('spelling:') && RIGHT.has(grade.verdict)) check = { ...check, verdict: 'PARTIALLY_CORRECT' }; // the prompt: a spelling error is never "right" as a whole
-      if (check.verdict && check.verdict !== grade.verdict && !(check.verdict === 'CORRECT' && grade.verdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION')) {
-        grade = { ...grade, verdict: check.verdict, next: check.verdict === 'CORRECT' ? (grade.next === 'SAME_ITEM' ? 'NEW_ITEM' : grade.next) : grade.next === 'NEW_ITEM' ? 'SAME_ITEM' : grade.next };
+    if (fast && nothingToGrade(learnerText, taskText)) {
+      grade = { verdict: 'NOT_EVALUATED', relevance: 'NO_ACTIVE_ITEM', next: taskText.trim() ? 'SAME_ITEM' : 'NONE', criteria: [] };
+      timings.skippedGrade = true;
+    } else {
+      const g0 = Date.now();
+      const g = fast
+        ? await p.call({ messages: [sysMsg, ...withNote(p.messages, GRADE_INSTRUCTION_SHORT)], max_tokens: 160, json: true, reasoning: p.parts.tuning ? p.gradeReasoning : undefined, temperature: 0 })
+        : await p.call({ messages: [{ role: 'system', content: `${p.system}\n\n${GRADE_INSTRUCTION}` }, ...p.messages], max_tokens: 400, json: true, reasoning: p.parts.tuning ? p.gradeReasoning : undefined, temperature: 0 });
+      timings.gradeMs = Date.now() - g0;
+      add(g.usage);
+      grade = readGrade(g.text);
+      if (grade && p.parts.answerCheck && grade.relevance === 'ACTIVE_ITEM' && grade.verdict !== 'NOT_EVALUATED') {
+        check = answerCheck(grade.answer ?? learnerText, grade.expected);
+        if (!check.verdict && check.note?.startsWith('spelling:') && RIGHT.has(grade.verdict)) check = { ...check, verdict: 'PARTIALLY_CORRECT' }; // the prompt: a spelling error is never "right" as a whole
+        if (check.verdict && check.verdict !== grade.verdict && !(check.verdict === 'CORRECT' && grade.verdict === 'CORRECT_WITH_EQUIVALENT_FORMULATION')) {
+          grade = { ...grade, verdict: check.verdict, next: check.verdict === 'CORRECT' ? (grade.next === 'SAME_ITEM' ? 'NEW_ITEM' : grade.next) : grade.next === 'NEW_ITEM' ? 'SAME_ITEM' : grade.next };
+        }
       }
     }
   }
   const extra = [grade ? decisionNote(grade, check) : '', p.parts.examples ? examplesFor(kind, band) : ''].filter(Boolean).join('\n\n');
-  const sys = extra ? `${p.system}\n\n${extra}` : p.system;
-  const write = async (note?: string) => {
-    const r = await p.call({ messages: [{ role: 'system', content: note ? `${sys}\n\n${note}` : sys }, ...p.messages], max_tokens: p.maxTokens, temperature });
-    add(r.usage);
-    return { ...r, text: grade ? stripLeadingMarker(r.text) : r.text };
+  const build = (note?: string): ChatMsg[] => {
+    const n = [extra, note].filter(Boolean).join('\n\n');
+    return fast ? [sysMsg, ...withNote(p.messages, n)] : [{ role: 'system', content: n ? `${p.system}\n\n${n}` : p.system }, ...p.messages];
   };
-  let r = await write();
+  const clean = (t: string) => (grade ? stripLeadingMarker(t) : t);
+  const write = async (note?: string) => { const r = await p.call({ messages: build(note), max_tokens: p.maxTokens, temperature }); add(r.usage); return { ...r, text: clean(r.text) }; };
+  const problems = (text: string) => replyProblems({ reply: text, grade, kind, band, learnerText, taskText });
   const regenerated: string[] = [];
+  const marker = grade ? `${markerOf(grade)}\n` : '';
+
+  // Streamed: send the hidden line now; hold the first sentence for the opening checks (language, "not in your materials"); then send each
+  // sentence that does not give the answer away. A sentence that does ends the reply with "try again" (nothing already shown is taken back).
+  if (p.onText && fast && p.parts.gradeFirst) {
+    timings.streamed = true;
+    const emit = (t: string) => { if (!t) return; if (timings.firstMs === undefined) timings.firstMs = Date.now() - t0; p.onText!(t); };
+    if (marker) p.onText(marker);
+    let buf = ''; let sent = ''; let first = true; let stop = false; let redo: string[] | null = null;
+    const r0 = Date.now();
+    const leaks = (sentence: string) => p.parts.replyChecks && grade ? problems(`${sentence} ?`).some((x) => x.startsWith('You gave the correct answer away')) : false;
+    const flush = (sentence: string): boolean => {
+      if (first) {
+        first = false;
+        if (p.parts.replyChecks) {
+          const open = replyProblems({ reply: `${sentence} ?`, grade: null, kind, band, learnerText, taskText }).filter((x) => /not in their course materials|reply in (Arabic|English)/.test(x));
+          if (open.length) { redo = open; return false; }
+        }
+      }
+      if (leaks(sentence)) { stop = true; timings.cut = true; regenerated.push('answer given away mid-stream: ended with "try again"'); return false; }
+      emit(sentence); sent += sentence; return true;
+    };
+    const r = await p.call({ messages: build(), max_tokens: p.maxTokens, temperature, onDelta: (d) => {
+      if (stop || redo) return false;
+      buf += d;
+      if (first && sent === '' && /^\s*\[\[assess/i.test(buf) && !/\]\]/.test(buf)) return true; // a hidden line the model wrote anyway: wait for its end
+      if (grade) buf = buf.replace(/^\s*\[\[assess\b[^\]]*\]\]\s*/i, '');
+      let m: RegExpExecArray | null;
+      while (!stop && !redo && (m = SENTENCE_END.exec(buf))) { const cut = m.index + m[0].length; const piece = buf.slice(0, cut); buf = buf.slice(cut); if (!flush(piece)) break; }
+      return !(stop || redo);
+    } });
+    add(r.usage);
+    if (!redo && !stop && buf.trim()) flush(buf); // the last sentence (no end mark)
+    const redoNow = redo as string[] | null;
+    if (redoNow) {
+      regenerated.push(...redoNow);
+      const g0 = Date.now(); const again = await write(regenNote(redoNow)); timings.regenMs = Date.now() - g0;
+      emit(again.text); sent = again.text;
+    } else if (stop) {
+      const ending = TRY_AGAIN(/[\u0600-\u06FF]/.test(sent + learnerText));
+      emit(sent ? ` ${ending}` : ending); sent += sent ? ` ${ending}` : ending;
+    }
+    timings.replyMs = Date.now() - r0; timings.totalMs = Date.now() - t0;
+    const text = marker && sent.trim() ? `${marker}${sent.trim()}` : sent.trim();
+    return { text, finish: r.finish, usage, meta: { grade, check, regenerated, timings } };
+  }
+
+  const r0 = Date.now();
+  let r = await write();
+  timings.replyMs = Date.now() - r0; timings.firstMs = Date.now() - t0;
   if (p.parts.replyChecks && r.text) {
-    const reasons = replyProblems({ reply: r.text, grade, kind, band, learnerText, taskText });
+    const reasons = problems(r.text);
     if (reasons.length) {
       regenerated.push(...reasons);
-      const again = await write(regenNote(reasons));
-      if (again.text && replyProblems({ reply: again.text, grade, kind, band, learnerText, taskText }).length < reasons.length) r = again;
+      const g0 = Date.now(); const again = await write(regenNote(reasons)); timings.regenMs = Date.now() - g0;
+      if (again.text && problems(again.text).length < reasons.length) r = again;
     }
   }
-  const text = grade && r.text ? `${markerOf(grade)}\n${r.text}` : r.text;
-  return { text, finish: r.finish, usage, meta: { grade, check, regenerated } };
+  timings.totalMs = Date.now() - t0;
+  const text = grade && r.text ? `${marker}${r.text}` : r.text;
+  return { text, finish: r.finish, usage, meta: { grade, check, regenerated, timings } };
 }
