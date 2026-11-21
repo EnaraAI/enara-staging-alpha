@@ -19,8 +19,8 @@ function score(t, r) {
   const v = r.assessment?.verdict; const cls = v ? CLASS[v] ?? 'none' : null;
   checks.marker = Boolean(r.assessment);
   checks.verdict = Boolean(cls && e.verdicts.includes(cls));
-  if (e.retry && e.answer) { const a = fold(e.answer); checks.noLeak = !(a.length >= 2 && ` ${fold(text)} `.includes(` ${a} `) && !` ${fold(t.turn.query)} `.includes(` ${a} `)); }
-  if (e.task) { const tail = text.trim().split('\n').filter((l) => l.trim()).slice(-2).join(' '); checks.task = TASK.test(tail); }
+  if (e.retry && e.answer) { const a = fold(e.answer); const task = t.turn.history.at(-1)?.content ?? ''; checks.noLeak = !(a.length >= 2 && ` ${fold(text)} `.includes(` ${a} `) && !` ${fold(t.turn.query)} `.includes(` ${a} `) && !` ${fold(task)} `.includes(` ${a} `)); }
+  if (e.task) { const tail = text.trim().split('\n').filter((l) => l.trim()).slice(-2).join(' '); checks.task = TASK.test(fold(tail)) || TASK.test(tail); }
   if (!e.english) checks.language = t.lang === 'ar' ? arShare(text) >= 0.3 : arShare(text) < 0.3 || /[a-z]{4}/i.test(text) && t.subject === 'arabic';
   if (t.age === 'u9') checks.length = words(text) <= 45; else if (t.age === 'child') checks.length = words(text) <= 80;
   if (e.cite) checks.cited = r.citations > 0;
