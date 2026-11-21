@@ -99,6 +99,7 @@ async function pickCourse(get) {
   const list = Array.isArray(j) ? j : (j?.courses ?? j?.items ?? []);
   const info = { status: r.status, count: list.length };
   const eng = list.find((c) => /english/i.test(`${c.name ?? ''} ${c.courseName ?? ''} ${c.subject ?? ''}`)) ?? null;
+  info.names = list.map((c) => String(c.name ?? c.courseName ?? c.title ?? '').slice(0, 60));
   info.picked = eng ? String(eng.id ?? eng.courseId ?? '') || null : null;
   return info;
 }
@@ -129,12 +130,17 @@ async function calls(audioDir) {
       args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', `--use-file-for-fake-audio-capture=${join(audioDir, id, 'call.wav')}`, '--autoplay-policy=no-user-gesture-required'],
     });
     let result;
+    const consoleLines = [];
     try {
       const context = await browser.newContext({ bypassCSP: true, permissions: ['microphone'] });
       const page = await context.newPage();
       // The harness page lives on the lms-test origin (served by Playwright, not by the site), so our API calls are same-origin.
       await page.route(`${SITE}/__avatarcost`, (route) => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><html><head><meta charset="utf-8"><title>avatarcost</title></head><body></body></html>' }));
-      page.on('pageerror', (e) => console.log(`[${id}] pageerror ${String(e.message).slice(0, 160)}`));
+      // Browser console and page errors, masked (anything token-like is cut out), for the artifact and the log.
+      const mask = (t) => String(t).replace(/eyJ[\w-]+\.[\w-]+\.[\w-]*/g, '<jwt>').replace(/[A-Za-z0-9+/_=-]{40,}/g, '<long>').slice(0, 400);
+      page.on('pageerror', (e) => consoleLines.push(`pageerror ${mask(e.message)}`));
+      page.on('console', (m) => { if (consoleLines.length < 400) consoleLines.push(`${m.type()} ${mask(m.text())}`); });
+      page.on('requestfailed', (r) => { if (consoleLines.length < 400) consoleLines.push(`requestfailed ${new URL(r.url()).host}${new URL(r.url()).pathname.slice(0, 80)} ${r.failure()?.errorText ?? ''}`); });
       await page.goto(`${SITE}/__avatarcost`);
       await page.addScriptTag({ content: umd });
       await page.addScriptTag({ content: harness });
@@ -157,6 +163,8 @@ async function calls(audioDir) {
       const msgs = j?.messages ?? j?.session?.messages ?? [];
       result.stored = { status: r.status, user: msgs.filter((m) => m.role === 'user').map((m) => m.text ?? m.content ?? ''), ai: msgs.filter((m) => m.role !== 'user').length };
     }
+    result.console = consoleLines;
+    if (!result.ok) { console.log(`EVENTS ${id} ${JSON.stringify(result.events ?? [])} closed=${result.closedReason ?? null}`); for (const l of consoleLines.slice(0, 60)) console.log(`CONSOLE ${id} ${l}`); }
     result.id = id; result.group = call.group; result.voice = call.voice;
     results.push(result);
     const brief = { id, ok: result.ok, speech: result.speech, durationSec: result.durationSec, readyMs: result.readyMs, endStatus: result.endStatus, errors: result.errors, turns: (result.turns ?? []).map((t) => ({ ref: t.text, heard: t.heard, lat: t.replyAudioLatencyMs, ft: t.queries?.[0]?.firstContentMs ?? null })) };

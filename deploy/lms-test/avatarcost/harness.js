@@ -128,7 +128,13 @@
     client.addListener(AnamEvent.USER_SPEECH_STARTED, () => ev('user_speech_started'));
     client.addListener(AnamEvent.USER_SPEECH_ENDED, () => ev('user_speech_ended'));
     client.addListener(AnamEvent.TALK_STREAM_INTERRUPTED, () => { ev('talk_interrupted'); answering = false; });
-    client.addListener(AnamEvent.CONNECTION_CLOSED, (reason) => { closed = String(reason); ev('connection_closed', { reason: String(reason).slice(0, 80) }); });
+    client.addListener(AnamEvent.CONNECTION_CLOSED, (reason, details) => { closed = String(reason); ev('connection_closed', { reason: String(reason).slice(0, 120), details: details ? String(details).slice(0, 300) : null }); });
+    client.addListener(AnamEvent.SERVER_WARNING, (m) => ev('server_warning', { m: String(m).slice(0, 200) }));
+    client.addListener(AnamEvent.MESSAGE_DELIVERY_FAILED, (f) => ev('delivery_failed', { f: JSON.stringify(f).slice(0, 200) }));
+    client.addListener(AnamEvent.MIC_PERMISSION_DENIED, (m) => ev('mic_denied', { m: String(m).slice(0, 200) }));
+    client.addListener(AnamEvent.INPUT_AUDIO_STREAM_STARTED, () => ev('input_audio_started'));
+    client.addListener(AnamEvent.VIDEO_STREAM_STARTED, () => ev('video_stream_started'));
+    client.addListener(AnamEvent.DATA_CHANNEL_OPEN, () => ev('data_channel_open'));
     client.addListener(AnamEvent.MESSAGE_STREAM_EVENT_RECEIVED, (m) => {
       if (m.role !== 'user' && m.id !== lastPersonaStreamId) { lastPersonaStreamId = m.id; personaStreamFirst.push(now()); ev('persona_stream_first'); }
     });
