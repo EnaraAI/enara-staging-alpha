@@ -88,7 +88,7 @@ const TUTOR_LLM_VALUES = {
 const FORBIDDEN_IN_NAME = /(KEY|KEK|SECRET|TOKEN|PASSWORD|URI|URL|DSN|CREDENTIAL|PRIVATE)/;
 const FLAG_VALUE = /^[A-Za-z0-9_,.:-]{0,200}$/;
 // ENARA_ENGINE_V2 is a comma list of switch names only (no other characters); it may be longer than other flags.
-const ENGINE_FLAG_VALUE = /^[A-Za-z0-9]+(,[A-Za-z0-9]+){0,40}$/;
+const ENGINE_FLAG_VALUE = /^[A-Za-z0-9]+(,[A-Za-z0-9]+){0,79}$/; // up to 80 names; the whole value is also capped at 1000 characters
 const flagValueOk = (key, value) => (key === 'ENARA_ENGINE_V2' ? value.length <= 1000 && ENGINE_FLAG_VALUE.test(value) : key in TUTOR_LLM_VALUES ? TUTOR_LLM_VALUES[key].test(value) : FLAG_VALUE.test(value));
 
 /**
