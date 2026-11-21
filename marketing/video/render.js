@@ -24,7 +24,8 @@ function plan(mode) {
     place(subs, chunks(s.ar)); place(subsEn, s.text.split(/(?<=[.:!?])\s+/));
     t += d;
   }
-  return { timeline, subs, subsEn, audio, total: +t.toFixed(3) };
+  const tidy = (l) => l.map((x, i) => ({ ...x, end: i + 1 < l.length ? Math.min(x.end, l[i + 1].start - 0.05) : x.end }));
+  return { timeline, subs: tidy(subs), subsEn: tidy(subsEn), audio, total: +t.toFixed(3) };
 }
 const srtTime = (x) => { const ms = Math.round(x * 1000); const h = Math.floor(ms / 3600000), m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60; return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')},${String(ms % 1000).padStart(3, '0')}`; };
 const srt = (list0) => { const list = list0.map((x, i) => ({ ...x, end: i + 1 < list0.length ? Math.min(x.end, list0[i + 1].start - 0.05) : x.end })); return list.map((x, i) => `${i + 1}\n${srtTime(x.start)} --> ${srtTime(x.end)}\n${x.text}\n`).join('\n'); };
