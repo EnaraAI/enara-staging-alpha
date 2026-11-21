@@ -242,7 +242,7 @@ async function diagnose() {
   await new Promise((r) => setTimeout(r, 3000));
   const token = await learnerToken();
   console.log(`CHATCHECK ${JSON.stringify(await chatCheck(asLearner(token)))}`);
-  await new Promise((r) => setTimeout(r, 15000));
+  await new Promise((r) => setTimeout(r, 25000));
   ctl.abort();
   await reader;
   const mask = (t) => String(t).replace(/eyJ[\w-]+\.[\w-]+\.[\w-]*/g, '<jwt>').replace(/sk-[A-Za-z0-9_-]+/g, '<key>').replace(/[A-Za-z0-9+/_=-]{40,}/g, '<long>');
@@ -252,7 +252,7 @@ async function diagnose() {
   for (const l of lines) {
     let msg = l;
     try { const j = JSON.parse(l); msg = j.message ?? j.text ?? l; } catch {}
-    if (want.test(msg) && shown < 40) { console.log(`LOG ${mask(msg).slice(0, 500)}`); shown += 1; }
+    if (shown < 60) { console.log(`LOG ${want.test(msg) ? '*' : ' '} ${mask(msg).replace(/\s+/g, ' ').slice(0, 600)}`); shown += 1; }
   }
 }
 
