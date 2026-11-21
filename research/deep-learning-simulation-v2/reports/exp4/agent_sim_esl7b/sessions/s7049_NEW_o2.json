@@ -1149,7 +1149,101 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 1.2: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 4.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"You are at school. Ask your teacher for a ruler.\" | \"You are at a guest house. Ask the receptionist for another pillow.\" | \"Write one sentence about a person you know. Use Can I, Could I or Excuse me.\" | \"You did not answer your aunt's phone call. Say sorry and why.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHi again! Can we practise polite requests and questions in messages again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nLook: Could I use your pen, please? Start a request with Can I or Could I, and add please. Example: Could I borrow a pencil, please?\nAsk a friend for a ruler."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A2-FN-routine-exchanges (polite requests and questions in messages). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: a bare order, \"I want\" or a bare \"Sorry\" is a normal request, apology or suggestion. Its error: makes a bare order or \"I want\" request (\"Tell me the time of the bus.\").\nW2 (wrong) strength 1: a question keeps statement order after the question word. Its error: keeps statement order in a question (\"When the bus leaves?\").\nC1 (correct) strength 1.2: requests and questions use a polite frame (Could you ...?, Can I ... please?, Excuse me). Independent correct productions so far: 4.\nC2 (correct) strength 0: a question puts does/is before the subject. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"You are at school. Ask your teacher for a ruler.\" | \"You are at a guest house. Ask the receptionist for another pillow.\" | \"Write one sentence about a person you know. Use Can I, Could I or Excuse me.\" | \"You did not answer your aunt's phone call. Say sorry and why.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n(none: this is the start of the lesson)\n\nLEARNER'S LAST MESSAGE:\nHi again! Can we practise polite requests and questions in messages again today?\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nLook: Could I use your pen, please? Start a request with Can I or Could I, and add please. Example: Could I borrow a pencil, please?\nAsk a friend for a ruler.",
+   "stateBefore": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Start a request with Can I or Could I, and add please."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Could I borrow your ruler, please?",
+    "errors": {
+     "W1": "Give me your ruler."
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "fn2",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "Could I borrow your ruler, please?",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "Could I borrow your ruler, please?",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
