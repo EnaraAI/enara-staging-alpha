@@ -17,6 +17,7 @@ import { AvatarVoice, SentenceSplitter, type VoiceLanguage } from '../../service
 import { UtteranceRecorder, base64 } from '../../services/utteranceRecorder';
 import { markRelayDown, relayBase } from '../../services/relay';
 import { notCaughtLine } from '../../services/voiceText';
+import { SpeechChunkCleaner } from '../../services/speechText';
 import { WebAudioSink } from '../../services/webAudioSink';
 import { classifyMicError, isInFrame, micMessage } from '../../services/micCheck';
 import { MicProblemNotice, useMicGate, type MicProblem } from '../MicCheck';
@@ -295,13 +296,16 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      // Anam speaks what it is given: words only, no Markdown symbols, citation markers or LaTeX.
+      const speech = new SpeechChunkCleaner();
 
       const handleLine = (trimmed: string) => {
         if (!trimmed) return;
         const data = JSON.parse(trimmed);
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
         if (data.content && talkStream?.isActive()) {
-          talkStream.streamMessageChunk(data.content, false);
+          const words = speech.push(data.content);
+          if (words) talkStream.streamMessageChunk(words, false);
         } else if (data.language_switch) {
           // The current answer keeps speaking in the current voice; the
           // switch only takes effect once this turn is fully spoken.
@@ -322,6 +326,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
 
       if (buffer.trim()) handleLine(buffer.trim());
 
+      const rest = speech.flush();
+      if (rest && talkStream?.isActive()) talkStream.streamMessageChunk(rest, false);
       if (talkStream?.isActive()) talkStream.endMessage();
     } catch (e) {
       console.error('[AVATAR] ENARA answer streaming failed', e);

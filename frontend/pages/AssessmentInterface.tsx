@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Clock, AlertCircle, CheckCircle2, Send, Sparkles, MessageSquare, Bot, X, Loader2 } from 'lucide-react';
 import { Assessment, Question } from '../types';
+import { TutorText } from '../components/TutorText';
 import { startAssessmentAttempt, submitAssessmentAttempt, createTutorSession, sendTutorMessage } from '../services/apiService';
 import { toast } from '../services/toastService';
 
@@ -396,7 +397,7 @@ export const AssessmentInterface: React.FC<AssessmentInterfaceProps> = ({ assess
                         ? 'bg-white text-slate-700 shadow-sm border border-slate-100' 
                         : 'bg-teal-600 text-white shadow-md'
                     }`}>
-                      {msg.text}
+                      {msg.role === 'ai' ? <TutorText text={msg.text} /> : msg.text}
                     </div>
                   </div>
                 ))}

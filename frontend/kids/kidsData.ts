@@ -370,7 +370,7 @@ export function planItems(plan: Any) {
 
 // ---------- Tutor ----------
 export function chatMessages(messages: Any[]) {
-  return (messages || []).map((m: Any) => ({ from: m.role === 'user' || m.role === 'student' ? 'child' : 'tutor', text: m.text || '', ...(Array.isArray(m.meta?.pics) ? { pics: kidsPics(m.meta.pics) } : {}) }));
+  return (messages || []).map((m: Any) => ({ from: m.role === 'user' || m.role === 'student' ? 'child' : 'tutor', text: m.text || '', ...(Array.isArray(m.meta?.pics) ? { pics: kidsPics(m.meta.pics) } : {}), ...(Array.isArray(m.meta?.citations) ? { citations: m.meta.citations } : {}) }));
 }
 export function chatSessions(sessions: Any[]) {
   return (sessions || []).map((s: Any) => ({ id: s.id, title: s.title || s.lessonTitle || '…', date: s.lastMessageAt || s.timestamp, count: s.messageCount || 0, live: s.mode === 'live' }));

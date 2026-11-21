@@ -2,6 +2,7 @@ import { QUICK_CLOSE_MS, transcriptionReconnectDelayMs } from './retryPolicy';
 import { CommitStrategy, RealtimeEvents, Scribe, type RealtimeConnection } from '@elevenlabs/client';
 import { avatarFetch } from './apiService';
 import { markRelayDown, relayBase, relayWsBase } from './relay';
+import { stripMarkdownForSpeech } from './speechText';
 
 import { isEcho, isOffLanguage, isRepeatUtterance, languageOfText, REPEAT_WINDOW_MS, toVoiceLanguage, voiceWords as words, type VoiceLanguage } from './voiceText';
 
@@ -204,7 +205,8 @@ export class AvatarVoice {
   // sentences before it, so speech starts before the whole reply exists.
   // The voice follows the sentence's own script (Arabic letters -> Arabic).
   say(text: string): void {
-    const clean = text.trim();
+    // Spoken words only: no Markdown symbols, citation markers or LaTeX.
+    const clean = stripMarkdownForSpeech(text);
     if (!clean || this.stopped) return;
     const generation = this.generation;
     this.spokenText += ` ${clean}`;

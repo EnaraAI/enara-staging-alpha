@@ -2,6 +2,7 @@ import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
 import { resolveSessionClassId } from '../services/sessionClass';
 import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
 import { SentenceSplitter } from '../services/sentenceSplitter';
+import { stripMarkdownForSpeech } from '../services/speechText';
 import { avatarSpeakingOn, avatarSpeakingUsesAnamVoice, isWavClip, LATENCY_KEEP, MAX_CLIP_BYTES, pronunciationReady, PRONUNCIATION_NOTE_LINE, SPEAKING_PRACTICE_LINE } from '../services/avatarSpeaking';
 import { assessPronunciation } from '../services/pronunciation';
 import { ageFromBirthDate } from '../services/languageTeachingContext';
@@ -448,7 +449,7 @@ export const speakAvatarText = asyncHandler(async (req: AuthRequest, res: Respon
   if (!isElevenLabsVoiceConfigured()) {
     throw new AppError('Voice is not configured', 503, 'AVATAR_UNAVAILABLE');
   }
-  const text = typeof body.text === 'string' ? body.text.trim() : '';
+  const text = typeof body.text === 'string' ? stripMarkdownForSpeech(body.text) : '';
   if (!text || text.length > 1000) throw new AppError('Text must be 1-1000 characters', 400, 'VALIDATION_ERROR');
   // Speech costs per character: cap it per call. Counted in the same write
   // that finds the call, so speech starts after one database round trip.
@@ -705,7 +706,10 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   let firstAudioAt: number | undefined;
   let voiceRefused = false;
   let voiceRefusalSent = false;
-  const sayInline = (sentence: string) => {
+  const sayInline = (written: string) => {
+    // Spoken words only: no Markdown symbols, citation markers or LaTeX (the written reply keeps them).
+    const sentence = stripMarkdownForSpeech(written);
+    if (!sentence) return;
     const n = sentenceNo++;
     const audio = (async () => {
       if (closed) return null;
