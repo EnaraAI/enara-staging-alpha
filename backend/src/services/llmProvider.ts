@@ -43,9 +43,14 @@ export const REASONING_OFF: Record<string, unknown>[] = [{ reasoning_effort: 'no
 let reasoningMode = 0;
 export const _resetReasoningMode = () => { reasoningMode = 0; };
 export const reasoningModeUsed = () => Object.keys(REASONING_OFF[reasoningMode])[0] ?? 'default';
+// Quality check (20 saved turns, 21 Nov): without a reminder DeepSeek left out the hidden grading line in 3 of 20 replies and sometimes
+// gave a long worked example instead of answering. A short reminder at the END of the system prompt (where this model follows
+// instructions best) lifted valid lines to 18 of 20. Added only when the request asks for the hidden line; repairOnce covers the rest.
+export const DEEPSEEK_REMINDER = 'Rules for this reply, most important first:\n1. Your reply MUST start with the hidden line [[assess verdict=... relevance=... next=...]] in exactly the format described above. Never leave it out.\n2. Reply to the STUDENT\'s LAST message in the conversation: judge that answer first (right, partly right or wrong; a spelling slip is an error), then give exactly ONE task.\n3. Keep to the length limits for this learner. No stories, lists or worked examples unless the instructions above ask for one now.';
 /** Anthropic-style request -> chat-completions request. */
 export function toChat(body: ABody, stream: boolean): Record<string, unknown> {
-  const system = textOf(body.system as string | Block[] | undefined);
+  const base = textOf(body.system as string | Block[] | undefined);
+  const system = base.includes('[[assess') ? `${base}\n\n${DEEPSEEK_REMINDER}` : base;
   const messages = [
     ...(system ? [{ role: 'system', content: system }] : []),
     ...body.messages.map((m) => ({ role: m.role, content: textOf(m.content) })).filter((m) => m.content),
