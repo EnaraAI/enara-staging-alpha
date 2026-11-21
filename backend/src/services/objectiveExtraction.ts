@@ -7,6 +7,7 @@ import { LearningObjective } from '../models/LearningObjective';
 import { logger } from '../utils/logging';
 import { trackAiCall } from './aiCalls';
 import { findCycle } from './objectiveGraph';
+import { llmClient, llmModel } from './llmProvider';
 
 // AI-assisted proposal of learning objectives for a curriculum. Output is
 // validated and stored as drafts (origin 'ai') that a person must approve.
@@ -83,10 +84,10 @@ export async function extractObjectiveDrafts(params: {
   client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 50_000, maxRetries: 0 });
   const response = await trackAiCall(
     'objective_extraction',
-    config.anthropicTutorModel,
+    llmModel(config.anthropicTutorModel),
     () =>
-      client!.messages.create({
-        model: config.anthropicTutorModel,
+      llmClient(client!, 50_000).messages.create({
+        model: llmModel(config.anthropicTutorModel),
         max_tokens: 8000,
         output_config: { effort: 'low' },
         system:

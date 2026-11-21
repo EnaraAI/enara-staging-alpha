@@ -18,6 +18,7 @@ import { logger } from '../utils/logging';
 import { asksForPrivateStudentDetails, runAnalytics, type AnalyticsResult } from './educatorAnalytics';
 import { routeWithModel } from './educatorAnalyticsRouter';
 import { isFeatureEnabled } from './featureFlags';
+import { llmClient, llmModel } from './llmProvider';
 
 // Grounded educator chat (P3). Answers only from passages of documents the
 // educator may use, selected by upload id. Never from general knowledge:
@@ -265,7 +266,7 @@ export async function askEducatorChat(req: AuthRequest, params: { conversationId
   const config = getConfig();
   if (!config.anthropicApiKey) throw new AppError('AI is not configured', 503, 'AI_UNAVAILABLE');
   client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 30_000, maxRetries: 0 });
-  const model = config.anthropicTutorModel;
+  const model = llmModel(config.anthropicTutorModel);
   const system = systemPrompt(sources);
   const messages = [...history, { role: 'user' as const, content: question }];
   let text: string;
@@ -278,7 +279,7 @@ export async function askEducatorChat(req: AuthRequest, params: { conversationId
         maxAttempts: 2,
         bound: { inputTokens: textTokenBound(system, messages), outputTokens: MAX_OUTPUT_TOKENS },
       },
-      () => client!.messages.create({ model, max_tokens: MAX_OUTPUT_TOKENS, output_config: { effort: 'low' }, system, messages }),
+      () => llmClient(client!, 30_000).messages.create({ model, max_tokens: MAX_OUTPUT_TOKENS, output_config: { effort: 'low' }, system, messages }),
     );
     if (response.stop_reason === 'refusal') return finish('refused', 'I cannot help with that request.');
     text = response.content.map((b) => (b.type === 'text' ? b.text : '')).join('').trim();

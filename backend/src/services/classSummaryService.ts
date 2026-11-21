@@ -8,6 +8,7 @@ import { logger } from '../utils/logging';
 import { buildOverview } from './analyticsService';
 import { emailLayout, isEmailConfigured, sendEmail } from './emailService';
 import { ReminderLog } from '../models/ReminderLog';
+import { llmClient, llmModel } from './llmProvider';
 
 // "This week in your school" for teachers and admins: who is stuck, which
 // topics to re-teach, and what students asked the tutor most. Facts come from
@@ -81,8 +82,8 @@ export async function buildWeeklySummary(scope: Record<string, unknown>): Promis
     client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 25_000, maxRetries: 0 });
     try {
       const institutionId = typeof scope.institutionId === 'string' ? scope.institutionId : undefined;
-      const response = await trackAiCall('weekly_summary', config.anthropicVoiceModel, () => client!.messages.create({
-        model: config.anthropicVoiceModel,
+      const response = await trackAiCall('weekly_summary', llmModel(config.anthropicVoiceModel), () => llmClient(client!, 25_000).messages.create({
+        model: llmModel(config.anthropicVoiceModel),
         max_tokens: 1500,
         output_config: { effort: 'low' },
         system:
