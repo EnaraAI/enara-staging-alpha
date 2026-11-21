@@ -129,6 +129,21 @@ test.describe.serial('10 · Parents P1: code-first entry, two children in two sc
     await shot(page, '10-parents-account');
   });
 
+  test('desktop: the portal uses the wide layout (side navigation), the phone layout stays for phones', async () => {
+    const page = state.page!;
+    await page.setViewportSize({ width: 1366, height: 900 });
+    await page.getByRole('button', { name: 'Home' }).click();
+    const width = await page.locator('.pp').evaluate((el) => el.getBoundingClientRect().width);
+    expect(width).toBeGreaterThan(900);
+    const nav = await page.locator('.pp-nav').evaluate((el) => ({ dir: getComputedStyle(el).flexDirection, top: el.getBoundingClientRect().top }));
+    expect(nav.dir).toBe('column');
+    expect(nav.top).toBeLessThan(300); // beside the content, not a bottom bar
+    await shot(page, '10-parents-desktop');
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(await page.locator('.pp').evaluate((el) => el.getBoundingClientRect().width)).toBeLessThanOrEqual(480);
+    expect(await page.locator('.pp-nav').evaluate((el) => getComputedStyle(el).flexDirection)).toBe('row');
+  });
+
   test('a second device without this device\'s token gets the code page, not the portal', async ({ browser }) => {
     const { context, page } = await parentDevice(browser);
     await page.goto(`${ENARA}/parents`);

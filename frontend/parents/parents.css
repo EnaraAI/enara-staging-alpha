@@ -215,3 +215,31 @@
 .pp-navlink[aria-current="page"]::after { content: ''; inline-size: 20px; block-size: 3px; border-radius: 2px; background: var(--blue); }
 .pp-skeleton { block-size: 96px; border-radius: 10px; background: linear-gradient(90deg, #eef2f6, #f6f8fb, #eef2f6); }
 @media (prefers-reduced-motion: reduce) { .pp * { transition: none !important; animation: none !important; } }
+
+/* Desktop (owner request 21 Nov 2026: the portal showed the phone layout on a desktop). From 900px wide: a wider page, the header across
+   the top, the sections as a side navigation, the content in a readable column, and sheets as centred dialogs. Phones are unchanged. */
+@media (min-width: 900px) {
+  .pp {
+    max-inline-size: 1120px;
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "head head" "nav switch" "nav main";
+    column-gap: 24px;
+    padding-inline: 24px;
+  }
+  .pp-header { grid-area: head; padding-block: 20px 12px; padding-inline: 0; border-block-end: 1px solid var(--line); margin-block-end: 16px; }
+  .pp-switcher { grid-area: switch; padding-inline: 0; }
+  .pp-main { grid-area: main; padding-inline: 0; padding-block: 0 40px; max-inline-size: 820px; }
+  .pp-ptr { display: none; }
+  .pp-nav {
+    grid-area: nav; align-self: start; position: sticky; inset-block-start: 16px; inset-block-end: auto;
+    flex-direction: column; gap: 4px; padding: 8px; border: 1px solid var(--line); border-radius: 12px;
+  }
+  .pp-navlink { flex: none; flex-direction: row; justify-content: flex-start; gap: 12px; min-block-size: 44px; padding-inline: 12px; font-size: 14px; border-radius: 8px; }
+  .pp-navlink:hover { background: var(--track); }
+  .pp-navlink[aria-current="page"] { background: var(--blue-50); }
+  .pp-navlink[aria-current="page"]::after { display: none; }
+  .pp-sheet-backdrop { align-items: center; }
+  .pp-sheet { max-inline-size: 560px; border-radius: 16px; }
+}
