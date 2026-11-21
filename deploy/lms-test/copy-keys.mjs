@@ -6,7 +6,7 @@ import { PROJECT_ID, TEAM_ID } from './lib.mjs';
 
 const API = 'https://api.vercel.com';
 const SOURCE_DOMAIN = 'test.enara.app';
-const KEYS = ['ANAM_API_KEY', 'ANAM_AVATAR_ID', 'ANAM_VOICE_ID_EN', 'ANAM_VOICE_ID_EN_FEMALE', 'AZURE_SPEECH_KEY', 'AZURE_SPEECH_REGION'];
+const KEYS = ['ELEVENLABS_API_KEY', 'ELEVENLABS_VOICE_ID_EN', 'ELEVENLABS_FEMALE_VOICE_ID', 'ELEVENLABS_STT_MODEL', 'ELEVENLABS_TTS_MODEL', 'ELEVENLABS_EXAM_STT_MODEL'];
 const token = process.env.VERCEL_TOKEN;
 if (!token) { console.log('VERCEL_TOKEN is not set'); process.exit(1); }
 
