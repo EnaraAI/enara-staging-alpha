@@ -14,7 +14,7 @@
   ],
   "s": {
    "W1": 0,
-   "W2": 1,
+   "W2": 0,
    "C1": 1,
    "C2": 0
   },
@@ -1750,7 +1750,117 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Complete: \"I ___ (visit) my aunt last weekend.\"\" | \"Now write one or two sentences about what you did last weekend.\" | \"Yes, \"I visited my aunt last weekend.\" is correct. Now write one sentence about a person you know, using a regular verb in the past.\" | \"Now write one question to a friend about last weekend. Use did.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"You visited your cousin yesterday\" is a good sentence about a finished action. But the task was a question. Why did you choose this form? Answer in one short sentence.\n\nLEARNER'S LAST MESSAGE:\nI think the main verb keeps the past form after did.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"Did you visit your cousin yesterday?\". A question about the past starts with \"Did\", and the main verb stays in its base form.\nRight: \"Did they watch the match?\" Wrong: \"Did they watched the match?\"\nNow try a new one on your own. Write a question about the past from these words: he / clean / his room / on Sunday."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-past-questions-did (past questions with did). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the main verb keeps the past form after did. Its error: keeps the past form after did (\"Did you went to school?\").\nW2 (wrong) strength 1: a question is a statement with rising voice, or verb before subject without did. Its error: makes a question without did (\"You went to school?\" / \"Went you to school?\").\nC1 (correct) strength 1: after did the main verb is in the base form. Independent correct productions so far: 0.\nC2 (correct) strength 0: a past question is did + subject + base verb. Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Complete: \"I ___ (visit) my aunt last weekend.\"\" | \"Now write one or two sentences about what you did last weekend.\" | \"Yes, \"I visited my aunt last weekend.\" is correct. Now write one sentence about a person you know, using a regular verb in the past.\" | \"Now write one question to a friend about last weekend. Use did.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"You visited your cousin yesterday\" is a good sentence about a finished action. But the task was a question. Why did you choose this form? Answer in one short sentence.\n\nLEARNER'S LAST MESSAGE:\nI think the main verb keeps the past form after did.\nFACT: the last learner message did not produce the form (no exercise answer or sentence).\n\nTUTOR TURN TO JUDGE:\nThe answer is \"Did you visit your cousin yesterday?\". A question about the past starts with \"Did\", and the main verb stays in its base form.\nRight: \"Did they watch the match?\" Wrong: \"Did they watched the match?\"\nNow try a new one on your own. Write a question about the past from these words: he / clean / his room / on Sunday.",
+   "stateBefore": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "The answer is \"Did you visit your cousin yesterday?\""
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "A question about the past starts with \"Did\", and the main verb stays in its base form."
+    },
+    {
+     "rule": "R1",
+     "belief": "W2",
+     "quote": "A question about the past starts with \"Did\""
+    },
+    {
+     "rule": "R2",
+     "belief": "W1",
+     "quote": "Right: \"Did they watch the match?\" Wrong: \"Did they watched the match?\""
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "Did he clean his room on Sunday?",
+    "errors": {
+     "W1": "Did he cleaned his room on Sunday?",
+     "W2": "He cleaned his room on Sunday?"
+    }
+   },
+   "applied": [
+    "R5",
+    "R1:W1",
+    "R1:W2",
+    "R2:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "pastq",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1872,6 +1982,74 @@
   "retr": {
    "C1": [],
    "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "pastq",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0.5,
+   "W2": 0.25,
+   "C1": 1,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
   },
   "afterF1": true
  }

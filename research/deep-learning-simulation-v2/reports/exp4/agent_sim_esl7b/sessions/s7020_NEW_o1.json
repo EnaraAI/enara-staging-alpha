@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -1861,7 +1861,103 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 3: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now write one sentence with can and jump.\" | \"\"She can\" is right. After can, the verb stays the same. Right: \"We can sing.\" Wrong: \"We can sings.\" Try again: write one sentence with can and jump.\" | \"Now write one sentence with can and swim.\" | \"Write one sentence about a person you know using can + base verb.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Sam can swim.\" is right. The verb stays the same after can.\nWrite one sentence about a person you know using can + base verb.\n\nLEARNER'S LAST MESSAGE:\nMy brother can run fast.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"can run\" is right: can plus the plain verb.\nNow try one on your own.\nWrite one sentence with Sam, can't and sing."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 3: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now write one sentence with can and jump.\" | \"\"She can\" is right. After can, the verb stays the same. Right: \"We can sing.\" Wrong: \"We can sings.\" Try again: write one sentence with can and jump.\" | \"Now write one sentence with can and swim.\" | \"Write one sentence about a person you know using can + base verb.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"Sam can swim.\" is right. The verb stays the same after can.\nWrite one sentence about a person you know using can + base verb.\n\nLEARNER'S LAST MESSAGE:\nMy brother can run fast.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"can run\" is right: can plus the plain verb.\nNow try one on your own.\nWrite one sentence with Sam, can't and sing.",
+   "stateBefore": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"can run\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My brother can run fast."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "can plus the plain verb"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "Sam can't sing.",
+    "errors": {
+     "W1": "Sam can't sings."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1979,6 +2075,68 @@
   },
   "retr": {
    "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "can",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "can",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1"
+  ],
+  "s": {
+   "W1": 0.75,
+   "W2": 0,
+   "C1": 1.425,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 1,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 0,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
    "C2": []
   },
   "afterF1": true

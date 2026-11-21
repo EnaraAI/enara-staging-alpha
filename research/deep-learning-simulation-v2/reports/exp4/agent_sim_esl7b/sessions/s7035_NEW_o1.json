@@ -1944,7 +1944,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 2.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 3.\nItems this learner answered in session 1: \"Complete: \"Take an umbrella. It is ___ today.\"\" | \"\"rain\" is not the right kind of word after \"It is\". Example: the trees move a lot. Think: I describe the weather with a describing word. The word is \"windy\": \"It is windy.\" Rule: after \"It is\", use a \" | \"Yes, \"rainy\" is a describing word that fits the weather. Now write one sentence about a person you know, using a weather word.\" | \"Complete: \"My hat flew away! It is very ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"It is sunny today.\" is right: \"It is\" plus a weather adjective. Now try a new situation.\nComplete: \"My hat flew away! It is very ___.\"\n\nLEARNER'S LAST MESSAGE:\nwindy\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"windy\" fits the sentence.\nNow one more, on your own.\nComplete with the right form of the word in brackets: At the beach, it is very ___ (sun) today."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 0: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 3: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 2.\nC2 (correct) strength 3: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 3.\nItems this learner answered in session 1: \"Complete: \"Take an umbrella. It is ___ today.\"\" | \"\"rain\" is not the right kind of word after \"It is\". Example: the trees move a lot. Think: I describe the weather with a describing word. The word is \"windy\": \"It is windy.\" Rule: after \"It is\", use a \" | \"Yes, \"rainy\" is a describing word that fits the weather. Now write one sentence about a person you know, using a weather word.\" | \"Complete: \"My hat flew away! It is very ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\n\"It is sunny today.\" is right: \"It is\" plus a weather adjective. Now try a new situation.\nComplete: \"My hat flew away! It is very ___.\"\n\nLEARNER'S LAST MESSAGE:\nwindy\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"windy\" fits the sentence.\nNow one more, on your own.\nComplete with the right form of the word in brackets: At the beach, it is very ___ (sun) today.",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"windy\" fits the sentence."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "Yes, \"windy\" fits the sentence."
+    }
+   ],
+   "retrieval": [
+    "C1",
+    "C2"
+   ],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "sunny",
+    "errors": {
+     "W1": "sun",
+     "W2": "suny"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2",
+    "retrieval:C1",
+    "retrieval:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 3
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 3
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -2066,6 +2169,74 @@
   "retr": {
    "C1": [],
    "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 3,
+   "C2": 3
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 3
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 0,
+   "C1": 1.425,
+   "C2": 1.425
+  },
+  "indep": {
+   "C1": 2,
+   "C2": 3
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
   },
   "afterF1": true
  }

@@ -1772,7 +1772,89 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 0: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 0.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Look: \"This is a pen.\" Use the right name for the object. Right: \"I read a book,\" not \"I read a bag.\" You put books in it. Write: \"This is a ___.\"\" | \"Write it again: \"This is a ___.\"\" | \"Now try this one on your own: \"I sit on a ___.\"\" | \"Write one sentence about a person you know. Use a classroom thing.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNice try! \"My sister has a\" is right. Check the spelling of the object word. Write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy sister has a bencil.\nFACT: the last learner message contained the error of W1 (writes b for p or f for v (\"bencil\", \"bage\")).\n\nTUTOR TURN TO JUDGE:\nThe word is \"pencil\". You write with it.\nRight: \"This is a desk.\" Wrong: \"This is desk.\"\nNow write one sentence about a book. Start with \"This is a\"."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-classroom-objects (classroom objects). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 3: p and b (f and v) are the same letter. Its error: writes b for p or f for v (\"bencil\", \"bage\").\nW2 (wrong) strength 1: an Arabic phrase is translated word for word. Its error: translates an Arabic phrase word for word (\"the black board pen\" for marker).\nC1 (correct) strength 0: classroom words keep their English consonants (p not b, v not f): pencil, bag. Independent correct productions so far: 0.\nC2 (correct) strength 0: classroom objects have their own English names (marker, rubber). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Look: \"This is a pen.\" Use the right name for the object. Right: \"I read a book,\" not \"I read a bag.\" You put books in it. Write: \"This is a ___.\"\" | \"Write it again: \"This is a ___.\"\" | \"Now try this one on your own: \"I sit on a ___.\"\" | \"Write one sentence about a person you know. Use a classroom thing.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nNice try! \"My sister has a\" is right. Check the spelling of the object word. Write your sentence again.\n\nLEARNER'S LAST MESSAGE:\nMy sister has a bencil.\nFACT: the last learner message contained the error of W1 (writes b for p or f for v (\"bencil\", \"bage\")).\n\nTUTOR TURN TO JUDGE:\nThe word is \"pencil\". You write with it.\nRight: \"This is a desk.\" Wrong: \"This is desk.\"\nNow write one sentence about a book. Start with \"This is a\".",
+   "stateBefore": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W1",
+     "quote": "The word is \"pencil\"."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "This is a book.",
+    "errors": {
+     "W1": "This is a pook."
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "class",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [],
+     "C2": []
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -1868,6 +1950,66 @@
   "afterF1": true
  },
  "stateS2Start": {
+  "form": "class",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "class",
+  "band": "A1",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 3,
+   "W2": 1,
+   "C1": 0,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [],
+   "C2": []
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
   "form": "class",
   "band": "A1",
   "primary": "W1",
