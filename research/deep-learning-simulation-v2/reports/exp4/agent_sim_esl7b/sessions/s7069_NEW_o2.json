@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 3,
+   "C1": 4,
    "C2": 0
   },
   "start": {
@@ -1696,7 +1696,112 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: \"Dad ___ going to paint the fence.\"\" | \"Dad ___ going to paint the fence.\" | \"Now correct this: \"I going to study tonight.\"\" | \"Write one sentence about a person you know. Use going to.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"are going to play\" is right! Good work. Now write one sentence about a person you know using am, is or are going to and a verb.\n\nLEARNER'S LAST MESSAGE:\nMy dad is going to cook dinner tonight.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"is going to cook\" is right, and \"tonight\" tells when.\nCorrect: \"I going to study tonight.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-GR-going-to (going to for plans). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: \"going to\" alone is enough. Its error: leaves out am/is/are before going to (\"I going to visit my aunt.\").\nC1 (correct) strength 3: a plan is am/is/are + going to + base verb. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Complete: \"Dad ___ going to paint the fence.\"\" | \"Dad ___ going to paint the fence.\" | \"Now correct this: \"I going to study tonight.\"\" | \"Write one sentence about a person you know. Use going to.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"are going to play\" is right! Good work. Now write one sentence about a person you know using am, is or are going to and a verb.\n\nLEARNER'S LAST MESSAGE:\nMy dad is going to cook dinner tonight.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"is going to cook\" is right, and \"tonight\" tells when.\nCorrect: \"I going to study tonight.\"",
+   "stateBefore": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"is going to cook\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My dad is going to cook dinner tonight."
+    }
+   ],
+   "retrieval": [
+    "C1"
+   ],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "I am going to study tonight.",
+    "errors": {
+     "W1": "I going to study tonight."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1",
+    "retrieval:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "goingto",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "I am going to study tonight.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "I am going to study tonight.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

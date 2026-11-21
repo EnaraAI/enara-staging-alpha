@@ -1684,7 +1684,108 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 2.2: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 2.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Complete: \"I brush my teeth in the ___.\"\" | \"Complete: \"I make toast in the ___.\"\" | \"Try again: I make toast in the ___.\" | \"Complete: \"I sleep in the ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour idea, \"sleeping room\", fits. But we need the room's name. Example: We wash in the bathroom.\nWrite one word: My bed is in the ___.\n\nLEARNER'S LAST MESSAGE:\nsleeping room\nFACT: the last learner message contained the error of W2 (translates the Arabic phrase (\"the sleeping room\" for bedroom)).\n\nTUTOR TURN TO JUDGE:\nUse the room's name: \"bedroom\". We sleep in the bedroom.\nNow do this one on your own.\nComplete: \"I make toast in the ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-VO-home-rooms (rooms in a home). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: vowels can be left out. Its error: leaves vowels out of a room word (\"kitchn\", \"bathrom\").\nW2 (wrong) strength 1: the Arabic phrase is translated. Its error: translates the Arabic phrase (\"the sleeping room\" for bedroom).\nC1 (correct) strength 2.2: room words are spelled with all their vowels (kitchen, bathroom). Independent correct productions so far: 2.\nC2 (correct) strength 0: rooms have single English names (bedroom, living room). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Complete: \"I brush my teeth in the ___.\"\" | \"Complete: \"I make toast in the ___.\"\" | \"Try again: I make toast in the ___.\" | \"Complete: \"I sleep in the ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour idea, \"sleeping room\", fits. But we need the room's name. Example: We wash in the bathroom.\nWrite one word: My bed is in the ___.\n\nLEARNER'S LAST MESSAGE:\nsleeping room\nFACT: the last learner message contained the error of W2 (translates the Arabic phrase (\"the sleeping room\" for bedroom)).\n\nTUTOR TURN TO JUDGE:\nUse the room's name: \"bedroom\". We sleep in the bedroom.\nNow do this one on your own.\nComplete: \"I make toast in the ___.\"",
+   "stateBefore": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 2.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R5",
+     "belief": "W2",
+     "quote": "Use the room's name: \"bedroom\"."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "kitchen",
+    "errors": {
+     "W1": "kitchn",
+     "W2": "cooking room"
+    }
+   },
+   "applied": [
+    "R5"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rooms",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 2.2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 2,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 1,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "kitchen",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "kitchen",
+    "probes": [
+     "W1",
+     "W2"
+    ]
+   }
   }
  ],
  "assess": {
