@@ -18,7 +18,7 @@
    "C2": 0
   },
   "indep": {
-   "C1": 3,
+   "C1": 4,
    "C2": 0
   },
   "start": {
@@ -1655,7 +1655,109 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-prepositions-time (at, on and in for time). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: one preposition (in, like Arabic fi) works for every time. Its error: uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\").\nC1 (correct) strength 3: at + clock time, on + day/date, in + month/year. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write in, on or at: My train leaves ___ 5 o'clock.\" | \"Your answer \"in\" does not fit a clock time. Example: The film starts at half past nine (9:30). Rule: use \"at\" before a clock time. Right: The bus comes at half past eight. Wrong: The bus comes in half\" | \"Now try this one on your own. Write in, on or at: Football starts ___ 4 o'clock.\" | \"Now write one sentence about a person you know using at + clock time.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"in\" is right for April.\n\nWrite one sentence about a person you know using on + day.\n\nLEARNER'S LAST MESSAGE:\nMy brother plays football on Friday.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour sentence shows on + day, and \"on Friday\" is right. It does not use a clock time yet.\nSeven o'clock means 7:00.\nWrite in, on or at: My train leaves ___ 5 o'clock."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-prepositions-time (at, on and in for time). Learner level A1. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: one preposition (in, like Arabic fi) works for every time. Its error: uses \"in\" for every time (\"The lesson is in 9 o'clock.\" / \"in Monday\").\nC1 (correct) strength 3: at + clock time, on + day/date, in + month/year. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Write in, on or at: My train leaves ___ 5 o'clock.\" | \"Your answer \"in\" does not fit a clock time. Example: The film starts at half past nine (9:30). Rule: use \"at\" before a clock time. Right: The bus comes at half past eight. Wrong: The bus comes in half\" | \"Now try this one on your own. Write in, on or at: Football starts ___ 4 o'clock.\" | \"Now write one sentence about a person you know using at + clock time.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"in\" is right for April.\n\nWrite one sentence about a person you know using on + day.\n\nLEARNER'S LAST MESSAGE:\nMy brother plays football on Friday.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYour sentence shows on + day, and \"on Friday\" is right. It does not use a clock time yet.\nSeven o'clock means 7:00.\nWrite in, on or at: My train leaves ___ 5 o'clock.",
+   "stateBefore": {
+    "form": "preptime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "\"on Friday\" is right"
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "My brother plays football on Friday."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "at",
+    "errors": {
+     "W1": "in"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "preptime",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 4,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "at",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "at",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

@@ -14,11 +14,11 @@
   "s": {
    "W1": 2,
    "W2": 0,
-   "C1": 2,
+   "C1": 3,
    "C2": 0
   },
   "indep": {
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "start": {
@@ -1641,7 +1641,110 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 2: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now complete: \"A nurse works in a ___.\"\" | \"The place you chose fits the job. Check the end of the word: one letter is missing before the last letter. Write the word again.\" | \"Now try this one on your own: \"A chef works in a ___.\"\" | \"Your word fits. Check the letters after \"rest\" and before \"nt\". Write it again: \"A chef works in a ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"u\" is right. Good job trying again!\n\nComplete: \"A pilot works at an ___.\"\n\nLEARNER'S LAST MESSAGE:\nairport\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that is correct. Example: A farmer grows food, so a farmer works at a farm. Rule: choose the place where the job happens.\nExample: A nurse works in a hospital.\nNow write one sentence about a person you know using the right workplace word."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-jobs-workplaces (jobs and workplaces). Learner level A2. First language Arabic.\nSession 2. This is 7 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 2: vowels can be left out. Its error: leaves vowels out of a job or workplace word (\"doctr\", \"techer\", \"hospitl\").\nC1 (correct) strength 2: each job and workplace word is spelled with its vowels (doctor, teacher, hospital). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now complete: \"A nurse works in a ___.\"\" | \"The place you chose fits the job. Check the end of the word: one letter is missing before the last letter. Write the word again.\" | \"Now try this one on your own: \"A chef works in a ___.\"\" | \"Your word fits. Check the letters after \"rest\" and before \"nt\". Write it again: \"A chef works in a ___.\"\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, \"u\" is right. Good job trying again!\n\nComplete: \"A pilot works at an ___.\"\n\nLEARNER'S LAST MESSAGE:\nairport\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, that is correct. Example: A farmer grows food, so a farmer works at a farm. Rule: choose the place where the job happens.\nExample: A nurse works in a hospital.\nNow write one sentence about a person you know using the right workplace word.",
+   "stateBefore": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 2,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, that is correct."
+    },
+    {
+     "rule": "R4",
+     "belief": "C1",
+     "quote": "airport"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My aunt works in a hospital.",
+    "errors": {
+     "W1": "My aunt works in a hospitl."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R4:C1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "jobs",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 1,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My aunt works in a hospitl.",
+   "production": {
+    "kind": "sentence",
+    "correct": false,
+    "fired": "W1",
+    "text": "My aunt works in a hospitl.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
