@@ -1,3 +1,4 @@
+import { warmOnOpen } from '../services/llmWarmup';
 import { Router } from 'express';
 import multer from 'multer';
 import { beginSpeaking, speakingTurn } from '../controllers/speakingExam.controller';
@@ -120,11 +121,13 @@ router.get('/results/analytics', getResultsAnalytics);
 router.get('/results/:id', getMyResult);
 
 router.get('/tutor/reviews/due', listDueReviews);
-router.get('/tutor/speaking', getTutorSpeaking);
-router.get('/tutor/sessions', listTutorSessions);
-router.post('/tutor/sessions', createTutorSession);
+router.get('/tutor/speaking', warmOnOpen, getTutorSpeaking);
+// Warm-up ping (llmWarmup.ts): answers at once; the tiny model request runs after the response. The learner never waits for it.
+router.post('/tutor/warm', warmOnOpen, (_req, res) => { res.status(202).json({ ok: true }); });
+router.get('/tutor/sessions', warmOnOpen, listTutorSessions);
+router.post('/tutor/sessions', warmOnOpen, createTutorSession);
 router.delete('/tutor/sessions', clearTutorSessions);
-router.get('/tutor/sessions/:id', getTutorSession);
+router.get('/tutor/sessions/:id', warmOnOpen, getTutorSession);
 router.delete('/tutor/sessions/:id', deleteTutorSession);
 router.post('/tutor/sessions/:id/messages', sendTutorMessage);
 router.post('/tutor/sessions/:id/messages/stream', streamTutorMessage);

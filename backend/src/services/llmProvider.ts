@@ -12,6 +12,7 @@
 // grading) run on the reply exactly as before. Documents sent as PDF blocks cannot be read by this model: they are left out (passages
 // from the school's materials are text and are kept).
 import type Anthropic from '@anthropic-ai/sdk';
+import { logger } from '../utils/logging';
 import { type ChatCall, type ChatMsg, type DsParts, dsParts, gradedReply, isGraded } from './deepseekTutor';
 
 export const tutorProvider = (): 'deepseek' | 'anthropic' => (process.env.TUTOR_LLM_PROVIDER?.trim().toLowerCase() === 'deepseek' ? 'deepseek' : 'anthropic');
@@ -135,42 +136,89 @@ function streamOf(body: ABody, timeout: number) {
   return { [Symbol.asyncIterator]: () => it, finalMessage: () => finalP, abort: () => ac.abort() };
 }
 
-/** One plain chat-completions call for the graded turn (deepseekTutor.ts). Reasoning stays off unless a level is asked for. */
+/** One chat-completions call for the graded turn (deepseekTutor.ts). Reasoning stays off unless a level is asked for. With onDelta the reply
+ * is streamed; onDelta returning false stops it (the text so far is kept; output tokens are then estimated). */
 function chatCall(timeout: number, signal?: AbortSignal): ChatCall {
   return async (q) => {
+    const ac = new AbortController();
+    const onAbort = () => ac.abort(); signal?.addEventListener('abort', onAbort);
     const payload = () => ({
       model: tutorModel(), messages: q.messages, max_tokens: q.max_tokens,
       ...(typeof q.temperature === 'number' ? { temperature: q.temperature } : {}),
       ...(q.json ? { response_format: { type: 'json_object' } } : {}),
+      ...(q.onDelta ? { stream: true, stream_options: { include_usage: true } } : {}),
       ...(q.reasoning && q.reasoning !== 'none' && reasoningMode === 0 ? { reasoning_effort: q.reasoning } : REASONING_OFF[reasoningMode]),
     });
-    let r: Response;
-    try { r = await post(payload, signal, timeout); } catch (e) {
-      if (!q.json || (e as { status?: number }).status !== 400) throw e;
-      r = await post(() => { const x = payload() as Record<string, unknown>; delete x.response_format; return x; }, signal, timeout); // a server without JSON mode
-    }
-    const m = fromChat((await r.json()) as Parameters<typeof fromChat>[0]);
-    return { text: m.content[0]?.text ?? '', finish: m.stop_reason, usage: { input_tokens: m.usage.input_tokens, output_tokens: m.usage.output_tokens } };
+    try {
+      let r: Response;
+      try { r = await post(payload, ac.signal, timeout); } catch (e) {
+        if (!q.json || (e as { status?: number }).status !== 400) throw e;
+        r = await post(() => { const x = payload() as Record<string, unknown>; delete x.response_format; return x; }, ac.signal, timeout); // a server without JSON mode
+      }
+      if (!q.onDelta) {
+        const m = fromChat((await r.json()) as Parameters<typeof fromChat>[0]);
+        return { text: m.content[0]?.text ?? '', finish: m.stop_reason, usage: { input_tokens: m.usage.input_tokens, output_tokens: m.usage.output_tokens } };
+      }
+      let text = ''; let finish = 'stop'; let usage: Usage; let stopped = false;
+      const rd = r.body!.getReader(); const dec = new TextDecoder(); let buf = '';
+      try {
+        outer: for (;;) {
+          const { done, value } = await rd.read(); if (done) break;
+          buf += dec.decode(value, { stream: true });
+          let i;
+          while ((i = buf.indexOf('\n')) >= 0) {
+            const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+            if (!line.startsWith('data:')) continue;
+            const d = line.slice(5).trim(); if (!d || d === '[DONE]') continue;
+            const j = JSON.parse(d) as { usage?: Usage; choices?: { delta?: { content?: string | null }; finish_reason?: string | null }[] };
+            if (j.usage) usage = j.usage;
+            const ch = j.choices?.[0];
+            if (ch?.finish_reason) finish = ch.finish_reason;
+            const t = ch?.delta?.content;
+            if (t) { text += t; if (q.onDelta(t) === false) { stopped = true; break outer; } }
+          }
+        }
+      } finally { if (stopped) { ac.abort(); rd.cancel().catch(() => undefined); } }
+      const u = usageOf(usage);
+      if (stopped || !u.output_tokens) u.output_tokens = Math.max(u.output_tokens, Math.ceil(text.length / 3));
+      return { text, finish: STOP[finish] ?? 'end_turn', usage: { input_tokens: u.input_tokens, output_tokens: u.output_tokens } };
+    } finally { signal?.removeEventListener('abort', onAbort); }
   };
 }
 const anyPart = (p: DsParts) => p.gradeFirst || p.answerCheck || p.examples || p.replyChecks || p.tuning;
 const gradeReasoning = () => { const v = process.env.TUTOR_LLM_GRADE_REASONING?.trim().toLowerCase(); return v && ['none', 'low', 'high'].includes(v) ? v : 'none'; };
-async function graded(body: ABody, parts: DsParts, timeout: number, signal?: AbortSignal) {
+async function graded(body: ABody, parts: DsParts, timeout: number, signal?: AbortSignal, onText?: (t: string) => void) {
   const chat = toChat(body, false, { reminder: !parts.gradeFirst }) as { messages: ChatMsg[] };
   const [sys, ...rest] = chat.messages[0]?.role === 'system' ? chat.messages : [{ role: 'system' as const, content: '' }, ...chat.messages];
-  const r = await gradedReply({ system: sys.content, messages: rest, maxTokens: body.max_tokens, temperature: body.temperature, parts, call: chatCall(timeout, signal), gradeReasoning: gradeReasoning() });
-  return fromChat({ model: tutorModel(), choices: [{ message: { content: r.text }, finish_reason: r.finish === 'max_tokens' ? 'length' : 'stop' }], usage: { prompt_tokens: r.usage.input_tokens, completion_tokens: r.usage.output_tokens } });
+  const r = await gradedReply({ system: sys.content, messages: rest, maxTokens: body.max_tokens, temperature: body.temperature, parts, call: chatCall(timeout, signal), gradeReasoning: gradeReasoning(), onText });
+  // Timings only (no learner text): where a DeepSeek turn spends its time.
+  logger.info('ds_turn_timing', { ...r.meta.timings, regenerated: r.meta.regenerated.length, verdict: r.meta.grade?.verdict ?? null });
+  const m = fromChat({ model: tutorModel(), choices: [{ message: { content: r.text }, finish_reason: r.finish === 'max_tokens' ? 'length' : 'stop' }], usage: { prompt_tokens: r.usage.input_tokens, completion_tokens: r.usage.output_tokens } });
+  return Object.assign(m, { ds_meta: { timings: r.meta.timings, regenerated: r.meta.regenerated, skippedGrade: Boolean(r.meta.timings.skippedGrade) } });
 }
-/** A graded turn as a stream: written whole first (it needs its checks), then sent as text deltas in the same event shape. */
+/** A graded turn as a stream. dsFast: checked sentences are sent as they are ready; otherwise the reply is written whole first, then sent. */
 function gradedStream(body: ABody, parts: DsParts, timeout: number) {
   const ac = new AbortController(); const timer = setTimeout(() => ac.abort(), timeout);
-  const finalP = graded(body, parts, timeout, ac.signal).finally(() => clearTimeout(timer));
+  const queue: string[] = []; let wake: (() => void) | null = null; let ended = false;
+  const push = (t: string) => { queue.push(t); wake?.(); };
+  const live = Boolean(parts.fast && parts.gradeFirst);
+  const finalP = graded(body, parts, timeout, ac.signal, live ? push : undefined).finally(() => { clearTimeout(timer); ended = true; wake?.(); });
   finalP.catch(() => undefined);
   async function* events() {
-    const m = await finalP; const text = m.content[0]?.text ?? '';
-    yield { type: 'message_start', message: { ...m, content: [], stop_reason: null } };
+    yield { type: 'message_start', message: { id: 'deepseek', type: 'message', role: 'assistant', model: tutorModel(), content: [], stop_reason: null, usage: usageOf(undefined) } };
     yield { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } };
-    for (const piece of text.match(/[\s\S]{1,24}(?=\s|$)|[\s\S]{1,24}/g) ?? []) yield { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: piece } };
+    if (live) {
+      for (;;) {
+        while (queue.length) yield { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: queue.shift()! } };
+        if (ended) break;
+        await new Promise<void>((res) => { if (queue.length || ended) res(); else wake = res; }); wake = null;
+      }
+      await finalP; // rethrows a failure
+    } else {
+      const m = await finalP; const text = m.content[0]?.text ?? '';
+      for (const piece of text.match(/[\s\S]{1,24}(?=\s|$)|[\s\S]{1,24}/g) ?? []) yield { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: piece } };
+    }
+    const m = await finalP;
     yield { type: 'content_block_stop', index: 0 };
     yield { type: 'message_delta', delta: { stop_reason: m.stop_reason, stop_sequence: null }, usage: { output_tokens: m.usage.output_tokens } };
     yield { type: 'message_stop' };

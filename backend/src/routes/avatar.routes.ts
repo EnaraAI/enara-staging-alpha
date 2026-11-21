@@ -1,3 +1,4 @@
+import { warmOnOpen } from '../services/llmWarmup';
 import { Router } from 'express';
 import { checkVoiceNow } from '../services/elevenlabsVoice';
 import { authMiddleware, requireRole } from '../middleware/auth.middleware';
@@ -23,7 +24,7 @@ router.use(authMiddleware);
 router.get('/voice-check', async (_req, res, next) => {
   try { res.json(await checkVoiceNow()); } catch (e) { next(e); }
 });
-router.post('/session', startAvatarSession);
+router.post('/session', warmOnOpen, startAvatarSession); // warm-up ping in the background (llmWarmup.ts)
 router.post('/query-stream', streamAvatarAnswer);
 router.post('/session/:id/language', switchAvatarLanguage);
 router.post('/session/:id/fallback', avatarFallback);
