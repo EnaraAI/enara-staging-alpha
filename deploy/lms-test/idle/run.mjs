@@ -17,7 +17,8 @@ note({ step: 'warm-ping', ...(await post('llm-ping')) });
 note({ step: 'warm-ping', ...(await post('llm-ping')) });
 const warm = log.filter((e) => e.ok).map((e) => e.ms); const warmMs = Math.max(...warm, 400);
 let idleAfterMin = null; let coldStartMs = null;
-for (const gapMin of [1, 2, 4, 6, 9, 13, 18, 25]) {
+// First run (cancelled to save time) showed it still warm after quiet gaps of 1, 2, 4, 6, 9, 13 and 18 min; continue from there.
+for (const gapMin of [25, 40]) {
   await sleep(gapMin * 60_000);
   const r = await post('llm-ping'); note({ step: 'gap', gapMin, ...r });
   if (r.ok && r.ms > Math.max(4 * warmMs, 3000)) { idleAfterMin = gapMin; coldStartMs = r.ms; break; }
@@ -25,9 +26,10 @@ for (const gapMin of [1, 2, 4, 6, 9, 13, 18, 25]) {
 save({ idleAfterMin, coldStartMs });
 // Phase 2: the learner's first reply after a quiet gap longer than the timeout, without and with the warm-up ping (sent when the page
 // opens; the learner types for about 10 s).
-const gap = (idleAfterMin ?? 30) + 2;
+if (idleAfterMin === null) { save({ idleAfterMin, coldStartMs, note: 'still warm after 40 quiet minutes: no cold start to measure' }); process.exit(0); }
+const gap = idleAfterMin + 2;
 note({ step: 'warm-turn', ...(await turn()) });
-for (let i = 0; i < 2; i++) {
+for (let i = 0; i < 1; i++) { // one round each (owner, to save time)
   await sleep(gap * 60_000);
   note({ step: 'cold-turn-no-warmup', gapMin: gap, ...(await turn()) });
   await sleep(gap * 60_000);
