@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { deepseekClient, deepseekReady, tutorModel } from './llmProvider';
 import { clientFor, fallbackKey, fallbackModel, hasFallback, modelFallbackOn, shouldFallBack } from './modelFallback';
 import { getConfig } from '../config/env';
 import { AppError } from '../middleware/errorHandler';
@@ -56,7 +57,10 @@ export async function askForJson<T>(params: {
   // metered), except under a spending guard, where each HTTP request has to
   // pass through reserve() first.
   client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 55_000, maxRetries: 0 });
-  const model = params.model ?? config.anthropicTutorModel;
+  // Tutor provider switch (llmProvider.ts): DeepSeek on lms-test while the Anthropic key is replaced (grading and checks included).
+  const ds = deepseekReady();
+  const useClient = ds ? deepseekClient(55_000) : client;
+  const model = ds ? tutorModel()! : params.model ?? config.anthropicTutorModel;
   let lastError = '';
   // One operation: the validation retry and transport retries are separate,
   // numbered attempts under it.
@@ -71,7 +75,7 @@ export async function askForJson<T>(params: {
           bound: { inputTokens: textTokenBound(params.system, params.user), outputTokens: params.maxTokens },
         },
         () =>
-          client!.messages.create({
+          useClient!.messages.create({
             model,
             max_tokens: params.maxTokens,
             output_config: { effort: 'low' },
@@ -82,7 +86,7 @@ export async function askForJson<T>(params: {
       ).catch(async (error) => {
         // modelFallback (not under a spending guard: the guard reserved one request): one more try with the fallback key and/or model.
         if (guard || !modelFallbackOn() || !hasFallback() || !shouldFallBack(error)) throw error;
-        const fbModel = fallbackModel() ?? model;
+        const fbModel = fallbackModel() ?? (ds ? params.model ?? config.anthropicTutorModel : model); // a fallback always goes to Anthropic
         return meteredMessage(
           { feature: params.feature, modelName: fbModel, institutionId: params.institutionId, refs: params.refs, maxAttempts: 1, bound: { inputTokens: textTokenBound(params.system, params.user), outputTokens: params.maxTokens } },
           () => clientFor(fallbackKey() ?? config.anthropicApiKey!, 55_000).messages.create({ model: fbModel, max_tokens: params.maxTokens, output_config: { effort: 'low' }, system: params.system, messages: [{ role: 'user', content: params.user }] }),

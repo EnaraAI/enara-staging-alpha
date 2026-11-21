@@ -12,6 +12,7 @@ import { seedLmsTest } from './lmsTestSeed';
 import { mockLmsRouter } from './mockLms';
 import { runHealthCheck, setupHealthCheck } from './healthCheck';
 import { avatarUsageReport, parseAvatarIds } from './avatarUsageReport';
+import { llmCheck, llmCompare } from './llmCheck';
 
 // Maintenance for the LMS TEST deployment only (lms-test.enara.app): 404 unless
 // switched on AND MONGODB_URI is the test cluster AND a maintenance token is
@@ -292,6 +293,14 @@ router.get('/avatar-usage', async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+});
+
+// Tutor provider checks (llmCheck.ts): the endpoint's models and timings, and one request through the adapter for the quality check.
+router.get('/llm-check', async (_req, res, next) => {
+  try { res.json(await llmCheck()); } catch (e) { next(e); }
+});
+router.post('/llm-compare', async (req, res, next) => {
+  try { res.json(await llmCompare(req.body ?? {})); } catch (e) { next(e); }
 });
 
 export default router;
