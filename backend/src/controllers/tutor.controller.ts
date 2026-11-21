@@ -8,6 +8,7 @@ import { currentKeyVerdict, independentSuccessItem, type LanguageTeachingContext
 import { engineV2 } from '../services/engineV2';
 import { kidsAudioVisualOn, pictureChoices } from '../services/kidsPictures';
 import { kidsSpeakingInfo } from '../services/kidsSpeaking';
+import { asksToExplainAgain, retrieveWithRewrite, reusePassages } from '../services/retrievalBoost';
 import { gradeAllSubjectsOn, practiceOutcome, practiceTurnFrom, SUBJECT_GRADE_LINE } from '../services/subjectPractice';
 import { recordOutcomeForError, recordTutorOutcome, adaptiveSpacingOn, removeExamItems } from '../services/errorsToWorkOn';
 import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
@@ -349,14 +350,21 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
   turn.subjectGrading = !turn.language && gradeAllSubjectsOn();
   turn.directParams = async () => {
     // Course passages for this question (school-scoped), with citations.
-    turn.sources = (await isFeatureEnabled(session.institutionId, 'learning_intelligence_enabled')) && !(await isShadowMode(session.institutionId))
-      ? await retrieveCurriculumSources({
+    const retrievalAllowed = (await isFeatureEnabled(session.institutionId, 'learning_intelligence_enabled')) && !(await isShadowMode(session.institutionId));
+    // ragReuse: "explain again" re-uses the passages the previous reply cited (same scope); otherwise search.
+    const lastCited = [...earlier].reverse().find((m) => m.role === 'ai')?.meta?.citations?.map((c) => c.chunkId).filter(Boolean) as string[] | undefined;
+    const reused = retrievalAllowed && asksToExplainAgain(turn.text) && lastCited?.length
+      ? await reusePassages({ institutionId: session.institutionId, curriculumId: session.curriculumId, chunkIds: lastCited }).catch(() => [])
+      : [];
+    // ragRewrite: when the search finds nothing, one keyword rewrite (English + Arabic) and one more search.
+    turn.sources = reused.length ? reused : retrievalAllowed
+      ? (await retrieveWithRewrite({
           institutionId: session.institutionId,
           curriculumId: session.curriculumId,
           query: turn.text,
           lessonId: session.lessonId,
           objectiveId: session.objectiveId,
-        }).catch(() => [])
+        }).catch(() => ({ sources: [] as RetrievedSource[] }))).sources
       : [];
     return {
       query: enrichedQuery,
