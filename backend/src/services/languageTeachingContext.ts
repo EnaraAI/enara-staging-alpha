@@ -13,6 +13,7 @@ import { lexicalL1Line, lexicalTransfer, spellingPatternLine, spellingSlip, type
 import { priorAnsweredItems } from './learnerMemory';
 import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
 import { graderV2On } from './graderV2';
+import { KIDS_PICS_LINE } from './kidsPictures';
 import { engineV2, arbitrationForced } from './engineV2';
 import { RULE_BANK, ruleBankEntry, type RuleBankEntry } from './ruleBank';
 import {
@@ -2045,6 +2046,7 @@ export function renderLanguageContextParts(ctx: Omit<LanguageTeachingContext, 'p
     ...(engineV2('planner2') && clockLesson(lesson.spec) ? [CLOCK_TIMES_LINE] : []),
     ...(engineV2('planner2') ? [OWN_QUESTION_LINE, NO_PRAISE_ON_ERROR_LINE, ...(band === 'child' ? [CHILD_EXPLAIN_LINE] : [])] : []),
     ...(band === 'child' && under9(l.ageYears) ? [CHILD_SHORT_LINE] : []),
+    ...(band === 'child' && under9(l.ageYears) && engineV2('kidsAudioVisual') ? [KIDS_PICS_LINE] : []),
     assessmentInstruction(),
   ].join('\n');
   const dynamic = [
@@ -2091,6 +2093,7 @@ export function renderLanguageContextPrompt(ctx: Omit<LanguageTeachingContext, '
     ...(engineV2('planner2') && clockLesson(lesson.spec) ? [CLOCK_TIMES_LINE] : []),
     ...(engineV2('planner2') ? [OWN_QUESTION_LINE, NO_PRAISE_ON_ERROR_LINE, ...(band === 'child' ? [CHILD_EXPLAIN_LINE] : [])] : []),
     ...(band === 'child' && under9(l.ageYears) ? [CHILD_SHORT_LINE] : []),
+    ...(band === 'child' && under9(l.ageYears) && engineV2('kidsAudioVisual') ? [KIDS_PICS_LINE] : []),
     assessmentInstruction(),
     '</language_teaching_context>',
   );

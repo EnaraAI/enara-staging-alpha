@@ -807,7 +807,16 @@ import React from 'react';
           return h(TutorBubble, { key: i, from: m.from, lang: p.lang, name: false, onReadAloud: m.from === 'tutor' ? (p.onReadAloud ? function () { p.onReadAloud(m.text); } : function () {}) : undefined },
             h('span', { className: 'ek-chat__text' }, m.text),
             m.picture && h('div', { className: 'ek-chat__pic' }, h(FractionPicture, { label: T('A circle cut into quarters and a circle cut in half', 'دائرة مقسومة أرباعًا ودائرة مقسومة نصفين') }), h(Button, { variant: 'ghost', size: 'sm', icon: 'image' }, T('Make it bigger', 'كبّر الصورة'))),
-            m.jump && h('div', null, h(Button, { size: 'sm', iconEnd: 'arrowRight', className: 'ek-chat__jump', onClick: m.onJump }, m.jump)));
+            m.jump && h('div', null, h(Button, { size: 'sm', iconEnd: 'arrowRight', className: 'ek-chat__jump', onClick: m.onJump }, m.jump)),
+            // kidsAudioVisual: picture choices (tap = answer, read aloud); the last tutor message only.
+            m.pics && m.pics.length > 1 && i === msgs.length - 1 && h('div', { className: 'ek-pics', role: 'group', 'aria-label': T('Tap a picture', 'اضغط على صورة') },
+              m.pics.map(function (c) {
+                return h('div', { key: c.word, className: 'ek-pics__item' },
+                  h('button', { type: 'button', className: 'ek-pics__pick', 'aria-label': c.word, onClick: function () { if (p.onReadAloud) p.onReadAloud(c.word); send(c.word); } },
+                    h('img', { src: c.src, alt: '', width: 72, height: 72, loading: 'lazy' }), h('span', { className: 'ek-pics__word' }, c.word)),
+                  h('button', { type: 'button', className: 'ek-pics__say', 'aria-label': T('Listen: ', 'استمع: ') + c.word, onClick: function () { if (p.onReadAloud) p.onReadAloud(c.word); } }, '\uD83D\uDD0A'));
+              }),
+              h('span', { className: 'ek-pics__credit' }, 'Pictures: OpenMoji (CC BY-SA 4.0)')));
         }),
         msgs.length === 0 && h(TutorBubble, { lang: p.lang, name: false }, p.greeting || T('Hi! I’m Enara. What would you like to learn about?', 'مرحبًا! أنا إنارة. ماذا تحب أن تتعلّم؟')),
         (p.thinking === undefined ? !p.onSend : p.thinking) && h('div', { className: 'ek-thinking', role: 'status' }, h('span', { className: 'ek-dots', 'aria-hidden': true }, h('i'), h('i'), h('i')), T('Enara is thinking…', 'إنارة تفكّر…')))

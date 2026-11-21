@@ -697,7 +697,7 @@ function TutorDrawer({ ctx, tutor, onClose }: { ctx: Ctx; tutor: Tutor; onClose:
         setSessionId(id);
       }
       const r: any = await api.sendTutorMessage(id!, text, tutor.courseId ? { courseId: tutor.courseId, lessonId: tutor.lessonId } : undefined);
-      setMessages(m => [...m, { from: 'tutor', text: r.assistantMessage?.text || '' }]);
+      setMessages(m => [...m, { from: 'tutor', text: r.assistantMessage?.text || '', ...(r.assistantMessage?.meta?.pics ? { pics: D.kidsPics(r.assistantMessage.meta.pics) } : {}) }]);
     } catch (e) {
       setMessages(m => [...m, { from: 'tutor', text: ctx.T('Sorry, I couldn’t answer just now. Please try again.', 'عذرًا، لم أستطع الإجابة الآن. حاول مرة أخرى.') }]);
       if (!api.isFeatureDisabled(e)) toast.error(ctx.T('Enara isn’t available', 'إنارة غير متاحة'), errText(e));

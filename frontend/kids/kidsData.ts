@@ -370,8 +370,13 @@ export function planItems(plan: Any) {
 
 // ---------- Tutor ----------
 export function chatMessages(messages: Any[]) {
-  return (messages || []).map((m: Any) => ({ from: m.role === 'user' || m.role === 'student' ? 'child' : 'tutor', text: m.text || '' }));
+  return (messages || []).map((m: Any) => ({ from: m.role === 'user' || m.role === 'student' ? 'child' : 'tutor', text: m.text || '', ...(Array.isArray(m.meta?.pics) ? { pics: kidsPics(m.meta.pics) } : {}) }));
 }
 export function chatSessions(sessions: Any[]) {
   return (sessions || []).map((s: Any) => ({ id: s.id, title: s.title || s.lessonTitle || '…', date: s.lastMessageAt || s.timestamp, count: s.messageCount || 0, live: s.mode === 'live' }));
+}
+
+/** kidsAudioVisual: only well-formed picture choices from our own picture folder. */
+export function kidsPics(pics: Any): { word: string; src: string }[] {
+  return (Array.isArray(pics) ? pics : []).filter((c: Any) => c && typeof c.word === 'string' && typeof c.src === 'string' && /^\/kids\/pics\/[a-z0-9-]+\.svg$/.test(c.src)).slice(0, 4);
 }
