@@ -15,8 +15,8 @@
   "s": {
    "W1": 0,
    "W2": 1,
-   "C1": 2,
-   "C2": 1
+   "C1": 3,
+   "C2": 2
   },
   "indep": {
    "C1": 0,
@@ -1880,7 +1880,105 @@
    "answerReleased": true,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 2: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 1: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. Complete: \"Take an umbrella. It is ___ today.\"\" | \"I cannot read \"rny\" as a whole word. Rule: after It is, write a full weather word. Think about the umbrella: what is the weather like? Write the whole word.\" | \"Think about the umbrella. Write the whole word.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour word fits the grey clouds, so the meaning is right. But letters are missing: check the letters after \"l\", because two vowels are missing there. Write the word again.\n\nLEARNER'S LAST MESSAGE:\ncloudy\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"cloudy\" is right, and the spelling is complete.\nNow a fresh one on your own. Complete: \"We swim in the sea. It is very ___.\""
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A2-VO-weather (weather words). Learner level A2. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the noun works as the description. Its error: uses the noun instead of the adjective (\"It is rain today.\" / \"It is sun.\").\nW2 (wrong) strength 1: vowels can be left out. Its error: leaves out vowels in a weather word (\"sny\", \"windi\").\nC1 (correct) strength 2: weather is described with an adjective after \"It is\" (sunny, rainy). Independent correct productions so far: 0.\nC2 (correct) strength 1: weather adjectives are spelled with their vowels (sunny, windy). Independent correct productions so far: 0.\nItems this learner answered in session 1: \"Now you try. Complete: \"Take an umbrella. It is ___ today.\"\" | \"I cannot read \"rny\" as a whole word. Rule: after It is, write a full weather word. Think about the umbrella: what is the weather like? Write the whole word.\" | \"Think about the umbrella. Write the whole word.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYour word fits the grey clouds, so the meaning is right. But letters are missing: check the letters after \"l\", because two vowels are missing there. Write the word again.\n\nLEARNER'S LAST MESSAGE:\ncloudy\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"cloudy\" is right, and the spelling is complete.\nNow a fresh one on your own. Complete: \"We swim in the sea. It is very ___.\"",
+   "stateBefore": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 2,
+     "C2": 1
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"cloudy\" is right, and the spelling is complete."
+    },
+    {
+     "rule": "R3",
+     "belief": "C2",
+     "quote": "the spelling is complete"
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1",
+     "W2"
+    ],
+    "correct": "sunny",
+    "errors": {
+     "W1": "sun",
+     "W2": "sny"
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R3:C2"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "weather",
+    "band": "A2",
+    "primary": "W1",
+    "ws": [
+     "W1",
+     "W2"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 1,
+     "C1": 3,
+     "C2": 2
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 2,
+     "W2": 1,
+     "C1": 1,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": [
+      2
+     ]
+    },
+    "afterF1": true
+   }
   }
  ],
  "assess": {
@@ -2002,6 +2100,74 @@
   "retr": {
    "C1": [],
    "C2": []
+  },
+  "afterF1": true
+ },
+ "stateEndS2": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0,
+   "W2": 1,
+   "C1": 3,
+   "C2": 2
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
+  },
+  "afterF1": true
+ },
+ "stateWk4": {
+  "form": "weather",
+  "band": "A2",
+  "primary": "W1",
+  "ws": [
+   "W1",
+   "W2"
+  ],
+  "s": {
+   "W1": 0.5,
+   "W2": 1,
+   "C1": 1.95,
+   "C2": 0.95
+  },
+  "indep": {
+   "C1": 0,
+   "C2": 0
+  },
+  "start": {
+   "W1": 2,
+   "W2": 1,
+   "C1": 1,
+   "C2": 0
+  },
+  "retr": {
+   "C1": [
+    2
+   ],
+   "C2": [
+    2
+   ]
   },
   "afterF1": true
  }
