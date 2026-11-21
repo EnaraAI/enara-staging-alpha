@@ -140,6 +140,21 @@ async function calls(audioDir) {
       const mask = (t) => String(t).replace(/eyJ[\w-]+\.[\w-]+\.[\w-]*/g, '<jwt>').replace(/[A-Za-z0-9+/_=-]{40,}/g, '<long>').slice(0, 400);
       page.on('pageerror', (e) => consoleLines.push(`pageerror ${mask(e.message)}`));
       page.on('console', (m) => { if (consoleLines.length < 400) consoleLines.push(`${m.type()} ${mask(m.text())}`); });
+      // Anam signalling: WebSocket frames (short, masked) and HTTP statuses, to see why a call closes.
+      page.on('websocket', (ws) => {
+        const host = new URL(ws.url()).host;
+        consoleLines.push(`ws open ${host}`);
+        ws.on('framereceived', (f) => { const t = typeof f.payload === 'string' ? f.payload : '<bin>'; if (consoleLines.length < 400 && !/"(answer|offer|candidate|iceCandidate)"|sdp/i.test(t.slice(0, 300))) consoleLines.push(`ws< ${mask(t)}`); });
+        ws.on('framesent', (f) => { const t = typeof f.payload === 'string' ? f.payload : '<bin>'; if (consoleLines.length < 400 && !/sdp|candidate/i.test(t.slice(0, 300))) consoleLines.push(`ws> ${mask(t).slice(0, 160)}`); });
+        ws.on('close', () => consoleLines.push(`ws close ${host}`));
+      });
+      page.on('response', async (r) => {
+        const u = new URL(r.url());
+        if (!/anam\.ai$/.test(u.host)) return;
+        let body = '';
+        if (r.status() >= 400) body = await r.text().catch(() => '');
+        consoleLines.push(`http ${r.request().method()} ${u.host}${u.pathname.slice(0, 80)} ${r.status()} ${mask(body).slice(0, 300)}`);
+      });
       page.on('requestfailed', (r) => { if (consoleLines.length < 400) consoleLines.push(`requestfailed ${new URL(r.url()).host}${new URL(r.url()).pathname.slice(0, 80)} ${r.failure()?.errorText ?? ''}`); });
       await page.goto(`${SITE}/__avatarcost`);
       await page.addScriptTag({ content: umd });
