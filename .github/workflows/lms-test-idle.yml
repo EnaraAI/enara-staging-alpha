@@ -1,0 +1,30 @@
+# One-off (owner, 21 Nov 2026): measure the Modal idle timeout and the warm-up ping effect on lms-test. Results (times only) are pushed to
+# claude/tutor-lms-idle-results.
+name: lms-test idle timeout probe
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/idle/**', '.github/workflows/lms-test-idle.yml']
+permissions:
+  contents: write
+jobs:
+  probe:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Probe (lms-test)
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node deploy/lms-test/idle/run.mjs
+      - name: Publish results
+        if: always()
+        run: |
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-idle-results
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "idle probe ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-idle-results
