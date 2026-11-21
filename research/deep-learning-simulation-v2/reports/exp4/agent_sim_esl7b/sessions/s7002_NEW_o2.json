@@ -1529,7 +1529,103 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 3: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Read the message. What day is the game?\" | \"Sorry, the message was missing. Here it is: \"Practice is on Wednesday. The game is on Saturday.\" What day is the game?\" | \"Now one alone. Read the message: \"The shop opens on Monday. The sale is on Friday. Bring 2 bags.\" Which day is the sale?\" | \"Now write one sentence about a person you know. In it, they read all the words of the question first.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, 8:30 is right. The club starts at 8:30, not at 8:00.\n\nRead the message. What time does the game start? Text: \"Hi Mona! The football game is on Thursday. It is not on Monday this week. Ali brings the ball at 5:15. The game starts at 5:30. Meet me at the sports hall, not at the gate. Bring 3 friends and 1 bottle of water. From Jamal\"\n\nLEARNER'S LAST MESSAGE:\n5:15\nFACT: the last learner message contained the error of W1 (answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\")).\n\nTUTOR TURN TO JUDGE:\nExample: Text: \"Tom has a red pen. Lena has a blue pen.\" Question: \"Who has a blue pen?\" I read every question word first, so the answer is Lena.\nRule: Read the whole question first, then find what fits all of it.\nExample: \"I read all the question, then I look.\"\nRead the question again and try again."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-C-A1-RD-very-short-texts (finding a name, time or place in a short message). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0: the first name/number/time/place in the text of the asked type is the answer. Its error: answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\").\nC1 (correct) strength 3: the answer is the name, number, time or place in the text that fits all the words of the question. Independent correct productions so far: 3.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Now you try. Read the message. What day is the game?\" | \"Sorry, the message was missing. Here it is: \"Practice is on Wednesday. The game is on Saturday.\" What day is the game?\" | \"Now one alone. Read the message: \"The shop opens on Monday. The sale is on Friday. Bring 2 bags.\" Which day is the sale?\" | \"Now write one sentence about a person you know. In it, they read all the words of the question first.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nYes, 8:30 is right. The club starts at 8:30, not at 8:00.\n\nRead the message. What time does the game start? Text: \"Hi Mona! The football game is on Thursday. It is not on Monday this week. Ali brings the ball at 5:15. The game starts at 5:30. Meet me at the sports hall, not at the gate. Bring 3 friends and 1 bottle of water. From Jamal\"\n\nLEARNER'S LAST MESSAGE:\n5:15\nFACT: the last learner message contained the error of W1 (answers with the first name, number, time or place of the asked type without checking the question (\"Mr Sami\" for \"Who is here in the afternoon?\")).\n\nTUTOR TURN TO JUDGE:\nExample: Text: \"Tom has a red pen. Lena has a blue pen.\" Question: \"Who has a blue pen?\" I read every question word first, so the answer is Lena.\nRule: Read the whole question first, then find what fits all of it.\nExample: \"I read all the question, then I look.\"\nRead the question again and try again.",
+   "stateBefore": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "Rule: Read the whole question first, then find what fits all of it."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "blank",
+    "probes": [
+     "W1"
+    ],
+    "correct": "5:30",
+    "errors": {
+     "W1": "5:15"
+    }
+   },
+   "applied": [
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "rd1",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 3,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 3,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "5:30",
+   "production": {
+    "kind": "blank",
+    "correct": true,
+    "text": "5:30",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {

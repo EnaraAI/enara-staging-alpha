@@ -12,9 +12,9 @@
    "W1"
   ],
   "s": {
-   "W1": 0.5,
+   "W1": 0,
    "W2": 0,
-   "C1": 0,
+   "C1": 1,
    "C2": 0
   },
   "indep": {
@@ -1416,7 +1416,109 @@
    "answerReleased": false,
    "twoAsks": false,
    "twoAsksRaw": false,
-   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0.5: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 0: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Correct this sentence: \"He wants sandwich for lunch.\"\" | \"Correct the sentence: \"She can swims.\"\" | \"Your answer is the same as the task. What needs to change? Write it again.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat sentence still has an error. After can, the verb stays in its base form, with no -s, even for he, she or a name.\n\nTry one more. Correct this sentence: 'Our teacher can sings very well.'\n\nLEARNER'S LAST MESSAGE:\nOur teacher can sing very well.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"Our teacher can sing very well.\" is right. The verb after can has no -s.\nNow write one sentence about a person you know using can and a verb."
+   "judgeInput": "KNOWLEDGE STATE (before this tutor turn):\nTarget form: EN-F-A1-GR-can-ability (can). Learner level A1. First language Arabic.\nSession 2. This is 12 days after session 1; the forgetting rule has run, so strengths may be non-whole (LEARNING_RULES 2a, 6).\nW1 (wrong) strength 0.5: after he/she/it the verb after can takes -s. Its error: adds -s to the verb after can (\"She can swims.\").\nC1 (correct) strength 0: after can the verb is the base form for every subject (no -s). Independent correct productions so far: 0.\nThis outcome has one wrong belief only (no W2, no C2).\nItems this learner answered in session 1: \"Correct this sentence: \"He wants sandwich for lunch.\"\" | \"Correct the sentence: \"She can swims.\"\" | \"Your answer is the same as the task. What needs to change? Write it again.\"\n\nPREVIOUS TUTOR TURN (the task set before the learner's message):\nThat sentence still has an error. After can, the verb stays in its base form, with no -s, even for he, she or a name.\n\nTry one more. Correct this sentence: 'Our teacher can sings very well.'\n\nLEARNER'S LAST MESSAGE:\nOur teacher can sing very well.\nFACT: the last learner message produced the form CORRECTLY.\n\nTUTOR TURN TO JUDGE:\nYes, \"Our teacher can sing very well.\" is right. The verb after can has no -s.\nNow write one sentence about a person you know using can and a verb.",
+   "stateBefore": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0.5,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   },
+   "events": [
+    {
+     "rule": "R3",
+     "belief": "C1",
+     "quote": "Yes, \"Our teacher can sing very well.\" is right."
+    },
+    {
+     "rule": "R1",
+     "belief": "W1",
+     "quote": "The verb after can has no -s."
+    }
+   ],
+   "retrieval": [],
+   "next_task": {
+    "kind": "sentence",
+    "probes": [
+     "W1"
+    ],
+    "correct": "My brother can swim.",
+    "errors": {
+     "W1": "My brother can swims."
+    }
+   },
+   "applied": [
+    "R3:C1",
+    "R1:W1"
+   ],
+   "rejected": [],
+   "stateAfter": {
+    "form": "can",
+    "band": "A1",
+    "primary": "W1",
+    "ws": [
+     "W1"
+    ],
+    "s": {
+     "W1": 0,
+     "W2": 0,
+     "C1": 1,
+     "C2": 0
+    },
+    "indep": {
+     "C1": 0,
+     "C2": 0
+    },
+    "start": {
+     "W1": 3,
+     "W2": 0,
+     "C1": 0,
+     "C2": 0
+    },
+    "retr": {
+     "C1": [
+      2
+     ],
+     "C2": []
+    },
+    "afterF1": true
+   }
+  },
+  {
+   "session": 2,
+   "learner": "My brother can swim.",
+   "production": {
+    "kind": "sentence",
+    "correct": true,
+    "text": "My brother can swim.",
+    "probes": [
+     "W1"
+    ]
+   }
   }
  ],
  "assess": {
