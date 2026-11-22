@@ -26,6 +26,15 @@ export const getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
   });
 });
 
+// Assessment engine (P1a): the learner's screen language (ar | en), set from the app's language switch. Feedback is written in it.
+export const setMyUiLanguage = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const lang = (req.body as { language?: unknown } | undefined)?.language;
+  if (lang !== 'ar' && lang !== 'en') throw new AppError('language must be ar or en', 400, 'VALIDATION_ERROR');
+  const { Student } = await import('../models/Student');
+  await Student.updateOne({ id: req.user!.studentId! }, { $set: { uiLanguage: lang } });
+  res.json({ uiLanguage: lang });
+});
+
 export const listMyCourses = asyncHandler(async (req: AuthRequest, res: Response) => {
   const studentId = req.user!.studentId!;
   const instances = await getEnrolledInstances(studentId);

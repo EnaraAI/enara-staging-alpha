@@ -25,6 +25,15 @@ export interface IAttemptAnswer {
   criterionScores?: { criterionId: string; levelId?: string; points: number }[];
   needsReview?: boolean;
   proposalId?: string;
+  // Assessment engine (docs/tutor/ASSESSMENT_ENGINE_PLAN.md §3-§4): the grading engine's result for this answer.
+  // feedbackText is the only stored model free text (deleted with the learner, studentErasure).
+  criteria?: { code: string; points: number; max: number; reasonCode: string }[];
+  errorCodes?: string[];
+  confidence?: number;
+  flagged?: boolean;
+  grader?: string;
+  feedbackText?: string;
+  teacherOverride?: { total: number; reasonCode: 'too_strict' | 'too_lenient' | 'wrong_criterion' | 'rubric_unclear'; at: Date; by: string };
 }
 
 // Automatic grading (autograde-v1):
@@ -158,6 +167,16 @@ const attemptAnswerSchema = new Schema<IAttemptAnswer>(
     criterionScores: { type: [{ criterionId: String, levelId: String, points: Number, _id: false }], default: undefined },
     needsReview: Boolean,
     proposalId: String,
+    criteria: { type: [{ code: String, points: Number, max: Number, reasonCode: String, _id: false }], default: undefined },
+    errorCodes: { type: [String], default: undefined },
+    confidence: { type: Number, min: 0, max: 1 },
+    flagged: Boolean,
+    grader: String,
+    feedbackText: { type: String, maxlength: 4000 },
+    teacherOverride: {
+      type: { total: Number, reasonCode: { type: String, enum: ['too_strict', 'too_lenient', 'wrong_criterion', 'rubric_unclear'] }, at: Date, by: String, _id: false },
+      default: undefined,
+    },
   },
   { _id: false }
 );

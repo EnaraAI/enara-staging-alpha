@@ -549,6 +549,19 @@ export const MIGRATIONS: Migration[] = [
       for (const model of LMS_MOODLE_QUIZ_MODELS) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
     },
   },
+  {
+    id: '2026-12-01-assessment-engine-p1a',
+    description: 'Assessment engine P1a: bank_items, bank_rubrics and review_decisions indexes (new collections), and the curriculum seed objectives (shared space ENARA-SHARED; CEFR from the outcome bank, other files only when verified). Nothing existing removed.',
+    up: async () => {
+      const { BankItem } = await import('../models/BankItem');
+      const { BankRubric } = await import('../models/BankRubric');
+      const { ReviewDecision } = await import('../models/ReviewDecision');
+      for (const model of [BankItem, BankRubric, ReviewDecision]) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
+      const { applySeeds } = await import('../assessment/curricula');
+      const r = await applySeeds();
+      logger.info('assessment_seeds_applied', r);
+    },
+  },
 ];
 
 type TtlCollection = { collectionName: string; indexes(): Promise<{ key: Record<string, unknown>; expireAfterSeconds?: number }[]>; createIndex(key: Record<string, 1>, opts: { expireAfterSeconds: number }): Promise<unknown> };

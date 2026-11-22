@@ -52,6 +52,9 @@ export interface IQuestion {
   cognitiveLevel?: number;
   // Wrong options that signal a known misconception (never sent to students).
   distractors?: { option: string; category: string; description: string }[];
+  // Assessment engine (P1a): a question copied from the item bank keeps the bank item and version it came from.
+  itemId?: string;
+  itemVersion?: number;
 }
 
 export interface IAssessment extends Document {
@@ -132,6 +135,8 @@ const questionSchema = new Schema<IQuestion>(
     difficulty: { type: Number, min: 1, max: 5 },
     cognitiveLevel: { type: Number, min: 1, max: 6 },
     distractors: { type: [{ option: String, category: String, description: String, _id: false }], default: undefined },
+    itemId: String,
+    itemVersion: Number,
   },
   { _id: false }
 );

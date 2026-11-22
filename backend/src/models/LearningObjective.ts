@@ -34,7 +34,14 @@ export interface ILearningObjective extends Document {
   status: ObjectiveStatus;
   version: number;
   // Where the objective came from: a person, or an AI proposal awaiting review.
-  origin: 'teacher' | 'ai';
+  origin: 'teacher' | 'ai' | 'seed';
+  // Assessment engine (P1a): where the objective sits in a curriculum (seeds from official syllabus documents). Arabic and English
+  // titles are in `translations`. track: Thanaweya Amma streams (science / maths / literary).
+  curriculumKey?: string;
+  level?: string;
+  subjectKey?: string;
+  track?: 'science' | 'maths' | 'literary';
+  source?: { document: string; year: number | null; status: 'verified' | 'unverified' };
   extraction?: {
     method: string;
     model?: string;
@@ -70,7 +77,12 @@ const objectiveSchema = new Schema<ILearningObjective>(
     estimatedLearningMinutes: { type: Number, min: 1, max: 6000 },
     status: { type: String, enum: OBJECTIVE_STATUSES, default: 'draft' },
     version: { type: Number, default: 1 },
-    origin: { type: String, enum: ['teacher', 'ai'], default: 'teacher' },
+    origin: { type: String, enum: ['teacher', 'ai', 'seed'], default: 'teacher' },
+    curriculumKey: String,
+    level: String,
+    subjectKey: String,
+    track: { type: String, enum: ['science', 'maths', 'literary'] },
+    source: { type: { document: String, year: Number, status: { type: String, enum: ['verified', 'unverified'] }, _id: false }, default: undefined },
     extraction: {
       method: String,
       model: String,
