@@ -3,7 +3,7 @@ name: lms-test full data set
 on:
   push:
     branches: ['claude/tutor-lms-dscompare-run']
-    paths: ['deploy/lms-test/fullseed/**', '.github/workflows/lms-test-fullseed.yml']
+    paths: ['deploy/lms-test/fullseed/**', '!deploy/lms-test/fullseed/shots.*', '.github/workflows/lms-test-fullseed.yml']
 permissions:
   contents: read
 jobs:
