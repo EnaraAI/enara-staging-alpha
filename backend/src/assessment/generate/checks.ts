@@ -11,7 +11,8 @@ export interface GenItem {
   objective_code: string; source?: string; flags?: Record<string, boolean>; level?: string;
 }
 
-const PII = [/[\w.+-]+@[\w-]+\.[\w.]+/, /(?:\+?\d[\d\s-]{8,}\d)/, /https?:\/\//i];
+// Personal data: an email, an international (+...) or Egyptian mobile number (01x...), a link. Plain long numbers (maths) are fine.
+const PII = [/[\w.+-]+@[\w-]+\.[\w.]+/, /\+\d[\d\s-]{8,}\d/, /(?<!\d)01[0125][\s-]?\d{4}[\s-]?\d{4}(?!\d)/, /https?:\/\//i];
 // Minors' content list (kept short and plain; the judge's safety score covers the rest).
 const BANNED = /\b(kill yourself|suicide|porn|sex|cocaine|heroin|gamble|betting|nazi)\b|انتحار|إباحي|مخدرات|قمار|جنس/i;
 const tokens = (s: string) => new Set(normalizeAnswer(s).split(/\s+/).filter((w) => w.length > 2));

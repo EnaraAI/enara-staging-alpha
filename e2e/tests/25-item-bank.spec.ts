@@ -9,19 +9,20 @@ import { enaraApi, login } from '../lib/enara';
 const STUDENT = 'LT-S-A15';
 const CLASS = 'LT-C-ENG-7B';
 const RUN = Date.now();
+const TAG = String(RUN).slice(-5);
 const TITLE = `E2E item bank ${RUN}`;
 
 test('25 · item bank: checks, review with reasons, versions, approve, add to an assessment, graded by code', async () => {
   const admin = await login('admin.a');
   const bad = await enaraApi.post('/api/item-bank', admin, { item: { type: 'mcq', subject: 'language', language: 'en', level: 'A2', objective_code: 'EN-A2-GR-1', difficulty: 2, stem: 'Which word is a verb?', options: [{ id: 'a', text: 'run' }, { id: 'b', text: 'table' }], answer_key: { correct: ['a'], multi: false } } }).then(() => 'accepted', (e: Error) => String(e));
   expect(bad).toMatch(/400|3-5 options/);
-  const item = await enaraApi.post('/api/item-bank', admin, { item: { type: 'mcq', subject: 'language', language: 'en', level: 'A2', objective_code: 'EN-A2-GR-1', difficulty: 2, stem: `Which word is a verb? (${RUN})`, options: [{ id: 'a', text: 'table' }, { id: 'b', text: 'swim' }, { id: 'c', text: 'happy' }, { id: 'd', text: 'blue' }], answer_key: { correct: ['b'], multi: false } } });
+  const item = await enaraApi.post('/api/item-bank', admin, { item: { type: 'mcq', subject: 'language', language: 'en', level: 'A2', objective_code: 'EN-A2-GR-1', difficulty: 2, stem: `Which word is a verb? (set ${TAG})`, options: [{ id: 'a', text: 'table' }, { id: 'b', text: 'swim' }, { id: 'c', text: 'happy' }, { id: 'd', text: 'blue' }], answer_key: { correct: ['b'], multi: false } } });
   expect(item).toMatchObject({ version: 1, review_status: 'draft', source: 'teacher' });
   const noReason = await enaraApi.post(`/api/item-bank/${item.id}/review`, admin, { decision: 'reject' }).then(() => 'accepted', (e: Error) => String(e));
   expect(noReason).toMatch(/400|reasonCode/);
   const notYet = await enaraApi.get(`/api/item-bank/${item.id}/question`, admin).then(() => 'given', (e: Error) => String(e));
   expect(notYet).toMatch(/409|approved/);
-  const v2 = await enaraApi.post(`/api/item-bank/${item.id}/review`, admin, { decision: 'edit', edits: { stem: `Which of these words is a verb? (${RUN})` } });
+  const v2 = await enaraApi.post(`/api/item-bank/${item.id}/review`, admin, { decision: 'edit', edits: { stem: `Which of these words is a verb? (set ${TAG})` } });
   expect(v2).toMatchObject({ version: 2, review_status: 'draft' });
   const ok = await enaraApi.post(`/api/item-bank/${item.id}/review`, admin, { decision: 'approve' });
   expect(ok).toMatchObject({ version: 2, review_status: 'approved' });

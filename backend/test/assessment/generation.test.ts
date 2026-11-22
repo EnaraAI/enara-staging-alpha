@@ -41,6 +41,9 @@ describe('code checks', () => {
   });
   it('refuses: personal data, unsuitable content, wrong script, a near repeat', () => {
     expect(checkGenerated(mcq({ stem: 'Email ahmed@example.com: which word is a verb?' })).join()).toMatch(/personal data/);
+    expect(checkGenerated(mcq({ stem: 'Call 01012345678: which word is a verb?' })).join()).toMatch(/personal data/);
+    // Long plain numbers are not personal data (maths; found by E2E 25).
+    expect(checkGenerated(mcq({ stem: 'Which word is a verb? (1795391400038)' })).join()).not.toMatch(/personal data/);
     expect(checkGenerated(mcq({ stem: 'Which word about gamble is a verb?' })).join()).toMatch(/not suitable/);
     expect(checkGenerated(mcq({ language: 'ar' })).join()).toMatch(/not written in Arabic/);
     expect(checkGenerated(mcq(), { recentStems: ['Which word is a verb?'] }).join()).toMatch(/repeats/);
