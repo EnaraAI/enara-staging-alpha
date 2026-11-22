@@ -8,7 +8,7 @@ export const AUTO_GRADED = new Set(['multiple-choice', 'true-false', 'short-answ
 // Engine questions are graded by code too (src/assessment/questionBridge.ts), with their own checks below.
 
 export function questionPoints(q: Pick<IQuestion, 'type' | 'points' | 'rubric'>) {
-  if (q.type === 'open-response') return (q.rubric?.criteria || []).reduce((n, c) => n + (c.maxPoints || 0), 0);
+  if (q.type === 'open-response' || (q.type === 'engine' && q.rubric?.criteria?.length)) return (q.rubric?.criteria || []).reduce((n, c) => n + (c.maxPoints || 0), 0);
   return q.points ?? 1;
 }
 

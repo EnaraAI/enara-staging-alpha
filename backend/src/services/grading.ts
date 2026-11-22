@@ -1,4 +1,4 @@
-import { gradeEngineQuestion } from '../assessment/questionBridge';
+import { gradeEngineQuestion, isOpenEngine } from '../assessment/questionBridge';
 import { AppError } from '../middleware/errorHandler';
 import { AssessmentAttempt, type IAttemptAnswer } from '../models/AssessmentAttempt';
 import type { IQuestion } from '../models/Assessment';
@@ -26,6 +26,11 @@ export function gradeAnswers(questions: IQuestion[], answers: Record<string, str
     const studentAnswer = answers[q.id] ?? '';
     const maxPoints = questionPoints(q);
     // Assessment engine (P1b): closed items graded by code, per part, with reason codes; a malformed item goes to a person.
+    if (isOpenEngine(q)) {
+      // Open engine types: graded by the engine's domain grader in the automatic grader (autoGrading.ts); nothing written = 0 by rule.
+      const written = String(studentAnswer).trim().length > 0;
+      return { questionId: q.id, questionText: q.text, topic: q.topic, studentAnswer, isCorrect: false, explanation: q.explanation, points: written ? null : 0, maxPoints, ...(written ? { needsReview: true } : { method: 'rule' as const, feedback: 'No answer was given.' }) };
+    }
     if (q.type === 'engine') {
       const g = gradeEngineQuestion(q as never, studentAnswer);
       if ('invalid' in g) return { questionId: q.id, questionText: q.text, topic: q.topic, studentAnswer, isCorrect: false, explanation: q.explanation, points: null, maxPoints, needsReview: true };

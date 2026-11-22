@@ -31,6 +31,8 @@ export interface IAttemptAnswer {
   errorCodes?: string[];
   confidence?: number;
   flagged?: boolean;
+  // Why the engine sent this answer to the teacher (low_confidence, runs_disagree, near_pass_mark, model_unavailable, ...).
+  flagReasons?: string[];
   grader?: string;
   feedbackText?: string;
   // The learner's answer to an engine question in plain words (option texts, not ids). Their own data: removed with them.
@@ -173,6 +175,7 @@ const attemptAnswerSchema = new Schema<IAttemptAnswer>(
     errorCodes: { type: [String], default: undefined },
     confidence: { type: Number, min: 0, max: 1 },
     flagged: Boolean,
+    flagReasons: { type: [String], default: undefined },
     grader: String,
     feedbackText: { type: String, maxlength: 4000 },
     answerText: { type: String, maxlength: 4000 },

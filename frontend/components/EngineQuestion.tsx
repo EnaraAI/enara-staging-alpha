@@ -10,8 +10,8 @@ type Opt = { id: string; text: string };
 export interface EngineQ { id: string; text: string; engine: { type: string; options?: unknown; language: string } }
 
 const T = {
-  en: { chooseAll: 'Choose all that apply', chooseOne: 'Choose one', true: 'True', false: 'False', blank: 'Blank', choose: 'Choose…', number: 'Number', unit: 'Unit', up: 'Move up', down: 'Move down', matchWith: 'matches', orderHint: 'Put these in the right order', matchHint: 'Match each item on the start with one on the end', numberHint: 'Write a number (and its unit if needed)' },
-  ar: { chooseAll: 'اختر كل الإجابات الصحيحة', chooseOne: 'اختر إجابة واحدة', true: 'صح', false: 'خطأ', blank: 'فراغ', choose: 'اختر…', number: 'العدد', unit: 'الوحدة', up: 'إلى أعلى', down: 'إلى أسفل', matchWith: 'يقابل', orderHint: 'رتّب العناصر بالترتيب الصحيح', matchHint: 'صِل كل عنصر في البداية بما يناسبه في النهاية', numberHint: 'اكتب العدد (ووحدته إن لزم)' },
+  en: { yourAnswer: 'Your answer', steps: 'Your working (steps)', final: 'Final answer', chooseAll: 'Choose all that apply', chooseOne: 'Choose one', true: 'True', false: 'False', blank: 'Blank', choose: 'Choose…', number: 'Number', unit: 'Unit', up: 'Move up', down: 'Move down', matchWith: 'matches', orderHint: 'Put these in the right order', matchHint: 'Match each item on the start with one on the end', numberHint: 'Write a number (and its unit if needed)' },
+  ar: { yourAnswer: 'إجابتك', steps: 'خطوات الحل', final: 'الإجابة النهائية', chooseAll: 'اختر كل الإجابات الصحيحة', chooseOne: 'اختر إجابة واحدة', true: 'صح', false: 'خطأ', blank: 'فراغ', choose: 'اختر…', number: 'العدد', unit: 'الوحدة', up: 'إلى أعلى', down: 'إلى أسفل', matchWith: 'يقابل', orderHint: 'رتّب العناصر بالترتيب الصحيح', matchHint: 'صِل كل عنصر في البداية بما يناسبه في النهاية', numberHint: 'اكتب العدد (ووحدته إن لزم)' },
 };
 
 const parse = <V,>(value: string, fallback: V): V => { try { return value ? (JSON.parse(value) as V) : fallback; } catch { return fallback; } };
@@ -139,6 +139,29 @@ export const EngineQuestion: React.FC<{ q: EngineQ; value: string; onChange: (v:
               </li>
             ))}
           </ol>
+        </div>
+      );
+    }
+    case 'short_answer':
+    case 'essay':
+      return (
+        <div className="mt-3" dir={dir} data-testid={`eq-${q.id}`}>
+          <textarea aria-label={label(t.yourAnswer)} dir="auto" value={value}
+            className={`w-full border border-slate-300 rounded-lg p-3 text-base ${e.type === 'essay' ? 'min-h-[180px]' : 'min-h-[80px]'}`}
+            onChange={(ev) => onChange(ev.target.value)} />
+        </div>
+      );
+    case 'math_steps': {
+      const v = parse<{ steps?: string; final?: string }>(value, {});
+      return (
+        <div className="mt-3 space-y-2" dir={dir} data-testid={`eq-${q.id}`}>
+          <textarea aria-label={label(t.steps)} dir="auto" value={v.steps ?? ''} className="w-full border border-slate-300 rounded-lg p-3 text-base min-h-[120px]"
+            onChange={(ev) => emit({ ...v, steps: ev.target.value }, onChange)} />
+          <label className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+            <span>{t.final}</span>
+            <input aria-label={label(t.final)} dir="auto" value={v.final ?? ''} className="w-48 border border-slate-300 rounded-lg px-3 py-2 text-base"
+              onChange={(ev) => emit({ ...v, final: ev.target.value }, onChange)} />
+          </label>
         </div>
       );
     }

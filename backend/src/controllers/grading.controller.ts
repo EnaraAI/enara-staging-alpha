@@ -1,3 +1,5 @@
+import { isOpenEngine } from '../assessment/questionBridge';
+const OVERRIDE_REASONS = ['too_strict', 'too_lenient', 'wrong_criterion', 'rubric_unclear'] as const;
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
@@ -169,7 +171,7 @@ async function resolveScore(q: IQuestion, answer: IAttemptAnswer, body: Record<s
   }
   const proposal = answer.proposalId ? await GradingProposal.findOne({ id: answer.proposalId, status: 'proposed' }).select('points').lean() : null;
   if (body.criterionScores !== undefined) {
-    if (q.type !== 'open-response') throw new AppError('Only open responses have rubric levels', 400, 'VALIDATION_ERROR');
+    if (q.type !== 'open-response' && !isOpenEngine(q)) throw new AppError('Only open responses have rubric levels', 400, 'VALIDATION_ERROR');
     return { ...scoreFromCriteria(q, body.criterionScores), method: 'teacher' as const, proposalPoints: proposal?.points };
   }
   const points = getOptionalNumber(body, 'points', { min: 0, max: answer.maxPoints ?? 100 });
@@ -196,7 +198,13 @@ export const scoreAnswer = asyncHandler(async (req: AuthRequest, res: Response) 
   const answer = attempt.answers.find((a) => a.questionId === questionId);
   if (!q || !answer) throw new AppError('Question not found', 404);
   const score = await resolveScore(q, answer, body);
-  const reason = getOptionalString(body, 'reason', { max: 500 });
+  // Assessment engine: changing a model's score on an engine question needs one of the fixed reason codes (fed to the bench).
+  const modelScored = isOpenEngine(q) && typeof answer.grader === 'string' && answer.grader.startsWith('model:');
+  const reasonCode = body.reasonCode === undefined ? undefined : String(body.reasonCode);
+  if (reasonCode !== undefined && !(OVERRIDE_REASONS as readonly string[]).includes(reasonCode)) throw new AppError(`reasonCode must be one of ${OVERRIDE_REASONS.join(', ')}`, 400, 'VALIDATION_ERROR');
+  const engineOverride = modelScored && score.method === 'teacher' && score.points !== answer.points;
+  if (engineOverride && !reasonCode) throw new AppError('Choose why you changed the score', 400, 'REASON_REQUIRED');
+  const reason = getOptionalString(body, 'reason', { max: 500 }) ?? (engineOverride ? reasonCode : undefined);
   const overridesRule = answer.method === 'rule' && typeof answer.points === 'number' && score.points !== answer.points;
   const overridesProposal = score.method === 'teacher' && typeof score.proposalPoints === 'number' && score.points !== score.proposalPoints;
   if ((overridesRule || overridesProposal) && !reason) {
@@ -214,6 +222,11 @@ export const scoreAnswer = asyncHandler(async (req: AuthRequest, res: Response) 
         'answers.$[a].criterionScores': score.criterionScores,
         'answers.$[a].feedback': feedback,
         'answers.$[a].needsReview': false,
+        ...(isOpenEngine(q) ? {
+          'answers.$[a].flagged': false,
+          ...(score.method === 'teacher' ? { 'answers.$[a].grader': 'teacher' } : {}),
+          ...(engineOverride ? { 'answers.$[a].teacherOverride': { total: score.points, reasonCode, at: now, by: req.user!.id } } : {}),
+        } : {}),
       },
       $push: { history: { at: now, by: req.user!.id, action, questionId, from: answer.points ?? null, to: score.points, reason } },
     },

@@ -1,4 +1,7 @@
-import { gradeEngineQuestion } from '../assessment/questionBridge';
+import { gradeEngineQuestion, isOpenEngine } from '../assessment/questionBridge';
+import { gradeOpenAnswer, nearPassMark } from '../assessment/grading-engine/open';
+import type { OpenItem } from '../assessment/grading-engine/graders/domains';
+import { engineV2 } from './engineV2';
 import { recordAlert } from './auditTrail';
 import { AssessmentAttempt, type IAttemptAnswer } from '../models/AssessmentAttempt';
 import type { IQuestion } from '../models/Assessment';
@@ -11,7 +14,9 @@ import { AUTO_GRADED, getVersion, questionPoints } from './assessmentVersions';
 import { isAiConfigured } from './aiJson';
 import { isFeatureEnabled } from './featureFlags';
 import { totals, updateLearningIntelligence } from './grading';
-import { evaluateRubricAnswer, evaluateShortAnswer, questionObjectiveIds, type EvalPolicy } from './gradingProposals';
+import { questionObjectiveIds, type EvalPolicy } from './gradingProposals';
+// Every grade comes through the assessment engine's entry; the older open graders are reached through it, unchanged.
+import { legacyRubricAnswer as evaluateRubricAnswer, legacyShortAnswer as evaluateShortAnswer } from '../assessment/grading-engine';
 import { notifyResultsReleased } from './teachingNotifications';
 import { logger } from '../utils/logging';
 import { lmsResultChanged } from '../integrations/lms/core/gradeEvents';
@@ -54,7 +59,7 @@ const hasText = (v: unknown) => String(v ?? '').trim().length > 0;
 // Answers the answer key can't settle on its own.
 export function needsAiEvaluation(q: IQuestion | undefined, a: IAttemptAnswer) {
   if (!q || !hasText(a.studentAnswer)) return false;
-  if (q.type === 'engine') return false; // graded by code (assessment engine)
+  if (q.type === 'engine') return isOpenEngine(q); // closed engine items: by code; open ones: the engine's domain graders
   // Option B2 (ENARA_EC_CHECK=on): error-correction answers that are not an exact key match go to the
   // error-correction check, even when the rules gave credit or the word is the target.
   if (q.type === 'short-answer' && useErrorCorrectionCheck({ ...q, prompt: q.text } as never, String(a.studentAnswer))) return true;
@@ -199,11 +204,13 @@ export function validateGrading(params: { attempt: AttemptDoc; assignment: Pick<
       } else if (!hasText(a.studentAnswer) && a.points !== 0) fail('bad_points', `Unanswered question ${q.id} has points`);
       continue;
     }
+    // A flagged engine answer with no model grade (model unavailable): 0 points until the teacher scores it.
+    if (isOpenEngine(q) && a.flagged && a.grader === 'none') { if (a.points !== 0) fail('bad_points', `Question ${q.id} has points without a grade`); continue; }
     if (a.method !== 'ai') fail('bad_method', `Question ${q.id} was not graded by the grader`);
     const e = evaluations.get(q.id);
     if (!e || e.attemptId !== attempt.id || e.questionId !== q.id || !usable(e)) fail('missing_evaluation', `Question ${q.id} has no valid evaluation`);
     if (!hasText(a.feedback) || !hasText(a.scoreExplanation)) fail('missing_feedback', `Question ${q.id} has no feedback`, true);
-    if (q.type === 'open-response') {
+    if (q.type === 'open-response' || isOpenEngine(q)) {
       const criteria = q.rubric?.criteria || [];
       const scores = a.criterionScores || [];
       if (scores.length !== criteria.length) fail('bad_criteria', `Question ${q.id} is missing criterion scores`);
@@ -266,7 +273,13 @@ async function recordFailure(attempt: AttemptDoc, error: unknown, now: Date) {
 }
 
 // One grading run. Safe to call any number of times, from anywhere.
-export async function processAttempt(attemptId: string, now = new Date()): Promise<'released' | 'finalized' | 'failed' | 'exception' | 'skipped'> {
+// Assessment engine (P2a): the engine item of an open engine question, for its domain grader.
+function openItemOf(q: IQuestion): OpenItem {
+  const e = q.engine as { type: OpenItem['type']; domain: OpenItem['domain']; language: string; answer_key?: { final?: OpenItem['final']; solution?: string } };
+  return { questionId: q.id, stem: q.text, type: e.type, domain: e.domain, language: e.language, ...(e.answer_key?.final ? { final: e.answer_key.final } : {}), ...(e.answer_key?.solution ? { solution: e.answer_key.solution } : {}) };
+}
+
+export async function processAttempt(attemptId: string, now = new Date()): Promise<'released' | 'finalized' | 'review' | 'failed' | 'exception' | 'skipped'> {
   const attempt = await claim(attemptId, now);
   if (!attempt) return 'skipped';
   try {
@@ -282,7 +295,14 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
     if (unsupported) throw new GradingError('unsupported_question', `Question type ${unsupported.type} can't be graded automatically`, false);
 
     const todo = attempt.answers.filter((a) => needsAiEvaluation(byId.get(a.questionId), a));
-    if (todo.length) {
+    // Engine open answers never stop the attempt when the model is not available: they go to the teacher's queue (flagged).
+    const engineTodo = todo.filter((a) => isOpenEngine(byId.get(a.questionId) ?? {}));
+    const legacyTodo = todo.filter((a) => !isOpenEngine(byId.get(a.questionId) ?? {}));
+    const engineModelReady = engineTodo.length > 0 && engineV2('assessGrading') && isAiConfigured() && (await isFeatureEnabled(attempt.institutionId, 'ai_grading_enabled'));
+    const uiLanguage: 'ar' | 'en' = engineTodo.length
+      ? await (await import('../models/Student')).Student.findOne({ id: attempt.studentId }).select('uiLanguage').lean().then((st) => (st?.uiLanguage === 'ar' ? 'ar' : st?.uiLanguage === 'en' ? 'en' : (/^ar/.test(String((byId.get(engineTodo[0].questionId)?.engine as { language?: string } | undefined)?.language)) ? 'ar' : 'en')))
+      : 'en';
+    if (legacyTodo.length) {
       if (!(await isFeatureEnabled(attempt.institutionId, 'ai_grading_enabled'))) throw new GradingError('ai_grading_off', 'AI grading is turned off for this school', false);
       if (!isAiConfigured()) throw new GradingError('ai_unavailable', 'AI is not configured', true);
     }
@@ -302,6 +322,23 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
         continue;
       }
       const text = String(a.studentAnswer);
+      if (isOpenEngine(q)) {
+        const maxByCriterion = Object.fromEntries((q.rubric?.criteria || []).map((c) => [c.id, c.maxPoints]));
+        const g = await gradeOpenAnswer({ attempt, item: openItemOf(q), answer: a.studentAnswer, uiLanguage, maxByCriterion, modelReady: engineModelReady });
+        if (g.proposalId) evaluations.set(q.id, { id: g.proposalId, attemptId: attempt.id, questionId: q.id, status: 'proposed', objectiveIds: [] } as unknown as Evaluation);
+        const blank = g.grader === 'none';
+        answers.push({
+          ...a, points: g.points, method: 'ai', needsReview: g.flagged, proposalId: g.proposalId,
+          criterionScores: g.criterionScores,
+          feedback: blank ? 'Your teacher will check this answer.' : g.feedback,
+          scoreExplanation: blank ? 'Waiting for your teacher.' : g.scoreExplanation,
+          strengths: g.strengths, improvements: g.improvements,
+          criteria: g.criteria, errorCodes: g.errorCodes, confidence: g.confidence, flagged: g.flagged, flagReasons: g.flagReasons, grader: g.grader,
+          ...(blank ? {} : { feedbackText: g.feedback }),
+        } as IAttemptAnswer);
+        history.push({ at: now, by: GRADER, action: g.flagged ? 'engine_flagged' : 'engine_evaluated', questionId: q.id, to: g.points, reason: g.flagged ? g.flagReasons.join(', ') : `runs: ${g.runs.map((r) => r.points).join(', ')}` });
+        continue;
+      }
       if (q.type === 'open-response') {
         const { chosen, all } = await evaluateOpen(attempt, q, text, objectives);
         evaluations.set(q.id, chosen);
@@ -329,6 +366,24 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
 
     // Result validation.
     const t = validateGrading({ attempt, assignment, version, questions, answers, evaluations });
+    // Assessment engine: a model-graded attempt within 1 point of the pass mark (the assignment's own, else the app's 60 %) goes to the teacher.
+    const modelGraded = answers.filter((a) => isOpenEngine(byId.get(a.questionId) ?? {}) && a.grader && a.grader !== 'none');
+    if (modelGraded.length && nearPassMark(t.totalPoints, t.maxPoints, assignment.speaking?.passThreshold ?? 60)) {
+      for (const a of modelGraded) { a.flagged = true; a.needsReview = true; a.flagReasons = [...new Set([...(a.flagReasons ?? []), 'near_pass_mark'])]; }
+    }
+    // Flagged engine answers: the attempt waits in the teacher's queue (needs_review); nothing is finalized or released.
+    if (answers.some((a) => a.flagged)) {
+      history.push({ at: now, by: GRADER, action: 'flagged_for_teacher' });
+      const held = await AssessmentAttempt.findOneAndUpdate(
+        { id: attempt.id, gradingStatus: 'grading_in_progress', gradingRuns: attempt.gradingRuns },
+        { $set: { answers, totalPoints: t.totalPoints, maxPoints: t.maxPoints, gradingStatus: 'needs_review' }, $unset: { gradingLeaseUntil: 1, nextGradingAt: 1, gradingError: 1, exceptionReason: 1 }, $push: { history: { $each: history } } },
+        { new: true },
+      );
+      if (!held) return 'skipped';
+      logger.info('grading_flagged_for_teacher', { attemptId: held.id, flagged: answers.filter((a) => a.flagged).length, version: AUTO_GRADING_VERSION });
+      await recordGradeChange(held.id, 'auto_graded', GRADER).catch(() => undefined);
+      return 'review';
+    }
     // Manual release (assignment setting): finalize only; a teacher releases.
     const hold = assignment.releasePolicy === 'manual';
     history.push({ at: now, by: GRADER, action: 'validated' }, { at: now, by: GRADER, action: 'finalized', to: { totalPoints: t.totalPoints, maxPoints: t.maxPoints } });
