@@ -35,6 +35,29 @@ test.enara.app stays frozen. No secrets are asked for or printed.
    - E2E: a parent with a child in 3 subjects sees all 3 chips; an unreleased result stays hidden.
 9. Small PR, E2E must pass, live on lms-test, 3-line report.
 
+## Added: smart recommendations per subject
+1. **Where:** each subject tab gets a "How you can help this week" card with up to 3 suggestions. The "All subjects" overview shows the top one per subject.
+2. **Built from the child's real data in that subject:**
+   - open points to practise;
+   - the weakest outcome;
+   - released results only (an unreleased result never shapes a suggestion);
+   - minutes this week against the goal;
+   - the next lesson or assignment due.
+3. **Each suggestion says:**
+   - what to do at home: a 5–10 minute activity that needs nothing special;
+   - why: for example "she mixed up halves and quarters twice this week";
+   - what to say, in the parent's language.
+4. **By age:** for a child, things to do together; for a teen, a way to ask about it that doesn't sound like checking up. No answers to graded work are ever given.
+5. **How it's written:**
+   - Code first picks what matters most (the rules above). DeepSeek then writes it in plain words, and the reply checks already in use review it.
+   - If the model fails or a check refuses it, a written-in-advance suggestion for that outcome is shown. The card is never empty or made up.
+   - Written once per child, subject and week, then saved. Cost is about 0.1 cent per child each week.
+   - It carries the existing "ENARA suggestion" label.
+6. **Weekly email:** each child's part shows the top suggestion per subject, still one email per parent.
+7. **Tests:**
+   - Unit tests: the picking rules, never using an unreleased result, the fallback, Arabic, and the age wording.
+   - E2E: the card shows for each of the 3 subjects.
+
 ## Open from the last plan
 `docs/lms/SEED_FIXES_PLAN.md` asks whether to hide the placeholder parent cards ("Sample data"). This work doesn't depend on it. The new subject cards use only real data, so they carry no badge.
 
