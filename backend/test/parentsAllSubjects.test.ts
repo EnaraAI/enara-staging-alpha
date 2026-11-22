@@ -151,7 +151,7 @@ describe('the parent sees every subject with activity (API)', () => {
     await M.User.create({ email: 'admin@sub-A.test', password: hash, role: 'admin', name: 'Admin', status: 'active', institutionId: 'sub-A' });
     await M.Student.create({ id: 'k1', name: 'Mona Fahmy', email: 'k1@sub-A.test', institutionId: 'sub-A', learnerAgeBand: 'child' });
     const course = async (id: string, courseName: string, objectives: string[]) => {
-      await M.Curriculum.create({ id, name: courseName, courseName, institutionId: 'sub-A', type: 'National', level: 'G5', languages: ['English'], summary: '', description: '', lastUpdated: '2026-11-01', chapters: [1, 2, 3].map((n) => ({ id: `${id}-L${n}`, title: `${courseName} lesson ${n}`, uploads: [] })) });
+      await M.Curriculum.create({ id, name: courseName, courseName, institutionId: 'sub-A', type: 'National', level: 'G5', languages: ['English'], summary: `${courseName} course`, description: `${courseName} course`, lastUpdated: '2026-11-01', chapters: [1, 2, 3].map((n) => ({ id: `${id}-L${n}`, title: `${courseName} lesson ${n}`, uploads: [] })) });
       for (const [i, t] of objectives.entries()) await M.LearningObjective.create({ id: `${id}-O${i + 1}`, institutionId: 'sub-A', curriculumId: id, code: `${id}.${i + 1}`, title: t, description: t, status: 'approved', version: 1, origin: 'teacher', createdBy: 'x' });
     };
     await course('CUR-ENG', 'English', ['Talk about routines', 'Past simple']);
