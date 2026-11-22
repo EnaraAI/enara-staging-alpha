@@ -61,20 +61,26 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
   const [points, setPoints] = useState<string>(a.points ?? '');
   const [feedback, setFeedback] = useState<string>(a.feedback ?? '');
   const [reason, setReason] = useState('');
+  // Assessment engine: why a model score was changed (fixed codes, fed to the benchmark).
+  const [reasonCode, setReasonCode] = useState('');
+  const rubricLevels = q.type === 'open-response' || (q.type === 'engine' && (q.rubric?.criteria || []).length > 0);
+  const modelScored = q.type === 'engine' && typeof a.grader === 'string' && a.grader.startsWith('model:');
   const [busy, setBusy] = useState(false);
 
   const save = async () => {
     setBusy(true);
     const body = {
-      ...(q.type === 'open-response' ? { criterionScores: Object.entries(levels).map(([criterionId, levelId]) => ({ criterionId, levelId })) } : { points: Number(points) }),
+      ...(rubricLevels ? { criterionScores: Object.entries(levels).map(([criterionId, levelId]) => ({ criterionId, levelId })) } : { points: Number(points) }),
       feedback: feedback || undefined,
       reason: reason || undefined,
+      ...(reasonCode ? { reasonCode } : {}),
     };
     try {
       if (mode === 'correct') await correctSubmissionGrade(attemptId, { questionId: q.id, ...body });
       else await scoreSubmissionAnswer(attemptId, q.id, body);
       toast.success(mode === 'correct' ? 'Grade corrected' : 'Saved', mode === 'correct' ? 'The student sees the new grade; the original is kept in the history.' : '');
       setReason('');
+      setReasonCode('');
       onChanged();
     } catch (err) {
       toast.error('Not saved', errorText(err));
@@ -134,12 +140,21 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
           </p>
         </div>
       )}
+      {a.flagged && (
+        <p className="text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded px-2 py-1" data-testid="engine-flag">
+          Needs your check: {(a.flagReasons || []).map((r: string) => ({ low_confidence: 'the grader was not sure', runs_disagree: 'two grading runs disagreed', near_pass_mark: 'close to the pass mark', model_unavailable: 'the grader was not available', model_error: 'a grading run failed', integrity: 'the answer may contain instructions to the grader' } as Record<string, string>)[r] ?? r).join(' · ')}
+          {typeof a.confidence === 'number' && a.grader !== 'none' ? ` · confidence ${Math.round(a.confidence * 100)}%` : ''}
+        </p>
+      )}
+      {q.type === 'engine' && Array.isArray(a.criteria) && a.criteria.length > 0 && (
+        <ul className="text-xs text-slate-700 space-y-0.5">{a.criteria.map((c: any) => <li key={c.code}><b>{(q.rubric?.criteria || []).find((x: any) => x.id === c.code)?.title ?? c.code}:</b> {c.points} / {c.max}</li>)}</ul>
+      )}
       {a.feedback && !editing && <p className="text-sm text-slate-700" dir="auto"><b>Feedback the student sees:</b> {a.feedback}</p>}
 
       {mode === 'correct' && !editing && <button onClick={() => setEditing(true)} className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold">Correct this grade</button>}
       {editing && mode !== 'view' && (
         <div className="space-y-2 border-t border-slate-100 pt-3">
-          {q.type === 'open-response' ? (
+          {rubricLevels ? (
             (q.rubric?.criteria || []).map((c: any) => (
               <fieldset key={c.id}>
                 <legend className="text-xs font-semibold text-slate-700">{c.title}</legend>
@@ -157,6 +172,15 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
             <label className="text-sm text-slate-700 inline-flex items-center gap-2">Points<input type="number" min={0} max={a.maxPoints} className="w-20 border border-slate-300 rounded px-2 py-1" value={points} onChange={(e) => setPoints(e.target.value)} /></label>
           )}
           <textarea aria-label="Feedback" dir="auto" className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm" placeholder="Feedback for the student (specific and with a next step)" value={feedback} onChange={(e) => setFeedback(e.target.value)} />
+          {modelScored && (
+            <select aria-label="Why you changed the score" data-testid="override-reason" className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm bg-white" value={reasonCode} onChange={(e) => setReasonCode(e.target.value)}>
+              <option value="">Why you changed the score (needed if you change it)</option>
+              <option value="too_strict">The grader was too strict</option>
+              <option value="too_lenient">The grader was too lenient</option>
+              <option value="wrong_criterion">Scored against the wrong criterion</option>
+              <option value="rubric_unclear">The rubric is unclear here</option>
+            </select>
+          )}
           <input aria-label="Reason" className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm" placeholder={mode === 'correct' ? 'Reason for the correction (required, kept in the history)' : 'Reason (required when changing an answer-key score)'} value={reason} onChange={(e) => setReason(e.target.value)} />
           <button disabled={busy} onClick={save} className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold">{mode === 'correct' ? 'Save correction' : 'Save score'}</button>
         </div>

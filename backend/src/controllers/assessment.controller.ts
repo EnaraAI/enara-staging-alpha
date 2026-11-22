@@ -1,4 +1,4 @@
-import { checkEngineQuestion } from '../assessment/questionBridge';
+import { checkEngineQuestion, isOpenEngine } from '../assessment/questionBridge';
 import { engineV2 } from '../services/engineV2';
 import { MISCONCEPTION_CATEGORIES } from '../services/misconceptionTaxonomy';
 import { assertObjectivesUsable } from '../services/learningAccess';
@@ -147,9 +147,11 @@ function engineQuestion(q: Record<string, unknown>, index: number) {
     points: getOptionalNumber(q, 'points', { min: 0, max: 100 }),
     source: q.source === 'ai' ? ('ai' as const) : ('manual' as const),
   };
-  const checked = checkEngineQuestion({ ...base, engine: ensurePlainObject(q.engine, `questions[${index}].engine`) as never });
+  const engine = ensurePlainObject(q.engine, `questions[${index}].engine`);
+  if (isOpenEngine({ type: 'engine', engine: engine as never }) && !engineV2('assessGrading')) throw new AppError('Open answers graded by the engine are not switched on', 400, 'VALIDATION_ERROR');
+  const checked = checkEngineQuestion({ ...base, engine: engine as never });
   if (!checked.ok) throw new AppError(`Question ${index + 1}: ${checked.problems.slice(0, 3).join('; ')}`, 400, 'VALIDATION_ERROR');
-  return { ...base, engine: checked.engine, sources: undefined as ReturnType<typeof parseSourceRefs> };
+  return { ...base, engine: checked.engine, ...(checked.rubric ? { rubric: checked.rubric, points: checked.points } : {}), sources: undefined as ReturnType<typeof parseSourceRefs> };
 }
 
 function normalizeQuestions(raw: unknown) {

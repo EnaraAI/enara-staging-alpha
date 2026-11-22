@@ -45,6 +45,8 @@ export function trustedWrong(q: Pick<Q, 'type' | 'text' | 'correctAnswer'> | und
   if (a.method === 'teacher' || a.method === 'ai_proposal') return true;
   if (!q) return false;
   if ((q.type === 'multiple-choice' || q.type === 'true-false') && (a.method === 'rule' || a.method === undefined)) return true;
+  // Assessment engine closed items are scored by code from a checked key: as trusted as a choice item.
+  if (q.type === 'engine' && a.method === 'rule') return true;
   if (q.type === 'short-answer' && a.method === 'rule' && opts.graderV2 && /_{2,}/.test(q.text ?? '')) {
     const ans = norm1(a.studentAnswer);
     if (!ans || ans.split(/\s+/).length > 3) return false;
@@ -57,6 +59,9 @@ export function trustedWrong(q: Pick<Q, 'type' | 'text' | 'correctAnswer'> | und
 
 /** The error type of a wrong answer: the chosen option's distractor category (school item authoring), else 'unknown'. Never the answer text. */
 export function errorOf(q: Q, a: A): { errorCode: string; errorLabel?: string } {
+  // Assessment engine: the grader's error code (fixed taxonomy), never text from the answer.
+  const engineCode = (a as { errorCodes?: string[] }).errorCodes?.[0];
+  if (engineCode) return { errorCode: slug(engineCode) };
   const chosen = typeof a.studentAnswer === 'number' && q.options ? q.options[a.studentAnswer] : typeof a.studentAnswer === 'string' ? a.studentAnswer : undefined;
   const d = chosen !== undefined ? q.distractors?.find((x) => x.option.trim().toLowerCase() === String(chosen).trim().toLowerCase()) : undefined;
   if (d?.category) return { errorCode: slug(d.category), ...(d.description ? { errorLabel: d.description.replace(/\s+/g, ' ').trim().slice(0, 120) } : {}) };

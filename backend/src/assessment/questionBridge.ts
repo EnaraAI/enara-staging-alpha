@@ -6,9 +6,20 @@
 import { createHash } from 'crypto';
 import { CLOSED_TYPES, ClosedItem, type ClosedType, type GradeResult } from './schema';
 import { gradeClosed, InvalidItemError } from './grading-engine/graders/closed';
+import { rubricFor, totalPoints } from './rubrics/templates';
+import { z } from 'zod';
 
 export const ENGINE_TYPE = 'engine' as const;
-export interface EngineContent { type: ClosedType; options?: unknown; answer_key: unknown; flags?: Record<string, boolean>; language: string; error_codes?: string[] }
+// Open types graded by a domain grader (P2a, switch assessGrading): language short answer and essay, maths worked steps.
+export const OPEN_ENGINE_TYPES = ['short_answer', 'essay', 'math_steps'] as const;
+export type OpenEngineType = (typeof OPEN_ENGINE_TYPES)[number];
+export const isOpenEngine = (q: { type?: string; engine?: { type?: string } | null }): boolean => q.type === 'engine' && (OPEN_ENGINE_TYPES as readonly string[]).includes(String(q.engine?.type));
+const OpenContent = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('short_answer'), domain: z.literal('language'), language: z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/), answer_key: z.object({ model_answer: z.string().max(2000).optional() }).strict().optional(), flags: z.record(z.boolean()).optional() }).strict(),
+  z.object({ type: z.literal('essay'), domain: z.literal('language'), language: z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/), answer_key: z.object({ model_answer: z.string().max(4000).optional() }).strict().optional(), flags: z.record(z.boolean()).optional() }).strict(),
+  z.object({ type: z.literal('math_steps'), domain: z.literal('math'), language: z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/), answer_key: z.object({ final: z.object({ value: z.union([z.number(), z.string().min(1).max(100)]), tolerance_abs: z.number().nonnegative().optional(), tolerance_rel: z.number().nonnegative().max(1).optional(), unit: z.string().max(32).nullable().optional() }).strict(), solution: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
+]);
+export interface EngineContent { type: ClosedType | OpenEngineType; domain?: 'language' | 'math'; options?: unknown; answer_key: unknown; flags?: Record<string, boolean>; language: string; error_codes?: string[] }
 type Q = { id: string; type: string; text: string; points?: number; difficulty?: number; engine?: EngineContent | null };
 
 /** The engine item of a question, in the schema the graders check. */
@@ -22,8 +33,15 @@ export function itemOf(q: Q): unknown {
 }
 
 /** Checks a teacher's engine question; returns the stored content or the problems in plain words. */
-export function checkEngineQuestion(q: Q): { ok: true; engine: EngineContent } | { ok: false; problems: string[] } {
+export function checkEngineQuestion(q: Q): { ok: true; engine: EngineContent; rubric?: ReturnType<typeof rubricFor>; points?: number } | { ok: false; problems: string[] } {
   const e = q.engine;
+  if (e && typeof e === 'object' && (OPEN_ENGINE_TYPES as readonly string[]).includes(String(e.type))) {
+    const parsed = OpenContent.safeParse(e);
+    if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => `${i.path.join('.') || 'engine'}: ${i.message}`) };
+    const c = parsed.data;
+    // The rubric and points are the engine's fixed template for (domain, type), in the item's language.
+    return { ok: true, engine: c as EngineContent, rubric: rubricFor(c.domain, c.type, c.language), points: totalPoints(c.domain, c.type) };
+  }
   if (!e || typeof e !== 'object' || !(CLOSED_TYPES as readonly string[]).includes(String(e.type))) return { ok: false, problems: [`engine.type must be one of ${CLOSED_TYPES.join(', ')}`] };
   const parsed = ClosedItem.safeParse(itemOf(q));
   if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => `${i.path.join('.') || 'item'}: ${i.message}`) };
@@ -55,6 +73,8 @@ export function describeKey(q: Q): string {
     case 'numeric': return `${String(k.value)}${k.unit ? ` ${String(k.unit)}` : ''}`;
     case 'ordering': return (k.order as string[]).map((id) => text(e.options, id)).join(' → ');
     case 'dropdown': return Object.entries(k.choices as Record<string, string>).sort().map(([, v]) => v).join(' · ');
+    case 'math_steps': { const f = (k as { final?: { value: unknown; unit?: string | null } } | undefined)?.final; return f ? `${String(f.value)}${f.unit ? ` ${f.unit}` : ''}` : ''; }
+    default: return '';
   }
 }
 
@@ -74,6 +94,7 @@ export function describeAnswer(q: Q, raw: unknown): string {
       return pairs.map(([l, r]) => `${text(o.left, l)} → ${text(o.right, r)}`).join(' · ');
     }
     case 'ordering': return Array.isArray(a) ? a.map((id) => text(e.options, id)).join(' → ') : String(a);
+    case 'math_steps': return a && typeof a === 'object' ? `${String((a as { steps?: unknown }).steps ?? '')}\n= ${String((a as { final?: unknown }).final ?? '')}`.trim() : String(a);
     default: return String(a);
   }
 }
