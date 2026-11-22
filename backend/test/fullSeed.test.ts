@@ -84,8 +84,8 @@ describe('full seed plan', () => {
     expect([...perParent.values()].some((n) => n >= 2)).toBe(true); // several children
     const inv = plan.users.filter((u) => u.role.startsWith('invitation')).map((u) => u.state);
     expect(inv).toEqual(expect.arrayContaining(['invitation pending', 'invitation revoked', 'invitation expired (never accepted)']));
-    const codes = plan.users.filter((u) => u.role === 'parent code').map((u) => u.state);
-    expect(codes).toEqual(expect.arrayContaining(['code active', 'code redeemed', 'code revoked', 'code expired']));
+    const codes = plan.codes.map((c) => c.state);
+    expect(codes).toEqual(expect.arrayContaining(['valid (30 days)', 'already used', 'cancelled by the school', 'expired']));
     const att = docsOf('AssessmentAttempt');
     expect(att.map((a) => a.gradingStatus)).toEqual(expect.arrayContaining(['released', 'needs_review', 'graded_draft']));
     expect(att.filter((a) => a.gradingStatus === 'released').every((a) => a.releasedAt instanceof Date)).toBe(true);
@@ -187,3 +187,21 @@ describe('full seed run and remove (in-memory MongoDB)', () => {
     expect(await mongoose.connection.collection('grade_ledger').countDocuments()).toBe(1);
   }, 120_000);
 });
+
+describe('parent link codes (owner, 22 Nov 2026)', () => {
+  it('every active learner in an active school has a real, typeable code that the app accepts, the same on every run', async () => {
+    const { normalizeCode, hashCode } = await import('../src/parents/codes');
+    const a = buildPlan(NOW); const b = buildPlan(NOW);
+    expect(a.codes.map((c) => c.code)).toEqual(b.codes.map((c) => c.code));
+    const valid = a.codes.filter((c) => c.state === 'valid (30 days)');
+    expect(valid.length).toBeGreaterThan(70); // the two active schools with the parent portal on
+    for (const c of a.codes) {
+      const n = normalizeCode(c.code)!;
+      expect(n).toMatch(/^[A-Z2-9]{8}$/);
+      expect(a.docs.some((d) => d.model === 'ParentLinkCode' && d.doc.codeHash === hashCode(n))).toBe(true);
+    }
+    expect(new Set(a.codes.map((c) => c.code)).size).toBe(a.codes.length);
+    expect(valid.every((c) => c.className && c.studentEmail.endsWith('@school.enara.app'))).toBe(true);
+  });
+});
+
