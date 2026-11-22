@@ -92,6 +92,8 @@ export async function generateVisualAid(params: {
   // Live calls use 'avatar_visual' (exempt from the staging cap); the text
   // tutor uses 'tutor_visual', which stays under it.
   feature?: 'avatar_visual' | 'tutor_visual';
+  // Maintenance comparison only (visual samples on lms-test): false draws the old way, without the drawing rules and the check.
+  check?: boolean;
 }): Promise<string | null> {
   const config = getConfig();
   if (!config.anthropicApiKey) return null;
@@ -133,7 +135,7 @@ async function describeVisual(params: Parameters<typeof generateVisualAid>[0]): 
       messages: [
         {
           role: 'user',
-          content: visualPrompt(params) + VISUAL_SPEC_FORMAT + '\n' + VISUAL_RULES_EXTRA + (requested ? '' : '\nIf it does not help, reply with exactly {"kind":"none"}') + (note ? `\n\n${note}` : ''),
+          content: visualPrompt(params) + VISUAL_SPEC_FORMAT + (params.check === false ? '' : '\n' + VISUAL_RULES_EXTRA) + (requested ? '' : '\nIf it does not help, reply with exactly {"kind":"none"}') + (note ? `\n\n${note}` : ''),
         },
       ],
     }));
@@ -150,6 +152,7 @@ async function describeVisual(params: Parameters<typeof generateVisualAid>[0]): 
     if (r.stop === 'max_tokens' || !r.spec) return undefined;
     if (r.spec.kind === 'none') return requested ? undefined : null;
     // Visual check (visualCheck.ts): fix the layout, then one redo with the reasons if something is still wrong.
+    if (params.check === false) return isolateEquations(sanitizeVisualHtml(renderVisualSpec(r.spec, sanitizeVisualHtml)));
     let checked = checkVisual(r.spec, conversation);
     if (checked.problems.length) {
       logger.info('avatar_visual_redo', { problems: checked.problems.length, kind: r.spec.kind });

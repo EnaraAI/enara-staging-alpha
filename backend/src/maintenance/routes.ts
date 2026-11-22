@@ -287,6 +287,23 @@ router.get('/enrollment-shadow-report', async (req, res, next) => {
 // Avatar cost and latency test (avatarUsageReport.ts): numbers for up to 30 listed avatar calls. Read only; IDs and numbers only.
 // The last on-screen visual of each test avatar call (owner, 22 Nov 2026: "let me see them"). Test database only; fake learners;
 // returns the stored visual page (HTML the tutor drew), nothing else.
+// Visual samples (owner, 22 Nov 2026: "give me more drawings"): one avatar visual for a fake lesson moment, drawn with the new drawing rules
+// and check (check: true) or the old way (check: false), for side-by-side images. Fake content; metered to the fake school LT-SCHOOL-A.
+router.post('/visual-sample', async (req, res, next) => {
+  try {
+    const b = (req.body ?? {}) as { question?: unknown; answer?: unknown; context?: unknown; check?: unknown };
+    if (typeof b.question !== 'string' || !b.question.trim()) { res.status(400).json({ error: 'question required' }); return; }
+    const s = (v: unknown, n: number) => (typeof v === 'string' ? v.slice(0, n) : undefined);
+    const { runWithCallContext } = await import('../utils/callContext');
+    const { generateVisualAid } = await import('../services/avatarVisuals');
+    const t = Date.now();
+    const html = await runWithCallContext({ institutionId: 'LT-SCHOOL-A', role: 'maintenance' }, () =>
+      generateVisualAid({ question: b.question as string, answer: s(b.answer, 2000), context: s(b.context, 2000), requested: true, check: b.check !== false }));
+    res.json({ html, ms: Date.now() - t });
+  } catch (e) {
+    next(e);
+  }
+});
 router.get('/avatar-visuals', async (req, res, next) => {
   try {
     const ids = parseAvatarIds(req.query.ids);
