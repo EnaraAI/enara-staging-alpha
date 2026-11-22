@@ -21,7 +21,9 @@ const ask = (m, check) => fetch('https://lms-test.enara.app/api/maintenance/visu
 mkdirSync('samples', { recursive: true });
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1320, height: 800 }, deviceScaleFactor: 2 });
-const cell = (label, color, html) => `<div class="c"><div class="h" style="color:${color}">${label}</div><iframe sandbox srcdoc="${(html || '<p style=\'font-family:system-ui;color:#888;padding:20px\'>(no visual)</p>').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></iframe></div>`;
+// Each drawing is rendered on its own page (as the screen panel shows it), then the two pictures are put side by side.
+const shot = async (html) => { const q = await browser.newPage({ viewport: { width: 620, height: 560 }, deviceScaleFactor: 2 }); await q.setContent(html || '<p style="font-family:system-ui;color:#888;padding:20px">(no visual)</p>', { waitUntil: 'load' }); await q.waitForTimeout(400); const b = await q.screenshot({ fullPage: true }); await q.close(); return `data:image/png;base64,${b.toString('base64')}`; };
+const cell = (label, color, img, ms) => `<div class="c"><div class="h" style="color:${color}">${label} <span style="color:#667;font-weight:400;font-size:15px">· drawn in ${(ms / 1000).toFixed(1)} s</span></div><img src="${img}" style="width:600px"></div>`;
 const index = [];
 const ONLY = (process.env.ONLY || '').split(',').filter(Boolean);
 for (const m of M.filter((x) => !ONLY.length || ONLY.includes(x.id))) {
@@ -29,7 +31,7 @@ for (const m of M.filter((x) => !ONLY.length || ONLY.includes(x.id))) {
   writeFileSync(`samples/${m.id}-old.html`, oldV.html || ''); writeFileSync(`samples/${m.id}-new.html`, newV.html || '');
   index.push({ id: m.id, oldMs: oldV.ms, newMs: newV.ms, old: Boolean(oldV.html), new: Boolean(newV.html), err: oldV.error || newV.error || null });
   console.log(m.id, oldV.ms, newV.ms, oldV.error || '', newV.error || '');
-  await page.setContent(`<html><body style="font-family:system-ui;margin:20px;background:#f6f7fa"><style>.c{display:inline-block;vertical-align:top;width:620px;margin-right:16px;background:#fff;border:1px solid #cfd6e4;border-radius:10px;padding:10px}.h{font-weight:700;font-size:18px;margin:2px 4px 8px}iframe{width:600px;height:560px;border:0}</style><h2 style="margin:0 0 4px;color:#08172b">${m.title}</h2><div style="color:#445;margin-bottom:12px">Learner: ${m.question}</div>${cell('Before (old drawing)', '#b42318', oldV.html)}${cell('After (new rules + check)', '#067647', newV.html)}</body></html>`);
+  await page.setContent(`<html><body style="font-family:system-ui;margin:20px;background:#f6f7fa"><style>.c{display:inline-block;vertical-align:top;width:620px;margin-right:16px;background:#fff;border:1px solid #cfd6e4;border-radius:10px;padding:10px}.h{font-weight:700;font-size:18px;margin:2px 4px 8px}</style><h2 style="margin:0 0 4px;color:#08172b">${m.title}</h2><div style="color:#445;margin-bottom:12px">Learner: ${m.question}</div>${cell('Before (old drawing)', '#b42318', await shot(oldV.html), oldV.ms ?? 0)}${cell('After (new rules + check)', '#067647', await shot(newV.html), newV.ms ?? 0)}</body></html>`);
   await page.waitForTimeout(700);
   await page.screenshot({ path: `samples/${m.id}.png`, fullPage: true });
 }

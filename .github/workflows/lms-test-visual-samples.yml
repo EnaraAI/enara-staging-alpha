@@ -22,7 +22,6 @@ jobs:
         working-directory: deploy/lms-test/avatarcost
         env:
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
-          ONLY: ma-nline,sc-plant,ar-math
         run: node samples.mjs
       - name: Publish
         working-directory: deploy/lms-test/avatarcost
