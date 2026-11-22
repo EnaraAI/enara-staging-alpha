@@ -30,8 +30,13 @@ function texts(svg: string): Txt[] {
   }
   return out;
 }
+const RTL = /[\u0590-\u08FF]/;
 const boxOf = (t: { text: string; x: number; y: number; fs: number; anchor: string }): Box => {
-  const w = Math.max(1, [...t.text].length) * t.fs * 0.56; const x0 = t.anchor === 'middle' ? t.x - w / 2 : t.anchor === 'end' ? t.x - w : t.x;
+  // Arabic/Hebrew text runs right to left: "start" is its right end, so it grows to the left of x (and "end" to the right).
+  const rtl = RTL.test(t.text);
+  const w = Math.max(1, [...t.text].length) * t.fs * (rtl ? 0.5 : 0.56);
+  const anchor = rtl ? (t.anchor === 'start' ? 'end' : t.anchor === 'end' ? 'start' : 'middle') : t.anchor;
+  const x0 = anchor === 'middle' ? t.x - w / 2 : anchor === 'end' ? t.x - w : t.x;
   return { x0, y0: t.y - t.fs * 0.85, x1: x0 + w, y1: t.y + t.fs * 0.25 };
 };
 const pad = (b: Box, p: number): Box => ({ x0: b.x0 - p, y0: b.y0 - p, x1: b.x1 + p, y1: b.y1 + p });

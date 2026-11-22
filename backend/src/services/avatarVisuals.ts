@@ -174,6 +174,16 @@ async function describeVisual(params: Parameters<typeof generateVisualAid>[0]): 
   }
 }
 
+/** The page only: the model sometimes writes a sentence first ("Here is a clear HTML/SVG visual aid ... ```html") - that text was shown
+ * to the learner. Keep what is inside a ```html fence if there is one, else everything from the first tag on. */
+export function cleanModelHtml(text: string): string {
+  const fenced = /```(?:html)?\s*\n?([\s\S]*?)(?:```|$)/i.exec(text);
+  let html = fenced && fenced[1].includes('<') ? fenced[1] : text;
+  const first = html.indexOf('<');
+  html = first > 0 ? html.slice(first) : html;
+  return html.replace(/```\s*$/, '').trim();
+}
+
 type Shown = Exclude<VisualSpec, { kind: 'none' }>;
 /** The visible lines of a visual (for the content check). */
 function visualLines(spec: Shown): string[] {
@@ -243,7 +253,7 @@ async function writeVisualPage(params: Parameters<typeof generateVisualAid>[0]):
       .join('')
       .trim();
     if (!html || (!requested && html.includes('NO_VISUAL'))) return null;
-    html = html.replace(/^```[a-zA-Z]*\n?/, '').replace(/\n?```$/, '').trim();
+    html = cleanModelHtml(html);
     html = isolateEquations(sanitizeVisualHtml(html));
     return html.includes('<') ? html : null;
   } catch (error) {
