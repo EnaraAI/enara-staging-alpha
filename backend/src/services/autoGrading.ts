@@ -1,3 +1,4 @@
+import { gradeEngineQuestion } from '../assessment/questionBridge';
 import { recordAlert } from './auditTrail';
 import { AssessmentAttempt, type IAttemptAnswer } from '../models/AssessmentAttempt';
 import type { IQuestion } from '../models/Assessment';
@@ -53,6 +54,7 @@ const hasText = (v: unknown) => String(v ?? '').trim().length > 0;
 // Answers the answer key can't settle on its own.
 export function needsAiEvaluation(q: IQuestion | undefined, a: IAttemptAnswer) {
   if (!q || !hasText(a.studentAnswer)) return false;
+  if (q.type === 'engine') return false; // graded by code (assessment engine)
   // Option B2 (ENARA_EC_CHECK=on): error-correction answers that are not an exact key match go to the
   // error-correction check, even when the rules gave credit or the word is the target.
   if (q.type === 'short-answer' && useErrorCorrectionCheck({ ...q, prompt: q.text } as never, String(a.studentAnswer))) return true;
@@ -188,6 +190,9 @@ export function validateGrading(params: { attempt: AttemptDoc; assignment: Pick<
       const tf = graderV2On() && hasText(a.studentAnswer) ? targetFormPoints(q, String(a.studentAnswer), max) : null;
       if (tf !== null) {
         if (a.points !== tf) fail('rule_mismatch', `Question ${q.id} does not match its target-form score`);
+      } else if (q.type === 'engine' && hasText(a.studentAnswer)) {
+        const g = gradeEngineQuestion(q as never, a.studentAnswer);
+        if (!('result' in g) || a.points !== g.result.total) fail('rule_mismatch', `Question ${q.id} does not match its answer key`);
       } else if (AUTO_GRADED.has(q.type) && hasText(a.studentAnswer)) {
         const correct = gradeAnswer(q, a.studentAnswer as string);
         if (correct !== a.isCorrect || a.points !== (correct ? max : 0)) fail('rule_mismatch', `Question ${q.id} does not match its answer key`);
@@ -273,7 +278,7 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
     });
     const questions = version.questions as IQuestion[];
     const byId = new Map(questions.map((q) => [q.id, q]));
-    const unsupported = questions.find((q) => !AUTO_GRADED.has(q.type) && q.type !== 'open-response');
+    const unsupported = questions.find((q) => !AUTO_GRADED.has(q.type) && q.type !== 'open-response' && q.type !== 'engine');
     if (unsupported) throw new GradingError('unsupported_question', `Question type ${unsupported.type} can't be graded automatically`, false);
 
     const todo = attempt.answers.filter((a) => needsAiEvaluation(byId.get(a.questionId), a));

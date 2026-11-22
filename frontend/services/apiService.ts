@@ -826,6 +826,8 @@ export async function requestAsPartner(
 
 // STUDENT SELF-SERVICE (/api/me, student role only)
 export const fetchMe = () => request('GET', '/api/me');
+// Assessment engine P1b: the learner's screen language (ar | en), saved on the account.
+export const saveMyUiLanguage = (language: 'ar' | 'en') => request<{ uiLanguage: 'ar' | 'en' }>('PUT', '/api/me/ui-language', { language });
 export const fetchMyDashboard = () => request('GET', '/api/me/dashboard');
 export const fetchMyCourses = () => request<any[]>('GET', '/api/me/courses');
 export const fetchMyCourse = (courseId: string) => request('GET', `/api/me/courses/${encodeURIComponent(courseId)}`);

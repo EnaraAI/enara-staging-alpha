@@ -1,3 +1,4 @@
+import { forLearner, gradeEngineQuestion } from '../assessment/questionBridge';
 import { gradeAnswer } from '../services/assessmentSecurity';
 import { groupClause, studentGroupIds } from '../services/enrollmentReads';
 import { processStudentEvidenceSafely } from '../services/evidenceProcessor';
@@ -38,7 +39,7 @@ function studentView(assessment: AssessmentDoc, content: { title: string; questi
   const base = stripAnswersForStudent(assessment);
   const questions = content.questions.map((q) => {
     const { correctAnswer, explanation, modelAnswer, distractors, source, ...rest } = (typeof (q as any).toObject === 'function' ? (q as any).toObject() : q) as IQuestion & Record<string, unknown>;
-    return rest;
+    return forLearner(rest as never);
   });
   return { ...base, title: content.title, questions };
 }
@@ -237,7 +238,10 @@ export const submitAssessmentAttempt = asyncHandler(async (req: AuthRequest, res
 
   const graded = questions.map((q) => {
     const studentAnswer = answers[q.id];
-    const isCorrect = gradeAnswer(q, studentAnswer);
+    // Engine questions (assessment engine P1b): right only when every part is right; the key in plain words for the result.
+    const engine = q.type === 'engine' ? gradeEngineQuestion(q as never, studentAnswer) : null;
+    const isCorrect = engine ? ('result' in engine && engine.result.total >= engine.result.max) : gradeAnswer(q, studentAnswer);
+    if (engine && 'result' in engine) return { questionId: q.id, questionText: q.text, topic: q.topic, studentAnswer: studentAnswer ?? '', correctAnswer: engine.correctAnswer, isCorrect, explanation: q.explanation };
     return {
       questionId: q.id,
       questionText: q.text,

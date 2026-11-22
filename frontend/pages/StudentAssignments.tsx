@@ -4,8 +4,10 @@ import { ArrowLeft, Clock, Loader2, MessagesSquare, Send } from 'lucide-react';
 import {
   appealMyResult,
   converseMyAssignment,
+  fetchMe,
   fetchMyAssignment,
   fetchMyAssignments,
+  saveMyUiLanguage,
   saveMyAssignmentDraft,
   startMyAssignment,
   startTutorHandoff,
@@ -13,6 +15,7 @@ import {
 } from '../services/apiService';
 import { toast } from '../services/toastService';
 import { SpeakingExam } from '../components/SpeakingExam';
+import { EngineQuestion, engineShowsStem, type UiLang } from '../components/EngineQuestion';
 
 // Student assignments (Phase 3): work set by teachers with due dates. Enara
 // grades submissions and shows results as soon as they pass its checks;
@@ -124,7 +127,7 @@ function Result({ r, assignmentId, onChanged }: { r: any; assignmentId: string; 
               <p className="text-sm font-semibold text-slate-900" dir="auto">{i + 1}. {a.questionText}</p>
               <span className="text-sm font-semibold tabular-nums text-slate-700 shrink-0">{a.points ?? '–'} / {a.maxPoints}</span>
             </div>
-            <p className="text-sm text-slate-700 whitespace-pre-wrap" dir="auto"><span className="text-slate-500">Your answer: </span>{String(a.studentAnswer || '—')}</p>
+            <p className="text-sm text-slate-700 whitespace-pre-wrap" dir="auto"><span className="text-slate-500">Your answer: </span>{String(a.answerText || a.studentAnswer || '—')}</p>
             {r.answerKeyShown && a.correctAnswer !== undefined && <p className="text-sm text-slate-700">Correct answer: <b>{String(a.correctAnswer)}</b></p>}
             {r.answerKeyShown && a.explanation && <p className="text-sm text-slate-600" dir="auto">{a.explanation}</p>}
             {a.scoreExplanation && <p className="text-sm text-slate-700" dir="auto"><span className="text-slate-500">Why this score: </span>{a.scoreExplanation}</p>}
@@ -227,6 +230,10 @@ export const StudentAssignments: React.FC<{ onAskTutor?: (message: string, sessi
   const [detail, setDetail] = useState<any>(null);
   const [work, setWork] = useState<{ attempt: any; questions: any[]; format?: string; speaking?: any; speakingAttempt?: any } | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  // Assessment engine P1b: the learner's screen language for the new question types (saved on the account).
+  const [uiLang, setUiLang] = useState<UiLang>('en');
+  useEffect(() => { fetchMe().then((m: any) => { if (m?.uiLanguage === 'ar' || m?.uiLanguage === 'en') setUiLang(m.uiLanguage); }).catch(() => undefined); }, []);
+  const switchLang = () => { const next: UiLang = uiLang === 'ar' ? 'en' : 'ar'; setUiLang(next); saveMyUiLanguage(next).catch(() => undefined); };
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState(false);
@@ -354,16 +361,21 @@ export const StudentAssignments: React.FC<{ onAskTutor?: (message: string, sessi
       <div className="max-w-3xl mx-auto p-4 sm:p-8 space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3 sticky top-0 bg-slate-50/95 py-2 z-10">
           <p className="text-sm text-slate-600">{answered} of {work.questions.length} answered · {savedAt ? `saved ${new Date(savedAt).toLocaleTimeString()}` : 'not saved yet'}</p>
+          {work.questions.some((q: any) => q.type === 'engine') && (
+            <button type="button" onClick={switchLang} data-testid="ui-lang" lang={uiLang === 'en' ? 'ar' : 'en'} aria-label={uiLang === 'en' ? 'العربية' : 'English'} className="min-w-[44px] min-h-[36px] px-3 rounded-full border border-slate-300 text-sm font-semibold">{uiLang === 'en' ? 'ع' : 'EN'}</button>
+          )}
           {work.attempt.expiresAt && <Countdown until={work.attempt.expiresAt} onEnd={() => { toast.info('Time is up', 'Submitting your answers.'); submit(); }} />}
         </div>
         {work.questions.map((q: any, i: number) => (
           <fieldset key={q.id} className="bg-white border border-slate-200 rounded-xl p-4">
             <legend className="sr-only">Question {i + 1}</legend>
             <div className="flex justify-between gap-3">
-              <p className="font-semibold text-slate-900" dir="auto">{i + 1}. {q.text}</p>
+              <p className="font-semibold text-slate-900" dir="auto">{i + 1}. {q.type === 'engine' && !engineShowsStem(q) ? '' : q.text}</p>
               <span className="text-xs text-slate-500 shrink-0">{q.points} pt{q.points === 1 ? '' : 's'}</span>
             </div>
-            {q.type === 'multiple-choice' || q.type === 'true-false' ? (
+            {q.type === 'engine' && q.engine ? (
+              <EngineQuestion q={q} index={i} lang={uiLang} value={answers[q.id] ?? ''} onChange={(v) => { setAnswers({ ...answers, [q.id]: v }); dirty.current = true; }} />
+            ) : q.type === 'multiple-choice' || q.type === 'true-false' ? (
               <div className="mt-3 space-y-2">
                 {(q.type === 'true-false' && !q.options?.length ? ['True', 'False'] : q.options).map((o: string) => (
                   <label key={o} className="flex items-center gap-2 text-sm text-slate-800 border border-slate-200 rounded-lg px-3 py-2 cursor-pointer has-[:checked]:border-teal-600 has-[:checked]:bg-teal-50">

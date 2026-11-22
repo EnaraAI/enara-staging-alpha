@@ -1,9 +1,11 @@
+import { checkEngineQuestion } from '../assessment/questionBridge';
 import { AppError } from '../middleware/errorHandler';
 import { Assessment, AssessmentVersion, type IQuestion } from '../models/Assessment';
 
 type AssessmentDoc = InstanceType<typeof Assessment>;
 
 export const AUTO_GRADED = new Set(['multiple-choice', 'true-false', 'short-answer']);
+// Engine questions are graded by code too (src/assessment/questionBridge.ts), with their own checks below.
 
 export function questionPoints(q: Pick<IQuestion, 'type' | 'points' | 'rubric'>) {
   if (q.type === 'open-response') return (q.rubric?.criteria || []).reduce((n, c) => n + (c.maxPoints || 0), 0);
@@ -21,7 +23,10 @@ export function publishProblems(a: Pick<AssessmentDoc, 'title' | 'questions'>): 
     if (ids.has(q.id)) problems.push(`${label} has a duplicate id.`);
     ids.add(q.id);
     if (!q.text?.trim()) problems.push(`${label} has no text.`);
-    if (AUTO_GRADED.has(q.type)) {
+    if (q.type === 'engine') {
+      const checked = checkEngineQuestion(q as never);
+      if (!checked.ok) problems.push(`${label}: ${checked.problems.slice(0, 2).join('; ')}`);
+    } else if (AUTO_GRADED.has(q.type)) {
       if (q.correctAnswer === undefined || q.correctAnswer === null || String(q.correctAnswer).trim() === '') problems.push(`${label} has no correct answer.`);
       if (q.type === 'multiple-choice') {
         if (!q.options || q.options.length < 2) problems.push(`${label} needs at least two options.`);
