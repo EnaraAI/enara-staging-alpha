@@ -1,0 +1,34 @@
+ [32m✓[39m test/assessment/openGrading.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m test/assessment/closedGraders.test.ts [2m([22m[2m32 tests[22m[2m)[22m[32m 202[2mms[22m[39m
+ [32m✓[39m test/maintenanceMoodleWs.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 9423[2mms[22m[39m
+   [33m[2m✓[22m[39m guards: disabled everywhere except lms-test with its own switch[2m > [22m404 without its switch, without the token, with a non-https URL, or on another cluster; 401 without the operator token [33m 7634[2mms[22m[39m
+ [32m✓[39m test/gradingPolicy.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m test/errorsToWorkOn.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m test/assessment/questionBridge.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m test/maintenanceLmsTest.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 13786[2mms[22m[39m
+   [33m[2m✓[22m[39m migrate and seed through the route[2m > [22mmigrate applies pending migrations once [33m 630[2mms[22m[39m
+   [33m[2m✓[22m[39m migrate and seed through the route[2m > [22mseed needs a password, is idempotent, and the fake data has the real shapes [33m 837[2mms[22m[39m
+   [33m[2m✓[22m[39m enrollment backfill and shadow report through the route (multi-class steps 3-4)[2m > [22mdry run writes nothing; apply and undo need confirm; real cluster is 404 [33m 367[2mms[22m[39m
+ [32m✓[39m test/assessment/curricula.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m test/maintenanceHealthCheck.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 16303[2mms[22m[39m
+   [33m[2m✓[22m[39m setup[2m > [22mregisters the mock LMS for LT-SCHOOL-A, idempotently; the key pair is made once, private key encrypted [33m 463[2mms[22m[39m
+   [33m[2m✓[22m[39m run: the whole round trip over HTTP[2m > [22mpasses: login, launch, exchange, roster, submit, grade sent and received by the mock (IDs only) [33m 1566[2mms[22m[39m
+   [33m[2m✓[22m[39m run: the whole round trip over HTTP[2m > [22mruns again and again: one new attempt each time until none are left, then the last result is re-sent; nothing is deleted [33m 998[2mms[22m[39m
+ [32m✓[39m test/assessmentForms.test.ts [2m([22m[2m100 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m test/assessment/bench.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 179[2mms[22m[39m
+ [32m✓[39m test/assessment/arText.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m test/gradingEvalAdapter.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m test/assessmentVocabValidity.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m test/assessmentSeparation.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 2294[2mms[22m[39m
+   [33m[2m✓[22m[39m assessment separation[2m > [22mno item shingle in backend/src (engine, prompt builders) [33m 1843[2mms[22m[39m
+   [33m[2m✓[22m[39m assessment separation[2m > [22mno item shingle in lesson data [33m 413[2mms[22m[39m
+ [32m✓[39m test/assessment/p1aDb.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 6594[2mms[22m[39m
+   [33m[2m✓[22m[39m with a database[2m > [22mbank items are versioned (same id, new version) and unique per version [33m 414[2mms[22m[39m
+ [32m✓[39m test/assessmentNovelty.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 11015[2mms[22m[39m
+   [33m[2m✓[22m[39m assessment novelty[2m > [22mno overlap with lesson fixtures [33m 2538[2mms[22m[39m
+   [33m[2m✓[22m[39m assessment novelty[2m > [22mno overlap with backend/src tutor text [33m 6312[2mms[22m[39m
+   [33m[2m✓[22m[39m assessment novelty[2m > [22mno overlap with research ESL post-tests, fixtures, benchmarks [33m 2153[2mms[22m[39m
+[2m Test Files [22m [1m[32m17 passed[39m[22m[90m (17)[39m
+[2m      Tests [22m [1m[32m255 passed[39m[22m[90m (255)[39m
+exit=0
+ref=claude/tutor-lms-assessment-p3a a31961c
