@@ -1,0 +1,32 @@
+# Assessment bench on lms-test (docs/tutor/ASSESSMENT_ENGINE_PLAN.md §7a): the real engine grades the frozen bench through the
+# maintenance route (DeepSeek on lms-test; no fallback to Anthropic; $5 cap per run). Results pushed to claude/tutor-lms-bench-results.
+name: lms-test assessment bench
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/bench/**', '.github/workflows/lms-test-bench.yml']
+permissions:
+  contents: write
+jobs:
+  bench:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Bench
+        working-directory: deploy/lms-test/bench
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node run.mjs 2>&1 | tee out.log
+      - name: Publish
+        if: always()
+        working-directory: deploy/lms-test/bench
+        run: |
+          mkdir -p out && cp out.log out/ 2>/dev/null || true
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-bench-results
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "assessment bench ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-bench-results
