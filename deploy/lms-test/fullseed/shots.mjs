@@ -9,7 +9,7 @@ const targets = JSON.parse(readFileSync(new URL('./shots.json', import.meta.url)
 mkdirSync('shots', { recursive: true });
 const browser = await chromium.launch();
 const index = [];
-if (process.env.SHOTS_MODE === 'engine' || targets.some((t) => t.engine)) { const { engineShots } = await import('./shots-engine.mjs'); await engineShots(browser, SITE, PW); }
+if (process.env.SHOTS_MODE === 'engine' || targets.some((t) => t.engine)) { const { engineShots } = await import('./shots.engine.mjs'); await engineShots(browser, SITE, PW); }
 for (const t of targets.filter((x) => !x.engine)) {
   const r = await fetch(`${SITE}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: t.email, password: PW }) });
   const j = await r.json().catch(() => ({}));
