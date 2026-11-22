@@ -162,7 +162,7 @@ describe('the parent sees every subject with activity (API)', () => {
     const session = async (id: string, cur: string, daysAgo: number) => {
       await M.TutorSession.create({ id, studentId: 'k1', institutionId: 'sub-A', title: `${cur} chat`, courseId: cur, curriculumId: cur, mode: 'chat', lastMessageAt: ago(daysAgo), messageCount: 2 });
       await M.TutorMessage.create({ id: `${id}-m1`, sessionId: id, studentId: 'k1', role: 'user', text: 'hi', timestamp: new Date(ago(daysAgo).getTime() - 10 * 60_000) });
-      await M.TutorMessage.create({ id: `${id}-m2`, sessionId: id, studentId: 'k1', role: 'assistant', text: 'hello', timestamp: ago(daysAgo) });
+      await M.TutorMessage.create({ id: `${id}-m2`, sessionId: id, studentId: 'k1', role: 'ai', text: 'hello', timestamp: ago(daysAgo) });
     };
     await session('ts-eng', 'CUR-ENG', 1);
     await session('ts-math', 'CUR-MATH', 2);
