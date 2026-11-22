@@ -40,3 +40,11 @@ describe('visual check: what is not flagged', () => {
     expect(contentProblems(['Draw a base', 'Join the ends'], 'draw a triangle')).toEqual([]);
   });
 });
+
+describe('visual check: Arabic labels and model chatter (visual samples, 22 Nov)', () => {
+  it('an Arabic label runs right to left: "start" grows to the left, so a label just right of a box edge sits on it', () => {
+    const svg = '<svg viewBox="0 0 600 360"><rect x="100" y="80" width="400" height="200" fill="none" stroke="#0056D2"/><text x="510" y="185" font-size="16">٣ سم</text></svg>';
+    expect(svgProblems(svg)).toEqual(['a line runs through the label "٣ سم"']);
+    expect(svgProblems(fixSvgLayout(svg).svg)).toEqual([]);
+  });
+});
