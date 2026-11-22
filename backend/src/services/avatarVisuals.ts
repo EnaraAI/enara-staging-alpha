@@ -4,7 +4,8 @@ import { textTokenBound } from './priceCatalog';
 import { getConfig } from '../config/env';
 import { deepseekClient, deepseekReady, tutorModel } from './llmProvider';
 import { logger } from '../utils/logging';
-import { parseVisualSpec, renderVisualSpec, VISUAL_SPEC_FORMAT } from './visualSpec';
+import { parseVisualSpec, renderVisualSpec, VISUAL_SPEC_FORMAT, type VisualSpec } from './visualSpec';
+import { VISUAL_RULES_EXTRA, contentProblems, fixSvgLayout, svgProblems } from './visualCheck';
 
 // Visual aid for the live avatar's side panel (ported from the avatar adapter):
 // after an answer, Claude decides whether a table, diagram or step list would
@@ -122,9 +123,9 @@ function visualPrompt(params: { question: string; answer?: string; context?: str
 // undefined: no usable description (the caller writes a full page instead).
 async function describeVisual(params: Parameters<typeof generateVisualAid>[0]): Promise<string | null | undefined> {
   const { question, answer, context, requested, feature = 'avatar_visual' } = params;
-  const config = getConfig();
-  try {
-    const bound = { inputTokens: textTokenBound(question, answer, context, VISUAL_SPEC_FORMAT) + 1500, outputTokens: 3000 };
+  const conversation = [context, question, answer].filter(Boolean).join('\n');
+  const ask = async (note?: string): Promise<{ spec: VisualSpec | null; stop?: 'refusal' | 'max_tokens' }> => {
+    const bound = { inputTokens: textTokenBound(question, answer, context, VISUAL_SPEC_FORMAT, VISUAL_RULES_EXTRA, note ?? '') + 1500, outputTokens: 3000 };
     const response = await meteredMessage({ feature, modelName: visualModel(), bound }, () => visualClient().messages.create({
       model: visualModel(),
       max_tokens: 3000,
@@ -132,24 +133,67 @@ async function describeVisual(params: Parameters<typeof generateVisualAid>[0]): 
       messages: [
         {
           role: 'user',
-          content: visualPrompt(params) + VISUAL_SPEC_FORMAT + (requested ? '' : '\nIf it does not help, reply with exactly {"kind":"none"}'),
+          content: visualPrompt(params) + VISUAL_SPEC_FORMAT + '\n' + VISUAL_RULES_EXTRA + (requested ? '' : '\nIf it does not help, reply with exactly {"kind":"none"}') + (note ? `\n\n${note}` : ''),
         },
       ],
     }));
-    if (response.stop_reason === 'refusal') return null;
-    if (response.stop_reason === 'max_tokens') return undefined;
+    if (response.stop_reason === 'refusal') return { spec: null, stop: 'refusal' };
+    if (response.stop_reason === 'max_tokens') return { spec: null, stop: 'max_tokens' };
     const text = response.content.map((block) => (block.type === 'text' ? block.text : '')).join('').trim();
     const spec = parseVisualSpec(text);
-    if (!spec) {
-      logger.warn('avatar_visual_spec_unusable', { chars: text.length });
-      return undefined;
+    if (!spec) logger.warn('avatar_visual_spec_unusable', { chars: text.length });
+    return { spec };
+  };
+  try {
+    let r = await ask();
+    if (r.stop === 'refusal') return null;
+    if (r.stop === 'max_tokens' || !r.spec) return undefined;
+    if (r.spec.kind === 'none') return requested ? undefined : null;
+    // Visual check (visualCheck.ts): fix the layout, then one redo with the reasons if something is still wrong.
+    let checked = checkVisual(r.spec, conversation);
+    if (checked.problems.length) {
+      logger.info('avatar_visual_redo', { problems: checked.problems.length, kind: r.spec.kind });
+      r = await ask(`YOUR LAST VISUAL WAS REJECTED. Fix this and keep it simple:\n${checked.problems.map((x) => `- ${x}`).join('\n')}`);
+      if (r.spec && r.spec.kind !== 'none') {
+        const again = checkVisual(r.spec, conversation);
+        if (again.problems.length < checked.problems.length) checked = again;
+      }
     }
-    if (spec.kind === 'none') return requested ? undefined : null;
+    // Only hard problems (overlaps, lines through labels, labels outside, made-up content) replace a drawing by a text card; a small
+    // unlabelled shape (an eye, a bubble) only asks for the one redo.
+    const hard = checked.problems.filter((x) => !x.startsWith('a small '));
+    const spec = hard.length ? fallbackCard(checked.spec) : checked.spec;
+    if (!spec) return null;
     return isolateEquations(sanitizeVisualHtml(renderVisualSpec(spec, sanitizeVisualHtml)));
   } catch (error) {
     logger.warn('avatar_visual_failed', { message: (error as Error).message });
     return null;
   }
+}
+
+type Shown = Exclude<VisualSpec, { kind: 'none' }>;
+/** The visible lines of a visual (for the content check). */
+function visualLines(spec: Shown): string[] {
+  switch (spec.kind) {
+    case 'table': return spec.rows.map((r) => r.join(' '));
+    case 'list': return spec.items.map((i) => [i.term, i.detail].filter(Boolean).join(' '));
+    case 'steps': return spec.items;
+    case 'dialogue': return spec.lines.map((l) => l.text);
+    case 'timeline': return spec.items.map((i) => `${i.when} ${i.text}`);
+    case 'svg': return [...[...spec.svg.matchAll(/<text\b[^>]*>([\s\S]*?)<\/text>/gi)].map((m) => m[1].replace(/<[^>]+>/g, '').trim()).filter(Boolean), ...(spec.caption ? [spec.caption] : [])];
+  }
+}
+/** Layout fix plus what is still wrong. */
+function checkVisual(spec: Shown, conversation: string): { spec: Shown; problems: string[] } {
+  let s = spec;
+  if (s.kind === 'svg') { const f = fixSvgLayout(s.svg); s = { ...s, svg: f.svg }; }
+  const problems = [...(s.kind === 'svg' ? svgProblems(s.svg) : []), ...contentProblems(visualLines(s), conversation)];
+  return { spec: s, problems };
+}
+/** When a drawing still has problems after the redo: a clean text card (the title and the caption), never a broken picture. */
+function fallbackCard(spec: Shown): Shown | null {
+  if (spec.kind !== 'svg') return spec; // text visuals: the content problems were already reduced by the redo; shown as they are
+  return spec.caption ? { kind: 'list', title: spec.title, items: [{ term: spec.caption }], ...(spec.rtl ? { rtl: true } : {}) } as Shown : null;
 }
 
 async function writeVisualPage(params: Parameters<typeof generateVisualAid>[0]): Promise<string | null> {
