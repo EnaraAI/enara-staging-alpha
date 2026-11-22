@@ -1,0 +1,33 @@
+# Owner (22 Nov 2026): screenshots of lms-test with the full data set; PNGs pushed to claude/tutor-lms-shots. No secrets in the output.
+name: lms-test screenshots
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/fullseed/shots.*', '.github/workflows/lms-test-shots.yml']
+permissions:
+  contents: write
+jobs:
+  shots:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Playwright
+        working-directory: deploy/lms-test/fullseed
+        run: npm i --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
+      - name: Screenshots
+        working-directory: deploy/lms-test/fullseed
+        env:
+          SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
+        run: node shots.mjs
+      - name: Publish
+        if: always()
+        working-directory: deploy/lms-test/fullseed
+        run: |
+          cd shots && git init -q && git checkout -q -b claude/tutor-lms-shots
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "lms-test screenshots ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-shots
