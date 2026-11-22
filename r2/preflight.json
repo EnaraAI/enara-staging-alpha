@@ -1,0 +1,51 @@
+{
+ "AI_PAUSED": "false",
+ "keysPresent": {
+  "ANAM_API_KEY": true,
+  "ANAM_AVATAR_ID": true,
+  "ELEVENLABS_API_KEY": false,
+  "ANTHROPIC_API_KEY": true,
+  "AI_TEST_SPEND_CAP_USD": true,
+  "ANAM_SESSION_RESERVE_USD": false,
+  "ANAM_MAX_SESSION_SECONDS": false
+ },
+ "envUpdated": {
+  "ELEVENLABS_API_KEY": null,
+  "ANAM_API_KEY": "2026-11-22T08:13:59.930Z"
+ },
+ "lastProdDeploys": [
+  {
+   "created": "2026-11-22T08:30:04.753Z",
+   "state": "READY",
+   "ref": "lms-test-live",
+   "sha": "55dcd324"
+  },
+  {
+   "created": "2026-11-22T08:14:25.538Z",
+   "state": "READY",
+   "ref": "lms-test-live",
+   "sha": "5e0b609d"
+  },
+  {
+   "created": "2026-11-21T20:27:16.436Z",
+   "state": "READY",
+   "ref": "lms-test-live",
+   "sha": "5e0b609d"
+  }
+ ],
+ "ready": {
+  "status": 200,
+  "checks": {
+   "mongo": "ok",
+   "postgres": "not_configured",
+   "r2": "configured",
+   "anthropic": "configured",
+   "elevenlabs": "not_configured",
+   "anam": "configured",
+   "aiTestSpendCap": "set",
+   "anthropicKey": "rejected",
+   "anthropicFallbackKey": "not_configured",
+   "anthropicFallbackModel": "not_set"
+  }
+ }
+}
