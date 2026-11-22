@@ -35,3 +35,4 @@ writeFileSync('out/misses.json', JSON.stringify(misses, null, 1));
 console.log((summary.lines ?? []).join('\n'));
 console.log('FAILURES', JSON.stringify(summary.failures ?? []));
 console.log('spent', summary.spentUsd, 'gold', summary.gold);
+console.log('BY MODEL', JSON.stringify(summary.byModel ?? []));
