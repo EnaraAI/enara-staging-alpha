@@ -47,12 +47,8 @@ export const AiBadge: React.FC = () => {
   );
 };
 
-/** Marks a section filled from the mock providers. */
-export const SampleBadge: React.FC<{ show?: boolean }> = ({ show = true }) => {
-  const { t } = useP();
-  if (!show) return null;
-  return <span className="pp-pill pp-pill--sample" title={t.sampleHint}>{t.sample}</span>;
-};
+/** Placeholder sections are no longer shown to parents (owner, 22 Nov 2026): only real data. Kept as a no-op for older imports. */
+export const SampleBadge: React.FC<{ show?: boolean }> = () => null;
 
 export const AVATAR_COLORS = [['#f59f0a', '#08172b'], ['#0ea5a4', '#ffffff'], ['#0b203c', '#ffffff'], ['#6d4aff', '#ffffff']] as const;
 export const Avatar: React.FC<{ initial: string; index: number }> = ({ initial, index }) => {

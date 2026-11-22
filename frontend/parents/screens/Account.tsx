@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { bi, type Lang } from '../i18n';
 import { cairoDate, parentsApi } from '../api';
-import { Avatar, ErrorBox, Icon, Loading, SampleBadge, useP } from '../ui';
+import { Avatar, ErrorBox, Icon, Loading, useP } from '../ui';
 import { useLive } from '../useLive';
 import { AddEmail } from './AddEmail';
 
@@ -69,17 +69,8 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
         })}
       </section>
 
-      {d.plan.mock ? (
-        <section className="pp-card" aria-labelledby="pp-plan">
-          <div className="pp-row"><h2 className="pp-h2" id="pp-plan">{bi(d.plan.name, lang)}</h2><span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><span style={{ fontSize: 14, fontWeight: 600 }}>{d.plan.price}</span><SampleBadge show={d.plan.mock} /></span></div>
-          <p className="pp-sub">{t.learnersCount(n(d.plan.learners))} · {t.renews(cairoDate(d.plan.renewsOn, lang, { day: 'numeric', month: 'long' }))}</p>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button type="button" className="pp-btn" onClick={() => setNote(t.comingSoon)}>{t.changePlan}</button>
-            <button type="button" className="pp-btn" onClick={() => setNote(t.comingSoon)}>{t.invoices}</button>
-          </div>
-          <div className="pp-row" style={{ fontSize: 14 }}><span>{t.payment}</span><span className="pp-meta">{bi(d.plan.payment, lang)}</span></div>
-        </section>
-      ) : (
+      {/* A placeholder plan (mock) is not shown: parents see only real data. */}
+      {d.plan.mock ? null : (
         // Parents P1: ENARA Parents is provided free by the school (D1); no price.
         <section className="pp-card" aria-labelledby="pp-plan" data-testid="pp-provided-by">
           <h2 className="pp-h2" id="pp-plan">{t.planTitle}</h2>

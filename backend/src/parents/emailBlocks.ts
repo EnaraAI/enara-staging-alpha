@@ -37,6 +37,8 @@ export interface ChildWeek {
   skillsMastered: number;
   level: string;
   tip: string;
+  /** All subjects (PARENT_ALL_SUBJECTS_ENABLED): one line per subject and its top suggestion; the level row only when it is real. */
+  subjects?: { name: string; minutes: number; lessons: number; result: number | null; tip: string | null }[];
 }
 
 /** One child's section of the weekly summary (approved markup). */
@@ -47,7 +49,20 @@ export function childSection(lang: Lang, c: ChildWeek): string {
   const e = escapeHtml;
   const level = lang === 'ar' ? ltr(e(c.level)) : e(c.level);
   const table = `<table${lang === 'ar' ? ' dir="rtl"' : ''} width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;">${row(lang, L.min, `${c.minutesDone} ${L.of} ${c.goalMinutes}`)}${row(lang, L.lessons, String(c.lessonsDone))}${row(lang, L.skills, String(c.skillsMastered))}${row(lang, L.level, level)}</table>`;
+  if (c.subjects?.length) return `${h2(lang, e(c.firstName))}${sub(lang, `${e(c.school)} · <strong>${e(STATUS_WORDS[lang][c.status])}</strong>`)}${subjectsBlock(lang, c)}`;
   return `${h2(lang, e(c.firstName))}${sub(lang, `${e(c.school)} · <strong>${e(STATUS_WORDS[lang][c.status])}</strong>`)}${table}${p(lang, `<strong>${L.tip}</strong> ${e(c.tip)}`)}`;
+}
+
+function subjectsBlock(lang: Lang, c: ChildWeek): string {
+  const e = escapeHtml;
+  const L = lang === 'ar'
+    ? { min: 'دقائق التدريب', of: 'من', skills: 'مهارات جديدة متقنة', level: 'مستوى الإنجليزية', mins: 'دقيقة', lessons: 'دروس', result: 'آخر نتيجة', help: 'كيف تساعدون هذا الأسبوع:' }
+    : { min: 'Minutes practised', of: 'of', skills: 'New skills mastered', level: 'English level', mins: 'min', lessons: 'lessons', result: 'latest result', help: 'How you can help this week:' };
+  const line = (s: NonNullable<ChildWeek['subjects']>[number]) => [`${s.minutes} ${L.mins}`, `${s.lessons} ${L.lessons}`, ...(s.result !== null ? [`${L.result} ${lang === 'ar' ? ltr(`${s.result}%`) : `${s.result}%`}`] : [])].join(' · ');
+  const rows = [row(lang, L.min, `${c.minutesDone} ${L.of} ${c.goalMinutes}`), ...c.subjects!.map((s) => row(lang, e(s.name), line(s))), row(lang, L.skills, String(c.skillsMastered)), ...(c.level ? [row(lang, L.level, lang === 'ar' ? ltr(e(c.level)) : e(c.level))] : [])].join('');
+  const table = `<table${lang === 'ar' ? ' dir="rtl"' : ''} width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;">${rows}</table>`;
+  const tips = c.subjects!.filter((s) => s.tip);
+  return `${table}${tips.length ? p(lang, `<strong>${L.help}</strong>`) + tips.map((s) => p(lang, `<strong>${e(s.name)}:</strong> ${e(s.tip!)}`)).join('') : ''}`;
 }
 
 /** One row per child of the invite email: first name, school, code (approved markup). Codes in the body only. */

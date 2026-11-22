@@ -21,7 +21,7 @@ import { suggestedEmailFor } from './csvInvites';
 import { mockPlan } from './mock';
 import { authConfig, googleParentSignIn } from './google';
 import { recordSignIn } from '../services/signInHistory';
-import { parentCodeSignupEnabled, parentEmailSigninEnabled, parentSettingsEnabled } from './flags';
+import { parentAllSubjectsEnabled, parentCodeSignupEnabled, parentEmailSigninEnabled, parentSettingsEnabled } from './flags';
 import { mergeWithTicket, startEmailVerification, startSignIn, verifyEmail, verifySignIn } from './emailSignin';
 import { createDeviceSession } from './deviceSession';
 import { isCodeOnlyEmail, previewStartCode, startWithCode } from './codeSignup';
@@ -235,6 +235,9 @@ router.post('/learners/:studentId/report/share', h(async (req, res) => {
   }
   const r = (await svc.weeklyReport(ctx)).report;
   const parent = await User.findById(uid(req)).select('name email').lean();
+  // All subjects: the tip is this week's top suggestion (real data), and the message names the subjects.
+  const o = parentAllSubjectsEnabled() ? await (await import('./subjectViews')).subjectsOverview(ctx) : null;
+  const topRec = o?.subjects.find((c) => c.top)?.top ?? null;
   const summary: WeeklySummary = {
     parentName: parent?.name || 'there',
     childName: ctx.firstName,
@@ -242,7 +245,8 @@ router.post('/learners/:studentId/report/share', h(async (req, res) => {
     outcomesMastered: r.outcomesMastered,
     minutesDone: r.minutesDone,
     goalMinutes: r.goalMinutes,
-    practiceTip: r.tryAtHome.text.en,
+    practiceTip: o ? (topRec ? topRec.do.en : '') : r.tryAtHome.text.en,
+    ...(o ? { subjects: o.subjects.map((c) => c.name.en) } : {}),
     statusLine: r.status === 'on_track' ? 'on track' : r.status === 'needs_nudge' ? 'needs a nudge' : 'check this',
   };
   const to = channel === 'email' ? String(parent?.email ?? '') : String(body.to ?? '');
@@ -265,6 +269,18 @@ router.put('/learners/:studentId/signals', h(async (req, res) => {
   if ('goal' in body) out.goal = (await setGoal(ctx.student.id, body.goal === null ? null : parseGoal(body.goal), 'parent', { id: uid(req), role: 'parent' })).goal;
   await track(req, ctx, 'feature', 'learner_signals');
   res.json(out);
+}));
+// All subjects (PARENT_ALL_SUBJECTS_ENABLED): the subjects the child has activity in, and one subject's view. 404 when off.
+router.get('/learners/:studentId/subjects', h(async (req, res) => {
+  if (!parentAllSubjectsEnabled()) throw new AppError('Not found', 404, 'NOT_FOUND');
+  const { subjectsOverview } = await import('./subjectViews');
+  res.json(await subjectsOverview(await screen('home')(req)));
+}));
+router.get('/learners/:studentId/subjects/:subjectKey', h(async (req, res) => {
+  if (!parentAllSubjectsEnabled()) throw new AppError('Not found', 404, 'NOT_FOUND');
+  const key = String(req.params.subjectKey ?? '').slice(0, 60);
+  const { subjectView } = await import('./subjectViews');
+  res.json(await subjectView(await screen('progress')(req), key));
 }));
 // Learner memory: a parent sees their child's errors to work on (workOn) in plain words, and chooses up to 5 interests (learnerProfile). 404 when off.
 router.get('/learners/:studentId/errors-to-work-on', h(async (req, res) => {

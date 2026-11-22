@@ -243,3 +243,12 @@
   .pp-sheet-backdrop { align-items: center; }
   .pp-sheet { max-inline-size: 560px; border-radius: 16px; }
 }
+
+/* All subjects: subject chips (text only), subject cards, suggestions. */
+.pp-subjects { display: flex; gap: 8px; padding-block: 0 12px; padding-inline: 16px; margin-inline: -16px; overflow-x: auto; scrollbar-width: none; }
+.pp-subject-chip { flex-shrink: 0; padding-block: 8px; padding-inline: 14px; border-radius: 9999px; border: 1px solid var(--line); background: var(--card); color: var(--text); font-size: 14px; font-weight: 600; min-block-size: 44px; cursor: pointer; white-space: nowrap; }
+.pp-subject-chip[aria-current="true"] { border: 2px solid var(--blue); background: var(--blue-50); }
+.pp-subject-head { display: flex; align-items: center; justify-content: space-between; inline-size: 100%; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; text-align: start; min-block-size: 44px; }
+.pp-rec { display: flex; flex-direction: column; gap: 4px; padding-block: 8px; border-block-start: 1px solid var(--line); }
+.pp-rec:first-of-type { border-block-start: 0; }
+.pp-rec-say { font-size: 14px; color: var(--text); }

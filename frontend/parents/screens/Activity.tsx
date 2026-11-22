@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { bi } from '../i18n';
 import { cairoDate, cairoTime, dayOfMonth, parentsApi, weekdayIndex, type LearnerChip, type Transcript } from '../api';
-import { AiBadge, ErrorBox, Icon, Loading, SampleBadge, Sheet, useP } from '../ui';
+import { AiBadge, ErrorBox, Icon, Loading, Sheet, useP } from '../ui';
+import { ALL } from './Subjects';
 import { useLive } from '../useLive';
 import { ClassFilter } from '../shared';
 
 const WEEK_ORDER = [6, 0, 1, 2, 3, 4, 5]; // Saturday first
 
-export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void }> = ({ learner, refreshKey, onFetched }) => {
+export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string }> = ({ learner, refreshKey, onFetched, subjectKey }) => {
   const { t, n, lang } = useP();
   const [classId, setClassId] = useState<string | null>(null);
   const q = useLive(() => parentsApi.activity(learner.studentId, classId), [learner.studentId, classId], refreshKey);
@@ -26,8 +27,10 @@ export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
 
   if (!q.data) return q.error ? <ErrorBox onRetry={q.reload} /> : <Loading />;
   const d = q.data;
+  // All subjects: a chosen subject shows only its sessions.
+  const sessions = subjectKey && subjectKey !== ALL ? d.sessions.filter((s) => s.subject?.key === subjectKey) : d.sessions;
   let lastDay = '';
-  const firstOpen = open ?? d.sessions[0]?.id ?? null;
+  const firstOpen = open ?? sessions[0]?.id ?? null;
 
   return (
     <>
@@ -54,8 +57,8 @@ export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
       </section>
 
       <ClassFilter classes={d.classes} value={classId} onChange={setClassId} />
-      {d.sessions.length === 0 && <p className="pp-sub">{t.noSessions}</p>}
-      {d.sessions.map((s) => {
+      {sessions.length === 0 && <p className="pp-sub">{t.noSessions}</p>}
+      {sessions.map((s) => {
         const isOpen = firstOpen === s.id;
         const heading = s.day !== lastDay ? (lastDay = s.day, <h2 className="pp-day-heading" key={`d${s.day}`}>{cairoDate(s.day, lang, { weekday: 'long', day: 'numeric', month: 'long' })}</h2>) : null;
         return (
@@ -69,7 +72,7 @@ export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
                 </div>
                 <div style={{ flexGrow: 1, minInlineSize: 0 }}>
                   <p style={{ fontSize: 14, fontWeight: 600, lineHeight: '20px' }} dir="auto">{s.title}</p>
-                  <p className="pp-meta" style={{ marginBlockStart: 2 }}>{cairoTime(s.startedAt, lang)} · {s.mode === 'voice' ? t.voice : t.chat}{s.class !== undefined ? ` · ${s.class ? t.inClass(s.class.name) : t.noClass}` : ''}</p>
+                  <p className="pp-meta" style={{ marginBlockStart: 2 }}>{cairoTime(s.startedAt, lang)} · {s.mode === 'voice' ? t.voice : t.chat}{s.subject ? ` · ${bi(s.subject.name, lang)}` : ''}{s.class !== undefined ? ` · ${s.class ? t.inClass(s.class.name) : t.noClass}` : ''}</p>
                 </div>
                 <Icon name="down" className={`pp-chev${isOpen ? ' pp-chev--open' : ''}`} />
               </button>
@@ -81,7 +84,8 @@ export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
                       <div className="pp-wrap">{s.methods.map((m, i) => <span className="pp-method" key={i}>{bi(m, lang)}</span>)}</div>
                     </div>
                   )}
-                  <div className="pp-row" style={{ justifyContent: 'flex-start', gap: 6, paddingBlockStart: s.methods.length ? 0 : 12 }}><AiBadge /><SampleBadge show={s.insight.mock} /></div>
+                  {!s.insight.mock && (<>
+                  <div className="pp-row" style={{ justifyContent: 'flex-start', gap: 6, paddingBlockStart: s.methods.length ? 0 : 12 }}><AiBadge /></div>
                   <div className="pp-grid2 pp-ai-block">
                     <div><p className="pp-eyebrow" style={{ marginBlockEnd: 4 }}>{t.wentWell}</p><p style={{ fontSize: 13, lineHeight: '18px' }}>{bi(s.insight.wentWell, lang)}</p></div>
                     <div><p className="pp-eyebrow" style={{ marginBlockEnd: 4 }}>{t.wasHard}</p><p style={{ fontSize: 13, lineHeight: '18px' }}>{bi(s.insight.wasHard, lang)}</p></div>
@@ -90,9 +94,10 @@ export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
                     <p className="pp-eyebrow" style={{ marginBlockEnd: 6 }}>{t.words}</p>
                     <div className="pp-wrap">{s.insight.words.map((w) => <span className="pp-word" key={w} lang="en" dir="ltr">{w}</span>)}</div>
                   </div>
+                  </>)}
                   <div className="pp-facts">
                     <span>{t.speakingTime} <strong style={{ fontWeight: 600 }}>{t.minShort(n(s.speakingMin))}</strong></span>
-                    <span>{t.focus} <strong style={{ fontWeight: 600 }}>{t.focusLevel[s.insight.focus]}</strong></span>
+                    {!s.insight.mock && <span>{t.focus} <strong style={{ fontWeight: 600 }}>{t.focusLevel[s.insight.focus]}</strong></span>}
                   </div>
                   {s.transcript.available ? (
                     <>

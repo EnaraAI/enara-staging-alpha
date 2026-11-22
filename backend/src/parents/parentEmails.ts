@@ -17,6 +17,7 @@ import { Student } from '../models/Student';
 import { User } from '../models/User';
 import { logger, serializeError } from '../utils/logging';
 import { isCodeOnlyEmail } from './codeSignup';
+import { parentAllSubjectsEnabled } from './flags';
 import { childSection, codeTable, escapeHtml, namesList, weekLabel, type ChildWeek, type Lang } from './emailBlocks';
 import { attemptVisible, resultsPolicyFor } from './resultVisibility';
 import { schoolsWithAccessOff } from './schoolAccess';
@@ -227,9 +228,16 @@ async function childWeek(parentUserId: string, studentId: string, lang: Lang, at
   }
   const r = (await svc.weeklyReport(ctx, at)).report;
   const school = await Institution.findOne({ id: ctx.link.institutionId }).select('name').lean();
-  return {
+  const base = {
     firstName: ctx.firstName, school: school?.name ?? '', status: r.status, minutesDone: r.minutesDone, goalMinutes: r.goalMinutes,
     lessonsDone: r.lessonsDone, skillsMastered: r.outcomesMastered, level: r.level.cefr, tip: r.tryAtHome.text[lang] || r.tryAtHome.text.en,
+  };
+  // All subjects: one line per subject with its top suggestion; only real data (no placeholder tip, the level only when real).
+  if (!parentAllSubjectsEnabled()) return base;
+  const o = await (await import('./subjectViews')).subjectsOverview(ctx, at);
+  return {
+    ...base, level: r.level.mock ? '' : r.level.cefr, tip: '',
+    subjects: o.subjects.map((c) => ({ name: c.name[lang] || c.name.en, minutes: c.minutesThisWeek, lessons: c.lessonsThisWeek, result: c.latestResult?.score ?? null, tip: c.top ? `${c.top.do[lang] || c.top.do.en} ${c.top.why[lang] || c.top.why.en}` : null })),
   };
 }
 

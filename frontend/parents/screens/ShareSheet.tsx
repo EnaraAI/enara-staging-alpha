@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { bi } from '../i18n';
 import { cairoDate, parentsApi, type LearnerChip } from '../api';
-import { AiBadge, ErrorBox, Icon, Loading, SampleBadge, Sheet, useP } from '../ui';
+import { AiBadge, ErrorBox, Icon, Loading, Sheet, useP } from '../ui';
 import { useLive } from '../useLive';
 
 // "Share this week": the weekly summary as one shareable card, on demand.
@@ -41,17 +41,16 @@ export const ShareSheet: React.FC<{ learner: LearnerChip; onClose: () => void }>
             <div className="pp-stats">
               <div><p>{n(r.minutesDone)}</p><p>{t.ofMinShort(n(r.goalMinutes))}</p></div>
               <div><p>{n(r.streak)}</p><p>{t.streakShort}</p></div>
-              <div><p>{r.level.cefr}</p><p>{bi(r.level.label, lang)}{r.level.subLevelPct !== null ? ` · ${n(r.level.subLevelPct)}%` : ''}</p></div>
+              {!r.level.mock && <div><p>{r.level.cefr}</p><p>{bi(r.level.label, lang)}{r.level.subLevelPct !== null ? ` · ${n(r.level.subLevelPct)}%` : ''}</p></div>}
             </div>
-            <div>
-              <div className="pp-row" style={{ marginBlockEnd: 6 }}><p className="pp-eyebrow">{t.heLearned}</p><span style={{ display: 'inline-flex', gap: 6 }}><AiBadge /><SampleBadge show={r.learned.mock} /></span></div>
+            {!r.learned.mock && <div>
+              <div className="pp-row" style={{ marginBlockEnd: 6 }}><p className="pp-eyebrow">{t.heLearned}</p><AiBadge /></div>
               <ul className="pp-bullets pp-ai-block">{r.learned.items.map((b, i) => <li key={i}>{bi(b, lang)}</li>)}</ul>
-            </div>
-            <div className="pp-card pp-try" style={{ padding: 12, gap: 4 }}>
+            </div>}
+            {!r.tryAtHome.mock && <div className="pp-card pp-try" style={{ padding: 12, gap: 4 }}>
               <p className="pp-eyebrow">{t.tryAtHome}</p>
               <p style={{ fontSize: 14 }}>{bi(r.tryAtHome.text, lang)}</p>
-            </div>
-            {(r.level.mock) && <SampleBadge />}
+            </div>}
           </div>
         </article>
       )}

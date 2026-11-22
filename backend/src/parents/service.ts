@@ -18,6 +18,7 @@ import * as mock from './mock';
 import { classOfAttempts, classOfCourse, classesForLabels } from '../services/multiClass';
 import { READ_CHECK_ACTOR, endParentLink, endReasonFor } from './linkLifecycle';
 import { parentAccessOf, schoolAccessOffError, schoolsWithAccessOff } from './schoolAccess';
+import { parentAllSubjectsEnabled } from './flags';
 import { attemptVerified, attemptVisible, resultsPolicyFor, visibleAttemptFilter, type ResultsPolicy } from './resultVisibility';
 
 // Parents Portal data. Everything is computed from live data on each request
@@ -81,7 +82,7 @@ function learnerHeader(ctx: LearnerContext) {
   };
 }
 
-const envelope = <T extends Record<string, unknown>>(ctx: LearnerContext, body: T) => ({ generatedAt: new Date().toISOString(), timezone: 'Africa/Cairo', learner: learnerHeader(ctx), ...body });
+export const envelope = <T extends Record<string, unknown>>(ctx: LearnerContext, body: T) => ({ generatedAt: new Date().toISOString(), timezone: 'Africa/Cairo', learner: learnerHeader(ctx), ...body });
 
 // Multi-class step 6 (Q3): one view of the child; for a child in several
 // classes each activity is labelled by class and a class filter is offered.
@@ -163,11 +164,13 @@ export function methodWords(code: string): { en: string; ar: string } {
   return { en, ar: en };
 }
 
-interface SessionRow {
+export interface SessionRow {
   id: string;
   title: string;
   lessonTitle?: string;
   courseId?: string;
+  curriculumId?: string;
+  classId?: string;
   mode: 'chat' | 'voice';
   startedAt: Date;
   endedAt: Date;
@@ -177,8 +180,8 @@ interface SessionRow {
   methods: string[];
 }
 
-async function loadSessions(studentId: string, since: Date): Promise<SessionRow[]> {
-  const sessions = await TutorSession.find({ studentId, lastMessageAt: { $gte: since } }).select('id title lessonTitle courseId mode teachingMethod createdAt lastMessageAt messages messageCount').sort({ lastMessageAt: -1 }).limit(300).lean();
+export async function loadSessions(studentId: string, since: Date): Promise<SessionRow[]> {
+  const sessions = await TutorSession.find({ studentId, lastMessageAt: { $gte: since } }).select('id title lessonTitle courseId curriculumId classId mode teachingMethod createdAt lastMessageAt messages messageCount').sort({ lastMessageAt: -1 }).limit(300).lean();
   if (!sessions.length) return [];
   const agg = await TutorMessage.aggregate<{ _id: string; first: Date; last: Date; count: number; learner: number; methods: (string | null)[]; legacy: (string | null)[] }>([
     { $match: { studentId, sessionId: { $in: sessions.map((s) => s.id) } } },
@@ -197,6 +200,8 @@ async function loadSessions(studentId: string, since: Date): Promise<SessionRow[
       title: s.title,
       lessonTitle: s.lessonTitle,
       courseId: s.courseId,
+      curriculumId: (s as { curriculumId?: string }).curriculumId,
+      classId: (s as { classId?: string }).classId,
       mode: s.mode ?? 'chat',
       startedAt: new Date(start),
       endedAt: new Date(end),
@@ -352,6 +357,8 @@ export async function progress(ctx: LearnerContext, classId?: unknown) {
   const classOf = cv ? await classOfAttempts(cv.classes, attempts) : null;
   if (cv) attempts = attempts.filter((a) => !cv.filter || classOf!.get(a.id)?.id === cv.filter).slice(0, 10);
   const lessonsDone = await LessonProgress.countDocuments({ studentId: ctx.student.id, status: 'completed' });
+  // All subjects: each result carries its subject (the subject filter); placeholder sections are left out.
+  const tags = parentAllSubjectsEnabled() ? await (await import('./subjectViews')).subjectLabels(ctx) : null;
   return envelope(ctx, {
     level: stripInternal(level),
     ladder: CEFR_ORDER.map((c) => ({ cefr: c, label: PARENT_LEVEL_LABELS[c], state: c === level.cefr ? 'current' : CEFR_ORDER.indexOf(c) < CEFR_ORDER.indexOf(level.cefr) ? 'done' : 'ahead' })),
@@ -366,7 +373,7 @@ export async function progress(ctx: LearnerContext, classId?: unknown) {
       items: attempts.map((a) => {
         const visible = attemptVisible(policy, a);
         const score = visible && typeof a.score === 'number' ? a.score : null;
-        return { id: a.id, title: a.assessmentTitle, score, submittedAt: a.submittedAt, passed: score !== null ? score >= 60 : null, verified: visible && attemptVerified(policy, a), ...(visible ? {} : { waiting: true }), ...(classOf ? { class: classOf.get(a.id) ?? null } : {}) };
+        return { id: a.id, title: a.assessmentTitle, score, submittedAt: a.submittedAt, passed: score !== null ? score >= 60 : null, verified: visible && attemptVerified(policy, a), ...(visible ? {} : { waiting: true }), ...(classOf ? { class: classOf.get(a.id) ?? null } : {}), ...(tags ? { subject: tags.attempt(a) } : {}) };
       }),
     },
     ...(cv ? { classes: { items: cv.list, filter: cv.filter } } : {}),
@@ -401,6 +408,7 @@ export async function activity(ctx: LearnerContext, now = new Date(), classId?: 
   const cv = await classView(ctx, classId);
   const classOfSession = (s: SessionRow) => (cv ? classOfCourse(cv.classes, s.courseId) : null);
   const perDay = minutesByDay(sessions);
+  const tags = parentAllSubjectsEnabled() ? await (await import('./subjectViews')).subjectLabels(ctx, now) : null;
   const calendar = Array.from({ length: 14 }, (_, i) => {
     const d = addDays(calStart, i);
     return { day: d, state: d > today ? 'upcoming' : perDay.has(d) ? 'practised' : d === today ? 'today' : 'missed', isToday: d === today, minutes: perDay.get(d) ?? 0 };
@@ -425,6 +433,7 @@ export async function activity(ctx: LearnerContext, now = new Date(), classId?: 
         transcript: { available: !transcriptExpired(s.startedAt, now), retentionDays: TRANSCRIPT_RETENTION_DAYS },
         audio: { available: false },
         ...(cv ? { class: classOfSession(s) } : {}),
+        ...(tags ? { subject: tags.session(s) } : {}),
       };
     }),
     ...(cv ? { classes: { items: cv.list, filter: cv.filter } } : {}),
@@ -460,6 +469,8 @@ export async function transcript(ctx: LearnerContext, sessionId: string, now = n
 export async function visibleAlerts(ctx: LearnerContext, now = new Date()) {
   const vis = visibilityFor(ctx.link, ctx.tier);
   const real = await SafetyAlert.find({ studentId: ctx.student.id }).sort({ createdAt: -1 }).limit(50).lean();
+  // All subjects switch: parents see only real data, so no example alerts.
+  if (!real.length && parentAllSubjectsEnabled()) return { mock: false, items: [] as { id: string; category: string; subtype: string | null; actionTaken: { en: string; ar: string }; createdAt: string; beta: boolean; excerpt?: string }[] };
   const source = real.length ? 'real' : 'mock';
   const rows = real.length
     ? real.map((a) => ({ id: a.id, category: a.category, subtype: a.subtype, actionTaken: { en: a.actionTaken, ar: a.actionTaken }, excerpt: a.excerpt, createdAt: a.createdAt.toISOString(), detector: a.detector, beta: a.beta, reviewRequired: a.reviewRequired, reviewedAt: a.reviewedAt?.toISOString() }))

@@ -92,6 +92,12 @@ export const T = {
     hiddenBySchool: "A child linked to you is hidden for now: their school switched parent access off. Ask the school.",
     // Parents P3
     waitingForTeacher: 'Waiting for the teacher',
+    allSubjects: 'All subjects', subjectsNav: 'Subjects', howToHelp: 'How you can help this week', helpWhy: 'Why', helpSay: 'You could say',
+    pointsToPractise: 'Points to practise', pointsCount: (n: string) => `${n} to practise`, noPoints: 'Nothing to practise right now.',
+    lessonsOf: (d: string, t: string) => `${d} of ${t} lessons`, outcomesOf: (m: string, t: string) => `${m} of ${t} outcomes mastered`,
+    subjectLevel: 'Level', latestResult: 'Latest result', recentSessions: 'Recent sessions', noRecentSessions: 'No tutor sessions yet.',
+    comingNext: 'Coming next', nextLesson: 'Next lesson', dueOn: (d: string) => `Due ${d}`, outcomesTitle: 'Outcomes', minThisWeek: (n: string) => `${n} min this week`,
+    noSubjects: 'Subjects show here once there is activity.',
     // Parents P4
     emailWeekly: 'Weekly summary by email', emailNewResults: 'New results by email', emailsNeedAddress: 'Add your email above to get these.',
     shareNoEmail: 'Add your email in Account first, then try again.',
@@ -190,6 +196,12 @@ export const T = {
     hiddenBySchool: 'أحد أبنائك المرتبطين مخفي حاليًا: أوقفت مدرسته وصول أولياء الأمور. تواصل مع المدرسة.',
     // Parents P3
     waitingForTeacher: 'بانتظار المعلم',
+    allSubjects: 'كل المواد', subjectsNav: 'المواد', howToHelp: 'إزاي تساعد الأسبوع ده', helpWhy: 'ليه', helpSay: 'ممكن تقول',
+    pointsToPractise: 'نقاط محتاجة تدريب', pointsCount: (n: string) => `${n} محتاجة تدريب`, noPoints: 'مفيش حاجة محتاجة تدريب دلوقتي.',
+    lessonsOf: (d: string, t: string) => `${d} من ${t} درس`, outcomesOf: (m: string, t: string) => `${m} من ${t} هدف متقن`,
+    subjectLevel: 'المستوى', latestResult: 'آخر نتيجة', recentSessions: 'آخر الجلسات', noRecentSessions: 'مفيش جلسات مع المعلم لسه.',
+    comingNext: 'الجاي', nextLesson: 'الدرس الجاي', dueOn: (d: string) => `التسليم ${d}`, outcomesTitle: 'الأهداف', minThisWeek: (n: string) => `${n} دقيقة الأسبوع ده`,
+    noSubjects: 'المواد هتظهر هنا أول ما يبقى فيه نشاط.',
     // Parents P4
     emailWeekly: 'الملخص الأسبوعي بالبريد الإلكتروني', emailNewResults: 'النتائج الجديدة بالبريد الإلكتروني', emailsNeedAddress: 'أضف بريدك الإلكتروني أعلاه لتصلك هذه الرسائل.',
     shareNoEmail: 'أضف بريدك الإلكتروني من صفحة الحساب أولًا، ثم حاول مرة أخرى.',

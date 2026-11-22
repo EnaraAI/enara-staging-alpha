@@ -4,6 +4,7 @@
 // hash of SEED_USER_PASSWORD on the server.
 import { createHash } from 'crypto';
 import { CODE_ALPHABET, hashCode } from '../../parents/codes';
+import { formOutcomes } from '../../parents/levels';
 import { EMAIL_DOMAIN, FAMILY, FEMALE, INTL, MALE, PUBLIC_FIGURES, SCHOOLS, SUBJECTS, type SchoolDef, type SubjectKey } from './content';
 
 export const SEED_BATCH = 'full-v1';
@@ -351,6 +352,17 @@ export function buildPlan(now: Date): FullSeedPlan {
           add('StudentObjectiveMastery', `${s.id}:${curId(k)}-O${oi + 1}`, { institutionId: school.id, studentId: s.id, objectiveId: `${curId(k)}-O${oi + 1}`, masteryEstimate: status === 'not_assessed' ? null : Math.round(m * 100) / 100, evidenceStrength: status === 'not_assessed' ? 'none' : m > 0.7 ? 'moderate' : 'limited',
             masteryStatus: status, evidenceCount: status === 'not_assessed' ? 0 : int(2, 9), independentEvidenceCount: status === 'not_assessed' ? 0 : int(1, 5), distinctIndependentItems: status === 'not_assessed' ? 0 : int(1, 4), needsVerification: false, lastEvidenceAt: at, lastMasteryUpdateAt: at, modelVersion: 'mastery-v1', createdAt: at, updatedAt: at });
         });
+        // English also has progress on the shared English outcomes (data/outcomes), so a parent sees the real CEFR level (no placeholder).
+        if (firstTime && k === 'ENG') {
+          const outs = [...formOutcomes('A1'), ...formOutcomes('A2')];
+          const masteredN = Math.round(Math.min(1, Math.max(0, s.ability)) * outs.length * 0.8);
+          outs.slice(0, masteredN + 3).forEach((o, oi) => {
+            const at = ago(Math.max(until + 1, 3 + ((oi * 7) % 27)), 17); // fixed (no random draw: the rest of the plan stays the same)
+            const status = oi < masteredN ? 'mastered' : 'developing';
+            add('StudentObjectiveMastery', `${s.id}:${o.id}`, { institutionId: school.id, studentId: s.id, objectiveId: o.id, masteryEstimate: status === 'mastered' ? 0.9 : 0.55, evidenceStrength: status === 'mastered' ? 'moderate' : 'limited',
+              masteryStatus: status, evidenceCount: 2 + (oi % 4), independentEvidenceCount: 1 + (oi % 2), distinctIndependentItems: 1 + (oi % 3), needsVerification: false, lastEvidenceAt: at, lastMasteryUpdateAt: at, modelVersion: 'mastery-v1', createdAt: at, updatedAt: at });
+          });
+        }
         topics.push(sub.subject);
       }
       if (s.archived) continue;

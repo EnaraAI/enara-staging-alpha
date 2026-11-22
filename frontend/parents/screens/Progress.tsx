@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import { bi } from '../i18n';
 import { cairoDate, parentsApi, type LearnerChip } from '../api';
-import { ErrorBox, Icon, Loading, SampleBadge, useP } from '../ui';
+import { ErrorBox, Icon, Loading, useP } from '../ui';
+import { ALL, SubjectView } from './Subjects';
 import { useLive } from '../useLive';
 import { ClassFilter } from '../shared';
 import { MemoryCard } from './MemoryCard';
 
-export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void }> = ({ learner, refreshKey, onFetched }) => {
+type ProgressProps = { learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; english?: boolean };
+
+// All subjects: English (and "All subjects") keep the CEFR view; another subject shows its own outcomes and results.
+// Placeholder sections (mock) are not shown.
+export const Progress: React.FC<ProgressProps> = (props) => (props.subjectKey && props.subjectKey !== ALL && !props.english
+  ? <SubjectView learner={props.learner} subjectKey={props.subjectKey} mode="progress" refreshKey={props.refreshKey} onFetched={props.onFetched} />
+  : <ProgressAll {...props} />);
+
+const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, subjectKey }) => {
   const { t, n, lang } = useP();
   const [classId, setClassId] = useState<string | null>(null);
   const q = useLive(() => parentsApi.progress(learner.studentId, classId), [learner.studentId, classId], refreshKey);
@@ -14,6 +23,7 @@ export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
   if (!q.data) return q.error ? <ErrorBox onRetry={q.reload} /> : <Loading />;
   const d = q.data;
   const lvlName = `${bi(d.level.label, lang)} (${d.level.cefr})`;
+  const shown = subjectKey && subjectKey !== ALL ? d.assessments.items.filter((a) => a.subject?.key === subjectKey) : d.assessments.items;
   const achieved = d.canDos.items.filter((c) => c.state === 'achieved').length;
   const weeks = d.trend.weeks;
   // Trend chart geometry (logical: the x axis is mirrored in RTL).
@@ -28,8 +38,8 @@ export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
     <>
       <h1 className="pp-h1">{t.progressTitle}</h1>
 
-      <section className="pp-card" aria-labelledby="pp-cefr" style={{ gap: 4 }}>
-        <div className="pp-row" style={{ marginBlockEnd: 8 }}><p className="pp-eyebrow" id="pp-cefr">{t.cefrTitle}</p><SampleBadge show={d.level.mock} /></div>
+      {!d.level.mock && <section className="pp-card" aria-labelledby="pp-cefr" style={{ gap: 4 }}>
+        <div className="pp-row" style={{ marginBlockEnd: 8 }}><p className="pp-eyebrow" id="pp-cefr">{t.cefrTitle}</p></div>
         <ol className="pp-ladder">
           {[...d.ladder].reverse().map((lv) => (
             <li key={lv.cefr} className={lv.state === 'current' ? 'is-current' : ''} aria-current={lv.state === 'current' ? 'step' : undefined}>
@@ -50,12 +60,11 @@ export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
             </li>
           ))}
         </ol>
-      </section>
+      </section>}
 
-      <section className="pp-card" aria-labelledby="pp-skills" style={{ gap: 14 }}>
+      {!d.skills.mock && <section className="pp-card" aria-labelledby="pp-skills" style={{ gap: 14 }}>
         <div className="pp-row pp-row--top">
           <div><h2 className="pp-h2" id="pp-skills">{t.skills}</h2><p className="pp-sub" style={{ marginBlockStart: 2 }}>{t.skillsSub(lvlName)}</p></div>
-          <SampleBadge show={d.skills.mock} />
         </div>
         {d.skills.items.map((s) => (
           <div className="pp-skill" key={s.skill}>
@@ -66,10 +75,10 @@ export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
             <div className="pp-bar pp-bar--navy" aria-hidden="true"><i style={{ inlineSize: `${s.pct}%` }} /></div>
           </div>
         ))}
-      </section>
+      </section>}
 
-      <section className="pp-card" aria-labelledby="pp-trend" style={{ gap: 10 }}>
-        <div className="pp-row"><h2 className="pp-h2" id="pp-trend">{t.trendTitle}</h2><SampleBadge show={d.trend.mock} /></div>
+      {!d.trend.mock && <section className="pp-card" aria-labelledby="pp-trend" style={{ gap: 10 }}>
+        <div className="pp-row"><h2 className="pp-h2" id="pp-trend">{t.trendTitle}</h2></div>
         {weeks.length > 1 && (
           <svg className="pp-chart" style={{ direction: 'ltr' }} width="100%" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={t.trendLabel(n(weeks[0].score), n(last.score))}>
             {[25, 50, 75].map((v) => (
@@ -91,12 +100,12 @@ export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
             <text x={xs[xs.length - 1]} y={134} textAnchor={rtl ? 'start' : 'end'} fontSize="10" fill="#566376">{t.thisWeekShort}</text>
           </svg>
         )}
-      </section>
+      </section>}
 
-      <section className="pp-card" aria-labelledby="pp-cando">
+      {!d.canDos.mock && <section className="pp-card" aria-labelledby="pp-cando">
         <div className="pp-row" style={{ alignItems: 'baseline' }}>
           <h2 className="pp-h2" id="pp-cando">{t.canDos(bi(d.level.label, lang))}</h2>
-          <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><span className="pp-sub">{t.ofN(n(achieved), n(d.canDos.items.length))}</span><SampleBadge show={d.canDos.mock} /></span>
+          <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><span className="pp-sub">{t.ofN(n(achieved), n(d.canDos.items.length))}</span></span>
         </div>
         {d.canDos.items.map((c) => (
           <div className="pp-cando" key={c.id}>
@@ -107,20 +116,20 @@ export const Progress: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
             </div>
           </div>
         ))}
-      </section>
+      </section>}
 
-      <section className="pp-grid2">
-        <div className="pp-card"><div className="pp-row"><p className="pp-eyebrow">{t.strengths}</p><SampleBadge show={d.strengths.mock} /></div>{d.strengths.strengths.map((s, i) => <p key={i} style={{ fontSize: 14, lineHeight: '20px' }}>{bi(s, lang)}</p>)}</div>
+      {!d.strengths.mock && <section className="pp-grid2">
+        <div className="pp-card"><div className="pp-row"><p className="pp-eyebrow">{t.strengths}</p></div>{d.strengths.strengths.map((s, i) => <p key={i} style={{ fontSize: 14, lineHeight: '20px' }}>{bi(s, lang)}</p>)}</div>
         <div className="pp-card"><p className="pp-eyebrow">{t.focusNext}</p>{d.strengths.focusAreas.map((s, i) => <p key={i} style={{ fontSize: 14, lineHeight: '20px' }}>{bi(s, lang)}</p>)}</div>
-      </section>
+      </section>}
 
       <MemoryCard studentId={learner.studentId} canEdit={learner.role !== 'view'} />
 
       <section className="pp-card" aria-labelledby="pp-results">
         <div className="pp-row"><h2 className="pp-h2" id="pp-results">{t.assessments}</h2><span className="pp-meta">{t.lessonsDone(n(d.lessonsCompleted.count))}</span></div>
         <ClassFilter classes={d.classes} value={classId} onChange={setClassId} />
-        {d.assessments.items.length === 0 && <p className="pp-sub">{t.noAssessments}</p>}
-        {d.assessments.items.map((a) => (
+        {shown.length === 0 && <p className="pp-sub">{t.noAssessments}</p>}
+        {shown.map((a) => (
           <div className="pp-row" key={a.id} data-testid="pp-result">
             <div style={{ flexGrow: 1, minInlineSize: 0 }}>
               <p style={{ fontSize: 14, fontWeight: 600, lineHeight: '20px' }} dir="auto">{a.title}</p>
