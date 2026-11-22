@@ -4,7 +4,7 @@ import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { bandOf, subjectKeyOf, subjectName, type SubjectDetail } from '../src/parents/subjects';
-import { checkWritten, fallbackRec, pickFocus, recommendationsFor } from '../src/parents/recommendations';
+import { checkWritten, fallbackRec, mergeReworded, pickFocus, recommendationsFor } from '../src/parents/recommendations';
 import { childSection } from '../src/parents/emailBlocks';
 import { whatsappText } from '../src/parents/reportSender';
 
@@ -81,6 +81,24 @@ describe('written-in-advance suggestions', () => {
     expect(kid.say.en).not.toBe(teen.say.en);
     const res = fallbackRec({ kind: 'result', topic: 'Unit quiz', score: 45 }, ctx('kid'));
     expect(res.why.en).toContain('45%');
+  });
+});
+
+describe('variation', () => {
+  it('the code changes the activity idea from week to week (variant), with the same facts', () => {
+    const f = { kind: 'error' as const, topic: 'Halves and quarters', detail: 'mixes up halves and quarters' };
+    const base = { name: 'Mona', subject: { en: 'Maths', ar: 'الرياضيات' }, family: 'maths' as const, tier: 'kid' as const };
+    const a = fallbackRec(f, { ...base, variant: 0 }); const b = fallbackRec(f, { ...base, variant: 1 });
+    expect(a.do.en).not.toBe(b.do.en);
+    expect(a.why).toEqual(b.why);
+  });
+  it('a reworded item is kept only if it passes the checks against the code text', () => {
+    const code = [fallbackRec({ kind: 'result', topic: 'Unit quiz', score: 45 }, { name: 'Mona', subject: { en: 'Maths', ar: 'الرياضيات' }, family: 'maths', tier: 'kid' })];
+    const ok = mergeReworded(code, [{ do: { en: 'Go over the quiz together and try one question like the hardest.', ar: 'راجعا الاختبار معًا وجرّبا سؤالًا مثل أصعب سؤال.' }, why: { en: 'Mona got 45% on the latest released Maths result, Unit quiz.', ar: code[0].why.ar }, say: code[0].say }]);
+    expect(ok.items[0].ai).toBe(true);
+    const bad = mergeReworded(code, [{ ...code[0], why: { en: 'Mona got 30% on Unit quiz.', ar: code[0].why.ar } }]);
+    expect(bad.items[0]).toEqual(code[0]);
+    expect(bad.refused[0]).toMatch(/number not in the data/);
   });
 });
 
@@ -246,14 +264,36 @@ describe('the parent sees every subject with activity (API)', () => {
     expect(r.body.alerts.items).toEqual([]);
   });
 
-  it('uses the model text when it passes the checks, and the written-in-advance text when it does not', async () => {
+  it('shows the code text at once; the model only rewords it in the background, and checked rewordings show from the next visit', async () => {
     const s = (await get('/api/parents/learners/k1/subjects/mathematics')).body.subject as SubjectDetail;
-    const good = { do: { en: 'Fold a paper strip into halves, then quarters.', ar: 'اطويا شريط ورق إلى نصفين ثم أرباع.' }, why: { en: 'Mona mixes up halves and quarters.', ar: 'منى تخلط بين النصف والربع.' }, say: { en: 'Which piece is bigger?', ar: 'أنهي قطعة أكبر؟' } };
-    const bad = { ...good, why: { en: 'Mona got 12% on the area quiz.', ar: good.why.ar } };
-    const out = await recommendationsFor({ ...s, family: 'maths', activeBefore: true, weakest: { title: 'Halves and quarters', estimate: 0.3 }, latestResult: { title: 'Fractions quiz', score: 45, submittedAt: null } }, { studentId: 'k1-test', name: 'Mona', tier: 'kid', weekStart: '2026-11-21' }, { write: async () => [good, bad] });
-    expect(out.source).toBe('mixed');
-    expect(out.items[0]).toMatchObject({ ai: true, do: good.do });
-    expect(out.items[1].ai).toBe(false);
+    const detailIn = { ...s, family: 'maths' as const, activeBefore: true, weakest: { title: 'Halves and quarters', estimate: 0.3 }, latestResult: { title: 'Fractions quiz', score: 45, submittedAt: null } };
+    const ctx = { studentId: 'k1-test', name: 'Mona', tier: 'kid' as const, weekStart: '2026-11-21' };
+    let seen: { do: { en: string } }[] = [];
+    const first = await recommendationsFor(detailIn, ctx, { wait: true, reword: async (items) => {
+      seen = items;
+      return [
+        { do: { en: 'Fold a paper strip into halves, then quarters, together.', ar: 'اطويا شريط ورق إلى نصفين ثم أرباع معًا.' }, why: items[0].why, say: { en: 'Which piece is bigger?', ar: 'أنهي قطعة أكبر؟' } },
+        { ...items[1], why: { en: 'Mona got 12% on the area quiz.', ar: items[1].why.ar } }, // a number not in the code's text: refused
+      ];
+    } });
+    expect(first.source).toBe('rules'); // at once: the code's text, nothing waits for the model
+    expect(first.items.every((x) => !x.ai)).toBe(true);
+    expect(seen.length).toBe(first.items.length); // the model got the code's own suggestions to reword
+    const next = await recommendationsFor(detailIn, ctx, { reword: async () => { throw new Error('not called: saved'); } });
+    expect(next.source).toBe('mixed');
+    expect(next.items[0]).toMatchObject({ ai: true, do: { en: 'Fold a paper strip into halves, then quarters, together.' } });
+    expect(next.items[1].ai).toBe(false);
+  });
+
+  it('keeps the code text when the model fails, and does not retry within the hour', async () => {
+    const s = (await get('/api/parents/learners/k1/subjects/science')).body.subject as SubjectDetail;
+    const detailIn = { ...s, family: 'science' as const, activeBefore: true, weakest: null, latestResult: { title: 'Plants quiz', score: 90, submittedAt: null } };
+    const ctx = { studentId: 'k1-test2', name: 'Mona', tier: 'kid' as const, weekStart: '2026-11-21' };
+    let calls = 0;
+    const fail = async () => { calls++; throw new Error('timeout'); };
+    expect((await recommendationsFor(detailIn, ctx, { wait: true, reword: fail })).items.length).toBeGreaterThan(0);
+    await recommendationsFor(detailIn, ctx, { wait: true, reword: fail });
+    expect(calls).toBe(1);
   });
 
   it('is off without the switch', async () => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { bi } from '../i18n';
 import { cairoDate, parentsApi, type LearnerChip } from '../api';
-import { ErrorBox, Icon, Loading, useP } from '../ui';
+import { ErrorBox, Icon, Loading, levelNextLine, useP } from '../ui';
 import { ALL, SubjectView } from './Subjects';
 import { useLive } from '../useLive';
 import { ClassFilter } from '../shared';
@@ -16,7 +16,8 @@ export const Progress: React.FC<ProgressProps> = (props) => (props.subjectKey &&
   : <ProgressAll {...props} />);
 
 const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, subjectKey }) => {
-  const { t, n, lang } = useP();
+  const ctx = useP();
+  const { t, n, lang } = ctx;
   const [classId, setClassId] = useState<string | null>(null);
   const q = useLive(() => parentsApi.progress(learner.studentId, classId), [learner.studentId, classId], refreshKey);
   React.useEffect(() => onFetched(q.fetchedAt, q.loading), [q.fetchedAt, q.loading]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -52,7 +53,7 @@ const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, 
                 {lv.state === 'current' && (d.level.subLevelPct !== null ? (
                   <>
                     <div className="pp-bar" style={{ blockSize: 6, background: '#fff' }} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={d.level.subLevelPct} aria-label={lvlName}><i style={{ inlineSize: `${d.level.subLevelPct}%` }} /></div>
-                    <span style={{ fontSize: 12, color: '#16263b' }}>{d.level.subLevel ? `${d.level.subLevel} · ` : ''}{d.level.nextLabel ? t.toNext(n(d.level.subLevelPct), `${bi(d.level.nextLabel, lang)} (${d.level.next})`) : ''}</span>
+                    <span style={{ fontSize: 12, color: '#16263b' }}>{d.level.subLevel ? `${d.level.subLevel} · ` : ''}{levelNextLine(ctx, d.level) ?? ''}</span>
                   </>
                 ) : <span style={{ fontSize: 12, color: '#566376' }}>{t.noSubLevel}</span>)}
                 {lv.state === 'done' && <span className="sr">{t.canDoState.achieved}</span>}

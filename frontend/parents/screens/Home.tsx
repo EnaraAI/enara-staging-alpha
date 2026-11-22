@@ -1,7 +1,7 @@
 import React from 'react';
 import { bi } from '../i18n';
 import { cairoDate, parentsApi, weekdayIndex, type LearnerChip } from '../api';
-import { AiBadge, ErrorBox, Icon, Loading, Ring, useP } from '../ui';
+import { AiBadge, ErrorBox, Icon, Loading, Ring, levelNextLine, useP } from '../ui';
 import type { SubjectCard } from '../api';
 import { ALL, SubjectView, SubjectsOverview } from './Subjects';
 import { useLive } from '../useLive';
@@ -15,7 +15,8 @@ export const Home: React.FC<HomeProps> = (props) => (props.subjectKey && props.s
   : <HomeAll {...props} />);
 
 const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetched, overview = [], onPickSubject }) => {
-  const { t, n, lang } = useP();
+  const ctx = useP();
+  const { t, n, lang } = ctx;
   const q = useLive(() => parentsApi.home(learner.studentId), [learner.studentId], refreshKey);
   React.useEffect(() => onFetched(q.fetchedAt, q.loading), [q.fetchedAt, q.loading]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!q.data) return q.error ? <ErrorBox onRetry={q.reload} /> : <Loading />;
@@ -73,7 +74,7 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
         {lvl.subLevelPct !== null ? (
           <>
             <div className="pp-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={lvl.subLevelPct} aria-label={t.level}><i style={{ inlineSize: `${lvl.subLevelPct}%` }} /></div>
-            {lvl.nextLabel && <p className="pp-sub">{t.toNext(n(lvl.subLevelPct), `${bi(lvl.nextLabel, lang)} (${lvl.next})`)}</p>}
+            {levelNextLine(ctx, lvl) && <p className="pp-sub">{levelNextLine(ctx, lvl)}</p>}
           </>
         ) : <p className="pp-sub">{t.noSubLevel}</p>}
         {kid && lvl.latestCanDo?.text && !lvl.latestCanDo.mock && (
