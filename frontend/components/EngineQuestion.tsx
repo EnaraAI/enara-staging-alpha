@@ -7,7 +7,7 @@ import React from 'react';
 
 export type UiLang = 'ar' | 'en';
 type Opt = { id: string; text: string };
-export interface EngineQ { id: string; text: string; engine: { type: string; options?: unknown; language: string; source?: string } }
+export interface EngineQ { id: string; text: string; engine: { type: string; options?: unknown; language: string; source?: string; audio?: { url: string } } }
 
 const T = {
   en: { yourAnswer: 'Your answer', steps: 'Your working (steps)', final: 'Final answer', chooseAll: 'Choose all that apply', chooseOne: 'Choose one', true: 'True', false: 'False', blank: 'Blank', choose: 'Choose…', number: 'Number', unit: 'Unit', up: 'Move up', down: 'Move down', matchWith: 'matches', orderHint: 'Put these in the right order', matchHint: 'Match each item on the start with one on the end', numberHint: 'Write a number (and its unit if needed)' },
@@ -21,7 +21,19 @@ const emit = (v: unknown, onChange: (s: string) => void) => {
 };
 const pieces = (stem: string, re: RegExp) => stem.split(re); // even = text, odd = placeholder name
 
-export const EngineQuestion: React.FC<{ q: EngineQ; value: string; onChange: (v: string) => void; lang: UiLang; index: number }> = ({ q, value, onChange, lang, index }) => {
+// Listening (P3b): a question with a recording shows a player above the answer; the transcript never reaches the learner.
+export const EngineQuestion: React.FC<{ q: EngineQ; value: string; onChange: (v: string) => void; lang: UiLang; index: number }> = (props) => {
+  const url = props.q.engine.audio?.url;
+  if (!url) return <EngineAnswer {...props} />;
+  return (
+    <div>
+      <audio controls preload="none" src={url} className="mt-3 w-full" aria-label={props.lang === 'ar' ? 'التسجيل الصوتي' : 'Recording'} data-testid={`eq-audio-${props.q.id}`} />
+      <EngineAnswer {...props} />
+    </div>
+  );
+};
+
+const EngineAnswer: React.FC<{ q: EngineQ; value: string; onChange: (v: string) => void; lang: UiLang; index: number }> = ({ q, value, onChange, lang, index }) => {
   const t = T[lang];
   const e = q.engine;
   const dir = e.language.startsWith('ar') ? 'rtl' : 'ltr';

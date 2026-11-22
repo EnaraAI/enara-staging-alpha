@@ -12,14 +12,15 @@ export const BENCH_SETS = [
   { domain: 'math', lang: 'en' }, { domain: 'math', lang: 'ar' },
   { domain: 'science', lang: 'en' }, { domain: 'science', lang: 'ar' },
   { domain: 'humanities', lang: 'en' }, { domain: 'humanities', lang: 'ar' },
+  { domain: 'listening', lang: 'en' }, { domain: 'listening', lang: 'ar' },
 ] as const;
-export type BenchDomain = 'language' | 'math' | 'science' | 'humanities';
+export type BenchDomain = 'language' | 'math' | 'science' | 'humanities' | 'listening';
 export type BenchLang = 'en' | 'ar';
 
 const Item = z.object({
   id: z.string().min(1),
   type: z.enum(['short_answer', 'essay', 'math_steps']),
-  domain: z.enum(['language', 'math', 'science', 'humanities']),
+  domain: z.enum(['language', 'math', 'science', 'humanities', 'listening']),
   language: z.enum(['en', 'ar']),
   level: z.string().min(1),
   difficulty: z.number().int().min(1).max(3),
@@ -65,7 +66,7 @@ export function checkSet(set: { domain: string; lang: string; items: unknown; an
     if (!templateFor(it.domain, it.type)) problems.push(`${it.id}: no rubric for ${it.domain}/${it.type}`);
     if (it.type === 'math_steps' && !it.final) problems.push(`${it.id}: math item without final`);
     if (isChecklist(it.domain, it.type) && !it.points?.length) problems.push(`${it.id}: ${it.domain} item without points`);
-    if (it.domain === 'humanities' && !it.source) problems.push(`${it.id}: humanities item without a source`);
+    if ((it.domain === 'humanities' || it.domain === 'listening') && !it.source) problems.push(`${it.id}: ${it.domain} item without a source`);
     const n = answers.data.filter((a) => a.itemId === it.id);
     if (n.length !== 3 || new Set(n.map((a) => a.band)).size !== 3) problems.push(`${it.id}: needs one weak, one mid, one strong answer`);
   }

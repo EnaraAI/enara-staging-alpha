@@ -20,7 +20,7 @@ vi.mock('../../src/models/GradingProposal', () => ({ GradingProposal: { create: 
 const { gradeOpenRun, checkExtras, splitMathAnswer, finalAnswerPoints, ERROR_CODES } = await import('../../src/assessment/grading-engine/graders/domains');
 const { combineRuns, gradeOpenAnswer, nearPassMark } = await import('../../src/assessment/grading-engine/open');
 const { rubricFor, totalPoints, modelCriteria } = await import('../../src/assessment/rubrics/templates');
-const { checkEngineQuestion, isOpenEngine, describeKey } = await import('../../src/assessment/questionBridge');
+const { checkEngineQuestion, isOpenEngine, describeKey, forLearner } = await import('../../src/assessment/questionBridge');
 
 const attempt = { id: 'att-1', institutionId: 'sch-1', assignmentId: 'asg-1' };
 const essayItem = { questionId: 'q1', stem: 'Write about your family.', type: 'essay' as const, domain: 'language' as const, language: 'en' };
@@ -193,5 +193,33 @@ describe('P3a: science and humanities (checklist rubrics built per item)', () =>
     expect(JSON.parse(calls[0].user).item.source).toContain('opened in 1869');
     expect(checkExtras({ confidence: 0.8, errorCodes: ['misconception'], feedback: 'ok' }, 'science', 'en').errorCodes).toEqual(['misconception']);
     expect(() => checkExtras({ confidence: 0.8, errorCodes: ['arithmetic'], feedback: 'ok' }, 'science', 'en')).toThrow(/unknown error codes/);
+  });
+});
+
+describe('P3b: listening (a recording; answers judged against its transcript)', () => {
+  const audio = { url: 'https://media.example.org/a.mp3', transcript: 'Attention please. The school trip leaves at half past eight from the main gate.' };
+  it('a listening question needs a recording with a transcript; points from the key; the learner gets the address only', () => {
+    const ok = checkEngineQuestion({ id: 'q', type: 'engine', text: 'When and where does the trip leave?', engine: { type: 'short_answer', domain: 'listening', language: 'en', audio, answer_key: { required_points: ['half past eight', 'main gate'] } } as never });
+    expect(ok.ok && ok.points).toBe(5);
+    if (!ok.ok) return;
+    expect(ok.rubric!.criteria.map((c) => c.id)).toEqual(['point_1', 'point_2', 'accuracy_vs_source', 'structure']);
+    const learner = forLearner({ id: 'q', type: 'engine', text: 't', engine: ok.engine } as never) as { engine: Record<string, unknown> };
+    expect(learner.engine.audio).toEqual({ url: audio.url });
+    expect(JSON.stringify(learner)).not.toMatch(/half past eight|main gate|required_points/);
+    const bad = checkEngineQuestion({ id: 'q', type: 'engine', text: 't', engine: { type: 'short_answer', domain: 'listening', language: 'en', audio: { url: 'http://insecure/a.mp3', transcript: audio.transcript }, answer_key: { required_points: ['x1'] } } as never });
+    expect(bad.ok).toBe(false);
+  });
+  it('a closed item may carry a recording too (checked; transcript hidden from the learner)', () => {
+    const c = checkEngineQuestion({ id: 'q', type: 'engine', text: 'The trip leaves at 8:30.', points: 1, engine: { type: 'true_false', language: 'en', answer_key: { value: true }, audio } as never });
+    expect(c.ok && (c.engine as { audio?: unknown }).audio).toEqual(audio);
+    const l = forLearner({ id: 'q', type: 'engine', text: 't', engine: (c as { engine: unknown }).engine } as never) as { engine: { audio?: unknown } };
+    expect(l.engine.audio).toEqual({ url: audio.url });
+  });
+  it('the model gets the transcript as the source and is told not to mark spelling', async () => {
+    replies = [{ criteria: [{ criterionId: 'point_1', levelId: 'p1', evidence: ['half past eight'], rationale: 'ok' }, { criterionId: 'accuracy_vs_source', levelId: 'p2', evidence: ['half past eight'], rationale: 'ok' }, { criterionId: 'structure', levelId: 'p1', evidence: ['half past eight'], rationale: 'ok' }], errorCodes: [], confidence: 0.9, scoreExplanation: 'ok', strengths: [], improvements: [], feedback: 'Well heard.', flags: [] }];
+    const r = await gradeOpenRun({ attempt, item: { questionId: 'q', stem: 'When?', type: 'short_answer', domain: 'listening', language: 'en', points: ['half past eight'], source: audio.transcript }, answer: 'It leevs at half past eight.', uiLanguage: 'en', run: 1 });
+    expect(r.points).toBe(4);
+    expect(calls[0].system).toMatch(/not mark spelling or grammar|Do NOT mark spelling/);
+    expect(JSON.parse(calls[0].user).item.source).toContain('main gate');
   });
 });
