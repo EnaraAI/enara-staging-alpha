@@ -1,0 +1,45 @@
+# Backend unit tests that need MongoDB (in-memory server; the session container cannot download it). Runs the files named in
+# deploy/lms-test/unit/run.json on the named branch; the summary is pushed to claude/tutor-lms-unit-results. No secrets used.
+name: backend unit tests (on request)
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/unit/run.json', '.github/workflows/lms-test-unit.yml']
+permissions:
+  contents: write
+jobs:
+  unit:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: runner }
+      - name: Read the request
+        id: req
+        run: |
+          echo "ref=$(jq -r .ref runner/deploy/lms-test/unit/run.json)" >> "$GITHUB_OUTPUT"
+          echo "files=$(jq -r '.files | join(" ")' runner/deploy/lms-test/unit/run.json)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with: { ref: '${{ steps.req.outputs.ref }}', path: code }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Install
+        working-directory: code/backend
+        run: npm ci --no-audit --no-fund
+      - name: Tests
+        working-directory: code/backend
+        run: |
+          set +e
+          npx vitest run ${{ steps.req.outputs.files }} > ../../out.txt 2>&1
+          echo "exit=$?" >> ../../out.txt
+          tail -80 ../../out.txt
+      - name: Publish
+        if: always()
+        run: |
+          mkdir pub && grep -E "✓|×|FAIL|Tests |Test Files|exit=|AssertionError|Expected|Received|Error:|❯ test" out.txt | head -400 > pub/summary.txt
+          echo "ref=${{ steps.req.outputs.ref }} $(cd code && git rev-parse --short HEAD)" >> pub/summary.txt
+          cd pub && git init -q && git checkout -q -b claude/tutor-lms-unit-results
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "unit results ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-unit-results
