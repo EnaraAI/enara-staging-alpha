@@ -1,10 +1,12 @@
 {
- "$comment": "Avatar cost/latency/STT run on lms-test only (synthetic voices). 'run' picks which calls this push runs; hard cap 30 calls in total including tries.",
+ "$comment": "Avatar cost/latency/STT run on lms-test only (synthetic voices). 'run' picks which calls this push runs; hard cap 40 calls in total including tries (owner: 1 check call + 10 more on 22 Nov 2026, new Anam account).",
  "run": {
-  "ids": [],
-  "attempt": 14,
+  "ids": [
+   "a02"
+  ],
+  "attempt": 15,
   "diagnose": false,
-  "$note": "Avatar calls used: 29 of 30. a01 worked on DeepSeek; a02 was cut off mid-call and a03-c05 never started: Anam said \"Usage limit reached, please upgrade your plan\". Parked until the Anam plan has minutes again."
+  "$note": "Avatar calls used: 29 of 40. New Anam account \"Enara\" (free plan, 30 min/month). Probe a02 once, then 10 more: a03-a07 (adult: lessac, joe, hfc_female, amy, ryan) and c01-c05 (child-like)."
  },
  "voices": {
   "amy": {
