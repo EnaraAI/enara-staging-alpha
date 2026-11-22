@@ -5,7 +5,7 @@ Status: **go given (22 Nov 2026). P1a in progress.** Branch `claude/tutor-assess
 ## Progress
 | Phase | Status | PR |
 |---|---|---|
-| P1a schema, seeds, ar.ts, uiLanguage, closed graders | PR open | see below |
+| P1a schema, seeds, ar.ts, uiLanguage, closed graders | done (seeds deferred: CURRICULUM_BOOKS_NEEDED.md) | #88 |
 | P1b learner UI for closed types + E2E ar/en | not started | – |
 | P2 grading engine core, language + math graders, flags, override, migration of open grading, bench | not started | – |
 | P3 science, humanities, code graders, listening/speaking, bench | not started | – |
