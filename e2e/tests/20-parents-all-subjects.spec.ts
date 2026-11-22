@@ -22,6 +22,8 @@ test.describe.serial('20 · Parents: every subject the child studies', () => {
   test('the student submits work in English, Maths and Science (and one Maths quiz held for the teacher)', async () => {
     const admin = await login('admin.a');
     const student = await login(STUDENT.toLowerCase());
+    // Class membership is read from class enrollments (as in scenario 15): make sure the student is enrolled in the class.
+    await enaraApi.post(`/api/multi-class/students/${STUDENT}/enrollments`, admin, { scope: 'class', targetId: CLASS }, [200, 201, 409]);
     const work = [
       { key: 'english', subject: 'English', title: `E2E English check ${RUN}`, release: 'auto', answers: ANSWERS },
       { key: 'maths', subject: 'Maths', title: `E2E Maths check ${RUN}`, release: 'auto', answers: ANSWERS },
