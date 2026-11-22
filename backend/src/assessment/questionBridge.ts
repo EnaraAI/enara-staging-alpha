@@ -150,7 +150,13 @@ export function forLearner<T extends Q>(q: T): T {
   const multi = rest.type === 'mcq' && (q.engine.answer_key as { multi?: boolean } | undefined)?.multi === true;
   // A recording: the learner gets its address only, never the transcript.
   const audio = rest.audio ? { url: rest.audio.url } : undefined;
-  return { ...q, engine: { ...rest, options, ...(multi ? { multi: true } : {}), ...(audio ? { audio } : {}) } };
+  // Science, humanities, listening: the checklist criteria are titled with the answer's points; the learner sees "Required point N".
+  const rubric = (q as { rubric?: { criteria?: { id: string; title?: string; levels?: { description?: string }[] }[] } }).rubric;
+  const ar = String(rest.language ?? '').startsWith('ar');
+  const safeRubric = rubric?.criteria?.some((c) => /^point_\d+$/.test(c.id))
+    ? { ...rubric, criteria: rubric.criteria.map((c) => { const m = /^point_(\d+)$/.exec(c.id); return m ? { ...c, title: ar ? `النقطة المطلوبة ${m[1]}` : `Required point ${m[1]}`, levels: (c.levels ?? []).map((l) => ({ ...l, description: '' })) } : c; }) }
+    : undefined;
+  return { ...q, ...(safeRubric ? { rubric: safeRubric } : {}), engine: { ...rest, options, ...(multi ? { multi: true } : {}), ...(audio ? { audio } : {}) } };
 }
 
 /** Grades one engine question; the fields of the stored attempt answer. A malformed item is a problem for a person, not a score. */

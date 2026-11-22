@@ -182,6 +182,12 @@ describe('P3a: science and humanities (checklist rubrics built per item)', () =>
     const hum = checkEngineQuestion({ id: 'q', type: 'engine', text: 'Why was the canal built?', engine: { type: 'essay', domain: 'humanities', language: 'en', source: 'The canal was opened in 1869 to join the Mediterranean and the Red Sea, shortening the trip to Asia.', answer_key: { required_points: ['opened in 1869', 'joins two seas', 'shorter trip to Asia'] } } as never });
     expect(hum.ok && hum.points).toBe(7);
     expect(describeKey({ id: 'q', type: 'engine', text: 't', engine: { type: 'short_answer', domain: 'science', language: 'en', answer_key: { content_points: sciPoints } } as never })).toBe(sciPoints.join(' · '));
+    // The learner's copy: the points never appear (not in the key, not in the rubric titles); found by E2E 23.
+    if (!hum.ok) return;
+    const learner = forLearner({ id: 'q', type: 'engine', text: 't', rubric: hum.rubric, engine: hum.engine } as never) as { rubric: { criteria: { title: string }[] } };
+    expect(JSON.stringify(learner)).not.toMatch(/joins two seas|shorter trip to Asia|required_points/);
+    expect(learner.rubric.criteria.map((c) => c.title).slice(0, 4)).toEqual(['Required point 1', 'Required point 2', 'Required point 3', 'Accuracy against the source']);
+    expect(JSON.stringify(learner)).toContain('The canal was opened in 1869'); // the source itself is for the learner
   });
   it('humanities: the model gets the source and is told to judge only against it; science error codes are accepted', async () => {
     replies = [{ criteria: [{ criterionId: 'point_1', levelId: 'p1', evidence: ['in 1869'], rationale: 'ok' }, { criterionId: 'accuracy_vs_source', levelId: 'p2', evidence: ['in 1869'], rationale: 'ok' }, { criterionId: 'structure', levelId: 'p1', evidence: ['It opened in 1869'], rationale: 'ok' }], errorCodes: ['unsupported_claim'], confidence: 0.8, scoreExplanation: 'Good.', strengths: [], improvements: [], feedback: 'Good use of the source.', flags: [] }];
