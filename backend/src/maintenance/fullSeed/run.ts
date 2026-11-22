@@ -50,7 +50,8 @@ export class SeedRefused extends Error {}
 export function seedPassword(env: NodeJS.ProcessEnv = process.env): string {
   const p = env.SEED_USER_PASSWORD;
   if (typeof p !== 'string' || !p.trim()) throw new SeedRefused('SEED_USER_PASSWORD is not set on the server; nothing was created');
-  if (p.length < 12) throw new SeedRefused('SEED_USER_PASSWORD is shorter than 12 characters; nothing was created');
+  // Owner (22 Nov 2026): one shared password for every account, admins included, chosen by the owner; at least 8 characters.
+  if (p.length < 8) throw new SeedRefused('SEED_USER_PASSWORD is shorter than 8 characters; nothing was created');
   return p;
 }
 
