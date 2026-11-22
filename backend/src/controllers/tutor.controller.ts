@@ -1,3 +1,4 @@
+import { guardSpokenMarker, spokenLines } from '../services/spokenInput';
 import { publicVersion } from '../utils/vendorNeutral';
 import { resolveSessionClassId } from '../services/sessionClass';
 import { assignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
@@ -160,6 +161,8 @@ export const clearTutorSessions = asyncHandler(async (req: AuthRequest, res: Res
 });
 
 type TurnContext = {
+  // The learner said it (microphone; the text is from speech-to-text), so a possible mishearing is never corrected (spokenInput.ts).
+  spoken?: boolean;
   courseId?: string;
   lessonId?: string;
   subject?: string;
@@ -170,6 +173,7 @@ type TurnContext = {
 // One tutor turn, prepared up to the provider call. Shared by the JSON and the
 // streaming endpoints, so both apply the same session, policy and credit checks.
 interface TutorTurn {
+  spoken?: boolean;
   studentId: string;
   session: InstanceType<typeof TutorSession>;
   text: string;
@@ -297,7 +301,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     throw new AppError(`The AI tutor is off while you work on "${tutorPolicy.title}"`, 403, 'TUTOR_BLOCKED');
   }
   const extraRules = [session.handoff?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean) as string[];
-  const turn: TutorTurn = { studentId, session, text: text.trim(), method, userMessage, earlierCount: earlier.length, lessonTitle, sources: [], turnLockId };
+  const turn: TutorTurn = { studentId, session, text: text.trim(), method, userMessage, earlierCount: earlier.length, lessonTitle, sources: [], turnLockId, spoken: context?.spoken === true };
   if (prevLt?.workOnErrorId) turn.prevWorkOn = { errorId: prevLt.workOnErrorId, hintLevel: prevLt.hintLevel ?? 0 }; // workOn
   if (!(enaraCourseId || isDirectTutorModelConfigured())) return turn;
 
@@ -390,7 +394,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
       history,
       teachingMethod: method,
       curriculum,
-      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined, turn.outOfScope ? OUT_OF_SCOPE_LINE : undefined, turn.injection === 'learner' ? INJECTION_NOTE : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
+      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined, turn.outOfScope ? OUT_OF_SCOPE_LINE : undefined, turn.injection === 'learner' ? INJECTION_NOTE : undefined, turn.spoken && turn.language ? spokenLines(turn.text).trim() : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
       planActive: Boolean(turn.plan),
       sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
       ...(engineV2('cache') && turn.language?.parts ? { languageContextStable: turn.language.parts.stable, languageContextDynamic: turn.language.parts.dynamic } : { languageContext: turn.language?.prompt }),
@@ -542,7 +546,7 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
     // r4: the hidden assessment line is read and removed before anything is stored or sent.
     if (reply && (turn.language || turn.subjectGrading)) {
       const stripped = stripAssessmentMarkers(reply.answer);
-      turn.languageMarker = stripped;
+      turn.languageMarker = turn.spoken && turn.language ? guardSpokenMarker(stripped, turn.text) : stripped;
       reply = stripped.text ? { ...reply, answer: stripped.text } : null;
     }
     // TRACK 2 (exampleGuard): a draft whose example answers an item the learner will solve gets ONE regeneration with the reason; if the new draft
@@ -554,7 +558,7 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
         const again = await queryDirectTutorModel({ ...params, pedagogy: [params.pedagogy, exampleGuardRegenNote(hits)].filter(Boolean).join('\n\n') });
         if (again) {
           const stripped2 = stripAssessmentMarkers(again.answer);
-          if (stripped2.text && !exampleGuardCheck(turn.language, stripped2.text, turn.text).length) { turn.languageMarker = stripped2; reply = { ...again, answer: stripped2.text }; }
+          if (stripped2.text && !exampleGuardCheck(turn.language, stripped2.text, turn.text).length) { turn.languageMarker = turn.spoken && turn.language ? guardSpokenMarker(stripped2, turn.text) : stripped2; reply = { ...again, answer: stripped2.text }; }
         }
       }
     }
@@ -565,7 +569,7 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
       if (again) {
         const stripped2 = stripAssessmentMarkers(again.answer);
         const safe = !turn.language || !exampleGuardCheck(turn.language, stripped2.text, turn.text).length;
-        if (stripped2.text && hasTrustedMarker(stripped2) && safe) { turn.languageMarker = stripped2; reply = { ...again, answer: stripped2.text }; }
+        if (stripped2.text && hasTrustedMarker(stripped2) && safe) { turn.languageMarker = turn.spoken && turn.language ? guardSpokenMarker(stripped2, turn.text) : stripped2; reply = { ...again, answer: stripped2.text }; }
       }
     }
   }
@@ -625,7 +629,7 @@ export const streamTutorMessage = asyncHandler(async (req: AuthRequest, res: Res
           answer += tail;
           send({ type: 'token', delta: tail });
         }
-        turn.languageMarker = filterSummary(filter, answer);
+        turn.languageMarker = turn.spoken && turn.language ? guardSpokenMarker(filterSummary(filter, answer), turn.text) : filterSummary(filter, answer);
       }
       if (!open) {
         if (turn.reservation) await releaseUsage(turn.reservation);
