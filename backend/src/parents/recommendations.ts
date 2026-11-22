@@ -14,7 +14,7 @@ import { deepseekReady, llmClient, llmModel } from '../services/llmProvider';
 import type { Tier } from './policy';
 import type { Bi, Family, SubjectDetail } from './subjects';
 
-export type FocusKind = 'error' | 'outcome' | 'result' | 'routine' | 'due' | 'next';
+export type FocusKind = 'error' | 'outcome' | 'result' | 'routine' | 'due' | 'next' | 'celebrate';
 export interface Focus { kind: FocusKind; topic?: string; detail?: string; score?: number; dueAt?: string }
 export interface Rec { kind: FocusKind; do: Bi; why: Bi; say: Bi; ai: boolean }
 
@@ -29,6 +29,8 @@ export function pickFocus(s: SubjectDetail, now = new Date()): Focus[] {
   if (s.minutesThisWeek === 0 && s.activeBefore) out.push({ kind: 'routine' });
   if (s.next.due && new Date(s.next.due.dueAt).getTime() - now.getTime() <= 7 * DAY) out.push({ kind: 'due', topic: s.next.due.title, dueAt: s.next.due.dueAt });
   if (out.length < 3 && s.next.lesson) out.push({ kind: 'next', topic: s.next.lesson });
+  // Nothing to work on but a good released result: build on it, so every subject with a result has a suggestion.
+  if (!out.length && s.latestResult && s.latestResult.score >= 60) out.push({ kind: 'celebrate', topic: s.latestResult.title, score: s.latestResult.score });
   return out.slice(0, 3);
 }
 
@@ -99,6 +101,13 @@ export function fallbackRec(f: Focus, ctx: { name: string; subject: Bi; family: 
         do: { en: 'Ask when they plan to do it, and offer a quiet 15 minutes.', ar: 'اسأله متى ينوي إنجازه، واعرض عليه ١٥ دقيقة هادئة.' },
         why: { en: `${q(t)} is due ${dueWords(f.dueAt!, 'en')}.`, ar: `موعد تسليم ${q(t)} هو ${dueWords(f.dueAt!, 'ar')}.` },
         say: say('Do you want me to sit with you while you do it?', 'تحب أقعد جنبك وإنت بتعمله؟', 'Is there anything you need for it?', 'محتاج أي حاجة عشانه؟'),
+      };
+    case 'celebrate':
+      return {
+        kind: f.kind, ai: false,
+        do: { en: `Ask them to show you one question from ${q(t)} they got right and how they solved it.`, ar: `اطلب منه أن يريك سؤالًا واحدًا من ${q(t)} أجاب عنه صح، وكيف حلّه.` },
+        why: { en: `${n} did well in ${sub.en}: ${f.score}% on ${q(t)}.`, ar: `${n} أبلى بلاءً حسنًا في ${sub.ar}: ${f.score}٪ في ${q(t)}.` },
+        say: say('Well done! Can you teach me how you did that one?', 'برافو! ممكن تعلّمني إزاي حليتها؟', 'Nice result. What helped you most?', 'نتيجة حلوة. إيه أكتر حاجة ساعدتك؟'),
       };
     default:
       return {

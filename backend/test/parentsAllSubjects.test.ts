@@ -54,6 +54,13 @@ describe('picking what matters', () => {
     expect(pickFocus(detail({ latestResult: { title: 'Unit quiz', score: 40, submittedAt: null }, minutesThisWeek: 0 })).map((x) => x.kind)).toEqual(['result', 'routine', 'next']);
     expect(pickFocus(detail({ latestResult: null, minutesThisWeek: 5 })).map((x) => x.kind)).toEqual(['next']);
   });
+  it('builds on a good released result when there is nothing else to work on', () => {
+    const f = pickFocus(detail({ latestResult: { title: 'Maths check', score: 75, submittedAt: null }, next: { lesson: null, due: null } }));
+    expect(f).toEqual([{ kind: 'celebrate', topic: 'Maths check', score: 75 }]);
+    const r = fallbackRec(f[0], { name: 'Karim', subject: { en: 'Maths', ar: 'الرياضيات' }, family: 'maths', tier: 'kid' });
+    expect(r.why.en).toContain('75%');
+    expect(AR.test(r.do.ar)).toBe(true);
+  });
   it('mentions something due within a week', () => {
     const soon = new Date(Date.now() + 2 * 86_400_000).toISOString();
     expect(pickFocus(detail({ next: { lesson: null, due: { title: 'Shapes quiz', dueAt: soon } } }))[0]).toMatchObject({ kind: 'due', topic: 'Shapes quiz' });
