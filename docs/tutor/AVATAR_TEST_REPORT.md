@@ -43,3 +43,17 @@ Anam is almost all of the cost. On the free plan a session stops at 3 minutes, s
 ## Worth knowing
 - **Free plan:** a session can last 3 minutes at most, and only 1 can run at a time. Real lessons would be cut off at 3 minutes.
 - **Speed step 6** (the avatar starts speaking from the first checked sentence): it can now be built and measured. It needs a few more test calls (about 4 minutes of the remaining free minutes).
+
+## Speed step 6 (22 Nov, 3 more calls, 12 sentences)
+The change: the avatar speaks an English-lesson reply sentence by sentence (`avatarSentences`, live in #76).
+
+| | Before (10 calls) | With step 6 (3 calls) |
+|---|---|---|
+| First text from the tutor (median) | 1.51 s | 1.60 s |
+| Avatar starts speaking (median) | 2.37 s | 2.63 s |
+| Slowest 10% | 3.22 s | 3.00 s |
+
+- **No measurable gain.** DeepSeek replies are short (2–3 sentences) and come within about 1 s. Most of the wait is the grading call and Anam's voice and video, not waiting for the rest of the reply.
+- **One outlier:** one sentence (call a09) took 32.7 s before any text. The server's own time for that turn was 4.5 s, so most of the delay was outside the tutor. The cause is not known yet.
+- **Anam minutes:** these 3 calls used **4.35 minutes**, slightly over the 4 asked (calls of 79–109 s). **11.9 free minutes are left** this month.
+- **Speech-to-text:** 12 of 12 sentences heard exactly.
