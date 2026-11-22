@@ -43,7 +43,8 @@ const ATTEMPT_KEEP = [
   'startedAt', 'submittedAt', 'timeSpentSec', 'assignmentId', 'assessmentVersion', 'isLate',
   'gradingStatus', 'totalPoints', 'maxPoints', 'finalizedAt', 'releasedAt', 'origin', 'createdAt', 'updatedAt',
 ] as const;
-const ANSWER_KEEP = ['questionId', 'isCorrect', 'points', 'maxPoints', 'method', 'originalPoints', 'needsReview'] as const;
+// Assessment engine fields kept are structured only (scores, reason codes, grader); feedbackText (model free text) is never kept.
+const ANSWER_KEEP = ['questionId', 'isCorrect', 'points', 'maxPoints', 'method', 'originalPoints', 'needsReview', 'criteria', 'confidence', 'flagged', 'grader'] as const;
 const PROPOSAL_KEEP = [
   '_id', 'institutionId', 'assignmentId', 'questionId', 'kind', 'run', 'status', 'points', 'maxPoints',
   'objectiveIds', 'confidence', 'flags', 'modelName', 'promptVersion', 'createdAt',

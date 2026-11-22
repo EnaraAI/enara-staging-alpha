@@ -52,7 +52,7 @@ export const SUBJECTS: Record<SubjectKey, SubjectDef> = {
         { id: 'q3', type: 'short-answer', text: 'They ___ (see) a film on Friday.', correctAnswer: 'saw', wrong: 'seen' } ] },
     ],
     errors: [{ code: 'third_person_s', label: 'Missing -s with he / she' }, { code: 'past_irregular', label: 'Irregular past forms' }, { code: 'have_has', label: 'have / has' }],
-    reviews: [{ question: 'Complete: He ___ (play) football on Fridays.', answer: 'plays' }, { question: 'Past of "go"?', answer: 'went', options: ['goed', 'went', 'gone'] }, { question: 'My mother\'s brother is my ...', answer: 'uncle', options: ['uncle', 'aunt', 'cousin'] }],
+    reviews: [{ question: 'Complete: He ___ (play) football on Fridays.', answer: 'plays' }, { question: 'Past of "go"?', answer: 'went', options: ['goed', 'went', 'gone'] }, { question: 'Your dad\'s sister is your ...', answer: 'aunt', options: ['uncle', 'aunt', 'cousin'] }],
     chats: [
       { title: 'Present simple with he and she', turns: [['Why do we say "she goes" and not "she go"?', 'Good question! With he, she and it we add -s or -es to the verb in the present simple: she goes, he plays, it works. Try one: My brother ___ (watch) TV every evening.'], ['My brother watches TV every evening', 'Yes, "watches" is right: watch ends in -ch, so we add -es. Next: My sister ___ (study) English.']] },
       { title: 'Talking about my holiday', turns: [['how do I say I went to the sea', 'You can say: "Last summer I went to the sea." "Went" is the past of "go". What did you do there? Write one sentence.'], ['I swimmed every day', 'Nearly! "Swim" is irregular: the past is "swam". So: "I swam every day." Can you say one more thing you did?']] },

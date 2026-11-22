@@ -11,6 +11,7 @@
 //                   no task at the end, too long for a young child, the wrong language (subject turns), no citation for a passage-based answer.
 //   dsTuning      - temperature 0.3; the grading call may use a little reasoning (TUTOR_LLM_GRADE_REASONING=none|low|high, default none).
 // Every part is a pure function here except gradedReply, which takes the chat call as an argument (tests pass a fake).
+import { foldArabic, westernDigits } from '../assessment/text/ar';
 import { engineV2 } from './engineV2';
 
 export type DsParts = { gradeFirst: boolean; answerCheck: boolean; examples: boolean; replyChecks: boolean; tuning: boolean; fast?: boolean };
@@ -39,8 +40,7 @@ export function ageBand(system: string): AgeBand {
 }
 
 // ---------------------------------------------------------------------------------------------------------------- answer checks (code)
-const AR_DIGITS = /[٠-٩۰-۹]/g;
-const westernDigits = (s: string) => s.replace(AR_DIGITS, (d) => String(d.charCodeAt(0) & 0xf)).replace(/[٫]/g, '.').replace(/[٬]/g, ',');
+
 /** A number from "0.5", "1/2", "50%", "2 1/2", "-3", "1,000", Arabic digits; with a unit word after it, if any. */
 export function parseNumber(raw: string): { value: number; unit: string } | null {
   const s = westernDigits(raw).trim().toLowerCase().replace(/^(=|the answer is|answer:|it is|it's|x\s*=)\s*/, '').replace(/[.。]$/, '');
@@ -56,7 +56,7 @@ export function parseNumber(raw: string): { value: number; unit: string } | null
 const close = (a: number, b: number) => Math.abs(a - b) <= 1e-9 + 1e-6 * Math.max(Math.abs(a), Math.abs(b));
 
 /** Arabic spelling forms that learners often mix up, folded together. */
-export const foldArabic = (s: string) => s.replace(/[ً-ْـ]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي');
+export { foldArabic } from '../assessment/text/ar'; // one Arabic fold for the tutor and the assessment engine
 const isArabic = (s: string) => /[؀-ۿ]/.test(s);
 function editDistance(a: string, b: string): number {
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)] as number[]);

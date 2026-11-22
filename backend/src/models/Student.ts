@@ -78,6 +78,8 @@ export interface IStudent extends Document {
   origin?: 'live' | 'demo_seed';
   // 'kids' shows this student the Enara Kids interface (set per student by school staff).
   uiMode?: StudentUiMode;
+  // The language of the learner's screens and feedback (assessment engine P1a), set from the app's language switch.
+  uiLanguage?: 'ar' | 'en';
   // Profile photo (approved) and a student's own upload awaiting a school admin.
   // Urls are plain /uploads/<key> paths, signed per response (uploadSigning).
   photoUrl?: string;
@@ -113,6 +115,7 @@ const studentSchema = new Schema<IStudent>(
     email: { type: String, required: true },
     grade: { type: String, default: '' },
     uiMode: { type: String, enum: STUDENT_UI_MODES, default: 'standard' },
+    uiLanguage: { type: String, enum: ['ar', 'en'] },
     avatar: { type: String, default: '' },
     photoUrl: { type: String },
     photoKey: { type: String },

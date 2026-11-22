@@ -23,7 +23,7 @@ import {
 } from '../controllers/meAssignments.controller';
 import { getMyStudyPlan, setMyStudyItem, startTutorHandoff } from '../controllers/meStudyPlan.controller';
 import {
-  getMe,
+  getMe, setMyUiLanguage,
   listMyCourses,
   getMyCourse,
   getMyLesson,
@@ -92,6 +92,7 @@ router.patch('/study-plan/items', teaching, studyPlans, setMyStudyItem);
 router.post('/tutor/handoff', teaching, startTutorHandoff);
 
 router.get('/', getMe);
+router.put('/ui-language', setMyUiLanguage);
 router.post('/photo', photoUpload.single('photo'), uploadMyPhoto);
 router.get('/dashboard', getDashboard);
 router.post('/study-plans', createStudyPlan);
