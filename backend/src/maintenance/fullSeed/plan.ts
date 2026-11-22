@@ -3,6 +3,7 @@
 // and lists each one in the hidden seed_registry; remove.ts deletes exactly those. Users carry no password here: run.ts adds the bcrypt
 // hash of SEED_USER_PASSWORD on the server.
 import { createHash } from 'crypto';
+import { CODE_ALPHABET, hashCode } from '../../parents/codes';
 import { EMAIL_DOMAIN, FAMILY, FEMALE, INTL, MALE, PUBLIC_FIGURES, SCHOOLS, SUBJECTS, type SchoolDef, type SubjectKey } from './content';
 
 export const SEED_BATCH = 'full-v1';
@@ -15,7 +16,15 @@ export type ModelName =
   | 'StudentObjectiveMastery' | 'TutorSession' | 'TutorMessage' | 'AvatarSession' | 'LearningEvent' | 'UsageLedger' | 'ParentEmailSend' | 'ReminderLog';
 export interface PlannedDoc { model: ModelName; key: string; doc: Record<string, unknown> }
 export interface SeedUser { key: string; role: string; name: string; email: string; schoolId?: string; school?: string; state: string; userId: string }
-export interface FullSeedPlan { docs: PlannedDoc[]; users: SeedUser[] }
+/** A parent link code a parent can type (owner, 22 Nov 2026: "write their codes and link those codes to the students accounts"). */
+export interface SeedCode { code: string; studentName: string; studentEmail: string; className: string; school: string; state: string; parents: string[] }
+export interface FullSeedPlan { docs: PlannedDoc[]; users: SeedUser[]; codes: SeedCode[] }
+/** A real code in the app's format (ENR-XXXX-XXXX), the same on every run: the app stores only its hash. */
+export function seedCode(key: string): { display: string; normalized: string } {
+  const bytes = createHash('sha256').update(`enara-parent-code:${key}`).digest();
+  let raw = ''; for (let i = 0; raw.length < 8 && i < bytes.length; i++) if (bytes[i] < 248) raw += CODE_ALPHABET[bytes[i] % CODE_ALPHABET.length];
+  return { display: `ENR-${raw.slice(0, 4)}-${raw.slice(4)}`, normalized: raw };
+}
 
 /** A fixed 24-hex ObjectId from a key, so a re-run writes the same documents. */
 export const oid = (key: string) => createHash('sha1').update(`enara-full-v1:${key}`).digest('hex').slice(0, 24);
@@ -34,7 +43,7 @@ export function buildPlan(now: Date): FullSeedPlan {
   const ago = (days: number, hour = 10, min = 0) => { const d = new Date(now.getTime() - days * DAY); d.setUTCHours(hour, min, 0, 0); return d; };
   /** Like ago(), for things that already happened: never later than 20 minutes before the run. */
   const past = (days: number, hour = 10, min = 0) => { const d = ago(days, hour, min); const cap = now.getTime() - 20 * 60_000; return d.getTime() > cap ? new Date(cap) : d; };
-  const docs: PlannedDoc[] = []; const users: SeedUser[] = [];
+  const docs: PlannedDoc[] = []; const users: SeedUser[] = []; const codes: SeedCode[] = []; const parentsOf = new Map<string, string[]>();
   const add = (model: ModelName, key: string, doc: Record<string, unknown>) => { docs.push({ model, key, doc: { _id: oid(`${model}:${key}`), ...doc } }); };
   const usedEmails = new Set<string>(); const usedNames = new Set<string>();
   const slug = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[^a-z]+/g, '');
@@ -246,6 +255,7 @@ export function buildPlan(now: Date): FullSeedPlan {
             const consent = status === 'pending' ? 'pending' : s.age < 13 ? 'captured' : 'not_required';
             add('ParentLearnerLink', `${key}:${s.id}`, { id: `pl-${key.toLowerCase().replace(/\./g, '-')}-${s.id.toLowerCase()}`, parentUserId: u.id, studentId: s.id, institutionId: school.id, role: pi === 0 ? (ci === 0 && R() < 0.05 ? 'view' : 'owner') : 'full', status, consent,
               ...(status === 'ended' ? { endedAt: ago(9), endReason: s.archived ? 'left_school' : 'unlinked_by_parent', endedBy: s.archived ? admin.id : u.id } : {}), learnerNotifiedAt: linkedAt, createdAt: linkedAt, updatedAt: status === 'ended' ? ago(9) : linkedAt });
+            if (status !== 'ended') parentsOf.set(s.id, [...(parentsOf.get(s.id) ?? []), `${u.email}${status === 'pending' ? ' (pending)' : ''}`]);
             linkStates.push(`${s.first} (${status}${consent === 'pending' ? ', consent pending' : consent === 'captured' ? ', consent given' : ''})`);
           }
           users[users.length - 1].state = [`${kids.length} ${kids.length === 1 ? 'child' : 'children'}: ${linkStates.join('; ')}`, verified ? 'email verified' : 'email not verified', `signs in by ${signIn}`, nParents === 2 ? (pi === 0 ? 'first of two guardians' : 'second guardian') : ''].filter(Boolean).join(', ');
@@ -260,13 +270,20 @@ export function buildPlan(now: Date): FullSeedPlan {
           }
         }
       }
-      // Parent codes: active, redeemed, revoked, expired.
-      const codeFor = schoolStudents.filter((s) => !s.archived).slice(0, 4);
-      ([['active', ago(-10), {}], ['redeemed', ago(-2), { redeemedAt: ago(12) }], ['revoked', ago(-8), { revokedAt: ago(4), revokedBy: admin.id }], ['active', ago(5), {}]] as [string, Date, Record<string, unknown>][]).forEach(([status, expiresAt, extra], i) => {
-        const s = codeFor[i]; const cls = classes.find((c) => c.group === s.group)!;
-        add('ParentLinkCode', `${S}.code${i}`, { id: `plc-${S.toLowerCase()}-${i + 1}`, codeHash: sha(`plc:${S}:${i}`), hint: String(10 + ((i * 37) % 89)), studentId: s.id, institutionId: school.id, createdBy: uid(cls.teacher), status, expiresAt, classId: cls.id, batchId: s.group, createdAt: new Date(expiresAt.getTime() - 14 * DAY), ...extra });
-        users.push({ key: `${S}.code${i}`, role: 'parent code', name: `for ${s.name}`, email: '', schoolId: school.id, school: school.name, state: status === 'active' && expiresAt < now ? 'code expired' : `code ${status}`, userId: '' });
-      });
+      // Parent link codes (real, typeable): every active learner gets one valid for 30 days; plus a redeemed, a revoked and an expired example.
+      const studentEmail = (s: StudentRec) => users.find((x) => x.key === s.key)?.email ?? '';
+      const className = (s: StudentRec) => [...new Set(classes.filter((x) => x.group === s.group).map((x) => x.name.split(' – ').pop()!))].join(', '); // the group, e.g. "Grade 3A"
+      const addCode = (s: StudentRec, n: number, status: string, expiresAt: Date, extra: Record<string, unknown>, label: string) => {
+        const c = seedCode(`${S}:${s.id}:${n}`); const cls = classes.find((x) => x.group === s.group)!;
+        add('ParentLinkCode', `${S}.code.${s.id}.${n}`, { id: `plc-${s.id.toLowerCase()}-${n}`, codeHash: hashCode(c.normalized), hint: c.normalized.slice(-2), studentId: s.id, institutionId: school.id, createdBy: uid(cls.teacher), status, expiresAt, classId: cls.id, batchId: s.group, createdAt: new Date(Math.min(now.getTime() - 3 * DAY, expiresAt.getTime() - 14 * DAY)), ...extra });
+        codes.push({ code: c.display, studentName: s.name, studentEmail: studentEmail(s), className: className(s), school: school.name, state: label, parents: parentsOf.get(s.id) ?? [] });
+      };
+      const live = school.status === 'active' ? schoolStudents.filter((s) => !s.archived) : [];
+      for (const s of live) addCode(s, 0, 'active', new Date(now.getTime() + 30 * DAY), {}, 'valid (30 days)');
+      const ex = schoolStudents.filter((s) => !s.archived).slice(0, 3);
+      if (ex[0]) addCode(ex[0], 1, 'redeemed', ago(2), { redeemedAt: ago(12) }, 'already used');
+      if (ex[1]) addCode(ex[1], 1, 'revoked', ago(-8), { revokedAt: ago(4), revokedBy: admin.id }, 'cancelled by the school');
+      if (ex[2]) addCode(ex[2], 1, 'active', ago(5), {}, 'expired');
     }
 
     // ---------------------------------------------------------------- history (8 weeks)
@@ -373,5 +390,5 @@ export function buildPlan(now: Date): FullSeedPlan {
     allStudents.push(...schoolStudents);
   }
   void allStudents;
-  return { docs, users };
+  return { docs, users, codes };
 }

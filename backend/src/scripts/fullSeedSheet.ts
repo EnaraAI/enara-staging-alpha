@@ -4,7 +4,7 @@
 // Names, emails and states come from the fixed plan, so they are the same whatever day this runs (only dates move).
 import { writeFileSync } from 'fs';
 import path from 'path';
-import { buildPlan, SEED_BATCH, type SeedUser } from '../maintenance/fullSeed/plan';
+import { type SeedCode, buildPlan, SEED_BATCH, type SeedUser } from '../maintenance/fullSeed/plan';
 import { SCHOOLS } from '../maintenance/fullSeed/content';
 
 export function sheet(users: SeedUser[]): string {
@@ -45,8 +45,30 @@ export function sheet(users: SeedUser[]): string {
   return out.join('\n');
 }
 
+/** The parent link codes, one row per student: what a parent types to link to that child. */
+export function codeSheet(codes: SeedCode[]): string {
+  const cell = (s: string) => s.replace(/\|/g, '\\|');
+  const out = [
+    '# lms-test parent link codes',
+    '',
+    'A parent types the code in the parent portal (Link a child) to link to that student. Each valid code works once and is valid for 30 days',
+    'from the last data run. Parents who are already linked sign in with their email and the shared password, or with an email code.',
+    '',
+  ];
+  for (const school of [...new Set(codes.map((c) => c.school))]) {
+    const rows = codes.filter((c) => c.school === school);
+    out.push(`## ${school} (${rows.length})`, '', '| Code | State | Student | Student email | Class | Parents already linked |', '|---|---|---|---|---|---|');
+    for (const c of rows) out.push(`| \`${c.code}\` | ${c.state} | ${cell(c.studentName)} | ${c.studentEmail} | ${cell(c.className)} | ${c.parents.length ? c.parents.join(', ') : 'none yet'} |`);
+    out.push('');
+  }
+  return out.join('\n');
+}
+
 if (require.main === module) {
+  const plan = buildPlan(new Date());
   const file = path.join(__dirname, '../../../docs/lms/SEED_USERS.md');
-  writeFileSync(file, sheet(buildPlan(new Date()).users));
-  console.log(`wrote ${file}`);
+  writeFileSync(file, sheet(plan.users));
+  const codesFile = path.join(__dirname, '../../../docs/lms/PARENT_CODES.md');
+  writeFileSync(codesFile, codeSheet(plan.codes));
+  console.log(`wrote ${file} and ${codesFile}`);
 }
