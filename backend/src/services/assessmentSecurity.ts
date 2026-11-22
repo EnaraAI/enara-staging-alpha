@@ -1,3 +1,4 @@
+import { forLearner } from '../assessment/questionBridge';
 import { Assessment } from '../models/Assessment';
 import { toPlainObject } from '../utils/serialize';
 import { graderV2On, matchKeyV2, type KeyItem } from './graderV2';
@@ -6,7 +7,7 @@ export function stripAnswersForStudent(assessment: InstanceType<typeof Assessmen
   const obj = toPlainObject(assessment) as Record<string, unknown>;
   const questions = (obj.questions as Array<Record<string, unknown>> | undefined)?.map((q) => {
     const { correctAnswer, explanation, modelAnswer, distractors, ...rest } = q;
-    return rest;
+    return forLearner(rest as never);
   });
   return { ...obj, questions };
 }

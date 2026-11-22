@@ -1,3 +1,4 @@
+import { forLearner } from '../assessment/questionBridge';
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
@@ -60,7 +61,7 @@ function questionsForStudent(questions: IQuestion[]) {
   return questions.map((q) => {
     const plain = (typeof (q as any).toObject === 'function' ? (q as any).toObject() : { ...q }) as IQuestion & Record<string, unknown>;
     const { correctAnswer, explanation, modelAnswer, distractors, source, ...rest } = plain;
-    return { ...rest, points: questionPoints(q) };
+    return forLearner({ ...rest, points: questionPoints(q) } as never);
   });
 }
 

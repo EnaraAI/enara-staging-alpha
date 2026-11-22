@@ -94,7 +94,7 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
       </div>
       <div>
         <p className="text-xs font-semibold text-slate-500">{conversation ? "Student's answer (said to the AI examiner)" : "Student's answer"}</p>
-        <p className="text-sm text-slate-900 whitespace-pre-wrap bg-slate-50 rounded p-2 mt-1" dir="auto">{String(a.studentAnswer || '—')}</p>
+        <p className="text-sm text-slate-900 whitespace-pre-wrap bg-slate-50 rounded p-2 mt-1" dir="auto">{String(a.answerText || a.studentAnswer || '—')}</p>
         {conversation && (
           <details className="mt-2 text-sm" open>
             <summary className="cursor-pointer text-xs font-semibold text-teal-800">Conversation with the AI examiner</summary>

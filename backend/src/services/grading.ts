@@ -1,3 +1,4 @@
+import { gradeEngineQuestion } from '../assessment/questionBridge';
 import { AppError } from '../middleware/errorHandler';
 import { AssessmentAttempt, type IAttemptAnswer } from '../models/AssessmentAttempt';
 import type { IQuestion } from '../models/Assessment';
@@ -24,6 +25,18 @@ export function gradeAnswers(questions: IQuestion[], answers: Record<string, str
   return questions.map((q) => {
     const studentAnswer = answers[q.id] ?? '';
     const maxPoints = questionPoints(q);
+    // Assessment engine (P1b): closed items graded by code, per part, with reason codes; a malformed item goes to a person.
+    if (q.type === 'engine') {
+      const g = gradeEngineQuestion(q as never, studentAnswer);
+      if ('invalid' in g) return { questionId: q.id, questionText: q.text, topic: q.topic, studentAnswer, isCorrect: false, explanation: q.explanation, points: null, maxPoints, needsReview: true };
+      const r = g.result;
+      return {
+        questionId: q.id, questionText: q.text, topic: q.topic, studentAnswer, correctAnswer: g.correctAnswer, ...(g.answerText ? { answerText: g.answerText } : {}),
+        isCorrect: r.total >= r.max, explanation: q.explanation, points: r.total, maxPoints: r.max, method: 'rule' as const,
+        criteria: r.criteria.map((c) => ({ code: c.code, points: c.points, max: c.max, reasonCode: c.reason_code })),
+        ...(r.error_codes.length ? { errorCodes: r.error_codes } : {}), confidence: r.confidence, flagged: r.flagged, grader: r.grader,
+      };
+    }
     // graderV2 ON: free sentences scored on the target form only (0/1/2), by rule.
     const tf = graderV2On() && String(studentAnswer).trim() ? targetFormPoints(q, String(studentAnswer), maxPoints) : null;
     if (tf !== null) {

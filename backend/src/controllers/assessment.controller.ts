@@ -1,3 +1,5 @@
+import { checkEngineQuestion } from '../assessment/questionBridge';
+import { engineV2 } from '../services/engineV2';
 import { MISCONCEPTION_CATEGORIES } from '../services/misconceptionTaxonomy';
 import { assertObjectivesUsable } from '../services/learningAccess';
 import { Response } from 'express';
@@ -31,7 +33,7 @@ import {
 const ASSESSMENT_STATUSES = ['upcoming', 'active', 'completed', 'pending', 'in-progress'] as const;
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'] as const;
 const ANSWER_REVEAL = ['after-submit', 'after-close', 'never'] as const;
-const QUESTION_TYPES = ['multiple-choice', 'true-false', 'short-answer', 'open-response'] as const;
+const QUESTION_TYPES = ['multiple-choice', 'true-false', 'short-answer', 'open-response', 'engine'] as const;
 const LIFECYCLES = ['draft', 'published'] as const;
 
 // Teachers see and edit assessments they wrote or that belong to a curriculum
@@ -130,6 +132,26 @@ function parseDistractors(q: Record<string, unknown>, options: string[]) {
   });
 }
 
+// Assessment engine P1b (assessTypesV1): a closed item (fill in the blanks, matching, numbers, ordering, drop-downs, multi-answer
+// choice ...) checked against the engine schema; refused with the problems in plain words.
+function engineQuestion(q: Record<string, unknown>, index: number) {
+  if (!engineV2('assessTypesV1')) throw new AppError('These question types are not switched on', 400, 'VALIDATION_ERROR');
+  const base = {
+    id: getRequiredString(q, 'id', { max: 80 }),
+    type: 'engine' as const,
+    text: getRequiredString(q, 'text', { max: 4000 }),
+    topic: getOptionalString(q, 'topic', { max: 160 }),
+    explanation: getOptionalString(q, 'explanation', { max: 4000 }) || '',
+    objectiveIds: q.objectiveIds === undefined ? undefined : [...new Set(getOptionalStringArray(q, 'objectiveIds', { maxItems: 10, maxLength: 128 }) || [])],
+    difficulty: getOptionalNumber(q, 'difficulty', { min: 1, max: 5 }),
+    points: getOptionalNumber(q, 'points', { min: 0, max: 100 }),
+    source: q.source === 'ai' ? ('ai' as const) : ('manual' as const),
+  };
+  const checked = checkEngineQuestion({ ...base, engine: ensurePlainObject(q.engine, `questions[${index}].engine`) as never });
+  if (!checked.ok) throw new AppError(`Question ${index + 1}: ${checked.problems.slice(0, 3).join('; ')}`, 400, 'VALIDATION_ERROR');
+  return { ...base, engine: checked.engine, sources: undefined as ReturnType<typeof parseSourceRefs> };
+}
+
 function normalizeQuestions(raw: unknown) {
   if (raw === undefined || raw === null) return [];
   if (!Array.isArray(raw) || raw.length > 200) {
@@ -142,6 +164,7 @@ function normalizeQuestions(raw: unknown) {
       throw new AppError('Question options are invalid', 400, 'VALIDATION_ERROR');
     }
     const type = requireEnum(q.type, QUESTION_TYPES, 'question.type');
+    if (type === 'engine') return engineQuestion(q, index);
     const correctAnswer = q.correctAnswer;
     if (type === 'open-response') {
       return {

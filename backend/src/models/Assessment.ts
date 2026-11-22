@@ -15,7 +15,7 @@ export interface IRubricCriterion {
 export const ASSESSMENT_KINDS = ['diagnostic', 'formative', 'quiz', 'unit_test', 'midterm', 'final', 'teacher_exam', 'standardized', 'retention_check', 'practice'] as const;
 export type AssessmentKind = (typeof ASSESSMENT_KINDS)[number];
 
-export type QuestionType = 'multiple-choice' | 'true-false' | 'short-answer' | 'open-response';
+export type QuestionType = 'multiple-choice' | 'true-false' | 'short-answer' | 'open-response' | 'engine';
 
 export interface IQuestion {
   id: string;
@@ -55,6 +55,8 @@ export interface IQuestion {
   // Assessment engine (P1a): a question copied from the item bank keeps the bank item and version it came from.
   itemId?: string;
   itemVersion?: number;
+  // type 'engine' (assessment engine P1b): a closed item in the engine schema (src/assessment/questionBridge.ts). answer_key never reaches a learner.
+  engine?: { type: string; options?: unknown; answer_key: unknown; flags?: Record<string, boolean>; language: string; error_codes?: string[] } | null;
 }
 
 export interface IAssessment extends Document {
@@ -96,7 +98,7 @@ const questionSchema = new Schema<IQuestion>(
     id: { type: String, required: true },
     type: {
       type: String,
-      enum: ['multiple-choice', 'true-false', 'short-answer', 'open-response'],
+      enum: ['multiple-choice', 'true-false', 'short-answer', 'open-response', 'engine'],
       required: true,
     },
     text: { type: String, required: true },
@@ -137,6 +139,7 @@ const questionSchema = new Schema<IQuestion>(
     distractors: { type: [{ option: String, category: String, description: String, _id: false }], default: undefined },
     itemId: String,
     itemVersion: Number,
+    engine: { type: Schema.Types.Mixed, default: undefined },
   },
   { _id: false }
 );

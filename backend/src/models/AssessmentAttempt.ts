@@ -33,6 +33,8 @@ export interface IAttemptAnswer {
   flagged?: boolean;
   grader?: string;
   feedbackText?: string;
+  // The learner's answer to an engine question in plain words (option texts, not ids). Their own data: removed with them.
+  answerText?: string;
   teacherOverride?: { total: number; reasonCode: 'too_strict' | 'too_lenient' | 'wrong_criterion' | 'rubric_unclear'; at: Date; by: string };
 }
 
@@ -173,6 +175,7 @@ const attemptAnswerSchema = new Schema<IAttemptAnswer>(
     flagged: Boolean,
     grader: String,
     feedbackText: { type: String, maxlength: 4000 },
+    answerText: { type: String, maxlength: 4000 },
     teacherOverride: {
       type: { total: Number, reasonCode: { type: String, enum: ['too_strict', 'too_lenient', 'wrong_criterion', 'rubric_unclear'] }, at: Date, by: String, _id: false },
       default: undefined,
