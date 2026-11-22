@@ -24,7 +24,8 @@
     "content:import": "tsx src/scripts/contentImport.ts",
     "ledger:backfill": "tsx src/scripts/gradeLedgerBackfill.ts",
     "eval:subjects": "tsx src/scripts/subjectEval.ts",
-    "test:closed-coverage": "vitest run test/assessment/closedGraders.test.ts --coverage.enabled --coverage.provider=v8 --coverage.include='src/assessment/grading-engine/graders/closed/**' --coverage.thresholds.lines=95 --coverage.thresholds.branches=95 --coverage.thresholds.functions=95 --coverage.thresholds.statements=95"
+    "test:closed-coverage": "vitest run test/assessment/closedGraders.test.ts --coverage.enabled --coverage.provider=v8 --coverage.include='src/assessment/grading-engine/graders/closed/**' --coverage.thresholds.lines=95 --coverage.thresholds.branches=95 --coverage.thresholds.functions=95 --coverage.thresholds.statements=95",
+    "bench:assessment": "tsx src/scripts/assessmentBench.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",

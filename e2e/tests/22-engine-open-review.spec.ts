@@ -45,6 +45,9 @@ test.describe.serial('22 · assessment engine: a flagged essay goes to the teach
     const essay = review.items.find((i: any) => i.question.id === 'q2').answer;
     expect(essay).toMatchObject({ flagged: true, flagReasons: ['model_unavailable'], points: 0, needsReview: true });
     expect(review.items.find((i: any) => i.question.id === 'q1').answer).toMatchObject({ points: 1, method: 'rule', grader: 'code' });
+    // The grading view shows engine keys in plain words, and no key for an essay.
+    expect(review.items.find((i: any) => i.question.id === 'q1').keyText).toBeTruthy();
+    expect(review.items.find((i: any) => i.question.id === 'q2').keyText ?? '').toBe('');
     const mine = await enaraApi.get(`/api/me/assignments/${st.assignmentId}`, student);
     expect(JSON.stringify(mine.attempts ?? mine)).not.toMatch(/"score":\s*\d/);
   });

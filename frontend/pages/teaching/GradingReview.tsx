@@ -100,7 +100,7 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
       </div>
       <div>
         <p className="text-xs font-semibold text-slate-500">{conversation ? "Student's answer (said to the AI examiner)" : "Student's answer"}</p>
-        <p className="text-sm text-slate-900 whitespace-pre-wrap bg-slate-50 rounded p-2 mt-1" dir="auto">{String(a.answerText || a.studentAnswer || '—')}</p>
+        <p className="text-sm text-slate-900 whitespace-pre-wrap bg-slate-50 rounded p-2 mt-1" dir="auto">{String(item.answerText || a.answerText || a.studentAnswer || '—')}</p>
         {conversation && (
           <details className="mt-2 text-sm" open>
             <summary className="cursor-pointer text-xs font-semibold text-teal-800">Conversation with the AI examiner</summary>
@@ -113,7 +113,7 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
             </div>
           </details>
         )}
-        {q.type !== 'open-response' && <p className="text-xs text-slate-600 mt-1">Answer key: <b>{String(q.correctAnswer)}</b></p>}
+        {q.type === 'engine' ? (item.keyText ? <p className="text-xs text-slate-600 mt-1">Answer key: <b>{String(item.keyText)}</b></p> : null) : q.type !== 'open-response' && <p className="text-xs text-slate-600 mt-1">Answer key: <b>{String(q.correctAnswer)}</b></p>}
         {q.modelAnswer && <p className="text-xs text-slate-600 mt-1" dir="auto">Model answer (never shown to students): {q.modelAnswer}</p>}
         {a.method && <p className="text-xs text-slate-600 mt-1">Graded by {METHOD[a.method] ?? a.method}</p>}
       </div>

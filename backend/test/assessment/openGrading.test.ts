@@ -7,8 +7,8 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 const calls: { system: string; user: string }[] = [];
 let replies: unknown[] = [];
 vi.mock('../../src/services/aiJson', () => ({
-  askForJson: vi.fn(async (p: { system: string; user: string; validate: (v: unknown) => unknown }) => {
-    calls.push({ system: p.system, user: p.user });
+  askForJson: vi.fn(async (p: { system: string; user: string; allowFallback?: boolean; validate: (v: unknown) => unknown }) => {
+    calls.push({ system: p.system, user: p.user, ...('allowFallback' in p ? { allowFallback: p.allowFallback } : {}) });
     const raw = replies.shift();
     if (raw instanceof Error) throw raw;
     return { value: p.validate(raw), model: 'test-model' };
@@ -70,6 +70,20 @@ describe('what the model receives', () => {
     expect(calls[0].user).not.toMatch(/att-1|sch-1|asg-1|studentId|name/);
     expect(r.points).toBe(10);
     expect(r.confidence).toBe(0.9);
+  });
+  it('bench runs: never retried on the fallback provider, nothing stored as a proposal; learner runs keep both', async () => {
+    const { GradingProposal } = await import('../../src/models/GradingProposal');
+    const create = GradingProposal.create as unknown as ReturnType<typeof vi.fn>;
+    replies = [goodEssay()];
+    create.mockClear();
+    const r = await gradeOpenRun({ attempt, item: essayItem, answer: essayAnswer, uiLanguage: 'en', run: 1, options: { store: false, allowFallback: false } });
+    expect(r.status).toBe('proposed');
+    expect((calls[calls.length - 1] as unknown as { allowFallback?: boolean }).allowFallback).toBe(false);
+    expect(create).not.toHaveBeenCalled();
+    replies = [goodEssay()];
+    await gradeOpenRun({ attempt, item: essayItem, answer: essayAnswer, uiLanguage: 'en', run: 1 });
+    expect((calls[calls.length - 1] as unknown as { allowFallback?: boolean }).allowFallback).toBeUndefined();
+    expect(create).toHaveBeenCalledTimes(1);
   });
   it('maths: the final answer is scored by code and the model is told; method points without a right final answer', async () => {
     const item = { questionId: 'q2', stem: 'A rectangle is 4 cm by 6 cm. Area?', type: 'math_steps' as const, domain: 'math' as const, language: 'en', final: { value: 24, unit: 'cm^2' }, solution: '4 x 6 = 24' };

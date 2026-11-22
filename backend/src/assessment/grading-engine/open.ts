@@ -6,7 +6,7 @@
 //   - the two runs differ by more than 1 point on any criterion;
 //   - the answer may contain instructions to the grader.
 // The "within 1 point of the pass mark" flag needs the whole attempt and is applied by the caller (attemptBoundaryFlag).
-import { gradeOpenRun, type OpenItem, type RunResult } from './graders/domains';
+import { gradeOpenRun, type OpenItem, type RunResult, type RunOptions } from './graders/domains';
 
 export const CONFIDENCE_FLAG = 0.7;
 export const FLAG_REASONS = ['model_unavailable', 'model_error', 'low_confidence', 'runs_disagree', 'integrity', 'near_pass_mark'] as const;
@@ -62,9 +62,9 @@ export function combineRuns(runs: RunResult[], maxByCriterion: Record<string, nu
 }
 
 /** Grades one open answer: two runs, combined, flagged when needed. A model that is not available gives a flagged blank grade. */
-export async function gradeOpenAnswer(p: { attempt: { id: string; institutionId?: string; assignmentId?: string }; item: OpenItem; answer: unknown; uiLanguage: 'ar' | 'en'; maxByCriterion: Record<string, number>; modelReady: boolean }): Promise<OpenGrade> {
+export async function gradeOpenAnswer(p: { attempt: { id: string; institutionId?: string; assignmentId?: string }; item: OpenItem; answer: unknown; uiLanguage: 'ar' | 'en'; maxByCriterion: Record<string, number>; modelReady: boolean; options?: RunOptions }): Promise<OpenGrade> {
   if (!p.modelReady) return combineRuns([{ proposalId: '', status: 'failed', criterionScores: [], points: 0, confidence: 0, errorCodes: [], feedback: '', scoreExplanation: '', strengths: [], improvements: [], flags: [], error: 'AI_UNAVAILABLE' }], p.maxByCriterion);
-  const runs = await Promise.all([1, 2].map((run) => gradeOpenRun({ attempt: p.attempt, item: p.item, answer: p.answer, uiLanguage: p.uiLanguage, run })));
+  const runs = await Promise.all([1, 2].map((run) => gradeOpenRun({ attempt: p.attempt, item: p.item, answer: p.answer, uiLanguage: p.uiLanguage, run, options: p.options })));
   return combineRuns(runs, p.maxByCriterion);
 }
 

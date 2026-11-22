@@ -50,6 +50,8 @@ export async function askForJson<T>(params: {
   // validation attempts (default 2) for callers that must fail fast.
   model?: string;
   validationAttempts?: number;
+  // false: never retry on the fallback key/model (the assessment bench: it must not spend on another provider).
+  allowFallback?: boolean;
 }): Promise<{ value: T; model: string }> {
   const config = getConfig();
   if (!config.anthropicApiKey) throw new AppError('AI is not configured', 503, 'AI_UNAVAILABLE');
@@ -85,7 +87,7 @@ export async function askForJson<T>(params: {
         op,
       ).catch(async (error) => {
         // modelFallback (not under a spending guard: the guard reserved one request): one more try with the fallback key and/or model.
-        if (guard || !modelFallbackOn() || !hasFallback() || !shouldFallBack(error)) throw error;
+        if (guard || params.allowFallback === false || !modelFallbackOn() || !hasFallback() || !shouldFallBack(error)) throw error;
         const fbModel = fallbackModel() ?? (ds ? params.model ?? config.anthropicTutorModel : model); // a fallback always goes to Anthropic
         return meteredMessage(
           { feature: params.feature, modelName: fbModel, institutionId: params.institutionId, refs: params.refs, maxAttempts: 1, bound: { inputTokens: textTokenBound(params.system, params.user), outputTokens: params.maxTokens } },

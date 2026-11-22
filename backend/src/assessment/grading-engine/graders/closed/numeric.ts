@@ -3,6 +3,7 @@
 //   - tolerance: tolerance_abs, else tolerance_rel, else a tiny float tolerance;
 //   - unit: converted when both units are known (cm vs m, سم vs م ...). Right value, missing unit → half marks (unit_missing);
 //     right value, a different unit that does not convert → half marks (unit_wrong);
+//   - learner forms: "x = 7", "cm^2" / "cm²"; with no unit in the key, a trailing unit, %, ° or word is ignored;
 //   - expressions: equal when mathjs simplify(a - b) is 0, or the two agree at 6 sample points (variables only, no function calls
 //     beyond the safe list). Input over 120 characters is not parsed.
 import { create, all, type MathNode } from 'mathjs';
@@ -101,6 +102,14 @@ export function sameExpression(a: string, b: string): boolean {
   } catch { return false; }
 }
 
+/** How learners write: "x = 7" / "س = ٧" (the answer after the equals sign), "cm^2" / "cm²" / "سم²" (the unit as cm2, سم2). */
+export function learnerForm(text: string): string {
+  return text
+    .replace(/^\s*[A-Za-z\u0621-\u064A]\s*=\s*(?=[-+\d.(])/, '')
+    .replace(/([A-Za-z\u0621-\u064A])\s*\^\s*([23])\b/g, '$1$2')
+    .replace(/([A-Za-z\u0621-\u064A])\s*([²³])/g, (_m, l: string, p: string) => `${l}${p === '²' ? '2' : '3'}`);
+}
+
 const within = (given: number, want: number, key: Numeric['answer_key']): boolean => {
   if (key.tolerance_abs !== undefined) return Math.abs(given - want) <= key.tolerance_abs + 1e-12;
   if (key.tolerance_rel !== undefined) return Math.abs(given - want) <= key.tolerance_rel * Math.abs(want) + 1e-12;
@@ -113,8 +122,10 @@ export function gradeNumeric(item: Numeric, answer: unknown, max: number): Grade
   const rawText = typeof answer === 'object' && answer !== null
     ? `${String((answer as { value?: unknown }).value ?? '')} ${String((answer as { unit?: unknown }).unit ?? '')}`.trim()
     : String(answer);
-  const text = normalizeNumberText(rawText, item.language);
-  const { num, unit } = key.unit ? splitUnit(text) : { num: text, unit: null };
+  const text = learnerForm(normalizeNumberText(rawText, item.language));
+  // No unit in the key: a unit, %, ° or a word after the number is ignored ("25%", "65°", "27 students"); with a unit, it is checked.
+  const parts = splitUnit(text);
+  const { num, unit } = key.unit ? parts : parts.unit && numberOf(parts.num) !== null ? { num: parts.num, unit: null } : { num: text, unit: null };
   const wrong = () => single(max, 'answer', 0, 'wrong', item.error_codes);
 
   // Expressions (no unit): equal by algebra.
